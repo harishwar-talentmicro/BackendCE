@@ -514,5 +514,22 @@ Location.prototype.getLoactionList = function(req,res,next){
     }
 };
 
+/**
+ * Get the Picture based on location for an ezeid
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @service-param token <string> (Token of logged in user, Non mandatory only required in case if the user you
+ *  you are searching is individual)
+ * @service-param ezeone_id* <string> [Mandatory] (Ezeone id with location id eg. HIRECRAFT.L0, HIRECRAFT, HIRECRAFT.L1)
+ * @service-param location_sequence <int> (Default : 0, Values should be 0 or greater
+ */
+Location.prototype.getLocationPicture = function(req,res,next){
+    var token = (req.query.token) ? req.query.token : null;
 
+    
+
+    if(token)
+};
 module.exports = Location;

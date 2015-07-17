@@ -800,10 +800,11 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         var ezeid = alterEzeoneId(req.body.ezeid);
         var rating = req.body.rating;
         var comments = req.body.comments;
-        var trans_type = req.body.trans_type;
+        var module = req.body.module;
         var trans_id = req.body.trans_id ? req.body.trans_id : 0;
         var resourceid = req.body.resourceid ? req.body.resourceid : 0;
         var toEzeid = alterEzeoneId(req.body.toEzeid) ? alterEzeoneId(req.body.toEzeid) : '';
+        var type = req.body.type;
 
         var responseMessage = {
             status: false,
@@ -823,8 +824,12 @@ Reservation.prototype.saveFeedback = function(req,res,next){
             validateStatus *= false;
         }
 
-        if (!trans_type) {
-            responseMessage.error['trans_type'] = 'Invalid Trans_type';
+        if (!module) {
+            responseMessage.error['module'] = 'Invalid module';
+            validateStatus *= false;
+        }
+        if (!type) {
+            responseMessage.error['type'] = 'Invalid type';
             validateStatus *= false;
         }
         if (!validateStatus) {
@@ -834,8 +839,11 @@ Reservation.prototype.saveFeedback = function(req,res,next){
             return;
         }
 
-        if (ezeid && rating && trans_type) {
-            var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments) + ',' + st.db.escape(trans_type) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)+ ',' + st.db.escape(toEzeid);
+        if (ezeid && rating && module) {
+
+            var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments)
+                + ',' + st.db.escape(module) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)
+                + ',' + st.db.escape(toEzeid)  + ',' + st.db.escape(type);
 
             console.log('CALL psavefeedback(' + query + ')');
 
@@ -851,7 +859,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                             ezeid : ezeid,
                             rating : rating,
                             comments : comments,
-                            trans_type : trans_type,
+                            module : module,
                             trans_id : trans_id,
                             resourceid : resourceid,
                             toEzeid : toEzeid
@@ -886,10 +894,10 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                 responseMessage.error = {rating: 'Invalid rating'};
                 console.log('FnSaveFeedback: rating is mandatory field');
             }
-            else if (!trans_type) {
-                responseMessage.message = 'Invalid trans_type';
-                responseMessage.error = {Token: 'Invalid trans_type'};
-                console.log('FnSaveFeedback: trans_type is mandatory field');
+            else if (!module) {
+                responseMessage.message = 'Invalid module';
+                responseMessage.error = {module: 'Invalid module'};
+                console.log('FnSaveFeedback: module is mandatory field');
             }
             res.status(401).json(responseMessage);
         }
