@@ -60,7 +60,8 @@ exports.FnGetSecondaryLocation = locationModule.getAll;
 exports.FnAddLocation = locationModule.save;
 exports.FnDeleteLocation = locationModule.deleteLocation;
 exports.FnGetLocationListForEZEID = locationModule.getAllForEzeid;
-exports.FnGetLocationList = locationModule.getLoactionList
+exports.FnGetLocationList = locationModule.getLoactionList;
+exports.FnGetLocationPicture = locationModule.getLocationPicture;
 
 var BusinessManager = require('./modules/business-module.js');
 var businessManager = new BusinessManager(db,stdLib);

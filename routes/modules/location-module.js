@@ -514,5 +514,152 @@ Location.prototype.getLoactionList = function(req,res,next){
     }
 };
 
+/**
+ * Get the Picture based on location for an ezeid
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @Method : GET
+ * @service-param token <string> (Token of logged in user, Non mandatory only required in case if the user you
+ *  you are searching is individual)
+ * @service-param ezeone_id* <string> [Mandatory] (Ezeone id with location id eg. HIRECRAFT.L0, HIRECRAFT, HIRECRAFT.L1)
+ */
+Location.prototype.getLocationPicture = function(req,res,next){
+    var token = (req.query.token) ? req.query.token : null;
 
+    var ezeoneId = null, locationSequence = 0, pin = null, validationFlag = true;
+    var error = {};
+    var respMsg = {
+        status : false,
+        error : null,
+        message : 'Please check the errors',
+        data : null
+    };
+    if(!req.query.ezeone_id){
+        error['ezeone_id'] = 'Invalid EZEOne ID';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        respMsg.error = error;
+        res.status(400).json(respMsg);
+        return;
+    }
+    else{
+
+        try{
+            var ezeParts = req.query.ezeone_id.split('.');
+            ezeoneId = alterEzeoneId(ezeParts[0]);
+            if(ezeParts.length > 1){
+                if(ezeParts[1].toString()){
+
+                    if(ezeParts[1][0].toString().toUpperCase() == 'L'){
+                        var locNo = parseInt(ezeParts[1].substr(1));
+                        locationSequence = (locNo !== NaN && locNo >= 0) ? locNo : 0;
+                    }
+                }
+
+                if(ezeParts.length > 2){
+                    if(ezeParts[2]){
+                        pin = ezeParts[2];
+                    }
+                }
+
+            }
+
+            var queryParams = st.db.escape(token) +',' + st.db.escape(ezeoneId) + ',' +
+                st.db.escape(locationSequence) +',' + st.db.escape(pin);
+            console.log(queryParams);
+            st.db.query('CALL pSearchInfnPic('+queryParams+')',function(err,result){
+                if(err){
+                    respMsg.status = false;
+                    respMsg.message = 'Internal Server error';
+                    respMsg.error = {
+                        server : 'Server Error'
+                    };
+                    respMsg.data = null;
+                    res.status(500).json(respMsg);
+                }
+                else{
+                    if(result){
+                        if(result[0]){
+                            if(result[0][0]){
+                                if(result[0][0].Picture){
+                                    respMsg.status = true;
+                                    respMsg.message = 'EZEOne ID Image loaded successfully';
+                                    respMsg.error = null;
+                                    respMsg.data = {
+                                        image : result[0][0].Picture,
+                                        image_name : result[0][0].PictureFileName
+                                    };
+                                    res.status(200).json(respMsg);
+                                }
+                                else{
+                                    respMsg.status = false;
+                                    respMsg.message = 'EZEOne ID Image not found';
+                                    respMsg.error = null;
+                                    respMsg.data = {
+                                        image : null,
+                                        image_name : null
+                                    };
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                respMsg.status = false;
+                                respMsg.message = 'EZEOne ID Image not found';
+                                respMsg.error = null;
+                                respMsg.data = {
+                                    image : null,
+                                    image_name : null
+                                };
+                                res.status(200).json(respMsg);
+                            }
+
+                        }
+                        else{
+                            respMsg.status = false;
+                            respMsg.message = 'EZEOne ID Image not found';
+                            respMsg.error = null;
+                            respMsg.data = {
+                                image : null,
+                                image_name : null
+                            };
+                            res.status(200).json(respMsg);
+                        }
+
+                    }
+                    else{
+                        respMsg.status = false;
+                        respMsg.message = 'EZEOne ID Image not found';
+                        respMsg.error = null;
+                        respMsg.data = {
+                            image : null,
+                            image_name : null
+                        };
+                        res.status(200).json(respMsg);
+                    }
+                }
+            });
+        }
+
+        catch(ex){
+            console.log('FnGetLocationPicture error:' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+            respMsg.status = false;
+            respMsg.message = 'Internal Server error';
+            respMsg.error = {
+                server : 'Server Error'
+            };
+            respMsg.data = null;
+            res.status(500).json(respMsg);
+        }
+
+    }
+
+
+};
 module.exports = Location;
