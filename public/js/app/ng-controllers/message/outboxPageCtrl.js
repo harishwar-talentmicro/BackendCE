@@ -40,6 +40,9 @@ angular.module('ezeidApp').
             /* defaultly getting all the transactions for SALES module */
             $scope.presentSelectedModule = 0;
 
+            console.log("SAi1");
+            console.log($routeParams.action);
+            console.log("SAi2");
 
             /* All Variable declaration goes here */
             $scope.resultPerPage = 5;
@@ -57,7 +60,23 @@ angular.module('ezeidApp').
             $scope.groupListing = "html/message/composeMessage.html";
             $scope.chatMessage = "html/chat/chatMessage.html";
 
-            $scope.activeTemplate = $scope.inboxListing;
+            //  $scope.activeTemplate = $scope.inboxListing;
+            if($routeParams.action)
+            {
+                if($routeParams.action == 'compose')
+                {
+                    $scope.activeTemplate = $scope.composeMessage;
+                }
+                else
+                {
+                    $scope.activeTemplate = $scope.inboxListing;
+                }
+            }
+            else
+            {
+                $scope.activeTemplate = $scope.inboxListing;
+            }
+            //$scope.activeTemplate = $routeParams.action ? $scope.composeMessage : $scope.inboxListing;
 
             $scope.titleText = "Inbox";
 

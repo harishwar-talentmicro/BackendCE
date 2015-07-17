@@ -2096,13 +2096,30 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
                 + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, GetResult) {
-                console.log(GetResult);
+
+                //var length = GetResult[0].length;
+
+                //var total = 0;
+
+
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
+                        if (GetResult.length > 0) {
+                            //for (var i = 0; i > length; i++)
+                            //{
+                            //    total = total + GetResult[0][i].amount;
+                            //    console.log(total);
+                            //}
                             responseMessage.status = true;
                             responseMessage.data = {
                                 from_date :from_date,
+                                to_date : to_date,
+                                stages : stages,
+                                probabilities : probabilities,
+                                transactions : GetResult[0],
+                                total_amount :null,
+                                total_items:null,
+                                funnel:GetResult[1]
                             }
                             responseMessage.error = null;
                             responseMessage.message = 'Transactionfilter details Send successfully';
