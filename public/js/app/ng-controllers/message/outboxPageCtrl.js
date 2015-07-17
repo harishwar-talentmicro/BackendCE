@@ -66,19 +66,20 @@ angular.module('ezeidApp').
                 if($routeParams.action == 'compose')
                 {
                     $scope.activeTemplate = $scope.composeMessage;
+                    $scope.titleText = "Compose";
                 }
                 else
                 {
                     $scope.activeTemplate = $scope.inboxListing;
+                    $scope.titleText = "Inbox";
                 }
             }
             else
             {
+                // Default Inbox is selected
                 $scope.activeTemplate = $scope.inboxListing;
+                $scope.titleText = "Inbox";
             }
-            //$scope.activeTemplate = $routeParams.action ? $scope.composeMessage : $scope.inboxListing;
-
-            $scope.titleText = "Inbox";
 
             /* initialization fot getting all the transaction history */
             getTransactionHistory().then(function(){
@@ -88,7 +89,6 @@ angular.module('ezeidApp').
             /* http request to get all the transaction history */
             function getTransactionHistory()
             {
-                ////console.log('------------');
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
@@ -110,10 +110,8 @@ angular.module('ezeidApp').
                             $scope.totalResult = resp.data[0].count;
                             resetPaginationStatus();
                         }
-
                         $scope.result = resp.data;
-
-                        defer.resolve()
+                        defer.resolve();
                     }
                     else
                     {
@@ -125,7 +123,6 @@ angular.module('ezeidApp').
                     defer.resolve();
                 });
                 return defer.promise;
-
             }
 
             $scope.convertTimeToLocal = function(dateTime)
@@ -279,18 +276,6 @@ angular.module('ezeidApp').
             $scope.modal = {
                 title: 'Groups',
                 class: 'business-manager-modal'
-            };
-
-            /* Navigate to compose message page */
-            $scope.openComposeMessage = function () {
-                $scope.activeTemplate =  $scope.composeMessage;
-                $scope.titleText = "Compose";
-            };
-
-            /* open inbox  */
-            $scope.openInbox = function () {
-                $scope.activeTemplate = $scope.inboxListing;
-                $scope.titleText = "Inbox";
             };
 
         }]);
