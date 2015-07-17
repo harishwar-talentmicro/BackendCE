@@ -528,8 +528,5 @@ Location.prototype.getLoactionList = function(req,res,next){
 Location.prototype.getLocationPicture = function(req,res,next){
     var token = (req.query.token) ? req.query.token : null;
 
-    
-
-    if(token)
 };
 module.exports = Location;
