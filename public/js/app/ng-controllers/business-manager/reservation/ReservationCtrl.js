@@ -146,6 +146,12 @@ var res = angular.module('ezeidApp').
 
             /* name of the ezeid */
             $scope.headTitle = $routeParams.name;
+
+
+
+            /* basic setting for loading review-form */
+            resetReviewModuleData();
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////////////GET DEFAULT CALENDAR DATA////////////////////////////////////////////
@@ -999,7 +1005,6 @@ var res = angular.module('ezeidApp').
                 if(parseInt(tid) > 0)
                 {
                     $scope.modal.isUpdate = true;
-                    getReservationData(tid);
                 }
                 else
                 {
@@ -1024,11 +1029,12 @@ var res = angular.module('ezeidApp').
                     /* Check for checking if reservation is in past */
                     var selectedTime = $scope.convertMinutesToTime($scope.currentBlockMinute);
                     var activeDate = moment($scope.activeDate).format('YYYY-MM-DD');
+                    var isPastReservation = !checkIfPastDateTime(activeDate,$scope.currentBlockMinute);
 
-                    if(!checkIfPastDateTime(activeDate,$scope.currentBlockMinute))
+                    if(isPastReservation)
                     {
                         Notification.error({ message: "You can't save or edit a reservation in the past", delay: MsgDelay });
-                        return;
+                        //return;
                     }
                     /* check if the reservation slot is available or not */
                     /* check if the reserver is the loggedin user */
@@ -1038,6 +1044,20 @@ var res = angular.module('ezeidApp').
                     if(typeof(reserverId) != 'undefined' && loggedId != reserverId)
                     {
                         Notification.error({ title : "Warning", message: "You can't edit someone else's reservation", delay: MsgDelay });
+                        return;
+                    }
+
+                    /**
+                     * If the reservation is in the past and try edit his own reservation then open REVIEW MODEL
+                     */
+                    if(isPastReservation)
+                    {
+                        /* open up modal box */
+                        resetReviewModuleData();
+                        /* setting up the data */
+                        $scope.ngTransId = tid;
+
+                        $scope.toggleReviewModalVisibility();
                         return;
                     }
 
@@ -1058,6 +1078,9 @@ var res = angular.module('ezeidApp').
                     $scope.endTime = $scope.convertMinutesToTime($scope.currentBlockMinute + $scope.duration);
                     $scope.modalVisibility();
                     $('#start-time').val($scope.startTime);
+
+                    /* get all the reservation slots data */
+                    getReservationData(tid);
                 }
                 else
                 {
@@ -1765,5 +1788,27 @@ var res = angular.module('ezeidApp').
                 return true;
             }
 
+           /************************************************************************************************************
+            /**
+             * Modal box for making a review
+             */
+            $scope.reviewModal = {
+                title: '',
+                class: 'business-manager-modal'
+            };
+
+            $scope.reviewModalVisibility = false;
+
+            /* toggle map visibility status */
+            $scope.toggleReviewModalVisibility = function () {
+                $scope.reviewModalVisibility = !$scope.reviewModalVisibility;
+            };
+
+            function resetReviewModuleData()
+            {
+                $scope.ngTransId = '';
+                $scope.ngResourceId = '';
+                $scope.ngToEzeId = '';
+            }
 
         }]);
