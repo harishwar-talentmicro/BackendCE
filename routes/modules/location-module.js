@@ -528,7 +528,7 @@ Location.prototype.getLoactionList = function(req,res,next){
 Location.prototype.getLocationPicture = function(req,res,next){
     var token = (req.query.token) ? req.query.token : null;
 
-    var ezeoneId = null, locationSequence = 0, validationFlag = true;
+    var ezeoneId = null, locationSequence = 0, pin = null, validationFlag = true;
     var error = {};
     var respMsg = {
         status : false,
@@ -547,39 +547,117 @@ Location.prototype.getLocationPicture = function(req,res,next){
         return;
     }
     else{
-        var ezeParts = req.query.ezeone_id.split('.');
-        ezeoneId = ezeParts[0];
-        if(ezeParts.length > 1){
-            if(ezeParts[1].toString()){
 
-                if(ezeParts[1][0].toString().toUpperCase() == 'L'){
-                    var locNo = parseInt(ezeParts[1].substr(1));
-                    locationSequence = (locNo !== NaN && locNo >= 0) ? locNo : 0;
+        try{
+            var ezeParts = req.query.ezeone_id.split('.');
+            ezeoneId = alterEzeoneId(ezeParts[0]);
+            if(ezeParts.length > 1){
+                if(ezeParts[1].toString()){
+
+                    if(ezeParts[1][0].toString().toUpperCase() == 'L'){
+                        var locNo = parseInt(ezeParts[1].substr(1));
+                        locationSequence = (locNo !== NaN && locNo >= 0) ? locNo : 0;
+                    }
                 }
+
+                if(ezeParts.length > 2){
+                    if(ezeParts[2]){
+                        pin = ezeParts[2];
+                    }
+                }
+
             }
+
+            var queryParams = st.db.escape(token) +',' + st.db.escape(ezeoneId) + ',' +
+                st.db.escape(locationSequence) +',' + st.db.escape(pin);
+            console.log(queryParams);
+            st.db.query('CALL pSearchInfnPic('+queryParams+')',function(err,result){
+                if(err){
+                    respMsg.status = false;
+                    respMsg.message = 'Internal Server error';
+                    respMsg.error = {
+                        server : 'Server Error'
+                    };
+                    respMsg.data = null;
+                    res.status(500).json(respMsg);
+                }
+                else{
+                    if(result){
+                        if(result[0]){
+                            if(result[0][0]){
+                                if(result[0][0].Picture){
+                                    respMsg.status = true;
+                                    respMsg.message = 'EZEOne ID Image loaded successfully';
+                                    respMsg.error = null;
+                                    respMsg.data = {
+                                        image : result[0][0].Picture,
+                                        image_name : result[0][0].PictureFileName
+                                    };
+                                    res.status(200).json(respMsg);
+                                }
+                                else{
+                                    respMsg.status = false;
+                                    respMsg.message = 'EZEOne ID Image not found';
+                                    respMsg.error = null;
+                                    respMsg.data = {
+                                        image : null,
+                                        image_name : null
+                                    };
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                respMsg.status = false;
+                                respMsg.message = 'EZEOne ID Image not found';
+                                respMsg.error = null;
+                                respMsg.data = {
+                                    image : null,
+                                    image_name : null
+                                };
+                                res.status(200).json(respMsg);
+                            }
+
+                        }
+                        else{
+                            respMsg.status = false;
+                            respMsg.message = 'EZEOne ID Image not found';
+                            respMsg.error = null;
+                            respMsg.data = {
+                                image : null,
+                                image_name : null
+                            };
+                            res.status(200).json(respMsg);
+                        }
+
+                    }
+                    else{
+                        respMsg.status = false;
+                        respMsg.message = 'EZEOne ID Image not found';
+                        respMsg.error = null;
+                        respMsg.data = {
+                            image : null,
+                            image_name : null
+                        };
+                        res.status(200).json(respMsg);
+                    }
+                }
+            });
         }
 
-        /**@todo
-         * Call stored procedure to load image and don't load image for individual user till the token is not valid
-         */
+        catch(ex){
+            console.log('FnGetLocationPicture error:' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
 
-        //st.db.query('CALL pGetEzeoneImage',function(err,result){
-        //   if(err){
-        //
-        //   }
-        //    else{
-        //       if(result){
-        //           if(result.length > 0){
-        //           }
-        //       }
-        //   }
-        //});
+            respMsg.status = false;
+            respMsg.message = 'Internal Server error';
+            respMsg.error = {
+                server : 'Server Error'
+            };
+            respMsg.data = null;
+            res.status(500).json(respMsg);
+        }
 
-        respMsg.status = true;
-        respMsg.message = 'EZEOne ID Image loaded successfully';
-        respMsg.error = null;
-        respMsg.data = '';
-        res.status(200).json(respMsg);
     }
 
 
