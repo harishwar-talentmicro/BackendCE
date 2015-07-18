@@ -1052,7 +1052,7 @@ var res = angular.module('ezeidApp').
                      */
                     if(isPastReservation)
                     {
-                        /* open up modal box */
+                        /* reset all the review data */
                         resetReviewModuleData();
                         /* setting up the data */
                         $scope.ngTransId = tid;
@@ -1809,6 +1809,20 @@ var res = angular.module('ezeidApp').
                 $scope.ngTransId = '';
                 $scope.ngResourceId = '';
                 $scope.ngToEzeId = '';
+            }
+
+            /**
+             * Open up modal box for reviewing resource
+             */
+            $scope.reviewResource = function()
+            {
+                /* reset all the review data */
+                resetReviewModuleData();
+                /* setting up the data */
+                $scope.ngResourceId = $scope.activeResourceId;
+
+                $scope.toggleReviewModalVisibility();
+                return;
             }
 
         }]);
