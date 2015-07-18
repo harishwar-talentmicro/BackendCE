@@ -3,336 +3,62 @@
     <!-- Header menu goes here -->
     <header-section></header-section>
     <section class="page-content">
-        <!-- NEW DESIGN GOES HERE -->
-        <div class="container width-100 ">
+       <div class="panel-body ">
+           <!--Header Div-->
+           <div class="row setRowLeftRightMarginZero">
+               <div class="col-lg-12 no-padding">
+                   <div class="inbox-head-left main-index inbox-head-left-bg text-left">
+                       <h3 class="text-white"><i class="fa fa-graduation-cap"></i> Job Details</h3>
+                   </div>
+               </div>
+           </div>
+           <div class="row setRowLeftRightMarginZero">
+               <div class="col-lg-12 no-padding">
+                   <div class="row setRowLeftRightMarginZero imgTopMargin">
+                       <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 setPaddingLeftRight0">
+                           <div class="row setRowLeftRightMarginZero">
+                               Opening for PHP Developers Looking for Experienced Candidates
+                           </div>
+                           <div class="row setRowLeftRightMarginZero">
+                               Dreamz Infra India Pvt Ltd
+                           </div>
+                           <div class="row setRowLeftRightMarginZero">
+                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+                                   <span class="glyphicon glyphicon-calendar"></span> 3 - 6 yrs
+                               </div>
+                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+                                   <i class="fa fa-map-marker"></i> Bengaluru
+                               </div>
+                           </div>
+                           <div class="row setRowLeftRightMarginZero">
+                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+                                   <input type="button" class="btn btn-primary" value="Sign In to Apply">
+                               </div>
+                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+                                   <input type="button" class="btn btn-primary" value="Sign Up and Apply">
+                               </div>
+                           </div>
+                           <div class="row setRowLeftRightMarginZero">
+                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+                                   2,50,000 - 6,00,000
+                               </div>
+                               <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+                                   Openings: 6
+                               </div>
+                           </div>
+                       </div>
+                       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
+                           <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
+                       </div>
+                   </div>
 
-            <div class="panel-body ">
-                <!-- Left Side Content: Messages Indexes -->
-                <!--<div class="col-lg-3 no-padding hidden">-->
-                <div class="col-lg-3 no-padding">
-                    <!-- main indexes -->
-                    <div class="inbox-head-left main-index inbox-head-left-bg">
-                        <h3 class="text-white text-center"><i class="fa fa-envelope"></i> Job</h3>
-                    </div>
 
-                </div>
-                <!-- Right Side Content: Messages Indexes -->
-                <!--<div class="col-lg-9 no-padding  message-content hidden">-->
-                <div class="col-lg-9 no-padding  message-content">
-                    <div class="inbox-head-new">
-                        <h3 class="text-white">Details</h3>
-                    </div>
-                    <!-- All messages goes here -->
+               </div>
+           </div>
 
-                    <!--Active Template Comes here-->
-                    <div ng-include="activeTemplate">
-                    </div>
 
-                </div>
-
-                <div class="review-form-test hidden">
-                    <review-form> </review-form>
-                </div>
-
-                <!--- Old Design Goes Here //////////////////////////////////////////////////////////////////////////////// --->
-                <!-- MAIN SECTION OF OUTBOX MODULE -->
-                <div class="width-75 container p-top-30 hidden">
-                    <div class="panel panel-default shadow-border">
-                        <div class="panel-heading text-center menu-text">
-                            <h3 class="text-center font-roboto"><i class="fa fa-check-square-o"></i> Your Transactions</h3>
-                        </div>
-                        <div class="panel-body">
-                            <!-- Side menu goes here -->
-                            <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style">
-                                <ul class="list-unstyled">
-                                    <li ng-click="changeSelectedModule(0)"><p ng-class="presentSelectedModule == 0?'active':''"><i class="fa fa-briefcase"></i> Sales</p></li>
-                                    <!--<li ng-click="changeSelectedModule(1)"><p ng-class="presentSelectedModule == 1?'active':''"><i class="fa fa-check-square"></i> Reservation</p></li>-->
-                                    <li ng-click="changeSelectedModule(2)"><p ng-class="presentSelectedModule == 2?'active':''"><i class="fa fa-truck" ></i> Home Delivery</p></li>
-                                    <li ng-click="changeSelectedModule(3)"><p ng-class="presentSelectedModule == 3?'active':''"><i class="fa fa-wrench" ></i> Help Desk</p></li>
-                                    <li ng-click="changeSelectedModule(4)"><p ng-class="presentSelectedModule == 4?'active':''"><i class="fa fa-file-word-o"></i> Resume</p></li>
-                                </ul>
-                            </div>
-                            <!-- Main content goes here -->
-                            <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 ">
-                                <div class="outbox-main-content">
-                                    <!-- Transaction history goes here -->
-                                    <div class="pagination input-group text-right" ng-show="paginationStatus">
-                                        <button ng-disabled="!paginationPrevious" ng-click="getPreviousResultPage()" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
-                                        <button ng-disabled="!paginationNext" ng-click="getNextResultPage()" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
-                                    </div>
-                                    <!-- Individual Strips starts here -->
-                                    <div class="individual-transaction" ng-repeat="res in result track by $index">
-                                        <transaction-history-item ng-to="res.ToEzeid"
-                                                                  ng-initiate-detail="initiateDetail(res.tid)"
-                                                                  ng-message="res.Message"
-                                                                  ng-quantity="res.statustitle"
-                                                                  ng-date="convertTimeToLocal(res.TaskDateTime)"
-                                                                  ng-id="res.tid"
-                                                                  ng-status="res.statustitle"
-                                                                  ng-udate="convertTimeToLocal(res.updatedDate)"> </transaction-history-item>
-                                    </div>
-                                    <!-- Individual Strips ends here -->
-                                    <h4 class="text text-danger text-center" ng-show="!result.length > 0"><i class="fa fa-warning"></i> No Tranaction Found</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
-    <!-- details modal of the transaction history item goes here -->
-    <modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
-        <div class="row">
-            <!-- Detail goes here -->
-            <div class="container">
-                <!-- Start date goes here -->
-                <div class="start-date text-center text-bolder">{{convertTimeToLocal(activeTransactionBasicInfo.TaskDateTime)}}</div>
-                <!-- main content -->
-                <div class="main-content">
-                    <p>To: <b>{{activeTransactionBasicInfo.ToEzeid}}</b></p>
-                    <br>
-                    <p>Message:</p>
-                    <p>
-                        {{activeTransactionBasicInfo.Message}}
-                    </p>
-                    <br>
-                    <p>Status: <b>{{checkIfEmpty(activeTransactionBasicInfo.statustitle,"New")}}</b></p>
-                    <p>Last Updated: <b>{{convertTimeToLocal(activeTransactionBasicInfo.updatedDate)}}</b></p>
-                </div>
-            </div>
-
-            <!-- Item goes here -->
-            <div class="container" ng-hide="accessRight == 0">
-                <h4>Transaction Items</h4>
-
-                <div class="individual-transaction-items ">
-                    <!-- Individual items -->
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th width="5%">Id</th>
-                            <th width="40%">Item</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2)">Quantity</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Unit Price</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Total Price</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="info in activeTransactionDetailedInfo track by $index">
-                            <td>{{$index + 1}}</td>
-                            <td>{{info.ItemName}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2)">{{info.Qty}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Rate}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Amount}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- Detail ends here -->
-        </div>
-    </modal>
-    <!-- transaction history item modal ends here -->
-    <!-- Footer goes here -->
-
-    <!-- Modal Box of Add/Edit Group -->
-    <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-trash"></span>  Delete(Group)</button>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Group Title
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <div class="form-group">
-                        <input class="form-control" maxlength="50" ng-model="modalBox.item.title"/>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="form-group">
-                        <select class="form-control" name="TitleSelect">
-                            <option value = ""> -- Select Action -- </option>
-                            <option value = ""> Delete Group </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Add New Member
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <div class="form-group">
-                        <input class="form-control" placeholder="Enter EZEOne ID or group name" maxlength="50" ng-model="modalBox.item.title"/>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-search"></span>  Find</button>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    ###### is valid
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="form-group">
-                        <select class="form-control" name="TitleSelect">
-                            <option value = ""> -- Select Action -- </option>
-                            <option value = ""> Join Group </option>
-                            <option value = ""> Add </option>
-                            <option value = ""> Delete </option>
-                            <option value = ""> Accept New Request(s) </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    Access denied
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Group Members
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" style="overflow-y: auto; height:200px; border: 1px solid #ddd;">
-                    <table class="rwd-table">
-                        <tbody>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                KRUNAL11
-                            </td>
-                            <td>
-                                Active
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                TEST10
-                            </td>
-                            <td>
-                                New Request
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                GOWRI
-                            </td>
-                            <td>
-                                Deleted
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                KRUNALPAID
-                            </td>
-                            <td>
-                                Deleted
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                IND1
-                            </td>
-                            <td>
-                                Declined
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                TEST10
-                            </td>
-                            <td>
-                                New Request
-                            </td>
-                        </tr>
-
-                        </tbody>
-                    </table>
-
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
-                        <input type="checkbox" checked name="vehicle" value="Bike">
-                        Hide Declined
-                    </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
-                        <input type="checkbox" checked name="vehicle" value="Bike">
-                        Hide Deleted
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-        </div>
-    </modal>
 
     <footer-section></footer-section>
 </section>

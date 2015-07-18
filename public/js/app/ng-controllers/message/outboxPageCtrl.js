@@ -5,7 +5,7 @@
  * @since 20150526
  */
 angular.module('ezeidApp').
-    controller('outboxPageCtrl', [
+    controller('OutboxPageCtrl', [
         '$rootScope',
         '$scope',
         '$http',

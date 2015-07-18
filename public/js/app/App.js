@@ -198,7 +198,7 @@
             })
             .when('/outbox/:action',{
                 templateUrl: 'html/message/outbox.html',
-                controller : 'outboxPageCtrl'
+                controller : 'OutboxPageCtrl'
             })
             .when('/outbox',{
                 templateUrl: 'html/message/outbox.html',
