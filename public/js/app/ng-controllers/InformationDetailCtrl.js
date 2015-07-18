@@ -70,6 +70,7 @@ angular.module('ezeidApp').
             $scope.showWorkingHourModel = false;
             $scope.showMapPopupModel = false;
             $scope.form_rating = 0;
+            $scope.showLoadingImgOverPic = true;
 
             /**
              * Function for converting UTC time from server to LOCAL timezone
@@ -138,7 +139,6 @@ angular.module('ezeidApp').
                     },1000);
                 }
             });
-            //  }
 
             var convertTimeToUTC = function(localTime,dateFormat){
                 if(!dateFormat){
@@ -176,7 +176,7 @@ angular.module('ezeidApp').
                         $rootScope.$broadcast('$preLoaderStop');
                         $timeout(function () {
                             $scope.SearchInfo = data[0];
-                            getPictureOfSearchedTerm();
+                            getPictureOfSearchedTerm(_ezeone);
 
                             if($scope.SearchInfo.IDTypeID == 2)
                             {
@@ -259,17 +259,26 @@ angular.module('ezeidApp').
                 });
             }
 
-            $scope.showLoadingImgOverPic = false;
+
             // Below function is for getting picture of searched term
-            function getPictureOfSearchedTerm()
+            function getPictureOfSearchedTerm(_ezeone)
             {
                 $scope.showLoadingImgOverPic = true;
-                $http({ method: 'get', url: GURL + 'location_image?TID=' + $scope.SearchInfo.TID}).success(function (data) {
-                    if (data.Result.length > 0) {
-                        $scope.companyTagLine = data.Result[0].TagLine;
-                        $scope.showLoadingImgOverPic = false;
+                $http({ method: 'get', url: GURL + 'location_image?token=' + $rootScope._userInfo.Token + '&ezeone_id='+_ezeone}).success(function (data) {
+
+                    if(data.status)
+                    {
+                        $scope.searchedEzeOneImage = data.data.image;
                     }
+
+                        $scope.showLoadingImgOverPic = false;
+
+                })
+                .error(function(data, status, headers, config)
+                {
+                    $scope.showLoadingImgOverPic = false;
                 });
+
             }
 
             //Auto refresh Banner

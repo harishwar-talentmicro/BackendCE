@@ -125,22 +125,25 @@
                                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
                                                         <div class="row setRowLeftRightMarginZero">
                                                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                                                                <div ng-show="SearchInfo.Picture">
+                                                                <div ng-show="searchedEzeOneImage">
                                                                     <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{SearchInfo.Picture}}">
+                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="{{searchedEzeOneImage}}">
                                                                     </div>
                                                                     <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{SearchInfo.Picture}}">
+                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="{{searchedEzeOneImage}}">
                                                                     </div>
                                                                 </div>
-                                                                {{SearchInfo.Picture}}
-                                                                <div ng-hide="SearchInfo.Picture">
-
-                                                                    <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                        <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
+                                                                <div ng-hide="searchedEzeOneImage">
+                                                                    <div ng-show="showLoadingImgOverPic" class="row addItemRowUserEzeid1">
+                                                                       <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/preloader.gif">
                                                                     </div>
-                                                                    <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
-                                                                        <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
+                                                                    <div ng-hide="showLoadingImgOverPic" class="row addItemRowUserEzeid1">
+                                                                        <div ng-show="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                            <img class="profilePicBorder imgSetBorder" width="148px" height="148px" ng-src="../images/new_individual.png">
+                                                                        </div>
+                                                                        <div ng-hide="SearchInfo.IDTypeID == 1" class="row addItemRowUserEzeid1">
+                                                                            <img class="profilePicBorderBusiness imgSetBorder" width="315px" height="155px" ng-src="../images/business_profile_pic.png">
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>

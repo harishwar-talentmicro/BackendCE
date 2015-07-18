@@ -52,6 +52,7 @@
         '/outbox/:action',
         '/compose-message',
         '/job',
+        '/jobdetail',
         '/access-history',
         '/:ezeond/sales',
         '/:ezeone/home_delivery',
@@ -206,6 +207,10 @@
             .when('/job',{
                 templateUrl: 'html/job/jobSearchResult.html',
                 controller : 'JobSearchResult'
+            })
+            .when('/jobdetail',{
+                templateUrl: 'html/job/jobDetail.html',
+                controller : 'JobDetail'
             })
             .when('/payment',{
                 templateUrl: 'html/payment-api.html',
