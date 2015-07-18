@@ -761,6 +761,16 @@
     padding:0px !important;
 }
 
+.hpw .no-left-padding
+{
+    padding-left:0px !important;
+}
+
+.hpw .no-right-padding
+{
+    padding-left:0px !important;
+}
+
 .hpw .border-bottom-gray
 {
     border-bottom: 1px solid rgb(94, 93, 93);
@@ -2405,7 +2415,7 @@ sup.tm{
 
 .hpw .page-content
 {
-    min-height: 600px;
+    min-height: 400px;
 }
 
 .hpw .panel-outbox-content
@@ -2816,4 +2826,39 @@ sup.tm{
 .hpw .business-mobile-desc-padding
 {
     padding-top: 100px;
+}
+
+.jsr .content-bg
+{
+
+    background: -webkit-linear-gradient(90deg, #ECE9E6 10%, #FFFFFF 90%); /* Chrome 10+, Saf5.1+ */
+    background:    -moz-linear-gradient(90deg, #ECE9E6 10%, #FFFFFF 90%); /* FF3.6+ */
+    background:     -ms-linear-gradient(90deg, #ECE9E6 10%, #FFFFFF 90%); /* IE10 */
+    background:      -o-linear-gradient(90deg, #ECE9E6 10%, #FFFFFF 90%); /* Opera 11.10+ */
+    background:         linear-gradient(90deg, #ECE9E6 10%, #FFFFFF 90%); /* W3C */
+
+}
+
+.jsr .sorting-block
+{
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid rgb(229, 229, 229);
+    box-shadow: 2px 2px 5px #888888;
+}
+
+.jsr .job-filter-content
+{
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 3px 3px 5px rgb(210, 202, 202);
+    border-bottom: 1px solid rgb(240, 240, 240);
+}
+
+.jsr .location-individual
+{
+    padding-top: 5px;
+    padding-left: 11px;
+    font-size: 0.9em;
+    color: gray;
 }
