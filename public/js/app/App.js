@@ -49,7 +49,9 @@
         '/profile-manager',
         '/profile-manager/:subview',
         '/outbox',
+        '/outbox/:action',
         '/compose-message',
+        '/job',
         '/access-history',
         '/:ezeond/sales',
         '/:ezeone/home_delivery',
@@ -199,7 +201,11 @@
             })
             .when('/outbox',{
                 templateUrl: 'html/message/outbox.html',
-                controller : 'outboxPageCtrl'
+                controller : 'OutboxPageCtrl'
+            })
+            .when('/job',{
+                templateUrl: 'html/job/jobSearchResult.html',
+                controller : 'JobSearchResult'
             })
             .when('/payment',{
                 templateUrl: 'html/payment-api.html',

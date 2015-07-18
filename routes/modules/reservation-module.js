@@ -840,6 +840,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         }
 
         if (ezeid && rating && module) {
+
             var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments)
                 + ',' + st.db.escape(module) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)
                 + ',' + st.db.escape(toEzeid)  + ',' + st.db.escape(type);

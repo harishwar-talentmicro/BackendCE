@@ -556,5 +556,12 @@ angular.module('ezeidApp').
 
             $scope.KeyWords = [];
 
+            /* on hover change the explanation text in "FOR BUSINESS" */
+            $('.hover-tile').mouseenter(function(){
+                $('.fr-text').removeClass('hidden');
+                $('#desc-text').html($(this).data('text'))});
+
+            $('.hover-tile').mouseout(function(){$('.fr-text').addClass('hidden')});
+
         }]);
 

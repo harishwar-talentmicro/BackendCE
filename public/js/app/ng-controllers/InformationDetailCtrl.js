@@ -69,7 +69,6 @@ angular.module('ezeidApp').
             $scope.activeTemplate = "";
             $scope.showWorkingHourModel = false;
             $scope.showMapPopupModel = false;
-            $scope.showDetailsModal = false;
             $scope.form_rating = 0;
 
             /**
@@ -138,7 +137,6 @@ angular.module('ezeidApp').
                         $scope._toggleResumeModal();
                     },1000);
                 }
-
             });
             //  }
 
@@ -178,21 +176,7 @@ angular.module('ezeidApp').
                         $rootScope.$broadcast('$preLoaderStop');
                         $timeout(function () {
                             $scope.SearchInfo = data[0];
-                            $scope.showDetailsModal = true;
-
-                            destroyModalDetailsWatcher = $scope.$watch('showDetailsModal',function(newVal,oldVal){
-                                if(!newVal){
-                                    //Below line is for Loading img
-                                    if(!$scope.businessModalOpen){
-                                        $scope.$emit('$preLoaderStart');
-                                        $timeout(function(){
-
-                                            $window.history.back();
-                                        },500);
-
-                                    }
-                                }
-                            });
+                            getPictureOfSearchedTerm();
 
                             if($scope.SearchInfo.IDTypeID == 2)
                             {
@@ -265,12 +249,25 @@ angular.module('ezeidApp').
                 return defer.promise;
             }
 
-            //Below function is for getting about company
+            // Below function is for getting about company
             function getAboutCompany()
             {
                 $http({ method: 'get', url: GURL + 'ewtCompanyProfile?TID=' + $scope.SearchInfo.TID}).success(function (data) {
                     if (data.Result.length > 0) {
                         $scope.companyTagLine = data.Result[0].TagLine;
+                    }
+                });
+            }
+
+            $scope.showLoadingImgOverPic = false;
+            // Below function is for getting picture of searched term
+            function getPictureOfSearchedTerm()
+            {
+                $scope.showLoadingImgOverPic = true;
+                $http({ method: 'get', url: GURL + 'location_image?TID=' + $scope.SearchInfo.TID}).success(function (data) {
+                    if (data.Result.length > 0) {
+                        $scope.companyTagLine = data.Result[0].TagLine;
+                        $scope.showLoadingImgOverPic = false;
                     }
                 });
             }
@@ -375,7 +372,6 @@ angular.module('ezeidApp').
                         //$location.url('/service-reservation'+params+'&name='+$scope.SearchInfo.CompanyName);
                     },500);
                     destroyModalDetailsWatcher();
-                    $scope.showDetailsModal = false;
                 }
             };
 
@@ -546,28 +542,24 @@ angular.module('ezeidApp').
             $scope.$watch('_showSalesModal',function(n){
                 if(!n){
                     $scope.businessModalOpen = false;
-                    $scope.showDetailsModal = true;
                 }
             });
 
             $scope.$watch('_showHomeDeliveryModal',function(n){
                 if(!n){
                     $scope.businessModalOpen = false;
-                    $scope.showDetailsModal = true;
                 }
             });
 
             $scope.$watch('_showServiceModal',function(n){
                 if(!n){
                     $scope.businessModalOpen = false;
-                    $scope.showDetailsModal = true;
                 }
             });
 
             $scope.$watch('_showResumeModal',function(n){
                 if(!n){
                     $scope.businessModalOpen = false;
-                    $scope.showDetailsModal = true;
                 }
             });
 

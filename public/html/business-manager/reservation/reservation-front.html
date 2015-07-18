@@ -85,8 +85,30 @@
                                         <hr>
                                         <!-- Resource Buttons goes here -->
                                         <div class="ezeid-resource">
-
-                                            <div class="row p-left-5">
+                                            <!-- Current user's profile goes here -->
+                                            <div class="selected-user-profile container">
+                                                <!-- Profile image goes here -->
+                                                <div class="col-lg-2 profile-image">
+                                                    <img class="width-100-px image-round" src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSnYIFMMDz1mhF79yOu8WtpFXomQRjZ3PWPqoZbahlRKXGpUdGL" />
+                                                </div>
+                                                <!-- Profile heading and content goes here -->
+                                                <div class="col-lg-7 profile-description">
+                                                    <span class="profile-ezeid-style">@KRUNALPAID</span><br>
+                                                    <small>{{description}}</small>
+                                                </div>
+                                                <!-- Profile ratings -->
+                                                <div class="col-lg-3 profile-rating">
+                                                    <i class="fa fa-star text-yellow"></i>
+                                                    <i class="fa fa-star text-yellow"></i>
+                                                    <i class="fa fa-star text-yellow"></i>
+                                                    <i class="fa fa-star text-yellow"></i>
+                                                    <i class="fa fa-star text-gray"></i>
+                                                    <br>
+                                                    <small ng-click="reviewResource()" class="text-white pointer">13 Reviews</small>
+                                                </div>
+                                            </div>
+                                            <!-- Current user's profile ends here -->
+                                            <div class="row p-left-5 p-top-10">
                                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-left">
                                                     <span>Select Resources </span> <i class="fa fa-check-circle text-primary"></i> <small class="text-danger">{{description}}</small>
                                                 </div>
@@ -234,8 +256,25 @@
             </div>
         </div>
     </modal>
+    <!-- Modal to make review -->
+    <div class="review-modal-form modal-no-css">
+        <modal mtitle="reviewModal.title" mclass="reviewModal.class" visible="reviewModalVisibility">
+            <div class="review-form-test row">
 
-
+                <div class="close-modal text-center">
+                    <button ng-click="toggleReviewModalVisibility()" id="close-review-modal" class="btn btn-danger btn-xs">
+                        <i class="fa fa-times"></i> Close
+                    </button>
+                </div>
+                <review-form  ng-trans-type="1"
+                              ng-trans-id = "ngTransId"
+                              ng-resource-id= "ngResourceId"
+                              ng-to-ezeid="ngToEzeId"
+                              toggle-review-modal-visibility="toggleReviewModalVisibility()"
+                        > </review-form>
+            </div>
+        </modal>
+    </div>
     <!-- coloring for availability : For executing coloring the table post-DOM rendering -->
     <div class="hidden">{{reservationMooduleStarter();ifHtmlLoaded = true}}</div>
     <!-- main container of day - calender end here -->

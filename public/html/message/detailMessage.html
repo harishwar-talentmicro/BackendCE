@@ -1,55 +1,25 @@
 
-<!-- Compose message block -->
-<div ng-controller="ComposeMessageCtrl as ComposeCtrl">
-    <div class="width-100 p-left-10 p-top-10">
-        <div class="compose-message">
-            <i class="fa fa-envelope-o"></i> COMPOSE MESSAGE
+<div class="message-content-tbl">
+    <div class="row setRowLeftRightMarginZero">
+        <div class="pagination-btn">
+            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setLeftRightPaddingZero topMarginButton">
+               <span>Message From: @KRUNAL11</span>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setLeftRightPaddingZero text-right">
+                <span>12:09AM</span>
+                <button class="btn btn-default" title="Download Attachment"><i class="fa fa-paperclip"></i></button>
+                <button class="btn btn-default" title="Replay"><i class="fa fa-reply"></i></button>
+                <button class="btn btn-default" title="Forward"><i class="fa fa-share"></i></button>
+                <button class="btn btn-default" title="Delete"><i class="fa fa-trash-o"></i></button>
+            </div>
         </div>
-        <div class="message-body">
-            <div class="input-group p-bottom-4">
-                <div class="input-group-addon">To</div>
-                <input type="text" ng-model="composeMsg.MessageTo" class="form-control" id="to" placeholder="To">
-            </div>
-            <div class="input-group p-bottom-4">
-                <div class="input-group-addon">From</div>
-                <input type="text" ng-model="composeMsg.MessageFrom" class="form-control" id="from" placeholder="From">
-            </div>
+    </div>
 
-            <div class="p-bottom-4">
-                <textarea class="form-control p-bottom-4" ng-model="composeMsg.MessageBody" placeholder="Your message" rows="5"></textarea>
-            </div>
-
-
-            <button class="btn btn-warning"><i class="fa fa-paperclip"></i> Attachments</button>
-            <label class="label label-info">myFile.pdf &nbsp;<span title="remove attachment" class="label label-danger">X</span></label>
-            <label class="label label-info">myFile1.pdf  &nbsp;<span title="remove attachment" class="label label-danger">X</span></label>
-            <hr>
-            <!-- Additional Filters -->
-            <div class="additional-filter p-bottom-4">
-                <span class="col-lg-4 no-padding">
-                <div class="">Priority</div>
-                <select class="form-control" ng-model="composeMsg.Priority">
-                    <option value="1">High</option>
-                    <option value="2">Medium</option>
-                    <option value="3">Low</option>
-                </select>
-                    </span>
-
-                <span class="col-lg-4 ">
-                    <div class="">Target Date</div>
-                    <!--<input type="text" class="form-control" id="target-date" placeholder="Target Date">-->
-                    <date-time-picker recipient="composeMsg.TargetDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
-                </span>
-
-                <span class="col-lg-4 no-padding">
-                    <div class="">Expiry Date</div>
-                    <!--<input type="text" class="form-control" id="expiry-date" placeholder="Expiry Date">-->
-                    <date-time-picker recipient="composeMsg.ExpiryDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
-                </span>
-            </div>
-            <div class="send-button text-right p-bottom-4">
-                <button class="btn btn-primary no-radius p-top-4 m_top_4" ng-click="ComposeCtrl.sendMessage();"><i class="fa fa-send"></i> Send</button>
-            </div>
+    <hr class="style-two">
+    <div class="row setRowLeftRightMarginZero">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero text-justify">
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
         </div>
     </div>
 </div>

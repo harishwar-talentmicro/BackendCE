@@ -2,7 +2,7 @@
  * Controller to manage all the functionaloties in OUTBOX
  *
  * @author: Krunal[EZE One]
- * @since 20150715
+ * @since 20150717
  */
 angular.module('ezeidApp').
     controller('ComposeMessageCtrl', [

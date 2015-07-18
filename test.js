@@ -214,5 +214,71 @@ db.query(countQuery,function(err,result){
 //console.log(hash);
 
 
-
-
+/***
+ * Data for generating reports
+ * @type {{status: boolean, data: {from_date: string, to_date: string, stages: string, probabilities: string, transactions: *[], total_amount: number, total_items: number, funnel: *[]}, message: string, error: null}}
+ */
+var data = {
+    status : true,
+    data : {
+        from_date : '2015-07-13', // Same as passed in parameters, if null send me the date of starting record in result
+        to_date : '2015-07-16', // Same as passed in parameters, if null send me the date of ending record in result
+        stages : '32,451,32', // Same as passed in parameters,
+        probabilities : '1,2,3,4', // Same as passed parameters
+        transactions : [
+            {
+                tid : 21,
+                user : 'IND1', // User who created the lead
+                customer : 'Krunal Patel',
+                customer_company : 'Patel Group of Companies',
+                decription : 'I want a quick review of your products and services', // transaction message
+                qty : 12, // Total item qty if not applicable send 0
+                amount : 130000.00, // Total amount for this transaction
+                next_action : 'Call', // Next action label
+                next_action_date : '2015-07-25 17:54'
+            },
+            {
+                tid : 26,
+                user : 'IND1', // User who created the lead
+                customer : 'Sandeep Gantait',
+                customer_company : 'Sandeep Consultancy Pvt. Ltd.',
+                decription : 'I want a quick review of your products and services', // transaction message
+                qty : 43, // Total item qty if not applicable send 0
+                amount : 4300000.00, // Total amount for this transaction
+                next_action : 'Followup', // Next action label
+                next_action_date : '2015-08-12 01:54'
+            }
+        ],
+        total_amount : 42300000.00, // Total amount of all transactions
+        total_items : 43224, // Total number of items i.e. sum of all transactions
+        funnel : [
+            {
+                stage_title : 'New Lead',
+                stage_id : 21,
+                count : 35
+            },
+            {
+                stage_title : 'Hot Lead',
+                stage_id : 22,
+                count : 12
+            },
+            {
+                stage_title : 'Opportunities',
+                stage_id : 23,
+                count : 5
+            },
+            {
+                stage_title : 'Contract',
+                stage_id : 24,
+                count : 3
+            },
+            {
+                stage_title : 'Customers',
+                stage_id : 25,
+                count : 4
+            }
+        ]
+    },
+    message : 'Statistics for Sales are generated successfully',
+    error : null
+};

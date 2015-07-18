@@ -57,16 +57,26 @@ angular.module('ezeidApp').
 
             $scope.inboxListing = "html/message/inbox.html";
             $scope.composeMessage = "html/message/composeMessage.html";
-            $scope.groupListing = "html/message/composeMessage.html";
+            $scope.detailMessage = "html/message/detailMessage.html";
+
             $scope.chatMessage = "html/chat/chatMessage.html";
 
-            //  $scope.activeTemplate = $scope.inboxListing;
             if($routeParams.action)
             {
                 if($routeParams.action == 'compose')
                 {
                     $scope.activeTemplate = $scope.composeMessage;
                     $scope.titleText = "Compose";
+                }
+                else if ($routeParams.action == 'inbox')
+                {
+                    $scope.activeTemplate = $scope.inboxListing;
+                    $scope.titleText = "Inbox";
+                }
+                else if ($routeParams.action == 'details')
+                {
+                    $scope.activeTemplate = $scope.detailMessage;
+                    $scope.titleText = "Details";
                 }
                 else
                 {

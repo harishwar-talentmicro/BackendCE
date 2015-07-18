@@ -242,13 +242,18 @@
     }
 }
 
-/*@media screen and (max-width: 844px) {*/
-/*.hpw .search-result-page-padding*/
-/*{*/
-/*padding-top: 355px;*/
-/*}*/
-/*}*/
 
+@media screen and (max-width: 990px) {
+    .hpw .business-img-text-align
+    {
+        text-align: center !important;
+    }
+
+    .hpw .business-mobile-desc-padding
+    {
+        padding-top: 0px !important;
+    }
+}
 @media screen and (max-width: 874px) {
     .srw .tile-frame-padding-top
     {
@@ -590,6 +595,8 @@
 {
     padding-top: 100px;
 }
+
+
 
 .hpw .p-bottom-100
 {
@@ -2748,4 +2755,65 @@ sup.tm{
     display: table !important;
     margin: 0px auto;
     width:100% !important;
+}
+
+.hpw .image-round
+{
+    border-radius: 50%;
+    border: 5px solid rgb(42, 165, 155);
+}
+
+.hpw .profile-rating
+{
+    padding-top: 3%;
+}
+
+.hpw .selected-user-profile
+{
+    padding: 14px;
+    background-color: #6EDBD6;
+    color: #fff !important;
+    /*border-right: 24px solid lightgrey;*/
+    border-left: 24px solid rgb(206, 230, 232);;
+}
+
+.hpw .profile-description
+{
+    min-height: 100%;
+    border-right: 1px solid rgb(239, 239, 239);
+    padding-top: 5%;
+}
+
+.hpw .profile-ezeid-style
+{
+    color: #fff;
+    font-size: 2em;
+    font-weight: 800;
+}
+
+.hpw .fr-text
+{
+    background-color: rgb(1, 82, 82);
+    color: white;
+    padding: 3px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 3px 3px rgb(211, 202, 202);
+}
+
+/*CSS3 extras*/
+.hpw a.tooltip span
+{
+    border-radius:4px;
+    box-shadow: 5px 5px 8px #CCC;
+}
+
+.hpw .business-img-text-align
+{
+    text-align: right;
+}
+
+.hpw .business-mobile-desc-padding
+{
+    padding-top: 100px;
 }
