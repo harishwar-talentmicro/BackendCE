@@ -1,338 +1,131 @@
 <!-- Outbox module goes here -->
-<section id="outbox-wrapper" class="hpw ow">
+<section id="job-search-result-wrapper" class="hpw ow jsr">
     <!-- Header menu goes here -->
     <header-section></header-section>
-    <section class="page-content">
-        <!-- NEW DESIGN GOES HERE -->
-        <div class="container width-100 ">
 
-            <div class="panel-body ">
-                <!-- Left Side Content: Messages Indexes -->
-                <!--<div class="col-lg-3 no-padding hidden">-->
-                <div class="col-lg-3 no-padding">
-                    <!-- main indexes -->
-                    <div class="inbox-head-left main-index inbox-head-left-bg">
-                        <h3 class="text-white text-center"><i class="fa fa-envelope"></i> Job</h3>
-                    </div>
-
-                </div>
-                <!-- Right Side Content: Messages Indexes -->
-                <!--<div class="col-lg-9 no-padding  message-content hidden">-->
-                <div class="col-lg-9 no-padding  message-content">
-                    <div class="inbox-head-new">
-                        <h3 class="text-white">{{titleText}} </h3>
-                    </div>
-                    <!-- All messages goes here -->
-
-                    <!--Active Template Comes here-->
-                    <div ng-include="activeTemplate">
-                    </div>
-
-                </div>
-
-                <div class="review-form-test hidden">
-                    <review-form> </review-form>
-                </div>
-
-                <!--- Old Design Goes Here //////////////////////////////////////////////////////////////////////////////// --->
-                <!-- MAIN SECTION OF OUTBOX MODULE -->
-                <div class="width-75 container p-top-30 hidden">
-                    <div class="panel panel-default shadow-border">
-                        <div class="panel-heading text-center menu-text">
-                            <h3 class="text-center font-roboto"><i class="fa fa-check-square-o"></i> Your Transactions</h3>
-                        </div>
-                        <div class="panel-body">
-                            <!-- Side menu goes here -->
-                            <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style">
-                                <ul class="list-unstyled">
-                                    <li ng-click="changeSelectedModule(0)"><p ng-class="presentSelectedModule == 0?'active':''"><i class="fa fa-briefcase"></i> Sales</p></li>
-                                    <!--<li ng-click="changeSelectedModule(1)"><p ng-class="presentSelectedModule == 1?'active':''"><i class="fa fa-check-square"></i> Reservation</p></li>-->
-                                    <li ng-click="changeSelectedModule(2)"><p ng-class="presentSelectedModule == 2?'active':''"><i class="fa fa-truck" ></i> Home Delivery</p></li>
-                                    <li ng-click="changeSelectedModule(3)"><p ng-class="presentSelectedModule == 3?'active':''"><i class="fa fa-wrench" ></i> Help Desk</p></li>
-                                    <li ng-click="changeSelectedModule(4)"><p ng-class="presentSelectedModule == 4?'active':''"><i class="fa fa-file-word-o"></i> Resume</p></li>
-                                </ul>
-                            </div>
-                            <!-- Main content goes here -->
-                            <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 ">
-                                <div class="outbox-main-content">
-                                    <!-- Transaction history goes here -->
-                                    <div class="pagination input-group text-right" ng-show="paginationStatus">
-                                        <button ng-disabled="!paginationPrevious" ng-click="getPreviousResultPage()" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
-                                        <button ng-disabled="!paginationNext" ng-click="getNextResultPage()" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
-                                    </div>
-                                    <!-- Individual Strips starts here -->
-                                    <div class="individual-transaction" ng-repeat="res in result track by $index">
-                                        <transaction-history-item ng-to="res.ToEzeid"
-                                                                  ng-initiate-detail="initiateDetail(res.tid)"
-                                                                  ng-message="res.Message"
-                                                                  ng-quantity="res.statustitle"
-                                                                  ng-date="convertTimeToLocal(res.TaskDateTime)"
-                                                                  ng-id="res.tid"
-                                                                  ng-status="res.statustitle"
-                                                                  ng-udate="convertTimeToLocal(res.updatedDate)"> </transaction-history-item>
-                                    </div>
-                                    <!-- Individual Strips ends here -->
-                                    <h4 class="text text-danger text-center" ng-show="!result.length > 0"><i class="fa fa-warning"></i> No Tranaction Found</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- details modal of the transaction history item goes here -->
-    <modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
-        <div class="row">
-            <!-- Detail goes here -->
-            <div class="container">
-                <!-- Start date goes here -->
-                <div class="start-date text-center text-bolder">{{convertTimeToLocal(activeTransactionBasicInfo.TaskDateTime)}}</div>
-                <!-- main content -->
-                <div class="main-content">
-                    <p>To: <b>{{activeTransactionBasicInfo.ToEzeid}}</b></p>
-                    <br>
-                    <p>Message:</p>
-                    <p>
-                        {{activeTransactionBasicInfo.Message}}
-                    </p>
-                    <br>
-                    <p>Status: <b>{{checkIfEmpty(activeTransactionBasicInfo.statustitle,"New")}}</b></p>
-                    <p>Last Updated: <b>{{convertTimeToLocal(activeTransactionBasicInfo.updatedDate)}}</b></p>
-                </div>
-            </div>
-
-            <!-- Item goes here -->
-            <div class="container" ng-hide="accessRight == 0">
-                <h4>Transaction Items</h4>
-
-                <div class="individual-transaction-items ">
-                    <!-- Individual items -->
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th width="5%">Id</th>
-                            <th width="40%">Item</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2)">Quantity</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Unit Price</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Total Price</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="info in activeTransactionDetailedInfo track by $index">
-                            <td>{{$index + 1}}</td>
-                            <td>{{info.ItemName}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2)">{{info.Qty}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Rate}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Amount}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- Detail ends here -->
-        </div>
-    </modal>
-    <!-- transaction history item modal ends here -->
-    <!-- Footer goes here -->
-
-    <!-- Modal Box of Add/Edit Group -->
-    <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
+    <!-- Navbar header menu for search result goes here -->
+    <nav class="navbar navbar-default m-bottom-0 no-radius">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-trash"></span>  Delete(Group)</button>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Group Title
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <div class="form-group">
-                        <input class="form-control" maxlength="50" ng-model="modalBox.item.title"/>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="form-group">
-                        <select class="form-control" name="TitleSelect">
-                            <option value = ""> -- Select Action -- </option>
-                            <option value = ""> Delete Group </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <!-- next and previous button for pagination -->
+                <div class="navbar-form navbar-left">
+                    <button class="btn btn-primary">
+                        Previous <i class="fa fa-arrow-circle-left"></i>
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fa fa-arrow-circle-right"></i> Next
+                    </button>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Add New Member
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <div class="form-group">
-                        <input class="form-control" placeholder="Enter EZEOne ID or group name" maxlength="50" ng-model="modalBox.item.title"/>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-search"></span>  Find</button>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    ###### is valid
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="form-group">
-                        <select class="form-control" name="TitleSelect">
-                            <option value = ""> -- Select Action -- </option>
-                            <option value = ""> Join Group </option>
-                            <option value = ""> Add </option>
-                            <option value = ""> Delete </option>
-                            <option value = ""> Accept New Request(s) </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    Access denied
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Group Members
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" style="overflow-y: auto; height:200px; border: 1px solid #ddd;">
-                    <table class="rwd-table">
-                        <tbody>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                KRUNAL11
-                            </td>
-                            <td>
-                                Active
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                TEST10
-                            </td>
-                            <td>
-                                New Request
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                GOWRI
-                            </td>
-                            <td>
-                                Deleted
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                KRUNALPAID
-                            </td>
-                            <td>
-                                Deleted
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                IND1
-                            </td>
-                            <td>
-                                Declined
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                TEST10
-                            </td>
-                            <td>
-                                New Request
-                            </td>
-                        </tr>
 
-                        </tbody>
-                    </table>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <div class="row text-left search-bar-center">
+                    <!-- Search Bar and advance filter goes here -->
+                    <div class="navbar-form navbar-left no-border " role="search">
+                        <div class="input-group">
+                            <div class="input-group-btn">
+                                <!-- Change Location btn -->
+                                <button type="button"
+                                        class="btn btn-info"
+                                        title="Click to change Search Location">
+                                    <i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b>
+                                </button>
+                            </div>
 
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
-                        <input type="checkbox" checked name="vehicle" value="Bike">
-                        Hide Declined
+                            <input id="searchTextField" type="text" placeholder=""
+                                   class="form-control width-search-bar dropdown-toggle" aria-label="..." data-toggle="dropdown">
+
+                            <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(params.searchType == 2) && (KeyWords.length > 0) && (params.searchTerm.length)">-->
+
+                            <div class="input-group-btn">
+                                <!-- Advance Search BTN -->
+                                <button  type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> Options</Filter></button>
+                                <!-- Search BTN -->
+                                <button type="button" class="btn btn-warning" title="search"><i class="fa fa-search"></i> </button>
+                            </div>
+                        </div>
+
+
                     </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
-                        <input type="checkbox" checked name="vehicle" value="Bike">
-                        Hide Deleted
-                    </div>
+                    <!-- Toggle buttons for switching betweeen maps and list -->
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown p8">
+                            <!-- Select All BTN -->
+                            <button class="btn btn-primary"><i class="fa fa-check-square"></i> Select All</button>
+                            <div class="btn-group">
+                                <button class="btn btn-default"><i class="fa fa-list"></i> List View</button>
+                                <button class="btn btn-default"><i class="fa fa-map-marker"></i> Map View</button>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    <!-- Main body of the search result -->
+    <div class="content-bg page-content">
+        <div class="container width-75 ">
+            <!-- main sorting div goes here -->
+            <div class="col-lg-12 p-top-10">
+                <div class="width-100 sorting-block row">
+                    <div class="col-lg-5 text-left">
+                        1-50 of 21436 Angular JS Jobs
+                    </div>
+                    <div class="col-lg-7 text-right">
+                        <button class="btn btn-default btn-sm">
+                            Sort by <i class="fa fa-reorder"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </modal>
+        <div class="container p-top-10 width-75">
+            <!-- left bar -->
+            <div class="col-lg-3 no-left-padding">
+                <div class="job-filter-content">
+                    <!-- filters goes here -->
+                    <div class="filter-content-heading">
+                        FILTER RESULTS
+                    </div>
+                </div>
+                <div class="job-filter-content">
+                    <!-- filters goes here -->
+                    <div class="filter-content-heading container">
+                        <!-- Filter by location -->
+                        <span class="filter-heading">
+                        <i class="fa fa-globe"></i> Location
+                            </span>
+                        <div class="location-individual">
+                            <i class="fa fa-check-square"></i> Bangalore
+                        </div>
+                        <div class="location-individual">
+                            <i class="fa fa-square"></i> New Delhi / NCR
+                        </div>
+                        <div class="location-individual">
+                            <i class="fa fa-square"></i> Hyderabad
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+            <!-- right bar -->
+            <div class="col-lg-9">
+                <!-- main content goes here -->
+                <div class="job-main-content">
+                    Search result goes here
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer goes here -->
     <footer-section></footer-section>
 </section>
