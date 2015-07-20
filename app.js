@@ -190,6 +190,7 @@ app.post('/feedback',LocationManager.FnSaveFeedback);
 app.get('/transaction_attachment',LocationManager.FnGetTransAttachment);
 app.get('/transaction_filter',LocationManager.FnGetTransactionFilter);
 app.get('/location_image',LocationManager.FnGetLocationPicture);
+app.get('/resource_image',LocationManager.FnResourcePicture);
 
 
 //below service are for EZEIDAP
