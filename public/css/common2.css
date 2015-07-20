@@ -781,6 +781,11 @@
     padding-left:0px !important;
 }
 
+.hpw .no-bottom-padding
+{
+    padding-bottom:0px !important;
+}
+
 .hpw .border-bottom-gray
 {
     border-bottom: 1px solid rgb(94, 93, 93);
@@ -2925,4 +2930,14 @@ sup.tm{
 
 .jsr .individual-tiles{
     padding-bottom: 10px;
+}
+
+.jdv .detail-content-bg
+{
+    background-color: rgb(242, 242, 242);
+}
+
+.hpw .text-dark-gray
+{
+    color:gray;
 }
