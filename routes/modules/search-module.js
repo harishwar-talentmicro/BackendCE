@@ -893,12 +893,15 @@ try {
     var Latitude = req.body.Latitude;
     var Longitude = req.body.Longitude;
     var Proximity = req.body.Proximity;
+    var currentDateTime = req.body.CurrentDate;
 
     if (Token != null && Keyword != null && Latitude != null && Longitude != null && Proximity  != null) {
         st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
-                    var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+ ',' + st.db.escape(Token);
+                    var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' +
+                        st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+
+                        ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime);
                     st.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
                         if (!err) {
                             if (GetResult != null) {
