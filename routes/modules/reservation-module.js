@@ -793,6 +793,14 @@ Reservation.prototype.saveFeedback = function(req,res,next){
      */
     var _this = this;
 
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -806,12 +814,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         var toEzeid = alterEzeoneId(req.body.toEzeid) ? alterEzeoneId(req.body.toEzeid) : '';
         var type = req.body.type;
 
-        var responseMessage = {
-            status: false,
-            error: {},
-            message: '',
-            data: null
-        };
+
         var validateStatus = true;
 
         if (!ezeid) {
@@ -911,6 +914,143 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
         res.status(400).json(responseMessage);
     }
+};
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @description Return image of a resource based on resource id (reservation resource)
+ * @service-param resource_id* <integer> [Mandatory]
+ * @service-param token* <string> [Mandatory]
+ *
+ */
+Reservation.prototype.getResourcePicture = function(req,res,next){
+    var _this = this;
+
+    var resourceId = (parseInt(req.query.resource_id) !== NaN) ? parseInt(req.query.resource_id) : 0;
+
+    var token = (req.query.token) ? req.query.token : null;
+
+    var status = true;
+    var error = {};
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    if(!resourceId){
+        error['resource_id'] = 'Invalid resource';
+        status *= false;
+    }
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        status *= false;
+    }
+
+    if(!status){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try{
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = resourceId;
+                        var query = 'CALL pGetResourcePic('+queryParams+')';
+                        st.db.query(query,function(err,results){
+                            if(err){
+                                responseMessage.status = false;
+                                responseMessage.message = 'An error occurred';
+                                responseMessage.error = {
+                                    server : 'Internal Server Error'
+                                };
+                                responseMessage.data = null;
+                                res.status(400).json(responseMessage);
+                            }
+                            else{
+                                var emptyResponse = {
+                                    status : false,
+                                    message : 'No image found',
+                                    data : null,
+                                    error : {
+                                        resource_id : 'No image found'
+                                    }
+                                };
+                                if(results){
+                                    if(results[0]){
+                                        if(results[0][0]){
+                                            if(results[0][0].picture){
+                                                res.status(200).json({
+                                                    status: true,
+                                                    message: 'Picture loaded successfully',
+                                                    data: {
+                                                        picture : results[0][0].picture,
+                                                        resource_id : resourceId
+                                                    },
+                                                    error: null
+                                                });
+                                            }
+                                            else{
+                                                res.status(200).json(emptyResponse);
+                                            }
+                                        }
+                                        else{
+                                            res.status(200).json(emptyResponse);
+                                        }
+                                    }
+                                    else{
+                                        res.status(200).json(emptyResponse);
+                                    }
+                                }
+                                else{
+                                    res.status(200).json(emptyResponse);
+                                }
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.status = false;
+                        responseMessage.message = 'Please login to continue';
+                        responseMessage.error = {
+                            token : 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                    }
+                }
+                else{
+                    responseMessage.status = false;
+                    responseMessage.message = 'An error occurred';
+                    responseMessage.error = {
+                        server : 'Internal Server Error'
+                    };
+                    responseMessage.data = null;
+                    res.status(400).json(responseMessage);
+                }
+            });
+        }
+
+        catch(ex){
+            responseMessage.error = {};
+            responseMessage.message = 'An error occurred !'
+            console.log('FnResourcePicture:error ' + ex.description);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+
+
 };
 
 module.exports = Reservation;
