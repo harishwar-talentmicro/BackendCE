@@ -1556,6 +1556,7 @@
              */
             $scope.TabPostJob = function(){
                 $scope.showDefaultTab = false;
+              //  http://10.0.100.223:3001/ewtGetLocationList?Token=3108561dcf9b5d2efbe8
             };
 
         }]);
