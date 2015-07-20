@@ -37,6 +37,7 @@
 
             //$scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
             $scope.txSearchTerm = '';
+            $scope.showDefaultTab = true;
 
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
@@ -1542,6 +1543,20 @@
             function _cartCalculateItems(itemList){
 
             }
+
+            /**
+             * select Resume Inquiries Tab
+             */
+            $scope.TabResumeInquiries = function(){
+                $scope.showDefaultTab = true;
+            };
+
+            /**
+             * select Post Job Tab
+             */
+            $scope.TabPostJob = function(){
+                $scope.showDefaultTab = false;
+            };
 
         }]);
 

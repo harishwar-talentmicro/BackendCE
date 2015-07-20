@@ -123,6 +123,11 @@
     width:300px !important;
 }
 
+.jsr .filter-pad
+{
+
+}
+
 @media screen and (max-width: 1320px) {
     .srw .tile-frame-padding-top
     {
@@ -321,6 +326,11 @@
 }
 
 @media screen and (max-width: 768px) {
+
+    .jsr .filter-pad
+    {
+        padding-right: 0px !important;
+    }
 
     .hpw .search-type
     {
@@ -815,6 +825,11 @@ hr.style-two {
 .hpw .height-80
 {
     height: 80%;
+}
+
+.hpw .height-45-px
+{
+    height: 45px !important;
 }
 
 .hpw .height-128
@@ -2861,4 +2876,53 @@ sup.tm{
     padding-left: 11px;
     font-size: 0.9em;
     color: gray;
+}
+
+.jsr .result-info-div
+{
+    padding-top: 10px;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+.jsr .filter-div
+{
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+
+.jsr .filter-heading
+{
+    font-size: 1.2em;
+}
+
+.jsr .job-main-content
+{
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 3px 3px 5px rgb(210, 202, 202);
+    border-bottom: 1px solid rgb(240, 240, 240);
+}
+
+.jsr .tile-head
+{
+    color: rgb(28, 160, 160);
+    font-size: 1.3em;
+    background-color: azure;
+}
+
+.jsr .company-name
+{
+    padding-left: 20px;
+    color: #7B7373;
+}
+
+.jsr .tile-content
+{
+    padding-left: 20px;
+    color:rgb(110, 108, 108);
+}
+
+.jsr .individual-tiles{
+    padding-bottom: 10px;
 }

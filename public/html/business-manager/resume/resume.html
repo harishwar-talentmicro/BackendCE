@@ -4,9 +4,16 @@
     <!--</div>-->
     <div class="panel-body">
         <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 tabs-row-sales">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a ng-click="TabResumeInquiries()"> <span class="glyphicon glyphicon-copy"></span> Resume Inquiries</a></li>
+                    <li><a ng-click="TabPostJob()"> <span class="glyphicon glyphicon-share"></span>  Post Job</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="row" ng-show="showDefaultTab">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 topMarginButton">
                 <div class="row bottom-clearfix">
-
 
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
                         <div class="input-group tx-search-input-group">
@@ -453,6 +460,14 @@
                             </button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row setRowLeftRightMarginZero" ng-hide="showDefaultTab">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 topMarginButton setPaddingLeftRight0">
+                <div class="row">
+                    post job
                 </div>
             </div>
         </div>
