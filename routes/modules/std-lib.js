@@ -20,16 +20,83 @@ function StdLib(db){
     this.db = db;
 };
 
-StdLib.prototype.generateToken = function(){
+/**
+ *
+ * @param ip
+ * @param userAgent
+ * @param ezeoneId
+ * @param callBack function (err,token)
+ */
+StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,callBack){
+    var _this = this;
+    //console.log('generateToken');
+    //var crypto = require("crypto");
+    //var algo = "ecdsa-with-SHA1"
+    //var rand = crypto.randomBytes(64).toString('hex');;
+    //var token = crypto.createHmac(algo, rand)
+    //    .update(Date.now().toString())
+    //    .digest("hex");
+    //return token;
 
-    console.log('generateToken');
-    var crypto = require("crypto");
-    var algo = "ecdsa-with-SHA1"
-    var rand = crypto.randomBytes(64).toString('hex');;
-    var token = crypto.createHmac(algo, rand)
-        .update(Date.now().toString())
-        .digest("hex");
-    return token;
+
+    /////////////////////////////////////////////////////////////////////
+
+    var deviceType = 1;
+    var deviceMapping = {
+        web : 1,
+        android : 2,
+        ios : 3,
+        windowsPhone : 4,
+        windowsApp :  5
+    };
+
+    var preUserAgents = {
+        android : '$__EZEONE_|_2015_|_ANDROID_|_APP__$',
+        ios : 'E-Z-E-O-N-E-!0s-APP-2015',
+        windowsPhone : '|eZeOnE_wInDoWs_pHoNe_2O!5|',
+        windowsApp : '$_wiNDowS_pcAPp_2015_$'
+    };
+
+    for(var agent in preUserAgents){
+        if(preUserAgents.hasOwnProperty(agent) && preUserAgents[agent] === userAgent){
+            deviceType = deviceMapping[agent];
+            break;
+        }
+    }
+
+    var tokenGenQueryParams = ip + ',' + userAgent + ',' + ezeoneId + ',' + deviceType;
+    var tokenGenQuery = 'CALL pGenerateTokenNew('+tokenGenQueryParams + ')';
+
+    _this.db.query(tokenGenQuery,function(err,results){
+       if(err){
+           callBack(err,null);
+       }
+        else{
+           if(results){
+                if(results[0]){
+                    if(results[0][0]){
+                        if(results[0][0].token){
+                            callBack(null,results[0][0].token);
+                        }
+                        else{
+                            callBack(null,null);
+                        }
+                    }
+                    else{
+                        callBack(null,null);
+                    }
+                }
+                else{
+                    callBack(null,null);
+                }
+           }
+           else{
+               callBack(null,null);
+           }
+       }
+    });
+
+
 };
 
 StdLib.prototype.validateToken = function(Token, CallBack){
@@ -41,20 +108,29 @@ StdLib.prototype.validateToken = function(Token, CallBack){
         //below query to check token exists for the users or not.
         if (Token != null && Token != '') {
             if(Token != 2){
-                var Query = 'select TID,Token from tmaster where Token=' + _this.db.escape(Token);
-                //var Query = 'select Token from tmaster';
-                //70084b50d3c43822fbef
+                /**
+                 * @info : Token is now queried from session table i.e. tloginout
+                 */
+                var Query = 'select masterid,token from tloginout where token=' + _this.db.escape(Token)+' AND status = 1';
+
                _this.db.query(Query, function (err, Result) {
                     if (!err) {
-                        if (Result.length > 0) {
-                            // console.log(Result);
-                            console.log('FnValidateToken: Token found');
-                            CallBack(null, Result[0]);
+                        if(Result){
+                            if (Result.length > 0) {
+                                // console.log(Result);
+                                console.log('FnValidateToken: Token found');
+                                CallBack(null, Result[0]);
+                            }
+                            else {
+                                CallBack(null, null);
+                                console.log('FnValidateToken:No Token found');
+                            }
                         }
-                        else {
+                        else{
                             CallBack(null, null);
                             console.log('FnValidateToken:No Token found');
                         }
+
                     }
                     else {
                         CallBack(err, null);
