@@ -51,7 +51,7 @@ function FnEncryptPassword(Password) {
     }
 }
 
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt-nodejs');
 /**
  * Hashes the password for saving into database
  * @param password
@@ -658,14 +658,15 @@ User.prototype.login = function(req,res,next){
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 console.log(loginResult);
                 if (!err) {
-                    if(loginResult) {
+                    if(loginResult && Password) {
                         if (loginResult[0].length > 0) {
                             // console.log('loginResult: ' + loginResult);
-                            var Encrypt = st.generateToken();
+                            //var Encrypt = st.generateToken();
 
 
                             var loginDetails = loginResult[0];
-                            if(comparePassword(Password,loginDetails.Password)){
+
+                            if(comparePassword(Password,loginDetails[0].Password)){
                                 st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
                                     if (!err) {
                                         //  console.log(TokenResult);
@@ -800,13 +801,14 @@ User.prototype.logout = function(req,res,next){
         if (Token != null && Token != '') {
 
             var Query = 'CALL pLogout('+st.db.escape(Token)+')';
-            st.db.query(Query, function (err, TokenResult) {
+            st.db.query(Query, function (err, result) {
                 if (!err) {
-                    if(TokenResult){
+                    if(result){
+                        console.log(result);
                         /**
                          * @todo Please check if the code is working or not
                          */
-                        if(TokenResult){
+                        if(result.affectedRows){
                             RtnMessage.IsAuthenticate = false;
                             console.log('FnLogout: tmaster: Logout success');
                             res.clearCookie('Token');

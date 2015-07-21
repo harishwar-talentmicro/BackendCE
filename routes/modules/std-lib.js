@@ -64,7 +64,9 @@ StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,callBack){
         }
     }
 
-    var tokenGenQueryParams = ip + ',' + userAgent + ',' + ezeoneId + ',' + deviceType;
+
+    var tokenGenQueryParams = _this.db.escape(ip) + ',' + _this.db.escape(userAgent)
+        + ',' + _this.db.escape(ezeoneId) + ',' + _this.db.escape(deviceType);
     var tokenGenQuery = 'CALL pGenerateTokenNew('+tokenGenQueryParams + ')';
 
     _this.db.query(tokenGenQuery,function(err,results){
