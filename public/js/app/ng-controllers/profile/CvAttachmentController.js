@@ -168,11 +168,19 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }).success(function (res)
            {
+               console.log("SAi1");
+               console.log(res);
                 if(res.status)
                 {
+                    console.log("SAi2");
+
+                    console.log(res.skillMatrix.length);
+
                     CVAttachCtrl._CVInfo = res.data[0];
-                    if((res.skillMatrix.length == 0) && (res.skillMatrix == null) && (res.skillMatrix == 'null'))
+                    if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
+                        console.log("SAi10");
+
                         $scope.skillMatrix = [
                             {
                                 "tid":0,
@@ -182,9 +190,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
                                 "active_status":1
                             }
                         ];
+
+                        console.log($scope.skillMatrix);
                     }
                     else
                     {
+                        console.log("SAi11");
                         $scope.skillMatrix.push(
                             {
                                 "tid":0,
@@ -194,6 +205,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                                 "active_status":1
                             }
                         );
+
+                        console.log($scope.skillMatrix);
 
                         for (var nCount = 0; nCount < res.skillMatrix.length; nCount++)
                         {
@@ -240,6 +253,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 }
                 else
                 {
+                    console.log("SAi3");
                     CVAttachCtrl._CVInfo.Status = 1;
                     $scope.showLink = false;
                     $scope.skillMatrix = [
@@ -251,6 +265,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             "active_status":1
                         }
                     ];
+
+                    console.log($scope.skillMatrix);
                 }
            });
     };
@@ -355,15 +371,18 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
         }).success(function (res)
             {
+                console.log("SAi7");
                 $scope.$emit('$preLoaderStop');
                 if(res.status)
                 {
+                    console.log("SAi8");
                     for (var nCount = 0; nCount < res.data.length; nCount++)
                     {
                         $scope.availableTags.push(res.data[nCount].SkillTitle);
                     }
                 }
            }).error(function(err){
+                console.log("SAi9");
                 $scope.$emit('$preLoaderStop');
             });
     };
