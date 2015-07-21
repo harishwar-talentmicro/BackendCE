@@ -235,9 +235,9 @@ User.prototype.register = function(req,res,next){
                     CountryID = 0;
                 }
 
-                if (Operation == 'I') {
-                    TokenNo = st.generateToken();
-                }
+                //if (Operation == 'I') {
+                //    TokenNo = st.generateToken();
+                //}
                 var EncryptPWD = '';
                 if (Password != null) {
                     EncryptPWD = hashPassword(Password);
@@ -332,12 +332,30 @@ User.prototype.register = function(req,res,next){
                                                         // Neat!
                                                         if (!err) {
                                                             console.log('FnRegistration: Mail saved Successfully');
-                                                            res.send(RtnMessage);
                                                         }
                                                         else {
                                                             console.log('FnRegistration: Mail not Saved Successfully' + err);
-                                                            res.send(RtnMessage);
+
                                                         }
+                                                        if (Operation == 'I') {
+                                                            var ip =  req.headers['x-forwarded-for'] ||
+                                                                req.connection.remoteAddress ||
+                                                                req.socket.remoteAddress ||
+                                                                req.connection.socket.remoteAddress;
+                                                            var userAgent = (req.headers['User-Agent']) ? req.headers['User-Agent'] : '';
+
+                                                            st.generateToken(ip,userAgent,EZEID,function(err,token){
+                                                                if(err){
+                                                                    console.log('FnRegistration: Token Generation Error' + err);
+                                                                }
+                                                                else{
+                                                                    RtnMessage.Token = token;
+                                                                }
+                                                                res.send(RtnMessage);
+                                                            });
+                                                        }
+
+
                                                     });
                                                 });
                                             }
@@ -421,9 +439,9 @@ User.prototype.register = function(req,res,next){
                     CountryID = 0;
                 }
 
-                if (Operation == 'I') {
-                    TokenNo = st.generateToken();
-                }
+                //if (Operation == 'I') {
+                //    TokenNo = st.generateToken();
+                //}
                 var EncryptPWD = '';
                 if (Password != null) {
                     EncryptPWD = hashPassword(Password);
@@ -506,12 +524,27 @@ User.prototype.register = function(req,res,next){
                                                         // Neat!
                                                         if (!err) {
                                                             console.log('FnRegistration: Mail saved Successfully');
-                                                            res.send(RtnMessage);
                                                         }
                                                         else {
                                                             console.log('FnRegistration: Mail not Saved Successfully' + err);
-                                                            res.send(RtnMessage);
                                                         }
+
+                                                        var ip =  req.headers['x-forwarded-for'] ||
+                                                            req.connection.remoteAddress ||
+                                                            req.socket.remoteAddress ||
+                                                            req.connection.socket.remoteAddress;
+                                                        var userAgent = (req.headers['User-Agent']) ? req.headers['User-Agent'] : '';
+
+                                                        st.generateToken(ip,userAgent,EZEID,function(err,token) {
+                                                            if (err) {
+                                                                console.log('FnRegistration: Token Generation Error' + err);
+                                                            }
+                                                            else {
+                                                                RtnMessage.Token = token;
+                                                            }
+                                                            res.send(RtnMessage);
+                                                        });
+
                                                     });
                                                 });
                                             }
@@ -587,8 +620,8 @@ User.prototype.register = function(req,res,next){
 
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnRegistration error:' + ex.description);
         //throw new Error(ex);
     }
@@ -616,7 +649,7 @@ User.prototype.login = function(req,res,next){
         //res.setHeader('content-type', 'application/json');
         var UserName = alterEzeoneId(req.body.UserName);
         var Password = req.body.Password;
-        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+        var userAgent = (req.headers['User-Agent']) ? req.headers['User-Agent'] : '';
         var ip = req.headers['x-forwarded-for'] ||
             req.connection.remoteAddress ||
             req.socket.remoteAddress ||
