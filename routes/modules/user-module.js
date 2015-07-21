@@ -50,15 +50,14 @@ function FnEncryptPassword(Password) {
         return 'error'
     }
 }
-/**
+
 var bcrypt = require('bcrypt');
-
-
+/**
  * Hashes the password for saving into database
  * @param password
  * @returns {*}
-
-/**function hashPassword(password){
+*/
+function hashPassword(password){
     if(!password){
         return null;
     }
@@ -66,16 +65,16 @@ var bcrypt = require('bcrypt');
     return hash;
 }
 
-
+/**
  * Compare the password and the hash for authenticating purposes
  * @param password
  * @param hash
  * @returns {*}
-
+ */
 function comparePassword(password,hash){
     return bcrypt.compareSync(password,hash);
 }
-*/
+
 
 /** Now password cannot be decrypted, So this function is useless******/
 function FnDecrypt(EncryptPassword){
@@ -241,7 +240,7 @@ User.prototype.register = function(req,res,next){
                 }
                 var EncryptPWD = '';
                 if (Password != null) {
-                    EncryptPWD = FnEncryptPassword(Password);
+                    EncryptPWD = hashPassword(Password);
                 }
                 var DOBDate = null;
                 console.log(EZEID.toUpperCase());
@@ -427,7 +426,7 @@ User.prototype.register = function(req,res,next){
                 }
                 var EncryptPWD = '';
                 if (Password != null) {
-                    EncryptPWD = FnEncryptPassword(Password);
+                    EncryptPWD = hashPassword(Password);
                 }
                 var DOBDate = null;
                 console.log(EZEID.toUpperCase());
@@ -617,6 +616,11 @@ User.prototype.login = function(req,res,next){
         //res.setHeader('content-type', 'application/json');
         var UserName = alterEzeoneId(req.body.UserName);
         var Password = req.body.Password;
+        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+        var ip = req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress;
         var RtnMessage = {
             Token: '',
             IsAuthenticate: false,
@@ -644,72 +648,82 @@ User.prototype.login = function(req,res,next){
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
-            var EncryptPWD = FnEncryptPassword(Password);
 
             var FindArray = UserName.split('.');
-           
+
             //console.log('findarray: ' + FindArray.length);
 
-            var Query = st.db.escape(UserName)+','+ st.db.escape(EncryptPWD);
-console.log(Query);
-            st.db.query('CALL PLogin(' + Query + ')', function (err, loginResult) {
+            var Query = st.db.escape(UserName);
+            console.log(Query);
+            st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 console.log(loginResult);
                 if (!err) {
                     if(loginResult) {
                         if (loginResult[0].length > 0) {
                             // console.log('loginResult: ' + loginResult);
                             var Encrypt = st.generateToken();
-                               console.log(Encrypt);
-                            var loginDetails = loginResult[0];
-                            console.log(loginDetails[0].TID);
-                            var Query = 'update tmaster set Token=' + st.db.escape(Encrypt) + ' where TID=' + st.db.escape(loginDetails[0].TID);
-                            st.db.query(Query, function (err, TokenResult) {
-                                if (!err) {
-                                    //  console.log(TokenResult);
 
-                                    if (TokenResult.affectedRows > 0) {
-                                        //res.setHeader('Cookie','Token='+Encrypt);
-                                        // console.log(loginDetails[0]);
-                                        res.cookie('Token', Encrypt, { maxAge: 900000, httpOnly: true });
-                                        RtnMessage.Token = Encrypt;
-                                        RtnMessage.IsAuthenticate = true;
-                                        RtnMessage.FirstName = loginDetails[0].FirstName;
-                                        RtnMessage.Type = loginDetails[0].IDTypeID;
-                                        RtnMessage.Icon = loginDetails[0].Icon;
-                                        RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                        RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                        RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                        RtnMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                        RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                        RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                        RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                        RtnMessage.SalesFormMsg= loginDetails[0].SalesFormMsg;
-                                        RtnMessage.ReservationFormMsg= loginDetails[0].ReservationFormMsg;
-                                        RtnMessage.HomeDeliveryFormMsg= loginDetails[0].HomeDeliveryFormMsg;
-                                        RtnMessage.ServiceFormMsg= loginDetails[0].ServiceFormMsg;
-                                        RtnMessage.CVFormMsg= loginDetails[0].CVFormMsg;
-                                        RtnMessage.SalesItemListType= loginDetails[0].SalesItemListType;
-                                        RtnMessage.RefreshInterval= loginDetails[0].RefreshInterval;
-                                        RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                        RtnMessage.MasterID= loginDetails[0].ParentMasterID;
-                                        RtnMessage.VisibleModules= loginDetails[0].VisibleModules;
-                                        RtnMessage.FreshersAccepted= loginDetails[0].FreshersAccepted;
-                                        RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                        res.send(RtnMessage);
-                                        console.log('FnLogin:tmaster: Login success');
+
+                            var loginDetails = loginResult[0];
+                            if(comparePassword(Password,loginDetails.Password)){
+                                st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
+                                    if (!err) {
+                                        //  console.log(TokenResult);
+
+                                        if (TokenResult) {
+                                            //res.setHeader('Cookie','Token='+Encrypt);
+                                            // console.log(loginDetails[0]);
+                                            res.cookie('Token', TokenResult, { maxAge: 900000, httpOnly: true });
+                                            RtnMessage.Token = TokenResult;
+                                            RtnMessage.IsAuthenticate = true;
+                                            RtnMessage.FirstName = loginDetails[0].FirstName;
+                                            RtnMessage.Type = loginDetails[0].IDTypeID;
+                                            RtnMessage.Icon = loginDetails[0].Icon;
+                                            RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                            RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                            RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                            RtnMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                            RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                            RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                            RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                            RtnMessage.SalesFormMsg= loginDetails[0].SalesFormMsg;
+                                            RtnMessage.ReservationFormMsg= loginDetails[0].ReservationFormMsg;
+                                            RtnMessage.HomeDeliveryFormMsg= loginDetails[0].HomeDeliveryFormMsg;
+                                            RtnMessage.ServiceFormMsg= loginDetails[0].ServiceFormMsg;
+                                            RtnMessage.CVFormMsg= loginDetails[0].CVFormMsg;
+                                            RtnMessage.SalesItemListType= loginDetails[0].SalesItemListType;
+                                            RtnMessage.RefreshInterval= loginDetails[0].RefreshInterval;
+                                            RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                            RtnMessage.MasterID= loginDetails[0].ParentMasterID;
+                                            RtnMessage.VisibleModules= loginDetails[0].VisibleModules;
+                                            RtnMessage.FreshersAccepted= loginDetails[0].FreshersAccepted;
+                                            RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                            res.send(RtnMessage);
+                                            console.log('FnLogin:tmaster: Login success');
+                                        }
+                                        else {
+
+                                            res.send(RtnMessage);
+                                            console.log('FnLogin:tmaster:Fail to generate Token');
+                                        }
                                     }
                                     else {
-
+                                        res.statusCode = 500;
                                         res.send(RtnMessage);
-                                        console.log('FnLogin:tmaster:Fail to generate Token');
+                                        console.log('FnLogin:tmaster:' + err);
                                     }
-                                }
-                                else {
-                                    res.statusCode = 500;
-                                    res.send(RtnMessage);
-                                    console.log('FnLogin:tmaster:' + err);
-                                }
-                            });
+                                });
+                            }
+
+                            else{
+                                res.send(RtnMessage);
+                            }
+
+
+
+
+                            //console.log(loginDetails[0].TID);
+
                         }
 
                         else {
@@ -742,14 +756,17 @@ console.log(Query);
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log(ex);
         console.log('FnLogin:: error:' + ex.description);
-           
+
     }
 };
 
+/**
+ * Password migration is still remaining from here
+ */
 /**
  * Method : GET
  * @param req
@@ -782,13 +799,25 @@ User.prototype.logout = function(req,res,next){
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && Token != '') {
 
-            var Query = 'update tmaster set Token=' + st.db.escape('') + ' where Token=' + st.db.escape(Token);
+            var Query = 'CALL pLogout('+st.db.escape(Token)+')';
             st.db.query(Query, function (err, TokenResult) {
                 if (!err) {
-                    RtnMessage.IsAuthenticate = false;
-                    console.log('FnLogout: tmaster: Logout success');
-                    res.clearCookie('Token');
-                    res.send(RtnMessage);
+                    if(TokenResult){
+                        /**
+                         * @todo Please check if the code is working or not
+                         */
+                        if(TokenResult){
+                            RtnMessage.IsAuthenticate = false;
+                            console.log('FnLogout: tmaster: Logout success');
+                            res.clearCookie('Token');
+                            res.send(RtnMessage);
+                        }
+                    }
+                    else{
+                        res.statusCode = 500;
+                        console.log('FnLogout:tmaster:' + err);
+                        res.send(RtnMessage);
+                    }
                 }
                 else {
                     res.statusCode = 500;
@@ -807,10 +836,10 @@ User.prototype.logout = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnLogout error:' + ex.description);
-           
+
     }
 };
 
@@ -1238,8 +1267,8 @@ User.prototype.changePassword = function(req,res,next){
             st.validateToken(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var EncryptOldPWD = FnEncryptPassword(OldPassword);
-                        var EncryptNewPWD = FnEncryptPassword(NewPassword);
+                        var EncryptOldPWD = hashPassword(OldPassword);
+                        var EncryptNewPWD = hashPassword(NewPassword);
                         var Query = st.db.escape(TokenNo) + ',' + st.db.escape(EncryptOldPWD) + ',' + st.db.escape(EncryptNewPWD);
                         st.db.query('CALL pChangePassword(' + Query + ')', function (err, ChangePasswordResult) {
                             if (!err) {
@@ -1323,7 +1352,7 @@ User.prototype.forgetPassword = function(req,res,next){
         if (EZEID != null) {
             var Password = FnRandomPassword();
             // console.log(Password);
-            var EncryptPWD = FnEncryptPassword(Password);
+            var EncryptPWD = hashPassword(Password);
             // console.log(EncryptPWD);
             var Query = 'Update tmaster set Password= ' + st.db.escape(EncryptPWD) + ' where EZEID=' + st.db.escape(EZEID);
             // console.log('FnForgotPassword: ' + Query);

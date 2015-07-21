@@ -85,37 +85,30 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
 
                             if (!err) {
                                 if (GetResult) {
-                                    //console.log('Length:'+GetResult[0].length);
-                                    if(GetResult[0]){
-                                        if (GetResult[0][0]) {
-                                            var totalRecord=GetResult[0][0].TotalCount;
-                                            var limit= 10;
-                                            var PageValue = parseInt(totalRecord / limit);
-                                            var PageMod = totalRecord % limit;
-                                            if (PageMod > 0){
-                                                var TotalPage = PageValue + 1;
-                                            }
-                                            else{
-                                                TotalPage = PageValue;
-                                            }
-
-                                            //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
-                                            RtnMessage.TotalPage = TotalPage;
-                                            RtnMessage.Result =GetResult[0];
-                                            res.send(RtnMessage);
-                                            console.log('FnGetTranscation: Transaction details Send successfully');
+                                    console.log('Length:'+GetResult[0].length);
+                                    if (GetResult[0].length > 0) {
+                                        var totalRecord=GetResult[0][0].TotalCount;
+                                        var limit= 10;
+                                        var PageValue = parseInt(totalRecord / limit);
+                                        var PageMod = totalRecord % limit;
+                                        if (PageMod > 0){
+                                            var TotalPage = PageValue + 1;
+                                        }
+                                        else{
+                                            TotalPage = PageValue;
                                         }
 
-                                        else {
-                                            console.log('FnGetTranscation:No Transaction details found');
-                                            res.json(null);
-                                        }
+                                        //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
+                                        RtnMessage.TotalPage = TotalPage;
+                                        RtnMessage.Result =GetResult[0];
+                                        res.send(RtnMessage);
+                                        console.log('FnGetTranscation: Transaction details Send successfully');
                                     }
-                                    else{
+
+                                    else {
                                         console.log('FnGetTranscation:No Transaction details found');
                                         res.json(null);
                                     }
-
                                 }
                                 else {
                                     console.log('FnGetTranscation:No transaction details found');
