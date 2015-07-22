@@ -38,7 +38,7 @@
             //$scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
             $scope.txSearchTerm = '';
             $scope.showDefaultTab = true;
-
+            console.log('resume ctrl');
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
@@ -739,7 +739,7 @@
             /**
              * Loads company list as soon as controller is initialized
              */
-            loadCompany();
+        //    loadCompany();
 
 
             $scope.$watch('modalBox.tx.companyId',function(n,v){
@@ -1296,6 +1296,7 @@
                                     //    $scope.$emit('$preLoaderStop');
                                     //    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
                                     //});
+                                    $scope.$emit('$preLoaderStop');
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
                                     Notification.error({message : 'Unable to load resume applications list', delay : MsgDelay} );
@@ -1512,6 +1513,7 @@
              * Function is executed once only when dom is loaded and ready
              */
             $scope.domLoaded = function(){
+                console.log('domloaded called');
                 if(!_domLoaded){
                     $timeout(function(){
                         $scope.$emit('$preLoaderStart');
@@ -1520,11 +1522,13 @@
                     _domLoaded = true;
                 }
             };
+
+            init();
             /**
              * Refreshes company data every 1 minute
              */
             $interval(function(){
-                loadCompany();
+                //loadCompany();
             },60000);
 
 
@@ -1544,6 +1548,30 @@
 
             }
 
+            // Get all location list
+            function getLocationList()
+            {
+                $http({
+                    url : GURL + 'ewtGetLocationListForEZEID',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+
+                        console.log(resp);
+                       /* if(resp && resp !== 'null'){
+                            $scope.modalBox.locationList = resp.Result;
+
+                        }
+                        else{
+
+                        }*/
+                    }).error(function(err){
+                      //  defer.reject();
+                    });
+            }
+
             /**
              * select Resume Inquiries Tab
              */
@@ -1556,12 +1584,12 @@
              */
             $scope.TabPostJob = function(){
                 $scope.showDefaultTab = false;
-              //  http://10.0.100.223:3001/ewtGetLocationList?Token=3108561dcf9b5d2efbe8
+
+                getLocationList();
             };
 
 
 
         }]);
-
 })();
 
