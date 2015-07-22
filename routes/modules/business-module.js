@@ -1987,6 +1987,19 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
             message:''
         };
 
+        var validateStatus = true;
+
+        if (!tid) {
+            responseMessage.error['tid'] = 'Invalid tid';
+            validateStatus *= false;
+        }
+        if (!validateStatus) {
+            console.log('FnGetTransAttachment  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to get transaction attachment ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
+
         if (tid) {
 
             st.db.query('CALL pGetTransAttachment(' + st.db.escape(tid) +')', function (err, GetResult) {
@@ -2057,9 +2070,9 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
  * @param res
  * @param next
  */
-BusinessManager.prototype.getTransactionFilter = function(req,res,next){
+BusinessManager.prototype.salesStatistics = function(req,res,next){
     /**
-     * @todo FnGetTransactionFilter
+     * @todo FnSalesStatistics
      */
     var _this = this;
     try {
@@ -2095,6 +2108,12 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
             responseMessage.error['probabilities'] = 'Invalid probabilities';
             validateStatus *= false;
         }
+        if (!validateStatus) {
+            console.log('FnSalesStatistics  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.message = 'Unable to get Sales Statistics ! Please check the errors';
+            res.status(200).json(responseMessage);
+            return;
+        }
 
         if (stages && user && probabilities) {
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
@@ -2123,15 +2142,15 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
                                 funnel:GetResult[1]
                             }
                             responseMessage.error = null;
-                            responseMessage.message = 'Transactionfilter details Send successfully';
-                            console.log('FnGetTransactionfilter: Transactionfilter details Send successfully');
+                            responseMessage.message = 'Sales Statistics Send successfully';
+                            console.log('FnSalesStatistics: Sales Statistics Send successfully');
                             res.status(200).json(responseMessage);
                         }
                         else {
 
                             responseMessage.error = {};
-                            responseMessage.message = 'No founded Transactionfilter details';
-                            console.log('FnGetTransactionfilter: No founded Transactionfilter details');
+                            responseMessage.message = 'No founded Sales Statistics';
+                            console.log('FnSalesStatistics: No founded Sales Statistics');
                             res.json(responseMessage);
                         }
                     }
@@ -2139,8 +2158,8 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
 
 
                         responseMessage.error = {};
-                        responseMessage.message = 'No founded Transactionfilter details';
-                        console.log('FnGetTransactionfilter: No founded Transactionfilter details');
+                        responseMessage.message = 'No founded Sales Statistics';
+                        console.log('FnSalesStatistics: No founded Sales Statistics');
                         res.json(responseMessage);
                     }
 
@@ -2149,8 +2168,8 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
 
                     responseMessage.data = null ;
                     responseMessage.error = {};
-                    responseMessage.message = 'Error in getting Transactionfilter details';
-                    console.log('FnGetTransactionfilter: error in getting Transactionfilter details' + err);
+                    responseMessage.message = 'Error in getting Sales Statistics';
+                    console.log('FnSalesStatistics: error in getting Sales Statistics' + err);
                     res.status(500).json(responseMessage);
                 }
             });
@@ -2162,21 +2181,21 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
                 responseMessage.error = {
                     stages : 'Invalid stages'
                 };
-                console.log('FnGetTransactionfilter: stages is mandatory field');
+                console.log('FnSalesStatistics: stages is mandatory field');
             }
             else if (!probabilities) {
                 responseMessage.message = 'Invalid probabilities';
                 responseMessage.error = {
                     probabilities : 'Invalid probabilities'
                 };
-                console.log('FnGetTransactionfilter: probabilities is mandatory field');
+                console.log('FnSalesStatistics: probabilities is mandatory field');
             }
             else if (!user) {
                 responseMessage.message = 'Invalid user';
                 responseMessage.error = {
                     user : 'Invalid user'
                 };
-                console.log('FnGetTransactionfilter: user is mandatory field');
+                console.log('FnSalesStatistics: user is mandatory field');
             }
 
             res.status(401).json(responseMessage);
@@ -2185,7 +2204,7 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetTransactionfilter:error ' + ex.description);
+        console.log('FnSalesStatistics:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
