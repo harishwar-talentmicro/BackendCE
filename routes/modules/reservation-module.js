@@ -793,14 +793,6 @@ Reservation.prototype.saveFeedback = function(req,res,next){
      */
     var _this = this;
 
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-
-
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -813,6 +805,13 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         var resourceid = req.body.resourceid ? req.body.resourceid : 0;
         var toEzeid = alterEzeoneId(req.body.toEzeid) ? alterEzeoneId(req.body.toEzeid) : '';
         var type = req.body.type;
+
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: null
+        };
 
 
         var validateStatus = true;

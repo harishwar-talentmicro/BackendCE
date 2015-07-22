@@ -188,7 +188,7 @@ app.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
 app.get('/image_url',LocationManager.FnImageURL);
 app.post('/feedback',LocationManager.FnSaveFeedback);
 app.get('/transaction_attachment',LocationManager.FnGetTransAttachment);
-app.get('/transaction_filter',LocationManager.FnGetTransactionFilter);
+app.get('/sales_statistics',LocationManager.FnSalesStatistics);
 app.get('/location_image',LocationManager.FnGetLocationPicture);
 app.get('/resource_image',LocationManager.FnResourcePicture);
 
