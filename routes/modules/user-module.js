@@ -43,8 +43,8 @@ function FnEncryptPassword(Password) {
         return crypted;
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP generate error:' + ex.description);
 
         return 'error'
@@ -56,13 +56,18 @@ var bcrypt = require('bcrypt-nodejs');
  * Hashes the password for saving into database
  * @param password
  * @returns {*}
-*/
+ */
 function hashPassword(password){
     if(!password){
         return null;
     }
-    var hash = bcrypt.hashSync(password, 12);
-    return hash;
+    try{
+        var hash = bcrypt.hashSync(password, 12);
+        return hash;
+    }
+    catch(ex){
+        console.log(ex);
+    }
 }
 
 /**
@@ -72,6 +77,12 @@ function hashPassword(password){
  * @returns {*}
  */
 function comparePassword(password,hash){
+    if(!password){
+        return false;
+    }
+    if(!hash){
+        return false;
+    }
     return bcrypt.compareSync(password,hash);
 }
 
@@ -221,7 +232,10 @@ User.prototype.register = function(req,res,next){
             Icon: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if(OperationType == 1){
+        console.log(OperationType);
+        if(parseInt(OperationType) == 1){
+            console.log('----------req.body for Operation type 1--------------');
+            console.log(req.body);
             if( IDTypeID != null && EZEID != null && Password != null ){
                 if(FirstName == null)
                     FirstName='';
@@ -260,11 +274,12 @@ User.prototype.register = function(req,res,next){
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)  + ',' + st.db.escape(CategoryID);
 
 
-                //console.log(InsertQuery);
+                console.log(InsertQuery);
 
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
-                        //console.log('InsertResult: ' + InsertResult);
+                        console.log('InsertResult: ');
+                        console.log( InsertResult);
                         if (InsertResult != null) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
@@ -428,6 +443,8 @@ User.prototype.register = function(req,res,next){
         }
         else
         {
+            console.log('----------req.body for Operation type other than 1--------------');
+            console.log(req.body);
             if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null  && Gender.toString() != 'NaN') {
                 if (LastName == null) {
                     LastName = '';
@@ -620,6 +637,7 @@ User.prototype.register = function(req,res,next){
 
     }
     catch (ex) {
+        console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnRegistration error:' + ex.description);
@@ -953,8 +971,8 @@ User.prototype.getLoginDetails = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetLoginDetails error:' + ex.description);
         //throw new Error(ex);
     }
@@ -1004,10 +1022,10 @@ User.prototype.getCountry = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetCountry error:' + ex.description);
-           
+
     }
 };
 
@@ -1080,10 +1098,10 @@ User.prototype.getState = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetState error:' + ex.description);
-           
+
     }
 };
 
@@ -1136,10 +1154,10 @@ User.prototype.getCity = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetCity error:' + ex.description);
-           
+
     }
 };
 
@@ -1212,8 +1230,8 @@ User.prototype.getUserDetails = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetUserDetails error:' + ex.description);
 
     }
@@ -1269,8 +1287,8 @@ User.prototype.checkEzeid = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnCheckEzeid error:' + ex.description);
 
     }
@@ -1287,7 +1305,7 @@ User.prototype.changePassword = function(req,res,next){
      * @todo FnChangePassword
      */
     var _this = this;
-       try {
+    try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1357,8 +1375,8 @@ User.prototype.changePassword = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnChangePassword error:' + ex.description);
 
     }
@@ -1472,8 +1490,8 @@ User.prototype.forgetPassword = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnForgetPassword error:' + ex.description);
     }
 };
@@ -1492,28 +1510,28 @@ User.prototype.decryptPassword = function(req,res,next){
     try {
 //res.setHeader("Access-Control-Allow-Origin", "*");
 //res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Origin', "*");
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+        res.header('Access-Control-Allow-Credentials', true);
+        res.header('Access-Control-Allow-Origin', "*");
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+        res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
 
-    var password = req.query.Password;
+        var password = req.query.Password;
 
-    var RtnMessage = {
-        Password : ''
-    };
-    RtnMessage.Password = FnDecrypt(password);
-    console.log(RtnMessage.Password);
-    res.send(RtnMessage);
+        var RtnMessage = {
+            Password : ''
+        };
+        RtnMessage.Password = FnDecrypt(password);
+        console.log(RtnMessage.Password);
+        res.send(RtnMessage);
 
 
-}
-catch(ex){
-    console.log('FnDecrypterror:' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-    return 'error'
-}
+    }
+    catch(ex){
+        console.log('FnDecrypterror:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        return 'error'
+    }
 }
 
 function FnRandomPassword() {
@@ -1528,8 +1546,8 @@ function FnRandomPassword() {
         return text;
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP generate error:' + ex.description);
 
         return 'error'
@@ -1608,8 +1626,8 @@ User.prototype.getCompanyProfile = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetCompanyProfile error:' + ex.description);
 
     }
@@ -1696,8 +1714,8 @@ User.prototype.saveCompanyProfile = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSaveCompanyProfile: Error:' + ex.description);
 
     }
@@ -1778,8 +1796,8 @@ User.prototype.getWebLink = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetWebLink error:' + ex.description);
 
     }
@@ -1875,8 +1893,8 @@ User.prototype.saveWebLink = function(req,res,next){
 
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSaveWebLink:error ' + ex.description);
 
     }
@@ -1956,8 +1974,8 @@ User.prototype.deleteWebLink = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnDeleteWebLink:error ' + ex.description);
 
     }
@@ -2054,8 +2072,8 @@ User.prototype.getEzeidDetails = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnEZEIDDetails error:' + ex.description);
 
     }
@@ -2143,8 +2161,8 @@ User.prototype.getResume = function(req,res,next){
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetCVInfo error:' + ex.description);
 
         res.status(400).json(responseMessage);
@@ -2327,8 +2345,8 @@ User.prototype.saveResume = function(req,res,next){
 
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnSaveCVInfo error:' + ex.description);
 
     }
@@ -2394,8 +2412,8 @@ function FnSaveSkills(skill, CallBack) {
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('OTP FnSendMailEzeid error:' + ex.description);
 
         return 'error'
@@ -2512,8 +2530,8 @@ User.prototype.getDocPin = function(req,res,next) {
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetDocPin:  error:' + ex.description);
     }
 };
@@ -2529,73 +2547,73 @@ User.prototype.getDoc = function(req,res,next) {
      * @todo FnGetDoc
      */
     var _this = this;
-try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var Token = req.query.TokenNo;
-    var Type = parseInt(req.query.Type);
+        var Token = req.query.TokenNo;
+        var Type = parseInt(req.query.Type);
 
-    if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
-                    st.db.query('CALL pGetDocs(' + st.db.escape(Token) + ',' + st.db.escape(Type) + ')', function (err, DocumentResult) {
-                        if (!err) {
-                            //console.log(DocumentResult);
-                            if (DocumentResult[0] != null) {
-                                if (DocumentResult[0].length > 0) {
-                                    res.send(DocumentResult[0]);
-                                    console.log('FnGetDoc: Document sent successfully');
+        if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        st.db.query('CALL pGetDocs(' + st.db.escape(Token) + ',' + st.db.escape(Type) + ')', function (err, DocumentResult) {
+                            if (!err) {
+                                //console.log(DocumentResult);
+                                if (DocumentResult[0] != null) {
+                                    if (DocumentResult[0].length > 0) {
+                                        res.send(DocumentResult[0]);
+                                        console.log('FnGetDoc: Document sent successfully');
+                                    }
+                                    else {
+                                        console.log('FnGetDoc: No document available');
+                                        res.json(null);
+                                    }
+
                                 }
                                 else {
                                     console.log('FnGetDoc: No document available');
                                     res.json(null);
                                 }
-
                             }
                             else {
-                                console.log('FnGetDoc: No document available');
+                                res.statusCode = 500;
                                 res.json(null);
+                                console.log('FnGetDoc: Error in sending documents: ' + err);
                             }
-                        }
-                        else {
-                            res.statusCode = 500;
-                            res.json(null);
-                            console.log('FnGetDoc: Error in sending documents: ' + err);
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        console.log('FnGetDoc: Invalid Token');
+                        res.statusCode = 401;
+                        res.json(null);
+                    }
                 }
                 else {
-                    console.log('FnGetDoc: Invalid Token');
-                    res.statusCode = 401;
+                    console.log('FnGetDoc: Token error: ' + err);
+                    res.statusCode = 500;
                     res.json(null);
                 }
+            });
+
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetDoc: Token is empty');
             }
-            else {
-                console.log('FnGetDoc: Token error: ' + err);
-                res.statusCode = 500;
-                res.json(null);
+            else if (Type.toString() != 'NaN' || Type.toString() == '0') {
+                console.log('FnGetDoc: Type is empty');
             }
-        });
+            res.statusCode = 400;
+            res.json(null);
+        }
 
     }
-    else {
-        if (Token == null) {
-            console.log('FnGetDoc: Token is empty');
-        }
-        else if (Type.toString() != 'NaN' || Type.toString() == '0') {
-            console.log('FnGetDoc: Type is empty');
-        }
-        res.statusCode = 400;
-        res.json(null);
+    catch (ex) {
+        console.log('FnGetDoc error:' + ex.description);
+
     }
-
-}
-catch (ex) {
-    console.log('FnGetDoc error:' + ex.description);
-
-}
 };
 
 /**
@@ -2610,72 +2628,72 @@ User.prototype.updateDocPin = function(req,res,next) {
      */
     var _this = this;
     try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var token = req.body.TokenNo;
-    var tPin = req.body.Pin;
-    var RtnMessage = {
-        IsUpdated: false
-    };
-    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-    if (tPin == '') {
-        tPin = null;
-    }
-    if (token != null && token != '') {
-        st.validateToken(token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
-                    var query = st.db.escape(token) + ',' + st.db.escape(tPin);
-                    st.db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
-                        if (!err) {
-                            //  console.log(UpdateResult);
-                            // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                            if (UpdateResult.affectedRows > 0) {
-                                RtnMessage.IsUpdated = true;
-                                res.send(RtnMessage);
-                                console.log('FnUpdateDocPin:  Doc Pin updates successfully');
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var token = req.body.TokenNo;
+        var tPin = req.body.Pin;
+        var RtnMessage = {
+            IsUpdated: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if (tPin == '') {
+            tPin = null;
+        }
+        if (token != null && token != '') {
+            st.validateToken(token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = st.db.escape(token) + ',' + st.db.escape(tPin);
+                        st.db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
+                            if (!err) {
+                                //  console.log(UpdateResult);
+                                // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
+                                if (UpdateResult.affectedRows > 0) {
+                                    RtnMessage.IsUpdated = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateDocPin:  Doc Pin updates successfully');
+                                }
+                                else {
+                                    console.log('FnUpdateDocPin:  Doc Pin  is not updated');
+                                    res.send(RtnMessage);
+                                }
                             }
                             else {
-                                console.log('FnUpdateDocPin:  Doc Pin  is not updated');
+                                console.log('FnUpdateDocPin: ' + err);
+                                res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
-                        }
-                        else {
-                            console.log('FnUpdateDocPin: ' + err);
-                            res.statusCode = 500;
-                            res.send(RtnMessage);
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        console.log('FnUpdateDocPin: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
                 }
                 else {
-                    console.log('FnUpdateDocPin: Invalid token');
-                    res.statusCode = 401;
+                    console.log('FnUpdateDocPin: : ' + err);
+                    res.statusCode = 500;
                     res.send(RtnMessage);
+
                 }
-            }
-            else {
-                console.log('FnUpdateDocPin: : ' + err);
-                res.statusCode = 500;
-                res.send(RtnMessage);
+            });
 
-            }
-        });
-
-    }
-    else {
-        if (token == null || token == '') {
-            console.log('FnUpdateDocPin: token is empty');
         }
+        else {
+            if (token == null || token == '') {
+                console.log('FnUpdateDocPin: token is empty');
+            }
 
-        res.statusCode = 400;
-        res.send(RtnMessage);
+            res.statusCode = 400;
+            res.send(RtnMessage);
+
+        }
+    }
+    catch (ex) {
+        console.log('FnUpdateDocPin:  error:' + ex.description);
 
     }
-}
-catch (ex) {
-    console.log('FnUpdateDocPin:  error:' + ex.description);
-
-}
 };
 
 /**
@@ -2689,79 +2707,79 @@ User.prototype.saveDoc = function(req,res,next) {
      * @todo FnSaveDoc
      */
     var _this = this;
-try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var Token = req.body.TokenNo;
-    var tRefNo = req.body.RefNo;
-    var tRefExpiryDate = req.body.RefExpiryDate;
-    var tRefType = parseInt(req.body.RefType);
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.body.TokenNo;
+        var tRefNo = req.body.RefNo;
+        var tRefExpiryDate = req.body.RefExpiryDate;
+        var tRefType = parseInt(req.body.RefType);
 
-    var RtnMessage = {
-        IsSuccessfull: false
-    };
-    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-    if (Token != null) {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null && tRefType.toString() != 'NaN') {
-                    if (tRefExpiryDate != null) {
-                        tRefExpiryDate = new Date(tRefExpiryDate);
-                        //console.log(tRefExpiryDate);
-                    }
-                    var query = st.db.escape(Token) + ',' + st.db.escape(tRefNo) + ',' + st.db.escape(tRefExpiryDate) + ',' + st.db.escape(tRefType);
-                    //console.log('FnSaveDoc: Inserting data: ' + query);
-                    st.db.query('CALL pSaveDocs(' + query + ')', function (err, InsertResult) {
-                        if (!err) {
-                            //console.log(InsertResult);
-                            if (InsertResult.affectedRows > 0) {
-                                RtnMessage.IsSuccessfull = true;
-                                console.log('Document Saved successfully');
-                                res.send(RtnMessage);
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null && tRefType.toString() != 'NaN') {
+                        if (tRefExpiryDate != null) {
+                            tRefExpiryDate = new Date(tRefExpiryDate);
+                            //console.log(tRefExpiryDate);
+                        }
+                        var query = st.db.escape(Token) + ',' + st.db.escape(tRefNo) + ',' + st.db.escape(tRefExpiryDate) + ',' + st.db.escape(tRefType);
+                        //console.log('FnSaveDoc: Inserting data: ' + query);
+                        st.db.query('CALL pSaveDocs(' + query + ')', function (err, InsertResult) {
+                            if (!err) {
+                                //console.log(InsertResult);
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    console.log('Document Saved successfully');
+                                    res.send(RtnMessage);
+                                }
+                                else {
+                                    console.log('FnSaveDocs: Document not inserted');
+                                    res.send(RtnMessage);
+                                }
                             }
                             else {
-                                console.log('FnSaveDocs: Document not inserted');
+                                res.statusCode = 500;
                                 res.send(RtnMessage);
+                                console.log('FnSaveDoc: Error in saving documents: ' + err);
                             }
-                        }
-                        else {
-                            res.statusCode = 500;
-                            res.send(RtnMessage);
-                            console.log('FnSaveDoc: Error in saving documents: ' + err);
-                        }
-                    });
-                }
-                else {
-                    if (tRefType.toString() == 'NaN') {
-                        console.log('FnSaveDoc: tRefType');
-                        res.statusCode = 400;
+                        });
                     }
                     else {
-                        console.log('FnSaveDoc: Invalid Token');
-                        res.statusCode = 401;
+                        if (tRefType.toString() == 'NaN') {
+                            console.log('FnSaveDoc: tRefType');
+                            res.statusCode = 400;
+                        }
+                        else {
+                            console.log('FnSaveDoc: Invalid Token');
+                            res.statusCode = 401;
+                        }
+                        res.send(RtnMessage);
                     }
+                }
+                else {
+                    console.log('FnSaveDoc: Token error: ' + err);
+                    res.statusCode = 500;
                     res.send(RtnMessage);
                 }
-            }
-            else {
-                console.log('FnSaveDoc: Token error: ' + err);
-                res.statusCode = 500;
-                res.send(RtnMessage);
-            }
-        });
+            });
+
+        }
+        else {
+            console.log('FnSaveDoc: Token is empty');
+            res.statusCode = 400;
+            res.send(RtnMessage);
+        }
 
     }
-    else {
-        console.log('FnSaveDoc: Token is empty');
-        res.statusCode = 400;
-        res.send(RtnMessage);
+    catch (ex) {
+        console.log('FnSaveDoc error:' + ex.description);
     }
-
-}
-catch (ex) {
-    console.log('FnSaveDoc error:' + ex.description);
-}
 };
 
 /**
@@ -2777,41 +2795,41 @@ User.prototype.getFunctions = function(req,res,next) {
     var _this = this;
     try {
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var LangID = parseInt(req.query.LangID);
-    if (LangID.toString != 'NaN') {
-        var Query = 'select FunctionID, FunctionName  from mfunctiontype where LangID=' + st.db.escape(LangID);
-        st.db.query(Query, function (err, FunctionRoleMapResult) {
-            if (!err) {
-                if (FunctionRoleMapResult.length > 0) {
-                    res.send(FunctionRoleMapResult);
-                    console.log('FnGetFunctions: mfunctiontype: Functions sent successfully');
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var LangID = parseInt(req.query.LangID);
+        if (LangID.toString != 'NaN') {
+            var Query = 'select FunctionID, FunctionName  from mfunctiontype where LangID=' + st.db.escape(LangID);
+            st.db.query(Query, function (err, FunctionRoleMapResult) {
+                if (!err) {
+                    if (FunctionRoleMapResult.length > 0) {
+                        res.send(FunctionRoleMapResult);
+                        console.log('FnGetFunctions: mfunctiontype: Functions sent successfully');
+                    }
+                    else {
+                        res.json(null);
+                        res.statusCode = 500;
+                        console.log('FnGetFunctions: mfunctiontype: No function  found');
+                    }
                 }
                 else {
+
                     res.json(null);
-                    res.statusCode = 500;
-                    console.log('FnGetFunctions: mfunctiontype: No function  found');
+                    console.log('FnGetFunctions: mfunctiontype: ' + err);
                 }
-            }
-            else {
+            });
+        }
+        else {
+            console.log('FnGetFunctions: LangId is empty');
+            res.statusCode = 400;
+            res.json(null);
+        }
 
-                res.json(null);
-                console.log('FnGetFunctions: mfunctiontype: ' + err);
-            }
-        });
     }
-    else {
-        console.log('FnGetFunctions: LangId is empty');
-        res.statusCode = 400;
-        res.json(null);
+    catch (ex) {
+        console.log('FnGetFunctions error:' + ex.description);
+
     }
-
-}
-catch (ex) {
-    console.log('FnGetFunctions error:' + ex.description);
-
-}
 };
 
 var fs = require("fs");
@@ -2826,63 +2844,69 @@ User.prototype.uploadDoc = function(req,res,next) {
      * @todo FnUploadDocument
      */
     var _this = this;
-try {
+    try {
 
-    var deleteTempFile = function(){
-        fs.unlink('../bin/'+req.files.file.path);
-    };
+        var deleteTempFile = function(){
+            fs.unlink('../bin/'+req.files.file.path);
+        };
 
-    var RtnMessage = {
-        IsSuccessfull: false
-    };
-    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-    // console.log(req.files);
-    // console.log(req.body);
-    var Token = req.body.TokenNo;
-    var CntType = req.files.file.mimetype;
-    var RefFileName = req.files.file.path;
-    //var RefFileName = req.body.Filename;
-    var tRefType = req.body.RefType;
-    //console.log(req.body);
+        // console.log(req.files);
+        // console.log(req.body);
+        var Token = req.body.TokenNo;
+        var CntType = req.files.file.mimetype;
+        var RefFileName = req.files.file.path;
+        //var RefFileName = req.body.Filename;
+        var tRefType = req.body.RefType;
+        //console.log(req.body);
 
-    st.validateToken(Token, function (err, Result) {
-        if (!err) {
-            if (Result != null) {
-                if (req && req.files) {
-                    if (CntType != null && RefFileName != null && tRefType != null && Token != null) {
+        st.validateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    if (req && req.files) {
+                        if (CntType != null && RefFileName != null && tRefType != null && Token != null) {
 
-                        var fileName = '';
-                        if (RefFileName != null) {
-                            fileName = RefFileName.split('.').pop();
-                        }
-                        //console.log(Token);
-                        fs.readFile(RefFileName, function (err, original_data) {
-                            var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64')) + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType);
-                            //console.log(query);
-                            st.db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
-                                if (!err) {
-                                    //    console.log(InsertResult);
-                                    if (InsertResult.affectedRows > 0) {
-                                        RtnMessage.IsSuccessfull = true;
-                                        console.log('FnUploadDocument: Document Saved successfully');
-                                        res.send(RtnMessage);
-                                        deleteTempFile();
+                            var fileName = '';
+                            if (RefFileName != null) {
+                                fileName = RefFileName.split('.').pop();
+                            }
+                            //console.log(Token);
+                            fs.readFile(RefFileName, function (err, original_data) {
+                                var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64')) + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType);
+                                //console.log(query);
+                                st.db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
+                                    if (!err) {
+                                        //    console.log(InsertResult);
+                                        if (InsertResult.affectedRows > 0) {
+                                            RtnMessage.IsSuccessfull = true;
+                                            console.log('FnUploadDocument: Document Saved successfully');
+                                            res.send(RtnMessage);
+                                            deleteTempFile();
+                                        }
+                                        else {
+                                            console.log('FnUploadDocument: Document not inserted');
+                                            res.send(RtnMessage);
+                                            deleteTempFile();
+                                        }
                                     }
                                     else {
-                                        console.log('FnUploadDocument: Document not inserted');
+                                        res.statusCode = 500;
                                         res.send(RtnMessage);
+                                        console.log('FnUploadDocument: Error in saving documents:' + err);
                                         deleteTempFile();
                                     }
-                                }
-                                else {
-                                    res.statusCode = 500;
-                                    res.send(RtnMessage);
-                                    console.log('FnUploadDocument: Error in saving documents:' + err);
-                                    deleteTempFile();
-                                }
+                                });
                             });
-                        });
+                        }
+                        else {
+                            res.send(RtnMessage);
+                            console.log('FnUploadDocument: Mandatory field are available');
+                            deleteTempFile();
+                        }
                     }
                     else {
                         res.send(RtnMessage);
@@ -2891,31 +2915,25 @@ try {
                     }
                 }
                 else {
+                    res.statusCode = 401;
                     res.send(RtnMessage);
-                    console.log('FnUploadDocument: Mandatory field are available');
+                    console.log('FnUploadDocument: Invalid Token');
                     deleteTempFile();
                 }
             }
             else {
-                res.statusCode = 401;
+                res.statusCode = 500;
                 res.send(RtnMessage);
-                console.log('FnUploadDocument: Invalid Token');
+                console.log('FnUploadDocument: Error in validating token: ' + err);
                 deleteTempFile();
             }
-        }
-        else {
-            res.statusCode = 500;
-            res.send(RtnMessage);
-            console.log('FnUploadDocument: Error in validating token: ' + err);
-            deleteTempFile();
-        }
-    });
-}
-catch (ex) {
-    console.log('FnGetDocument error:' + ex.description);
-    //throw new Error(ex);
-    deleteTempFile();
-}
+        });
+    }
+    catch (ex) {
+        console.log('FnGetDocument error:' + ex.description);
+        //throw new Error(ex);
+        deleteTempFile();
+    }
 };
 
 var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
@@ -2952,33 +2970,37 @@ User.prototype.webLinkRedirect = function(req,res,next) {
      * @todo FnWebLinkRedirect
      */
     var _this = this;
-if(req.params.id){
-    var link = req.params.id;
-    var arr = link.split('.');
-    if(arr.length > 1){
-        var lastItem = arr[arr.length - 1];
+    if(req.params.id){
+        var link = req.params.id;
+        var arr = link.split('.');
+        if(arr.length > 1){
+            var lastItem = arr[arr.length - 1];
 
-        arr.splice(arr.length - 1,1);
+            arr.splice(arr.length - 1,1);
 
-        var ezeid = alterEzeoneId(arr.join('.'));
+            var ezeid = alterEzeoneId(arr.join('.'));
 
-        var urlBreaker = lastItem.split('');
-        if(urlBreaker.length > 1 && urlBreaker.length < 4){
-            if(urlBreaker[0] === 'U'){
-                urlBreaker.splice(0,1);
-                var urlSeqNumber = parseInt(urlBreaker.join(''));
-                if(!isNaN(urlSeqNumber)){
-                    if(urlSeqNumber > 0 && urlSeqNumber < 100){
-                        FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+            var urlBreaker = lastItem.split('');
+            if(urlBreaker.length > 1 && urlBreaker.length < 4){
+                if(urlBreaker[0] === 'U'){
+                    urlBreaker.splice(0,1);
+                    var urlSeqNumber = parseInt(urlBreaker.join(''));
+                    if(!isNaN(urlSeqNumber)){
+                        if(urlSeqNumber > 0 && urlSeqNumber < 100){
+                            FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
 
-                            if(url){
-                                res.redirect(url);
-                            }
-                            else{
+                                if(url){
+                                    res.redirect(url);
+                                }
+                                else{
 
-                                next();
-                            }
-                        });
+                                    next();
+                                }
+                            });
+                        }
+                        else{
+                            next();
+                        }
                     }
                     else{
                         next();
@@ -2999,10 +3021,6 @@ if(req.params.id){
     else{
         next();
     }
-}
-else{
-    next();
-}
 };
 
 /**
@@ -3050,8 +3068,8 @@ User.prototype.getMTitle = function(req,res,next) {
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetMTitle error:' + ex.description);
 
     }
@@ -3157,8 +3175,8 @@ User.prototype.updateProfilePicture = function(req,res,next) {
 
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnUpdateProfilePicture error:' + ex.description);
 
     }
@@ -3217,8 +3235,8 @@ User.prototype.getLoginCheck = function(req,res,next) {
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetUserDetails error:' + ex.description);
 
     }
@@ -3266,8 +3284,8 @@ User.prototype.getProxmity = function(req,res,next) {
         }
     }
     catch (ex) {
-	var errorDate = new Date();
-	console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnGetProxmity error:' + ex.description);
         //throw new Error(ex);
     }
