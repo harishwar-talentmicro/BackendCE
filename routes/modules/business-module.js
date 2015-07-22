@@ -2091,25 +2091,26 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
             responseMessage.error['user'] = 'Invalid user';
             validateStatus *= false;
         }
+        if (!probabilities) {
+            responseMessage.error['probabilities'] = 'Invalid probabilities';
+            validateStatus *= false;
+        }
 
-        if (stages && user) {
+        if (stages && user && probabilities) {
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
                 + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, GetResult) {
-
-                //var length = GetResult[0].length;
-
-                //var total = 0;
-
-
+                var length = GetResult[0].length;
+                var total_count = 0, total_qty = 0;
                 if (!err) {
                     if (GetResult) {
                         if (GetResult.length > 0) {
-                            //for (var i = 0; i > length; i++)
-                            //{
-                            //    total = total + GetResult[0][i].amount;
-                            //    console.log(total);
-                            //}
+                            console.log(GetResult[0][0].amount);
+                            for (var i = 0; i < length; i++)
+                            {
+                                total_count = total_count + GetResult[0][i].amount;
+                                total_qty = total_qty + GetResult[0][i].qty;
+                            }
                             responseMessage.status = true;
                             responseMessage.data = {
                                 from_date :from_date,
@@ -2117,8 +2118,8 @@ BusinessManager.prototype.getTransactionFilter = function(req,res,next){
                                 stages : stages,
                                 probabilities : probabilities,
                                 transactions : GetResult[0],
-                                total_amount :null,
-                                total_items:null,
+                                total_amount :total_count,
+                                total_items:total_qty,
                                 funnel:GetResult[1]
                             }
                             responseMessage.error = null;
