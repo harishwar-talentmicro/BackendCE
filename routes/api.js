@@ -1,8 +1,16 @@
-
+/**
+ *  @author Gowri shankar
+ *  @since July 22,2015 02:55 PM IST
+ *  @title api.js
+ *  @description Handles all web services url paths
+ */
+"use strict";
 
 var express = require('express');
 var router = express.Router();
 var LocationManager = require('../routes/routes.js');
+
+
 //this part is for passenger
 router.post('/ewLogin', LocationManager.FnLogin);
 router.get('/ewLogout', LocationManager.FnLogout);
