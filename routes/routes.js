@@ -144,6 +144,12 @@ exports.FnSaveFeedback = reservationModule.saveFeedback;
 exports.FnResourcePicture = reservationModule.getResourcePicture;
 
 
+var JobModule = require('./modules/job-module.js');
+var job = new JobModule(db,stdLib);
+exports.FnSaveJobs = job.create;
+exports.FnGetJobs = job.getAll;
+
+
 //ap parts
 var Auth_AP = require('./ap-modules/auth-module-ap.js');
 var authModuleAP = new Auth_AP(db,stdLib);

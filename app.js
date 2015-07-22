@@ -165,6 +165,8 @@ app.get('/transaction_attachment',LocationManager.FnGetTransAttachment);
 app.get('/sales_statistics',LocationManager.FnSalesStatistics);
 app.get('/location_image',LocationManager.FnGetLocationPicture);
 app.get('/resource_image',LocationManager.FnResourcePicture);
+app.post('/job',LocationManager.FnSaveJobs);
+app.get('/job',LocationManager.FnGetJobs);
 
 
 //below service are for EZEIDAP
