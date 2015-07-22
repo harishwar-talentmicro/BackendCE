@@ -465,13 +465,12 @@
 
         <div class="row setRowLeftRightMarginZero post-job" ng-hide="showDefaultTab">
            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-
                 <div class="row setRowLeftRightMarginZero topMarginButton">
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
                         <label>Job Title</label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
-                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Job Title">
+                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "jobTitle" placeholder="Job Title">
                     </div>
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                     </div>
@@ -479,7 +478,7 @@
                         <label>Job Code</label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
-                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Job Code">
+                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "jobCode" placeholder="Job Code">
                     </div>
                 </div>
                 <div class="row setRowLeftRightMarginZero setTopMargin">
@@ -490,7 +489,7 @@
                     </div>
                     <div class="row setRowLeftRightMarginZero">
                         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setPaddingLeftRight0    ">
-                            <textarea rows="3" class="form-control no-radius ng-pristine ng-valid ng-touched" name="keywords">Job Description</textarea>
+                            <textarea rows="3" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "jobDescription" name="keywords">Job Description</textarea>
                         </div>
                     </div>
                 </div>
@@ -499,7 +498,7 @@
                         <label>Skill Keywords</label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
-                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Ex: Sales, Marketing">
+                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "skillKeyWords" placeholder="Ex: Sales, Marketing">
                     </div>
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                     </div>
@@ -508,7 +507,7 @@
                         <label>No.of Vacancies</label>
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="No. of Vacancies">
+                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "jobVacancies" placeholder="No. of Vacancies">
                     </div>
                 </div>
                 <div class="row setRowLeftRightMarginZero setTopMargin">
@@ -518,13 +517,13 @@
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
                         <div class="row setRowLeftRightMarginZero">
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
-                                <input type="text" class="form-control" placeholder="Ex: 1" >
+                                <input type="text" class="form-control" placeholder="Ex: 1" ng-model = "experienceFrom" >
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0 text-center inerAddText">
                                 <div>to</div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
-                                <input type="text" class="form-control" placeholder="Ex: 3">
+                                <input type="text" class="form-control" placeholder="Ex: 3" ng-model = "experienceTo">
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0 text-center inerAddText">
                                 <span>Years</span>
@@ -559,13 +558,13 @@
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
                             <div class="row setRowLeftRightMarginZero">
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
-                                    <input type="text" class="form-control" placeholder="Ex: 100000" >
+                                    <input type="text" class="form-control" placeholder="Ex: 100000" ng-model = "salaryFrom">
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0 text-center inerAddText">
                                     <div>to</div>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
-                                    <input type="text" class="form-control" placeholder="Ex: 200000">
+                                    <input type="text" class="form-control" placeholder="Ex: 200000" ng-model = "salaryTo">
                                 </div>
                             </div>
                         </div>
@@ -573,7 +572,7 @@
                             <div>Per</div>
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
-                            <select class="form-control ng-pristine ng-valid ng-touched">
+                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "salaryType">
                                 <option value="0"> Hour </option>
                                 <option value="1"> Month </option>
                                 <option value="2"> Annual </option>
@@ -584,7 +583,7 @@
                         </div>
 
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <select class="form-control ng-pristine ng-valid ng-touched">
+                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
                                 <option value="0"> Job Type </option>
                                 <option value="1"> Full Time </option>
                                 <option value="2"> Part Time </option>
@@ -603,27 +602,26 @@
                     </div>
                     <div class="row setRowLeftRightMarginZero">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Contact name">
+                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Contact name" ng-model = "contactName">
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Phone Number">
+                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Phone Number" ng-model = "phone">
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Email ID">
+                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Email ID" ng-model = "email">
                         </div>
                     </div>
                 </div>
                 <div class="row setRowLeftRightMarginZero setTopMargin">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                            <input type="button" class="btn btn-primary" value="Save">
-                            <input type="button" class="btn btn-primary" value="Cancel">
-                        </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                        <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
+                        <input type="button" class="btn btn-primary" value="Cancel">
+                    </div>
                 </div>
-               
             </div>
         </div>
     </div>

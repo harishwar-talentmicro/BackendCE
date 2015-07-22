@@ -38,7 +38,6 @@
             //$scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
             $scope.txSearchTerm = '';
             $scope.showDefaultTab = true;
-            console.log('resume ctrl');
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
@@ -48,7 +47,6 @@
             {
                 $location.path('/business-manager');
             };
-
 
             /**
              * Permission Configuration for what fields and button should be visible and what should be hidden
@@ -162,6 +160,19 @@
             $scope.txActionTypes = [];
             $scope.txFolderRules = [];
 
+            // Declaretion for job posting
+            $scope.jobTitle = "";
+            $scope.jobCode = "";
+            $scope.jobDescription = "";
+            $scope.skillKeyWords = "";
+            $scope.jobVacancies = "";
+            $scope.experienceFrom = "";
+            $scope.experienceTo = "";
+            $scope.salaryFrom = "";
+            $scope.salaryTo = "";
+            $scope.salaryType = "";
+            $scope.jobType = "";
+            $scope.contactName = "";
 
 
             $scope.showModal = false;
@@ -1560,16 +1571,10 @@
                 }).success(function(resp){
 
                         console.log(resp);
-                       /* if(resp && resp !== 'null'){
-                            $scope.modalBox.locationList = resp.Result;
 
-                        }
-                        else{
-
-                        }*/
-                    }).error(function(err){
-                      //  defer.reject();
-                    });
+                }).error(function(err){
+                  //  defer.reject();
+                });
             }
 
             /**
@@ -1586,6 +1591,11 @@
                 $scope.showDefaultTab = false;
 
                 getLocationList();
+            };
+
+            // save job to system
+            $scope.postJob = function(){
+                console.log($scope.jobTitle);
             };
 
 
