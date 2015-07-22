@@ -356,19 +356,20 @@ Location.prototype.getAllForEzeid = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var TID = req.query.TID;
+        //var TID = req.query.TID;
         var RtnMessage = {
             Result: [],
             Message: ''
         };
         console.log(req.query.Token);
         console.log(Token);
-        if (Token && TID) {
+        if (Token) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
+                        console.log(Result);
                         //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+st.db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+st.db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+st.db.escape(TID);
-                        st.db.query('CALL pGetSubUserLocationList(' + st.db.escape(TID) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetSubUserLocationList(' + st.db.escape(Result.masterid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult[0]) {
                                     if (GetResult[0].length > 0) {
@@ -419,10 +420,7 @@ Location.prototype.getAllForEzeid = function(req,res,next){
                 console.log('FnGetLocationListForEZEID: Token is empty');
                 RtnMessage.Message ='Token is empty';
             }
-            else if (TID == null) {
-                console.log('FnGetLocationListForEZEID: TID is empty');
-                RtnMessage.Message ='TID is empty';
-            }
+            
             res.statusCode=400;
             res.send(RtnMessage);
         }
