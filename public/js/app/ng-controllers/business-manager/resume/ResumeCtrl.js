@@ -38,7 +38,6 @@
             //$scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
             $scope.txSearchTerm = '';
             $scope.showDefaultTab = true;
-
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
@@ -48,7 +47,6 @@
             {
                 $location.path('/business-manager');
             };
-
 
             /**
              * Permission Configuration for what fields and button should be visible and what should be hidden
@@ -162,6 +160,19 @@
             $scope.txActionTypes = [];
             $scope.txFolderRules = [];
 
+            // Declaretion for job posting
+            $scope.jobTitle = "";
+            $scope.jobCode = "";
+            $scope.jobDescription = "";
+            $scope.skillKeyWords = "";
+            $scope.jobVacancies = "";
+            $scope.experienceFrom = "";
+            $scope.experienceTo = "";
+            $scope.salaryFrom = "";
+            $scope.salaryTo = "";
+            $scope.salaryType = "";
+            $scope.jobType = "";
+            $scope.contactName = "";
 
 
             $scope.showModal = false;
@@ -739,7 +750,7 @@
             /**
              * Loads company list as soon as controller is initialized
              */
-            loadCompany();
+        //    loadCompany();
 
 
             $scope.$watch('modalBox.tx.companyId',function(n,v){
@@ -1296,6 +1307,7 @@
                                     //    $scope.$emit('$preLoaderStop');
                                     //    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
                                     //});
+                                    $scope.$emit('$preLoaderStop');
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
                                     Notification.error({message : 'Unable to load resume applications list', delay : MsgDelay} );
@@ -1512,6 +1524,7 @@
              * Function is executed once only when dom is loaded and ready
              */
             $scope.domLoaded = function(){
+                console.log('domloaded called');
                 if(!_domLoaded){
                     $timeout(function(){
                         $scope.$emit('$preLoaderStart');
@@ -1520,11 +1533,13 @@
                     _domLoaded = true;
                 }
             };
+
+            init();
             /**
              * Refreshes company data every 1 minute
              */
             $interval(function(){
-                loadCompany();
+                //loadCompany();
             },60000);
 
 
@@ -1544,6 +1559,24 @@
 
             }
 
+            // Get all location list
+            function getLocationList()
+            {
+                $http({
+                    url : GURL + 'ewtGetLocationListForEZEID',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+
+                        console.log(resp);
+
+                }).error(function(err){
+                  //  defer.reject();
+                });
+            }
+
             /**
              * select Resume Inquiries Tab
              */
@@ -1556,12 +1589,17 @@
              */
             $scope.TabPostJob = function(){
                 $scope.showDefaultTab = false;
-              //  http://10.0.100.223:3001/ewtGetLocationList?Token=3108561dcf9b5d2efbe8
+
+                getLocationList();
+            };
+
+            // save job to system
+            $scope.postJob = function(){
+                console.log($scope.jobTitle);
             };
 
 
 
         }]);
-
 })();
 

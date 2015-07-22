@@ -463,69 +463,67 @@
             </div>
         </div>
 
-        <div class="row setRowLeftRightMarginZero" ng-hide="showDefaultTab">
-           <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">-->
-
-                <div class="row setRowLeftRightMarginZero">
+        <div class="row setRowLeftRightMarginZero post-job" ng-hide="showDefaultTab">
+           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                <div class="row setRowLeftRightMarginZero topMarginButton">
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
-                        <span>Job Title</span>
+                        <label>Job Title</label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
-                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Job Title">
+                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "jobTitle" placeholder="Job Title">
                     </div>
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                     </div>
-
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
-                        <span>Job Code</span>
+                        <label>Job Code</label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
-                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Job Code">
+                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "jobCode" placeholder="Job Code">
                     </div>
                 </div>
-                <div class="row setRowLeftRightMarginZero topMarginButton">
+                <div class="row setRowLeftRightMarginZero setTopMargin">
                    <div class="row setRowLeftRightMarginZero">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <span>Job Description</span>
+                            <label>Job Description</label>
                         </div>
                     </div>
                     <div class="row setRowLeftRightMarginZero">
                         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setPaddingLeftRight0    ">
-                            <textarea rows="3" class="form-control no-radius ng-pristine ng-valid ng-touched" name="keywords">Job Description</textarea>
+                            <textarea rows="3" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "jobDescription" name="keywords">Job Description</textarea>
                         </div>
                     </div>
                 </div>
-                <div class="row setRowLeftRightMarginZero topMarginButton">
+                <div class="row setRowLeftRightMarginZero setTopMargin">
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
-                        <span>Skill Keywords</span>
+                        <label>Skill Keywords</label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
-                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Ex: Sales, Marketing">
+                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "skillKeyWords" placeholder="Ex: Sales, Marketing">
                     </div>
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                     </div>
 
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
-                        <span>No.of Vacancies</span>
+                        <label>No.of Vacancies</label>
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="No. of Vacancies">
+                        <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" ng-model = "jobVacancies" placeholder="No. of Vacancies">
                     </div>
                 </div>
-                <div class="row setRowLeftRightMarginZero topMarginButton">
+                <div class="row setRowLeftRightMarginZero setTopMargin">
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
-                        <span>Experience</span>
+                        <label>Experience</label>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
                         <div class="row setRowLeftRightMarginZero">
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
-                                <input type="text" class="form-control" placeholder="Ex: 1" >
+                                <input type="text" class="form-control" placeholder="Ex: 1" ng-model = "experienceFrom" >
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0 text-center inerAddText">
                                 <div>to</div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
-                                <input type="text" class="form-control" placeholder="Ex: 3">
+                                <input type="text" class="form-control" placeholder="Ex: 3" ng-model = "experienceTo">
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0 text-center inerAddText">
                                 <span>Years</span>
@@ -536,37 +534,37 @@
                     </div>
 
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
-                        <span>Locations</span>
+                        <label>Locations</label>
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
                         <select class="form-control ng-pristine ng-valid ng-touched">
                             <option value="0">
 
-                                <label>L1</label>
+                                <span>L1</span>
                             </option>
                             <option value="1">
 
-                                <label>L2</label>
+                                <span>L2</span>
                             </option>
 
                         </select>
                     </div>
                 </div>
-                <div class="row setRowLeftRightMarginZero topMarginButton">
+                <div class="row setRowLeftRightMarginZero setTopMargin">
                     <div class="row setRowLeftRightMarginZero">
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
-                            <span>Salary</span>
+                            <label>Salary</label>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setPaddingLeftRight0">
                             <div class="row setRowLeftRightMarginZero">
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
-                                    <input type="text" class="form-control" placeholder="Ex: 100000" >
+                                    <input type="text" class="form-control" placeholder="Ex: 100000" ng-model = "salaryFrom">
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0 text-center inerAddText">
                                     <div>to</div>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeftRight0">
-                                    <input type="text" class="form-control" placeholder="Ex: 200000">
+                                    <input type="text" class="form-control" placeholder="Ex: 200000" ng-model = "salaryTo">
                                 </div>
                             </div>
                         </div>
@@ -574,7 +572,7 @@
                             <div>Per</div>
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
-                            <select class="form-control ng-pristine ng-valid ng-touched">
+                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "salaryType">
                                 <option value="0"> Hour </option>
                                 <option value="1"> Month </option>
                                 <option value="2"> Annual </option>
@@ -585,7 +583,7 @@
                         </div>
 
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <select class="form-control ng-pristine ng-valid ng-touched">
+                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
                                 <option value="0"> Job Type </option>
                                 <option value="1"> Full Time </option>
                                 <option value="2"> Part Time </option>
@@ -594,345 +592,347 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row setRowLeftRightMarginZero">
+                    <div class="row setRowLeftRightMarginZero salaryInfoText">
                         <span>(For India, enter the amount in Rs. Lakhs)</span>
                     </div>
                 </div>
-                <div class="row setRowLeftRightMarginZero topMarginButton">
+                <div class="row setRowLeftRightMarginZero setTopMargin">
                     <div class="row setRowLeftRightMarginZero">
-                        Contact Information
+                        <label>Contact Information</label>
                     </div>
                     <div class="row setRowLeftRightMarginZero">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Contact name">
+                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Contact name" ng-model = "contactName">
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Phone Number">
+                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Phone Number" ng-model = "phone">
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Email ID">
+                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Email ID" ng-model = "email">
                         </div>
                     </div>
                 </div>
-                <div class="row setRowLeftRightMarginZero topMarginButton">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
-                            <input type="button" class="btn btn-primary" value="Save">
-                            <input type="button" class="btn btn-primary" value="Cancel">
-                        </div>
+                <div class="row setRowLeftRightMarginZero setTopMargin">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
+                        <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
+                        <input type="button" class="btn btn-primary" value="Cancel">
                     </div>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
     <div class="row">
-            <!-- Modal Box starts -->
-            <modal mtitle="modalBox.title" mclass="modalBox.class" visible="showModal">
-                <div class="container-fluid">
-                    <div class="row">
+        <!-- Modal Box starts -->
+        <modal mtitle="modalBox.title" mclass="modalBox.class" visible="showModal">
+            <div class="container-fluid">
+                <div class="row">
 
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
-                            <div class="row">
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>EZEOne</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group form-group-sm ">
-                                                <input type="text" class="form-control no-radius"
-                                                       ezeid-only
-                                                       name="ezeid"
-                                                       ng-disabled="modalBox.editMode"
-                                                       ng-model="modalBox.tx.ezeid"
-                                                       ng-change="(modalBox.tx.contactInfo = '')"
-                                                       ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }" />
-                                            </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>EZEOne</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <input type="text" class="form-control no-radius"
+                                                   ezeid-only
+                                                   name="ezeid"
+                                                   ng-disabled="modalBox.editMode"
+                                                   ng-model="modalBox.tx.ezeid"
+                                                   ng-change="(modalBox.tx.contactInfo = '')"
+                                                   ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }" />
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
 
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Company</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
-                                             ng-if="!modalBox.editMode" ng-show="!modalBox.editMode">
-                                            <!--<div class="form-group form-group-sm ">-->
-                                            <!--<input type="text" class="form-control no-radius"-->
-                                            <!--placeholder="Company Name"-->
-                                            <!--ng-disabled="modalBox.tx.ezeid"-->
-                                            <!--ng-model="modalBox.tx.companyName"-->
-                                            <!--ng-model-options="{updateOn : 'blur',debounce : {'blur': 0} }"/>-->
-                                            <!--</div>-->
-                                            <autocomplete
-                                                    list="companySuggestionList"
-                                                    company-id="modalBox.tx.companyId"
-                                                    company-name="modalBox.tx.companyName"
-                                                    load-suggestion="loadSuggestion"></autocomplete>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
-                                            <div class="form-group form-group-sm">
-                                                <input class="form-control" disabled type="text" value="{{modalBox.tx.companyName}}"/>
-                                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Company</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                                         ng-if="!modalBox.editMode" ng-show="!modalBox.editMode">
+                                        <!--<div class="form-group form-group-sm ">-->
+                                        <!--<input type="text" class="form-control no-radius"-->
+                                        <!--placeholder="Company Name"-->
+                                        <!--ng-disabled="modalBox.tx.ezeid"-->
+                                        <!--ng-model="modalBox.tx.companyName"-->
+                                        <!--ng-model-options="{updateOn : 'blur',debounce : {'blur': 0} }"/>-->
+                                        <!--</div>-->
+                                        <autocomplete
+                                                list="companySuggestionList"
+                                                company-id="modalBox.tx.companyId"
+                                                company-name="modalBox.tx.companyName"
+                                                load-suggestion="loadSuggestion"></autocomplete>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
+                                        <div class="form-group form-group-sm">
+                                            <input class="form-control" disabled type="text" value="{{modalBox.tx.companyName}}"/>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Contact Information</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group form-group-sm ">
-                                                <input type="text"
-                                                       class="form-control no-radius"
-                                                       placeholder="Contact Information"
-                                                       name="contactInfo"
-                                                       ng-disabled="modalBox.tx.ezeid"
-                                                       ng-model="modalBox.tx.contactInfo" />
-                                            </div>
-
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Contact Information</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <input type="text"
+                                                   class="form-control no-radius"
+                                                   placeholder="Contact Information"
+                                                   name="contactInfo"
+                                                   ng-disabled="modalBox.tx.ezeid"
+                                                   ng-model="modalBox.tx.contactInfo" />
                                         </div>
 
                                     </div>
-                                </div>
 
-                                <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
+                                </div>
+                            </div>
+
+                            <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
+                            <!--<div class="row">-->
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                            <!--<label>Location</label>-->
+                            <!--</div>-->
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                            <!--<div class="form-group form-group-sm ">-->
+                            <!--<select class="form-control" ng-model="modalBox.tx.locId" name="locId">-->
+                            <!--<option value="0">&#45;&#45;Select Locations&#45;&#45;</option>-->
+                            <!--</select>-->
+                            <!--</div>-->
+                            <!--</div>-->
+                            <!--</div>-->
+                            <!--</div>-->
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Transaction Status</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <select class="form-control" ng-model="modalBox.tx.statusType">
+                                                <!--<option value="">&#45;&#45;Select Status of Transaction&#45;&#45;</option>-->
+                                                <option value="0">New</option>
+                                                <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{::txStatus.TID}}">{{::txStatus.StatusTitle}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Next Action</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <select class="form-control" ng-model="modalBox.tx.nextAction" name="nextAction">
+                                                <option value="0">--Select Next Action to be taken--</option>
+                                                <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Next Action Date and Time</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
+                                                                "format" : "d M Y H:m:s",
+                                                                "timepicker" : true,
+                                                                "mask" : false,
+                                                                "hours12" : false,
+                                                                "minDate" : "-1970/01/01"
+                                                                }'></date-time-picker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Folder Rules</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <select class="form-control" ng-model="modalBox.tx.folderRule" name="folderRule">
+                                                <option value="0">--Select Folder Rule from list--</option>
+                                                <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
+                            <!--<div class="row">-->
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                            <!--<label>Order Amount</label>-->
+                            <!--</div>-->
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                            <!--<div class="form-group form-group-sm ">-->
+                            <!--<input type="text" numbers-only class="form-control no-radius" placeholder="Contact Information" name="orderAmount" />-->
+                            <!--</div>-->
+
+                            <!--</div>-->
+
+
+                            <!--</div>-->
+                            <!--</div>-->
+
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label> Message</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Notes</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                        <textarea rows="1" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
                                 <!--<div class="row">-->
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                <!--<label>Location</label>-->
-                                <!--</div>-->
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                <!--<div class="form-group form-group-sm ">-->
-                                <!--<select class="form-control" ng-model="modalBox.tx.locId" name="locId">-->
-                                <!--<option value="0">&#45;&#45;Select Locations&#45;&#45;</option>-->
-                                <!--</select>-->
-                                <!--</div>-->
-                                <!--</div>-->
-                                <!--</div>-->
-                                <!--</div>-->
-
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Transaction Status</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group form-group-sm ">
-                                                <select class="form-control" ng-model="modalBox.tx.statusType">
-                                                    <!--<option value="">&#45;&#45;Select Status of Transaction&#45;&#45;</option>-->
-                                                    <option value="0">New</option>
-                                                    <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{::txStatus.TID}}">{{::txStatus.StatusTitle}}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Next Action</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group form-group-sm ">
-                                                <select class="form-control" ng-model="modalBox.tx.nextAction" name="nextAction">
-                                                    <option value="0">--Select Next Action to be taken--</option>
-                                                    <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Next Action Date and Time</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group form-group-sm ">
-                                                <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
-                                                                    "format" : "d M Y H:m:s",
-                                                                    "timepicker" : true,
-                                                                    "mask" : false,
-                                                                    "hours12" : false,
-                                                                    "minDate" : "-1970/01/01"
-                                                                    }'></date-time-picker>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Folder Rules</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group form-group-sm ">
-                                                <select class="form-control" ng-model="modalBox.tx.folderRule" name="folderRule">
-                                                    <option value="0">--Select Folder Rule from list--</option>
-                                                    <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
-                                <!--<div class="row">-->
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                <!--<label>Order Amount</label>-->
-                                <!--</div>-->
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                <!--<div class="form-group form-group-sm ">-->
-                                <!--<input type="text" numbers-only class="form-control no-radius" placeholder="Contact Information" name="orderAmount" />-->
-                                <!--</div>-->
-
-                                <!--</div>-->
-
-
-                                <!--</div>-->
-                                <!--</div>-->
-
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label> Message</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                    <div class="row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                            <label>Notes</label>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
-                                            <textarea rows="1" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-
-
-                                <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
-                                    <!--<div class="row">-->
-                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                            <!--<label> Address</label>-->
-                                        <!--</div>-->
-                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
-                                            <!--<div class="form-group form-group-sm ">-->
-                                                <!--<select class="form-control" ng-model="modalBox.tx.locId" ng-change="findAddress()">-->
-                                                    <!--<option value="">Other Location</option>-->
-                                                    <!--<option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>-->
-                                                <!--</select>-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
-                                            <!--<div class="form-group form-group-sm ">-->
-                                                <!--<input-->
-                                                        <!--ng-disabled="modalBox.tx.locId"-->
-                                                        <!--type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
-                                            <!--<div class="form-group form-group-sm ">-->
-                                                <!--<input type="text"-->
-                                                       <!--ng-disabled="modalBox.tx.locId"-->
-                                                       <!--placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
-                                            <!--<div class="form-group form-group-sm ">-->
-                                                <!--<input-->
-                                                        <!--ng-disabled="modalBox.tx.locId"-->
-                                                        <!--type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
-                                            <!--<div class="form-group form-group-sm ">-->
-                                                <!--<input type="text"-->
-                                                       <!--ng-disabled="modalBox.tx.locId"-->
-                                                       <!--placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
-                                            <!--<div class="form-group form-group-sm ">-->
-                                                <!--<input type="text"-->
-                                                       <!--ng-disabled="modalBox.tx.locId"-->
-                                                       <!--placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">-->
-                                            <!--<textarea  rows="4" class="form-control" ng-model="modalBox.tx.deliveryAddress"></textarea>-->
+                                    <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                        <!--<label> Address</label>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                            <!--<select class="form-control" ng-model="modalBox.tx.locId" ng-change="findAddress()">-->
+                                                <!--<option value="">Other Location</option>-->
+                                                <!--<option ng-repeat="location in modalBox.locationList track by location.TID" value="{{location.TID}}">{{location.LocTitle}}</option>-->
+                                            <!--</select>-->
                                         <!--</div>-->
                                     <!--</div>-->
+                                    <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                            <!--<input-->
+                                                    <!--ng-disabled="modalBox.tx.locId"-->
+                                                    <!--type="text" placeholder="Address Line 1" class="form-control no-radius"  name="area" ng-model="modalBox.tx.address" />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                            <!--<input type="text"-->
+                                                   <!--ng-disabled="modalBox.tx.locId"-->
+                                                   <!--placeholder="Locality" class="form-control no-radius"  name="area" ng-model="modalBox.tx.area" />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                            <!--<input-->
+                                                    <!--ng-disabled="modalBox.tx.locId"-->
+                                                    <!--type="text" placeholder="City" class="form-control no-radius" name="city" ng-model="modalBox.tx.city" />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                            <!--<input type="text"-->
+                                                   <!--ng-disabled="modalBox.tx.locId"-->
+                                                   <!--placeholder="State" class="form-control no-radius" name="state" ng-model="modalBox.tx.state" />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-hide="modalBox.editMode">-->
+                                        <!--<div class="form-group form-group-sm ">-->
+                                            <!--<input type="text"-->
+                                                   <!--ng-disabled="modalBox.tx.locId"-->
+                                                   <!--placeholder="Country" class="form-control no-radius"  name="country" ng-model="modalBox.tx.country" />-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">-->
+                                        <!--<textarea  rows="4" class="form-control" ng-model="modalBox.tx.deliveryAddress"></textarea>-->
+                                    <!--</div>-->
                                 <!--</div>-->
+                            <!--</div>-->
 
 
-                                <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
-                                <!--<div class="row">-->
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                <!--<label>Delivery Address</label>-->
-                                <!--</div>-->
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                            <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
+                            <!--<div class="row">-->
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                            <!--<label>Delivery Address</label>-->
+                            <!--</div>-->
+                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
 
-                                <!--<textarea rows="4" class="form-control no-radius" ng-model="modalBox.tx.deliveryAddress" name="deliveryAddress"></textarea>-->
+                            <!--<textarea rows="4" class="form-control no-radius" ng-model="modalBox.tx.deliveryAddress" name="deliveryAddress"></textarea>-->
 
-                                <!--</div>-->
-                                <!--</div>-->
-                                <!--</div>-->
-
-                            </div>
-
-                            <div class="row top-clearfix-padding-half bottom-clearfix">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode && (!resumePermissionConf.txUpdate)">
-                                    <small class="text-danger">You do not have permission to edit the application</small>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode" ng-click="saveTransaction()">
-                                        <span class="glyphicon glyphicon-hand-right"></span>
-                                        Submit Resume Application
-                                    </button>
-                                    <button ng-click="saveTransaction()"
-                                            class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
-                                            title="(resumePermissionConf.txUpdate) ? 'Update resume application' : 'You do not have editing permission'"
-                                            ng-disabled="(!resumePermissionConf.txUpdate)">
-                                        <span class="glyphicon glyphicon-ok-circle"></span>
-                                        Update Resume Application
-                                    </button>
-                                    <button class="btn btn-danger btn-sm no-radius" ng-click="toggleModalBox()">
-                                        <span class="glyphicon glyphicon-remove"></span>
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
+                            <!--</div>-->
+                            <!--</div>-->
+                            <!--</div>-->
 
                         </div>
 
-                    </div>
-                </div>
-            </modal>
-            <!-- end: ModalBox ends -->
-            {{domLoaded()}}
+                        <div class="row top-clearfix-padding-half bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode && (!resumePermissionConf.txUpdate)">
+                                <small class="text-danger">You do not have permission to edit the application</small>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode" ng-click="saveTransaction()">
+                                    <span class="glyphicon glyphicon-hand-right"></span>
+                                    Submit Resume Application
+                                </button>
+                                <button ng-click="saveTransaction()"
+                                        class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
+                                        title="(resumePermissionConf.txUpdate) ? 'Update resume application' : 'You do not have editing permission'"
+                                        ng-disabled="(!resumePermissionConf.txUpdate)">
+                                    <span class="glyphicon glyphicon-ok-circle"></span>
+                                    Update Resume Application
+                                </button>
+                                <button class="btn btn-danger btn-sm no-radius" ng-click="toggleModalBox()">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
 
-        </div>
+                    </div>
+
+                </div>
+            </div>
+        </modal>
+        <!-- end: ModalBox ends -->
+
+
+    </div>
 
 </div>
+
 
 
 <!-- Template for Item having item name,description,picture,qty and rate -->

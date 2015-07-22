@@ -1923,23 +1923,13 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     min-height: 80px;
     font-family: 'Open Sans Light', sans-serif;
 }
-/*
 
-.resume-tab .nav > li.active > a, ul > li.active > a {
-    background: #60D560;
-    color: #FFF;
-    margin-bottom: 0px;
-    border: none;
+.post-job label {
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
+    color: #11A300;
 }
-
-.resume-tab .nav > li > a, ul > li > a {
-    border-radius: 0px;
-    background: #D9ECFF;
-    color: #0DA3D8;
-    margin-bottom: 10px;
+.salaryInfoText
+{
+    color: rgb(205, 100, 121);
 }
-
-.resume-tab .nav > li > a:hover, ul > li > a:hover{
-    background: #98F098;
-    color: #3295BA;
-}*/
