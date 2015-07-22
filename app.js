@@ -3,8 +3,8 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser'), cors = require('cors'),
-LocationManager = require('./routes/routes.js');
+var bodyParser = require('body-parser'), cors = require('cors');
+var LocationManager = require('./routes/routes.js');
 var compress = require('compression');
 
 var app = express();
@@ -32,6 +32,8 @@ app.use(multer({ dest: './uploads/'}));
 function setHeaders(res, path) {
     res.setHeader('Content-Disposition', contentDisposition(path))
 }
+var api = require('./routes/api.js');
+app.use('/api',api);
 
 app.use('/css', express.static(path.join(__dirname, 'public/css/'),{
     setHeaders : function(res,path){
@@ -51,34 +53,6 @@ app.use('/js', express.static(path.join(__dirname, 'public/js/'),{
 app.use('/fonts', express.static(path.join(__dirname, 'public/fonts/')));
 app.use('/directives', express.static(path.join(__dirname, 'public/directives/')));
 app.use('/images', express.static(path.join(__dirname, 'public/images/')));
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        res.status(err.status || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
-});
-
-app.get('/legal.html',function(req,res,next){
-    res.sendFile(__dirname + '/public/html/legal.html');
-});
 
 //this part is for passenger
 app.post('/ewLogin', LocationManager.FnLogin);
@@ -191,6 +165,8 @@ app.get('/transaction_attachment',LocationManager.FnGetTransAttachment);
 app.get('/sales_statistics',LocationManager.FnSalesStatistics);
 app.get('/location_image',LocationManager.FnGetLocationPicture);
 app.get('/resource_image',LocationManager.FnResourcePicture);
+app.post('/job',LocationManager.FnSaveJobs);
+app.get('/job',LocationManager.FnGetJobs);
 
 
 //below service are for EZEIDAP
@@ -231,6 +207,37 @@ app.get('/ewtGetGatesVES',LocationManager.FnGetGatesVES);
 app.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
 app.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
 app.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
+
+// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err
+        });
+    });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
+});
+
+
+app.get('/legal.html',function(req,res,next){
+    res.sendFile(__dirname + '/public/html/legal.html');
+});
+
+
 
 app.get('/test',function(req,res){
     res.status(200).json(req.cookies);
