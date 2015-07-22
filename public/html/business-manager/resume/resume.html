@@ -537,6 +537,19 @@
                         <label>Locations</label>
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
+
+<!--                        <button title="Search by" ng-click="selectJobType()" type="button" class="btn btn-default normal-view-buttons dropdown-toggle keyword-btn-radius" data-toggle="dropdown">
+                            <b class="ng-binding">Job Type</b>
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;">
+                            <li ng-repeat="KeyWord in KeyWords">
+                                <a ng-click="setAutoCompeted(KeyWord)">{{KeyWord}}</a>
+                            </li>
+                        </ul>-->
+
+
+<!--
                         <select class="form-control ng-pristine ng-valid ng-touched">
                             <option value="0">
 
@@ -547,7 +560,13 @@
                                 <span>L2</span>
                             </option>
 
-                        </select>
+                        </select>-->
+
+                        <div isteven-multi-select="" input-model="modernBrowsers"
+                             output-model="anyOutput"
+                             button-label="icon name" item-label="icon name maker" tick-property="ticked">
+
+                        </div>
                     </div>
                 </div>
                 <div class="row setRowLeftRightMarginZero setTopMargin">
@@ -602,7 +621,11 @@
                     </div>
                     <div class="row setRowLeftRightMarginZero">
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-                            <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Contact name" ng-model = "contactName">
+
+                            <div class="form-group">
+                                <input type="text" class="form-control no-radius ng-pristine ng-valid ng-touched" placeholder="Contact name" ng-model = "contactName"/>
+                                <small class="text-danger" ng-show="contactName.length < 1 && validationDone">Please check Contact Name</small>
+                            </div>
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0">
                         </div>
