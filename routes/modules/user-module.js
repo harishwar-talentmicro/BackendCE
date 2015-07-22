@@ -61,8 +61,13 @@ function hashPassword(password){
     if(!password){
         return null;
     }
-    var hash = bcrypt.hashSync(password, 12);
-    return hash;
+    try{
+        var hash = bcrypt.hashSync(password, 12);
+        return hash;
+    }
+    catch(ex){
+        console.log(ex);
+    }
 }
 
 /**
@@ -72,6 +77,12 @@ function hashPassword(password){
  * @returns {*}
  */
 function comparePassword(password,hash){
+    if(!password){
+        return false;
+    }
+    if(!hash){
+        return false;
+    }
     return bcrypt.compareSync(password,hash);
 }
 
@@ -221,7 +232,10 @@ User.prototype.register = function(req,res,next){
             Icon: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if(OperationType == 1){
+        console.log(OperationType);
+        if(parseInt(OperationType) == 1){
+            console.log('----------req.body for Operation type 1--------------');
+            console.log(req.body);
             if( IDTypeID != null && EZEID != null && Password != null ){
                 if(FirstName == null)
                     FirstName='';
@@ -260,11 +274,12 @@ User.prototype.register = function(req,res,next){
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)  + ',' + st.db.escape(CategoryID);
 
 
-                //console.log(InsertQuery);
+                console.log(InsertQuery);
 
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
-                        //console.log('InsertResult: ' + InsertResult);
+                        console.log('InsertResult: ');
+                        console.log( InsertResult);
                         if (InsertResult != null) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
@@ -428,6 +443,8 @@ User.prototype.register = function(req,res,next){
         }
         else
         {
+            console.log('----------req.body for Operation type other than 1--------------');
+            console.log(req.body);
             if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null  && Gender.toString() != 'NaN') {
                 if (LastName == null) {
                     LastName = '';
@@ -620,6 +637,7 @@ User.prototype.register = function(req,res,next){
 
     }
     catch (ex) {
+        console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnRegistration error:' + ex.description);
