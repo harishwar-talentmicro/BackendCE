@@ -161,6 +161,7 @@
             $scope.txFolderRules = [];
 
             // Declaration for job posting
+            $scope.locationList = [];
             $scope.jobTitle = "";
             $scope.jobCode = "";
             $scope.jobDescription = "";
@@ -1599,18 +1600,24 @@
             // Get all posted Jobs
             function getPostedJob()
             {
+                $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'job',
                     method : 'GET',
                     params : {
-                        Token : $rootScope._userInfo.Token,
+                        token : $rootScope._userInfo.Token,
                         ezeone_id : $rootScope._userInfo.ezeid
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
 
-
+                    if(resp.status)
+                    {
+                        $scope.jobData = resp.data;
+                        console.log($scope.jobData);
+                    }
                 }).error(function(err){
-                    //  defer.reject();
+                    $scope.$emit('$preLoaderStop');
                 });
             }
 
@@ -1709,18 +1716,18 @@
 
                     var location = [
                         {
-                            location_title : 'bangalore',
-                            latitude :  12.453323,
-                            longitude : 73.4545,
-                            country : 'india'
+                            "location_title" : "bangalore",
+                            "latitude" :  "12.453323",
+                            "longitude" : "73.4545",
+                            "country" : "india"
                         },
                         {
-                            location_title : 'chennai',
-                            latitude :  12.453323,
-                            longitude : 73.4545,
-                            country : 'india'
+                            "location_title" : "chennai",
+                            "latitude" :  "12.453323",
+                            "longitude" : "73.4545",
+                            "country" : "india"
                         }
-                    ];
+                    ]
 
                     $scope.jobData = {
                                         token : $rootScope._userInfo.Token,
@@ -1741,7 +1748,7 @@
                                         contactName : $scope.contactName,
                                         email_id : $scope.email,
                                         mobileNo : $scope.phone,
-                                        locationsList : location
+                                        locationsList : JSON.stringify(location)
                                      }
                     $http({
                         method: "POST",
@@ -1766,7 +1773,7 @@
                 }
             };
 
-
+            $scope.SalaryTypeList = [{ id: 1, label: "Hour" }, { id: 2, label: "White List" }];
 
         }]);
 })();
