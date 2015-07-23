@@ -1631,7 +1631,7 @@
                     err.push('Please select Per Hour/PM/PA');
                 }
                 if($scope.jobType == 0){
-                    err.push('Please select Job type');
+                    err.push('Please select Job type');  
                 }
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
