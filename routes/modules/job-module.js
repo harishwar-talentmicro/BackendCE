@@ -60,7 +60,11 @@ Job.prototype.create = function(req,res,next){
     var email_id = req.body.email_id;
     var mobileNo = req.body.mobileNo;
     var locationsList = req.body.locationsList;
-    locationsList = JSON.parse(locationsList);
+    if(typeof(locationsList) == "string"){
+        locationsList = JSON.parse(locationsList);
+    }
+
+
     var location_id = '';
 
     var responseMessage = {
