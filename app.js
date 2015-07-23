@@ -192,6 +192,8 @@ app.get('/location_image',LocationManager.FnGetLocationPicture);
 app.get('/resource_image',LocationManager.FnResourcePicture);
 app.post('/job',LocationManager.FnSaveJobs);
 app.get('/job',LocationManager.FnGetJobs);
+app.get('/job_locations',LocationManager.FnGetJobLocations);
+app.get('/job_search',LocationManager.FnSearchJobs);
 
 
 //below service are for EZEIDAP

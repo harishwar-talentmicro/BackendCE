@@ -3052,3 +3052,14 @@ sup.tm{
 {
     width:32.5%;
 }
+
+.hpw .filter-dropdown .selected
+{
+    background-color: rgb(19, 165, 120);
+    color: #fff;
+}
+
+.hpw .drop-down-4
+{
+    padding-left: 66%;
+}
