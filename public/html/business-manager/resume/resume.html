@@ -6,8 +6,8 @@
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 tabs-row-sales">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a ng-click="TabResumeInquiries()"> <span class="glyphicon glyphicon-copy"></span> Resume Inquiries</a></li>
-                    <li><a ng-click="TabPostJob()"> <span class="glyphicon glyphicon-share"></span>  Post Job</a></li>
+                    <li class="active"><a ng-click="TabResumeInquiries()"> <span class="glyphicon glyphicon-copy"></span> Recruitment Tracker </a></li>
+                    <li><a ng-click="TabPostJob()"> <span class="glyphicon glyphicon-folder-open"></span> Jobs </a></li>
                 </ul>
             </div>
         </div>
@@ -464,6 +464,7 @@
         </div>
 
         <div class="row setRowLeftRightMarginZero post-job" ng-hide="showDefaultTab">
+
            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
                 <div class="row setRowLeftRightMarginZero topMarginButton">
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setPaddingLeftRight0 fotterButtonContainer">
@@ -537,36 +538,7 @@
                         <label>Locations</label>
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeftRight0">
-
-<!--                        <button title="Search by" ng-click="selectJobType()" type="button" class="btn btn-default normal-view-buttons dropdown-toggle keyword-btn-radius" data-toggle="dropdown">
-                            <b class="ng-binding">Job Type</b>
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;">
-                            <li ng-repeat="KeyWord in KeyWords">
-                                <a ng-click="setAutoCompeted(KeyWord)">{{KeyWord}}</a>
-                            </li>
-                        </ul>-->
-
-
-<!--
-                        <select class="form-control ng-pristine ng-valid ng-touched">
-                            <option value="0">
-
-                                <span>L1</span>
-                            </option>
-                            <option value="1">
-
-                                <span>L2</span>
-                            </option>
-
-                        </select>-->
-
-                        <div isteven-multi-select="" input-model="modernBrowsers"
-                             output-model="anyOutput"
-                             button-label="icon name" item-label="icon name maker" tick-property="ticked">
-
-                        </div>
+                        <input type="text" class="form-control" placeholder="Locations" ng-model = "jobLocations"/>
                     </div>
                 </div>
                 <div class="row setRowLeftRightMarginZero setTopMargin">
