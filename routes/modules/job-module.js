@@ -79,6 +79,9 @@ Job.prototype.create = function(req,res,next){
         validateStatus *= false;
     }
     if(!tid){
+        tid = 0;
+    }
+    if(parseInt(tid) == NaN){
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }

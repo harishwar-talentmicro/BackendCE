@@ -331,7 +331,65 @@
     <!--List of Job Start hear-->
 
     <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in jobData track by tx.tid">
-        <div class="row tx-row even job-result setRowLeftRightMarginZero" tabindex="1">
+
+
+            <div class="row tx-row even" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <small class="ng-binding">
+                                16-Jul 03:49 PM
+                            </small>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <b class="font-roboto ng-binding" ng-class="{'hidden' : (!tx.RequesterEZEID)}">@GOWRI</b>
+                       </div>
+                    </div>
+                </div>
+                <div class="col-lg-2  col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="java" style="word-wrap:break-word;">
+                    <small class="text-success">
+                        <b class="ng-binding">java</b>
+                    </small>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" title="Do not have permission to edit" ng-hide="editModes[$index]" ng-dblclick="(resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No action yet</small>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                            <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="toggleModalBox($event,$index)" data-original-title="View Details">
+                                <span class="glyphicon glyphicon-fullscreen"></span>
+                                Details
+                            </button>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                            <button ng-disabled="!resumePermissionConf.txUpdate" title="You do not have permission to edit" ng-click="(resumePermissionConf.txUpdate) ? (toggleAllEditMode($index,false,false,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius" disabled="disabled">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
+                    <a target="_blank" title="Download Resume" href="/@GOWRI.CV" class="btn btn-default btn-xs">Download
+                        <br>
+                        Resume</a>
+                </div>
+
+            </div>
+
+
+
+
+        <!--<div class="row tx-row even job-result setRowLeftRightMarginZero" tabindex="1">
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix">
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -341,11 +399,11 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="col-lg-2  col-md-2 col-sm-12 col-xs-12 bottom-clearfix">
+            &lt;!&ndash;<div class="col-lg-2  col-md-2 col-sm-12 col-xs-12 bottom-clearfix">
                    <label><b class="job-resultColor">Skills </b> </label> Html,Css,Js
                 <br>
                 <label><b class="job-resultColor">Vacancies</b> </label>  <small> 10</small>
-            </div>-->
+            </div>&ndash;&gt;
             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix">
                 <label> <b class="job-resultColor">Exp</b> </label>  1 to 5 Years
                 <br>
@@ -366,7 +424,7 @@
                     </label>
                 </div>
             </div>
-        </div>
+        </div>-->
     </div>
 
     <!--List of Job End hear-->

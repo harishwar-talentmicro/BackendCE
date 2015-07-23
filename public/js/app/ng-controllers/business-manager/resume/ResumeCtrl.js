@@ -1750,6 +1750,7 @@
                                         mobileNo : $scope.phone,
                                         locationsList : JSON.stringify(location)
                                      }
+
                     $http({
                         method: "POST",
                         url: GURL + 'job',
