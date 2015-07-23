@@ -101,6 +101,16 @@ StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,callBack){
 
 };
 
+StdLib.prototype.generateRandomHash = function(timeStamp){
+    var crypto = require('crypto');
+    var hash = crypto.createHash('sha1');
+    if(!timeStamp){
+        timeStamp = Date.now().toString();
+    }
+    hash.update(timeStamp.toString());
+    return hash.digest('hex') + crypto.randomBytes(30).toString('hex');
+}
+
 StdLib.prototype.validateToken = function(Token, CallBack){
     var _this = this;
     console.log('validateToken');
