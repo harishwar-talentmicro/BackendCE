@@ -51,7 +51,7 @@ function FnEncryptPassword(Password) {
     }
 }
 
-var bcrypt = require('bcrypt-nodejs');
+var bcrypt = require('bcrypt');
 /**
  * Hashes the password for saving into database
  * @param password
