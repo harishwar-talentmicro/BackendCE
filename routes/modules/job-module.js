@@ -60,11 +60,11 @@ Job.prototype.create = function(req,res,next){
     var email_id = req.body.email_id;
     var mobileNo = req.body.mobileNo;
     var locationsList = req.body.locationsList;
-    if(typeof(locationsList) == "string"){
+
         locationsList = JSON.parse(locationsList);
-    }
+    
 
-
+    console.log(req.body);
     var location_id = '';
 
     var responseMessage = {
@@ -161,6 +161,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
+                                console.log(insertresult);
 
                                 if (!err) {
                                     if (insertresult) {
@@ -388,5 +389,45 @@ Job.prototype.getAll = function(req,res,next){
         }
     }
     };
+
+
+Job.prototype.getJobLocations = function(req,res,next){
+    /**
+     * @todo FnGetJobLocations
+     */
+    var _this = this;
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to load Locations ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        st.db.query('CALL pgetjoblocations()',function(err,result){
+            if(err){
+                console.log('Error : FnGetJobLocations ');
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'Locations loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnGetJobLocations '+ ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
 
 module.exports = Job;
