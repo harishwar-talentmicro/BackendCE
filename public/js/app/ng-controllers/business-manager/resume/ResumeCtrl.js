@@ -160,7 +160,7 @@
             $scope.txActionTypes = [];
             $scope.txFolderRules = [];
 
-            // Declaretion for job posting
+            // Declaration for job posting
             $scope.jobTitle = "";
             $scope.jobCode = "";
             $scope.jobDescription = "";
@@ -170,9 +170,14 @@
             $scope.experienceTo = "";
             $scope.salaryFrom = "";
             $scope.salaryTo = "";
-            $scope.salaryType = "";
-            $scope.jobType = "";
+            $scope.salaryType = "0";
+            $scope.jobType = "0";
             $scope.contactName = "";
+            $scope.phone = "";
+            $scope.email = "";
+
+            $scope.validationDone = false;
+
 
 
             $scope.showModal = false;
@@ -1570,10 +1575,11 @@
                     }
                 }).success(function(resp){
 
+                        console.log("SAi321");
                         console.log(resp);
 
                 }).error(function(err){
-                  //  defer.reject();
+                    //  defer.reject();
                 });
             }
 
@@ -1593,11 +1599,189 @@
                 getLocationList();
             };
 
-            // save job to system
-            $scope.postJob = function(){
-                console.log($scope.jobTitle);
+            // Validation function
+            function validateItem(){
+
+                var err = [];
+                if($scope.jobTitle.length < 1 ){
+                    err.push('Job Title is empty');
+                }
+                if($scope.jobCode.length < 1){
+                    err.push('Job Code is empty');
+                }
+                if($scope.jobDescription.length < 1){
+                    err.push('Job Description is empty');
+                }
+                if($scope.skillKeyWords.length < 1){
+                    err.push('Skill Keywords is empty');
+                }
+                if($scope.experienceFrom.length < 1){
+                    err.push('Experience From is empty');
+                }
+                if($scope.experienceTo.length < 1){
+                    err.push('Experience To is empty');
+                }
+                if($scope.salaryFrom.length < 1){
+                    err.push('Salary From is empty');
+                }
+                if($scope.salaryTo.length < 1){
+                    err.push('Salary To is empty');
+                }
+                if($scope.salaryType == 1){
+                    err.push('Please select Per Hour/PM/PA');
+                }
+                if($scope.jobType == 0){
+                    err.push('Please select Job type');  
+                }
+                if($scope.contactName.length < 1){
+                    err.push('Contact Name is empty');
+                }
+                if($scope.phone.length < 1){
+                    err.push('Phone is empty');
+                }
+                if($scope.email.length < 1){
+                    err.push('Email is empty');
+                }
+
+                if(err.length > 0){
+                    for(var i = 0; i < err.length; i++){
+                        Notification.error({ message : err[i], delay : 2000});
+                    }
+                    return false;
+                }
+
+                return true;
             };
 
+            // save job to system
+            $scope.postJob = function(){
+                $scope.validationDone = true;
+                if(validateItem())
+                {
+
+                    console.log($scope.jobTitle);
+                    console.log($scope.jobCode);
+                    console.log($scope.jobDescription);
+                    console.log($scope.skillKeyWords);
+                    console.log($scope.jobVacancies);
+                    console.log($scope.experienceFrom);
+                    console.log($scope.experienceTo);
+                    console.log($scope.salaryFrom);
+                    console.log($scope.salaryTo);
+                    console.log($scope.salaryType);
+                    console.log($scope.jobType);
+                    console.log($scope.contactName);
+                    console.log($scope.phone);
+                    console.log($scope.email);
+
+                    $scope.jobData = {
+                                        token : $rootScope._userInfo.Token,
+                                        tid : 0,
+                                        ezeone_id : "@krunal",
+                                        job_code : $scope.jobCode,
+                                        job_title : $scope.jobTitle,
+                                        exp_from : $scope.experienceFrom,
+                                        exp_to : $scope.experienceTo,
+                                        job_description : $scope.jobDescription,
+                                        salaryFrom : $scope.salaryFrom,
+                                        salaryTo :  $scope.salaryTo,
+                                        salaryType : $scope.salaryType,
+                                        keySkills : $scope.skillKeyWords,
+                                        openings : $scope.jobVacancies,
+                                        jobType : $scope.jobType,
+                                        status : 1,
+                                        contactName : $scope.contactName,
+                                        email_id : $scope.email,
+                                        mobileNo : $scope.phone
+                                     }
+                    $http({
+                        method: "POST",
+                        url: GURL + 'job',
+                        data:  $scope.jobData
+
+                    }).success(function (data) {
+
+                            console.log(data);
+
+                            if(data.IsSuccessfull) {
+                                /*Notification.success({message: "Saved..", delay: MsgDelay});
+                                $scope.skillMatrix = [];
+                                skillsTid = [];
+
+                                $timeout(function()
+                                {
+                                    getCVInfo();
+                                    $scope.$emit('$preLoaderStop');
+                                },3000);*/
+
+                            }else{
+                               /* Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
+                                $scope.$emit('$preLoaderStop');*/
+                            }
+                        })
+                        .error(function(data, status, headers, config) {
+                            $scope.$emit('$preLoaderStop');
+                        });
+
+                }
+            };
+
+            var suggestion = [
+                'Full Time',
+                'Part Time',
+                'Contract',
+                'Internship'
+            ];
+
+            $scope.KeyWords = [];
+
+
+            // Select job type
+            $scope.selectJobType = function(){
+                var a  = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
+                $scope.KeyWords = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
+            };
+
+            /*Demo d=code of*/
+            $scope.anyOutput = [];
+            // Modern browsers
+            $scope.modernBrowsers = [
+                {
+                    icon: '<img src="https://cdn1.iconfinder.com/data/icons/fatcow/32/opera.png" />',
+                    name: 'Opera',
+                    maker: 'Opera Software',
+                    ticked: true,
+                    disabled: false
+                },
+                {
+                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32/internet_explorer.png" />',
+                    name: 'Internet Explorer',
+                    maker: 'Microsoft',
+                    ticked: false,
+                    disabled: false
+                },
+                {
+                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/humano2/32x32/apps/firefox-icon.png" />',
+                    name: 'Firefox',
+                    maker: 'Mozilla Foundation',
+                    ticked: true,
+                    disabled: false
+                },
+                {
+                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32x32/safari_browser.png" />',
+                    name: 'Safari',
+                    maker: 'Apple',
+                    ticked: false,
+                    disabled: false
+                },
+                {
+                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/google_jfk_icons_by_carlosjj/32/chrome.png" />',
+                    name: 'Chrome',
+                    maker: 'Google',
+                    ticked: true,
+                    disabled: false
+                }
+            ];
 
 
         }]);
