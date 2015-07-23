@@ -148,7 +148,6 @@ Job.prototype.create = function(req,res,next){
                         var locCount = 0;
                         var locationDetails = locationsList[locCount];
 
-
                         var createJobPosting = function(){
                             var query = st.db.escape(tid) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(job_code)
                                 + ',' + st.db.escape(job_title) + ',' + st.db.escape(exp_from) + ',' + st.db.escape(exp_to)
@@ -214,10 +213,9 @@ Job.prototype.create = function(req,res,next){
                             };
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country);
-                            console.log(queryParams);
+
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
 
-                                console.log(results);
                                 if (results) {
                                     if (results[0]) {
                                         if (results[0][0]) {
@@ -233,27 +231,32 @@ Job.prototype.create = function(req,res,next){
                                             }
                                         }
                                         else {
-                                            console.log('FnSaveJobLocation:No geeting location id');
+                                            console.log('FnSaveJobLocation:results no found');
+                                            responseMessage.error = {};
+                                            responseMessage.message = 'results no found';
+                                            console.log('FnSaveJobLocation: results no found');
+                                            res.status(200).json(responseMessage);
                                         }
                                     }
                                     else {
-                                        console.log('FnSaveJobLocation:No save locations');
+                                        console.log('FnSaveJobLocation:results no found');
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'results no found';
+                                        console.log('FnSaveJobLocation: results no found');
+                                        res.status(200).json(responseMessage);
                                     }
                                 }
                                 else {
-                                    console.log('FnSaveJobLocation:No save locations');
+                                    console.log('FnSaveJobLocation:results no found');
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'results no found';
+                                    console.log('FnSaveJobLocation: results no found');
+                                    res.status(200).json(responseMessage);
                                 }
                             });
                         };
-
-
+                        //calling function at first time
                         insertLocations(locationDetails);
-
-                            //------------------------- For loop ends ------------------------------------
-
-
-
-
                     }
                     else {
                         responseMessage.message = 'Invalid token';
