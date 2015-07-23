@@ -91,7 +91,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                 type : 'service'
             },
             {
-                title : ($rootScope._userInfo.CVModuleTitle) ? $rootScope._userInfo.CVModuleTitle :'Resume',
+                title : 'Recruitment',
                 permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[4] : 0,
                 listType : 0,
                 message : ($rootScope._userInfo.CVFormMsg) ? $rootScope._userInfo.CVFormMsg : '',
