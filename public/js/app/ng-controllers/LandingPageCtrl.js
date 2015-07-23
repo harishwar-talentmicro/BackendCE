@@ -49,7 +49,19 @@ angular.module('ezeidApp').
              */
 
             var placeDetail = [];
-            var searchTypeArr = ["EZEOne ID", "Keywords", "Job Keywords"];
+            var searchTypeArr = ["EZEOne ID", "Keywords", "Employers", "Jobs"];
+
+            /* basic settings for searching */
+            $scope.activeSearchType = 1;//Keyword selected by default
+            $scope.activeProximity = 0;//Defaultly ANY proximity is selected
+            $scope.activeRating = [false,false,false,false,false];
+
+            /* setting default search opptions to OFF */
+            $scope.parkingStatus = 0;
+            $scope.openStatus = 0;
+            $scope.homeDelivery = 0;
+
+
             var mapLatitude;
             var mapLongitude;
 
@@ -563,5 +575,139 @@ angular.module('ezeidApp').
 
             $('.hover-tile').mouseout(function(){$('.fr-text').addClass('hidden')});
 
+
+            /**
+             * code for toggling the search options
+             */
+            $scope.mainToggleStatus = false;
+            toggleSearchOptions();
+            function toggleSearchOptions()
+            {
+                $('.advance-filter-btn').click(
+                    function(){$('.advance-search').slideToggle("slow",function(){
+                        if(!$scope.mainToggleStatus)
+                        {
+                            $scope.mainToggleStatus = !$scope.mainToggleStatus;
+                            $('.advance-filter-btn').children().removeClass('fa-arrow-circle-down').addClass('fa-arrow-circle-up');
+                            return;
+                        }
+                        else
+                        {
+                            $scope.mainToggleStatus = !$scope.mainToggleStatus;
+                            $('.advance-filter-btn').children().removeClass('fa-arrow-circle-up').addClass('fa-arrow-circle-down');
+                            return;
+                        }
+
+                })});
+
+                $('.search-option').click(function(){$('.search-option-content').slideToggle("fast",function(){})});
+                $('.search-proximity').click(function(){$('.search-proximity-content').slideToggle("fast",function(){})});
+                $('.search-rating').click(function(){$('.search-rating-content').slideToggle("fast",function(){})});
+                $('.job-type').click(function(){$('.job-type-content').slideToggle("fast",function(){})});
+                $('.search-experience').click(function(){$('.search-experience-content').slideToggle("fast",function(){})});
+            }
+
+            /**
+             * activate search type
+             */
+            $scope.changeSeacrhType = function(searchType)
+            {
+                changeSearchFilterVisibility(searchType);
+                $scope.activeSearchType = searchType;
+                if(parseInt(searchType) ==  0)
+                {
+                    $('.advance-filter-btn').hide();
+                    $('.advance-search').hide();
+                }
+                else
+                {
+                    $('.advance-filter-btn').show();
+                }
+            }
+
+            /* change different search option status */
+            $scope.changeSearchOptions = function(opt) {
+                if (parseInt(opt) === 1) {
+                    $scope.parkingStatus = !$scope.parkingStatus;
+                }
+                else if (parseInt(opt) === 2) {
+                    $scope.homeDelivery = !$scope.homeDelivery;
+                }
+                else
+                {
+                    $scope.openStatus = !$scope.openStatus;
+                }
+            }
+
+            /**
+             * Change the proximity
+             */
+            $scope.changeProximity = function(proximity)
+            {
+                $scope.activeProximity = proximity;
+            }
+
+
+            /**
+             * Change the active star rating
+             */
+            $scope.changeActiveRating = function(ratingId)
+            {
+                $scope.activeRating[ratingId] = !$scope.activeRating[ratingId];
+            }
+
+            /**
+             * Change the visibility of different filters on the basis of search type
+             */
+            function changeSearchFilterVisibility(searchOption)
+            {
+                console.log("hello "+searchOption);
+                hideAllSearchOptions();
+                switch(searchOption)
+                {
+                    case 0://EZEOne ID selected
+                    {
+                        /* do nothing */
+                        return;
+                    }
+                    case 1://Keywords selected
+                    {
+                        /* enable: Proximity, Search Options & Star Ratings */
+                        $('.opt-1').removeClass('hidden');
+                        $('.opt-2').removeClass('hidden');
+                        $('.opt-3').removeClass('hidden');
+                        return;
+                    }
+                    case 2://Employers selected
+                    {
+                        /* enable: Proximity & Ratings */
+                        $('.opt-1').removeClass('hidden').css('width',"49.7%");
+                        $('.opt-3').removeClass('hidden').css('width',"49.7%");;
+                        return;
+                    }
+                    case 3://Job selected
+                    {
+                        /* enable: Proximity, Job Types & Experience */
+                        $('.opt-1').removeClass('hidden');
+                        $('.opt-4').removeClass('hidden');
+                        $('.opt-5').removeClass('hidden');
+                        return;
+                    }
+                }
+            }
+
+            /**
+             * hide all the filters from the search bar
+             */
+            function hideAllSearchOptions()
+            {
+                $('.opt').each(function(){
+                    if(!$(this).hasClass('hidden'))
+                    {
+                        $(this).addClass('hidden');
+                    }
+                    $(this).removeAttr('style');
+                });
+            }
         }]);
 

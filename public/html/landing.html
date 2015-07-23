@@ -8,8 +8,17 @@
 
         <!-- Mid contents of the Header image goes here -->
         <div class="landing-center">
-            <div class="main-title text-bolder">IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> INTERACT</div>
+            <!--<div class="main-title text-bolder">IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> INTERACT</div>-->
+            <div class="main-title text-bolder opt-group">
+                <!--IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> INTERACT-->
+                <div class="btn btn-gray" ng-click="changeSeacrhType(0)" ng-class="activeSearchType == 0?'selected':''">EZEOne ID</div>
+                <div class="btn btn-gray"  ng-click="changeSeacrhType(1)" ng-class="activeSearchType == 1?'selected':''">Keywords</div>
+                <div class="btn btn-gray"  ng-click="changeSeacrhType(2)" ng-class="activeSearchType == 2?'selected':''">Employers</div>
+                <div class="btn btn-gray"  ng-click="changeSeacrhType(3)" ng-class="activeSearchType == 3?'selected':''">Jobs</div>
+            </div>
             <div class="main-subtitle">Search any product or service in your neighbourhood. <b>It is Easy, Accurate & Verified</b></div>
+
+
             <!-- Search Bar goes here -->
             <div class="container m_top_10">
                 <div class="row">
@@ -46,49 +55,160 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="input-group p-bottom-3">
-                            <div class="input-group-btn">
-                                <!-- Change Location btn -->
-                                <button  data-toggle="tooltip"
-                                         type="button" ng-click="modalVisibility()" class="btn btn-dark-blue normal-view-buttons"
-                                         title="Click to change Search Location"><i class="fa fa-map-marker"></i>
-                                    <b class="">Location</b>
-                                </button>
-                                <!-- Searc type button -->
-                                <button title="Search by" type="button" class="btn btn-default normal-view-buttons dropdown-toggle keyword-btn-radius" data-toggle="dropdown">
-                                    <b>{{searchType[searchParams.searchType - 1]}}</b>
-                                    <span class="caret"></span></button>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li class="btn-link" ng-repeat="search in searchType track by $index">
-                                        <!-- Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] -->
-                                        <a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>
+
+                        <!-- search bar goes here in NORMAL VIEW  -->
+                        <div class="search-bar-content">
+                            <div class="text-white text-left">
+                            <span class="advance-filter-btn pointer">
+                            <i class="fa fa-arrow-circle-down"></i> Options
+                                </span>
+                            </div>
+
+                            <div class="advance-search text-left p-bottom-4" style="display: none">
+
+
+                                <button class="btn btn-default btn-sm search-btn-width dropdown-toggle search-proximity opt opt-1">Search Proximity <span class="caret"></span></button>
+                                <span class="drop-down-0 opt opt-1">
+                                    <div class="filter-dropdown search-proximity-content" style="display: none;">
+                                        <!-- check boxes with distance -->
+                                        <div class="select-option" ng-class="activeProximity == 1?'selected':''" ng-click="changeProximity(1)">
+                                            1 Mile (1.6 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="activeProximity == 2?'selected':''" ng-click="changeProximity(2)">
+                                            2 Mile (3.2 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="activeProximity == 5?'selected':''" ng-click="changeProximity(5)">
+                                            5 Mile (8 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="activeProximity == 10?'selected':''" ng-click="changeProximity(10)">
+                                            10 Mile (16 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="activeProximity == 25?'selected':''" ng-click="changeProximity(25)">
+                                            25 Mile (40 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="activeProximity == 50?'selected':''" ng-click="changeProximity(50)">
+                                            50 Mile (80 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="activeProximity == 0?'selected':''" ng-click="changeProximity(0)">
+                                            Any
+                                        </div>
+                                    </div>
+                                </span>
+
+
+
+                                <button class="btn btn-default btn-sm search-btn-width dropdown-toggle search-option opt opt-2 hidden">Search Option <span class="caret"></span></button>
+                                <div class="drop-down-1 opt opt-2">
+                                    <div class="filter-dropdown width-90 search-option-content" style="display: none;">
+                                        <div class="checkbox-dropdown" ng-click="changeSearchOptions(1)">
+                                            <i class="fa " ng-class="parkingStatus ?'fa-check-square':'fa-square-o'"></i> Parking Required
+                                        </div>
+                                        <div class="checkbox-dropdown" ng-click="changeSearchOptions(2)">
+                                            <i class="fa " ng-class="homeDelivery ?'fa-check-square':'fa-square-o'"></i> Need Home Delivery
+                                        </div>
+                                        <div class="checkbox-dropdown" ng-click="changeSearchOptions(3)">
+                                            <i class="fa " ng-class="openStatus ?'fa-check-square':'fa-square-o'"></i> Open/Working Entities
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <button class="btn btn-default btn-sm search-btn-width search-rating opt opt-3 hidden">Ratings <span class="caret"></span></button>
+                                <div class="drop-down-2 opt opt-3">
+                                    <div class="filter-dropdown width-42 search-rating-content" style="display: none;">
+                                        <div class="checkbox-dropdown" ng-repeat="star in stars track by $index" ng-click="changeActiveRating($index)">
+                                            <i class="fa " ng-class="activeRating[$index]?'fa-check-square':'fa-square-o'"></i> <i ng-repeat="str in starArr[$index]" class="fa fa-star text-yellow"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- active during job search -->
+                                <button class="btn btn-default btn-sm search-btn-width job-type opt opt-4 ">Job Types <span class="caret"></span></button>
+                                <span class="drop-down-3 opt opt-4 ">
+                                    <div class="filter-dropdown width-42 job-type-content" style="display: none;">
+                                        <div class="checkbox-dropdown">
+                                            <i class="fa fa-square-o"></i> Full Time
+                                        </div>
+                                        <div class="checkbox-dropdown">
+                                            <i class="fa fa-square-o"></i> Part Time
+                                        </div>
+                                        <div class="checkbox-dropdown">
+                                            <i class="fa fa-square-o"></i> Work From Home
+                                        </div>
+                                        <div class="checkbox-dropdown">
+                                            <i class="fa fa-square-o"></i> Internship
+                                        </div>
+                                        <div class="checkbox-dropdown">
+                                            <i class="fa fa-square-o"></i> Consultant
+                                        </div>
+                                        <div class="checkbox-dropdown">
+                                            <i class="fa fa-square-o"></i> Freelancer
+                                        </div>
+                                    </div>
+                                </span>
+
+
+
+
+                                <button class="btn btn-default btn-sm search-btn-width search-experience opt opt-5 ">Experience <span class="caret"></span></button>
+                                <div class="drop-down-4 opt opt-5">
+                                    <div class="filter-dropdown width-42 search-experience-content" style="display: none;">
+                                        <div class="checkbox-dropdown">
+                                            <input type="number" placeholder="Your experience in years" class="form-control" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="input-group p-bottom-3">
+                                <div class="input-group-btn">
+                                    <!-- Change Location btn -->
+                                    <button  data-toggle="tooltip"
+                                             type="button" ng-click="modalVisibility()" class="btn btn-default normal-view-buttons"
+                                             title="Click to change Search Location"><i class="fa fa-map-marker"></i>
+                                        <b class="">Location</b>
+                                    </button>
+                                    <!-- Searc type button -->
+                                    <!--<button title="Search by" type="button" class="btn btn-default normal-view-buttons dropdown-toggle keyword-btn-radius" data-toggle="dropdown">-->
+                                    <!--<b>{{searchType[searchParams.searchType - 1]}}</b>-->
+                                    <!--<span class="caret"></span></button>-->
+                                    <!--<ul class="dropdown-menu" role="menu">-->
+                                    <!--<li class="btn-link" ng-repeat="search in searchType track by $index">-->
+                                    <!--&lt;!&ndash; Index incremented by 1: As the array's default index is [0,1,2] & searchType's value is [1,2,3] &ndash;&gt;-->
+                                    <!--<a class="btn-link" ng-click="($event.preventDefault())(searchParams.searchType = $index + 1) (searchParams.searchTerm = '')">{{search}}</a>-->
+                                    <!--</li>-->
+                                    <!--</ul>-->
+                                </div>
+                                <!--<input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
+
+                                <input type="text" id="searchTextField" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control dropdown-toggle" aria-label="..." data-toggle="dropdown">
+
+                                <!-- {{searchParams}}-->
+
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(searchParams.searchType == 2) && (KeyWords.length > 0) && (searchParams.searchTerm.length)">
+                                    <li ng-repeat="KeyWord in KeyWords">
+                                        <a ng-click="setAutoCompeted(KeyWord)">{{KeyWord}}</a>
                                     </li>
                                 </ul>
-                            </div>
-                            <!--<input type="text" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control" aria-label="...">-->
-
-                            <input type="text" id="searchTextField" ng-keypress="checkEnterKey($event)" placeholder="{{placeHolderText[searchParams.searchType - 1]}}" ng-model="searchParams.searchTerm" ng-class="(searchParams.searchType === 1) ? 'text-uppercase' : ''" class="form-control dropdown-toggle" aria-label="..." data-toggle="dropdown">
-
-                           <!-- {{searchParams}}-->
-
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(searchParams.searchType == 2) && (KeyWords.length > 0) && (searchParams.searchTerm.length)">
-                                <li ng-repeat="KeyWord in KeyWords">
-                                    <a ng-click="setAutoCompeted(KeyWord)">{{KeyWord}}</a>
-                                </li>
-                            </ul>
-                            <div class="input-group-btn">
-                                <!-- Filter BTN -->
-                                <button  data-toggle="tooltip"  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"
-                                         type="button" class="btn no-radius normal-view-buttons btn-default dropdown-toggle btn-advanced-filter" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> <b class="normal-view-buttons">Options</b></button>
-                                <!-- Search BTN -->
-                                <button  data-toggle="tooltip" type="button" class="btn btn-dark-orange"
-                                         title="search" ng-click="triggerSearch()">
-                                    <i class="fa fa-search"></i> <b class="normal-view-buttons">Search</b>
-                                    </b></button>
+                                <div class="input-group-btn">
+                                    <!-- Filter BTN -->
+                                    <!--<button  data-toggle="tooltip"  ng-click="toggleFilterContainer($event,true)" ng-disabled="searchParams.searchType === 1"-->
+                                    <!--type="button"-->
+                                    <!--class="btn no-radius normal-view-buttons btn-default dropdown-toggle btn-advanced-filter"-->
+                                    <!--data-toggle="dropdown" title="Click to choose Search Options">-->
+                                    <!--<i class="fa fa-check-square-o"></i> <b class="normal-view-buttons">Options</b>-->
+                                    <!--</button>-->
+                                    <!-- Search BTN -->
+                                    <button  data-toggle="tooltip" type="button" class="btn btn-dark-orange"
+                                             title="search" ng-click="triggerSearch()">
+                                        <i class="fa fa-search"></i> <b class="normal-view-buttons">Search</b>
+                                        </b>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
-
                         <!-- User's present location goes here -->
                         <div class="current-location text-center">
                             <p class="text-white">
@@ -391,7 +511,7 @@
                                             business & link each of
                                             your branch to Geo
                                             Location"
-                                data-toggle="tooltip" class="hover-tile" shape="rect" coords="77,4,118,49">
+                              data-toggle="tooltip" class="hover-tile" shape="rect" coords="77,4,118,49">
                         <area data-text="List your products and
                                         services online and enable
                                         customer locate you by
@@ -419,7 +539,7 @@
                     <div class="fr-text">
                         <small id="desc-text">
                             Everything required to take your business into next generation...
-                    </small>
+                        </small>
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
