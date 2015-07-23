@@ -321,37 +321,56 @@ Job.prototype.getAll = function(req,res,next){
     }
     else {
         try {
-
-            st.db.query('CALL pGetJobs(' + st.db.escape(ezeone_id) + ',' + st.db.escape(token) + ')', function (err, getresult) {
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (getresult) {
-                        if(getresult[0].length){
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Jobs send successfully';
-                            responseMessage.data = getresult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetJobs: Jobs send successfully');
-                        }
-                        else{
-                            responseMessage.error = {};
-                            responseMessage.message = 'No founded Jobs details';
-                            console.log('FnGetJobs: No founded Jobs details');
-                            res.status(200).json(responseMessage);
-                        }
+                    if (result) {
+
+                        st.db.query('CALL pGetJobs(' + st.db.escape(ezeone_id) + ')', function (err, getresult) {
+                            if (!err) {
+                                if (getresult) {
+                                    if (getresult[0].length) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Jobs send successfully';
+                                        responseMessage.data = getresult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetJobs: Jobs send successfully');
+                                    }
+                                    else {
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded Jobs details';
+                                        console.log('FnGetJobs: No founded Jobs details');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded Jobs details';
+                                    console.log('FnGetJobs: No founded Jobs details');
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error getting from Jobs details';
+                                console.log('FnGetJobs:Error getting from Jobs details:' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
                     }
                     else {
+                        responseMessage.message = 'Invalid token';
                         responseMessage.error = {};
-                        responseMessage.message = 'No founded Jobs details';
-                        console.log('FnGetJobs: No founded Jobs details');
-                        res.status(200).json(responseMessage);
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetJobs: Invalid token');
                     }
                 }
                 else {
                     responseMessage.error = {};
-                    responseMessage.message = 'Error getting from Jobs details';
-                    console.log('FnGetJobs:Error getting from Jobs details:' + err);
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
+                    console.log('FnGetJobs:Error in processing Token' + err);
                 }
             });
         }
