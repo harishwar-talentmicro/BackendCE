@@ -1692,7 +1692,7 @@
                     console.log($scope.phone);
                     console.log($scope.email);
 
-                    var location = [
+                    /*var location [] =
                         {
                             "location_title": "bangalore",
                             "latitude": 12.453323,
@@ -1704,6 +1704,21 @@
                             "latitude": 12.453323,
                             "longitude": 73.475545,
                             "country": "india"
+                        }
+                    ;*/
+
+                    var location = [
+                        {
+                            location_title : 'bangalore',
+                            latitude :  12.453323,
+                            longitude : 73.4545,
+                            country : 'india'
+                        },
+                        {
+                            location_title : 'chennai',
+                            latitude :  12.453323,
+                            longitude : 73.4545,
+                            country : 'india'
                         }
                     ];
 
@@ -1734,6 +1749,9 @@
                         data:  $scope.jobData
                     }).success(function (data) {
 
+                            console.log("SAi1234");
+                            console.log(data);
+
                             if(data.IsSuccessfull) {
 
 
@@ -1748,62 +1766,6 @@
                 }
             };
 
-            var suggestion = [
-                'Full Time',
-                'Part Time',
-                'Contract',
-                'Internship'
-            ];
-
-            $scope.KeyWords = [];
-
-
-            // Select job type
-            $scope.selectJobType = function(){
-                var a  = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
-                $scope.KeyWords = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
-            };
-
-            /*Demo d=code of*/
-            $scope.anyOutput = [];
-            // Modern browsers
-            $scope.modernBrowsers = [
-                {
-                    icon: '<img src="https://cdn1.iconfinder.com/data/icons/fatcow/32/opera.png" />',
-                    name: 'Opera',
-                    maker: 'Opera Software',
-                    ticked: true,
-                    disabled: false
-                },
-                {
-                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32/internet_explorer.png" />',
-                    name: 'Internet Explorer',
-                    maker: 'Microsoft',
-                    ticked: false,
-                    disabled: false
-                },
-                {
-                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/humano2/32x32/apps/firefox-icon.png" />',
-                    name: 'Firefox',
-                    maker: 'Mozilla Foundation',
-                    ticked: true,
-                    disabled: false
-                },
-                {
-                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32x32/safari_browser.png" />',
-                    name: 'Safari',
-                    maker: 'Apple',
-                    ticked: false,
-                    disabled: false
-                },
-                {
-                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/google_jfk_icons_by_carlosjj/32/chrome.png" />',
-                    name: 'Chrome',
-                    maker: 'Google',
-                    ticked: true,
-                    disabled: false
-                }
-            ];
 
 
         }]);
