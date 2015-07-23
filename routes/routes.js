@@ -148,6 +148,8 @@ var JobModule = require('./modules/job-module.js');
 var job = new JobModule(db,stdLib);
 exports.FnSaveJobs = job.create;
 exports.FnGetJobs = job.getAll;
+exports.FnGetJobLocations = job.getJobLocations;
+exports.FnSearchJobs = job.searchJobs;
 
 
 //ap parts

@@ -60,9 +60,9 @@ Job.prototype.create = function(req,res,next){
     var email_id = req.body.email_id;
     var mobileNo = req.body.mobileNo;
     var locationsList = req.body.locationsList;
-
+    if(typeOf(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
-    
+    }
 
     console.log(req.body);
     var location_id = '';
@@ -429,5 +429,72 @@ Job.prototype.getJobLocations = function(req,res,next){
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
+
+/**
+ * @todo FnSearchJobs
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description search jobs of a person
+ */
+Job.prototype.searchJobs = function(req,res,next){
+    var _this = this;
+    try{
+    var latitude = req.query.latitude;
+    var longitude = req.query.longitude;
+    var proximity = req.query.proximity;
+    var jobType = req.query.jobType;
+    var exp = req.query.exp;
+    var keywords = req.query.keywords;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)
+                                + ',' + st.db.escape(jobType) + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords);
+                            console.log(st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)
+                                + ',' + st.db.escape(jobType) + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords));
+                            st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
+                                console.log(getresult);
+
+                                if (!err) {
+                                    if (getresult) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Jobs details loaded successfully';
+                                        responseMessage.data = getresult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSearchJobs: Jobs save successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Jobs details not found';
+                                        responseMessage.error = {};
+                                        res.status(400).json(responseMessage);
+                                        console.log('FnSearchJobs:Jobs details not found');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {};
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnSearchJobs: error in getting job details:' + err);
+                                }
+                            });
+
+        }
+        catch(ex){
+            responseMessage.error = {};
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSearchJobs:error ' + ex.description);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    };
+
 
 module.exports = Job;
