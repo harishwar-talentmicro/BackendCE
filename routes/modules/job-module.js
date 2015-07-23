@@ -126,7 +126,7 @@ Job.prototype.create = function(req,res,next){
         error['locationsList'] = 'Invalid locationsList';
         validateStatus *= false;
     }
-    if(!email_id || !mobileNo){
+    if(!(email_id || mobileNo)){
         error['email_id OR  MobileNo'] = 'Invalid email_id or mobileNo';
         validateStatus *= false;
     }
@@ -144,17 +144,74 @@ Job.prototype.create = function(req,res,next){
                 if (!err) {
                     if (result) {
                         console.log(locationsList.length);
-                        for (var i = 0; i < locationsList.length; i++) {
-                            var locationDetails = locationsList[i];
-                            var list = {
 
+                        var locCount = 0;
+                        var locationDetails = locationsList[locCount];
+
+
+                        var createJobPosting = function(){
+                            var query = st.db.escape(tid) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(job_code)
+                                + ',' + st.db.escape(job_title) + ',' + st.db.escape(exp_from) + ',' + st.db.escape(exp_to)
+                                + ',' + st.db.escape(job_description) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
+                                + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
+                                + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
+                                + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id);
+                            console.log('CALL pSaveJobs(' + query + ')');
+                            st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
+
+                                if (!err) {
+                                    if (insertresult) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Jobs save successfully';
+                                        responseMessage.data = {
+                                            token: token,
+                                            tid: tid,
+                                            ezeone_id: ezeone_id,
+                                            job_code: job_code,
+                                            job_title: job_title,
+                                            exp_from: exp_from,
+                                            exp_to: exp_to,
+                                            job_description: job_description,
+                                            salaryFrom: salaryFrom,
+                                            salaryTo: salaryTo,
+                                            salaryType: salaryType,
+                                            keySkills: keySkills,
+                                            openings: openings,
+                                            jobType: jobType,
+                                            status: status,
+                                            contactName: contactName,
+                                            email_id: email_id,
+                                            mobileNo: mobileNo,
+                                            location_id: location_id
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveJobs: Jobs save successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'No save Jobs details';
+                                        responseMessage.error = {};
+                                        res.status(400).json(responseMessage);
+                                        console.log('FnSaveJobs:No save Jobs details');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {};
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnSaveJobs: error in saving Feedback details:' + err);
+                                }
+                            });
+                        };
+
+
+                        var insertLocations = function(locationDetails){
+                            var list = {
                                 location_title: locationDetails.location_title,
                                 latitude: locationDetails.latitude,
                                 longitude: locationDetails.longitude,
                                 country: locationDetails.country
                             };
-                            console.log(list);
-
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country);
                             console.log(queryParams);
@@ -166,7 +223,14 @@ Job.prototype.create = function(req,res,next){
                                         if (results[0][0]) {
 
                                             console.log(results[0][0].id);
-                                            location_id = location_id + results[0][0].id + ',';
+                                            location_id += results[0][0].id + ',';
+                                            locCount +=1;
+                                            if(locCount < locationsList.length){
+                                                insertLocations(locationsList[locCount]);
+                                            }
+                                            else{
+                                                createJobPosting();
+                                            }
                                         }
                                         else {
                                             console.log('FnSaveJobLocation:No geeting location id');
@@ -180,63 +244,15 @@ Job.prototype.create = function(req,res,next){
                                     console.log('FnSaveJobLocation:No save locations');
                                 }
                             });
-                        }
-                        console.log('----------');
-                        console.log(location_id);
-                        console.log('----------');
+                        };
 
-                                    var query = st.db.escape(tid) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(job_code)
-                                        + ',' + st.db.escape(job_title) + ',' + st.db.escape(exp_from) + ',' + st.db.escape(exp_to)
-                                        + ',' + st.db.escape(job_description) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
-                                        + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
-                                        + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
-                                        + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id);
-                                    console.log('CALL pSaveJobs(' + query + ')');
-                                    st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
 
-                                        if (!err) {
-                                            if (insertresult) {
-                                                responseMessage.status = true;
-                                                responseMessage.error = null;
-                                                responseMessage.message = 'Jobs save successfully';
-                                                responseMessage.data = {
-                                                    token: token,
-                                                    tid: tid,
-                                                    ezeone_id: ezeone_id,
-                                                    job_code: job_code,
-                                                    job_title: job_title,
-                                                    exp_from: exp_from,
-                                                    exp_to: exp_to,
-                                                    job_description: job_description,
-                                                    salaryFrom: salaryFrom,
-                                                    salaryTo: salaryTo,
-                                                    salaryType: salaryType,
-                                                    keySkills: keySkills,
-                                                    openings: openings,
-                                                    jobType: jobType,
-                                                    status: status,
-                                                    contactName: contactName,
-                                                    email_id: email_id,
-                                                    mobileNo: mobileNo,
-                                                    location_id: location_id
-                                                };
-                                                res.status(200).json(responseMessage);
-                                                console.log('FnSaveJobs: Jobs save successfully');
-                                            }
-                                            else {
-                                                responseMessage.message = 'No save Jobs details';
-                                                responseMessage.error = {};
-                                                res.status(400).json(responseMessage);
-                                                console.log('FnSaveJobs:No save Jobs details');
-                                            }
-                                        }
-                                        else {
-                                            responseMessage.message = 'An error occured ! Please try again';
-                                            responseMessage.error = {};
-                                            res.status(500).json(responseMessage);
-                                            console.log('FnSaveJobs: error in saving Feedback details:' + err);
-                                        }
-                                    });
+                        insertLocations(locationDetails);
+
+                            //------------------------- For loop ends ------------------------------------
+
+
+
 
                     }
                     else {
