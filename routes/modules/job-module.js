@@ -59,6 +59,7 @@ Job.prototype.create = function(req,res,next){
     var contactName = req.body.contactName;
     var email_id = req.body.email_id;
     var mobileNo = req.body.mobileNo;
+    var locations = req.body.locations;
 
     var responseMessage = {
         status: false,
@@ -119,6 +120,10 @@ Job.prototype.create = function(req,res,next){
         error['contactName'] = 'Invalid contactName';
         validateStatus *= false;
     }
+    if(!locations){
+        error['locations'] = 'Invalid locations';
+        validateStatus *= false;
+    }
     if(!email_id || !mobileNo){
         error['email_id OR  MobileNo'] = 'Invalid email_id or mobileNo';
         validateStatus *= false;
@@ -141,33 +146,35 @@ Job.prototype.create = function(req,res,next){
                             + ',' + st.db.escape(job_description) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                             + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                             + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
-                            + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo);
-                        var query = 'CALL pSaveJobs(' + query + ')';
-                        st.db.query(query, function (err, insertresult) {
+                            + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo)+ ',' + st.db.escape(locations);
+
+                        st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
+
                             if (!err) {
                                 if (insertresult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Jobs save successfully';
                                     responseMessage.data = {
-                                          token : token,
-                                          tid : tid,
-                                          ezeone_id : ezeone_id,
-                                          job_code : job_code,
-                                          job_title : job_title,
-                                          exp_from : exp_from,
-                                          exp_to : exp_to,
-                                          job_description : job_description,
-                                          salaryFrom : salaryFrom,
-                                          salaryTo : salaryTo,
-                                          salaryType : salaryType,
-                                          keySkills : keySkills,
-                                          openings : openings,
-                                          jobType : jobType,
-                                          status : status,
-                                          contactName : contactName,
-                                          email_id : email_id,
-                                          mobileNo : mobileNo
+                                        token : token,
+                                        tid : tid,
+                                        ezeone_id : ezeone_id,
+                                        job_code : job_code,
+                                        job_title : job_title,
+                                        exp_from : exp_from,
+                                        exp_to : exp_to,
+                                        job_description : job_description,
+                                        salaryFrom : salaryFrom,
+                                        salaryTo : salaryTo,
+                                        salaryType : salaryType,
+                                        keySkills : keySkills,
+                                        openings : openings,
+                                        jobType : jobType,
+                                        status : status,
+                                        contactName : contactName,
+                                        email_id : email_id,
+                                        mobileNo : mobileNo,
+                                        locations : locations
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveJobs: Jobs save successfully');
@@ -246,9 +253,7 @@ Job.prototype.getAll = function(req,res,next){
     else {
         try {
 
-            var query = 'CALL pGetJobs(' + st.db.escape(ezeone_id) + ')';
-            console.log(query);
-            st.db.query(query, function (err, getresult) {
+            st.db.query('CALL pGetJobs(' + st.db.escape(ezeone_id) + ')', function (err, getresult) {
                 if (!err) {
                     if (getresult) {
                         if(getresult[0].length){
