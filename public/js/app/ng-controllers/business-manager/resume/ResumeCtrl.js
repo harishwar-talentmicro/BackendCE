@@ -373,7 +373,6 @@
                         $scope.toggleAllEditMode();
 
                         var id = $scope.txList.indexOfWhere('TID',parseInt(resp.data.TID));
-                        ////console.log($scope.txList[id]);
                         $scope.txList[id].FolderRuleID = parseInt(resp.data.folderRuleID);
                         $scope.txList[id].Status = parseInt(resp.data.status);
 
@@ -672,7 +671,6 @@
              */
             $scope.removeItem = function(txItem){
                 var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
-                ////////////console.log(txItemIndex);
                 $scope.modalBox.tx.itemList.splice(txItemIndex,1);
             };
 
@@ -759,7 +757,6 @@
 
 
             $scope.$watch('modalBox.tx.companyId',function(n,v){
-                ////console.log(n);
                 if(n){
                     ////console.log(companyList);
                     var indx = companyList.indexOfWhere('id',n);
@@ -1529,7 +1526,6 @@
              * Function is executed once only when dom is loaded and ready
              */
             $scope.domLoaded = function(){
-                console.log('domloaded called');
                 if(!_domLoaded){
                     $timeout(function(){
                         $scope.$emit('$preLoaderStart');
@@ -1575,8 +1571,7 @@
                     }
                 }).success(function(resp){
 
-                        console.log("SAi321");
-                        console.log(resp);
+
 
                 }).error(function(err){
                     //  defer.reject();
@@ -1596,8 +1591,28 @@
             $scope.TabPostJob = function(){
                 $scope.showDefaultTab = false;
 
-                getLocationList();
+                getPostedJob();
+
+               // getLocationList();
             };
+
+            // Get all posted Jobs
+            function getPostedJob()
+            {
+                $http({
+                    url : GURL + 'job',
+                    method : 'GET',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        ezeone_id : $rootScope._userInfo.ezeid
+                    }
+                }).success(function(resp){
+
+
+                }).error(function(err){
+                    //  defer.reject();
+                });
+            }
 
             // Validation function
             function validateItem(){
@@ -1657,15 +1672,10 @@
             // save job to system
             $scope.postJob = function(){
 
-                console.log("sai");
-                console.log($rootScope._userInfo.ezeid);
-
 
                 $scope.validationDone = true;
                 if(validateItem())
                 {
-
-
 
                     console.log($scope.jobTitle);
                     console.log($scope.jobCode);
@@ -1681,6 +1691,36 @@
                     console.log($scope.contactName);
                     console.log($scope.phone);
                     console.log($scope.email);
+
+                    /*var location [] =
+                        {
+                            "location_title": "bangalore",
+                            "latitude": 12.453323,
+                            "longitude": 73.4545,
+                            "country": "india"
+                        },
+                        {
+                            "location_title": "chennai",
+                            "latitude": 12.453323,
+                            "longitude": 73.475545,
+                            "country": "india"
+                        }
+                    ;*/
+
+                    var location = [
+                        {
+                            location_title : 'bangalore',
+                            latitude :  12.453323,
+                            longitude : 73.4545,
+                            country : 'india'
+                        },
+                        {
+                            location_title : 'chennai',
+                            latitude :  12.453323,
+                            longitude : 73.4545,
+                            country : 'india'
+                        }
+                    ];
 
                     $scope.jobData = {
                                         token : $rootScope._userInfo.Token,
@@ -1700,7 +1740,8 @@
                                         status : 1,
                                         contactName : $scope.contactName,
                                         email_id : $scope.email,
-                                        mobileNo : $scope.phone
+                                        mobileNo : $scope.phone,
+                                        locationsList : location
                                      }
                     $http({
                         method: "POST",
@@ -1708,22 +1749,14 @@
                         data:  $scope.jobData
                     }).success(function (data) {
 
+                            console.log("SAi1234");
                             console.log(data);
 
                             if(data.IsSuccessfull) {
-                                /*Notification.success({message: "Saved..", delay: MsgDelay});
-                                $scope.skillMatrix = [];
-                                skillsTid = [];
 
-                                $timeout(function()
-                                {
-                                    getCVInfo();
-                                    $scope.$emit('$preLoaderStop');
-                                },3000);*/
 
                             }else{
-                               /* Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
-                                $scope.$emit('$preLoaderStop');*/
+
                             }
                         })
                         .error(function(data, status, headers, config) {
@@ -1733,62 +1766,6 @@
                 }
             };
 
-            var suggestion = [
-                'Full Time',
-                'Part Time',
-                'Contract',
-                'Internship'
-            ];
-
-            $scope.KeyWords = [];
-
-
-            // Select job type
-            $scope.selectJobType = function(){
-                var a  = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
-                $scope.KeyWords = $filter('filter')(suggestion,$scope.searchParams.searchTerm);
-            };
-
-            /*Demo d=code of*/
-            $scope.anyOutput = [];
-            // Modern browsers
-            $scope.modernBrowsers = [
-                {
-                    icon: '<img src="https://cdn1.iconfinder.com/data/icons/fatcow/32/opera.png" />',
-                    name: 'Opera',
-                    maker: 'Opera Software',
-                    ticked: true,
-                    disabled: false
-                },
-                {
-                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32/internet_explorer.png" />',
-                    name: 'Internet Explorer',
-                    maker: 'Microsoft',
-                    ticked: false,
-                    disabled: false
-                },
-                {
-                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/humano2/32x32/apps/firefox-icon.png" />',
-                    name: 'Firefox',
-                    maker: 'Mozilla Foundation',
-                    ticked: true,
-                    disabled: false
-                },
-                {
-                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32x32/safari_browser.png" />',
-                    name: 'Safari',
-                    maker: 'Apple',
-                    ticked: false,
-                    disabled: false
-                },
-                {
-                    icon: '<img  src="https://cdn1.iconfinder.com/data/icons/google_jfk_icons_by_carlosjj/32/chrome.png" />',
-                    name: 'Chrome',
-                    maker: 'Google',
-                    ticked: true,
-                    disabled: false
-                }
-            ];
 
 
         }]);

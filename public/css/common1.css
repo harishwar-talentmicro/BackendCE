@@ -1933,3 +1933,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     color: rgb(205, 100, 121);
 }
+
+.job-resultColor
+{
+   color:  #00AB91;
+}
