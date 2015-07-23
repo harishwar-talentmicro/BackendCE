@@ -593,7 +593,7 @@
 
 .hpw .p-top-10
 {
-    padding-top: 10px;
+    padding-top: 10px !important;
 }
 
 .hpw .p-top-7
@@ -2604,7 +2604,7 @@ sup.tm{
 {
     text-align: center;
     font-size: 1.1em;
-    font-family: cursive;
+    /*font-family: cursive;*/
     font-weight: bold;
 }
 
@@ -2940,4 +2940,115 @@ sup.tm{
 .hpw .text-dark-gray
 {
     color:gray;
+}
+
+.hpw .button-bg-style
+{
+    padding: 10px;
+    background-color: rgb(18, 105, 126);
+}
+
+.hpw .btn-search-opt
+{
+    background-color: #104B84;
+    color:#fff;
+}
+
+.hpw .btn-search-opt:hover
+{
+    background-color: #14898E;
+    color:#fff;
+}
+
+.hpw .width-33-prcnt
+{
+    width: 32.9% !important;
+}
+
+.hpw .width-25-prcnt
+{
+    width: 25% !important;
+}
+
+.hpw .advance-filter-btn
+{
+    padding-left: 10px;
+    background-color: rgb(18, 105, 126);
+    padding: 2px 10px 2px 10px;
+}
+
+.hpw .btn-gray
+{
+    background-color: #DADADA;
+    color:#000;
+}
+
+.hpw .opt-group .selected
+{
+    background-color: orange;
+    color: #fff;
+}
+
+.hpw .filter-dropdown
+{
+    position: absolute;
+    padding-top: 3px;
+    background-color: #fff;
+    z-index: 999;
+    padding: 4px;
+    width: 25%;
+    border: 1px solid rgb(161, 161, 161);
+}
+
+.hpw .drop-down-1
+{
+    padding-left: 33.5%;
+    position: absolute;
+}
+
+.hpw .drop-down-2
+{
+    padding-left: 66.9%;
+    position: absolute;
+}
+
+.hpw .width-90
+{
+    width:90% !important;
+}
+
+.hpw .width-42
+{
+    width: 42%;
+}
+
+.hpw .select-option
+{
+    padding-left: 3px;
+    cursor: pointer;
+    padding: 3px;
+}
+
+.hpw .checkbox-dropdown
+{
+    padding-left: 3px;
+    cursor: pointer;
+    padding: 3px;
+}
+
+.hpw .checkbox-dropdown:hover
+{
+    background-color: rgb(42, 110, 169);
+    color: #fff !important;
+}
+
+.hpw .select-option:hover
+{
+    background-color: rgb(42, 110, 169);
+    color: #fff;
+}
+
+.hpw .search-btn-width
+{
+    width:32.5%;
 }
