@@ -357,7 +357,7 @@ User.prototype.register = function(req,res,next){
                                                                 req.connection.remoteAddress ||
                                                                 req.socket.remoteAddress ||
                                                                 req.connection.socket.remoteAddress;
-                                                            var userAgent = (req.headers['User-Agent']) ? req.headers['User-Agent'] : '';
+                                                            var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
                                                             st.generateToken(ip,userAgent,EZEID,function(err,token){
                                                                 if(err){
@@ -550,7 +550,7 @@ User.prototype.register = function(req,res,next){
                                                             req.connection.remoteAddress ||
                                                             req.socket.remoteAddress ||
                                                             req.connection.socket.remoteAddress;
-                                                        var userAgent = (req.headers['User-Agent']) ? req.headers['User-Agent'] : '';
+                                                        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
                                                         st.generateToken(ip,userAgent,EZEID,function(err,token) {
                                                             if (err) {
@@ -667,7 +667,7 @@ User.prototype.login = function(req,res,next){
         //res.setHeader('content-type', 'application/json');
         var UserName = alterEzeoneId(req.body.UserName);
         var Password = req.body.Password;
-        var userAgent = (req.headers['User-Agent']) ? req.headers['User-Agent'] : '';
+        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
         var ip = req.headers['x-forwarded-for'] ||
             req.connection.remoteAddress ||
             req.socket.remoteAddress ||
@@ -1320,34 +1320,77 @@ User.prototype.changePassword = function(req,res,next){
             st.validateToken(TokenNo, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var EncryptOldPWD = hashPassword(OldPassword);
-                        var EncryptNewPWD = hashPassword(NewPassword);
-                        var Query = st.db.escape(TokenNo) + ',' + st.db.escape(EncryptOldPWD) + ',' + st.db.escape(EncryptNewPWD);
-                        st.db.query('CALL pChangePassword(' + Query + ')', function (err, ChangePasswordResult) {
-                            if (!err) {
-                                //console.log(ChangePasswordResult);
-                                if (ChangePasswordResult) {
-                                    if (ChangePasswordResult.affectedRows > 0) {
-                                        RtnMessage.IsChanged = true;
-                                        res.send(RtnMessage);
-                                        console.log('FnChangePassword:pChangePassword: PASSSWORD CHANGED SUCCESSFULLY');
-                                    }
-                                    else {
-                                        res.send(RtnMessage);
-                                        console.log('FnChangePassword:pChangePassword: Password changed failed');
-                                    }
-                                }
-                                else {
-                                    res.send(RtnMessage);
-                                    console.log('FnChangePassword:pChangePassword: Password changed failed ');
-                                }
+                        var oldPassQueryParams = st.db.escape(TokenNo);
+                        var oldPassQuery = 'CALL pgetoldpassword('+oldPassQueryParams+')';
+                        console.log(oldPassQuery);
+                        st.db.query(oldPassQuery,function(err,oldPassResult){
+                            if(err){
+                                console.log('Error : FnChangePassword - During old password retrieval; Procedure: pgetoldpassword');
+                                console.log(err);
+                                res.status(400).json(RtnMessage);
                             }
-                            else {
-                                res.statusCode = 500;
-                                res.send(RtnMessage);
-                                console.log('FnChangePassword:pChangePassword:' + err);
+                            else{
+
+                                if(oldPassResult){
+                                    if(oldPassResult[0]){
+                                        if(oldPassResult[0][0]){
+                                            if(oldPassResult[0][0].Password){
+                                                if(comparePassword(OldPassword,oldPassResult[0][0].Password)){
+                                                    var ip = req.headers['x-forwarded-for'] ||
+                                                    req.connection.remoteAddress ||
+                                                    req.socket.remoteAddress ||
+                                                    req.connection.socket.remoteAddress;
+                                                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                                                    var newPassword = hashPassword(NewPassword);
+
+                                                    var passChangeQueryParams = st.db.escape(TokenNo) + st.db.escape(oldPassResult[0][0].Password)+ ','+
+                                                        st.db.escape(newPassword) + ',' + st.db.escape(ip) +',' + st.db.escape(userAgent);
+
+                                                    var passChangeQuery = 'CALL pChangePassword('+passChangeQueryParams + ')';
+                                                    console.log(passChangeQuery);
+
+
+                                                    st.db.query(passChangeQuery,function(err,passChangeResult){
+                                                        if(err){
+                                                            console.log('Error FnChangePassword :  procedure pChangePassword');
+                                                            console.log(err);
+                                                            res.status(400).json(RtnMessage);
+                                                        }
+                                                        else{
+                                                            if(passChangeResult){
+                                                                console.log(passChangeResult);
+                                                                RtnMessage.IsChanged = true;
+                                                                res.status(200).json(RtnMessage);
+                                                            }
+                                                            else{
+                                                                res.status(200).status(RtnMessage);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                                else{
+                                                    res.status(200).json(RtnMessage);
+                                                }
+                                            }
+                                            else{
+                                                res.status(401).json(RtnMessage);
+                                            }
+                                        }
+                                        else{
+                                            res.status(401).json(RtnMessage);
+                                        }
+                                    }
+                                    else{
+                                        res.status(401).json(RtnMessage);
+                                    }
+                                }
+                                else{
+                                    res.status(401).json(RtnMessage);
+                                }
                             }
                         });
+
                     } else {
                         res.statusCode = 401;
                         res.send(RtnMessage);
@@ -1378,6 +1421,7 @@ User.prototype.changePassword = function(req,res,next){
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         console.log('FnChangePassword error:' + ex.description);
+        res.status(400).json(RtnMessage);
 
     }
 };
@@ -1532,7 +1576,7 @@ User.prototype.decryptPassword = function(req,res,next){
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         return 'error'
     }
-}
+};
 
 function FnRandomPassword() {
     try {
