@@ -176,89 +176,89 @@ function decrypt(EncryptPassword){
 //};
 //
 //var db = getDBContext();
-var fs = require('fs');
-
-var countQuery = "SELECT COUNT(*) AS total FROM tmaster WHERE 1";
-var totalCount = 0;
-
-var userList = [];
-var failedList = [];
-
-var updateString = "";
-function passUpdateString(password,ezeid){
-    var query = "UPDATE tmaster SET password = "+ password + " WHERE ezeid = "+ezeid +";";
-    updateString+=query;
-}
-
-
-function decryptAllPasswords(totalCount){
-    var selectQuery = "SELECT TID as tid,EZEID as ezeid,Password as password FROM tmaster WHERE 1";
-    db.query(selectQuery,function(err,results){
-        if(err){
-            console.log('Error in select Query');
-        }
-        else{
-            if(results){
-                if(results.length > 0){
-                    for(var i=0; i<results.length;i++){
-                        var user = {
-                            ezeid : null,
-                            password : null,
-                            encpassword : null
-                        };
-                        //console.log(results[i].password);
-                        //console.log(decrypt(results[i].password));
-                        user.ezeid = results[i].ezeid;
-                        user.encpassword = results[i].password;
-                        try{
-                            console.log('user : '+i+' started');
-                            user.password = (results[i].password) ? decrypt(results[i].password) : null;
-                            if(user.password){
-                                passUpdateString( bcrypt.hashSync(user.password, 12),user.ezeid);
-                            }
-                            else{
-                                passUpdateString( user.password,user.ezeid);
-                            }
-
-                            console.log('user : '+i+' finished');
-
-                        }
-                        catch(ex){
-                            console.log(ex);
-                            failedList.push(user);
-                        }
-
-                        userList.push(user);
-                    }
-
-                    console.log('UserList : '+userList.length);
-                    console.log('FailedList : '+failedList.length);
-
-                    fs.writeFileSync('./test-user-details.json',JSON.stringify(userList));
-                    fs.writeFileSync('./test-failed-details.json',JSON.stringify(failedList));
-                    fs.writeFileSync('./password-update.sql',updateString);
-                    console.log('All Done');
-                }
-            }
-        }
-    });
-
-};
-
-db.query(countQuery,function(err,result){
-    if(err){
-       console.log('Error in count query');
-    }
-    else{
-        if(result){
-            if(result.length > 0){
-                totalCount = result[0].total;
-                console.log('Total Count done');
-                decryptAllPasswords(totalCount);
-            }
-        }
-    }
-});
+//var fs = require('fs');
+//
+//var countQuery = "SELECT COUNT(*) AS total FROM tmaster WHERE 1";
+//var totalCount = 0;
+//
+//var userList = [];
+//var failedList = [];
+//
+//var updateString = "";
+//function passUpdateString(password,ezeid){
+//    var query = "UPDATE tmaster SET password = "+ password + " WHERE ezeid = "+ezeid +";";
+//    updateString+=query;
+//}
+//
+//
+//function decryptAllPasswords(totalCount){
+//    var selectQuery = "SELECT TID as tid,EZEID as ezeid,Password as password FROM tmaster WHERE 1";
+//    db.query(selectQuery,function(err,results){
+//        if(err){
+//            console.log('Error in select Query');
+//        }
+//        else{
+//            if(results){
+//                if(results.length > 0){
+//                    for(var i=0; i<results.length;i++){
+//                        var user = {
+//                            ezeid : null,
+//                            password : null,
+//                            encpassword : null
+//                        };
+//                        //console.log(results[i].password);
+//                        //console.log(decrypt(results[i].password));
+//                        user.ezeid = results[i].ezeid;
+//                        user.encpassword = results[i].password;
+//                        try{
+//                            console.log('user : '+i+' started');
+//                            user.password = (results[i].password) ? decrypt(results[i].password) : null;
+//                            if(user.password){
+//                                passUpdateString( bcrypt.hashSync(user.password, 12),user.ezeid);
+//                            }
+//                            else{
+//                                passUpdateString( user.password,user.ezeid);
+//                            }
+//
+//                            console.log('user : '+i+' finished');
+//
+//                        }
+//                        catch(ex){
+//                            console.log(ex);
+//                            failedList.push(user);
+//                        }
+//
+//                        userList.push(user);
+//                    }
+//
+//                    console.log('UserList : '+userList.length);
+//                    console.log('FailedList : '+failedList.length);
+//
+//                    fs.writeFileSync('./test-user-details.json',JSON.stringify(userList));
+//                    fs.writeFileSync('./test-failed-details.json',JSON.stringify(failedList));
+//                    fs.writeFileSync('./password-update.sql',updateString);
+//                    console.log('All Done');
+//                }
+//            }
+//        }
+//    });
+//
+//};
+//
+//db.query(countQuery,function(err,result){
+//    if(err){
+//       console.log('Error in count query');
+//    }
+//    else{
+//        if(result){
+//            if(result.length > 0){
+//                totalCount = result[0].total;
+//                console.log('Total Count done');
+//                decryptAllPasswords(totalCount);
+//            }
+//        }
+//    }
+//});
 
 //fs.appendFile('message.txt', 'data to append');
 //var bcrypt = require('bcrypt');
@@ -334,3 +334,36 @@ db.query(countQuery,function(err,result){
 //    message : 'Statistics for Sales are generated successfully',
 //    error : null
 //};
+
+var token = '9570b586-30ec-11e5-b492-42010af056e4';
+db.query('CALL pgetoldpassword('+db.escape(token)+')',function(err,results){
+    if(err){
+        console.log('Error : pgetoldpassword');
+        console.log(err);
+        res.json(400).json(RtnMessage);
+    }
+    else{
+        console.log(results);
+        if(results){
+            if(results[0]){
+                if(results[0][0]){
+                    if(results[0][0].Password){
+
+                    }
+                    else{
+                        res.status(401).json(RtnMessage);
+                    }
+                }
+                else{
+                    res.status(401).json(RtnMessage);
+                }
+            }
+            else{
+                res.status(401).json(RtnMessage);
+            }
+        }
+        else{
+            res.status(401).json(RtnMessage);
+        }
+    }
+});

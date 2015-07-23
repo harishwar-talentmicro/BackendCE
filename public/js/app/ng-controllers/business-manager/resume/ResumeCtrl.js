@@ -1631,7 +1631,7 @@
                     err.push('Please select Per Hour/PM/PA');
                 }
                 if($scope.jobType == 0){
-                    err.push('Please select Job type');  
+                    err.push('Please select Job type');
                 }
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
@@ -1653,11 +1653,19 @@
                 return true;
             };
 
+
             // save job to system
             $scope.postJob = function(){
+
+                console.log("sai");
+                console.log($rootScope._userInfo.ezeid);
+
+
                 $scope.validationDone = true;
                 if(validateItem())
                 {
+
+
 
                     console.log($scope.jobTitle);
                     console.log($scope.jobCode);
@@ -1677,7 +1685,7 @@
                     $scope.jobData = {
                                         token : $rootScope._userInfo.Token,
                                         tid : 0,
-                                        ezeone_id : "@krunal",
+                                        ezeone_id : $rootScope._userInfo.ezeid,
                                         job_code : $scope.jobCode,
                                         job_title : $scope.jobTitle,
                                         exp_from : $scope.experienceFrom,
@@ -1698,7 +1706,6 @@
                         method: "POST",
                         url: GURL + 'job',
                         data:  $scope.jobData
-
                     }).success(function (data) {
 
                             console.log(data);
