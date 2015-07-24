@@ -1,190 +1,433 @@
 <div id="wrapper" ng-controller="bulksalesController as bulksalesController">
     <header-section></header-section>
-       <div class="container-fluid">
+    <div class="container-fluid">
 
-                <div class="row">
-                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">-->
-                    <div class="col-sm-10" style="margin: auto; float: none;">
-                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setpadding12">-->
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4>{{formTitle}}</h4>
-                                <span ng-hide="showCreateMailTemplate" class="textMailLimit">(Maximum Limit: 10 companies)</span>
+        <div class="row">
+            <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2 col-xs-offset-0">-->
+            <div class="col-sm-10" style="margin: auto; float: none;">
+                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setpadding12">-->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>{{formTitle}}</h4>
+                        <span ng-hide="showCreateMailTemplate" class="textMailLimit">(Maximum Limit: 10 companies)</span>
+                    </div>
+                    <div class="panel-body setPanelPadding">
+                        <div ng-hide="validationMode > 0" class="setTableFixHeight">
+                            <div ng-hide="showCreateMailTemplate" class="row setRowLeftRightMarginZero" style="padding-left: 2.5%;padding-right: 2.5%;">
+                                <table class="rwd-table bulkmailTable">
+                                    <thead>
+                                    <tr>
+                                        <th> </th>
+                                        <th class="setBulkMailHeaderText">Company Name</th>
+                                        <th class="setBulkMailHeaderText">Country/City</th>
+                                        <th class="setBulkMailHeaderText">Distance(km)</th>
+                                        <th class="setBulkMailHeaderText">Phone No.</th>
+                                        <th class="setBulkMailHeaderText">Web Site</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody ng-show="showListing">
+                                    <tr ng-repeat="_item in bulksalesController.result">
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="companyID"
+                                                   data-tid="{{_item.TID}}"
+                                                   ng-click="toggleCheckbox($event)"
+                                                   ng-checked="selectedTID.indexOf(_item.TID)!=-1"/>
+                                        </td>
+                                        <td title="{{_item.CompanyName}}" data-th="Company Name">{{_item.CompanyName | truncate:21}}</td>
+                                        <td title="{{_item.city}}" data-th="Country/City">{{_item.city | truncate:9}}</td>
+                                        <td data-th="Distance (km)">{{_item.distance}}</td>
+                                        <td data-th="Phone No.">{{ (_item.PhoneNumber) ? _item.CountryCode +' ' : ""}} {{_item.PhoneNumber}}</td>
+                                        <td data-th="Web Site"><a target="_blank" href="http:\\{{_item.Website}}"><u>{{_item.Website}}</u></a></td>
+                                    </tr>
+                                    </tbody>
+                                    <tbody ng-hide="showListing">
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td> No Search result found.</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="panel-body setPanelPadding">
-                                <div ng-hide="validationMode > 0" class="setTableFixHeight">
-                                    <div ng-hide="showCreateMailTemplate" class="row setRowLeftRightMarginZero" style="padding-left: 2.5%;padding-right: 2.5%;">
-                                        <table class="rwd-table bulkmailTable">
-                                            <thead>
-                                                <tr>
-                                                    <th> </th>
-                                                    <th class="setBulkMailHeaderText">Company Name</th>
-                                                    <th class="setBulkMailHeaderText">Country/City</th>
-                                                    <th class="setBulkMailHeaderText">Distance(km)</th>
-                                                    <th class="setBulkMailHeaderText">Phone No.</th>
-                                                    <th class="setBulkMailHeaderText">Web Site</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody ng-show="showListing">
-                                               <tr ng-repeat="_item in bulksalesController.result">
-                                                   <td>
-                                                      <input type="checkbox"
-                                                               name="companyID"
-                                                               data-tid="{{_item.TID}}"
-                                                               ng-click="toggleCheckbox($event)"
-                                                               ng-checked="selectedTID.indexOf(_item.TID)!=-1"/>
-                                                   </td>
-                                                    <td title="{{_item.CompanyName}}" data-th="Company Name">{{_item.CompanyName | truncate:21}}</td>
-                                                    <td title="{{_item.city}}" data-th="Country/City">{{_item.city | truncate:9}}</td>
-                                                    <td data-th="Distance (km)">{{_item.distance}}</td>
-                                                    <td data-th="Phone No.">{{ (_item.PhoneNumber) ? _item.CountryCode +' ' : ""}} {{_item.PhoneNumber}}</td>
-                                                    <td data-th="Web Site"><a target="_blank" href="http:\\{{_item.Website}}"><u>{{_item.Website}}</u></a></td>
-                                                </tr>
-                                            </tbody>
-                                            <tbody ng-hide="showListing">
-                                                <tr>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td> No Search result found.</td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                </tr>
-                                                </tbody>
-                                        </table>
-                                    </div>
-                                </div><br/>
-                                <div style="text-align: center">
-                                  <div class="well well-lg templateBoxContainer">
-                                      <form name="MailTemplateForm" novalidate >
-                                          <div class="row setRowLeftRightMarginZero centerAlign">
-                                              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                                  Template
-                                              </div>
-                                              <div ng-hide="showCreateMailTemplate">
-                                                  <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 searchHeaderAlignment ">
-                                                      <select class="form-control" name="TitleSeelect" ng-model="bulksalesController._info.TID"
-                                                           ng-change="bulksalesController.getTemplateDetails(bulksalesController._info.TID)"
-                                                           ng-options="template.TID as template.Title for template in bulksalesController.templates" required>
-                                                          <option value = ""> -- Select Template -- </option>
-                                                      </select>
-                                                  </div>
-                                                  <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
-                                                      <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm('new')" >New</button>
-                                                  </div>
-                                                  <div ng-show="bulksalesController._info.TID" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
-                                                      <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm('edit')" >Edit</button>
-                                                  </div>
-                                              </div>
+                        </div><br/>
+                        <div style="text-align: center">
+                            <div class="well well-lg templateBoxContainer">
+                                <form name="MailTemplateForm" novalidate >
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Template
+                                        </div>
+                                        <div ng-hide="showCreateMailTemplate">
+                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 searchHeaderAlignment ">
+                                                <select class="form-control" name="TitleSeelect" ng-model="bulksalesController._info.TID"
+                                                        ng-change="bulksalesController.getTemplateDetails(bulksalesController._info.TID)"
+                                                        ng-options="template.TID as template.Title for template in bulksalesController.templates" required>
+                                                    <option value = ""> -- Select Template -- </option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                                <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm('new')" >New</button>
+                                            </div>
+                                            <div ng-show="bulksalesController._info.TID" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                                <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm('edit')" >Edit</button>
+                                            </div>
+                                        </div>
 
-                                              <div ng-show="showCreateMailTemplate">
-                                                  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                                      <input type="text" name="Title" id="Title" ng-model="bulksalesController._info.Title"
-                                                             class="form-control emptyBox"  ng-class="MailTemplateForm.Title.$touched && !bulksalesController._info.Title.length ? 'mandatoryTextBox' : ''"
-                                                             placeholder="Template title" maxlength="100" required>
-                                                  </div>
-                                              </div>
+                                        <div ng-show="showCreateMailTemplate">
+                                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                                <input type="text" name="Title" id="Title" ng-model="bulksalesController._info.Title"
+                                                       class="form-control emptyBox"  ng-class="MailTemplateForm.Title.$touched && !bulksalesController._info.Title.length ? 'mandatoryTextBox' : ''"
+                                                       placeholder="Template title" maxlength="100" required>
+                                            </div>
+                                        </div>
 
-                                          </div><br/>
-                                          <div class="row setRowLeftRightMarginZero centerAlign">
-                                              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                                  Name
-                                              </div>
-                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
-                                                  <input type="text" name="FromName" ng-model="bulksalesController._info.FromName"
-                                                         ng-class="MailTemplateForm.FromName.$touched && !bulksalesController._info.FromName.length && validationMode > 0  ? 'mandatoryTextBox' : ''"
-                                                         class="form-control emptyBox" id="FromName" placeholder="From name" maxlength="100" ng-readonly="validationMode == 0" required>
-                                              </div>
-                                              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton keyWordText">
-                                                  From
-                                              </div>
-                                              <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
-                                                  <input type="text" name="FromEmailID" class="form-control emptyBox"
-                                                         id="FromEmailID" ng-model="bulksalesController._info.FromEmailID"
-                                                         ng-class="MailTemplateForm.FromEmailID.$touched && !bulksalesController._info.FromEmailID.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                                         placeholder="From email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-readonly="validationMode == 0" required>
-                                                   <span ng-show="MailTemplateForm.FromEmailID.$error.email" ng-if="MailTemplateForm.FromEmailID.$error.email == true ? bulksalesController._info.isWrongEmailPatternFrom = true : bulksalesController._info.isWrongEmailPatternFrom = false"></span>
-                                              </div>
-                                          </div><br/>
-                                          <div class="row setRowLeftRightMarginZero centerAlign">
-                                              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                                  Cc
-                                              </div>
-                                              <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                                  <input type="email" name="CCMailIDS" class="form-control"
-                                                         id="CCMailIDS" ng-model="bulksalesController._info.CCMailIDS" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/"
-                                                         placeholder="Cc email" maxlength="100" ng-readonly="validationMode == 0" required>
-                                                  <span ng-show="MailTemplateForm.CCMailIDS.$error.email" ng-if="MailTemplateForm.CCMailIDS.$error.email == true ? bulksalesController._info.isWrongEmailPatternCc = true : bulksalesController._info.isWrongEmailPatternCc = false"></span>
-                                              </div>
-                                          </div><br/>
-                                          <div class="row setRowLeftRightMarginZero centerAlign">
-                                              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                                  Bcc
-                                              </div>
-                                              <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                                  <input type="email" name="BCCMailIDS" class="form-control"
-                                                         id="BCCMailIDS" ng-model="bulksalesController._info.BCCMailIDS" class="form-control"
-                                                         ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/"  placeholder="Bcc email" maxlength="100" ng-readonly="validationMode == 0" required>
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Name
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
+                                            <input type="text" name="FromName" ng-model="bulksalesController._info.FromName"
+                                                   ng-class="MailTemplateForm.FromName.$touched && !bulksalesController._info.FromName.length && validationMode > 0  ? 'mandatoryTextBox' : ''"
+                                                   class="form-control emptyBox" id="FromName" placeholder="From name" maxlength="100" ng-readonly="validationMode == 0" required>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton keyWordText">
+                                            From
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
+                                            <input type="text" name="FromEmailID" class="form-control emptyBox"
+                                                   id="FromEmailID" ng-model="bulksalesController._info.FromEmailID"
+                                                   ng-class="MailTemplateForm.FromEmailID.$touched && !bulksalesController._info.FromEmailID.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
+                                                   placeholder="From email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-readonly="validationMode == 0" required>
+                                            <span ng-show="MailTemplateForm.FromEmailID.$error.email" ng-if="MailTemplateForm.FromEmailID.$error.email == true ? bulksalesController._info.isWrongEmailPatternFrom = true : bulksalesController._info.isWrongEmailPatternFrom = false"></span>
+                                        </div>
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Cc
+                                        </div>
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                            <input type="email" name="CCMailIDS" class="form-control"
+                                                   id="CCMailIDS" ng-model="bulksalesController._info.CCMailIDS" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/"
+                                                   placeholder="Cc email" maxlength="100" ng-readonly="validationMode == 0" required>
+                                            <span ng-show="MailTemplateForm.CCMailIDS.$error.email" ng-if="MailTemplateForm.CCMailIDS.$error.email == true ? bulksalesController._info.isWrongEmailPatternCc = true : bulksalesController._info.isWrongEmailPatternCc = false"></span>
+                                        </div>
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Bcc
+                                        </div>
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                            <input type="email" name="BCCMailIDS" class="form-control"
+                                                   id="BCCMailIDS" ng-model="bulksalesController._info.BCCMailIDS" class="form-control"
+                                                   ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/"  placeholder="Bcc email" maxlength="100" ng-readonly="validationMode == 0" required>
 
-                                                  <span ng-show="MailTemplateForm.BCCMailIDS.$error.email" ng-if="MailTemplateForm.BCCMailIDS.$error.email == true ? bulksalesController._info.isWrongEmailPatternBcc = true : bulksalesController._info.isWrongEmailPatternBcc = false"></span>
-                                              </div>
-                                          </div><br/>
-                                          <div class="row setRowLeftRightMarginZero centerAlign">
-                                              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                                  Subject
-                                              </div>
-                                              <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                                  <input type="text" name="Subject" id="Subject" ng-model="bulksalesController._info.Subject"
-                                                         class="form-control emptyBox"  ng-class="MailTemplateForm.Subject.$touched && !bulksalesController._info.Subject.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                                         placeholder="Subject" maxlength="250" ng-readonly="validationMode == 0" required>
-                                              </div>
-                                          </div><br/>
-                                          <div class="row setRowLeftRightMarginZero centerAlign">
-                                              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                                  Body <a class="showPointer" ng-click="profile.openTermsAndConditionForm()" id="termConditions" data-toggle="tooltip" data-placement="top" title="Tags Supported: {FirstName}, {LastName}, {CompanyName}">  <u>?</u> </a>
-                                              </div>
-                                              <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">-->
-                                              <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                            <span ng-show="MailTemplateForm.BCCMailIDS.$error.email" ng-if="MailTemplateForm.BCCMailIDS.$error.email == true ? bulksalesController._info.isWrongEmailPatternBcc = true : bulksalesController._info.isWrongEmailPatternBcc = false"></span>
+                                        </div>
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Subject
+                                        </div>
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                            <input type="text" name="Subject" id="Subject" ng-model="bulksalesController._info.Subject"
+                                                   class="form-control emptyBox"  ng-class="MailTemplateForm.Subject.$touched && !bulksalesController._info.Subject.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
+                                                   placeholder="Subject" maxlength="250" ng-readonly="validationMode == 0" required>
+                                        </div>
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Body <a class="showPointer" ng-click="profile.openTermsAndConditionForm()" id="termConditions" data-toggle="tooltip" data-placement="top" title="Tags Supported: {FirstName}, {LastName}, {CompanyName}">  <u>?</u> </a>
+                                        </div>
+                                        <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">-->
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
                                                   <textarea rows="10" cols="92" name="Body" id="Body" ng-model="bulksalesController._info.Body"
                                                             class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !bulksalesController._info.Body.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
                                                             placeholder="Type here" ng-readonly="validationMode == 0" required></textarea>
-                                              </div>
-                                          </div><br/>
-                                          <div class="row setRowLeftRightMarginZero centerAlign" >
-                                              <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer">
+                                        </div>
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign" >
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer">
 
-                                              </div>
-                                              <div ng-hide="showCreateMailTemplate">
-                                                  <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                                      <button type="submit" class="btn btn-primary" ng-click="bulksalesController.SendEnquiryMail()"
-                                                              ng-disabled="!bulksalesController._info.TID" >Send</button>
-                                                  </div>
-                                                  <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                                      <button type="button" class="btn btn-primary" ng-click="bulksalesController.closeSalesEnquiryForm()" >Close</button>
-                                                  </div>
-                                              </div>
+                                        </div>
+                                        <div ng-hide="showCreateMailTemplate">
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="submit" class="btn btn-primary" ng-click="bulksalesController.SendEnquiryMail()"
+                                                        ng-disabled="!bulksalesController._info.TID" >Send</button>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="button" class="btn btn-primary" ng-click="bulksalesController.closeSalesEnquiryForm()" >Close</button>
+                                            </div>
+                                        </div>
 
-                                              <div ng-show="showCreateMailTemplate">
-                                                  <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                                      <button type="submit" class="btn btn-primary" ng-click="bulksalesController.saveMailTemplate()"
-                                                              ng-disabled="!bulksalesController._info.Title || !bulksalesController._info.FromName || !bulksalesController._info.FromEmailID
+                                        <div ng-show="showCreateMailTemplate">
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="submit" class="btn btn-primary" ng-click="bulksalesController.saveMailTemplate()"
+                                                        ng-disabled="!bulksalesController._info.Title || !bulksalesController._info.FromName || !bulksalesController._info.FromEmailID
                                                                             || !bulksalesController._info.Subject || !bulksalesController._info.Body">Save</button>
-                                                  </div>
-                                                  <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                                      <button type="button" class="btn btn-primary" ng-click="bulksalesController.closeCreateMailTemplateForm()" >Cancel</button>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                      </form>
-                                  </div>
-                                </div>
-                             </div>
-                         </div>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="button" class="btn btn-primary" ng-click="bulksalesController.closeCreateMailTemplateForm()" >Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-       </div>
+        </div>
+    </div>
+</div>
 
 </div>
+
+<!-- Start of design for finding - Job Seekers -->
+<section id="job-seeker-search" class="jss hpw job-seeker-bg">
+    <div class="container width-90">
+        <div class="panel">
+            <div class="panel-primary panel-heading">
+                <i class="fa fa-search"></i>  Find Job Seekers
+            </div>
+            <div class="panel-default panel-body">
+                <!-- seacrh bar to search job keyword by skill keywords -->
+                <div class="container p-bottom-10">
+                    <div class="col-lg-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search job seekers by skill keywords" />
+                            <span class="btn btn-primary input-group-addon"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                    <!-- Job type and salary range -->
+                    <div class="col-lg-8">
+                        <!-- Job Type -->
+                        <div class="col-lg-4 no-left-padding">
+                            <select class="form-control">
+                                <option>Full Time</option>
+                                <option>Part Time</option>
+                                <option>Work From Home</option>
+                                <option>Internship</option>
+                                <option>Consultant</option>
+                                <option>Freelancer</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-8 no-padding">
+                            <div class="input-group">
+                                <span class="input-group-addon">Salary From</span>
+                                <input type="number" class="form-control" />
+                                <span class="input-group-addon">To</span>
+                                <input type="number" class="form-control" />
+
+                            <span class="btn btn-default input-group-addon  dropdown-toggle" data-toggle="dropdown">per Annum
+                                <span class="caret"></span>
+                            </span>
+                                <ul class="dropdown-menu salary-filter-type">
+                                    <li><a href="#">per Hour</a></li>
+                                    <li><a href="#">per Month</a></li>
+                                    <li><a href="#">per Annum</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container p-bottom-10">
+                    <!-- Country -->
+                    <div class="col-lg-4">
+                        <select class="form-control">
+                            <option>India</option>
+                            <option>UAE</option>
+                            <option>Ireland</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-8 no-padding">
+                        <!-- Locations -->
+                        <div class="col-lg-4">
+                            <input type="text" class="form-control" placeholder="Preffered Location" />
+                        </div>
+                        <!-- Experiences -->
+                        <div class="col-lg-8 no-left-padding">
+                            <div class="input-group">
+                                <span class="input-group-addon">Experience</span>
+                                <input type="text" class="form-control" />
+                                <span class="input-group-addon">To</span>
+                                <input type="text" class="form-control" />
+                                <span class="input-group-addon">years</span>
+                                <span class="btn btn-dark-orange input-group-addon"><i class="fa fa-search"></i> Search</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="container">
+                    <div class="col-lg-12">
+                        <hr>
+                    </div>
+                    <div class="col-lg-6">
+                        Showing 1-10 of 120 results
+                    </div>
+                    <div class="col-lg-6 text-right">
+                        <button class="btn btn-primary"><i class="fa fa-arrow-circle-left"></i></button>
+                        <button class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i></button>
+                    </div>
+                </div>
+                <div class="container">
+                    <!-- main table goes here -->
+                    <div class="main-table p-top-20 col-lg-12">
+                        <div class="col-lg-12 table-head">
+                            <div class="col-lg-1">
+                                <i class="fa fa-square-o"></i> #
+                            </div>
+                            <div class="col-lg-2">
+                                Name
+                            </div>
+                            <div class="col-lg-1">
+                                Location
+                            </div>
+                            <div class="col-lg-3">
+                                Skills
+                            </div>
+                            <div class="col-lg-1">
+                                Experience
+                            </div>
+                            <div class="col-lg-3">
+                                Preferred Job Type
+                            </div>
+                            <div class="col-lg-1">
+                                Freshness
+                            </div>
+                        </div>
+                        <div class="col-lg-12 table-body">
+                            <div class="col-lg-1">
+                                <i class="fa fa-check-square-o"></i> 1
+                            </div>
+                            <div class="col-lg-2">
+                                Chandra Shekar
+                            </div>
+                            <div class="col-lg-1">
+                                Bengaluru
+                            </div>
+                            <div class="col-lg-3">
+                                J2ee, Oracle, C++, SQL
+                            </div>
+                            <div class="col-lg-1">
+                                3.5 Yrs
+                            </div>
+                            <div class="col-lg-3">
+                                Full Time, Consultant, Freelancer
+                            </div>
+                            <div class="col-lg-1">
+                                5 Day
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 table-body table-striped-bg">
+                            <div class="col-lg-1">
+                                <i class="fa fa-check-square-o"></i> 2
+                            </div>
+                            <div class="col-lg-2">
+                                Shweta
+                            </div>
+                            <div class="col-lg-1">
+                                Bengaluru
+                            </div>
+                            <div class="col-lg-3">
+                                J2ee, Oracle, C++, SQL
+                            </div>
+                            <div class="col-lg-1">
+                                3.5 Yrs
+                            </div>
+                            <div class="col-lg-3">
+                                Full Time, Consultant, Freelancer
+                            </div>
+                            <div class="col-lg-1">
+                                5 Day
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 table-body">
+                            <div class="col-lg-1">
+                                <i class="fa fa-square-o"></i> 3
+                            </div>
+                            <div class="col-lg-2">
+                                Ramesh Shekar
+                            </div>
+                            <div class="col-lg-1">
+                                Bengaluru
+                            </div>
+                            <div class="col-lg-3">
+                                J2ee, Oracle, C++, SQL
+                            </div>
+                            <div class="col-lg-1">
+                                3.5 Yrs
+                            </div>
+                            <div class="col-lg-3">
+                                Full Time, Consultant, Freelancer
+                            </div>
+                            <div class="col-lg-1">
+                                5 Day
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="panel-danger panel-footer text-white">
+                <i class="fa fa-envelope"></i> Compose Mail <label class="label label-primary">2</label>
+            </div>
+            <div class="panel-body">
+                <div class="container">
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                        <span class="input-group-addon">
+                            Template
+                        </span>
+                            <select class="form-control">
+                                <option>New</option>
+                                <option> - </option>
+                            </select>
+                            <span class="btn btn-primary input-group-addon"><i class="fa fa-plus"></i> New</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <span class="input-group-addon">Job Type</span>
+                            <select class="form-control">
+                                <option>Full Time</option>
+                                <option>Part Time</option>
+                                <option>Work From Home</option>
+                                <option>Internship</option>
+                                <option>Consultant</option>
+                                <option>Freealancer</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 p-top-10">
+                        <div class="input-group">
+                            <span class="input-group-addon">Subject</span>
+                            <input type="text" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-lg-12 p-top-10">
+                        <div class="input-group">
+                            <span class="input-group-addon">Message</span>
+                            <textarea class="form-control" rows="6"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 text-right p-top-10">
+                        <button class="btn btn-danger"><i class="fa fa-trash"></i> Cancel</button>
+                        <button class="btn btn-success"><i class="fa fa-send"></i> Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- End of design for finding - Job Seekers -->
 <footer-section></footer-section>
