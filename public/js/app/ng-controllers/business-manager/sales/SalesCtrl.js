@@ -89,8 +89,6 @@
                     txList : true,
                     txUpdate : false
                 },
-
-
             ];
 
             /**
@@ -251,31 +249,6 @@
                 return defer.promise;
             };
 
-
-
-            //$scope.loadLocationListForEzeid = function(tid){
-            //    var defer = $q.defer();
-            //    $http({
-            //        url : GURL + 'ewtGetLocationListForEZEID',
-            //        method : 'GET',
-            //        params : {
-            //            Token : $rootScope._userInfo.Token,
-            //            TID :   tid
-            //        }
-            //    }).success(function(resp){
-            //        if(resp && resp !== 'null'){
-            //            $scope.modalBox.locationList = resp.Result;
-            //            defer.resolve(resp.Result);
-            //        }
-            //        else{
-            //            defer.reject();
-            //        }
-            //    }).error(function(err){
-            //        defer.reject();
-            //    });
-            //    return defer.promise;
-            //};
-
             /**
              * Eliminates the rate and item description from the message
              * so that it can be recalculated and saved when internal user changes or updates the order
@@ -324,7 +297,7 @@
                         contactInfo : tx.ContactInfo,
                         DeliveryAddress : tx.DeliveryAddress,
                         nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
-                        nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY HH:mm'),
+                        nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm A','DD MMM YYYY HH:mm'),
                         taskDateTime : tx.TaskDateTime,
                         folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
                         message : alterTransactionMessageToEdit(tx.Message),
@@ -414,7 +387,8 @@
                         status : ($scope.modalBox.tx.statusType) ? $scope.modalBox.tx.statusType : 0,
                         folderRuleID : ($scope.modalBox.tx.folderRule) ? $scope.modalBox.tx.folderRule : 0,
                         nextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
-                        nextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss A'),
+                        nextActionDateTime : UtilityService.convertTimeToUTC(($scope.modalBox.tx.nextActionDateTime)
+                                ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
                         Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
@@ -425,7 +399,6 @@
                         $scope.toggleAllEditMode();
 
                         var id = $scope.txList.indexOfWhere('TID',parseInt(resp.data.TID));
-                        ////console.log($scope.txList[id]);
                         $scope.txList[id].FolderRuleID = parseInt(resp.data.folderRuleID);
                         $scope.txList[id].Status = parseInt(resp.data.status);
 
@@ -441,10 +414,12 @@
                         $scope.txList[id].NextActionID = (parseInt(resp.data.nextAction)!== NaN ) ? parseInt(resp.data.nextAction) : 0 ;
                         var date = moment().format('DD MMM YYYY hh:mm A');
                         try{
-                            date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD hh:mm:ss').format('DD MMM YYYY hh:mm A');
+                            date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD HH:mm:ss').format('DD MMM YYYY hh:mm A');
+                            resp.data.nextActionDateTime = UtilityService.convertTimeToLocal(date,'DD MMM YYYY hh:mm A');
                         }
                         catch(ex){
-
+                            var date = moment().format('YYYY-MM-DD HH:mm:ss A');
+                            resp.data.nextActionDateTime = UtilityService.convertTimeToLocal(date,'DD MMM YYYY hh:mm A');
                         }
                         $scope.txList[id].NextActionDate = resp.data.nextActionDateTime;
                     }
@@ -1043,14 +1018,10 @@
                  * make any transaction load request and therefore show no transaction available for him
                  * else let him see the transaction as he can see transaction of default folder also
                  */
-                ////console.log($rootScope._userInfo.MasterID);
-                ////console.log(folderRules);
                 if($rootScope._userInfo.MasterID > 0 && (!folderRules)){
                     $timeout(function(){
                         defer.resolve([]);
                         $scope.txList = [];
-                        //$scope.totalPages = 1;
-                        //$scope.pageNumber = 1;
                     },300);
                 }
                 else{
@@ -1080,7 +1051,8 @@
                                 for(var a = 0; a < resp.Result.length; a++){
                                     $scope.editModes.push(false);
                                     resp.Result[a].TaskDateTime = UtilityService.convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A');
-                                    resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ? UtilityService.convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A') :
+                                    resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ?
+                                        UtilityService.convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A') :
                                         UtilityService.convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
                                 }
                                 $scope.txList = resp.Result;
@@ -1119,7 +1091,6 @@
                         FunctionType : 0    // For Sales
                     }
                 }).success(function(resp){
-                    //////////console.log(resp);
                     if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
 
                         if(resp.Result && resp.Result.length > 0){
@@ -1572,7 +1543,7 @@
                     DurationScales : 0,
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
                     NextActionDateTime : UtilityService.convertTimeToUTC(($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
-                            moment().format('YYYY-MM-DD hh:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
+                            moment().format('DD MMM YYYY HH:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
                     //NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
                     //    moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
