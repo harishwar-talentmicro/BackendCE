@@ -1,5 +1,7 @@
 {
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
-  "PASS_RESET_PAGE_LINK" : "reset_password"
+  "PASS_RESET_PAGE_LINK" : "reset_password",
+  "DB_PASS" : "",
+  "DB_HOST" : ""
 }

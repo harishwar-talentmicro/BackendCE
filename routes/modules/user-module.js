@@ -16,6 +16,7 @@
 
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
+var moment = require('moment');
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -1494,7 +1495,7 @@ User.prototype.forgetPassword = function(req,res,next){
 
                                                 // send mail with defined transport object
                                                 //message Type 7 - Forgot password mails service
-                                                var post = { MessageType: 7, Priority: 2, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
+                                                var post = { MessageType: 7, Priority: 1, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
                                                 console.log(post);
                                                 var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                     // Neat!
@@ -1558,6 +1559,112 @@ User.prototype.forgetPassword = function(req,res,next){
         console.log('FnForgetPassword error:' + ex.description);
     }
 };
+
+
+/**
+ * Verifies the forget password reset link received by the user for its validity
+ * and after validation only it shows the fields to reset the password
+ * @param req
+ * @param res
+ * @param next
+ *
+ *
+ * @METHOD : POST
+ * @service-param : reset_code <string>
+ * @service-param : ezeone_id <string>
+ *
+ * @url : /pass_reset_code
+ */
+User.prototype.verifyResetPasswordLink = function(req,res,next){
+
+    var status = true;
+    var error = {};
+    var respMsg = {
+        status : false,
+        message : 'Link is invalid or expired',
+        data : null,
+        error : null
+    };
+
+    if(!req.body.reset_code){
+        error['reset_code'] = 'Reset code is invalid';
+        status *= false;
+    }
+
+    if(!req.body.ezeone_id){
+        error['ezeone_id'] = 'EZEOne ID is invalid';
+        status *= false;
+    }
+
+    if(status){
+        try{
+            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            var timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss').toString();
+
+            var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code);
+            var verifyQuery = 'CALL pverifyresetcode('+verifyQueryParams+')';
+
+            st.db.query(verifyQuery,function(err,verifyRes){
+               if(err){
+                   console.log('Error in verifyQuery : FnVerifyResetPasswordLink ');
+                   console.log(err);
+                   var errorDate = new Date();
+                   console.log(errorDate.toTimeString() + ' ......... error ...........');
+                   respMsg.error = {server : 'Internal Server Error'};
+                   respMsg.message = 'An error occurred ! Please try again';
+                   res.status(400).json(respMsg);
+               }
+               else{
+                   if(verifyRes){
+                       if(verifyRes[0]){
+                           if(verifyRes[0][0]){
+                               if(verifyRes[0][0].tid){
+                                   respMsg.status = true;
+                                   respMsg.data = {
+                                       tid : verifyRes[0][0].tid,
+                                       reset_otp : ''
+                                   };
+                                   respMsg.message = 'Reset code is valid ! Proceed to reset password';
+                                   respMsg.error = null;
+                                   res.status(200).json(respMsg);
+                               }
+                               else{
+                                   res.status(200).json(respMsg);
+                               }
+                           }
+                           else{
+                               res.status(200).json(respMsg);
+                           }
+                       }
+                       else{
+                           res.status(200).json(respMsg);
+                       }
+                   }
+                   else{
+                       res.status(200).json(respMsg);
+                   }
+               }
+
+            });
+        }
+        catch(ex){
+            console.log('Error : FnVerifyResetPasswordLink ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = {server : 'Internal Server Error'};
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else{
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+
+
+}
 
 /**
  * Method : GET

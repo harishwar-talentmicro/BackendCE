@@ -6,6 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors');
 var LocationManager = require('./routes/routes.js');
 var compress = require('compression');
+var fs = require('fs')
+var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 
 var app = express();
 app.use(compress());
@@ -32,7 +34,7 @@ var fs = require('fs');
 // Add headers
 app.all('*',function(req,res,next){
     console.log();
-    req.CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
+    req.CONFIG = CONFIG;
     console.log(req.CONFIG);
     //// Website you wish to allow to connect
     //res.setHeader('Access-Control-Allow-Origin', '*');
@@ -103,6 +105,7 @@ app.get('/ewtGetDoc', LocationManager.FnGetDoc);
 app.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 app.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
 app.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
+app.post('/pass_reset_code',LocationManager.FnVerifyResetPasswordLink);
 app.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
 app.post('/ewtChangePassword', LocationManager.FnChangePassword);
 app.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);
