@@ -682,7 +682,9 @@ angular.module('ezeidApp').
                     {
                         /* enable: Proximity & Ratings */
                         $('.opt-1').removeClass('hidden').css('width',"49.7%");
-                        $('.opt-3').removeClass('hidden').css('width',"49.7%");;
+                        $('.opt-3').removeClass('hidden').css('width',"49.7%");
+
+                        $('.drop-down-2').css('padding-left','50.1%');
                         return;
                     }
                     case 3://Job selected
