@@ -51,8 +51,16 @@ function FnEncryptPassword(Password) {
         return 'error'
     }
 }
+var bcrypt = null;
 
-var bcrypt = require('bcrypt');
+try{
+    bcrypt = require('bcrypt');
+}
+catch(ex){
+    console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+    bcrypt = require('bcrypt-nodejs');
+}
+
 /**
  * Hashes the password for saving into database
  * @param password
