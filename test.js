@@ -335,35 +335,44 @@ function decrypt(EncryptPassword){
 //    error : null
 //};
 
-var token = '9570b586-30ec-11e5-b492-42010af056e4';
-db.query('CALL pgetoldpassword('+db.escape(token)+')',function(err,results){
-    if(err){
-        console.log('Error : pgetoldpassword');
-        console.log(err);
-        res.json(400).json(RtnMessage);
-    }
-    else{
-        console.log(results);
-        if(results){
-            if(results[0]){
-                if(results[0][0]){
-                    if(results[0][0].Password){
-
-                    }
-                    else{
-                        res.status(401).json(RtnMessage);
-                    }
-                }
-                else{
-                    res.status(401).json(RtnMessage);
-                }
-            }
-            else{
-                res.status(401).json(RtnMessage);
-            }
-        }
-        else{
-            res.status(401).json(RtnMessage);
-        }
-    }
-});
+//var token = '9570b586-30ec-11e5-b492-42010af056e4';
+//db.query('CALL pgetoldpassword('+db.escape(token)+')',function(err,results){
+//    if(err){
+//        console.log('Error : pgetoldpassword');
+//        console.log(err);
+//        res.json(400).json(RtnMessage);
+//    }
+//    else{
+//        console.log(results);
+//        if(results){
+//            if(results[0]){
+//                if(results[0][0]){
+//                    if(results[0][0].Password){
+//
+//                    }
+//                    else{
+//                        res.status(401).json(RtnMessage);
+//                    }
+//                }
+//                else{
+//                    res.status(401).json(RtnMessage);
+//                }
+//            }
+//            else{
+//                res.status(401).json(RtnMessage);
+//            }
+//        }
+//        else{
+//            res.status(401).json(RtnMessage);
+//        }
+//    }
+//});
+var timeStamp = Date.now();
+var crypto = require('crypto');
+var hash = crypto.createHash('sha1');
+if(!timeStamp){
+    var timeStamp = Date.now().toString();
+}
+hash.update(timeStamp);
+var x =  hash.digest('hex') + crypto.randomBytes(30);
+console.log(x);
