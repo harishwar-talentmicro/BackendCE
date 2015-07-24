@@ -27,6 +27,31 @@ var multer  = require('multer');
 
 app.use(multer({ dest: './uploads/'}));
 
+var fs = require('fs');
+
+// Add headers
+app.all('*',function(req,res,next){
+    console.log();
+    req.CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
+    console.log(req.CONFIG);
+    //// Website you wish to allow to connect
+    //res.setHeader('Access-Control-Allow-Origin', '*');
+    //
+    //// Request methods you wish to allow
+    //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    //
+    //// Request headers you wish to allow
+    //res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    //
+    //// Set to true if you need the website to include cookies in the requests sent
+    //// to the API (e.g. in case you use sessions)
+    //res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
+
+
 //app.use(express.static(path.join(__dirname, 'public')));
 // Set header to force download
 function setHeaders(res, path) {
