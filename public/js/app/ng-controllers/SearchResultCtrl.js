@@ -245,6 +245,7 @@ var res = angular.module('ezeidApp').
                     HomeDelivery:_filterValue.homeDelivery,
                     CurrentDate:CurrentDate,
                     pagecount:pagecount,
+                    promotion_flag: parseInt(_filterValue.promotionsOnly) == 1?1:2,
                     isPagination:1,
                     pagesize:$scope.resultPerPage
                 } }).success(function (data) {

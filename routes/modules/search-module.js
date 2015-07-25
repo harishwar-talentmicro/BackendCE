@@ -168,48 +168,58 @@ Search.prototype.searchKeyword = function(req,res,next){
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // st.db.query(searchQuery, function (err, SearchResult) {
+                                console.log(SearchResult);
                                 if (!err) {
-                                    if (SearchResult[0] != null) {
+                                    if (SearchResult[0]) {
                                         if (SearchResult[0].length > 0) {
-                                            if (SearchResult[0][0].totalcount == 1)
-                                            {
-                                                res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
+                                            if (SearchResult[0][0].totalcount == 1) {
+                                                res.json({
+                                                    totalcount: SearchResult[0][0].totalcount,
+                                                    Result: SearchResult[1]
+                                                });
                                                 console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
                                             }
-                                            else
-                                            {
+                                            else {
+                                                console.log(SearchResult[0]);
                                                 res.send(SearchResult[0]);
                                                 console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
                                             }
 
-                                            if (SearchType == 2){
-                                                var getQuery = 'select masterid from tloginout where token='+st.db.escape(token);
-                                                st.db.query(getQuery, function (err, getResult) {
-                                                    var tid = 0;
-                                                    if(!err){
-                                                        if(getResult){
-                                                            if(getResult[0]){
-                                                                tid = getResult[0].TID;
-                                                            }
-                                                        }
+                                            if (SearchType == 2) {
 
-                                                        console.log(tid);
-                                                    }
-                                                    var query = st.db.escape(tid) + ',' + st.db.escape(logHistory.ezeid) + ',' + st.db.escape(logHistory.ip) + ',' + st.db.escape(logHistory.type);
-                                                    console.log('CALL pCreateAccessHistory(' + query + ')');
-                                                    if(logHistory.type < 1){
-                                                        st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
-                                                            if(!err){
-                                                                console.log('FnSearchByKeywords:Access history is created');
+                                                var getQuery = 'select TID from tmaster where Token=' + st.db.token;
+                                                st.db.query(getQuery, function (err, getResult) {
+                                                    console.log(getResult);
+                                                    if (getResult) {
+                                                        var tid = getResult[0].TID;
+
+                                                        var getQuery = 'select masterid from tloginout where token=' + st.db.escape(token);
+                                                        st.db.query(getQuery, function (err, getResult) {
+                                                            var tid = 0;
+                                                            if (!err) {
+                                                                if (getResult) {
+                                                                    if (getResult[0]) {
+                                                                        tid = getResult[0].TID;
+                                                                    }
+                                                                }
+
+
+                                                                console.log(tid);
                                                             }
-                                                            else {
-                                                                console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                            var query = st.db.escape(tid) + ',' + st.db.escape(logHistory.ezeid) + ',' + st.db.escape(logHistory.ip) + ',' + st.db.escape(logHistory.type);
+                                                            console.log('CALL pCreateAccessHistory(' + query + ')');
+                                                            if (logHistory.type > 1) {
+                                                                st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err) {
+                                                                    if (!err) {
+                                                                        console.log('FnSearchByKeywords:Access history is created');
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                                    }
+                                                                });
                                                             }
                                                         });
-
-
                                                     }
-
                                                 });
                                             }
                                         }
