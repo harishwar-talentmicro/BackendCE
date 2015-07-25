@@ -97,6 +97,20 @@
                                 </div>
                             </div>
 
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                    <h5 class="text-primary text-left">Salary</h5>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                    <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
+                                    Active(Access is Active)
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8 cvBottomSpace" style="padding-left: 0px;">
+                                    <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="NotVisible" class="check-box pull-left" value="2" style="margin-top: 0px;"/>
+                                    Inactive(Access Denied/Not Looking for Change)
+                                </div>
+                            </div>
+
                             <div class="row setRowLeftRightMarginZero" ng-show="true">
                                 <div class="row">
                                     <span class="skillText">Skill Matrix ( To find best matching roles ) </span>

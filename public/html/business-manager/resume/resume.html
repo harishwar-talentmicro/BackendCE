@@ -56,7 +56,6 @@
                                 </div>
                             </div>
 
-
                             <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
                                  title="Folders">
                                 <label class="label label-danger">Folders</label>
@@ -367,7 +366,7 @@
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
                                     <div class="form-group form-group-sm">
-                                        <select class="form-control" ng-model="jobFilterStatus">
+                                        <select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">
                                             <!-- <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>-->
                                             <option value="0"> Active </option>
                                             <option value="1"> Closed(Hired) </option>
@@ -406,7 +405,7 @@
                 <!-- Top filter ends -->
 
                 <!--List of Job Start hear-->
-                <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero" ng-repeat="job in jobData track by job.tid">
+                <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero" ng-repeat="job in jobData track by $index">
                     <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
                         <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                             <small class="text-success">
@@ -420,7 +419,7 @@
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                             <small class="text-success">
-                                <b class="ng-binding">2 Days Before</b>
+                                <b class="ng-binding">{{job.posteddate | ageFilter}}</b>
                             </small>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
@@ -430,14 +429,14 @@
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
                             <div class="row">
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                                <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
                                     <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="View Details">
                                         <span class="glyphicon glyphicon-fullscreen"></span>
                                         Details
                                     </button>
-                                </div>
+                                </div>-->
                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
-                                    <button ng-disabled="!resumePermissionConf.txUpdate" title="You do not have permission to edit" ng-click="(resumePermissionConf.txUpdate) ? (toggleAllEditMode($index,false,false,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius" disabled="disabled">
+                                    <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
                                         <span class="glyphicon glyphicon-pencil"></span>
                                         Edit
                                     </button>
@@ -543,7 +542,7 @@
                                     <button type="button" class="btn btn-white no-radius">Per</button>
                                 </span>
 
-                                    <select class="form-control " name="listType" ng-model="salaryType">
+                                    <select class="form-control" name="listType" ng-model="salaryType">
                                         <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
                                     </select>
                                 </div>
@@ -622,7 +621,7 @@
         <div class="row setRowLeftRightMarginZero post-job" ng-show="JobSeekerTab">
         <!-- Start of design for finding - Job Seekers -->
         <section id="job-seeker-search" class="jss hpw job-seeker-bg">
-            <div class="container width-90">
+            <div class="container width-100 setRowLeftRightMarginZero setLeftRightPaddingZero">
                 <div class="panel">
                     <div class="panel-primary panel-heading">
                         <i class="fa fa-search"></i>  Find Job Seekers

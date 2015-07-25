@@ -176,7 +176,7 @@
             $scope.experienceTo = "";
             $scope.salaryFrom = "";
             $scope.salaryTo = "";
-            $scope.salaryType = 0;
+            $scope.salaryType = 1;
             $scope.jobType = 0;
             $scope.contactName = "";
             $scope.phone = "";
@@ -1603,7 +1603,7 @@
                 $scope.showJobListing = true;
 
                 $scope.jobSearchTerm= "";
-                $scope.jobFilterStatus = 1;
+                $scope.jobFilterStatus = 0;
 
                 getPostedJob();
 
@@ -1789,15 +1789,15 @@
 
                             if(data.status)
                             {
+                                $scope.jobSearchTerm= "";
+                                $scope.jobFilterStatus = 0;
                                 getPostedJob();
                                 $scope.showJobListing = true;
-
                             }
                         })
                         .error(function(data, status, headers, config) {
                             $scope.$emit('$preLoaderStop');
                         });
-
                 }
             };
 
@@ -1820,7 +1820,7 @@
                     $scope.jobLocation = "";
                     $scope.salaryFrom = "";
                     $scope.salaryTo = "";
-                    $scope.salaryType = 0;
+                    $scope.salaryType = 1;
                     $scope.jobType = 0;
                     $scope.contactName = "";
                     $scope.phone = "";
