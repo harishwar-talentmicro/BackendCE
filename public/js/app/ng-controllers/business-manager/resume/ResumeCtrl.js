@@ -182,8 +182,6 @@
             $scope.phone = "";
             $scope.emailContact = "";
 
-            $scope.jobFilterStatus = 0;
-
             $scope.validationDone = false;
 
 
@@ -1604,6 +1602,9 @@
                 $scope.JobSeekerTab = false;
                 $scope.showJobListing = true;
 
+                $scope.jobSearchTerm = "";
+                $scope.jobFilterStatus = 0;
+
                 getPostedJob();
 
                // getLocationList();
@@ -1627,7 +1628,9 @@
                     method : 'GET',
                     params : {
                         token : $rootScope._userInfo.Token,
-                        ezeone_id : $rootScope._userInfo.ezeid
+                        ezeone_id : $rootScope._userInfo.ezeid,
+                        keywordsForSearch : $scope.jobSearchTerm,
+                        status : jobFilterStatus
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -1796,7 +1799,6 @@
             $scope.openJobPostForm = function(_index){
                 $scope.showJobListing = false;
 
-                    console.log(_index);
                 if(_index == 'add')
                 {
                     $scope.jobTid = 0;
