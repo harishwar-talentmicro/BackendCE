@@ -166,8 +166,9 @@ Search.prototype.searchKeyword = function(req,res,next){
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // st.db.query(searchQuery, function (err, SearchResult) {
+                                console.log(SearchResult);
                                 if (!err) {
-                                    if (SearchResult[0] != null) {
+                                    if (SearchResult[0]) {
                                         if (SearchResult[0].length > 0) {
                                             if (SearchResult[0][0].totalcount == 1)
                                             {
@@ -176,20 +177,22 @@ Search.prototype.searchKeyword = function(req,res,next){
                                             }
                                             else
                                             {
+                                                console.log(SearchResult[0]);
                                                 res.send(SearchResult[0]);
                                                 console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
                                             }
 
                                             if (SearchType == 2){
-                                                var getQuery = 'select TID from tmaster where Token='+st.db.escape(token);
+                                                var getQuery = 'select TID from tmaster where Token='+ st.db.token;
                                                 st.db.query(getQuery, function (err, getResult) {
-                                                    if(!err){
+                                                    console.log(getResult);
+                                                    if(getResult){
                                                         var tid = getResult[0].TID;
                                                         console.log(tid);
                                                     }
                                                     var query = st.db.escape(tid) + ',' + st.db.escape(logHistory.ezeid) + ',' + st.db.escape(logHistory.ip) + ',' + st.db.escape(logHistory.type);
                                                     console.log('CALL pCreateAccessHistory(' + query + ')');
-                                                    if(logHistory.type < 1){
+                                                    if(logHistory.type > 1){
                                                         st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
                                                             if(!err){
                                                                 console.log('FnSearchByKeywords:Access history is created');
