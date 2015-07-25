@@ -19,6 +19,7 @@ exports.FnCheckEzeid = userModule.checkEzeid;
 exports.FnChangePassword = userModule.changePassword;
 exports.FnForgetPassword = userModule.forgetPassword;
 exports.FnVerifyResetPasswordLink = userModule.verifyResetPasswordLink;
+exports.FnVerifySecretCode = userModule.verifySecretCode;
 exports.FnDecryptPassword = userModule.decryptPassword;
 exports.FnGetCompanyProfile = userModule.getCompanyProfile;
 exports.FnSaveCompanyProfile = userModule.saveCompanyProfile;

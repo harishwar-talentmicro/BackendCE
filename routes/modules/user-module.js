@@ -1674,6 +1674,112 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
 
 }
 
+
+/**
+ * @todo FnVerifySecretCode
+ * @param req
+ * @param res
+ * @param next
+ *
+ *
+ * @METHOD : POST
+ * @service-param : secret_code <string>
+ * @service-param : ezeone_id <varchar>
+ * @service-param : new_password <varchar>
+ *
+ * @url : /verify_secret_code
+ */
+User.prototype.verifySecretCode = function(req,res,next) {
+
+    var status = true;
+    var error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!req.body.secret_code) {
+        error['secret_code'] = 'secret_code is invalid';
+        status *= false;
+    }
+
+    if (!req.body.ezeone_id) {
+        error['ezeone_id'] = 'EZEOne ID is invalid';
+        status *= false;
+    }
+    if (!req.body.new_password) {
+        error['new_password'] = 'new_password is invalid';
+        status *= false;
+    }
+
+    if (status) {
+        try {
+            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.body.new_password);
+            var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
+
+            st.db.query(verifyQuery, function (err, verifyRes) {
+                if (err) {
+                    console.log('Error in verifyQuery : FnVerifySecretCode ');
+                    console.log(err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    respMsg.error = {server: 'Internal Server Error'};
+                    respMsg.message = 'An error occurred ! Please try again';
+                    res.status(400).json(respMsg);
+                }
+                else {
+                    console.log(verifyRes[0][0].Error);
+                    if (verifyRes) {
+                        if (verifyRes[0]) {
+                            if (verifyRes[0].length > 0) {
+                                respMsg.message = verifyRes[0][0].Error;
+                                res.status(200).json(respMsg);
+                            }
+                            else {
+                                if (verifyRes[0][0]) {
+                                    respMsg.status = true;
+                                    respMsg.data = {
+                                        secret_code: req.body.secret_code,
+                                        ezeone_id: req.body.ezeone_id,
+                                        new_password: req.body.new_password
+                                    };
+                                    respMsg.message = 'secret code is saved successfully';
+                                    respMsg.error = null;
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                        }
+                        else {
+                            res.status(200).json(respMsg);
+                        }
+                    }
+                    else {
+                        res.status(200).json(respMsg);
+                    }
+                }
+            });
+        }
+        catch (ex) {
+            console.log('Error : FnVerifySecretCode ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = {server: 'Internal Server Error'};
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+};
+
+
 /**
  * Method : GET
  * @param req
@@ -3468,5 +3574,6 @@ User.prototype.getProxmity = function(req,res,next) {
         //throw new Error(ex);
     }
 };
+
 
 module.exports = User;
