@@ -123,6 +123,9 @@ Job.prototype.create = function(req,res,next){
         validateStatus *= false;
     }
     if(!status){
+        tid = 0;
+    }
+    if(parseInt(status) == NaN){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
@@ -293,7 +296,6 @@ Job.prototype.create = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetJobs
  * Method : GET
@@ -395,7 +397,6 @@ Job.prototype.getAll = function(req,res,next){
         }
     }
     };
-
 
 Job.prototype.getJobLocations = function(req,res,next){
     /**
