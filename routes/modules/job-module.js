@@ -123,6 +123,9 @@ Job.prototype.create = function(req,res,next){
         validateStatus *= false;
     }
     if(!status){
+        tid = 0;
+    }
+    if(parseInt(status) == NaN){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
@@ -293,7 +296,6 @@ Job.prototype.create = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetJobs
  * Method : GET
@@ -307,7 +309,9 @@ Job.prototype.getAll = function(req,res,next){
 
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
-
+    var keywordsForSearch = req.query.keywordsForSearch;
+    var status = req.query.status;
+    console.log(req.query);
     var responseMessage = {
         status: false,
         error: {},
@@ -333,8 +337,10 @@ Job.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-
-                        st.db.query('CALL pGetJobs(' + st.db.escape(ezeone_id) + ')', function (err, getresult) {
+                        var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status);
+                        console.log(query);
+                        console.log('CALL pGetJobs(' + query + ')');
+                        st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
                             if (!err) {
                                 if (getresult) {
                                     if (getresult[0].length) {
@@ -393,7 +399,6 @@ Job.prototype.getAll = function(req,res,next){
         }
     }
     };
-
 
 Job.prototype.getJobLocations = function(req,res,next){
     /**
