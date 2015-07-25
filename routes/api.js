@@ -35,6 +35,7 @@ router.get('/ewtGetDoc', LocationManager.FnGetDoc);
 router.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 router.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
 router.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
+router.post('/pass_reset_code',LocationManager.FnVerifyResetPasswordLink);
 router.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
 router.post('/ewtChangePassword', LocationManager.FnChangePassword);
 router.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);

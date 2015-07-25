@@ -6,6 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors');
 var LocationManager = require('./routes/routes.js');
 var compress = require('compression');
+var fs = require('fs')
+var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 
 var app = express();
 app.use(compress());
@@ -26,6 +28,31 @@ app.use(cookieParser());
 var multer  = require('multer');
 
 app.use(multer({ dest: './uploads/'}));
+
+var fs = require('fs');
+
+// Add headers
+app.all('*',function(req,res,next){
+    console.log();
+    req.CONFIG = CONFIG;
+    console.log(req.CONFIG);
+    //// Website you wish to allow to connect
+    //res.setHeader('Access-Control-Allow-Origin', '*');
+    //
+    //// Request methods you wish to allow
+    //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    //
+    //// Request headers you wish to allow
+    //res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    //
+    //// Set to true if you need the website to include cookies in the requests sent
+    //// to the API (e.g. in case you use sessions)
+    //res.setHeader('Access-Control-Allow-Credentials', true);
+
+    // Pass to next layer of middleware
+    next();
+});
+
 
 //app.use(express.static(path.join(__dirname, 'public')));
 // Set header to force download
@@ -78,6 +105,7 @@ app.get('/ewtGetDoc', LocationManager.FnGetDoc);
 app.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 app.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
 app.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
+app.post('/pass_reset_code',LocationManager.FnVerifyResetPasswordLink);
 app.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
 app.post('/ewtChangePassword', LocationManager.FnChangePassword);
 app.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);

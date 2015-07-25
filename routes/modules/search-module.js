@@ -52,9 +52,9 @@ Search.prototype.searchKeyword = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var type = parseInt(req.body.SearchType);
         var find = req.body.Keywords;
-        var token = req.body.Token;
-        var CategoryID = req.body.SCategory;
-        var Proximity = parseInt(req.body.Proximity);
+        var token = req.body.Token ? req.body.Token : 2;
+        //var CategoryID = req.body.SCategory;
+        //var Proximity = parseInt(req.body.Proximity);
         var Latitude = parseFloat(req.body.Latitude);
         var Longitude = parseFloat(req.body.Longitude);
         var ParkingStatus = req.body.ParkingStatus;
@@ -77,7 +77,7 @@ Search.prototype.searchKeyword = function(req,res,next){
 
         if (type == "1") {
 
-            if (find != null && find != '' && CategoryID != null && token != null && token != '' && CurrentDate != null && pagesize != null && pagecount != null) {
+            if (find != null && find != '' && token != null && CurrentDate != null && pagesize != null && pagecount != null) {
                 st.validateToken(token, function (err, Result) {
                     if (!err) {
                         if (Result != null) {
@@ -157,7 +157,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                     }
                                 }
                             }
-                            var SearchQuery = st.db.escape('') + ',' + st.db.escape(CategoryID) + ',' + st.db.escape(0) + ',' + st.db.escape(Latitude)
+                            var SearchQuery = st.db.escape('') + ',' + st.db.escape(Latitude)
                                 + ',' + st.db.escape(Longitude) +',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin) + ',' + st.db.escape(SearchType) + ',' + st.db.escape(DocType)
                                 + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape(token)
                                 + ',' + st.db.escape(HomeDelivery) + ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
@@ -242,12 +242,6 @@ Search.prototype.searchKeyword = function(req,res,next){
                 if (find == null || find == '') {
                     console.log('FnSearchByKeywords: keyword is empty');
                 }
-                else if (CategoryID == null || CategoryID == '') {
-                    console.log('FnSearchByKeywords: CategoryID is empty');
-                }
-                else if (token == null || token == '') {
-                    console.log('FnSearchByKeywords: token is empty');
-                }
                 else if (CurrentDate == null || CurrentDate == '') {
                     console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
@@ -263,13 +257,13 @@ Search.prototype.searchKeyword = function(req,res,next){
         }
         else if (type == "2") {
 
-            if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null && pagesize != null && pagecount != null) {
+            if (find != null && find != ''&& Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CurrentDate != null && pagesize != null && pagecount != null) {
 
                 if (ParkingStatus == 0) {
                     ParkingStatus = "1,2,3";
                 }
 
-                var InsertQuery = st.db.escape(find) + ',' + st.db.escape(CategoryID) + ',' + st.db.escape(Proximity) + ',' + st.db.escape(Latitude)
+                var InsertQuery = st.db.escape(find) + ',' + st.db.escape(Latitude)
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(1)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
@@ -306,17 +300,11 @@ Search.prototype.searchKeyword = function(req,res,next){
                 if (find == null || find == '') {
                     console.log('FnSearchByKeywords: keyword is empty');
                 }
-                else if (CategoryID == null || CategoryID == '') {
-                    console.log('FnSearchByKeywords: CategoryID is empty');
-                }
-                else if (Proximity == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
-                }
                 else if (Latitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
+                    console.log('FnSearchByKeywords: Latitude is empty');
                 }
                 else if (Longitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
+                    console.log('FnSearchByKeywords: Longitude is empty');
                 }
                 else if (pagesize == null) {
                     console.log('FnSearchByKeywords: pagesize is empty');
@@ -330,11 +318,11 @@ Search.prototype.searchKeyword = function(req,res,next){
         }
         else if (type == "3") {
 
-            if (find != null && find != '' && Proximity.toString() != 'NaN' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
+            if (find != null && find != '' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
                 if (ParkingStatus == 0) {
                     ParkingStatus = "1,2,3";
                 }
-                var InsertQuery = st.db.escape(find) + ',' + st.db.escape(CategoryID) + ',' + st.db.escape(Proximity) + ',' + st.db.escape(Latitude)
+                var InsertQuery = st.db.escape(find) + ',' + st.db.escape(Latitude)
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token)  + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
@@ -370,17 +358,12 @@ Search.prototype.searchKeyword = function(req,res,next){
                 if (find == null || find == '') {
                     console.log('FnSearchByKeywords: keyword is empty');
                 }
-                else if (CategoryID == null || CategoryID == '') {
-                    console.log('FnSearchByKeywords: CategoryID is empty');
-                }
-                else if (Proximity == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
-                }
+
                 else if (Latitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
+                    console.log('FnSearchByKeywords: Latitude is empty');
                 }
                 else if (Longitude == 'NaN') {
-                    console.log('FnSearchByKeywords: Proximity is empty');
+                    console.log('FnSearchByKeywords: Longitude is empty');
                 }
                 res.statusCode = 400;
                 res.json(null);

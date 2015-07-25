@@ -16,6 +16,7 @@
 
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
+var moment = require('moment');
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -50,8 +51,16 @@ function FnEncryptPassword(Password) {
         return 'error'
     }
 }
+var bcrypt = null;
 
-var bcrypt = require('bcrypt');
+try{
+    bcrypt = require('bcrypt');
+}
+catch(ex){
+    console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+    bcrypt = require('bcrypt-nodejs');
+}
+
 /**
  * Hashes the password for saving into database
  * @param password
@@ -1426,12 +1435,6 @@ User.prototype.changePassword = function(req,res,next){
     }
 };
 
-/**
- * Method : POST
- * @param req
- * @param res
- * @param next
- */
 User.prototype.forgetPassword = function(req,res,next){
     /**
      * @todo FnForgetPassword
@@ -1442,63 +1445,87 @@ User.prototype.forgetPassword = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var EZEID = alterEzeoneId(req.body.EZEID);
+
+        var resetCode = st.generateRandomHash(Date.now().toString());
+
+        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+        var ip =  req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress;
+
         var RtnMessage = {
             IsChanged: false
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+
         if (EZEID != null) {
-            var Password = FnRandomPassword();
-            // console.log(Password);
-            var EncryptPWD = hashPassword(Password);
-            // console.log(EncryptPWD);
-            var Query = 'Update tmaster set Password= ' + st.db.escape(EncryptPWD) + ' where EZEID=' + st.db.escape(EZEID);
-            // console.log('FnForgotPassword: ' + Query);
-            st.db.query(Query, function (err, ForgetPasswordResult) {
+            var resetQueryParams = st.db.escape(EZEID) + ',' + st.db.escape(resetCode) +
+                ',' + st.db.escape(userAgent) + ',' + st.db.escape(ip);
+            var resetQuery = 'CALL pResetpassword('+resetQueryParams+')';
+
+            st.db.query(resetQuery, function (err, ForgetPasswordResult) {
                 if (!err) {
                     //console.log(InsertResult);
-                    if (ForgetPasswordResult != null) {
+                    if (ForgetPasswordResult) {
                         if (ForgetPasswordResult.affectedRows > 0) {
                             RtnMessage.IsChanged = true;
-                            var UserQuery = 'Select a.TID, ifnull(a.FirstName,"") as FirstName,ifnull(a.LastName,"") as LastName,a.Password,ifnull(b.EMailID,"") as EMailID from tmaster a,tlocations b where b.SeqNo=0 and b.EZEID=a.EZEID and a.EZEID=' + st.db.escape(EZEID);
+                            var UserQuery = 'Select a.TID, ifnull(a.FirstName,"") as FirstName,ifnull(a.LastName,"") as'+
+                                ' LastName,ifnull(b.EMailID,"") as EMailID from tmaster a,tlocations b where b.SeqNo=0'+
+                                ' and b.EZEID=a.EZEID and a.EZEID=' + st.db.escape(EZEID);
                             //  console.log(UserQuery);
                             st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
-                                    //  console.log(UserResult);
+                                    if(UserResult){
+                                        {
 
-                                    var fs = require('fs');
-                                    fs.readFile("ForgetPasswordTemplate.txt", "utf8", function (err, data) {
-                                        if (err) throw err;
-                                        data = data.replace("[Firstname]", UserResult[0].FirstName);
-                                        data = data.replace("[Lastname]", UserResult[0].LastName);
-                                        data = data.replace("[Password]", Password);
+                                            //  console.log(UserResult);
+                                            UserResult[0].FirstName = (UserResult[0].FirstName) ? UserResult[0].FirstName : 'Anonymous';
+                                            UserResult[0].LastName = (UserResult[0].LastName) ? UserResult[0].LastName : ' ';
+                                            var fs = require('fs');
+                                            fs.readFile("ForgetPasswordTemplate.txt", "utf8", function (err, data) {
+                                                if (err) throw err;
+                                                var passwordResetLink = req.CONFIG.SCHEME + "://" + req.CONFIG.DOMAIN + "/" +
+                                                    req.CONFIG.PASS_RESET_PAGE_LINK + "/" + EZEID + "/" + resetCode
+                                                data = data.replace("[Firstname]", UserResult[0].FirstName);
+                                                data = data.replace("[Lastname]", UserResult[0].LastName);
+                                                data = data.replace("[resetlink]", passwordResetLink);
+                                                data = data.replace("[resetlink]", passwordResetLink);
 
-                                        console.log(UserResult);
-                                        //console.log('Body:' + data);
-                                        var mailOptions = {
-                                            from: EZEIDEmail,
-                                            to: UserResult[0].EMailID,
-                                            subject: 'Password reset request',
-                                            html: data // html body
-                                        };
+                                                console.log(UserResult);
+                                                //console.log('Body:' + data);
+                                                var mailOptions = {
+                                                    from: EZEIDEmail,
+                                                    to: UserResult[0].EMailID,
+                                                    subject: 'EZEOne : Password reset request',
+                                                    html: data // html body
+                                                };
 
-                                        // send mail with defined transport object
-                                        //message Type 7 - Forgot password mails service
-                                        var post = { MessageType: 7, Priority: 2, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
-                                        console.log(post);
-                                        var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                            // Neat!
-                                            if (!err) {
-                                                console.log('FnRegistration: Mail saved Successfully');
-                                                res.send(RtnMessage);
-                                            }
-                                            else {
-                                                console.log('FnRegistration: Mail not Saved Successfully' + err);
-                                                res.send(RtnMessage);
-                                            }
-                                        });
-                                    });
+                                                // send mail with defined transport object
+                                                //message Type 7 - Forgot password mails service
+                                                var post = { MessageType: 7, Priority: 1, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
+                                                console.log(post);
+                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                    // Neat!
+                                                    if (!err) {
+                                                        console.log('FnRegistration: Mail saved Successfully');
+                                                        RtnMessage.IsChanged = true;
+                                                        res.send(RtnMessage);
+                                                    }
+                                                    else {
+                                                        console.log('FnRegistration: Mail not Saved Successfully' + err);
+                                                        res.send(RtnMessage);
+                                                    }
+                                                });
+                                            });
 
-                                    console.log('FnForgetPassword:tmaster: Password reset successfully');
+                                            console.log('FnForgetPassword:tmaster: Password reset successfully');
+                                        }
+                                    }
+                                    else{
+                                        RtnMessage.IsChanged = false;
+                                        res.send(RtnMessage);
+                                    }
                                 }
                                 else {
                                     res.statusCode = 500;
@@ -1536,9 +1563,116 @@ User.prototype.forgetPassword = function(req,res,next){
     catch (ex) {
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
         console.log('FnForgetPassword error:' + ex.description);
     }
 };
+
+
+/**
+ * Verifies the forget password reset link received by the user for its validity
+ * and after validation only it shows the fields to reset the password
+ * @param req
+ * @param res
+ * @param next
+ *
+ *
+ * @METHOD : POST
+ * @service-param : reset_code <string>
+ * @service-param : ezeone_id <string>
+ *
+ * @url : /pass_reset_code
+ */
+User.prototype.verifyResetPasswordLink = function(req,res,next){
+
+    var status = true;
+    var error = {};
+    var respMsg = {
+        status : false,
+        message : 'Link is invalid or expired',
+        data : null,
+        error : null
+    };
+
+    if(!req.body.reset_code){
+        error['reset_code'] = 'Reset code is invalid';
+        status *= false;
+    }
+
+    if(!req.body.ezeone_id){
+        error['ezeone_id'] = 'EZEOne ID is invalid';
+        status *= false;
+    }
+
+    if(status){
+        try{
+            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            var timestamp = moment(new Date()).format('YYYY-MM-DD HH:mm:ss').toString();
+
+            var verifyQueryParams = st.db.escape(req.body.ezeone_id) + ','+ st.db.escape(req.body.reset_code);
+            var verifyQuery = 'CALL pverifyresetcode('+verifyQueryParams+')';
+
+            st.db.query(verifyQuery,function(err,verifyRes){
+               if(err){
+                   console.log('Error in verifyQuery : FnVerifyResetPasswordLink ');
+                   console.log(err);
+                   var errorDate = new Date();
+                   console.log(errorDate.toTimeString() + ' ......... error ...........');
+                   respMsg.error = {server : 'Internal Server Error'};
+                   respMsg.message = 'An error occurred ! Please try again';
+                   res.status(400).json(respMsg);
+               }
+               else{
+                   if(verifyRes){
+                       if(verifyRes[0]){
+                           if(verifyRes[0][0]){
+                               if(verifyRes[0][0].tid){
+                                   respMsg.status = true;
+                                   respMsg.data = {
+                                       tid : verifyRes[0][0].tid,
+                                       reset_otp : ''
+                                   };
+                                   respMsg.message = 'Reset code is valid ! Proceed to reset password';
+                                   respMsg.error = null;
+                                   res.status(200).json(respMsg);
+                               }
+                               else{
+                                   res.status(200).json(respMsg);
+                               }
+                           }
+                           else{
+                               res.status(200).json(respMsg);
+                           }
+                       }
+                       else{
+                           res.status(200).json(respMsg);
+                       }
+                   }
+                   else{
+                       res.status(200).json(respMsg);
+                   }
+               }
+
+            });
+        }
+        catch(ex){
+            console.log('Error : FnVerifyResetPasswordLink ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = {server : 'Internal Server Error'};
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else{
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+
+
+}
 
 /**
  * Method : GET

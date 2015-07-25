@@ -38,7 +38,7 @@
         ]);
 
    /* ezeid.value('GURL',"/");*/
-    ezeid.value('GURL',"http://104.199.128.226:3001/");
+    ezeid.value('GURL',"http://104.199.128.226:3002/");
     ezeid.value('MsgDelay',2000);
 
     /**
@@ -77,7 +77,8 @@
      * for eg. User cannot open signup page while he is logged in
      */
     ezeid.value('UNAUTHORIZED_ROUTES',[
-        '/signup'
+        '/signup',
+        '/reset_password/:ezeone/:reset_code'
     ]);
 
     ezeid.value('MsgDelay',5000);
@@ -218,6 +219,10 @@
                 controller : 'paymentApiCtrl'
             })
 
+            .when('/reset_password/:ezeone/:reset_code',{
+                templateUrl : 'html/reset_password.html',
+                controller : 'ResetPasswordCtrl'
+            })
             .when('/:ezeone/sales',{
                 templateUrl : 'html/business-manager/sales/sales-front.html',
                 controller : 'SalesFrontCtrl'
