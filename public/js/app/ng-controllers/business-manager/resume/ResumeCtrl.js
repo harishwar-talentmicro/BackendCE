@@ -1602,8 +1602,8 @@
                 $scope.JobSeekerTab = false;
                 $scope.showJobListing = true;
 
-                $scope.jobSearchTerm = "";
-                $scope.jobFilterStatus = 0;
+                $scope.jobSearchTerm= "";
+                $scope.jobFilterStatus = 1;
 
                 getPostedJob();
 
@@ -1619,6 +1619,14 @@
                 $scope.JobSeekerTab = true;
             };
 
+
+            /**
+             * search for job term
+             */
+            $scope.searchJobTerm = function(){
+                getPostedJob();
+            };
+
             // Get all posted Jobs
             function getPostedJob()
             {
@@ -1630,7 +1638,7 @@
                         token : $rootScope._userInfo.Token,
                         ezeone_id : $rootScope._userInfo.ezeid,
                         keywordsForSearch : $scope.jobSearchTerm,
-                        status : jobFilterStatus
+                        status : $scope.jobFilterStatus
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -1793,7 +1801,7 @@
                 }
             };
 
-            $scope.SalaryTypeList = [{ id: 0, label: "Hour" }, { id: 1, label: "Month" }, { id: 2, label: "Annual" }];
+            $scope.SalaryTypeList = [{ id: 1, label: "Hour" }, { id: 2, label: "Month" }, { id: 3, label: "Annual" }];
 
             // Show job posting form
             $scope.openJobPostForm = function(_index){

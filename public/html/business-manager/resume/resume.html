@@ -339,7 +339,7 @@
                                     </span>
                                     <span class="input-group-btn">
                                         <button class="btn btn-info"
-                                                ng-click="triggerStatusFilter(1,filterStatus)"
+                                                ng-click="searchJobTerm()"
                                                 type="button"><i class="fa fa-search"></i> Search
                                         </button>
                                     </span>
@@ -446,9 +446,9 @@
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="java" style="word-wrap:break-word;">
                             <small class="text-success">
-                                <b class="ng-binding" ng-show="jobStatus == 0">Active</b>
-                                <b class="ng-binding" ng-show="jobStatus == 1">Closed(Hired)</b>
-                                <b class="ng-binding" ng-show="jobStatus == 2">Cancelled</b>
+                                <b class="ng-binding" ng-show="job.status == 0">Active</b>
+                                <b class="ng-binding" ng-show="job.status == 1">Closed(Hired)</b>
+                                <b class="ng-binding" ng-show="job.status == 2">Cancelled</b>
                             </small>
                         </div>
                     </div>

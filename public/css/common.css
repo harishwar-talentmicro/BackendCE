@@ -2812,3 +2812,8 @@ h4.front-business-form.warning-text{
 .modal-dialog.modal-lg.business-manager-modal #table-business-features label{
     color:#FFFFFF!important;
 }
+
+.ezeone-multi-select .btn-default{
+    border-radius: 0px;
+    font-size: 12px;
+}

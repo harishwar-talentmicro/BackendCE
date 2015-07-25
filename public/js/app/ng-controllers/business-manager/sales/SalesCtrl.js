@@ -991,27 +991,50 @@
                  * which are assigned to him and assign them to the data model of myFolders also
                  * to make ui and requested data consistent
                  */
-                var folderRules = ($scope.myFolders) ? $scope.myFolders.join(',') : '';
-                if(!folderRules){
-                    var fr = [];
-                    for(var x=0; x<$scope.userFolders.length;x++){
-                        fr[x] = $scope.userFolders[x].TID.toString();
-                    }
-                    $scope.myFolders = fr;
-                    folderRules = (fr.length > 0) ? fr.join(',') : '';
 
-                    if(parseInt($rootScope._userInfo.MasterID) == 0){
-                        folderRules = '';
-                    }
+
+                console.log('In loadTransaction');
+                console.log($scope.myFolders);
+
+                var folderRuleArr = [];
+                for(var i = 0; i < $scope.myFolders; i++){
+                    folderRuleArr.push($scope.myFolders[i].id);
                 }
+                var folderRules = (folderRuleArr) ? folderRuleArr.join(',') : '';
+                /**
+                 * Commented as we don't have to load anything if user is not having folder assigned
+                 * because from now onwards default folder will always be there
+                 */
+
+                //if(!folderRules){
+                //    var fr = [];
+                //    var frArr = []; //Folder Rule Array
+                //    for(var x=0; x<$scope.userFolders.length;x++){
+                //        fr[x] = $scope.userFolders[x].TID.toString();
+                //    }
+                //    for(var x =0; x < fr.length;x++){
+                //        frArr[x] = {id : parseInt(fr[x])};
+                //    }
+                //    $scope.myFolders = frArr;
+                //    folderRules = (fr.length > 0) ? fr.join(',') : '';
+                //
+                //    /**
+                //     * Commented as we don't have to load anything if user is not having folder assigned
+                //     * because from now onwards default folder will always be there
+                //     */
+                //}
 
                 /**
-                 * If user is master user, then let him see default folder transaction also which actually
-                 * doesn't belong to any rule
+                 * Commented as we don't have to load anything if user is not having folder assigned
+                 * because from now onwards default folder will always be there
                  */
-                if($scope.myFolders.length === $scope.userFolders.length && parseInt($rootScope._userInfo.MasterID) == 0){
-                    folderRules = '';
-                }
+                ///**
+                // * If user is master user, then let him see default folder transaction also which actually
+                // * doesn't belong to any rule
+                // */
+                //if($scope.myFolders.length === $scope.userFolders.length && parseInt($rootScope._userInfo.MasterID) == 0){
+                //    folderRules = '';
+                //}
 
                 /**
                  * If user is subuser and he is not having any rules assigned to him then don't allow him to
@@ -1233,41 +1256,52 @@
                         var folder = angular.copy($scope.txFolderRules[_findex]);
                         folder.id = parseInt(folder.TID);
                         folder.label = folder.FolderTitle;
-                        var folderM = { id : folder.id, label : folder.label};
-                        $scope.userFolders.push(folderM);
+                        $scope.userFolders.push(folder);
                         $scope.myFolders.push({ id : folder.id});
                     }
                 }
             };
 
-            var watchMyFolders = function(){
-                $scope.$watch('myFolders',function(n,v){
-                    ////console.log(n);
-                    if(!n){
-                        ////console.log(n);
-                        for(var c=0;c<$scope.userFolders.length;c++){
-                            $scope.myFolders = $scope.userFolders[c].TID;
-                        }
-
-                        $scope.$emit('$preLoaderStart');
-                        $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                            $scope.$emit('$preLoaderStop');
-                        },function(){
-                            $scope.$emit('$preLoaderStop');
-                        });
-                    }
-                    else{
-                        if(n !== v && (n.length > 0 || v.length > 0) ){
-                            $scope.$emit('$preLoaderStart');
-                            $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                                $scope.$emit('$preLoaderStop');
-                            },function(){
-                                $scope.$emit('$preLoaderStop');
-                            });
-                        }
-                    }
-                });
-            };
+            //var watchMyFolders = function(){
+            //    console.log('i exec');
+            //    $scope.$watch('myFolders',function(n,v){
+            //        console.log('myFodlers');
+            //        console.log(n);
+            //        if(!n){
+            //
+            //            console.log('myFodlers if');
+            //            ////console.log(n);
+            //            var myFolders = [];
+            //            for(var c=0;c<$scope.userFolders.length;c++){
+            //                 myFolders[c] = { id : parseInt($scope.userFolders[c].TID) };
+            //            }
+            //
+            //            $scope.myFolders = myFolders;
+            //            //$scope.$emit('$preLoaderStart');
+            //            //console.log('In watchMyFolders');
+            //            //console.log($scope.myFolders);
+            //            //$scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+            //            //    $scope.$emit('$preLoaderStop');
+            //            //},function(){
+            //            //    $scope.$emit('$preLoaderStop');
+            //            //});
+            //        }
+            //        else{
+            //            console.log('myFodlers else');
+            //            console.log(n);
+            //            console.log(v);
+            //            if((n !== v) && (n) ){
+            //                console.log('myFodlers else if');
+            //                $scope.$emit('$preLoaderStart');
+            //                $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+            //                    $scope.$emit('$preLoaderStop');
+            //                },function(){
+            //                    $scope.$emit('$preLoaderStop');
+            //                });
+            //            }
+            //        }
+            //    });
+            //};
             /**
              * Loading user list to fetch rules that are specific to the subuser who logged in
              * (Folder list of logged in user can be fetched by selecting the logged in user from response
@@ -1419,7 +1453,7 @@
                                 $scope.loadTransaction(1,-2,$scope.txSearchTerm,$scope.sortBy).then(function(){
                                     watchPageNumber();
                                     watchSortBy();
-                                    watchMyFolders();
+                                    //watchMyFolders();
                                     $scope.loadItemList().then(function(){
                                         $scope.$emit('$preLoaderStop');
                                     },function(){
@@ -1762,6 +1796,8 @@
                     return itemText;
                 }
             };
+
+            $scope.multiSelectTransText = {buttonDefaultText: 'Select Folders'};
 
         }]);
 
