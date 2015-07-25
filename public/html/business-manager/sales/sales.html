@@ -70,13 +70,15 @@
                             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="By Folders">
                                 <!--{{myFolders}}-->
                                 <!--<br/>-->
-                                <div class="form-group form-group-sm">
-                                    <select class="form-control"
-                                            ng-model="myFolders"
-                                            style="height:auto;max-height: 100px;;" multiple>
-                                        <option ng-repeat="userFolder in userFolders track by userFolder.TID" value="{{userFolder.TID}}">{{userFolder.FolderTitle}}</option>
-                                    </select>
-                                </div>
+                                <!--<div class="form-group form-group-sm">-->
+                                    <!--<select class="form-control"-->
+                                            <!--ng-model="myFolders"-->
+                                            <!--style="height:auto;max-height: 100px;;" multiple>-->
+                                        <!--<option ng-repeat="userFolder in userFolders track by userFolder.TID" value="{{userFolder.TID}}">{{userFolder.FolderTitle}}</option>-->
+                                    <!--</select>-->
+                                <!--</div>-->
+
+                                <div ng-dropdown-multiselect="" options="userFolders" selected-model="myFolders" extra-settings="multiSelectDropDownSettings"></div>
                             </div>
                         </div>
 

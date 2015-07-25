@@ -3012,6 +3012,21 @@ sup.tm{
     position: absolute;
 }
 
+.hpw .drop-down-3
+{
+    position: absolute;
+    margin-left: -31.8%;
+    width: 450px;
+    margin-top: 4.2%;
+}
+
+.hpw .drop-down-4
+{
+    /*padding-left: 66.9%;*/
+    position: absolute;
+}
+
+
 .hpw .width-90
 {
     width:90% !important;
@@ -3062,4 +3077,9 @@ sup.tm{
 .hpw .drop-down-4
 {
     padding-left: 66%;
+}
+
+.hpw .abs-pos
+{
+    position: absolute;
 }

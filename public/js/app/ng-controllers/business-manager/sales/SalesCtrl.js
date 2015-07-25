@@ -260,7 +260,7 @@
             var alterTransactionMessageToEdit = function(msg){
                 var alteredMsg = '';
                 var str = '   '; //30 characters
-                var indexStr = msg.indexOf(str);
+                var indexStr = msg.lastIndexOf(str);
                 if(indexStr !== -1){
                     alteredMsg = msg.substr(0,indexStr);
                 }
@@ -1231,8 +1231,11 @@
                     var _findex = $scope.txFolderRules.indexOfWhere('TID',userFoldersList[b]);
                     if(_findex !== -1){
                         var folder = angular.copy($scope.txFolderRules[_findex]);
-                        $scope.userFolders.push(folder);
-                        $scope.myFolders.push(folder.TID);
+                        folder.id = parseInt(folder.TID);
+                        folder.label = folder.FolderTitle;
+                        var folderM = { id : folder.id, label : folder.label};
+                        $scope.userFolders.push(folderM);
+                        $scope.myFolders.push({ id : folder.id});
                     }
                 }
             };
@@ -1745,6 +1748,20 @@
             $interval(function(){
                 calculateCartDetails();
             },700);
+
+
+
+
+            $scope.multiSelectDropDownSettings = {
+                smartButtonMaxItems: 3,
+                smartButtonTextConverter: function(itemText, originalItem) {
+                    if (itemText === 'Jhon') {
+                        return 'Jhonny!';
+                    }
+
+                    return itemText;
+                }
+            };
 
         }]);
 
