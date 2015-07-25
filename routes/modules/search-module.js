@@ -181,10 +181,16 @@ Search.prototype.searchKeyword = function(req,res,next){
                                             }
 
                                             if (SearchType == 2){
-                                                var getQuery = 'select TID from tmaster where Token='+st.db.escape(token);
+                                                var getQuery = 'select masterid from tloginout where token='+st.db.escape(token);
                                                 st.db.query(getQuery, function (err, getResult) {
+                                                    var tid = 0;
                                                     if(!err){
-                                                        var tid = getResult[0].TID;
+                                                        if(getResult){
+                                                            if(getResult[0]){
+                                                                tid = getResult[0].TID;
+                                                            }
+                                                        }
+
                                                         console.log(tid);
                                                     }
                                                     var query = st.db.escape(tid) + ',' + st.db.escape(logHistory.ezeid) + ',' + st.db.escape(logHistory.ip) + ',' + st.db.escape(logHistory.type);
