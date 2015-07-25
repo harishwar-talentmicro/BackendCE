@@ -245,9 +245,30 @@
     {
         display: none !important;
     }
+
+    .hpw .search-btn-width
+    {
+        width:32.7% !important;
+    }
+
+    .hpw .extra-left-padding
+    {
+        padding-left:5px;
+    }
+
+    .hpw .drop-down-3
+    {
+        margin-top: 4.9% !important;
+    }
 }
 
 
+@media screen and (max-width: 1050px) {
+    .hpw .drop-down-3
+    {
+        margin-top: 5.9% !important;
+    }
+}
 @media screen and (max-width: 990px) {
     .hpw .business-img-text-align
     {
@@ -258,8 +279,25 @@
     {
         padding-top: 0px !important;
     }
+
+    .hpw .search-btn-width
+    {
+        width:32.69% !important;
+    }
 }
+
 @media screen and (max-width: 874px) {
+
+    .hpw .drop-down-3
+    {
+        margin-top: 6.9% !important;
+    }
+
+    .hpw .search-btn-width
+    {
+        width:32.51% !important;
+    }
+
     .srw .tile-frame-padding-top
     {
         padding-top: 148px;
@@ -326,6 +364,11 @@
 }
 
 @media screen and (max-width: 768px) {
+
+    .hpw .drop-down-3
+    {
+        margin-top: 5.1% !important;
+    }
 
     .jsr .filter-pad
     {
@@ -411,6 +454,41 @@
     }
 
 }
+
+@media screen and (max-width:   600px) {
+    .hpw .drop-down-3
+    {
+        margin-top: 6.5% !important;
+    }
+}
+@media only screen and (max-width:   478px) {
+
+    .hpw .mobile-view-text
+    {
+        display: inline !important;
+    }
+}
+@media screen and (max-width:   380px) {
+    .hpw .search-btn-width
+    {
+        width:32.19% !important;
+    }
+}
+
+@media screen and (max-width:   335px) {
+    .hpw .search-btn-width
+    {
+        width:32.09% !important;
+    }
+}
+
+@media screen and (max-width:   300px) {
+    .hpw .search-btn-width
+    {
+        width:31.59% !important;
+    }
+}
+
 
 .hpw .header-item
 {
@@ -3007,13 +3085,13 @@ sup.tm{
 
 .hpw .drop-down-1
 {
-    padding-left: 33.1%;
+    padding-left: 33.5%;
     position: absolute;
 }
 
 .hpw .drop-down-2
 {
-    padding-left: 66.2%;
+    padding-left: 67%;
     position: absolute;
 }
 
@@ -3021,7 +3099,7 @@ sup.tm{
 {
     position: absolute;
     margin-left: -31.8%;
-    width: 450px;
+    width: 55%;
     margin-top: 4.2%;
 }
 
@@ -3070,7 +3148,7 @@ sup.tm{
 
 .hpw .search-btn-width
 {
-    width:32.5%;
+    width:32.89%;
 }
 
 .hpw .filter-dropdown .selected
@@ -3081,7 +3159,7 @@ sup.tm{
 
 .hpw .drop-down-4
 {
-    padding-left: 66%;
+    padding-left: 67%;
 }
 
 .hpw .abs-pos
