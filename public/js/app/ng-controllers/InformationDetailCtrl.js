@@ -102,43 +102,81 @@ angular.module('ezeidApp').
             };
             var ezeone = $routeParams.ezeone;
 
-            getSearchInformation(ezeone).then(function(){
-                var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
-                var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
-                if($routeParams['sales'] && (visibleModules[0] == 1)){
-                    $timeout(function(){
-                        $scope._salesModalTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleSalesModal();
-                    },1000);
+            if(ezeone){
+                var ezeTermArr = ezeone.split('.');
+                if(ezeTermArr.length > 1){
+                    switch(ezeTermArr[1].toUpperCase()){
+                        case 'CV':
+                            getSearchKeyword(ezeone);
+                            break;
+                        case 'ID' :
+                            getSearchKeyword(ezeone);
+                            break;
+                        case 'PP':
+                            getSearchKeyword(ezeone);
+                            break;
+                        case 'DL':
+                            getSearchKeyword(ezeone);
+                            break;
+                        case 'BR':
+                            getSearchKeyword(ezeone);
+                            break;
+                        case 'D1':
+                            getSearchKeyword(ezeone);
+                            break;
+                        case 'D2':
+                            getSearchKeyword(ezeone);
+                            break;
+                        default :
+                            getSearchInformation(ezeone).then(function(){
+                                var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
+                                var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
+                                if($routeParams['sales'] && (visibleModules[0] == 1)){
+                                    $timeout(function(){
+                                        $scope._salesModalTitle = $scope.SearchInfo.EZEID;
+                                        $scope._toggleSalesModal();
+                                    },1000);
+                                }
+
+                                else if($routeParams['reservation'] && (visibleModules[1] == 1)){
+                                    $timeout(function(){
+                                        $scope._reservationModalTitle = $scope.SearchInfo.EZEID;
+                                        $scope._toggleReservationModal();
+                                    },1000);
+                                }
+
+                                else if($routeParams['homeDelivery'] && (visibleModules[2] == 1)){
+                                    $timeout(function(){
+                                        $scope._homeDeliveryTitle = $scope.SearchInfo.EZEID;
+                                        $scope._toggleHomeDeliveryModal();
+                                    },1000);
+                                }
+                                else if($routeParams['service'] && (visibleModules[3] == 1)){
+                                    $timeout(function(){
+                                        $scope._serviceModalTitle = $scope.SearchInfo.EZEID;
+                                        $scope._toggleServiceModal();
+                                    },1000);
+                                }
+
+                                else if($routeParams['resume'] && (visibleModules[4] == 1)){
+                                    $timeout(function(){
+                                        $scope._resumeModalTitle = $scope.SearchInfo.EZEID;
+                                        $scope._toggleResumeModal();
+                                    },1000);
+                                }
+                            });
+                            break;
+                    }
                 }
 
-                else if($routeParams['reservation'] && (visibleModules[1] == 1)){
-                    $timeout(function(){
-                        $scope._reservationModalTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleReservationModal();
-                    },1000);
-                }
+            }
 
-                else if($routeParams['homeDelivery'] && (visibleModules[2] == 1)){
-                    $timeout(function(){
-                        $scope._homeDeliveryTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleHomeDeliveryModal();
-                    },1000);
-                }
-                else if($routeParams['service'] && (visibleModules[3] == 1)){
-                    $timeout(function(){
-                        $scope._serviceModalTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleServiceModal();
-                    },1000);
-                }
+            function getSearchKeyword(_searchTerm){
+                var redirectUrl = '/searchResult?searchType=1&searchTerm='+_searchTerm+
+                    '&proximity=0&rating=1,2,3,4,5&homeDelivery=0&parkingStatus=0&openStatus=0&lat=12.912229199999999&lng=77.6411084';
+                $location.url(redirectUrl);
+            }
 
-                else if($routeParams['resume'] && (visibleModules[4] == 1)){
-                    $timeout(function(){
-                        $scope._resumeModalTitle = $scope.SearchInfo.EZEID;
-                        $scope._toggleResumeModal();
-                    },1000);
-                }
-            });
 
             var convertTimeToUTC = function(localTime,dateFormat){
                 if(!dateFormat){
@@ -168,7 +206,7 @@ angular.module('ezeidApp').
                     /*$scope.Token = 2;*/
                 }
 
-                $http({ method: 'get',
+                $http({ method: 'GET',
                     url: GURL + 'ewtGetSearchInformationNew?Token=' + $rootScope._userInfo.Token + '&ezeTerm='+_ezeone+'&CurrentDate='+CurrentDate}).success(function (data) {
 
                     if (data && data != 'null')

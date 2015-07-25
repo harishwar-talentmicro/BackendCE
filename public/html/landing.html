@@ -11,10 +11,10 @@
             <!--<div class="main-title text-bolder">IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> INTERACT</div>-->
             <div class="main-title text-bolder opt-group">
                 <!--IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> INTERACT-->
-                <div class="btn btn-gray" ng-click="changeSeacrhType(0)" ng-class="activeSearchType == 0?'selected':''">EZEOne ID</div>
-                <div class="btn btn-gray"  ng-click="changeSeacrhType(1)" ng-class="activeSearchType == 1?'selected':''">Keywords</div>
-                <div class="btn btn-gray"  ng-click="changeSeacrhType(2)" ng-class="activeSearchType == 2?'selected':''">Employers</div>
-                <div class="btn btn-gray"  ng-click="changeSeacrhType(3)" ng-class="activeSearchType == 3?'selected':''">Jobs</div>
+                <div class="btn btn-gray" ng-click="changeSeacrhType(1)" ng-class="searchParams.searchType == 1?'selected':''">EZEOne ID</div>
+                <div class="btn btn-gray"  ng-click="changeSeacrhType(2)" ng-class="searchParams.searchType ==2?'selected':''">Keywords</div>
+                <div class="btn btn-gray"  ng-click="changeSeacrhType(3)" ng-class="searchParams.searchType == 3?'selected':''">Employers</div>
+                <div class="btn btn-gray"  ng-click="changeSeacrhType(4)" ng-class="searchParams.searchType == 4?'selected':''">Jobs</div>
             </div>
             <div class="main-subtitle">Search any product or service in your neighbourhood. <b>It is Easy, Accurate & Verified</b></div>
 
@@ -42,25 +42,25 @@
                                 <span class="drop-down-0 opt opt-1">
                                     <div class="filter-dropdown search-proximity-content" style="display: none;">
                                         <!-- check boxes with distance -->
-                                        <div class="select-option" ng-class="activeProximity == 1?'selected':''" ng-click="changeProximity(1)">
+                                        <div class="select-option" ng-class="searchParams.proximity == 1?'selected':''" ng-click="changeProximity(1)">
                                             1 Mile (1.6 Km)
                                         </div>
-                                        <div class="select-option"  ng-class="activeProximity == 2?'selected':''" ng-click="changeProximity(2)">
+                                        <div class="select-option"  ng-class="searchParams.proximity == 2?'selected':''" ng-click="changeProximity(2)">
                                             2 Mile (3.2 Km)
                                         </div>
-                                        <div class="select-option"  ng-class="activeProximity == 5?'selected':''" ng-click="changeProximity(5)">
+                                        <div class="select-option"  ng-class="searchParams.proximity == 5?'selected':''" ng-click="changeProximity(5)">
                                             5 Mile (8 Km)
                                         </div>
-                                        <div class="select-option"  ng-class="activeProximity == 10?'selected':''" ng-click="changeProximity(10)">
+                                        <div class="select-option"  ng-class="searchParams.proximity == 10?'selected':''" ng-click="changeProximity(10)">
                                             10 Mile (16 Km)
                                         </div>
-                                        <div class="select-option"  ng-class="activeProximity == 25?'selected':''" ng-click="changeProximity(25)">
+                                        <div class="select-option"  ng-class="searchParams.proximity == 25?'selected':''" ng-click="changeProximity(25)">
                                             25 Mile (40 Km)
                                         </div>
-                                        <div class="select-option"  ng-class="activeProximity == 50?'selected':''" ng-click="changeProximity(50)">
+                                        <div class="select-option"  ng-class="searchParams.proximity == 50?'selected':''" ng-click="changeProximity(50)">
                                             50 Mile (80 Km)
                                         </div>
-                                        <div class="select-option"  ng-class="activeProximity == 0?'selected':''" ng-click="changeProximity(0)">
+                                        <div class="select-option"  ng-class="searchParams.proximity == 0?'selected':''" ng-click="changeProximity(0)">
                                             Any
                                         </div>
                                     </div>
@@ -75,16 +75,16 @@
                                 <div class="drop-down-1 opt opt-2">
                                     <div class="filter-dropdown width-90 search-option-content" style="display: none;">
                                         <div class="checkbox-dropdown" ng-click="changeSearchOptions(1)">
-                                            <i class="fa " ng-class="parkingStatus ?'fa-check-square':'fa-square-o'"></i> Parking Required
+                                            <i class="fa " ng-class="searchParams.parkingStatus ?'fa-check-square':'fa-square-o'"></i> Parking Required
                                         </div>
                                         <div class="checkbox-dropdown" ng-click="changeSearchOptions(2)">
-                                            <i class="fa " ng-class="homeDelivery ?'fa-check-square':'fa-square-o'"></i> Need Home Delivery
+                                            <i class="fa " ng-class="searchParams.homeDelivery ?'fa-check-square':'fa-square-o'"></i> Need Home Delivery
                                         </div>
                                         <div class="checkbox-dropdown" ng-click="changeSearchOptions(3)">
-                                            <i class="fa " ng-class="openStatus ?'fa-check-square':'fa-square-o'"></i> Open/Working Entities
+                                            <i class="fa " ng-class="searchParams.openStatus ?'fa-check-square':'fa-square-o'"></i> Open/Working Entities
                                         </div>
                                         <div class="checkbox-dropdown" ng-click="changeSearchOptions(4)">
-                                            <i class="fa " ng-class="promotionsOnly ?'fa-check-square':'fa-square-o'"></i> Show Promotions only
+                                            <i class="fa " ng-class="searchParams.promotionsOnly ?'fa-check-square':'fa-square-o'"></i> Show Promotions only
                                         </div>
                                     </div>
                                 </div>
@@ -104,23 +104,23 @@
                                 <button class="btn btn-default btn-sm search-btn-width job-type opt opt-4 hidden">Job Types <span class="caret"></span></button>
                                 <span class="drop-down-3 opt opt-4 hidden">
                                     <div class="filter-dropdown width-42 job-type-content" style="display: none;">
-                                        <div class="checkbox-dropdown">
-                                            <i class="fa fa-square-o"></i> Full Time
+                                        <div class="checkbox-dropdown" ng-click="changeJobType(0)">
+                                            <i class="fa" ng-class="activeJobType[0]?'fa-check-square':'fa-square-o'"></i> Full Time
                                         </div>
-                                        <div class="checkbox-dropdown">
-                                            <i class="fa fa-square-o"></i> Part Time
+                                        <div class="checkbox-dropdown" ng-click="changeJobType(1)">
+                                            <i class="fa" ng-class="activeJobType[1]?'fa-check-square':'fa-square-o'"></i> Part Time
                                         </div>
-                                        <div class="checkbox-dropdown">
-                                            <i class="fa fa-square-o"></i> Work From Home
+                                        <div class="checkbox-dropdown" ng-click="changeJobType(2)">
+                                            <i class="fa" ng-class="activeJobType[2]?'fa-check-square':'fa-square-o'"></i> Work From Home
                                         </div>
-                                        <div class="checkbox-dropdown">
-                                            <i class="fa fa-square-o"></i> Internship
+                                        <div class="checkbox-dropdown" ng-click="changeJobType(3)">
+                                            <i class="fa" ng-class="activeJobType[3]?'fa-check-square':'fa-square-o'"></i> Internship
                                         </div>
-                                        <div class="checkbox-dropdown">
-                                            <i class="fa fa-square-o"></i> Consultant
+                                        <div class="checkbox-dropdown" ng-click="changeJobType(4)">
+                                            <i class="fa" ng-class="activeJobType[4]?'fa-check-square':'fa-square-o'"></i> Consultant
                                         </div>
-                                        <div class="checkbox-dropdown">
-                                            <i class="fa fa-square-o"></i> Freelancer
+                                        <div class="checkbox-dropdown" ng-click="changeJobType(5)">
+                                            <i class="fa" ng-class="activeJobType[5]?'fa-check-square':'fa-square-o'"></i> Freelancer
                                         </div>
                                     </div>
                                 </span>
@@ -133,8 +133,8 @@
                                     <div class="filter-dropdown width-42 search-experience-content" style="display: none;">
                                         <div class="checkbox-dropdown">
                                             <div class="input-group">
-                                                <input type="number" placeholder="Your experience in years" class="form-control" />
-                                                <span class="input-group-addon">Years</span>
+                                                <input type="text" id="experience" placeholder="Your experience in years" class="form-control" />
+                                                <span class="input-group-addon">Yrs</span>
                                             </div>
                                         </div>
                                     </div>

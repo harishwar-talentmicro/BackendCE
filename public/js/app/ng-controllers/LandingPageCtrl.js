@@ -51,11 +51,6 @@ angular.module('ezeidApp').
             var placeDetail = [];
             var searchTypeArr = ["EZEOne ID", "Keywords", "Employers", "Jobs"];
 
-            /* basic settings for searching */
-            $scope.activeSearchType = 1;//Keyword selected by default
-            $scope.activeProximity = 0;//Defaultly ANY proximity is selected
-            $scope.activeRating = [false,false,false,false,false];
-
             /* setting default search opptions to OFF */
             $scope.parkingStatus = 0;
             $scope.openStatus = 0;
@@ -81,14 +76,40 @@ angular.module('ezeidApp').
             ];
 
             /* convert star ratings to comma seperated string */
-            var starStr = [];
+
+
             $scope.getStars = function () {
+                var starStr = [];
                 for (var i = 0; i < 5; i++) {
-                    if ($scope.stars[i]) {
+                    if ($scope.activeRating[i]) {
                         starStr.push(i + 1);
                     }
                 }
+                console.log(starStr.join(","));
                 return starStr.join(",");
+            }
+
+            /**
+             * get experience
+             */
+            $scope.getExperience = function()
+            {
+                var experience = $('#experience').val();
+                return experience;
+            }
+
+            /**
+             * Get all job types and convert them to comma seperated string
+             */
+            $scope.getJobType = function()
+            {
+                var jobTypeStr = [];
+                for (var i = 0; i < 6; i++) {
+                    if ($scope.activeJobType[i]) {
+                        jobTypeStr.push(i + 1);
+                    }
+                }
+                return jobTypeStr.join(",");
             }
 
             /* splice array as index [0] is there, with empty value */
@@ -100,20 +121,40 @@ angular.module('ezeidApp').
                 "Type Job Skill Keywords to locate employers"
             ];
 
+            /* basic settings for searching */
+            //$scope.activeSearchType = 2;
+            //$scope.activeProximity = 0;//Defaultly ANY proximity is selected
+            $scope.activeRating = [true,true,true,true,true];//Checkboxes for star rating
+            $scope.activeJobType = [true,true,true,true,true,true];//Checkboxes for job type
+
 
             $scope.placeHolderText = placeHolder;
 
+            /* for normal search keyword */
             $scope.searchParams = {
                 searchType: 2,
                 searchTerm: '',
                 proximity: 0,
                 rating: '1,2,3,4,5',
                 homeDelivery: false,
-                parkingStatus: 0,
+                parkingStatus: false,
                 openStatus: false,
+                promotionsOnly: false,
+                //experience:0,
+                //jobType:'1,2,3,4,5,6',
                 lat: '12.93',
                 lng: '77.57'
             };
+
+            ///* for job search keyword */
+            //$scope.jobSearchParams = {
+            //    searchTerm: '',
+            //    proximity: 0,
+            //    experience:0,
+            //    jobType:'1,2,3,4,5,6',
+            //    lat: '12.93',
+            //    lng: '77.57'
+            //};
 
             if ($routeParams['ezeid']) {
                 $scope.searchParams.searchTerm = $routeParams['ezeid'];
@@ -135,20 +176,6 @@ angular.module('ezeidApp').
                 if ($scope.searchParams.searchTerm.length < 1) {
                     return false;
                 }
-                /* check if the user is logged in and the search type is 1[EZEID] */
-
-                //if (!$rootScope._userInfo.IsAuthenticate && $scope.searchParams.searchType == 1) {
-                //    /* through error */
-                //    /**
-                //     * @todo
-                //     * If user is  searching for EZEID then let him search if the search result comes as business
-                //     * user without any pin and show him result else don't allow him to search
-                //     */
-                //
-                //
-                //    Notification.error({message: 'Please login to search for EZEOne', delay: MsgDelay});
-                //    return false;
-                //}
 
                 var modifyValue = [
                     'homeDelivery',
@@ -156,12 +183,37 @@ angular.module('ezeidApp').
                     'openStatus',
                     'promotionsOnly'
                 ];
-
                 $scope.searchParams.rating = $scope.getStars();
+                $scope.searchParams.jobType = $scope.getJobType();
+                $scope.searchParams.experience = $scope.getExperience();
 
+                var searchStr;
+                if(parseInt($scope.searchParams.searchType) === 4)
+                {
+                    searchStr = getJobSearchTermString(modifyValue);
+                }
+                else
+                {
+                    searchStr = getSearchtermString(modifyValue);
+                }
+                console.log(searchStr);
+
+                $location.url('/searchResult?' + searchStr);
+            };
+
+            /**
+             * Get the string to search a normal search term
+             */
+            function getSearchtermString(modifyValue)
+            {
                 var searchStr = "";
                 for (var prop in $scope.searchParams) {
                     if ($scope.searchParams.hasOwnProperty(prop)) {
+                        if(prop.toString() == 'experience' || prop.toString() == 'jobType')
+                        {
+                            continue;
+                        }
+                        console.log(prop.toString());
                         if (modifyValue.indexOf(prop) !== -1) {
                             var val = ($scope.searchParams[prop]) ? 1 : 0;
                             var attr = prop + '=' + val + '&'
@@ -172,10 +224,41 @@ angular.module('ezeidApp').
                         }
                     }
                 }
+                return searchStr;
+            }
 
-                $location.url('/searchResult?' + searchStr);
-            };
+            /**
+             * Get the string to search JOBs
+             */
+            function getJobSearchTermString(modifyValue)
+            {
+                var searchStr = "";
+                for (var prop in $scope.searchParams) {
+                    if ($scope.searchParams.hasOwnProperty(prop)) {
 
+                        if(
+                            prop.toString() == 'promotionsOnly' ||
+                            prop.toString() == 'openStatus' ||
+                            prop.toString() == 'parkingStatus' ||
+                            prop.toString() == 'homeDelivery' ||
+                            prop.toString() == 'rating' ||
+                            prop.toString() == 'searchType')
+                        {
+                            continue;
+                        }
+
+                        if (modifyValue.indexOf(prop) !== -1) {
+                            var val = ($scope.searchParams[prop]) ? 1 : 0;
+                            var attr = prop + '=' + val + '&'
+                            searchStr += attr;
+                        }
+                        else {
+                            searchStr += (prop + '=' + encodeURIComponent($scope.searchParams[prop]) + '&');
+                        }
+                    }
+                }
+                return searchStr;
+            }
 
             /**
              * Check enter key press in search box
@@ -614,8 +697,8 @@ angular.module('ezeidApp').
             $scope.changeSeacrhType = function(searchType)
             {
                 changeSearchFilterVisibility(searchType);
-                $scope.activeSearchType = searchType;
-                if(parseInt(searchType) ==  0)
+                $scope.searchParams.searchType = searchType;
+                if(parseInt(searchType) ===  1)
                 {
                     $('.advance-filter-btn').hide();
                     $('.advance-search').hide();
@@ -629,17 +712,17 @@ angular.module('ezeidApp').
             /* change different search option status */
             $scope.changeSearchOptions = function(opt) {
                 if (parseInt(opt) === 1) {
-                    $scope.parkingStatus = !$scope.parkingStatus;
+                    $scope.searchParams.parkingStatus = !$scope.searchParams.parkingStatus;
                 }
                 else if (parseInt(opt) === 2) {
-                    $scope.homeDelivery = !$scope.homeDelivery;
+                    $scope.searchParams.homeDelivery = !$scope.searchParams.homeDelivery;
                 }
                 else if (parseInt(opt) === 3) {
-                    $scope.openStatus = !$scope.openStatus;
+                    $scope.searchParams.openStatus = !$scope.searchParams.openStatus;
                 }
                 else
                 {
-                    $scope.promotionsOnly = !$scope.promotionsOnly;
+                    $scope.searchParams.promotionsOnly = !$scope.searchParams.promotionsOnly;
                 }
 
             }
@@ -649,7 +732,7 @@ angular.module('ezeidApp').
              */
             $scope.changeProximity = function(proximity)
             {
-                $scope.activeProximity = proximity;
+                $scope.searchParams.proximity = proximity;
             }
 
 
@@ -666,16 +749,16 @@ angular.module('ezeidApp').
              */
             function changeSearchFilterVisibility(searchOption)
             {
-                console.log("hello "+searchOption);
+
                 hideAllSearchOptions();
                 switch(searchOption)
                 {
-                    case 0://EZEOne ID selected
+                    case 1://EZEOne ID selected
                     {
                         /* do nothing */
                         return;
                     }
-                    case 1://Keywords selected
+                    case 2://Keywords selected
                     {
                         /* enable: Proximity, Search Options & Star Ratings */
                         $('.opt-1').removeClass('hidden');
@@ -683,7 +766,7 @@ angular.module('ezeidApp').
                         $('.opt-3').removeClass('hidden');
                         return;
                     }
-                    case 2://Employers selected
+                    case 3://Employers selected
                     {
                         /* enable: Proximity & Ratings */
                         $('.opt-1').removeClass('hidden').css('width',"49.7%");
@@ -692,7 +775,7 @@ angular.module('ezeidApp').
                         $('.drop-down-2').css('padding-left','50.1%');
                         return;
                     }
-                    case 3://Job selected
+                    case 4://Job selected
                     {
                         /* enable: Proximity, Job Types & Experience */
                         $('.opt-1').removeClass('hidden');
@@ -734,6 +817,15 @@ angular.module('ezeidApp').
                     $('.normal-view-text').show();
                     $('.mobile-view-text').hide();
                 }
+            }
+
+            /**
+             * change the value of Job-types
+             * @param jobType: the checkbox ID
+             */
+            $scope.changeJobType = function(jobType)
+            {
+                $scope.activeJobType[jobType] = !$scope.activeJobType[jobType];
             }
         }]);
 

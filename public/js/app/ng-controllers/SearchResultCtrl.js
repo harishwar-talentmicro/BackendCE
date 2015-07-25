@@ -153,6 +153,11 @@ var res = angular.module('ezeidApp').
                 $scope.params.homeDelivery = $scope.params.homeDelivery == 0?1:0;
             }
 
+            $scope.changePromotionsOnly  = function()
+            {
+                $scope.params.promotionsOnly  == 0?1:0;
+            }
+
             //Set all the serach parameters
             $scope.params = $routeParams;
 
@@ -245,6 +250,7 @@ var res = angular.module('ezeidApp').
                     HomeDelivery:_filterValue.homeDelivery,
                     CurrentDate:CurrentDate,
                     pagecount:pagecount,
+                    promotion_flag: parseInt(_filterValue.promotionsOnly) == 1?1:2,
                     isPagination:1,
                     pagesize:$scope.resultPerPage
                 } }).success(function (data) {
@@ -397,7 +403,8 @@ var res = angular.module('ezeidApp').
                 var modifyValue = [
                     'homeDelivery',
                     'parkingStatus',
-                    'openStatus'
+                    'openStatus',
+                    'promotionsOnly'
                 ];
                 /* check and set all the filter values */
                 $scope.checkAndSetFilterValues();
@@ -405,6 +412,7 @@ var res = angular.module('ezeidApp').
                 var searchStr = "";
                 $scope.params.rating = $scope.getSearchStars();
                 for(var prop in $scope.params){
+                    console.log(prop.toString()+" --- "+$scope.params[prop]);
                     if($scope.params.hasOwnProperty(prop)){
                         if(modifyValue.indexOf(prop) !== -1){
                             var val = ($scope.params[prop] == true) ? 1:0;

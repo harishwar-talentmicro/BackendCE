@@ -152,6 +152,7 @@ exports.FnSaveJobs = job.create;
 exports.FnGetJobs = job.getAll;
 exports.FnGetJobLocations = job.getJobLocations;
 exports.FnSearchJobs = job.searchJobs;
+exports.FnJobSeekerSearch = job.searchJobSeekers;
 
 
 //ap parts

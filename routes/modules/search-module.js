@@ -72,8 +72,9 @@ Search.prototype.searchKeyword = function(req,res,next){
         var pagesize = req.body.pagesize ? parseInt(req.body.pagesize) : 0;
         var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
         var total = req.body.total ? parseInt(req.body.total) : 0;
+        var promotionFlag = (req.body.promotion_flag) ? ((parseInt(req.body.promotion_flag) == 1) ? req.body.promotion_flag : 2) : 2;
 
-        console.log(req.body);
+            console.log(req.body);
 
         if (type == "1") {
 
@@ -88,6 +89,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                             var DocType = '';
                             var FindArray = find.split('.');
                             var SearchType = 0;
+
                             //console.log('findarray: ' + FindArray.length);
                             console.log(req.ip);
 
@@ -161,47 +163,63 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 + ',' + st.db.escape(Longitude) +',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin) + ',' + st.db.escape(SearchType) + ',' + st.db.escape(DocType)
                                 + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape(token)
                                 + ',' + st.db.escape(HomeDelivery) + ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) ;
+                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total)+ ',' +st.db.escape(promotionFlag) ;
 
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // st.db.query(searchQuery, function (err, SearchResult) {
+                                console.log(SearchResult);
                                 if (!err) {
-                                    if (SearchResult[0] != null) {
+                                    if (SearchResult[0]) {
                                         if (SearchResult[0].length > 0) {
-                                            if (SearchResult[0][0].totalcount == 1)
-                                            {
-                                                res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
+                                            if (SearchResult[0][0].totalcount == 1) {
+                                                res.json({
+                                                    totalcount: SearchResult[0][0].totalcount,
+                                                    Result: SearchResult[1]
+                                                });
                                                 console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
                                             }
-                                            else
-                                            {
+                                            else {
+                                                console.log(SearchResult[0]);
                                                 res.send(SearchResult[0]);
                                                 console.log('FnSearchByKeywords: tmaster: Search result sent successfully');
                                             }
 
-                                            if (SearchType == 2){
-                                                var getQuery = 'select TID from tmaster where Token='+st.db.escape(token);
+                                            if (SearchType == 2) {
+
+                                                var getQuery = 'select TID from tmaster where Token=' + st.db.token;
                                                 st.db.query(getQuery, function (err, getResult) {
-                                                    if(!err){
+                                                    console.log(getResult);
+                                                    if (getResult) {
                                                         var tid = getResult[0].TID;
-                                                        console.log(tid);
-                                                    }
-                                                    var query = st.db.escape(tid) + ',' + st.db.escape(logHistory.ezeid) + ',' + st.db.escape(logHistory.ip) + ',' + st.db.escape(logHistory.type);
-                                                    console.log('CALL pCreateAccessHistory(' + query + ')');
-                                                    if(logHistory.type < 1){
-                                                        st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
-                                                            if(!err){
-                                                                console.log('FnSearchByKeywords:Access history is created');
+
+                                                        var getQuery = 'select masterid from tloginout where token=' + st.db.escape(token);
+                                                        st.db.query(getQuery, function (err, getResult) {
+                                                            var tid = 0;
+                                                            if (!err) {
+                                                                if (getResult) {
+                                                                    if (getResult[0]) {
+                                                                        tid = getResult[0].TID;
+                                                                    }
+                                                                }
+
+
+                                                                console.log(tid);
                                                             }
-                                                            else {
-                                                                console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                            var query = st.db.escape(tid) + ',' + st.db.escape(logHistory.ezeid) + ',' + st.db.escape(logHistory.ip) + ',' + st.db.escape(logHistory.type);
+                                                            console.log('CALL pCreateAccessHistory(' + query + ')');
+                                                            if (logHistory.type > 1) {
+                                                                st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err) {
+                                                                    if (!err) {
+                                                                        console.log('FnSearchByKeywords:Access history is created');
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                                    }
+                                                                });
                                                             }
                                                         });
-
-
                                                     }
-
                                                 });
                                             }
                                         }
@@ -267,7 +285,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(1)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) ;
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ','+ st.db.escape(promotionFlag);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
@@ -326,7 +344,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token)  + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total);
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {

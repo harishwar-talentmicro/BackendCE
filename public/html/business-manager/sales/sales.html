@@ -78,7 +78,11 @@
                                     <!--</select>-->
                                 <!--</div>-->
 
-                                <div ng-dropdown-multiselect="" options="userFolders" selected-model="myFolders" extra-settings="multiSelectDropDownSettings"></div>
+                                <div ng-dropdown-multiselect="" class="ezeone-multi-select" options="userFolders"
+                                     translation-texts="multiSelectTransText"
+                                     selected-model="myFolders" extra-settings="multiSelectDropDownSettings">
+
+                                </div>
                             </div>
                         </div>
 
@@ -127,6 +131,11 @@
 
 
                     <div class="col-lg-1 col-md-2 col-sm-6 col-xs-12 bottom-clearfix pull-right">
+                        <button class="btn btn-sm btn-info no-radius"
+                                ng-click=""
+                                data-toggle="tooltip" title="Go">
+                            Go
+                        </button>
                         <button class="btn btn-sm btn-success no-radius"
                                 ng-show="salesPermissionConf.txCreate"
                                 ng-click="toggleModalBox()"
