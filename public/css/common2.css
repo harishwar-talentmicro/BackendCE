@@ -596,6 +596,11 @@
     padding-top: 10px !important;
 }
 
+.hpw .p-top-20
+{
+    padding-top: 20px !important;
+}
+
 .hpw .p-top-7
 {
     padding-top: 7px !important;
@@ -3002,13 +3007,13 @@ sup.tm{
 
 .hpw .drop-down-1
 {
-    padding-left: 33.5%;
+    padding-left: 33.1%;
     position: absolute;
 }
 
 .hpw .drop-down-2
 {
-    padding-left: 66.9%;
+    padding-left: 66.2%;
     position: absolute;
 }
 
@@ -3082,4 +3087,39 @@ sup.tm{
 .hpw .abs-pos
 {
     position: absolute;
+}
+
+.job-seeker-bg
+{
+    background-color: #F9F9F9;
+}
+
+.jss .salary-filter-type
+{
+    margin-left: 62.3%;
+}
+
+.hpw .table-head
+{
+    padding: 5px;
+    background-color: #EFECEC;
+    font-weight: 600;
+    color: gray;
+}
+
+.hpw .table-body
+{
+    padding: 5px;
+}
+
+.hpw .table-striped-bg
+{
+    background-color: #EAEAF1;
+}
+
+.hpw .table-body:hover
+{
+    background-color: #5188CE;
+    color: #fff;
+    cusror:pointer;
 }

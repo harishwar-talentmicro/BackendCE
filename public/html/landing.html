@@ -109,6 +109,9 @@
                                         <div class="checkbox-dropdown" ng-click="changeSearchOptions(3)">
                                             <i class="fa " ng-class="openStatus ?'fa-check-square':'fa-square-o'"></i> Open/Working Entities
                                         </div>
+                                        <div class="checkbox-dropdown" ng-click="changeSearchOptions(4)">
+                                            <i class="fa " ng-class="promotionsOnly ?'fa-check-square':'fa-square-o'"></i> Show Promotions only
+                                        </div>
                                     </div>
                                 </div>
 
@@ -155,7 +158,10 @@
                                 <div class="drop-down-4 opt opt-5">
                                     <div class="filter-dropdown width-42 search-experience-content" style="display: none;">
                                         <div class="checkbox-dropdown">
-                                            <input type="number" placeholder="Your experience in years" class="form-control" />
+                                            <div class="input-group">
+                                                <input type="number" placeholder="Your experience in years" class="form-control" />
+                                                <span class="input-group-addon">Years</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
