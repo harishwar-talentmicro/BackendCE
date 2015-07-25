@@ -72,8 +72,9 @@ Search.prototype.searchKeyword = function(req,res,next){
         var pagesize = req.body.pagesize ? parseInt(req.body.pagesize) : 0;
         var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
         var total = req.body.total ? parseInt(req.body.total) : 0;
+        var promotionFlag = (req.body.promotion_flag) ? ((parseInt(req.body.promotion_flag) == 1) ? req.body.promotion_flag : 2) : 2;
 
-        console.log(req.body);
+            console.log(req.body);
 
         if (type == "1") {
 
@@ -88,6 +89,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                             var DocType = '';
                             var FindArray = find.split('.');
                             var SearchType = 0;
+
                             //console.log('findarray: ' + FindArray.length);
                             console.log(req.ip);
 
@@ -161,7 +163,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 + ',' + st.db.escape(Longitude) +',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin) + ',' + st.db.escape(SearchType) + ',' + st.db.escape(DocType)
                                 + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape("0") + ',' + st.db.escape(token)
                                 + ',' + st.db.escape(HomeDelivery) + ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total) ;
+                                st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(total)+ ',' +st.db.escape(promotionFlag) ;
 
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
@@ -273,7 +275,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(1)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) ;
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ','+ st.db.escape(promotionFlag);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
@@ -332,7 +334,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)
                     + ',' + st.db.escape('') + ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(OpenCloseStatus) + ',' + st.db.escape(Rating)
                     + ',' + st.db.escape(token)  + ',' + st.db.escape(HomeDelivery)+ ',' + st.db.escape(CurrentDate) + ',' + st.db.escape(isPagination) + ',' +
-                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total);
+                    st.db.escape(pagesize) + ',' + st.db.escape(pagecount)+ ',' + st.db.escape(total) + ',' + st.db.escape(promotionFlag);
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {

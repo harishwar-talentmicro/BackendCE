@@ -307,6 +307,7 @@ Job.prototype.create = function(req,res,next){
 Job.prototype.getAll = function(req,res,next){
     var _this = this;
 
+    var error = {};
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
     var keywordsForSearch = req.query.keywordsForSearch;
@@ -505,5 +506,11 @@ Job.prototype.searchJobs = function(req,res,next){
         }
     };
 
+Job.prototype.searchJobSeekers = function(req,res){
+    /**
+     * @todo Code API for Job seeker search
+     */
+    res.send('API in progress');
+};
 
 module.exports = Job;

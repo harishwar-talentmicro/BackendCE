@@ -198,6 +198,7 @@ app.post('/job',LocationManager.FnSaveJobs);
 app.get('/job',LocationManager.FnGetJobs);
 app.get('/job_locations',LocationManager.FnGetJobLocations);
 app.get('/job_search',LocationManager.FnSearchJobs);
+app.get('/job_seeker_search',LocationManager.FnJobSeekerSearch);
 
 
 //below service are for EZEIDAP
