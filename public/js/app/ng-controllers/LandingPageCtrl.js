@@ -716,5 +716,24 @@ angular.module('ezeidApp').
                     $(this).removeAttr('style');
                 });
             }
+
+            /**
+             * Toggle the text when the screen-size is smaller
+             */
+            toggleTextOnScreenSize();
+            function toggleTextOnScreenSize()
+            {
+                var screenSize = $(window).width();
+                if(parseInt(screenSize) < 500)
+                {
+                    $('.normal-view-text').hide();
+                    $('.mobile-view-text').show();
+                }
+                else
+                {
+                    $('.normal-view-text').show();
+                    $('.mobile-view-text').hide();
+                }
+            }
         }]);
 

@@ -106,6 +106,7 @@ app.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 app.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
 app.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
 app.post('/pass_reset_code',LocationManager.FnVerifyResetPasswordLink);
+app.post('/verify_secret_code',LocationManager.FnVerifySecretCode);
 app.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
 app.post('/ewtChangePassword', LocationManager.FnChangePassword);
 app.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);
