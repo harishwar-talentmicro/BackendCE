@@ -309,9 +309,9 @@ Job.prototype.getAll = function(req,res,next){
 
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
-    var keyWordsForSearch = req.query.keyWordsForSearch;
+    var keywordsForSearch = req.query.keywordsForSearch;
     var status = req.query.status;
-
+    console.log(req.query);
     var responseMessage = {
         status: false,
         error: {},
@@ -337,7 +337,9 @@ Job.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keyWordsForSearch)  + ',' + st.db.escape(status);
+                        var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status);
+                        console.log(query);
+                        console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
                             if (!err) {
                                 if (getresult) {
