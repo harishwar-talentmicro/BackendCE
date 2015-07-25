@@ -37,7 +37,10 @@
 
             //$scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
             $scope.txSearchTerm = '';
-            $scope.showDefaultTab = true;
+            $scope.ResumeInquiriesTab = true;
+            $scope.JobsTab = false;
+            $scope.JobSeekerTab = false;
+
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
@@ -161,6 +164,8 @@
             $scope.txFolderRules = [];
 
             // Declaration for job posting
+            $scope.showJobListing = true;
+            $scope.isWrongEmailPatternFrom = false;
             $scope.locationList = [];
             $scope.jobTitle = "";
             $scope.jobCode = "";
@@ -171,11 +176,11 @@
             $scope.experienceTo = "";
             $scope.salaryFrom = "";
             $scope.salaryTo = "";
-            $scope.salaryType = "0";
-            $scope.jobType = "0";
+            $scope.salaryType = 0;
+            $scope.jobType = 0;
             $scope.contactName = "";
             $scope.phone = "";
-            $scope.email = "";
+            $scope.emailContact = "";
 
             $scope.validationDone = false;
 
@@ -1583,18 +1588,35 @@
              * select Resume Inquiries Tab
              */
             $scope.TabResumeInquiries = function(){
-                $scope.showDefaultTab = true;
+                $scope.ResumeInquiriesTab = true;
+                $scope.JobsTab = false;
+                $scope.JobSeekerTab = false;
             };
 
             /**
              * select Post Job Tab
              */
             $scope.TabPostJob = function(){
-                $scope.showDefaultTab = false;
+                $scope.ResumeInquiriesTab = false;
+                $scope.JobsTab = true;
+                $scope.JobSeekerTab = false;
+                $scope.showJobListing = true;
+
+                $scope.jobSearchTerm = "";
+                $scope.jobFilterStatus = 0;
 
                 getPostedJob();
 
                // getLocationList();
+            };
+
+            /**
+             * select Job Seeker Tab
+             */
+            $scope.TabJobSeeker = function(){
+                $scope.ResumeInquiriesTab = false;
+                $scope.JobsTab = false;
+                $scope.JobSeekerTab = true;
             };
 
             // Get all posted Jobs
@@ -1606,7 +1628,9 @@
                     method : 'GET',
                     params : {
                         token : $rootScope._userInfo.Token,
-                        ezeone_id : $rootScope._userInfo.ezeid
+                        ezeone_id : $rootScope._userInfo.ezeid,
+                        keywordsForSearch : $scope.jobSearchTerm,
+                        status : jobFilterStatus
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -1614,7 +1638,6 @@
                     if(resp.status)
                     {
                         $scope.jobData = resp.data;
-                        console.log($scope.jobData);
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
@@ -1649,40 +1672,50 @@
                 if($scope.salaryTo.length < 1){
                     err.push('Salary To is empty');
                 }
-                if($scope.salaryType == 1){
-                    err.push('Please select Per Hour/PM/PA');
-                }
                 if($scope.jobType == 0){
                     err.push('Please select Job type');
                 }
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
                 }
+
+                console.log($scope.emailContact);
                 if($scope.phone.length < 1){
                     err.push('Phone is empty');
                 }
-                if($scope.email.length < 1){
+                if($scope.emailContact.length < 1){
                     err.push('Email is empty');
                 }
+
+                //$scope.registerForm.userEmail.$invalid
+                console.log("Sai777");
+               // console.log($scope.jobPostForm.emailContact.$invalid);
+
+                if($scope.isWrongEmailPatternFrom)
+                {
+                    console.log("SAi99");
+                    err.push('Not valid email!');
+                }
+
 
                 if(err.length > 0){
                     for(var i = 0; i < err.length; i++){
                         Notification.error({ message : err[i], delay : 2000});
                     }
+                   // Notification.error({ message : "Please enter information for Job", delay : 2000});
                     return false;
                 }
 
                 return true;
             };
 
-
             // save job to system
             $scope.postJob = function(){
-
 
                 $scope.validationDone = true;
                 if(validateItem())
                 {
+                    $scope.$emit('$preLoaderStart');
 
                     console.log($scope.jobTitle);
                     console.log($scope.jobCode);
@@ -1697,22 +1730,7 @@
                     console.log($scope.jobType);
                     console.log($scope.contactName);
                     console.log($scope.phone);
-                    console.log($scope.email);
-
-                    /*var location [] =
-                        {
-                            "location_title": "bangalore",
-                            "latitude": 12.453323,
-                            "longitude": 73.4545,
-                            "country": "india"
-                        },
-                        {
-                            "location_title": "chennai",
-                            "latitude": 12.453323,
-                            "longitude": 73.475545,
-                            "country": "india"
-                        }
-                    ;*/
+                    console.log($scope.emailContact);
 
                     var location = [
                         {
@@ -1731,7 +1749,7 @@
 
                     $scope.jobData = {
                                         token : $rootScope._userInfo.Token,
-                                        tid : 0,
+                                        tid : $scope.jobTid,
                                         ezeone_id : $rootScope._userInfo.ezeid,
                                         job_code : $scope.jobCode,
                                         job_title : $scope.jobTitle,
@@ -1744,9 +1762,9 @@
                                         keySkills : $scope.skillKeyWords,
                                         openings : $scope.jobVacancies,
                                         jobType : $scope.jobType,
-                                        status : 1,
+                                        status : $scope.jobStatus,
                                         contactName : $scope.contactName,
-                                        email_id : $scope.email,
+                                        email_id : $scope.emailContact,
                                         mobileNo : $scope.phone,
                                         locationsList : JSON.stringify(location)
                                      }
@@ -1757,13 +1775,14 @@
                         data:  $scope.jobData
                     }).success(function (data) {
 
+                            $scope.$emit('$preLoaderStop');
                             console.log("SAi1234");
                             console.log(data);
 
-                            if(data.IsSuccessfull) {
-
-
-                            }else{
+                            if(data.status)
+                            {
+                                getPostedJob();
+                                $scope.showJobListing = true;
 
                             }
                         })
@@ -1774,7 +1793,82 @@
                 }
             };
 
-            $scope.SalaryTypeList = [{ id: 1, label: "Hour" }, { id: 2, label: "White List" }];
+            $scope.SalaryTypeList = [{ id: 0, label: "Hour" }, { id: 1, label: "Month" }, { id: 2, label: "Annual" }];
+
+            // Show job posting form
+            $scope.openJobPostForm = function(_index){
+                $scope.showJobListing = false;
+
+                if(_index == 'add')
+                {
+                    $scope.jobTid = 0;
+                    $scope.jobTitle = "";
+                    $scope.jobCode = "";
+                    $scope.jobDescription = "";
+                    $scope.skillKeyWords = "";
+                    $scope.jobVacancies = "";
+                    $scope.experienceFrom = "";
+                    $scope.experienceTo = "";
+                    $scope.jobLocation = "";
+                    $scope.salaryFrom = "";
+                    $scope.salaryTo = "";
+                    $scope.salaryType = 0;
+                    $scope.jobType = 0;
+                    $scope.contactName = "";
+                    $scope.phone = "";
+                    $scope.emailContact = "";
+                    $scope.jobStatus = 0;
+                }
+                else
+                {
+                    console.log($scope.jobData[_index]);
+
+                    $scope.jobTid = $scope.jobData[_index].tid;
+                    $scope.jobTitle = $scope.jobData[_index].jobtitle;
+                    $scope.jobCode = $scope.jobData[_index].jobcode;
+                    $scope.jobDescription = $scope.jobData[_index].jobdescription;
+                    $scope.skillKeyWords = $scope.jobData[_index].keyskills;
+                    $scope.jobVacancies = $scope.jobData[_index].openings;
+                    $scope.experienceFrom = $scope.jobData[_index].expfrom;
+                    $scope.experienceTo = $scope.jobData[_index].expto;
+                    $scope.jobLocation = $scope.jobData[_index].location;
+                    $scope.salaryFrom = $scope.jobData[_index].salaryfrom;
+                    $scope.salaryTo = $scope.jobData[_index].salaryto;
+                    $scope.salaryType = $scope.jobData[_index].salarytype;
+                    $scope.jobType = $scope.jobData[_index].jobtype;
+                    $scope.contactName = $scope.jobData[_index].contactname;
+                    $scope.phone = $scope.jobData[_index].mobile;
+                    $scope.emailContact = $scope.jobData[_index].emailid;
+                    $scope.jobStatus = $scope.jobData[_index].status;
+                }
+
+             };
+
+            // Cancel job posting form
+            $scope.cancelJobPosting = function(){
+                $scope.showJobListing = true;
+            };
+
+            //For fatching location to post job
+            var googleMap = new GoogleMap();
+            googleMap.addSearchBox('google-map-search-box');
+            googleMap.listenOnMapControls(null,function(lat,lng){
+                $scope.jobLat = lat;
+                $scope.jobLong = lng;
+                googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+                    if(resp.data){
+                        var data = googleMap.parseReverseGeolocationData(resp.data);
+                        $scope.jobLocation = data.city;
+                    }
+                    else{
+                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                    }
+                },function(){
+                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                    defer.resolve();
+                });
+            },false);
+
 
         }]);
 })();

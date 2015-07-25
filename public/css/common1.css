@@ -1924,11 +1924,11 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     font-family: 'Open Sans Light', sans-serif;
 }
 
-.post-job label {
+/*.post-job label {
     font-family: 'Roboto', sans-serif;
     font-weight: normal;
     color: #11A300;
-}
+}*/
 .salaryInfoText
 {
     color: rgb(205, 100, 121);
