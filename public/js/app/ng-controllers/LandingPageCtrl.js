@@ -153,7 +153,8 @@ angular.module('ezeidApp').
                 var modifyValue = [
                     'homeDelivery',
                     'parkingStatus',
-                    'openStatus'
+                    'openStatus',
+                    'promotionsOnly'
                 ];
 
                 $scope.searchParams.rating = $scope.getStars();
@@ -226,7 +227,7 @@ angular.module('ezeidApp').
                             $scope.locationString = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
                             $scope.location = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
                             /* Setting up default lattitude & longitude of the map */
-                                $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
+                            $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
                             $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
                         }
                         if ($routeParams['ezeid']) {
@@ -472,8 +473,8 @@ angular.module('ezeidApp').
 
                 image.onload = function () {
                     $('.main-page-image').css({
-                            'background': 'url(/images/bg-test.jpg)',
-                            'background-size': 'cover'
+                        'background': 'url(/images/bg-test.jpg)',
+                        'background-size': 'cover'
                     });
 
                     $timeout(function(){
@@ -598,7 +599,7 @@ angular.module('ezeidApp').
                             return;
                         }
 
-                })});
+                    })});
 
                 $('.search-option').click(function(){$('.search-option-content').slideToggle("fast",function(){})});
                 $('.search-proximity').click(function(){$('.search-proximity-content').slideToggle("fast",function(){})});
@@ -633,10 +634,14 @@ angular.module('ezeidApp').
                 else if (parseInt(opt) === 2) {
                     $scope.homeDelivery = !$scope.homeDelivery;
                 }
-                else
-                {
+                else if (parseInt(opt) === 3) {
                     $scope.openStatus = !$scope.openStatus;
                 }
+                else
+                {
+                    $scope.promotionsOnly = !$scope.promotionsOnly;
+                }
+
             }
 
             /**
