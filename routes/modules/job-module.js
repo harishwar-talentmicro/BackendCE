@@ -122,9 +122,9 @@ Job.prototype.create = function(req,res,next){
         error['jobType'] = 'Invalid jobType';
         validateStatus *= false;
     }
-    if(!status){
-        tid = 0;
-    }
+    //if(!status){
+    //    tid = 0;
+    //}
     if(parseInt(status) == NaN){
         error['status'] = 'Invalid status';
         validateStatus *= false;
