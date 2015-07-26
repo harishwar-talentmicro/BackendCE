@@ -2489,6 +2489,29 @@ User.prototype.saveResume = function(req,res,next){
         ];
         var resultvalue = '';
 
+
+        /**
+         * 8 New parameters added
+         */
+        var salary = req.body.salary;  // Float (Decimal)
+        var noticePeriod = req.body.notice_period; // Integer, in days
+        var experience = req.body.experience; //
+        var currentEmployeer = req.body.current_employeer;
+        var currentJobTitle = req.body.current_job_title;
+        var jobType = req.body.job_type;
+        var jobLocation = req.body.job_location;
+
+
+        /**
+         * Data Conversions
+         */
+        salary = (parseFloat(salary) !== NaN && salary > 0) ? parseFloat(salary) : 0;
+        noticePeriod = (parseInt(noticePeriod) !== NaN && parseInt(noticePeriod) > 0) ? parseInt(noticePeriod) : 0;
+        experience = (parseInt(experience) !== NaN && parseInt(experience)) ? parseInt(experience) : 0;
+
+        jobType = (parseInt(jobType) !== NaN && parseInt(jobType) > 0 ) ? parseInt(jobType) : 1;
+
+        
         var RtnMessage = {
             IsSuccessfull: false
         };
