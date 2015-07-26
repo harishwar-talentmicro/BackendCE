@@ -2,23 +2,23 @@
 <!--<div class="panel-heading">-->
 <!--<h3 class="font-roboto business-manager-module-heading">{{(_userInfo.CVModuleTitle) ? _userInfo.CVModuleTitle : 'Resume Application'}}</h3>-->
 <!--</div>-->
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 tabs-row-sales">
-                <ul class="nav nav-tabs">
-                    <li ng-class="(ResumeInquiriesTab) ? 'active' : ''"><a ng-click="TabResumeInquiries()"> <span class="glyphicon glyphicon-copy"></span> Recruitment Tracker </a></li>
-                    <li ng-class="(JobsTab) ? 'active' : ''"><a ng-click="TabPostJob()"> <span class="glyphicon glyphicon-folder-open"></span> Jobs </a></li>
-                    <li ng-class="(JobSeekerTab) ? 'active' : ''"><a ng-click="TabJobSeeker()"> <span class="glyphicon glyphicon-briefcase"></span> Job Seeker </a></li>
-                </ul>
-            </div>
-        </div>
-        <hr/>
-        <div class="row" ng-show="ResumeInquiriesTab">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 topMarginButton">
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                        <div class="input-group tx-search-input-group">
-                            <input class="form-control" ng-model="txSearchTerm" type="text" placeholder="Search records based on EZEOne ID or message"/>
+<div class="panel-body">
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 tabs-row-sales">
+        <ul class="nav nav-tabs">
+            <li ng-class="(ResumeInquiriesTab) ? 'active' : ''"><a ng-click="TabResumeInquiries()"> <span class="glyphicon glyphicon-copy"></span> Recruitment Tracker </a></li>
+            <li ng-class="(JobsTab) ? 'active' : ''"><a ng-click="TabPostJob()"> <span class="glyphicon glyphicon-folder-open"></span> Jobs </a></li>
+            <li ng-class="(JobSeekerTab) ? 'active' : ''"><a ng-click="TabJobSeeker()"> <span class="glyphicon glyphicon-briefcase"></span> Job Seeker </a></li>
+        </ul>
+    </div>
+</div>
+<hr/>
+<div class="row" ng-show="ResumeInquiriesTab">
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 topMarginButton">
+    <div class="row bottom-clearfix">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+            <div class="input-group tx-search-input-group">
+                <input class="form-control" ng-model="txSearchTerm" type="text" placeholder="Search records based on EZEOne ID or message"/>
                                         <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
                                                 <i class="fa fa-times"></i>
                                         </span>
@@ -27,312 +27,312 @@
                                                     ng-click="triggerStatusFilter(1,filterStatus)"
                                                     type="button"><i class="fa fa-search"></i> Search</button>
                                         </span>
-                        </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+            <div class="row">
+                <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
+                     title="Order By">
+                    <label class="label label-danger">Order By</label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
+                    <div class="form-group form-group-sm">
+                        <select class="form-control" ng-model="sortBy">
+                            <option value="0"> By Task Date </option>
+                            <option value="1"> By Action Date </option>
+                        </select>
                     </div>
+                </div>
 
-                    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
-                        <div class="row">
-                            <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
-                                 title="Order By">
-                                <label class="label label-danger">Order By</label>
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
-                                <div class="form-group form-group-sm">
-                                    <select class="form-control" ng-model="sortBy">
-                                        <option value="0"> By Task Date </option>
-                                        <option value="1"> By Action Date </option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
-                                <label class="label label-danger">Status</label>
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
-                                <div class="form-group form-group-sm">
-                                    <select class="form-control" ng-model="filterStatus" ng-change="triggerStatusFilter(pageNumber,filterStatus)">
-                                        <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
-                                 title="Folders">
-                                <label class="label label-danger">Folders</label>
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="By Folders">
-                                <!--{{myFolders}}-->
-                                <!--<br/>-->
-                                <div class="form-group form-group-sm">
-
-                                    <select class="form-control"
-                                            ng-model="myFolders"
-                                            style="height:auto;max-height: 100px;;" multiple>
-                                        <option ng-repeat="userFolder in userFolders track by userFolder.TID" value="{{userFolder.TID}}">{{userFolder.FolderTitle}}</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
+                    <label class="label label-danger">Status</label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
+                    <div class="form-group form-group-sm">
+                        <select class="form-control" ng-model="filterStatus" ng-change="triggerStatusFilter(pageNumber,filterStatus)">
+                            <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
+                        </select>
                     </div>
+                </div>
 
+                <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
+                     title="Folders">
+                    <label class="label label-danger">Folders</label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="By Folders">
+                    <!--{{myFolders}}-->
+                    <!--<br/>-->
+                    <div class="form-group form-group-sm">
 
-                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
-                        <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
-                            <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
-                                <span class="glyphicon glyphicon-chevron-left"></span>
-                                Prev
-                            </button>
-                            <button type="button" class="btn btn-info bt-xs no-radius active">
-                                {{pageNumber}}
-                            </button>
-                            <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
-                                Next
-                            </button>
-                        </div>
+                        <select class="form-control"
+                                ng-model="myFolders"
+                                style="height:auto;max-height: 100px;;" multiple>
+                            <option ng-repeat="userFolder in userFolders track by userFolder.TID" value="{{userFolder.TID}}">{{userFolder.FolderTitle}}</option>
+                        </select>
                     </div>
                 </div>
             </div>
+        </div>
 
 
-            <div ng-show="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in txList track by tx.TID">
-                <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}}" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="{{$index+1}}">
-                    <!---------- Single Transaction Entry ---------------------->
+        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
+            <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
+                <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    Prev
+                </button>
+                <button type="button" class="btn btn-info bt-xs no-radius active">
+                    {{pageNumber}}
+                </button>
+                <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
-                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix">
-                        <div class="row">
-                            <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">-->
-                            <!--<small>{{tx.TrnNo}}</small>-->
-                            <!--</div>-->
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <small>
-                                    {{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}
-                                    <!--{{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
-                                </small>
-                                <br/>
-                                <small class="text-danger" ng-hide="editModes[$index]"><b>{{(tx.statustitle) ? tx.statustitle : 'New' | uppercase}}</b></small>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <b class="font-roboto" ng-class="{'hidden' : (!tx.RequesterEZEID)}">{{ (tx.RequesterEZEID) ? (tx.RequesterEZEID | uppercase) : ''}}</b>
-                                <br/>
-                                <small class="text-info">
-                                    {{(tx.RequesterEZEID) ? ((tx.ContactInfo.split(',').length > 1) ?
-                                    tx.ContactInfo.split(',')[1] : tx.ContactInfo) : tx.ContactInfo}}
-                                </small>
 
-                            </div>
-                        </div>
+<div ng-show="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in txList track by tx.TID">
+    <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}}" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="{{$index+1}}">
+        <!---------- Single Transaction Entry ---------------------->
+
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix">
+            <div class="row">
+                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">-->
+                <!--<small>{{tx.TrnNo}}</small>-->
+                <!--</div>-->
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <small>
+                        {{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}
+                        <!--{{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
+                    </small>
+                    <br/>
+                    <small class="text-danger" ng-hide="editModes[$index]"><b>{{(tx.statustitle) ? tx.statustitle : 'New' | uppercase}}</b></small>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <b class="font-roboto" ng-class="{'hidden' : (!tx.RequesterEZEID)}">{{ (tx.RequesterEZEID) ? (tx.RequesterEZEID | uppercase) : ''}}</b>
+                    <br/>
+                    <small class="text-info">
+                        {{(tx.RequesterEZEID) ? ((tx.ContactInfo.split(',').length > 1) ?
+                        tx.ContactInfo.split(',')[1] : tx.ContactInfo) : tx.ContactInfo}}
+                    </small>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!--<div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+        <!--<small>{{tx.DeliveryAddress}}</small>-->
+        <!--</div>-->
+
+        <div class="col-lg-2  col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}" style="word-wrap:break-word;">
+            <small class="text-success">
+                <b>{{tx.Message | truncate:100:'...'}}</b>
+            </small>
+        </div>
+
+        <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix"
+             ng-hide="editModes[$index]" ng-dblclick="((resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0)">
+            <div class="row">
+                <div ng-show="moduleConf.listType == 4" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                     title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
+                    <label class="label label-info">{{tx.Amount | formatDecimal:' ':2}}</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix"
+             title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
+             ng-hide="editModes[$index]"
+             ng-dblclick="(resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0">
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <small ng-class="{'hidden': (!tx.ActionTitle) }"><b>{{tx.ActionTitle}}</b></small>
+                    <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No action yet</small>
+                </div>
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <small class="text-danger" ng-class="{'hidden': (!tx.ActionTitle) }">
+                        {{tx.NextActionDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}
+                    </small>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Edit Mode -->
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <label class="tiny">Transaction Stage</label>
+                    <br/>
+                    <div class="form-group form-group-sm">
+                        <select class="form-control" ng-model="modalBox.tx.statusType">
+                            <option value="0">New</option>
+                            <option value="">--Select Status Type--</option>
+                            <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
+                        </select>
                     </div>
+                </div>
 
-
-                    <!--<div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
-                    <!--<small>{{tx.DeliveryAddress}}</small>-->
-                    <!--</div>-->
-
-                    <div class="col-lg-2  col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}" style="word-wrap:break-word;">
-                        <small class="text-success">
-                            <b>{{tx.Message | truncate:100:'...'}}</b>
-                        </small>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <label class="tiny">Folder</label>
+                    <br/>
+                    <div class="form-group form-group-sm">
+                        <select class="form-control" ng-model="modalBox.tx.folderRule">
+                            <option value="0">Default Folder</option>
+                            <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
+                        </select>
                     </div>
-
-                    <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix"
-                         ng-hide="editModes[$index]" ng-dblclick="((resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0)">
-                        <div class="row">
-                            <div ng-show="moduleConf.listType == 4" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
-                                 title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
-                                <label class="label label-info">{{tx.Amount | formatDecimal:' ':2}}</label>
-                            </div>
-                        </div>
+                </div>
+                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">-->
+                <!--<div class="form-group form-group-sm">-->
+                <!--<input type="text" class="form-control"  placeholder="Amount" ng-model="modalBox.tx.orderAmount" decimals-only />-->
+                <!--</div>-->
+                <!--</div>-->
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <label class="tiny">Next Action to be taken</label>
+                    <div class="form-group form-group-sm">
+                        <select class="form-control"  ng-model="modalBox.tx.nextAction">
+                            <option value="0">--Select Next Action--</option>
+                            <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
+                        </select>
                     </div>
+                </div>
 
-                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix"
-                         title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
-                         ng-hide="editModes[$index]"
-                         ng-dblclick="(resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0">
-                        <div class="row">
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                <small ng-class="{'hidden': (!tx.ActionTitle) }"><b>{{tx.ActionTitle}}</b></small>
-                                <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No action yet</small>
-                            </div>
-                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                                <small class="text-danger" ng-class="{'hidden': (!tx.ActionTitle) }">
-                                    {{tx.NextActionDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-                    <!-- Edit Mode -->
-                    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
-                        <div class="row">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <label class="tiny">Transaction Stage</label>
-                                <br/>
-                                <div class="form-group form-group-sm">
-                                    <select class="form-control" ng-model="modalBox.tx.statusType">
-                                        <option value="0">New</option>
-                                        <option value="">--Select Status Type--</option>
-                                        <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <label class="tiny">Folder</label>
-                                <br/>
-                                <div class="form-group form-group-sm">
-                                    <select class="form-control" ng-model="modalBox.tx.folderRule">
-                                        <option value="0">Default Folder</option>
-                                        <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">-->
-                            <!--<div class="form-group form-group-sm">-->
-                            <!--<input type="text" class="form-control"  placeholder="Amount" ng-model="modalBox.tx.orderAmount" decimals-only />-->
-                            <!--</div>-->
-                            <!--</div>-->
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <label class="tiny">Next Action to be taken</label>
-                                <div class="form-group form-group-sm">
-                                    <select class="form-control"  ng-model="modalBox.tx.nextAction">
-                                        <option value="0">--Select Next Action--</option>
-                                        <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <label class="tiny">Next Action Date</label>
-                                <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <label class="tiny">Next Action Date</label>
+                    <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
                                                                                     "format" : "d M Y H:m",
                                                                                     "timepicker" : true,
                                                                                     "mask" : false,
                                                                                     "hours12" : false,
                                                                                     "minDate" : "-1970/01/01"
                                                                                     }'></date-time-picker>
-                            </div>
+                </div>
 
-                        </div>
-
-
-
-                    </div>
-
-                    <!-- end: Edit Mode -->
+            </div>
 
 
 
-                    <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
-                        <div class="row">
-                            <!--<div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
-                            <!--<small class="text-info tiny">-->
-                            <!--Updated By-->
-                            <!--<br/>-->
-                            <!--</small>-->
-                            <!--<small class="text-danger tiny">-->
-                            <!--{{tx.UpdatedUser | truncate:8:'..'}}-->
-                            <!--<br/>-->
-                            <!--{{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM-YY"}}-->
-                            <!--<br/>-->
-                            <!--{{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
-                            <!--</small>-->
+        </div>
 
-                            <!--</div>-->
-
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
-                                <button class="btn btn-xs btn-block btn-info no-radius"
-                                        data-toggle="tooltip" title="View Details" ng-click="toggleModalBox($event,$index)">
-                                    <span class="glyphicon glyphicon-fullscreen"></span>
-                                    Details
-                                </button>
-
-                            </div>
-
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
-
-                                <button ng-click="updateTransaction()"
-
-                                        class="btn btn-xs btn-block btn-success no-radius" data-toggle="tooltip" title="Save">
-                                    <span class="glyphicon glyphicon-floppy-save"></span>
-                                    Save
-                                </button>
-                            </div>
-
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
-                                <button  ng-click="(editModes[$index] = false)(resetModalBox())" class="btn btn-xs btn-block btn-danger no-radius" data-toggle="tooltip" title="Save">
-                                    <span class="glyphicon glyphicon-remove"></span>
-                                    Cancel
-                                </button>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
-                                <button  ng-disabled="!resumePermissionConf.txUpdate"
-                                         title="{{(resumePermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
-                                         ng-click="(resumePermissionConf.txUpdate) ? (toggleAllEditMode($index,false,false,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius">
-                                    <span class="glyphicon glyphicon-pencil"></span>
-                                    Edit
-                                </button>
-                            </div>
+        <!-- end: Edit Mode -->
 
 
-                        </div>
-                    </div>
 
-                    <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                        <a target="_blank"
-                           title="Download Resume"
-                           href="{{('/' + tx.RequesterEZEID + '.CV') + ((tx.Pin) ?
+        <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+            <div class="row">
+                <!--<div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                <!--<small class="text-info tiny">-->
+                <!--Updated By-->
+                <!--<br/>-->
+                <!--</small>-->
+                <!--<small class="text-danger tiny">-->
+                <!--{{tx.UpdatedUser | truncate:8:'..'}}-->
+                <!--<br/>-->
+                <!--{{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM-YY"}}-->
+                <!--<br/>-->
+                <!--{{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
+                <!--</small>-->
+
+                <!--</div>-->
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                    <button class="btn btn-xs btn-block btn-info no-radius"
+                            data-toggle="tooltip" title="View Details" ng-click="toggleModalBox($event,$index)">
+                        <span class="glyphicon glyphicon-fullscreen"></span>
+                        Details
+                    </button>
+
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
+
+                    <button ng-click="updateTransaction()"
+
+                            class="btn btn-xs btn-block btn-success no-radius" data-toggle="tooltip" title="Save">
+                        <span class="glyphicon glyphicon-floppy-save"></span>
+                        Save
+                    </button>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
+                    <button  ng-click="(editModes[$index] = false)(resetModalBox())" class="btn btn-xs btn-block btn-danger no-radius" data-toggle="tooltip" title="Save">
+                        <span class="glyphicon glyphicon-remove"></span>
+                        Cancel
+                    </button>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                    <button  ng-disabled="!resumePermissionConf.txUpdate"
+                             title="{{(resumePermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
+                             ng-click="(resumePermissionConf.txUpdate) ? (toggleAllEditMode($index,false,false,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        Edit
+                    </button>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
+            <a target="_blank"
+               title="Download Resume"
+               href="{{('/' + tx.RequesterEZEID + '.CV') + ((tx.Pin) ?
                                        ((tx.Pin.trim()) ? ('.'+ tx.Pin.trim()) : '' ) : '') }}" class="btn btn-default btn-xs">Download
-                            <br/>
-                            Resume</a>
-                    </div>
-
-                </div>
-
-                <!----------end : Single Transaction Entry ---------------------->
-            </div>
-            <hr/>
-            <div ng-hide="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12 text-center">
-                <small class="text-center text-warning">No records found</small>
-            </div>
-
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div class="row bottom-clearfix">
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-0">
-
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 pull-right" ng-show="txList.length">
-                    <div class="btn-group pull-right" role="group" aria-label="First group">
-                        <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
-                            <span class="glyphicon glyphicon-chevron-left"></span>
-                            Prev
-                        </button>
-                        <button type="button" class="btn btn-info bt-xs no-radius active">
-                            {{pageNumber}}
-                        </button>
-                        <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
-                            <span class="glyphicon glyphicon-chevron-right"></span>
-                            Next
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                <br/>
+                Resume</a>
         </div>
 
-        <!-- Main job post starts here -->
-        <div class="row setRowLeftRightMarginZero post-job" ng-show="JobsTab">
+    </div>
 
-            <div ng-show="showJobListing">
+    <!----------end : Single Transaction Entry ---------------------->
+</div>
+<hr/>
+<div ng-hide="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12 text-center">
+    <small class="text-center text-warning">No records found</small>
+</div>
 
-                <!-- Top filter start -->
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
-                    <div class="row bottom-clearfix">
-                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                            <div class="input-group tx-search-input-group">
-                                <input class="form-control" ng-model="jobSearchTerm" type="text" placeholder="Search job based on Title"/>
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row bottom-clearfix">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-0">
+
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 pull-right" ng-show="txList.length">
+            <div class="btn-group pull-right" role="group" aria-label="First group">
+                <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    Prev
+                </button>
+                <button type="button" class="btn btn-info bt-xs no-radius active">
+                    {{pageNumber}}
+                </button>
+                <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                    Next
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Main job post starts here -->
+<div class="row setRowLeftRightMarginZero post-job" ng-show="JobsTab">
+
+<div ng-show="showJobListing">
+
+    <!-- Top filter start -->
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+        <div class="row bottom-clearfix">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+                <div class="input-group tx-search-input-group">
+                    <input class="form-control" ng-model="jobSearchTerm" type="text" placeholder="Search job based on Title"/>
                                     <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
                                             <i class="fa fa-times"></i>
                                     </span>
@@ -342,528 +342,544 @@
                                                 type="button"><i class="fa fa-search"></i> Search
                                         </button>
                                     </span>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
-                            <div class="row">
-                                <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
-                                     title="Order By">
-                                    <label class="label label-danger">Order By</label>
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
-                                    <div class="form-group form-group-sm">
-
-                                        <select class="form-control" ng-model="sortBy">
-                                            <option value="0"> By Task Date </option>
-                                            <option value="1"> By Action Date </option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
-                                    <label class="label label-danger">Status</label>
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
-                                    <div class="form-group form-group-sm">
-                                        <select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">
-                                            <!-- <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>-->
-                                            <option value="0"> Active </option>
-                                            <option value="1"> Closed(Hired) </option>
-                                            <option value="2"> Cancelled </option>
-                                            <option value="0,1,2"> All </option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 bottom-clearfix">
-                                    <button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" data-toggle="tooltip" title="" data-original-title="Add New Job">
-                                        <span class="glyphicon glyphicon-plus-sign"></span> Add New
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
-                            <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
-                                <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
-                                    <span class="glyphicon glyphicon-chevron-left"></span>
-                                    Prev
-                                </button>
-                                <button type="button" class="btn btn-info bt-xs no-radius active">
-                                    {{pageNumber}}
-                                </button>
-                                <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
-                                    <span class="glyphicon glyphicon-chevron-right"></span>
-                                    Next
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-                <!-- Top filter ends -->
-
-                <!--List of Job Start hear-->
-                <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero" ng-repeat="job in jobData track by $index">
-                    <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
-                        <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
-                            <small class="text-success">
-                                <b class="ng-binding">{{job.jobcode}}</b>
-                            </small>
-                        </div>
-                        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
-                            <small class="text-success">
-                                <b class="ng-binding">{{job.jobtitle}}</b>
-                            </small>
-                        </div>
-                        <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
-                            <small class="text-success">
-                                <b class="ng-binding">{{job.posteddate | ageFilter}}</b>
-                            </small>
-                        </div>
-                        <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
-                            <small class="text-success">
-                                <b class="ng-binding">27 Applied</b>
-                            </small>
-                        </div>
-                        <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
-                            <div class="row">
-                                <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
-                                    <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="View Details">
-                                        <span class="glyphicon glyphicon-fullscreen"></span>
-                                        Details
-                                    </button>
-                                </div>-->
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
-                                    <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
-                                        <span class="glyphicon glyphicon-pencil"></span>
-                                        Edit
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="java" style="word-wrap:break-word;">
-                            <small class="text-success">
-                                <b class="ng-binding" ng-show="job.status == 0">Active</b>
-                                <b class="ng-binding" ng-show="job.status == 1">Closed(Hired)</b>
-                                <b class="ng-binding" ng-show="job.status == 2">Cancelled</b>
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                <!--List of Job End hear-->
             </div>
 
-            <div ng-hide="showJobListing">
-                <!-- Post new job start from hear -->
-                <form name="jobPostForm" novalidate>
-                    <div class="job-post p-bottom-10">
-                        <div class="width-100 hpw">
-                            <div class="col-lg-6">
-                                <div class="input-group m-bot15">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+                <div class="row">
+                    <!--<div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
+                         title="Order By">
+                        <label class="label label-danger">Order By</label>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
+                        <div class="form-group form-group-sm">
+
+                            <select class="form-control" ng-model="sortBy">
+                                <option value="0"> By Task Date </option>
+                                <option value="1"> By Action Date </option>
+                            </select>
+                        </div>
+                    </div>-->
+
+                    <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
+                        <label class="label label-danger">Status</label>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
+                        <div class="form-group form-group-sm">
+                            <select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">
+                                <!-- <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>-->
+                                <option value="0"> Active </option>
+                                <option value="1"> Closed(Hired) </option>
+                                <option value="2"> Cancelled </option>
+                                <option value="0,1,2"> All </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 bottom-clearfix">
+                        <button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" data-toggle="tooltip" title="" data-original-title="Add New Job">
+                            <span class="glyphicon glyphicon-plus-sign"></span> Add New
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
+                <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
+                    <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                        Prev
+                    </button>
+                    <button type="button" class="btn btn-info bt-xs no-radius active">
+                        {{pageNumber}}
+                    </button>
+                    <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Top filter ends -->
+
+    <!--List of Job Start hear-->
+    <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero" ng-repeat="job in jobData track by $index">
+        <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
+            <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <small class="text-success">
+                    <b class="ng-binding">{{job.jobcode}}</b>
+                </small>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <small class="text-success">
+                    <b class="ng-binding">{{job.jobtitle}}</b>
+                </small>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <small class="text-success">
+                    <b class="ng-binding">{{job.posteddate | ageFilter}}</b>
+                </small>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <small class="text-success">
+                    <b class="ng-binding">27 Applied</b>
+                </small>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                <div class="row">
+                    <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                        <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="View Details">
+                            <span class="glyphicon glyphicon-fullscreen"></span>
+                            Details
+                        </button>
+                    </div>-->
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                        <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="java" style="word-wrap:break-word;">
+                <small class="text-success">
+                    <b class="ng-binding" ng-show="job.status == 0">Active</b>
+                    <b class="ng-binding" ng-show="job.status == 1">Closed(Hired)</b>
+                    <b class="ng-binding" ng-show="job.status == 2">Cancelled</b>
+                </small>
+            </div>
+        </div>
+    </div>
+    <!--List of Job End hear-->
+</div>
+
+<div ng-hide="showJobListing">
+    <!-- Post new job start from hear -->
+    <form name="jobPostForm" novalidate>
+        <div class="job-post p-bottom-10">
+            <div class="width-100 hpw">
+                <div class="col-lg-6">
+                    <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">Job Title</button>
                               </span>
-                                    <input type="text" maxlength="150" ng-model = "jobTitle" placeholder="Job Title" class="form-control"/>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="input-group m-bot15">
+                        <input type="text" maxlength="150" ng-model = "jobTitle" placeholder="Job Title" class="form-control"/>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">Job Code</button>
                               </span>
-                                    <input type="text" maxlength="30" ng-model = "jobCode" placeholder="Job Code" class="form-control"/>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-12 p-top-10">
-                                <div class="input-group m-bot15 p-top-10">
+                        <input type="text" maxlength="30" ng-model = "jobCode" placeholder="Job Code" class="form-control"/>
+                    </div>
+                </div>
+                <div class="col-lg-12 p-top-10">
+                    <div class="input-group m-bot15 p-top-10">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white"><small>Job Desc.</small></button>
                               </span>
-                                    <textarea rows="5" ng-model = "jobDescription" placeholder="Job Description" class="form-control"></textarea>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                        <textarea rows="5" ng-model = "jobDescription" placeholder="Job Description" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">Skill Keywords</button>
                               </span>
-                                    <input type="text" maxlength="250" ng-model = "skillKeyWords" placeholder="Ex: Sales, Marketing" class="form-control"/>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                        <input type="text" maxlength="250" ng-model = "skillKeyWords" placeholder="Ex: Sales, Marketing" class="form-control"/>
+                    </div>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">No. of Vacancies</button>
                               </span>
-                                    <input numbers-only type="text" ng-model = "jobVacancies" placeholder="No. of Vacancies" class="form-control"/>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                        <input numbers-only type="text" ng-model = "jobVacancies" placeholder="No. of Vacancies" class="form-control"/>
+                    </div>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">Experience</button>
                               </span>
-                                    <input type="text" decimals-only maxlength="5" placeholder="Ex: 1" ng-model = "experienceFrom" class="form-control"/>
+                        <input type="text" decimals-only maxlength="5" placeholder="Ex: 1" ng-model = "experienceFrom" class="form-control"/>
                                     <span class="input-group-btn">
                                 <button type="button" class="btn btn-white no-radius">To</button>
                               </span>
-                                    <input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "experienceTo" class="form-control"/>
+                        <input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "experienceTo" class="form-control"/>
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-white no-radius">Yrs</button>
                               </span>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                    </div>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                            <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">Location</button>
                               </span>
-                                    <input type="text" id="google-map-search-box" placeholder="Ex: Banglore" ng-model = "jobLocation" class="form-control"/>
-                                </div>
+                                <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "jobLocation" class="form-control"/>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
+                               </span>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                     <span ng-repeat="location in locationArrayString track by $index">
+                        <label  class="label label-default">{{location}} <i ng-click="removeLocation($index)" class="fa fa-times text-warning"></i></label>&nbsp;
+                    </span>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">Salary</button>
                               </span>
-                                    <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "salaryFrom" class="form-control text-right"/>
+                        <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "salaryFrom" class="form-control text-right"/>
                                     <span class="input-group-btn">
                                 <button type="button" class="btn btn-white no-radius">To</button>
                               </span>
-                                    <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "salaryTo" class="form-control text-right"/>
+                        <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "salaryTo" class="form-control text-right"/>
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-white no-radius">Per</button>
                                 </span>
 
-                                    <select class="form-control" name="listType" ng-model="salaryType">
-                                        <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
-                                    </select>
-                                </div>
-                                <small class="text-danger">(For India, enter the amount in Rs. Lakhs)</small>
-                            </div>
-
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                        <select class="form-control" name="listType" ng-model="salaryType">
+                            <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
+                        </select>
+                    </div>
+                    <small class="text-danger">(For India, enter the amount in Rs. Lakhs)</small>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">Job Type</button>
                               </span>
-                                    <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
-                                        <option value="0"> Job Type </option>
-                                        <option value="1"> Full Time </option>
-                                        <option value="2"> Part Time </option>
-                                        <option value="3"> Contract </option>
-                                        <option value="4"> Internship </option>
-                                    </select>
-                                </div>
-                            </div>
+                        <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
+                            <!--<option value="0"> Job Type </option>
+                            <option value="1"> Full Time </option>
+                            <option value="2"> Part Time </option>
+                            <option value="3"> Contract </option>
+                            <option value="4"> Internship </option> -->
 
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                            <option value="0"> Job Type </option>
+                            <option value="1">Full Time</option>
+                            <option value="2">Part Time</option>
+                            <option value="3">Work From Home</option>
+                            <option value="4">Internship</option>
+                            <option value="5">Consultant</option>
+                            <option value="6">Freelancer</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white">Contact Name</button>
                               </span>
-                                    <input type="text" maxlength="200" placeholder="Contact Name" ng-model = "contactName" class="form-control"/>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                        <input type="text" maxlength="200" placeholder="Contact Name" ng-model = "contactName" class="form-control"/>
+                    </div>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                                   <span class="input-group-btn">
                                     <button type="button" class="btn btn-white">Email</button>
                                   </span>
-                                    <input ng-model = "emailContact" type="email" name="emailID" maxlength="250" placeholder="Email" class="form-control" required>
-                                    <!--<span ng-show="jobPostForm.emailID.$invalid" ng-if="jobPostForm.emailID.$invalid == true ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false">sai</span>-->
-                                    <span ng-show="jobPostForm.emailID.$error.email" ng-if="jobPostForm.emailID.$error.email == true ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false">sai</span>
-                                </div>
-                            </div>
+                        <input type="email"
+                               ng-model = "emailContact"
+                               name="emailID"
+                               maxlength="250"
+                               placeholder="Email"
+                               class="form-control"/>
 
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                                    <span ng-show="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1))"
+                                          ng-if="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1)) ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false"></span>
+                    </div>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                                      <span class="input-group-btn">
                                         <button type="button" class="btn btn-white">Phone</button>
                                      </span>
-                                    <input type="text" numbers-only maxlength="12" placeholder="Phone" ng-model = "phone" class="form-control"/>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 p-top-10">
-                                <div class="input-group m-bot15">
+                        <input type="text" numbers-only maxlength="12" placeholder="Phone" ng-model = "phone" class="form-control"/>
+                    </div>
+                </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
                                      <span class="input-group-btn">
                                         <button type="button" class="btn btn-white">Status</button>
                                      </span>
-                                    <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobStatus">
-                                        <option value="0"> Active </option>
-                                        <option value="1"> Closed(Hired) </option>
-                                        <option value="2"> Cancelled </option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-12 p-top-10">
-                                <div class="m-bot15">
-                                    <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
-                                    <input type="button" ng-click="cancelJobPosting()" class="btn btn-primary" value="Cancel">
-                                </div>
-                            </div>
-                        </div>
+                        <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobStatus">
+                            <option value="0"> Active </option>
+                            <option value="1"> Closed(Hired) </option>
+                            <option value="2"> Cancelled </option>
+                        </select>
                     </div>
-                </form>
+                </div>
+                <div class="col-lg-12 p-top-10">
+                    <div class="m-bot15">
+                        <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
+                        <input type="button" ng-click="cancelJobPosting()" class="btn btn-primary" value="Cancel">
+                    </div>
+                </div>
             </div>
         </div>
+    </form>
+</div>
+</div>
 
-        <div class="row setRowLeftRightMarginZero post-job" ng-show="JobSeekerTab">
-        <!-- Start of design for finding - Job Seekers -->
-        <section id="job-seeker-search" class="jss hpw job-seeker-bg">
-            <div class="container width-100 setRowLeftRightMarginZero setLeftRightPaddingZero">
-                <div class="panel">
-                    <div class="panel-primary panel-heading">
-                        <i class="fa fa-search"></i>  Find Job Seekers
-                    </div>
-                    <div class="panel-default panel-body">
-                        <!-- seacrh bar to search job keyword by skill keywords -->
-                        <div class="container p-bottom-10">
-                            <div class="col-lg-4">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search job seekers by skill keywords" />
-                                    <span class="btn btn-primary input-group-addon"><i class="fa fa-search"></i></span>
-                                </div>
-                            </div>
-                            <!-- Job type and salary range -->
-                            <div class="col-lg-8">
-                                <!-- Job Type -->
-                                <div class="col-lg-4 no-left-padding">
-                                    <select class="form-control">
-                                        <option>Full Time</option>
-                                        <option>Part Time</option>
-                                        <option>Work From Home</option>
-                                        <option>Internship</option>
-                                        <option>Consultant</option>
-                                        <option>Freelancer</option>
-                                    </select>
-                                </div>
-                                <div class="col-lg-8 no-padding">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">Salary From</span>
-                                        <input type="number" class="form-control" />
-                                        <span class="input-group-addon">To</span>
-                                        <input type="number" class="form-control" />
-
-                                        <span class="btn btn-default input-group-addon  dropdown-toggle" data-toggle="dropdown">per Annum
+<div class="row setRowLeftRightMarginZero post-job" ng-show="JobSeekerTab">
+<!-- Start of design for finding - Job Seekers -->
+<section id="job-seeker-search" class="jss hpw job-seeker-bg">
+<div class="container width-100 setRowLeftRightMarginZero setLeftRightPaddingZero">
+<div class="panel">
+<div class="panel-primary panel-heading">
+    <i class="fa fa-search"></i>  Find Job Seekers
+</div>
+<div class="panel-default panel-body">
+    <!-- seacrh bar to search job keyword by skill keywords -->
+    <div class="container p-bottom-10">
+        <div class="col-lg-4">
+            <input type="text" class="form-control" placeholder="Skill Keyword" ng-model = "jobSeekerSkillKeyword" />
+            <!-- <div class="input-group">
+                 <input type="text" class="form-control" placeholder="Search job seekers by skill keywords" />
+                 <span class="btn btn-primary input-group-addon"><i class="fa fa-search"></i></span>
+             </div>-->
+        </div>
+        <!-- Job type and salary range -->
+        <div class="col-lg-8">
+            <!-- Job Type -->
+            <div class="col-lg-4 no-left-padding">
+                <select class="form-control" ng-model = "jobSeekerJobType">
+                    <option value="0"> Job Type </option>
+                    <option value="1">Full Time</option>
+                    <option value="2">Part Time</option>
+                    <option value="3">Work From Home</option>
+                    <option value="4">Internship</option>
+                    <option value="5">Consultant</option>
+                    <option value="6">Freelancer</option>
+                </select>
+            </div>
+            <div class="col-lg-8 no-padding">
+                <div class="input-group">
+                    <span class="input-group-addon">Salary From</span>
+                    <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "jobSeekerSalaryFrom" class="form-control text-right"/>
+                    <span class="input-group-addon">To</span>
+                    <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "jobSeekerSalaryTo" class="form-control text-right"/>
+                                        <span class="btn btn-default input-group-addon  dropdown-toggle" data-toggle="dropdown">{{salaryTypeArray[activeSalaryType]}}
                                             <span class="caret"></span>
                                         </span>
-                                        <ul class="dropdown-menu salary-filter-type">
-                                            <li><a href="#">per Hour</a></li>
-                                            <li><a href="#">per Month</a></li>
-                                            <li><a href="#">per Annum</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="container p-bottom-10">
-                            <!-- Country -->
-                            <div class="col-lg-4">
-                                <select class="form-control">
-                                    <option>India</option>
-                                    <option>UAE</option>
-                                    <option>Ireland</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-8 no-padding">
-                                <!-- Locations -->
-                                <div class="col-lg-4">
-                                    <input type="text" class="form-control" placeholder="Preffered Location" />
-                                </div>
-                                <!-- Experiences -->
-                                <div class="col-lg-8 no-left-padding">
-                                    <div class="input-group">
-                                        <span class="input-group-addon">Experience</span>
-                                        <input type="text" class="form-control" />
-                                        <span class="input-group-addon">To</span>
-                                        <input type="text" class="form-control" />
-                                        <span class="input-group-addon">years</span>
-                                        <span class="btn btn-dark-orange input-group-addon"><i class="fa fa-search"></i> Search</span>
-                                    </div>
-                                </div>
-                            </div>
+                    <ul class="dropdown-menu salary-filter-type">
+                        <li><a ng-click="activeSalaryType = 0">per Hour</a></li>
+                        <li><a  ng-click="activeSalaryType = 1">per Month</a></li>
+                        <li><a  ng-click="activeSalaryType = 2">per Annum</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container p-bottom-10">
+        <!-- Country -->
+        <div class="col-lg-4">
+            <select class="form-control" disabled>
+                <option value="">India</option>
+                <option>UAE</option>
+                <option>Ireland</option>
+            </select>
+        </div>
+        <div class="col-lg-8 no-padding">
+            <!-- Locations -->
+            <div class="col-lg-4">
+                <input type="text" id="google-map-search-box1" placeholder="Ex: Banglore" ng-model = "jobSeekerLocation" class="form-control"/>
+            </div>
+            <!-- Experiences -->
+            <div class="col-lg-8 no-left-padding">
+                <div class="input-group">
+                    <span class="input-group-addon">Experience</span>
+                    <input type="text" decimals-only maxlength="5" placeholder="Ex: 1" ng-model = "jobSeekerExperienceFrom" class="form-control"/>
+                    <span class="input-group-addon">To</span>
+                    <input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "jobSeekerExperienceTo" class="form-control"/>
+                    <span class="input-group-addon">years</span>
+                    <span class="btn btn-dark-orange input-group-addon"><i class="fa fa-search"></i> Search</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="col-lg-12">
+            <hr>
+        </div>
+        <div class="col-lg-6">
+            Showing 1-10 of 120 results
+        </div>
+        <div class="col-lg-6 text-right">
+            <button class="btn btn-primary"><i class="fa fa-arrow-circle-left"></i></button>
+            <button class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i></button>
+        </div>
+    </div>
+    <div class="container">
+        <!-- main table goes here -->
+        <div class="main-table p-top-20 col-lg-12">
+            <div class="col-lg-12 table-head">
+                <div class="col-lg-1">
+                    <i class="fa fa-square-o"></i> #
+                </div>
+                <div class="col-lg-2">
+                    Name
+                </div>
+                <div class="col-lg-1">
+                    Location
+                </div>
+                <div class="col-lg-3">
+                    Skills
+                </div>
+                <div class="col-lg-1">
+                    Experience
+                </div>
+                <div class="col-lg-3">
+                    Preferred Job Type
+                </div>
+                <div class="col-lg-1">
+                    Freshness
+                </div>
+            </div>
+            <div class="col-lg-12 table-body">
+                <div class="col-lg-1">
+                    <i class="fa fa-check-square-o"></i> 1
+                </div>
+                <div class="col-lg-2">
+                    Chandra Shekar
+                </div>
+                <div class="col-lg-1">
+                    Bengaluru
+                </div>
+                <div class="col-lg-3">
+                    J2ee, Oracle, C++, SQL
+                </div>
+                <div class="col-lg-1">
+                    3.5 Yrs
+                </div>
+                <div class="col-lg-3">
+                    Full Time, Consultant, Freelancer
+                </div>
+                <div class="col-lg-1">
+                    5 Day
+                </div>
+            </div>
 
-                        </div>
-                        <div class="container">
-                            <div class="col-lg-12">
-                                <hr>
-                            </div>
-                            <div class="col-lg-6">
-                                Showing 1-10 of 120 results
-                            </div>
-                            <div class="col-lg-6 text-right">
-                                <button class="btn btn-primary"><i class="fa fa-arrow-circle-left"></i></button>
-                                <button class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i></button>
-                            </div>
-                        </div>
-                        <div class="container">
-                            <!-- main table goes here -->
-                            <div class="main-table p-top-20 col-lg-12">
-                                <div class="col-lg-12 table-head">
-                                    <div class="col-lg-1">
-                                        <i class="fa fa-square-o"></i> #
-                                    </div>
-                                    <div class="col-lg-2">
-                                        Name
-                                    </div>
-                                    <div class="col-lg-1">
-                                        Location
-                                    </div>
-                                    <div class="col-lg-3">
-                                        Skills
-                                    </div>
-                                    <div class="col-lg-1">
-                                        Experience
-                                    </div>
-                                    <div class="col-lg-3">
-                                        Preferred Job Type
-                                    </div>
-                                    <div class="col-lg-1">
-                                        Freshness
-                                    </div>
-                                </div>
-                                <div class="col-lg-12 table-body">
-                                    <div class="col-lg-1">
-                                        <i class="fa fa-check-square-o"></i> 1
-                                    </div>
-                                    <div class="col-lg-2">
-                                        Chandra Shekar
-                                    </div>
-                                    <div class="col-lg-1">
-                                        Bengaluru
-                                    </div>
-                                    <div class="col-lg-3">
-                                        J2ee, Oracle, C++, SQL
-                                    </div>
-                                    <div class="col-lg-1">
-                                        3.5 Yrs
-                                    </div>
-                                    <div class="col-lg-3">
-                                        Full Time, Consultant, Freelancer
-                                    </div>
-                                    <div class="col-lg-1">
-                                        5 Day
-                                    </div>
-                                </div>
+            <div class="col-lg-12 table-body table-striped-bg">
+                <div class="col-lg-1">
+                    <i class="fa fa-check-square-o"></i> 2
+                </div>
+                <div class="col-lg-2">
+                    Shweta
+                </div>
+                <div class="col-lg-1">
+                    Bengaluru
+                </div>
+                <div class="col-lg-3">
+                    J2ee, Oracle, C++, SQL
+                </div>
+                <div class="col-lg-1">
+                    3.5 Yrs
+                </div>
+                <div class="col-lg-3">
+                    Full Time, Consultant, Freelancer
+                </div>
+                <div class="col-lg-1">
+                    5 Day
+                </div>
+            </div>
 
-                                <div class="col-lg-12 table-body table-striped-bg">
-                                    <div class="col-lg-1">
-                                        <i class="fa fa-check-square-o"></i> 2
-                                    </div>
-                                    <div class="col-lg-2">
-                                        Shweta
-                                    </div>
-                                    <div class="col-lg-1">
-                                        Bengaluru
-                                    </div>
-                                    <div class="col-lg-3">
-                                        J2ee, Oracle, C++, SQL
-                                    </div>
-                                    <div class="col-lg-1">
-                                        3.5 Yrs
-                                    </div>
-                                    <div class="col-lg-3">
-                                        Full Time, Consultant, Freelancer
-                                    </div>
-                                    <div class="col-lg-1">
-                                        5 Day
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12 table-body">
-                                    <div class="col-lg-1">
-                                        <i class="fa fa-square-o"></i> 3
-                                    </div>
-                                    <div class="col-lg-2">
-                                        Ramesh Shekar
-                                    </div>
-                                    <div class="col-lg-1">
-                                        Bengaluru
-                                    </div>
-                                    <div class="col-lg-3">
-                                        J2ee, Oracle, C++, SQL
-                                    </div>
-                                    <div class="col-lg-1">
-                                        3.5 Yrs
-                                    </div>
-                                    <div class="col-lg-3">
-                                        Full Time, Consultant, Freelancer
-                                    </div>
-                                    <div class="col-lg-1">
-                                        5 Day
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="col-lg-12 table-body">
+                <div class="col-lg-1">
+                    <i class="fa fa-square-o"></i> 3
+                </div>
+                <div class="col-lg-2">
+                    Ramesh Shekar
+                </div>
+                <div class="col-lg-1">
+                    Bengaluru
+                </div>
+                <div class="col-lg-3">
+                    J2ee, Oracle, C++, SQL
+                </div>
+                <div class="col-lg-1">
+                    3.5 Yrs
+                </div>
+                <div class="col-lg-3">
+                    Full Time, Consultant, Freelancer
+                </div>
+                <div class="col-lg-1">
+                    5 Day
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-                    </div>
-                    <div class="panel-danger panel-footer text-white">
-                        <i class="fa fa-envelope"></i> Compose Mail <label class="label label-primary">2</label>
-                    </div>
-                    <div class="panel-body">
-                        <div class="container">
-                            <div class="col-lg-6">
-                                <div class="input-group">
+</div>
+<div class="panel-danger panel-footer text-white">
+    <i class="fa fa-envelope"></i> Compose Mail <label class="label label-primary">2</label>
+</div>
+<div class="panel-body">
+    <div class="container">
+        <div class="col-lg-6">
+            <div class="input-group">
                                     <span class="input-group-addon">
                                         Template
                                     </span>
-                                    <select class="form-control">
-                                        <option>New</option>
-                                        <option> - </option>
-                                    </select>
-                                    <span class="btn btn-primary input-group-addon"><i class="fa fa-plus"></i> New</span>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="input-group">
-                                    <span class="input-group-addon">Job Type</span>
-                                    <select class="form-control">
-                                        <option>Full Time</option>
-                                        <option>Part Time</option>
-                                        <option>Work From Home</option>
-                                        <option>Internship</option>
-                                        <option>Consultant</option>
-                                        <option>Freealancer</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-12 p-top-10">
-                                <div class="input-group">
-                                    <span class="input-group-addon">Subject</span>
-                                    <input type="text" class="form-control" />
-                                </div>
-                            </div>
-                            <div class="col-lg-12 p-top-10">
-                                <div class="input-group">
-                                    <span class="input-group-addon">Message</span>
-                                    <textarea class="form-control" rows="6"></textarea>
-                                </div>
-                            </div>
-                            <div class="col-lg-12 text-right p-top-10">
-                                <button class="btn btn-danger"><i class="fa fa-trash"></i> Cancel</button>
-                                <button class="btn btn-success"><i class="fa fa-send"></i> Send</button>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
+                <select class="form-control">
+                    <option>New</option>
+                    <option> - </option>
+                </select>
+                <span class="btn btn-primary input-group-addon"><i class="fa fa-plus"></i> New</span>
             </div>
-        </section>
-        <!-- End of design for finding - Job Seekers -->
         </div>
-
+        <div class="col-lg-6">
+            <div class="input-group">
+                <span class="input-group-addon">Job Type</span>
+                <select class="form-control">
+                    <option value="0"> Job Type </option>
+                    <option value="1">Full Time</option>
+                    <option value="2">Part Time</option>
+                    <option value="3">Work From Home</option>
+                    <option value="4">Internship</option>
+                    <option value="5">Consultant</option>
+                    <option value="6">Freelancer</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-12 p-top-10">
+            <div class="input-group">
+                <span class="input-group-addon">Subject</span>
+                <input type="text" class="form-control" />
+            </div>
+        </div>
+        <div class="col-lg-12 p-top-10">
+            <div class="input-group">
+                <span class="input-group-addon">Message</span>
+                <textarea class="form-control" rows="6"></textarea>
+            </div>
+        </div>
+        <div class="col-lg-12 text-right p-top-10">
+            <button class="btn btn-danger"><i class="fa fa-trash"></i> Cancel</button>
+            <button class="btn btn-success"><i class="fa fa-send"></i> Send</button>
+        </div>
     </div>
+</div>
+</div>
+</div>
+</section>
+<!-- End of design for finding - Job Seekers -->
+</div>
+
+</div>
 </div>
 
 <div class="row">
