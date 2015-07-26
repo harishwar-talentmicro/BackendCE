@@ -156,13 +156,14 @@
             <!-- right bar -->
             <div class="col-lg-9  col-md-9 col-sm-9 col-xs-12 no-padding">
                 <!-- main content goes here -->
-                <div class="individual-tiles">
+
+                <div class="individual-tiles" ng-repeat="job in resultData track by $index">
                     <!-- Heading of the Job tile -->
                     <div class="job-main-content tile-head">
                         <div class="row">
                             <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
-                                <i class="fa fa-square"></i> Angular JS Developer<br>
-                                <small class="company-name">Oracle India Pvt. Ltd.</small>
+                                <i class="fa fa-square"></i> {{job.jobtitle}}<br>
+                                <small class="company-name">{{job.companyname}}</small>
                             </div>
                             <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12 text-right normal-view-buttons">
                                 <img class="height-45-px" alt="Oracle India Pvt. Ltd." src="http://img.naukimg.com/logo_images/v2/16512.gif">
@@ -171,15 +172,13 @@
                     </div>
                     <!-- content of the job tile -->
                     <div class="job-main-content tile-content">
-                        <span class="experience-title"><i class="fa fa-briefcase"></i> Exp: 0-3 Yrs</span>
-                        <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: Hyderabad</span>
-                        <div class="key-skills p-top-10">
+                        <span class="experience-title"><i class="fa fa-briefcase"></i> Exp: {{getExperienceString(job.expfrom,job.expto)}}</span>
+                        <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: {{job.location}}</span>
+                        <div class="key-skills p-top-10" ng-init="skills = getKeySkillsArray(job.keyskills)">
                             <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
-                                <button class="btn btn-default btn-xs">JQuery</button>
-                                <button class="btn btn-default btn-xs">JavaScript</button>
-                                <button class="btn btn-default btn-xs">HTML</button>
-                                <button class="btn btn-default btn-xs">CSS</button>
-                                <button class="btn btn-default btn-xs">Angular JS</button>
+                                <span ng-repeat="skill in activeSkillsArray track by $index">
+                                <button class="btn btn-default btn-xs">{{skill}}</button>
+                                    </span>
                             </p>
                         </div>
                         <div class="row">
@@ -193,42 +192,42 @@
                     </div>
                 </div>
 
-                <div class="individual-tiles">
-                    <!-- Heading of the Job tile -->
-                    <div class="job-main-content tile-head">
-                        <div class="row">
-                            <div class="col-lg-7">
-                                <i class="fa fa-check-square"></i> Angular JS Developer<br>
-                                <small class="company-name">HP India Pvt. Ltd.</small>
-                            </div>
-                            <div class="col-lg-5 text-right normal-view-buttons">
-                                <img class="height-45-px" alt="Oracle India Pvt. Ltd." src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRdSv2I9KbGIvimt1RmpMIhbRX9w8JGWpDfBmGdJvsrvqnuuqW3BQ">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- content of the job tile -->
-                    <div class="job-main-content tile-content">
-                        <span class="experience-title"><i class="fa fa-briefcase"></i> Exp: 0-1 Yrs</span>
-                        <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: Bangalore</span>
-                        <div class="key-skills p-top-10">
-                            <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
-                                <button class="btn btn-default btn-xs">JQuery</button>
-                                <button class="btn btn-default btn-xs">JavaScript</button>
-                                <button class="btn btn-default btn-xs">HTML</button>
-                                <button class="btn btn-default btn-xs">CSS</button>
-                                <button class="btn btn-default btn-xs">Angular JS</button>
-                            </p>
-                        </div>
-                        <div class="row">
-                            <div class="salary col-lg-7 col-md-7 col-sm-7 col-xs-7">
-                                <i class="fa fa-rupee"></i> 3.5 LPA - 5 LPA
-                            </div>
-                            <div class="posted-on text-right col-lg-5 col-md-5 col-sm-5 col-xs-5">
-                                <i class="fa fa-clock-o"></i> 55mins ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!--<div class="individual-tiles">-->
+                <!--&lt;!&ndash; Heading of the Job tile &ndash;&gt;-->
+                <!--<div class="job-main-content tile-head">-->
+                <!--<div class="row">-->
+                <!--<div class="col-lg-7">-->
+                <!--<i class="fa fa-check-square"></i> Angular JS Developer<br>-->
+                <!--<small class="company-name">HP India Pvt. Ltd.</small>-->
+                <!--</div>-->
+                <!--<div class="col-lg-5 text-right normal-view-buttons">-->
+                <!--<img class="height-45-px" alt="Oracle India Pvt. Ltd." src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRdSv2I9KbGIvimt1RmpMIhbRX9w8JGWpDfBmGdJvsrvqnuuqW3BQ">-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--&lt;!&ndash; content of the job tile &ndash;&gt;-->
+                <!--<div class="job-main-content tile-content">-->
+                <!--<span class="experience-title"><i class="fa fa-briefcase"></i> Exp: 0-1 Yrs</span>-->
+                <!--<span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: Bangalore</span>-->
+                <!--<div class="key-skills p-top-10">-->
+                <!--<p><i class="fa fa-arrow-circle-right"></i> Key Skills:-->
+                <!--<button class="btn btn-default btn-xs">JQuery</button>-->
+                <!--<button class="btn btn-default btn-xs">JavaScript</button>-->
+                <!--<button class="btn btn-default btn-xs">HTML</button>-->
+                <!--<button class="btn btn-default btn-xs">CSS</button>-->
+                <!--<button class="btn btn-default btn-xs">Angular JS</button>-->
+                <!--</p>-->
+                <!--</div>-->
+                <!--<div class="row">-->
+                <!--<div class="salary col-lg-7 col-md-7 col-sm-7 col-xs-7">-->
+                <!--<i class="fa fa-rupee"></i> 3.5 LPA - 5 LPA-->
+                <!--</div>-->
+                <!--<div class="posted-on text-right col-lg-5 col-md-5 col-sm-5 col-xs-5">-->
+                <!--<i class="fa fa-clock-o"></i> 55mins ago-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
+                <!--</div>-->
             </div>
         </div>
     </div>
