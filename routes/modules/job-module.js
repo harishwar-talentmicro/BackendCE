@@ -158,7 +158,7 @@ Job.prototype.create = function(req,res,next){
 
                         var locCount = 0;
                         var locationDetails = locationsList[locCount];
-
+                        location_id = location_id.substr(0,location_id.length - 1);
                         var createJobPosting = function(){
                             var query = st.db.escape(tid) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(job_code)
                                 + ',' + st.db.escape(job_title) + ',' + st.db.escape(exp_from) + ',' + st.db.escape(exp_to)
@@ -457,6 +457,7 @@ Job.prototype.searchJobs = function(req,res,next){
     var jobType = req.query.jobType;
     var exp = req.query.exp;
     var keywords = req.query.keywords;
+    var token = (req.query.token) ? req.query.token : '';
 
     var responseMessage = {
         status: false,
@@ -466,9 +467,11 @@ Job.prototype.searchJobs = function(req,res,next){
     };
 
     var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)
-                                + ',' + st.db.escape(jobType) + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords);
-                            console.log(st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)
-                                + ',' + st.db.escape(jobType) + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords));
+                                + ',' + st.db.escape(jobType) + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)
+        +',' + st.db.escape(token);
+
+
+                            console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
                                 console.log(getresult);
 
@@ -511,6 +514,111 @@ Job.prototype.searchJobSeekers = function(req,res){
      * @todo Code API for Job seeker search
      */
     res.send('API in progress');
+
+    var keyword = req.query.keyword;
+    var jobType = req.query.job_type;
+    var salaryFrom = req.query.salary_from;
+    var salaryTo = req.query.salary_to;
+    var salaryType = req.query.salary_type;
+    var experienceFrom = req.query.experience_from;
+    var experienceTo = req.query.experience_to;
+
+    var locationList = req.query.locations;
+
+
+    /**
+     * Validations
+     */
+    keyword = (keyword) ? keyword : null;
+    jobType = (jobType) ? jobType : null; // Comma Separated
+    salaryFrom = (parseFloat(salaryFrom) !== NaN && parseFloat(salaryFrom) > 0) ? parseFloat(salaryFrom) : 0;
+    salaryTo = (parseFloat(salaryTo) !== NaN && parseFloat(salaryTo) > 0) ? parseFloat(salaryTo) : 0;
+    salaryType = (parseInt(salaryType) !== NaN && parseInt(salaryType) > 0) ? parseInt(salaryType) : 1;
+    experienceFrom = (parseInt(experienceFrom) !== NaN && parseInt(experienceFrom) > 0) ? parseInt(experienceFrom) : 0;
+    experienceTo = (parseInt(experienceTo) !== NaN && parseInt(experienceTo) > 0) ? parseInt(experienceTo) : 0;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+
+    var queryParams = [];
+    var locationIds = '';
+    var locCount = 0;
+    var locationDetails = locationsList[locCount];
+
+    /**
+     * Job search for job seeker
+     */
+    var jobSeekerJobSearch = function(){
+        //PROCEDURE `pGetjobseekers`(IN tKeyWordsForSearch text,In tjobtype INT,IN tsalaryfrom DECIMAL(14,2),IN tsalaryTo DECIMAL(14,2),IN tsalarytype INT,In tlocations VARCHAR(150),In tExpfrom DECIMAL(14,2),IN tExpto DECIMAL(14,2))
+
+    };
+
+    /**
+     * Finds and return location id and if not in database then insert and return the tid
+     */
+    var insertLocations = function(locationDetails){
+        var list = {
+            location_title: locationDetails.location_title,
+            latitude: locationDetails.latitude,
+            longitude: locationDetails.longitude,
+            country: locationDetails.country
+        };
+        var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
+            + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country);
+
+        st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+
+            if (results) {
+                if (results[0]) {
+                    if (results[0][0]) {
+
+                        console.log(results[0][0].id);
+                        locationIds += results[0][0].id + ',';
+                        locCount +=1;
+                        if(locCount < locationsList.length){
+                            insertLocations(locationsList[locCount]);
+                        }
+                        else{
+                            jobSeekerJobSearch();
+                        }
+                    }
+                    else {
+                        console.log('FnSaveJobLocation:results no found');
+                        responseMessage.error = {};
+                        responseMessage.message = 'results no found';
+                        console.log('FnSaveJobLocation: results no found');
+                        res.status(200).json(responseMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveJobLocation:results no found');
+                    responseMessage.error = {};
+                    responseMessage.message = 'results no found';
+                    console.log('FnSaveJobLocation: results no found');
+                    res.status(200).json(responseMessage);
+                }
+            }
+            else {
+                console.log('FnSaveJobLocation:results no found');
+                responseMessage.error = {};
+                responseMessage.message = 'results no found';
+                console.log('FnSaveJobLocation: results no found');
+                res.status(200).json(responseMessage);
+            }
+        });
+    };
+    //calling function at first time
+    insertLocations(locationDetails);
+
+
+    //PROCEDURE `pGetjobseekers`(IN tKeyWordsForSearch text,In tjobtype INT,IN tsalaryfrom DECIMAL(14,2),IN tsalaryTo DECIMAL(14,2),IN tsalarytype INT,In tlocations VARCHAR(150),In tExpfrom DECIMAL(14,2),IN tExpto DECIMAL(14,2))
+
 };
 
 module.exports = Job;

@@ -707,6 +707,18 @@
     padding-right: 10%;
 }
 
+.hpw .select-itm
+{
+    padding: 5px;
+    line-height: 10px;
+}
+
+.hpw .select-itm:hover
+{
+    background-color: #AD03AD;
+    color: #fff;
+}
+
 .hpw .select-items
 {
     padding: 5px;
