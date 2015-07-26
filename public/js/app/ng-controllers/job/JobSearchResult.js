@@ -37,5 +37,13 @@ angular.module('ezeidApp').
             UtilityService
         ) {
 
+            /**
+             * All initialization goes here
+             */
+
+
+            /**
+             * All ACTIONS goes here
+             */
 
         }]);
