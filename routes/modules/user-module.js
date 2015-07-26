@@ -2491,7 +2491,7 @@ User.prototype.saveResume = function(req,res,next){
         var location_id = '';
 
         /**
-         * 8 New parameters added
+         * 7 New parameters added
          */
         var salary = req.body.salary;  // Float (Decimal)
         var noticePeriod = req.body.notice_period; // Integer, in days
