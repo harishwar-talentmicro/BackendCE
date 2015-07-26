@@ -46,10 +46,9 @@
                                         <h5 class="text-primary text-left">Key Skills</h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
-                                        <input type="text"  ng-class="cvForm.keySkills.$touched && !CVAttachCtrl._CVInfo.KeySkills.length ? 'mandatoryTextBoxCV' : ''" name="keySkills" class="form-control emptyBox" ng-model="CVAttachCtrl._CVInfo.KeySkills" placeholder="Key Skills (Comma Separated)" required/>
+                                        <input type="text" ng-class="cvForm.keySkills.$touched && !CVAttachCtrl._CVInfo.KeySkills.length ? 'mandatoryTextBoxCV' : ''" name="keySkills" class="form-control emptyBox" ng-model="CVAttachCtrl._CVInfo.KeySkills" placeholder="Key Skills (Comma Separated)" required/>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpaceMiddle label">
                                         <h5 class="text-primary text-left">CV Upload</h5>
@@ -83,17 +82,89 @@
                                         <input ng-show="CVAttachCtrl.EnablePin" maxlength="3" onkeypress="return isNumberKey(event);" type="text" style="width: 22%;" class="form-control" ng-model="CVAttachCtrl._CVInfo.Pin" placeholder="Pin"/>
                                     </div>
                             </div>
-                            <div class="row">
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                    <h5 class="text-primary text-left">CV Status</h5>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">CV Status</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                        <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
+                                        Active(Access is Active)
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8 cvBottomSpace" style="padding-left: 0px;">
+                                        <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="NotVisible" class="check-box pull-left" value="2" style="margin-top: 0px;"/>
+                                        Inactive(Access Denied/Not Looking for Change)
+                                    </div>
                                 </div>
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
-                                    <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
-                                    Active(Access is Active)
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Salary</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                        <input type="text" decimals-only maxlength="17" name="salary" class="form-control text-right" ng-model="CVAttachCtrl._CVInfo.salary" placeholder="Salary"/>
+                                    </div>
+
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Notice Period</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                        <input type="text" numbers-only maxlength="2" ng-model="CVAttachCtrl._CVInfo.noticePeriod" placeholder="Notice Period(Months)" class="form-control"/>
+                                    </div>
                                 </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8 cvBottomSpace" style="padding-left: 0px;">
-                                    <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="NotVisible" class="check-box pull-left" value="2" style="margin-top: 0px;"/>
-                                    Inactive(Access Denied/Not Looking for Change)
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Experience</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                        <div class="row">
+                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8">
+                                                <input type="text" decimals-only maxlength="5" name="expFrom" class="form-control" ng-model="CVAttachCtrl._CVInfo.experienceFrom" placeholder="Ex: 1"/>
+                                            </div>
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8 setTopMargin">
+                                                To
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8">
+                                                <input type="text" decimals-only maxlength="5" name="expTo" placeholder="Ex: 3" ng-model = "CVAttachCtrl._CVInfo.experienceTo" class="form-control"/>
+                                            </div>
+                                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8 setTopMargin">
+                                                Yrs
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Current Employer</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                        <input type="text" ng-model="CVAttachCtrl._CVInfo.currentEmployer" placeholder="Current Employer" class="form-control"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Current Job Title</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                        <input type="text" name="currentJobTitle" placeholder="Current Job Title" ng-model = "CVAttachCtrl._CVInfo.currentJobTitle" class="form-control"/>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Job Type</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                        <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "CVAttachCtrl._CVInfo.jobType">
+                                            <option value=""> Job Type </option>
+                                            <option value="1"> Full Time </option>
+                                            <option value="2"> Part Time </option>
+                                            <option value="3"> Contract </option>
+                                            <option value="4"> Internship </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Location</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                        <input type="text" id="google-map-search-box" placeholder="Ex: Banglore" ng-model = "CVAttachCtrl._CVInfo.jobLocation" class="form-control"/>
+                                    </div>
                                 </div>
                             </div>
 

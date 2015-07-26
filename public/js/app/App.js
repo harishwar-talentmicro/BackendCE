@@ -206,7 +206,7 @@
                 templateUrl: 'html/message/outbox.html',
                 controller : 'OutboxPageCtrl'
             })
-            .when('/job',{
+            .when('/jobsearch',{
                 templateUrl: 'html/job/jobSearchResult.html',
                 controller : 'JobSearchResult'
             })

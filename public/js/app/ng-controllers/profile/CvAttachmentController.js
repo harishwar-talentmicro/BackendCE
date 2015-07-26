@@ -1,6 +1,6 @@
 angular.module('ezeidApp').controller('CVAttachController',[
-    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q', '$window','$location','GURL',
-    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window,$location,GURL){
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q', '$window','$location','GURL','GoogleMaps',
+    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window,$location,GURL,GoogleMap){
 
     var CVAttachCtrl = this;
     CVAttachCtrl._CVInfo = {};
@@ -18,6 +18,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     var skillsTid = [];
     $scope.availableTags = [];
+    CVAttachCtrl._CVInfo.jobType = 0;
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
@@ -427,6 +428,26 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
             $scope.skillMatrix[index].exp = (parseFloat($scope.skillMatrix[index].exp)).toFixed(2);
         };
+
+        //For fatching location to post job
+        var googleMap = new GoogleMap();
+        googleMap.addSearchBox('google-map-search-box');
+        googleMap.listenOnMapControls(null,function(lat,lng){
+            $scope.jobLat = lat;
+            $scope.jobLong = lng;
+            googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+                if(resp.data){
+                    var data = googleMap.parseReverseGeolocationData(resp.data);
+                    CVAttachCtrl._CVInfo.jobLocation = data.city;
+                }
+                else{
+                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                }
+            },function(){
+                Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                defer.resolve();
+            });
+        },false);
 
 
     }]);
