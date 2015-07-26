@@ -95,7 +95,11 @@ angular.module('ezeidApp').
             $scope.getExperience = function()
             {
                 var experience = $('#experience').val();
-                return experience;
+                if(parseInt(experience) > 0)
+                {
+                    return experience;
+                }
+                return 0;
             }
 
             /**
@@ -140,7 +144,7 @@ angular.module('ezeidApp').
                 parkingStatus: false,
                 openStatus: false,
                 promotionsOnly: false,
-                //experience:0,
+                experience:0,
                 //jobType:'1,2,3,4,5,6',
                 lat: '12.93',
                 lng: '77.57'
@@ -188,17 +192,16 @@ angular.module('ezeidApp').
                 $scope.searchParams.experience = $scope.getExperience();
 
                 var searchStr;
-                if(parseInt($scope.searchParams.searchType) === 4)
+                if(parseInt($scope.searchParams.searchType) === 4)//For job search
                 {
                     searchStr = getJobSearchTermString(modifyValue);
+                    $location.url('/jobsearch?' + searchStr);
                 }
-                else
+                else//For all other search
                 {
                     searchStr = getSearchtermString(modifyValue);
+                    $location.url('/searchResult?' + searchStr);
                 }
-                console.log(searchStr);
-
-                $location.url('/searchResult?' + searchStr);
             };
 
             /**

@@ -37,5 +37,33 @@ angular.module('ezeidApp').
             UtilityService
         ) {
 
+            // Apply for job
+            $scope.applyForJob = function(_tid){
+
+                $scope.$emit('$preLoaderStart');
+
+                $scope.jobData = {
+                    token : $rootScope._userInfo.Token,
+                    tid : $scope.jobTid
+                }
+
+                $http({
+                    method: "POST",
+                    url: GURL + 'job',
+                    data:  $scope.jobData
+                }).success(function (data) {
+                    $scope.$emit('$preLoaderStop');
+
+                    if(data.status)
+                    {
+                      Notification.success({ message: "Applied Success..", delay : 2000});
+                    }
+                })
+                .error(function(data, status, headers, config) {
+                    $scope.$emit('$preLoaderStop');
+                });
+
+
+            };
 
         }]);
