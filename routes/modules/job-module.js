@@ -158,7 +158,7 @@ Job.prototype.create = function(req,res,next){
 
                         var locCount = 0;
                         var locationDetails = locationsList[locCount];
-
+                        location_id = location_id.substr(0,location_id.length - 1);
                         var createJobPosting = function(){
                             var query = st.db.escape(tid) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(job_code)
                                 + ',' + st.db.escape(job_title) + ',' + st.db.escape(exp_from) + ',' + st.db.escape(exp_to)
