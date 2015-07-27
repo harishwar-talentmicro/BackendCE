@@ -8,6 +8,11 @@
     padding-left: 0px;
     padding-right: 0px;
 }
+.noPaddingNoBorder
+{
+    padding: 0px;
+    border: 0px;
+}
 .navbar-brand
 {
     height: 35px;
@@ -1937,4 +1942,14 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .job-resultColor
 {
    color:  #00AB91;
+}
+
+.arw .label-form
+{
+    display: initial;
+    padding: 1px 2px 1px 2px;
+}
+.arw .location-box-border
+{
+    border: 1px solid #E6DCDC;
 }

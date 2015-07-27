@@ -1859,6 +1859,7 @@
                     var res = $scope.jobData[_index].location.split(",");
                     console.log("SAi");
                     console.log(res);
+
                     //$scope.locationArrayString.push($scope.jobLocation);
                 }
 
@@ -1868,9 +1869,6 @@
             $scope.cancelJobPosting = function(){
                 $scope.showJobListing = true;
             };
-
-          //  $scope.locationArrayString = [];
-          //  $scope.mainLocationArray = [];
 
             $scope.locationArrayString = [];
             $scope.mainLocationArray = [];

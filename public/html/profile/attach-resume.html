@@ -19,7 +19,7 @@
         display: block;
     }
 </style>
-
+<section id="attach-resume-wrapper" class="arw">
 <div  ng-controller="CVAttachController as CVAttachCtrl" style="min-height:290px">
     <!--<form name="cvForm" ng-submit="cvForm.$valid && CVAttachCtrl.saveCVDocInfo()" novalidate>-->
         <div class="form_style">
@@ -83,14 +83,14 @@
                                     </div>
                             </div>
                                 <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
                                         <h5 class="text-primary text-left">CV Status</h5>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 ">
                                         <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
                                         Active(Access is Active)
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8 cvBottomSpace" style="padding-left: 0px;">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8 " style="padding-left: 0px;">
                                         <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="NotVisible" class="check-box pull-left" value="2" style="margin-top: 0px;"/>
                                         Inactive(Access Denied/Not Looking for Change)
                                     </div>
@@ -154,11 +154,21 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Location</h5>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Prefer Location</h5>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
-                                        <input type="text" id="google-map-search-box" placeholder="Ex: Banglore" ng-model = "CVAttachCtrl._CVInfo.job_location" class="form-control"/>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
+                                        <div class="input-group">
+                                            <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "CVAttachCtrl._CVInfo.job_location1" class="form-control"/>
+                                            <span class="input-group-addon noPaddingNoBorder">
+                                                <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 location-box-border" ng-show="locationArrayString.length">
+                                        <span ng-repeat="location in locationArrayString track by $index">
+                                            <label  class="label label-default label-form">{{location}} <i ng-click="removeLocation($index)" class="fa fa-times text-warning"></i></label>&nbsp;
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -243,5 +253,5 @@
            </div>
         </div>
     <!--</form>-->
-</div>
+</section>
 

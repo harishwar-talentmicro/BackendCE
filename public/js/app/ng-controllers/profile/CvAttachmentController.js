@@ -18,7 +18,10 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     var skillsTid = [];
     $scope.availableTags = [];
-    CVAttachCtrl._CVInfo.jobType = 0;
+
+    CVAttachCtrl._CVInfo.job_type = 0;
+    CVAttachCtrl._CVInfo.job_location1 = "";
+    CVAttachCtrl._CVInfo.experience = 0;
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
@@ -29,6 +32,30 @@ angular.module('ezeidApp').controller('CVAttachController',[
             CVAttachCtrl._CVInfo.Status = 1;
         }
     });
+
+        $scope.locationArrayString = [];
+        $scope.mainLocationArray = [];
+
+        //For fatching location to post job
+        var googleMap = new GoogleMap();
+        googleMap.addSearchBox('google-map-search-box');
+        googleMap.listenOnMapControls(null,function(lat,lng){
+            $scope.jobLat = lat;
+            $scope.jobLong = lng;
+            googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+                if(resp.data){
+                    var data = googleMap.parseReverseGeolocationData(resp.data);
+                    CVAttachCtrl._CVInfo.job_location1 = data.city;
+                    $scope.country= data.country;
+                }
+                else{
+                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                }
+            },function(){
+                Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                defer.resolve();
+            });
+        },false);
 
     $http({ method: 'get', url: GURL + 'ewmGetFunctions?LangID=1'}).success(function (data) {
        CVAttachCtrl.Functions = data;
@@ -83,6 +110,17 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
        $scope.$emit('$preLoaderStart');
 
+        console.log("SAi........");
+        CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 0;
+       // CVAttachCtrl._CVInfo.job_location = (CVAttachCtrl._CVInfo.job_location) ? CVAttachCtrl._CVInfo.job_location : [];
+        CVAttachCtrl._CVInfo.experience = (CVAttachCtrl._CVInfo.experience) ? CVAttachCtrl._CVInfo.experience : 0;
+
+        console.log("SAi=============>");
+        console.log(CVAttachCtrl._CVInfo.job_type);
+       // console.log(CVAttachCtrl._CVInfo.job_location);
+        console.log(CVAttachCtrl._CVInfo.experience);
+
+
        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
        }
@@ -109,6 +147,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
         {
             CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
             CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
+            CVAttachCtrl._CVInfo.job_location = $scope.mainLocationArray;
+
             $http({
                     method: "POST",
                     url: GURL + 'ewtSaveCVInfo',
@@ -429,25 +469,42 @@ angular.module('ezeidApp').controller('CVAttachController',[
             $scope.skillMatrix[index].exp = (parseFloat($scope.skillMatrix[index].exp)).toFixed(2);
         };
 
-        //For fatching location to post job
-        var googleMap = new GoogleMap();
-        googleMap.addSearchBox('google-map-search-box');
-        googleMap.listenOnMapControls(null,function(lat,lng){
-            $scope.jobLat = lat;
-            $scope.jobLong = lng;
-            googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                if(resp.data){
-                    var data = googleMap.parseReverseGeolocationData(resp.data);
-                    CVAttachCtrl._CVInfo.jobLocation = data.city;
-                }
-                else{
-                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                }
-            },function(){
-                Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                defer.resolve();
-            });
-        },false);
+    /**
+     * Remove a particular element from location array
+     */
+    $scope.removeLocation = function(id)
+    {
+        $scope.locationArrayString.splice(id,1);
+        $scope.mainLocationArray.splice(id,1);
+    }
+
+        /**
+         * add location to array
+         */
+        $scope.addJobLocation = function(param)
+        {
+            if(!param || typeof(param) == undefined)
+            {
+                return;
+            }
+            var tempLocationArray = [];
+            if(typeof($scope.jobLat) == undefined || typeof($scope.country) == undefined ||  !CVAttachCtrl._CVInfo.job_location1.length > 0)
+            {
+                return;
+            }
+            tempLocationArray = {
+                "location_title" : CVAttachCtrl._CVInfo.job_location1,
+                "latitude" :  $scope.jobLat,
+                "longitude" : $scope.jobLong,
+                "country" : $scope.country
+            };
+
+            $scope.mainLocationArray.push(tempLocationArray);
+            $scope.locationArrayString.push(CVAttachCtrl._CVInfo.job_location1);
+            CVAttachCtrl._CVInfo.job_location1 = "";
+
+            console.log($scope.mainLocationArray);
+        }
 
 
     }]);
