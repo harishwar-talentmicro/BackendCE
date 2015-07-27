@@ -63,9 +63,6 @@ Job.prototype.create = function(req,res,next){
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
-    
-
-    console.log(req.body);
     var location_id = '';
 
     var responseMessage = {
@@ -134,8 +131,7 @@ Job.prototype.create = function(req,res,next){
         validateStatus *= false;
     }
     if(!locationsList){
-        error['locationsList'] = 'Invalid locationsList';
-        validateStatus *= false;
+        locationsList = [];
     }
     if(!(email_id || mobileNo)){
         error['email_id OR  MobileNo'] = 'Invalid email_id or mobileNo';
@@ -210,7 +206,7 @@ Job.prototype.create = function(req,res,next){
                                     responseMessage.message = 'An error occured ! Please try again';
                                     responseMessage.error = {};
                                     res.status(500).json(responseMessage);
-                                    console.log('FnSaveJobs: error in saving Feedback details:' + err);
+                                    console.log('FnSaveJobs: error in saving jobs details:' + err);
                                 }
                             });
                         };
@@ -470,7 +466,6 @@ Job.prototype.searchJobs = function(req,res,next){
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)
         +',' + st.db.escape(token);
 
-
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
                                 console.log(getresult);
@@ -513,7 +508,7 @@ Job.prototype.searchJobSeekers = function(req,res){
     /**
      * @todo Code API for Job seeker search
      */
-    res.send('API in progress');
+    //res.send('API in progress');
 
     var keyword = req.query.keyword;
     var jobType = req.query.job_type;
@@ -523,8 +518,15 @@ Job.prototype.searchJobSeekers = function(req,res){
     var experienceFrom = req.query.experience_from;
     var experienceTo = req.query.experience_to;
 
-    var locationList = req.query.locations;
+    var locationsList = req.query.locations;
 
+    if(typeof(locationsList) == "string"){
+        locationsList = JSON.parse(locationsList);
+    }
+
+    if(!locationsList){
+        locationsList = [];
+    }
 
     /**
      * Validations
@@ -556,7 +558,49 @@ Job.prototype.searchJobSeekers = function(req,res){
      */
     var jobSeekerJobSearch = function(){
         //PROCEDURE `pGetjobseekers`(IN tKeyWordsForSearch text,In tjobtype INT,IN tsalaryfrom DECIMAL(14,2),IN tsalaryTo DECIMAL(14,2),IN tsalarytype INT,In tlocations VARCHAR(150),In tExpfrom DECIMAL(14,2),IN tExpto DECIMAL(14,2))
+        locationIds = locationIds.substr(0,locationIds.length - 1);
+        var queryParams = st.db.escape(keyword) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
+                + ',' + st.db.escape(salaryType)+
+            ',' + st.db.escape(locationIds)+ ',' + st.db.escape(experienceFrom)+ ',' + st.db.escape(experienceTo);
 
+
+        var query = 'CALL pGetjobseekers(' + queryParams + ')';
+        console.log(query);
+        st.db.query(query, function (err, getResult) {
+            if(!err){
+            if(getResult){
+                if(getResult[0]){
+                    responseMessage.status = true;
+                    responseMessage.error = null;
+                    responseMessage.message = 'Job Seeker send successfully';
+                    responseMessage.data = getResult[0];
+                    res.status(200).json(responseMessage);
+                    console.log('FnGetJobSeeker: Job Seeker send successfully');
+
+                }
+                else {
+                    responseMessage.error = null;
+                    responseMessage.message = 'Job Seeker not found';
+                    console.log('FnGetJobSeeker: Job Seeker not found');
+                    res.status(200).json(responseMessage);
+                }
+            }
+            else {
+                responseMessage.error = null;
+                responseMessage.message = 'Job Seeker not found';
+                console.log('FnGetJobSeeker: Job Seeker not found');
+                res.status(200).json(responseMessage);
+            }
+        }
+        else {
+            responseMessage.error = {
+                server : 'Internal Server Error'
+            };
+            responseMessage.message = 'Error getting from Job Seeker';
+            console.log('FnGetJobSeeker:Error getting from Job Seeker:' + err);
+            res.status(500).json(responseMessage);
+        }
+    });
     };
 
     /**
@@ -577,7 +621,6 @@ Job.prototype.searchJobSeekers = function(req,res){
             if (results) {
                 if (results[0]) {
                     if (results[0][0]) {
-
                         console.log(results[0][0].id);
                         locationIds += results[0][0].id + ',';
                         locCount +=1;
@@ -620,5 +663,196 @@ Job.prototype.searchJobSeekers = function(req,res){
     //PROCEDURE `pGetjobseekers`(IN tKeyWordsForSearch text,In tjobtype INT,IN tsalaryfrom DECIMAL(14,2),IN tsalaryTo DECIMAL(14,2),IN tsalarytype INT,In tlocations VARCHAR(150),In tExpfrom DECIMAL(14,2),IN tExpto DECIMAL(14,2))
 
 };
+
+
+/**
+ * @todo FnApplyJob
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for apply job
+ */
+Job.prototype.applyJob = function(req,res,next){
+    var _this = this;
+
+        var token = req.body.token;
+        var jobId = req.body.job_id;
+
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: null
+        };
+
+        var validateStatus = true,error = {};
+        if(!token){
+            error['token'] = 'Invalid token';
+            validateStatus *= false;
+        }
+        if(!jobId){
+            error['jobId'] = 'Invalid job ID';
+            validateStatus *= false;
+        }
+
+        if(!validateStatus){
+            responseMessage.message = 'Please check the errors below';
+            res.status(400).json(responseMessage);
+        }
+        else {
+            try {
+                st.validateToken(token, function (err, result) {
+                    if (!err) {
+                        if (result) {
+                            var query = st.db.escape(jobId) + ',' + st.db.escape(token);
+                            console.log('CALL pApplyjob(' + query + ')');
+                            st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
+                                if (!err) {
+                                    if (insertResult) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Job applied successfully';
+                                        responseMessage.data = {
+                                            token: token,
+                                            jobId: jobId
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnApplyJob: Job applied successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Job applied not successfully';
+                                        responseMessage.error = null;
+                                        res.status(400).json(responseMessage);
+                                        console.log('FnApplyJob:Job applied not successfully');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnApplyJob: error in saving Job applied :' + err);
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'Invalid Token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('FnSaveJobs: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('FnSaveJobs:Error in processing Token' + err);
+                    }
+                });
+            }
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !'
+                res.status(500).json(responseMessage);
+                console.log('Error : FnGetJobLocations ' + ex.description);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+        };
+
+/**
+ * @todo FnAppliedJobList
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for applied job list
+*/
+Job.prototype.appliedJobList = function(req,res,next){
+    var _this = this;
+
+
+    var jobId = req.body.job_id;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!jobId){
+        error['jobId'] = 'Invalid job ID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            console.log('CALL pgetlistofcandappliedforjob(' + st.db.escape(jobId) + ')');
+            st.db.query('CALL pgetlistofcandappliedforjob(' + st.db.escape(jobId) + ')', function (err, getResult) {
+                if (!err) {
+                    if (getResult) {
+                        if(getResult[0].length){
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Applied job List loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnAppliedJobList: Applied job List loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Applied job List not loaded';
+                            responseMessage.error = null;
+                            res.status(200).json(responseMessage);
+                            console.log('FnAppliedJobList:Applied job List not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Applied job List not loaded';
+                        responseMessage.error = null;
+                        res.status(200).json(responseMessage);
+                        console.log('FnAppliedJobList:Applied job List not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnAppliedJobList: error in saving Applied job list :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetJobLocations ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 
 module.exports = Job;
