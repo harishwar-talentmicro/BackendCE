@@ -254,6 +254,7 @@ var res = angular.module('ezeidApp').
                     isPagination:1,
                     pagesize:$scope.resultPerPage
                 } }).success(function (data) {
+
                     $scope.isSearchInProgress = false;
                     $scope.$emit('$preLoaderStop');
                     /* set the total count */
