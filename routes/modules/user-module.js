@@ -2501,6 +2501,13 @@ User.prototype.saveResume = function(req,res,next){
         var jobType = req.body.job_type;
         var locationsList = req.body.job_location;
 
+        if(typeof(locationsList) == "string"){
+            locationsList = JSON.parse(locationsList);
+        }
+
+        if(!locationsList){
+            locationsList = [];
+        }
 
         /**
          * Data Conversions
@@ -2688,9 +2695,21 @@ User.prototype.saveResume = function(req,res,next){
                             });
                         };
 
+                        if(locationDetails){
+                            if(locationDetails.length > 0){
+                                insertLocations(locationDetails);
+                            }
+                            else{
+                                location_id = '';
+                                saveResumeDetails();
+                            }
 
-                        insertLocations(locationDetails);
+                        }
 
+                        else{
+                            location_id = '';
+                            saveResumeDetails();
+                        }
                     }
                     else {
                         console.log('FnSaveCVInfo: Invalid Token');

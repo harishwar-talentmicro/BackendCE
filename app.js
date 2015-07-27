@@ -29,8 +29,6 @@ var multer  = require('multer');
 
 app.use(multer({ dest: './uploads/'}));
 
-var fs = require('fs');
-
 // Add headers
 app.all('*',function(req,res,next){
     console.log();
