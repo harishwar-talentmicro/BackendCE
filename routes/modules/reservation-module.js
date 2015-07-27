@@ -774,11 +774,134 @@ Reservation.prototype.getworkinghoursList = function(req,res,next){
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
         console.log('FnGetworkinghoursList:error ' + ex.description);
-		var errorDate = new Date();
-		console.log(errorDate.toTimeString() + ' ......... error ...........');
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
 
         res.status(400).json(responseMessage);
     }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get feedback
+ */
+Reservation.prototype.getFeedback = function(req,res,next){
+    /**
+     * @todo FnGetFeedback
+     */
+    var _this = this;
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var moduleType = req.query.module_type;
+    var transId = req.query.trans_id;
+    var resourceId = req.query.resource_id;
+    var pageSize = req.query.page_size;
+    var pageCount = req.query.page_count;
+        console.log(req.query);
+    var responseMessage = {
+        status: false,
+        data: null,
+        error:{},
+        message:''
+    };
+
+    var validateStatus = true,error = {};
+    if(!(ezeone_id || transId || resourceId)){
+        error['ezeone_id or transId or resourceId'] = 'Invalid ezeone_id or transId or resourceId parameters';
+        validateStatus *= false;
+    }
+    if(!moduleType){
+        error['moduleType'] = 'Invalid moduleType';
+        validateStatus *= false;
+    }
+    if(!pageSize){
+        error['pageSize'] = 'Invalid pageSize';
+        validateStatus *= false;
+    }
+    if(!pageCount){
+        pageCount = 0;
+    }
+    if(parseInt(pageCount) == NaN){
+        error['pageCount'] = 'Invalid pageCount';
+        validateStatus *= false;
+    }
+
+        if(!validateStatus){
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors below';
+            res.status(400).json(responseMessage);
+        }
+
+        else {
+            try {
+                var queryParams = st.db.escape(ezeone_id) + ',' + st.db.escape(moduleType) + ',' + st.db.escape(transId)
+                    + ',' + st.db.escape(resourceId) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
+                var query = 'CALL pgetfeedbackDetails(' + queryParams + ')';
+                st.db.query(query, function (err, getResult) {
+                    console.log(getResult);
+                    if (!err) {
+                        if (getResult) {
+                            if (getResult[0]) {
+                                if (getResult[0].length > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.data = {
+                                        count : getResult[0],
+                                        result : getResult[1]
+                                    };
+                                    responseMessage.message = 'Feedback details loaded successfully';
+                                    console.log('FnGetFeedback:Feedback details loaded successfully');
+                                    res.status(200).json(responseMessage);
+                                }
+                                else {
+
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Feedback details not loaded';
+                                    console.log('FnGetFeedback: Feedback details not loaded');
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+
+                                responseMessage.error = null;
+                                responseMessage.message = 'Feedback details not loaded';
+                                console.log('FnGetFeedback: Feedback details not loaded');
+                                res.status(200).json(responseMessage);
+                            }
+                        }
+                        else {
+
+                            responseMessage.error = null;
+                            responseMessage.message = 'Feedback details not loaded';
+                            console.log('FnGetFeedback: Feedback details not loaded');
+                            res.status(200).json(responseMessage);
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'An error occured ! Please try again';
+                        responseMessage.error = {
+                            server: 'Internal server error'
+                        };
+                        res.status(500).json(responseMessage);
+                        console.log('FnGetFeedback: error in getting job details:' + err);
+                    }
+
+                });
+            }
+            catch (ex) {
+                responseMessage.error = {};
+                responseMessage.message = 'An error occured !'
+                console.log('FnGetFeedback:error ' + ex.description);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                res.status(400).json(responseMessage);
+            }
+        }
 };
 
 /**

@@ -703,11 +703,9 @@ Job.prototype.searchJobSeekers = function(req,res) {
         }
     }
     catch (ex) {
-        responseMessage.error = {
-            server: 'Internal Server Error'
-        };
-        responseMessage.message = 'An error occurred !'
-        res.status(500).json(responseMessage);
+        responseMessage.error = {};
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
         console.log('Error : FnJobSeekerSearch ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -902,7 +900,6 @@ Job.prototype.appliedJobList = function(req,res,next){
         }
     }
 };
-
 
 Job.prototype.getFiltersForJob = function(req,res,next){
     /**

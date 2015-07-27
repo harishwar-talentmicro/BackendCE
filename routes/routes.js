@@ -143,6 +143,7 @@ exports.FnGetResTransDetails = reservationModule.getTransDetails;
 exports.FnChangeReservationStatus = reservationModule.changeReservStatus;
 exports.FnGetworkinghoursList = reservationModule.getworkinghoursList;
 exports.FnSaveFeedback = reservationModule.saveFeedback;
+exports.FnGetFeedback = reservationModule.getFeedback;
 exports.FnResourcePicture = reservationModule.getResourcePicture;
 
 
