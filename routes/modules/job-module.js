@@ -323,7 +323,7 @@ Job.prototype.getAll = function(req,res,next){
     var keywordsForSearch = req.query.keywordsForSearch;
     var status = req.query.status;
     var pageSize = req.query.page_size;
-    var resultCount = req.query.result_count;
+    var pageCount = req.query.page_count;
     var orderBy = req.query.order_by;  // 1-ascending else descending
         console.log(req.query);
     var responseMessage = {
@@ -353,7 +353,7 @@ Job.prototype.getAll = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
-                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(resultCount)  + ',' + st.db.escape(orderBy);
+                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy);
                         console.log(query);
                         console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
@@ -478,7 +478,7 @@ Job.prototype.searchJobs = function(req,res,next){
     var keywords = req.query.keywords;
     var token = (req.query.token) ? req.query.token : '';
     var pageSize = req.query.page_size;
-    var resultCount = req.query.result_count;
+    var pageCount = req.query.page_count;
 
     var responseMessage = {
         status: false,
@@ -489,7 +489,7 @@ Job.prototype.searchJobs = function(req,res,next){
 
     var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)+ ',' + st.db.escape(jobType)
             + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
-            +',' + st.db.escape(resultCount);
+            +',' + st.db.escape(pageCount);
 
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
