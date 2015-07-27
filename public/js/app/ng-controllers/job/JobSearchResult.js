@@ -112,7 +112,6 @@ angular.module('ezeidApp').
             {
                 if(data.length > 0)
                 {
-                    console.log(data);
                     $scope.isResultEmpty = false;
                     $scope.resultData = data;
                 }
@@ -148,6 +147,29 @@ angular.module('ezeidApp').
             $scope.getKeySkillsArray = function(skillString)
             {
                 $scope.activeSkillsArray = skillString.split(",");
+            }
+
+            /**
+             * Get the salary range
+             */
+            $scope.getSalaryRange = function(salaryFrom,salaryTo)
+            {
+                if(!parseInt(salaryFrom) > 0 && !parseInt(salaryTo) > 0)
+                {
+                    return  "NA";
+                }
+                if(parseInt(salaryFrom) == parseInt(salaryTo))
+                {
+                    return UtilityService.currencyStyleConverter(salaryFrom)+" INR";
+                }
+                else if(parseInt(salaryFrom) < parseInt(salaryTo))
+                {
+                    return UtilityService.currencyStyleConverter(salaryFrom)+"-"+UtilityService.currencyStyleConverter(salaryTo)+" INR";
+                }
+                else
+                {
+                    return UtilityService.currencyStyleConverter(salaryTo)+"-"+UtilityService.currencyStyleConverter(salaryFrom)+" INR";
+                }
             }
 
         }]);
