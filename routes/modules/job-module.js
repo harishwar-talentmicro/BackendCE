@@ -925,10 +925,15 @@ Job.prototype.getFiltersForJob = function(req,res,next){
                 res.status(400).json(responseMsg);
             }
             else{
+                console.log(result);
                 responseMsg.status = true;
                 responseMsg.message = 'Job filters loaded successfully';
                 responseMsg.error = null;
-                responseMsg.data = result[0];
+                responseMsg.data = {
+                    location_information : result[0],
+                    salary : result[1],
+                    job_type: result[2]
+                };
                 res.status(200).json(responseMsg);
             }
         });
