@@ -1,5 +1,5 @@
 <!-- Outbox module goes here -->
-<section id="job-search-result-wrapper" class="hpw ow jsr">
+<section id="job-search-result-wrapper" class="hpw ow jsr rpw">
     <!-- Header menu goes here -->
     <header-section></header-section>
 
@@ -27,9 +27,9 @@
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <div class="row text-left search-bar-center">
+                <div class="row text-center">
                     <!-- Search Bar and advance filter goes here -->
-                    <div class="navbar-form navbar-left no-border " role="search">
+                    <div class="navbar-form navbar-left no-border search-bar-center" role="search">
                         <div class="input-group">
                             <div class="input-group-btn">
                                 <!-- Change Location btn -->
@@ -40,16 +40,18 @@
                                 </button>
                             </div>
 
-                            <input id="searchTextField" type="text" placeholder=""
+                            <input id="searchTextField" type="text" placeholder="" ng-model="params.searchTerm"
                                    class="form-control width-search-bar dropdown-toggle" aria-label="..." data-toggle="dropdown">
 
                             <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(params.searchType == 2) && (KeyWords.length > 0) && (params.searchTerm.length)">-->
 
                             <div class="input-group-btn">
                                 <!-- Advance Search BTN -->
-                                <button  type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" data-toggle="dropdown" title="Click to choose Search Options"><i class="fa fa-check-square-o"></i> Options</Filter></button>
+                                <button  type="button" class="btn btn-default dropdown-toggle btn-advanced-filter no-radius" ng-click="toggleAdvanceSearch()" title="Click to choose Search Options">
+                                    <i class="fa fa-check-square-o"></i> Options</Filter>
+                                </button>
                                 <!-- Search BTN -->
-                                <button type="button" class="btn btn-warning" title="search"><i class="fa fa-search"></i> </button>
+                                <button ng-click="triggerSearch()" type="button" class="btn btn-warning" title="search"><i class="fa fa-search"></i> </button>
                             </div>
                         </div>
 
@@ -60,7 +62,7 @@
                         <li class="dropdown p8">
                             <!-- Select All BTN -->
                             <button class="btn btn-primary"><i class="fa fa-check-square"></i> Select All</button>
-                            <div class="btn-group">
+                            <div class="btn-group hidden">
                                 <button class="btn btn-default"><i class="fa fa-list"></i> List View</button>
                                 <button class="btn btn-default"><i class="fa fa-map-marker"></i> Map View</button>
                             </div>
@@ -71,6 +73,88 @@
         </div><!-- /.container-fluid -->
     </nav>
 
+    <!-- Advance search options goes here -->
+    <div class="row" id="advance-filter" ng-show="advanceSearchVisibility">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-0 job-search-advnc-opt">
+            <div class="filter-container animation-slideup" >
+                <div class="container text text-center filter-text-highlight">
+                    <i>Search Options</i>
+                </div>
+                <!-- Main contents of advance filters -->
+                <div class="advance-filter-content border-style-bottom">
+                    <div class="container">
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
+                            <button ng-click="toggleVisibility(1)" class="btn btn-default form-control btn-sm">Proximity <span class="caret"></span></button>
+                            <div ng-show="showProximityFilter" class="filter-dropdown job-type-dropdown search-proximity-content">
+                                <div class="select-option" ng-class="params.proximity == 1?'selected':''" ng-click="changeProximity(1)">
+                                    1 Mile (1.6 Km)
+                                </div>
+                                <div class="select-option"  ng-class="params.proximity == 2?'selected':''" ng-click="changeProximity(2)">
+                                    2 Mile (3.2 Km)
+                                </div>
+                                <div class="select-option"  ng-class="params.proximity == 5?'selected':''" ng-click="changeProximity(5)">
+                                    5 Mile (8 Km)
+                                </div>
+                                <div class="select-option"  ng-class="params.proximity == 10?'selected':''" ng-click="changeProximity(10)">
+                                    10 Mile (16 Km)
+                                </div>
+                                <div class="select-option"  ng-class="params.proximity == 25?'selected':''" ng-click="changeProximity(25)">
+                                    25 Mile (40 Km)
+                                </div>
+                                <div class="select-option"  ng-class="params.proximity == 50?'selected':''" ng-click="changeProximity(50)">
+                                    50 Mile (80 Km)
+                                </div>
+                                <div class="select-option"  ng-class="params.proximity == 0?'selected':''" ng-click="changeProximity(0)">
+                                    Any
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 filter-item-border">
+                            <button ng-click="toggleVisibility()" class="btn btn-default form-control btn-sm">Job Type <span class="caret"></span></button>
+                            <div ng-show="jobTypeFilter" class="job-type-dropdown">
+                                <div class="checkbox-dropdown" ng-click="changeJobType(0)">
+                                    <i class="fa" ng-class="activeJobType[0]?'fa-check-square':'fa-square-o'"></i> Full Time
+                                </div>
+                                <div class="checkbox-dropdown" ng-click="changeJobType(1)">
+                                    <i class="fa" ng-class="activeJobType[1]?'fa-check-square':'fa-square-o'"></i> Part Time
+                                </div>
+                                <div class="checkbox-dropdown" ng-click="changeJobType(2)">
+                                    <i class="fa" ng-class="activeJobType[2]?'fa-check-square':'fa-square-o'"></i> Work From Home
+                                </div>
+                                <div class="checkbox-dropdown" ng-click="changeJobType(3)">
+                                    <i class="fa" ng-class="activeJobType[3]?'fa-check-square':'fa-square-o'"></i> Internship
+                                </div>
+                                <div class="checkbox-dropdown" ng-click="changeJobType(4)">
+                                    <i class="fa" ng-class="activeJobType[4]?'fa-check-square':'fa-square-o'"></i> Consultant
+                                </div>
+                                <div class="checkbox-dropdown" ng-click="changeJobType(5)">
+                                    <i class="fa" ng-class="activeJobType[5]?'fa-check-square':'fa-square-o'"></i> Freelancer
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 filter-item-border">
+                            <div class="input-group">
+                                <span disabled class="input-group-addon no-padding-and-border">
+                                    <button class="btn btn-primary btn-sm form-control">Experience</button>
+                                </span>
+                                <input type="text" class="form-control" ng-model="params.experience" placeholder="Experience" />
+                                <span class="input-group-addon no-padding-and-border">
+                                    <button disabled class="btn btn-default btn-sm form-control">Yrs</button>
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="done-btn text-right p-5">
+                        <button class="btn btn-warning btn-sm text-right" ng-click="resetAdvanceFilters()"><i class="fa fa-recycle"></i> Reset</button>
+                        <button class="btn btn-info btn-sm" ng-click="toggleAdvanceSearch()">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Main body of the search result -->
     <div class="content-bg page-content p-bottom-10">
         <div class="container width-75 ">
@@ -78,7 +162,7 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 result-info-div">
                 <div class="sorting-block row">
                     <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 text-left">
-                        1-50 of 21436 Angular JS Jobs
+                        {{getResultRange()}} for <b>{{searchTerm}}</b>
                     </div>
                     <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 text-right">
                         <button class="btn btn-default btn-sm">
@@ -192,42 +276,29 @@
                     </div>
                 </div>
 
-                <!--<div class="individual-tiles">-->
-                <!--&lt;!&ndash; Heading of the Job tile &ndash;&gt;-->
-                <!--<div class="job-main-content tile-head">-->
-                <!--<div class="row">-->
-                <!--<div class="col-lg-7">-->
-                <!--<i class="fa fa-check-square"></i> Angular JS Developer<br>-->
-                <!--<small class="company-name">HP India Pvt. Ltd.</small>-->
-                <!--</div>-->
-                <!--<div class="col-lg-5 text-right normal-view-buttons">-->
-                <!--<img class="height-45-px" alt="Oracle India Pvt. Ltd." src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRdSv2I9KbGIvimt1RmpMIhbRX9w8JGWpDfBmGdJvsrvqnuuqW3BQ">-->
-                <!--</div>-->
-                <!--</div>-->
-                <!--</div>-->
-                <!--&lt;!&ndash; content of the job tile &ndash;&gt;-->
-                <!--<div class="job-main-content tile-content">-->
-                <!--<span class="experience-title"><i class="fa fa-briefcase"></i> Exp: 0-1 Yrs</span>-->
-                <!--<span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: Bangalore</span>-->
-                <!--<div class="key-skills p-top-10">-->
-                <!--<p><i class="fa fa-arrow-circle-right"></i> Key Skills:-->
-                <!--<button class="btn btn-default btn-xs">JQuery</button>-->
-                <!--<button class="btn btn-default btn-xs">JavaScript</button>-->
-                <!--<button class="btn btn-default btn-xs">HTML</button>-->
-                <!--<button class="btn btn-default btn-xs">CSS</button>-->
-                <!--<button class="btn btn-default btn-xs">Angular JS</button>-->
-                <!--</p>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                <!--<div class="salary col-lg-7 col-md-7 col-sm-7 col-xs-7">-->
-                <!--<i class="fa fa-rupee"></i> 3.5 LPA - 5 LPA-->
-                <!--</div>-->
-                <!--<div class="posted-on text-right col-lg-5 col-md-5 col-sm-5 col-xs-5">-->
-                <!--<i class="fa fa-clock-o"></i> 55mins ago-->
-                <!--</div>-->
-                <!--</div>-->
-                <!--</div>-->
-                <!--</div>-->
+                <div class="individual-tiles" ng-show="isResultEmpty && !isProcessing">
+                    <!-- Heading of the Job tile -->
+                    <div class="job-main-content tile-head">
+                        <div class="row">
+                            <div class="col-lg-7 text-info text-uppercase">
+                                 N<i class="fa fa-cog fa-spin text-danger"></i> result f<i class="fa fa-cog fa-spin text-warning"></i>und<br>
+                            </div>
+                            <div class="col-lg-5 text-right normal-view-buttons">
+                                <!--<img class="height-45-px" alt="Oracle India Pvt. Ltd." src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRdSv2I9KbGIvimt1RmpMIhbRX9w8JGWpDfBmGdJvsrvqnuuqW3BQ">-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="individual-tiles" ng-show="isProcessing">
+                    <!-- Heading of the Job tile -->
+                    <div class="job-main-content tile-head">
+                        <div class="row">
+                            <div class="col-lg-12 text-info text-center">
+                                Waiting for the result.. <i class="fa fa-spinner fa-2x fa-spin"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
