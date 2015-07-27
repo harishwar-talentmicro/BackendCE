@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors');
 var LocationManager = require('./routes/routes.js');
 var compress = require('compression');
-var fs = require('fs')
+var fs = require('fs');
 var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 
 var app = express();
@@ -28,8 +28,6 @@ app.use(cookieParser());
 var multer  = require('multer');
 
 app.use(multer({ dest: './uploads/'}));
-
-var fs = require('fs');
 
 // Add headers
 app.all('*',function(req,res,next){
@@ -199,6 +197,8 @@ app.get('/job',LocationManager.FnGetJobs);
 app.get('/job_locations',LocationManager.FnGetJobLocations);
 app.get('/job_search',LocationManager.FnSearchJobs);
 app.get('/job_seeker_search',LocationManager.FnJobSeekerSearch);
+app.post('/job_apply',LocationManager.FnApplyJob);
+app.get('/job_applied_list',LocationManager.FnAppliedJobList);
 
 
 //below service are for EZEIDAP

@@ -2383,6 +2383,7 @@ User.prototype.getResume = function(req,res,next){
             status: false,
             data: null,
             skillMatrix : null,
+            job_location : null,
             error:{},
             message:''
         };
@@ -2393,13 +2394,14 @@ User.prototype.getResume = function(req,res,next){
                     if (Result) {
                         st.db.query('CALL pgetCVInfo(' + st.db.escape(Token) + ')', function (err, MessagesResult) {
                             if (!err) {
-
+                                        //console.log(MessagesResult);
                                 if (MessagesResult[0]) {
                                     if (MessagesResult[0].length > 0) {
 
                                         responseMessage.status = true;
                                         responseMessage.data = MessagesResult[0];
                                         responseMessage.skillMatrix = MessagesResult[1];
+                                        responseMessage.job_location = MessagesResult[2];
                                         responseMessage.error = null;
                                         responseMessage.message = 'Cv info send successfully';
                                         res.status(200).json(responseMessage);
@@ -2501,6 +2503,13 @@ User.prototype.saveResume = function(req,res,next){
         var jobType = req.body.job_type;
         var locationsList = req.body.job_location;
 
+        if(typeof(locationsList) == "string"){
+            locationsList = JSON.parse(locationsList);
+        }
+
+        if(!locationsList){
+            locationsList = [];
+        }
 
         /**
          * Data Conversions
@@ -2688,9 +2697,21 @@ User.prototype.saveResume = function(req,res,next){
                             });
                         };
 
+                        if(locationDetails){
+                            if(locationDetails.length > 0){
+                                insertLocations(locationDetails);
+                            }
+                            else{
+                                location_id = '';
+                                saveResumeDetails();
+                            }
 
-                        insertLocations(locationDetails);
+                        }
 
+                        else{
+                            location_id = '';
+                            saveResumeDetails();
+                        }
                     }
                     else {
                         console.log('FnSaveCVInfo: Invalid Token');
