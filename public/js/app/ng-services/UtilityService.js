@@ -113,6 +113,43 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
                 return str.substring(0,limit)+"...";
             }
             return str;
+        },
+
+        /**
+         * Currency formater
+         * convert the currency in to comma seperated string
+         */
+        currencyStyleConverter : function(amount)
+        {
+            var finalString = [];
+            var amountLength = amount.toString().length;
+            if(!amountLength > 0 || amountLength < 4)//no amount found or no need to mask
+            {
+                return ;
+            }
+            /* convert the digits in to individual array element */
+            var tempArr = amount.toString().split('');
+            /* reverse the array element */
+            var limit = amountLength - 1;
+            var i = 1;
+            while(limit >= 0)
+            {
+                finalString.push(tempArr[limit]);
+                if(i%3 == 0)
+                {
+                    finalString.push(',');
+                }
+                limit --;
+                i++;
+            }
+
+            var strArr = finalString.reverse();
+            if(amountLength % 3 == 0)
+            {
+                return strArr.join('').substr(1);
+            }
+
+           return strArr.join('');
         }
 
     };
