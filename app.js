@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors');
 var LocationManager = require('./routes/routes.js');
 var compress = require('compression');
-var fs = require('fs')
+var fs = require('fs');
 var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 
 var app = express();
