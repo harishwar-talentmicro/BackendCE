@@ -2394,7 +2394,7 @@ User.prototype.getResume = function(req,res,next){
                     if (Result) {
                         st.db.query('CALL pgetCVInfo(' + st.db.escape(Token) + ')', function (err, MessagesResult) {
                             if (!err) {
-                                        //console.log(MessagesResult);
+                                        console.log(MessagesResult);
                                 if (MessagesResult[0]) {
                                     if (MessagesResult[0].length > 0) {
 

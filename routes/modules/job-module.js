@@ -904,5 +904,43 @@ Job.prototype.appliedJobList = function(req,res,next){
 };
 
 
+Job.prototype.getFiltersForJob = function(req,res,next){
+    /**
+     * @todo FnGetFiltersForJob
+     */
+    var _this = this;
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to load job filters ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        st.db.query('CALL pgetmasterfiltersforjob()',function(err,result){
+            if(err){
+                console.log('Error : FnGetFiltersForJob :'+err);
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'Job filters loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnGetFiltersForJob '+ ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
 
 module.exports = Job;
