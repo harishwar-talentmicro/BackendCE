@@ -472,6 +472,8 @@ Job.prototype.searchJobs = function(req,res,next){
     var exp = req.query.exp;
     var keywords = req.query.keywords;
     var token = (req.query.token) ? req.query.token : '';
+    var pageSize = req.query.page_size;
+    var resultCount = req.query.result_count;
 
     var responseMessage = {
         status: false,
@@ -480,9 +482,9 @@ Job.prototype.searchJobs = function(req,res,next){
         data: null
     };
 
-    var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)
-                                + ',' + st.db.escape(jobType) + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)
-        +',' + st.db.escape(token);
+    var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)+ ',' + st.db.escape(jobType)
+            + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
+            +',' + st.db.escape(resultCount);
 
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
