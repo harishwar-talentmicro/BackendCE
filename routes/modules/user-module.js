@@ -2503,13 +2503,19 @@ User.prototype.saveResume = function(req,res,next){
         var jobType = req.body.job_type;
         var locationsList = req.body.job_location;
 
+        console.log(locationsList);
+
         if(typeof(locationsList) == "string"){
             locationsList = JSON.parse(locationsList);
         }
 
+        console.log(locationsList);
+
         if(!locationsList){
             locationsList = [];
         }
+
+        console.log(locationsList);
 
         /**
          * Data Conversions
@@ -2541,12 +2547,14 @@ User.prototype.saveResume = function(req,res,next){
 
                         var saveResumeDetails = function(){
                             location_id = location_id.substr(0,location_id.length - 1);
-                            var query = st.db.escape(FunctionID) + ',' + st.db.escape(0) + ',' + st.db.escape(KeySkills) + ',' +
+                            var queryParams = st.db.escape(FunctionID) + ',' + st.db.escape(0) + ',' + st.db.escape(KeySkills) + ',' +
                                 st.db.escape(Status) + ',' + st.db.escape(Pin) + ',' + st.db.escape(Token) + ',' + st.db.escape(ids)+ ','+
                                 st.db.escape(salary) + ',' + st.db.escape(noticePeriod) + ',' + st.db.escape(experience) + ','+
                                 st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle) + ',' + st.db.escape(jobType) + ','+
                                 st.db.escape(location_id);
-                            st.db.query('CALL pSaveCVInfo(' + query + ')', function (err, InsertResult) {
+                            var query = 'CALL pSaveCVInfo(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, InsertResult) {
                                 if (!err) {
                                     if (InsertResult[0]) {
                                         var async = require('async');
@@ -2661,20 +2669,33 @@ User.prototype.saveResume = function(req,res,next){
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country);
 
+                            console.log(queryParams);
+
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
 
-                                if (results) {
-                                    if (results[0]) {
-                                        if (results[0][0]) {
+                                if(err){
+                                    console.log('Error in saving psavejoblocation');
+                                    console.log(err);
+                                }
+                                else{
+                                    if (results) {
+                                        if (results[0]) {
+                                            if (results[0][0]) {
 
-                                            console.log(results[0][0].id);
-                                            location_id += results[0][0].id + ',';
-                                            locCount +=1;
-                                            if(locCount < locationsList.length){
-                                                insertLocations(locationsList[locCount]);
+                                                console.log(results[0][0].id);
+                                                location_id += results[0][0].id + ',';
+                                                locCount +=1;
+                                                if(locCount < locationsList.length){
+                                                    insertLocations(locationsList[locCount]);
+                                                }
+                                                else{
+                                                    saveResumeDetails();
+                                                }
                                             }
-                                            else{
-                                                saveResumeDetails();
+                                            else {
+                                                console.log('FnSaveJobLocation:results no found');
+                                                console.log('FnSaveJobLocation: results no found');
+                                                res.status(200).json(RtnMessage);
                                             }
                                         }
                                         else {
@@ -2689,23 +2710,19 @@ User.prototype.saveResume = function(req,res,next){
                                         res.status(200).json(RtnMessage);
                                     }
                                 }
-                                else {
-                                    console.log('FnSaveJobLocation:results no found');
-                                    console.log('FnSaveJobLocation: results no found');
-                                    res.status(200).json(RtnMessage);
-                                }
+
                             });
                         };
 
-                        if(locationDetails){
-                            if(locationDetails.length > 0){
+                        if(locationsList){
+                            if(locationsList.length > 0){
                                 insertLocations(locationDetails);
                             }
                             else{
                                 location_id = '';
                                 saveResumeDetails();
-                            }
 
+                            }
                         }
 
                         else{

@@ -264,8 +264,8 @@ Job.prototype.create = function(req,res,next){
                             });
                         };
                         //calling function at first time
-                        if (locationDetails) {
-                            if (locationDetails.length > 0) {
+                        if (locationsList) {
+                            if (locationsList.length > 0) {
                                 insertLocations(locationDetails);
                             }
                             else {
@@ -317,7 +317,6 @@ Job.prototype.create = function(req,res,next){
 Job.prototype.getAll = function(req,res,next){
     var _this = this;
 
-    var error = {};
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
     var keywordsForSearch = req.query.keywordsForSearch;
@@ -366,7 +365,8 @@ Job.prototype.getAll = function(req,res,next){
                                         responseMessage.message = 'Jobs send successfully';
                                         responseMessage.data = {
                                             total_count: getresult[0][0].count,
-                                            result : getresult[1]
+                                            result : getresult[1],
+                                            job_location : getresult[2]
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetJobs: Jobs send successfully');
@@ -686,8 +686,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
             });
         };
         //calling function at first time
-        if (locationDetails) {
-            if (locationDetails.length > 0) {
+        if (locationsList) {
+            if (locationsList.length > 0) {
                 insertLocations(locationDetails);
             }
             else {
