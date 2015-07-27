@@ -2695,9 +2695,21 @@ User.prototype.saveResume = function(req,res,next){
                             });
                         };
 
+                        if(locationDetails){
+                            if(locationDetails.length > 0){
+                                insertLocations(locationDetails);
+                            }
+                            else{
+                                location_id = '';
+                                saveResumeDetails();
+                            }
 
-                        insertLocations(locationDetails);
+                        }
 
+                        else{
+                            location_id = '';
+                            saveResumeDetails();
+                        }
                     }
                     else {
                         console.log('FnSaveCVInfo: Invalid Token');
