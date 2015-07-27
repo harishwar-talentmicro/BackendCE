@@ -332,7 +332,7 @@ Job.prototype.getAll = function(req,res,next){
         message: '',
         data: null
     };
-    var validateStatus = true;
+    var validateStatus = true, error = {};
     if(!ezeone_id){
         error['ezeone_id'] = 'Invalid ezeone_id';
         validateStatus *= false;
@@ -343,6 +343,7 @@ Job.prototype.getAll = function(req,res,next){
     }
 
     if(!validateStatus){
+        responseMessage.error = error ;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
     }
@@ -356,13 +357,17 @@ Job.prototype.getAll = function(req,res,next){
                         console.log(query);
                         console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
+                            console.log(getresult);
                             if (!err) {
                                 if (getresult) {
                                     if (getresult[0].length) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Jobs send successfully';
-                                        responseMessage.data = getresult[0];
+                                        responseMessage.data = {
+                                            total_count: getresult[0][0].count,
+                                            result : getresult[1]
+                                        };
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetJobs: Jobs send successfully');
                                     }
@@ -488,14 +493,19 @@ Job.prototype.searchJobs = function(req,res,next){
 
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
-                                console.log(getresult);
+                                console.log(getresult)
+                                console.log(getresult[0][0].count);
+                                console.log(getresult[1]);
 
                                 if (!err) {
                                     if (getresult) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Jobs details loaded successfully';
-                                        responseMessage.data = getresult[0];
+                                        responseMessage.data = {
+                                            total_count: getresult[0][0].count,
+                                            result : getresult[1]
+                                        };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSearchJobs: Jobs save successfully');
                                     }
