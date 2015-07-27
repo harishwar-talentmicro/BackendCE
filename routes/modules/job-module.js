@@ -322,7 +322,10 @@ Job.prototype.getAll = function(req,res,next){
     var token = req.query.token;
     var keywordsForSearch = req.query.keywordsForSearch;
     var status = req.query.status;
-    console.log(req.query);
+    var pageSize = req.query.page_size;
+    var resultCount = req.query.result_count;
+    var orderBy = req.query.order_by;  // 1-ascending else descending
+        console.log(req.query);
     var responseMessage = {
         status: false,
         error: {},
@@ -348,7 +351,8 @@ Job.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status);
+                        var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
+                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(resultCount)  + ',' + st.db.escape(orderBy);
                         console.log(query);
                         console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
@@ -531,7 +535,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var salaryType = req.query.salary_type;
         var experienceFrom = req.query.experience_from;
         var experienceTo = req.query.experience_to;
-
         var locationsList = req.query.locations;
 
         if (typeof(locationsList) == "string") {
@@ -541,7 +544,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
         if (!locationsList) {
             locationsList = [];
         }
-
+        console.log(req.query);
         /**
          * Validations
          */
