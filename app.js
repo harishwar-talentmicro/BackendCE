@@ -201,6 +201,7 @@ app.post('/job_apply',LocationManager.FnApplyJob);
 app.get('/job_applied_list',LocationManager.FnAppliedJobList);
 app.get('/job_filters',LocationManager.FnGetFiltersForJob);
 app.get('/feedback',LocationManager.FnGetFeedback);
+app.get('/job_details',LocationManager.FnGetJobDetails);
 
 
 //below service are for EZEIDAP
