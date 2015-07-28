@@ -494,9 +494,6 @@ Job.prototype.searchJobs = function(req,res,next){
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
                                 console.log(getresult)
-                                console.log(getresult[0][0].count);
-                                console.log(getresult[1]);
-
                                 if (!err) {
                                     if (getresult) {
                                         responseMessage.status = true;
