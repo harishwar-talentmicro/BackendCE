@@ -44,7 +44,7 @@ angular.module('ezeidApp').
 
                 $scope.jobData = {
                     token : $rootScope._userInfo.Token,
-                    tid : $scope.jobTid
+                    job_id : $scope.jobTid
                 }
 
                 $http({

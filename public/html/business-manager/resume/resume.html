@@ -351,11 +351,11 @@
                          title="Order By">
                         <label class="label label-danger">Order By</label>
                     </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
+                    <div class="col-lg-5 col-md-5 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
                         <div class="form-group form-group-sm">
-                            <select class="form-control" ng-model="sortBy">
-                                <option value="0"> By Task Date </option>
-                                <option value="1"> By Action Date </option>
+                            <select class="form-control" ng-model="order_by" ng-change="searchJobTerm()">
+                                <option value="1">By Date(Ascending)</option>
+                                <option value="2">By Date(Descending)</option>
                             </select>
                         </div>
                     </div>
@@ -373,7 +373,6 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 bottom-clearfix">
                         <button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" data-toggle="tooltip" title="" data-original-title="Add New Job">
                             <span class="glyphicon glyphicon-plus-sign"></span> Add New
@@ -382,19 +381,18 @@
                 </div>
             </div>
 
-
             <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
                 <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
-                    <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
+                    <button type="button" ng-click="getPreviousResultPage()" ng-disabled="!paginationPrevious" class="btn btn-info bt-xs no-radius">
                         <span class="glyphicon glyphicon-chevron-left"></span>
                         Prev
                     </button>
-                    <button type="button" class="btn btn-info bt-xs no-radius active">
+                   <!-- <button type="button" class="btn btn-info bt-xs no-radius active">
                         {{pageNumber}}
-                    </button>
-                    <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
-                        <span class="glyphicon glyphicon-chevron-right"></span>
+                    </button>-->
+                    <button type="button" ng-click="getNextResultPage()" ng-disabled="!paginationNext" class="btn btn-info bt-xs no-radius">
                         Next
+                        <span class="glyphicon glyphicon-chevron-right"></span>
                     </button>
                 </div>
             </div>
@@ -558,11 +556,6 @@
                                 <button type="button" class="btn btn-white">Job Type</button>
                               </span>
                         <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
-                            <!--<option value="0"> Job Type </option>
-                            <option value="1"> Full Time </option>
-                            <option value="2"> Part Time </option>
-                            <option value="3"> Contract </option>
-                            <option value="4"> Internship </option> -->
 
                             <option value="0"> Job Type </option>
                             <option value="1">Full Time</option>
