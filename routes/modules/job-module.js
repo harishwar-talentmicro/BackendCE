@@ -523,7 +523,6 @@ Job.prototype.searchJobs = function(req,res,next){
 
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
-                                console.log(getresult)
                                 if (!err) {
                                     if (getresult) {
                                         if (getresult[0]) {
@@ -767,7 +766,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
 };
 
-
 /**
  * @todo FnApplyJob
  * Method : POST
@@ -955,50 +953,6 @@ Job.prototype.appliedJobList = function(req,res,next){
     }
 };
 
-Job.prototype.getFiltersForJob = function(req,res,next){
-    /**
-     * @todo FnGetFiltersForJob
-     */
-    var _this = this;
-    var responseMsg = {
-        status : false,
-        data : [],
-        message : 'Unable to load job filters ! Please try again',
-        error : {
-            server : 'An internal server error'
-        }
-    };
-
-    try{
-        st.db.query('CALL pgetmasterfiltersforjob()',function(err,result){
-            if(err){
-                console.log('Error : FnGetFiltersForJob :'+err);
-                res.status(400).json(responseMsg);
-            }
-            else{
-                console.log(result);
-                responseMsg.status = true;
-                responseMsg.message = 'Job filters loaded successfully';
-                responseMsg.error = null;
-                responseMsg.data = {
-                    location_information : result[0],
-                    salary : result[1],
-                    job_type: result[2],
-                    category : result[3]
-                };
-                res.status(200).json(responseMsg);
-            }
-        });
-    }
-
-    catch(ex){
-        res.status(500).json(responseMsg);
-        console.log('Error : FnGetFiltersForJob '+ ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-    }
-};
-
 /**
  * @todo FnGetJobDetails
  * Method : GET
@@ -1081,5 +1035,10 @@ Job.prototype.getJobDetails = function(req,res,next){
         }
     }
 };
+
+
+
+
+
 
 module.exports = Job;
