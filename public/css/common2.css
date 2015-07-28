@@ -3027,6 +3027,10 @@ sup.tm{
     padding-bottom: 10px;
 }
 
+/*.jsr .individual-tiles  > .job-main-content:hover{*/
+    /*box-shadow: 3px 3px 5px rgb(27, 180, 224);*/
+/*}*/
+
 .jdv .detail-content-bg
 {
     background-color: rgb(242, 242, 242);
