@@ -199,9 +199,11 @@ app.get('/job_search',LocationManager.FnSearchJobs);
 app.get('/job_seeker_search',LocationManager.FnJobSeekerSearch);
 app.post('/job_apply',LocationManager.FnApplyJob);
 app.get('/job_applied_list',LocationManager.FnAppliedJobList);
-app.get('/job_filters',LocationManager.FnGetFiltersForJob);
 app.get('/feedback',LocationManager.FnGetFeedback);
 app.get('/job_details',LocationManager.FnGetJobDetails);
+app.get('/institutes',LocationManager.FnGetInstitutes);
+app.get('/educations',LocationManager.FnGetEducations);
+app.get('/specialization',LocationManager.FnGetSpecialization);
 
 
 //below service are for EZEIDAP

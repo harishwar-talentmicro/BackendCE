@@ -61,6 +61,10 @@ Job.prototype.create = function(req,res,next){
     var mobileNo = req.body.mobileNo;
     var locationsList = req.body.locationsList;
     var categoryID = req.body.category_id;
+    var educationID= (req.body.education_id) ? req.body.education_id : '';
+    var specializationID = (req.body.specialization_id) ? req.body.specialization_id : '';
+    var instituteID = (req.body.institute_id) ? req.body.institute_id : '';
+
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
@@ -163,7 +167,8 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
-                                + ',' + st.db.escape(categoryID);
+                                + ',' + st.db.escape(categoryID)+ ',' + st.db.escape(educationID)+ ',' + st.db.escape(specializationID)
+                                + ',' + st.db.escape(instituteID);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
                                 console.log(insertresult);
@@ -326,7 +331,7 @@ Job.prototype.getAll = function(req,res,next){
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
     var orderBy = req.query.order_by;  // 1-ascending else descending
-        console.log(req.query);
+        //console.log(req.query);
     var responseMessage = {
         status: false,
         error: {},
@@ -355,7 +360,6 @@ Job.prototype.getAll = function(req,res,next){
                     if (result) {
                         var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
                             + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy);
-                        console.log(query);
                         console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
 
@@ -363,30 +367,33 @@ Job.prototype.getAll = function(req,res,next){
                                 if (getresult) {
                                     if (getresult[0]) {
                                         if (getresult[0][0]) {
-                                            console.log(getresult[2].length);
+
+                                            var loc_result = [];
                                             for(var i=0; i< getresult[2].length; i++){
                                                 var jobids =  getresult[2][i].jobid;
-                                                for(var j=0; j< getresult[1].length; j++){
+
+
+                                                for(var j=0; j < getresult[1].length; j++){
                                                     var tid = getresult[1][j].tid;
                                                     if(jobids == tid){
-                                                       var loc_result = [getresult[2][i]];
 
-                                                        var result = [getresult[1][j]];
-
-                                                        var final_result = result.concat(loc_result);
-                                                        console.log('result........');
-                                                        console.log(final_result);
-
+                                                        var final_result = getresult[1][j];
+                                                       var location_result = getresult[2][i];
+                                                        loc_result.push(location_result);
+                                                        var job_location = JSON.stringify(loc_result);
+                                                        //console.log(job_location);
                                                     }
                                                 }
+
                                             }
+                                            console.log(job_location);
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs send successfully';
-                                            //console.log(getresult[2][0]);
+
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
-                                                result: getresult[1],
+                                                result: final_result,
                                                 job_location: getresult[2]
                                             };
                                             res.status(200).json(responseMessage);
@@ -500,9 +507,9 @@ Job.prototype.searchJobs = function(req,res,next){
     try{
     var latitude = req.query.latitude;
     var longitude = req.query.longitude;
-    var proximity = req.query.proximity;
+    var proximity = (req.query.proximity) ? req.query.proximity : 0;
     var jobType = req.query.jobType;
-    var exp = req.query.exp;
+    var exp = (req.query.exp) ? req.query.exp : -1;
     var keywords = req.query.keywords;
     var token = (req.query.token) ? req.query.token : '';
     var pageSize = req.query.page_size;
@@ -521,24 +528,42 @@ Job.prototype.searchJobs = function(req,res,next){
 
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
-                                console.log(getresult)
                                 if (!err) {
                                     if (getresult) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Jobs details loaded successfully';
-                                        responseMessage.data = {
-                                            total_count: getresult[0][0].count,
-                                            result : getresult[1]
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSearchJobs: Jobs save successfully');
+                                        if (getresult[0]) {
+                                            if (getresult[0][0]) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Jobs Search result loaded successfully';
+                                                responseMessage.data = {
+                                                    total_count: getresult[0][0].count,
+                                                    result: getresult[1],
+                                                    job_location : getresult[2],
+                                                    salary : getresult[3],
+                                                    category : getresult[4]
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSearchJobs: Jobs Search result loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.message = 'Search result not found';
+                                                responseMessage.error = {};
+                                                res.status(400).json(responseMessage);
+                                                console.log('FnSearchJobs:Search result not found');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.message = 'Search result not found';
+                                            responseMessage.error = {};
+                                            res.status(400).json(responseMessage);
+                                            console.log('FnSearchJobs:Search result not found');
+                                        }
                                     }
                                     else {
-                                        responseMessage.message = 'Jobs details not found';
+                                        responseMessage.message = 'Search result not found';
                                         responseMessage.error = {};
                                         res.status(400).json(responseMessage);
-                                        console.log('FnSearchJobs:Jobs details not found');
+                                        console.log('FnSearchJobs:Search result not found');
                                     }
                                 }
                                 else {
@@ -746,7 +771,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
 };
 
-
 /**
  * @todo FnApplyJob
  * Method : POST
@@ -934,49 +958,6 @@ Job.prototype.appliedJobList = function(req,res,next){
     }
 };
 
-Job.prototype.getFiltersForJob = function(req,res,next){
-    /**
-     * @todo FnGetFiltersForJob
-     */
-    var _this = this;
-    var responseMsg = {
-        status : false,
-        data : [],
-        message : 'Unable to load job filters ! Please try again',
-        error : {
-            server : 'An internal server error'
-        }
-    };
-
-    try{
-        st.db.query('CALL pgetmasterfiltersforjob()',function(err,result){
-            if(err){
-                console.log('Error : FnGetFiltersForJob :'+err);
-                res.status(400).json(responseMsg);
-            }
-            else{
-                console.log(result);
-                responseMsg.status = true;
-                responseMsg.message = 'Job filters loaded successfully';
-                responseMsg.error = null;
-                responseMsg.data = {
-                    location_information : result[0],
-                    salary : result[1],
-                    job_type: result[2]
-                };
-                res.status(200).json(responseMsg);
-            }
-        });
-    }
-
-    catch(ex){
-        res.status(500).json(responseMsg);
-        console.log('Error : FnGetFiltersForJob '+ ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-    }
-};
-
 /**
  * @todo FnGetJobDetails
  * Method : GET
@@ -1059,5 +1040,10 @@ Job.prototype.getJobDetails = function(req,res,next){
         }
     }
 };
+
+
+
+
+
 
 module.exports = Job;

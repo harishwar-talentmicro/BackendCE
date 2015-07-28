@@ -42,6 +42,9 @@ exports.FnGetMTitle = userModule.getMTitle;
 exports.FnUpdateProfilePicture = userModule.updateProfilePicture;
 exports.FnGetLoginCheck = userModule.getLoginCheck;
 exports.FnGetProxmity = userModule.getProxmity;
+exports.FnGetInstitutes = userModule.getInstitutes;
+exports.FnGetEducations = userModule.getEducations;
+exports.FnGetSpecialization = userModule.getSpecialization;
 
 var Audit = require('./modules/audit-module.js');
 var auditModule = new Audit(db,stdLib);

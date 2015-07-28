@@ -99,7 +99,7 @@ angular.module('ezeidApp').
                 {
                     return experience;
                 }
-                return 0;
+                return null;
             }
 
             /**
@@ -144,7 +144,7 @@ angular.module('ezeidApp').
                 parkingStatus: false,
                 openStatus: false,
                 promotionsOnly: false,
-                experience:0,
+                experience:'',
                 //jobType:'1,2,3,4,5,6',
                 lat: '12.93',
                 lng: '77.57'
@@ -216,7 +216,6 @@ angular.module('ezeidApp').
                         {
                             continue;
                         }
-                        console.log(prop.toString());
                         if (modifyValue.indexOf(prop) !== -1) {
                             var val = ($scope.searchParams[prop]) ? 1 : 0;
                             var attr = prop + '=' + val + '&'
