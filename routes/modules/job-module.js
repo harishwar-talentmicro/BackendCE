@@ -60,6 +60,7 @@ Job.prototype.create = function(req,res,next){
     var email_id = req.body.email_id;
     var mobileNo = req.body.mobileNo;
     var locationsList = req.body.locationsList;
+    var categoryID = req.body.category_id;
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
@@ -161,7 +162,8 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(job_description) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                                 + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
-                                + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id);
+                                + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
+                                + ',' + st.db.escape(categoryID);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
                                 console.log(insertresult);
@@ -824,7 +826,7 @@ Job.prototype.applyJob = function(req,res,next){
                             };
                             responseMessage.data = null;
                             res.status(401).json(responseMessage);
-                            console.log('FnSaveJobs: Invalid token');
+                            console.log('FnApplyJob: Invalid token');
                         }
                     }
                     else {

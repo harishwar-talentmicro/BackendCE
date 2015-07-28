@@ -214,10 +214,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 if(res.status)
                 {
                     console.log("SAi2");
-
                     console.log(res.skillMatrix.length);
 
                     CVAttachCtrl._CVInfo = res.data[0];
+
+                    //$scope.locationArrayString = [];
+                   // $scope.mainLocationArray = [];qs;
+
+
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
                         console.log("SAi10");

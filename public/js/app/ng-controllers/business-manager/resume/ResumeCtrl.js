@@ -1613,6 +1613,10 @@
 
                 $scope.jobSearchTerm= "";
                 $scope.jobFilterStatus = 0;
+                //Per page record is 10
+                $scope.page_size = 10;
+                $scope.page_count = 0;
+                $scope.order_by = 1;
 
                 getPostedJob();
 
@@ -1647,17 +1651,31 @@
                         token : $rootScope._userInfo.Token,
                         ezeone_id : $rootScope._userInfo.ezeid,
                         keywordsForSearch : $scope.jobSearchTerm,
-                        status : $scope.jobFilterStatus
+                        status : $scope.jobFilterStatus,
+                        page_size : $scope.page_size,
+                        page_count : $scope.page_count,
+                        order_by : $scope.order_by
                     }
                 }).success(function(resp){
                         $scope.$emit('$preLoaderStop');
 
+                        console.log(resp.data.result);
+
                         if(resp.status)
                         {
-                            for(var i = 0; i < resp.data.length; i++){
-                                resp.data[i].posteddate = convertTimeToLocal(resp.data[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
+                            for(var i = 0; i < resp.data.result.length; i++){
+                                resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
                             }
-                            $scope.jobData = resp.data;
+                            $scope.jobData = resp.data.result;
+
+                            for(var i = 0; i < resp.data.job_location.length; i++)
+                            {
+                                $scope.mainLocationArray.push(resp.data.job_location[i]);
+                                $scope.locationArrayString.push(resp.data.job_location[i].Locname);
+                            }
+
+                            $scope.mainLocationArray.push(tempLocationArray);
+                            $scope.locationArrayString.push($scope.jobLocation);
                         }
 
                     }).error(function(err){
@@ -1813,6 +1831,9 @@
             $scope.openJobPostForm = function(_index){
                 $scope.showJobListing = false;
 
+                $scope.locationArrayString = [];
+                $scope.mainLocationArray = [];
+
                 if(_index == 'add')
                 {
                     $scope.jobTid = 0;
@@ -1936,6 +1957,63 @@
                 $scope.jobLocation = "";
 
                 console.log($scope.mainLocationArray);
+            }
+
+
+            /* setting the parameter for implementing pagination */
+          //  var pagecount = 0;
+            if($scope.currentStartResultId > 0)
+            {
+                $scope.page_count = $scope.currentStartResultId;
+            }
+
+            $scope.currentStartResultId = 0;
+            $scope.isPagination = 1;//Want pagination
+            $scope.paginationNext = true;
+            $scope.paginationPrevious = true;
+
+            /**
+             * pagination: show next 20 result
+             */
+            $scope.getNextResultPage = function()
+            {
+                $scope.currentStartResultId += $scope.page_size;
+                /* just get the next result */
+              //  getSearchKeyWord($scope.params);
+                reConfigurePaginationButton();
+            }
+
+            /**
+             * Pagination: show previous 20 results
+             */
+            $scope.getPreviousResultPage = function()
+            {
+                $scope.currentStartResultId -= $scope.page_size;
+                /* just get the next result */
+              //  getSearchKeyWord($scope.params);
+                reConfigurePaginationButton();
+            }
+
+            /**
+             * Reset the status of the pagination button
+             */
+            function reConfigurePaginationButton()
+            {
+                if(($scope.currentStartResultId+$scope.page_size) > $scope.totalResult)
+                {
+                    $scope.paginationNext = false;
+                    $scope.paginationPrevious = true;
+                }
+                else if(($scope.currentStartResultId+$scope.page_size) < $scope.totalResult && ($scope.currentStartResultId+$scope.page_size) > $scope.page_size)
+                {
+                    $scope.paginationNext = true;
+                    $scope.paginationPrevious = true;
+                }
+                else
+                {
+                    $scope.paginationNext = true;
+                    $scope.paginationPrevious = false;
+                }
             }
 
         }]);
