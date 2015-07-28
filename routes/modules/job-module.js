@@ -326,7 +326,7 @@ Job.prototype.getAll = function(req,res,next){
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
     var orderBy = req.query.order_by;  // 1-ascending else descending
-        console.log(req.query);
+        //console.log(req.query);
     var responseMessage = {
         status: false,
         error: {},
@@ -355,7 +355,6 @@ Job.prototype.getAll = function(req,res,next){
                     if (result) {
                         var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
                             + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy);
-                        console.log(query);
                         console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
 
@@ -364,38 +363,32 @@ Job.prototype.getAll = function(req,res,next){
                                     if (getresult[0]) {
                                         if (getresult[0][0]) {
 
-                                            console.log(getresult[2].length);
-
+                                            var loc_result = [];
                                             for(var i=0; i< getresult[2].length; i++){
                                                 var jobids =  getresult[2][i].jobid;
 
-                                                console.log(getresult[1].length);
 
-                                                for(var j=0; j< getresult[1].length; j++){
+                                                for(var j=0; j < getresult[1].length; j++){
                                                     var tid = getresult[1][j].tid;
                                                     if(jobids == tid){
-                                                       var loc_result = [getresult[2][i]];
-                                                        console.log(loc_result);
-                                                        var result = getresult[1][j];
-                                                        console.log(result);
 
-                                                        //var array = [];
-                                                        //var item = { }
-                                                        var final_result = loc_result.push(result);
-                                                        console.log('result........');
-                                                        console.log(final_result);
-
+                                                        var final_result = getresult[1][j];
+                                                       var location_result = getresult[2][i];
+                                                        loc_result.push(location_result);
+                                                        var job_location = JSON.stringify(loc_result);
+                                                        //console.log(job_location);
                                                     }
                                                 }
 
                                             }
+                                            console.log(job_location);
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs send successfully';
-                                            //console.log(getresult[2][0]);
+
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
-                                                result: getresult[1],
+                                                result: final_result,
                                                 job_location: getresult[2]
                                             };
                                             res.status(200).json(responseMessage);
@@ -540,7 +533,10 @@ Job.prototype.searchJobs = function(req,res,next){
                                                 responseMessage.message = 'Jobs Search result loaded successfully';
                                                 responseMessage.data = {
                                                     total_count: getresult[0][0].count,
-                                                    result: getresult[1]
+                                                    result: getresult[1],
+                                                    job_location : getresult[2],
+                                                    salary : getresult[3],
+                                                    category : getresult[4]
                                                 };
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnSearchJobs: Jobs Search result loaded successfully');
