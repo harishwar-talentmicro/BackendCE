@@ -363,22 +363,31 @@ Job.prototype.getAll = function(req,res,next){
                                 if (getresult) {
                                     if (getresult[0]) {
                                         if (getresult[0][0]) {
+
                                             console.log(getresult[2].length);
+
                                             for(var i=0; i< getresult[2].length; i++){
                                                 var jobids =  getresult[2][i].jobid;
+
+                                                console.log(getresult[1].length);
+
                                                 for(var j=0; j< getresult[1].length; j++){
                                                     var tid = getresult[1][j].tid;
                                                     if(jobids == tid){
                                                        var loc_result = [getresult[2][i]];
+                                                        console.log(loc_result);
+                                                        var result = getresult[1][j];
+                                                        console.log(result);
 
-                                                        var result = [getresult[1][j]];
-
-                                                        var final_result = result.concat(loc_result);
+                                                        //var array = [];
+                                                        //var item = { }
+                                                        var final_result = loc_result.push(result);
                                                         console.log('result........');
                                                         console.log(final_result);
 
                                                     }
                                                 }
+
                                             }
                                             responseMessage.status = true;
                                             responseMessage.error = null;
@@ -502,7 +511,7 @@ Job.prototype.searchJobs = function(req,res,next){
     var longitude = req.query.longitude;
     var proximity = (req.query.proximity) ? req.query.proximity : 0;
     var jobType = req.query.jobType;
-    var exp = req.query.exp;
+    var exp = (req.query.exp) ? req.query.exp : -1;
     var keywords = req.query.keywords;
     var token = (req.query.token) ? req.query.token : '';
     var pageSize = req.query.page_size;
