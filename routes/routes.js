@@ -143,6 +143,7 @@ exports.FnGetResTransDetails = reservationModule.getTransDetails;
 exports.FnChangeReservationStatus = reservationModule.changeReservStatus;
 exports.FnGetworkinghoursList = reservationModule.getworkinghoursList;
 exports.FnSaveFeedback = reservationModule.saveFeedback;
+exports.FnGetFeedback = reservationModule.getFeedback;
 exports.FnResourcePicture = reservationModule.getResourcePicture;
 
 
@@ -155,6 +156,7 @@ exports.FnSearchJobs = job.searchJobs;
 exports.FnJobSeekerSearch = job.searchJobSeekers;
 exports.FnApplyJob = job.applyJob;
 exports.FnAppliedJobList = job.appliedJobList;
+exports.FnGetFiltersForJob = job.getFiltersForJob;
 
 
 //ap parts

@@ -264,8 +264,8 @@ Job.prototype.create = function(req,res,next){
                             });
                         };
                         //calling function at first time
-                        if (locationDetails) {
-                            if (locationDetails.length > 0) {
+                        if (locationsList) {
+                            if (locationsList.length > 0) {
                                 insertLocations(locationDetails);
                             }
                             else {
@@ -317,7 +317,6 @@ Job.prototype.create = function(req,res,next){
 Job.prototype.getAll = function(req,res,next){
     var _this = this;
 
-    var error = {};
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
     var keywordsForSearch = req.query.keywordsForSearch;
@@ -366,7 +365,8 @@ Job.prototype.getAll = function(req,res,next){
                                         responseMessage.message = 'Jobs send successfully';
                                         responseMessage.data = {
                                             total_count: getresult[0][0].count,
-                                            result : getresult[1]
+                                            result : getresult[1],
+                                            job_location : getresult[2]
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetJobs: Jobs send successfully');
@@ -494,9 +494,6 @@ Job.prototype.searchJobs = function(req,res,next){
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
                                 console.log(getresult)
-                                console.log(getresult[0][0].count);
-                                console.log(getresult[1]);
-
                                 if (!err) {
                                     if (getresult) {
                                         responseMessage.status = true;
@@ -686,8 +683,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
             });
         };
         //calling function at first time
-        if (locationDetails) {
-            if (locationDetails.length > 0) {
+        if (locationsList) {
+            if (locationsList.length > 0) {
                 insertLocations(locationDetails);
             }
             else {
@@ -703,11 +700,9 @@ Job.prototype.searchJobSeekers = function(req,res) {
         }
     }
     catch (ex) {
-        responseMessage.error = {
-            server: 'Internal Server Error'
-        };
-        responseMessage.message = 'An error occurred !'
-        res.status(500).json(responseMessage);
+        responseMessage.error = {};
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
         console.log('Error : FnJobSeekerSearch ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -903,6 +898,48 @@ Job.prototype.appliedJobList = function(req,res,next){
     }
 };
 
+Job.prototype.getFiltersForJob = function(req,res,next){
+    /**
+     * @todo FnGetFiltersForJob
+     */
+    var _this = this;
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to load job filters ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        st.db.query('CALL pgetmasterfiltersforjob()',function(err,result){
+            if(err){
+                console.log('Error : FnGetFiltersForJob :'+err);
+                res.status(400).json(responseMsg);
+            }
+            else{
+                console.log(result);
+                responseMsg.status = true;
+                responseMsg.message = 'Job filters loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = {
+                    location_information : result[0],
+                    salary : result[1],
+                    job_type: result[2]
+                };
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnGetFiltersForJob '+ ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
 
 
 module.exports = Job;
