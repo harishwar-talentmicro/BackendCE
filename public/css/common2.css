@@ -3213,3 +3213,34 @@ sup.tm{
     color: #fff;
     cusror:pointer;
 }
+
+.jsr .job-search-advnc-opt
+{
+    position: absolute;
+    z-index: 999;
+}
+
+.hpw .no-padding-and-border
+{
+    padding: 0px !important;
+    border: 0px !important;
+}
+
+.jsr .job-type-dropdown
+{
+    position: absolute;
+    z-index: 9999;
+    background-color: #FFF;
+    width: 80%;
+}
+
+.jsr .job-type-individual-element
+{
+    padding: 5px;
+}
+
+.jsr .job-type-dropdown{
+    border: 1px solid #e3e3e3;
+    box-shadow: 2px 2px #C5BDBD;
+    background-color: #F9F7F7;
+}
