@@ -500,7 +500,7 @@ Job.prototype.searchJobs = function(req,res,next){
     try{
     var latitude = req.query.latitude;
     var longitude = req.query.longitude;
-    var proximity = req.query.proximity;
+    var proximity = (req.query.proximity) ? req.query.proximity : 0;
     var jobType = req.query.jobType;
     var exp = req.query.exp;
     var keywords = req.query.keywords;
@@ -524,21 +524,37 @@ Job.prototype.searchJobs = function(req,res,next){
                                 console.log(getresult)
                                 if (!err) {
                                     if (getresult) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Jobs details loaded successfully';
-                                        responseMessage.data = {
-                                            total_count: getresult[0][0].count,
-                                            result : getresult[1]
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSearchJobs: Jobs save successfully');
+                                        if (getresult[0]) {
+                                            if (getresult[0][0]) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Jobs Search result loaded successfully';
+                                                responseMessage.data = {
+                                                    total_count: getresult[0][0].count,
+                                                    result: getresult[1]
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSearchJobs: Jobs Search result loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.message = 'Search result not found';
+                                                responseMessage.error = {};
+                                                res.status(400).json(responseMessage);
+                                                console.log('FnSearchJobs:Search result not found');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.message = 'Search result not found';
+                                            responseMessage.error = {};
+                                            res.status(400).json(responseMessage);
+                                            console.log('FnSearchJobs:Search result not found');
+                                        }
                                     }
                                     else {
-                                        responseMessage.message = 'Jobs details not found';
+                                        responseMessage.message = 'Search result not found';
                                         responseMessage.error = {};
                                         res.status(400).json(responseMessage);
-                                        console.log('FnSearchJobs:Jobs details not found');
+                                        console.log('FnSearchJobs:Search result not found');
                                     }
                                 }
                                 else {
@@ -962,7 +978,8 @@ Job.prototype.getFiltersForJob = function(req,res,next){
                 responseMsg.data = {
                     location_information : result[0],
                     salary : result[1],
-                    job_type: result[2]
+                    job_type: result[2],
+                    category : result[3]
                 };
                 res.status(200).json(responseMsg);
             }

@@ -57,10 +57,10 @@ Search.prototype.searchKeyword = function(req,res,next){
         //var Proximity = parseInt(req.body.Proximity);
         var Latitude = parseFloat(req.body.Latitude);
         var Longitude = parseFloat(req.body.Longitude);
-        var ParkingStatus = req.body.ParkingStatus;
-        var OpenCloseStatus = req.body.OpenStatus;
-        var Rating = req.body.Rating;
-        var HomeDelivery = req.body.HomeDelivery;
+        var ParkingStatus = (req.body.ParkingStatus) ? req.body.ParkingStatus : '';
+        var OpenCloseStatus = (req.body.OpenCloseStatus) ? req.body.OpenCloseStatus : '';
+        var Rating = (req.body.Rating) ? req.body.Rating : '';
+        var HomeDelivery = (req.body.HomeDelivery) ? req.body.HomeDelivery : 0;
         var CurrentDate = req.body.CurrentDate;
 
         if(CurrentDate != null)
