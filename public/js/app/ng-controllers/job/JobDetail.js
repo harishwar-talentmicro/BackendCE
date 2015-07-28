@@ -37,6 +37,39 @@ angular.module('ezeidApp').
             UtilityService
         ) {
 
+            if($routeParams.jobid)
+            {
+                getJobDetail($routeParams.jobid);
+            }
+
+
+
+            // Get job details
+            function getJobDetail(_jobID)
+            {
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'job_details',
+                    method : 'GET',
+                    params : {
+                        job_id : _jobID
+                    }
+                }).success(function(resp){
+                        $scope.$emit('$preLoaderStop');
+
+                        console.log("SAi candidate list..");
+                        console.log(resp);
+
+                        if(resp.status)
+                        {
+
+                        }
+
+                    }).error(function(err){
+                        $scope.$emit('$preLoaderStop');
+                    });
+            }
+
             // Apply for job
             $scope.applyForJob = function(_tid){
 

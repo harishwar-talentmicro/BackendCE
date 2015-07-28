@@ -333,15 +333,15 @@
             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
                 <div class="input-group tx-search-input-group">
                     <input class="form-control" ng-model="jobSearchTerm" type="text" placeholder="Search job based on Title"/>
-                                    <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
-                                            <i class="fa fa-times"></i>
-                                    </span>
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-info"
-                                                ng-click="searchJobTerm()"
-                                                type="button"><i class="fa fa-search"></i> Search
-                                        </button>
-                                    </span>
+                        <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
+                                <i class="fa fa-times"></i>
+                        </span>
+                        <span class="input-group-btn">
+                            <button class="btn btn-info"
+                                    ng-click="searchJobTerm()"
+                                    type="button"><i class="fa fa-search"></i> Search
+                            </button>
+                        </span>
                 </div>
             </div>
 
@@ -418,19 +418,20 @@
                     <b class="ng-binding">{{job.posteddate | ageFilter}}</b>
                 </small>
             </div>
-            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+            <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                 <small class="text-success">
-                    <b class="ng-binding">27 Applied</b>
+
+                    <b class="ng-binding">{{job.totalapplied}} Applied</b>
                 </small>
             </div>
-            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
                 <div class="row">
-                    <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
-                        <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="View Details">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openCandidateListPopup(job.tid)" data-original-title="View Candidates" ng-disabled="!job.totalapplied">
                             <span class="glyphicon glyphicon-fullscreen"></span>
-                            Details
+                            View Candidates
                         </button>
-                    </div>-->
+                    </div>
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
                         <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
                             <span class="glyphicon glyphicon-pencil"></span>
@@ -448,6 +449,74 @@
             </div>
         </div>
     </div>
+        <!--Applied job candidate list start-->
+        <modal mtitle="candidateModalBox.title" mclass="candidateModalBox.class" visible="showCandidateListModal">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero">
+                        <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
+                            <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    <b class="ng-binding">@krunal</b>
+                                </small>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    <b class="ng-binding">{{job.jobtitle}}</b>
+                                </small>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    <b class="ng-binding">{{job.posteddate | ageFilter}}</b>
+                                </small>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    {{job.tid}}
+                                    <b class="ng-binding" ng-click="openCandidateListPopup(job.tid)">27 Applied</b>
+                                </small>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                                <div class="row">
+                                    <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                                        <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="View Details">
+                                            <span class="glyphicon glyphicon-fullscreen"></span>
+                                            Details
+                                        </button>
+                                    </div>-->
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                                        <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                            Edit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="java" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    <b class="ng-binding" ng-show="job.status == 0">Active</b>
+                                    <b class="ng-binding" ng-show="job.status == 1">Closed(Hired)</b>
+                                    <b class="ng-binding" ng-show="job.status == 2">Cancelled</b>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+                        <div class="row top-clearfix-padding-half bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button class="btn btn-danger btn-sm no-radius" ng-click="openCandidateListPopup()">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </modal>
+        <!--Applied job candidate list end-->
     <!--List of Job End hear-->
 </div>
 
@@ -612,6 +681,21 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-lg-6 p-top-10">
+                    <div class="input-group m-bot15">
+                         <span class="input-group-btn">
+                            <button type="button" class="btn btn-white">Job Categories</button>
+                         </span>
+                        <select class="form-control" name="listType" ng-model="salaryType">
+                            <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
+                        </select>
+                    </div>
+                </div>
+
+
+
+
+
                 <div class="col-lg-12 p-top-10">
                     <div class="m-bot15">
                         <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
@@ -1173,8 +1257,6 @@
 </div>
 </modal>
 <!-- end: ModalBox ends -->
-
-
 </div>
 
 </div>
