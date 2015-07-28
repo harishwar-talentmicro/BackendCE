@@ -1663,7 +1663,8 @@
 
                         if(resp.status)
                         {
-                            for(var i = 0; i < resp.data.result.length; i++){
+                            for(var i = 0; i < resp.data.result.length; i++)
+                            {
                                 resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
                             }
                             $scope.jobData = resp.data.result;
@@ -1674,8 +1675,8 @@
                                 $scope.locationArrayString.push(resp.data.job_location[i].Locname);
                             }
 
-                            $scope.mainLocationArray.push(tempLocationArray);
-                            $scope.locationArrayString.push($scope.jobLocation);
+                        //  $scope.mainLocationArray.push(tempLocationArray);
+                       //     $scope.locationArrayString.push($scope.jobLocation);
                         }
 
                     }).error(function(err){
@@ -1827,12 +1828,40 @@
 
             $scope.SalaryTypeList = [{ id: 1, label: "Hour" }, { id: 2, label: "Month" }, { id: 3, label: "Annual" }];
 
+            // Get job Categories
+            function getJobCategories()
+            {
+                $http({
+                    url : GURL + 'ewmGetCategory',
+                    method : 'GET',
+                    params : {
+                        LangID : 1
+                    }
+                }).success(function(resp){
+
+                        console.log("SAi Categories list..");
+                        console.log(resp);
+
+                        if(resp.status)
+                        {
+
+                        }
+
+                    }).error(function(err){
+
+                    });
+            }
+
             // Show job posting form
             $scope.openJobPostForm = function(_index){
+
+                getJobCategories();
                 $scope.showJobListing = false;
 
                 $scope.locationArrayString = [];
                 $scope.mainLocationArray = [];
+
+
 
                 if(_index == 'add')
                 {
@@ -1876,12 +1905,7 @@
                     $scope.emailContact = $scope.jobData[_index].emailid;
                     $scope.jobStatus = $scope.jobData[_index].status;
 
-                  //  var str = "How are you doing today?";
                     var res = $scope.jobData[_index].location.split(",");
-                    console.log("SAi");
-                    console.log(res);
-
-                    //$scope.locationArrayString.push($scope.jobLocation);
                 }
 
             };
@@ -1959,63 +1983,50 @@
                 console.log($scope.mainLocationArray);
             }
 
+            $scope.candidateModalBox = {
+                title : 'View Candidate',
+                class : 'business-manager-modal'
+            };
+            $scope.showCandidateListModal = false;
 
-            /* setting the parameter for implementing pagination */
-          //  var pagecount = 0;
-            if($scope.currentStartResultId > 0)
+            // Get applied candidate List for job
+            function getCandidateList(_jobID)
             {
-                $scope.page_count = $scope.currentStartResultId;
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'job_applied_list',
+                    method : 'GET',
+                    params : {
+                        job_id : _jobID
+                    }
+                }).success(function(resp){
+                        $scope.$emit('$preLoaderStop');
+
+                        console.log("SAi candidate list..");
+                        console.log(resp);
+
+                        if(resp.status)
+                        {
+
+                        }
+
+                    }).error(function(err){
+                        $scope.$emit('$preLoaderStop');
+                    });
             }
 
-            $scope.currentStartResultId = 0;
-            $scope.isPagination = 1;//Want pagination
-            $scope.paginationNext = true;
-            $scope.paginationPrevious = true;
-
-            /**
-             * pagination: show next 20 result
-             */
-            $scope.getNextResultPage = function()
+            // Open popup - list of candidate who applied for job
+            $scope.openCandidateListPopup = function(_jobID)
             {
-                $scope.currentStartResultId += $scope.page_size;
-                /* just get the next result */
-              //  getSearchKeyWord($scope.params);
-                reConfigurePaginationButton();
-            }
+                console.log("job id"+_jobID);
+                $scope.showCandidateListModal = !$scope.showCandidateListModal;
 
-            /**
-             * Pagination: show previous 20 results
-             */
-            $scope.getPreviousResultPage = function()
-            {
-                $scope.currentStartResultId -= $scope.page_size;
-                /* just get the next result */
-              //  getSearchKeyWord($scope.params);
-                reConfigurePaginationButton();
-            }
-
-            /**
-             * Reset the status of the pagination button
-             */
-            function reConfigurePaginationButton()
-            {
-                if(($scope.currentStartResultId+$scope.page_size) > $scope.totalResult)
+                if(_jobID)
                 {
-                    $scope.paginationNext = false;
-                    $scope.paginationPrevious = true;
-                }
-                else if(($scope.currentStartResultId+$scope.page_size) < $scope.totalResult && ($scope.currentStartResultId+$scope.page_size) > $scope.page_size)
-                {
-                    $scope.paginationNext = true;
-                    $scope.paginationPrevious = true;
-                }
-                else
-                {
-                    $scope.paginationNext = true;
-                    $scope.paginationPrevious = false;
+                    getCandidateList(_jobID);
                 }
             }
 
-        }]);
+    }]);
 })();
 
