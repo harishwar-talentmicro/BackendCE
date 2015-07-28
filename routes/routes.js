@@ -157,6 +157,7 @@ exports.FnJobSeekerSearch = job.searchJobSeekers;
 exports.FnApplyJob = job.applyJob;
 exports.FnAppliedJobList = job.appliedJobList;
 exports.FnGetFiltersForJob = job.getFiltersForJob;
+exports.FnGetJobDetails = job.getJobDetails;
 
 
 //ap parts
