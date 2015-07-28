@@ -40,7 +40,7 @@
                                 </button>
                             </div>
 
-                            <input id="searchTextField" type="text" placeholder="" ng-model="params.searchTerm"
+                            <input id="searchTextField" type="text" placeholder="" ng-model="params.searchTerm" ng-keypress="triggerSearchOnEnterKey($event.keyCode)"
                                    class="form-control width-search-bar dropdown-toggle" aria-label="..." data-toggle="dropdown">
 
                             <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(params.searchType == 2) && (KeyWords.length > 0) && (params.searchTerm.length)">-->
@@ -162,12 +162,13 @@
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 result-info-div">
                 <div class="sorting-block row">
                     <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 text-left">
-                        {{getResultRange()}} for <b>{{searchTerm}}</b>
+                        {{getResultRange()}} for <b>{{searchKeyWord}}</b>
                     </div>
                     <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 text-right">
                         <button class="btn btn-default btn-sm">
                             Sort by <i class="fa fa-reorder"></i>
                         </button>
+
                     </div>
                 </div>
             </div>

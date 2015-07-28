@@ -40,7 +40,7 @@ angular.module('ezeidApp').
             /**
              * All initialization goes here
              */
-            //Basic initialization
+                //Basic initialization
             $scope.params = [];
             $scope.resultData = [];
             $scope.isResultEmpty = true;//YES - by default
@@ -52,6 +52,7 @@ angular.module('ezeidApp').
             $scope.params.proximity = 0;//Default any is selected
             $scope.params.jobType = '1,2,3,4,5,6';//Checkboxes for job type
             $scope.params.searchTerm = $routeParams.searchTerm;
+            $scope.searchKeyWord = $routeParams.searchTerm;
             $scope.activeJobType = [false,false,false,false,false,false];//Checkboxes for job type
             $scope.showProximityFilter = false;
             $scope.jobTypeFilter = false;
@@ -66,7 +67,7 @@ angular.module('ezeidApp').
 
             //easy and default calling of functions
             initiateSearch();
-
+            console.log("fry pan");
 
             /***********************************************************************************************************
              /***********************************************************************************************************
@@ -83,8 +84,8 @@ angular.module('ezeidApp').
             {
                 /* save all the route params in a temporary variable[params] */
                 $scope.params = $routeParams;
-                console.log($routeParams);
-                console.log($scope.params.proximity);
+                cleanExperienceData();
+
                 if(!parseInt($scope.params.searchTerm.length) > 0)
                 {
                     Notification.error({ message : 'Invalid request', delay : MsgDelay});
@@ -99,19 +100,34 @@ angular.module('ezeidApp').
             }
 
             /**
+             * clean the data of experience
+             */
+            function cleanExperienceData()
+            {
+                var exp = $scope.params.experience;
+                console.log(exp);
+                if(exp == 'null' || exp == '' || typeof(exp) == undefined)
+                {
+                    $scope.params.experience = '';
+                }
+                console.log(exp);
+            }
+
+            /**
              * make a search Api calls
              */
             function setSearchResult()
             {
                 var token = ($rootScope._userInfo.token)?$rootScope._userInfo.token:null;
                 /* make an API request to get the data */
+                var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
                 $http({ method: 'get', url: GURL + 'job_search',
                     params: {
                         latitude:$scope.params.lat,
                         longitude:$scope.params.lng,
                         proximity:$scope.params.proximity,
                         jobType:$scope.params.jobType,
-                        exp:$scope.params.experience,
+                        exp:experience,
                         keywords:$scope.params.searchTerm,
                         token: token,
                         page_size: $scope.pageSize,
@@ -119,12 +135,16 @@ angular.module('ezeidApp').
                         order_by: $scope.orderBy
                     }
                 }).success(function (response) {
-                    $scope.isProcessing = false;
+                        $scope.isProcessing = false;
                     /* YIPPE! Got response */
-                    var isEmpty = response.data.result[0].contactname;
-                    if(isEmpty == null)//No Result found
+                    console.log(response);
+                    var isEmpty = !(response.data.result.length > 0);
+                    console.log(isEmpty);
+                    if(isEmpty)//No Result found
                     {
                         console.log("No result found");
+                        /* reset all the data */
+                        resetSearchResultData();
                         return;
                     }
                     /* set the total count of the result */
@@ -137,6 +157,14 @@ angular.module('ezeidApp').
                     Notification.error({ message : 'An error occurred', delay : MsgDelay});
                     $scope.$emit('$preLoaderStop');
                 });
+            }
+
+            /**
+             * Reset all the search result data
+             */
+            function resetSearchResultData()
+            {
+                $scope.params = [];
             }
 
             /**
@@ -344,8 +372,26 @@ angular.module('ezeidApp').
             $scope.triggerSearch = function()
             {
                 setJobTypeData();
-                /* initiate search */
-                initiateSearch();
+                /* redirect to search page */
+                var searchStr = getSearchtermString();
+                $location.url('/jobsearch?' + searchStr);
+                console.log("hyt");
+                $scope.triggerSearchOnEnterKey();
+            }
+
+            /**
+             * Get the string to search a normal search term
+             */
+            function getSearchtermString()
+            {
+                var searchStr = "";
+                for (var prop in $scope.params) {
+                    console.log(prop);
+                    if ($scope.params.hasOwnProperty(prop)) {
+                        searchStr += (prop + '=' + encodeURIComponent($scope.params[prop]) + '&');
+                    }
+                }
+                return (searchStr);
             }
 
             /**
@@ -356,10 +402,10 @@ angular.module('ezeidApp').
                 var tempStringArr = [];
                 for(var i = 0;i < $scope.activeJobType.length; i++)
                 {
-                   if($scope.activeJobType[i])
-                   {
-                       tempStringArr.push(parseInt(i) + 1);
-                   }
+                    if($scope.activeJobType[i])
+                    {
+                        tempStringArr.push(parseInt(i) + 1);
+                    }
                 }
                 $scope.params.jobType = tempStringArr.join(',');
             }
@@ -367,16 +413,15 @@ angular.module('ezeidApp').
             /**
              * trigger search on ENTER key press
              */
-            triggerSearchOnEnterKey();
-            function triggerSearchOnEnterKey()
+            $scope.triggerSearchOnEnterKey = function(keyCode)
             {
-                $('#searchTextField').keypress(function(e){
-                    if(parseInt(e.keyCode) == 13)
-                    {
-                        /* trigger search */
-                        $scope.triggerSearch();
-                    }
-                });
+                if(parseInt(keyCode) == 13)
+                {
+                    /* trigger search */
+                    $scope.triggerSearch();
+                    console.log("FIRED");
+                }
             }
 
+            $scope.triggerSearchOnEnterKey();
         }]);
