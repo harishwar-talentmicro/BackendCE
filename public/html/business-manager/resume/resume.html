@@ -686,8 +686,9 @@
                          <span class="input-group-btn">
                             <button type="button" class="btn btn-white">Job Categories</button>
                          </span>
-                        <select class="form-control" name="listType" ng-model="salaryType">
-                            <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
+                        <select class="form-control" name="listType" ng-model="jobCategori">
+                            <option value="0" class="ng-binding ng-scope">Job Categories</option>
+                            <option ng-repeat="categori in jobCategories track by categori.CategoryID" value="{{categori.CategoryID}}">{{categori.CategoryTitle}}</option>
                         </select>
                     </div>
                 </div>

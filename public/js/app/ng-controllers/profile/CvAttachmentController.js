@@ -23,10 +23,22 @@ angular.module('ezeidApp').controller('CVAttachController',[
     CVAttachCtrl._CVInfo.job_location1 = "";
     CVAttachCtrl._CVInfo.experience = 0;
 
+     $scope.selectedFunctions = [];
+
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
+            $('.dropdown-toggle').click(function(){$( ".filter-dropdown" ).slideToggle( "slow", function() {
+                // Animation complete.
+            });})
+
+            $('.dropdown-toggleCategory').click(function(){$( ".filter-dropdownCategory" ).slideToggle( "slow", function() {
+                // Animation complete.
+            });})
+
             getCVInfo();
             getAllSkills();
+            getJobCategories();
+
         } else {
             $location.path('/');
             CVAttachCtrl._CVInfo.Status = 1;
@@ -110,16 +122,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
        $scope.$emit('$preLoaderStart');
 
-        console.log("SAi........");
         CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 0;
        // CVAttachCtrl._CVInfo.job_location = (CVAttachCtrl._CVInfo.job_location) ? CVAttachCtrl._CVInfo.job_location : [];
         CVAttachCtrl._CVInfo.experience = (CVAttachCtrl._CVInfo.experience) ? CVAttachCtrl._CVInfo.experience : 0;
-
-        console.log("SAi=============>");
-        console.log(CVAttachCtrl._CVInfo.job_type);
-       // console.log(CVAttachCtrl._CVInfo.job_location);
-        console.log(CVAttachCtrl._CVInfo.experience);
-
 
        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
@@ -209,12 +214,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }).success(function (res)
            {
-               console.log("SAi1");
-               console.log(res);
                 if(res.status)
                 {
-                    console.log("SAi2");
-                    console.log(res.skillMatrix.length);
 
                     CVAttachCtrl._CVInfo = res.data[0];
 
@@ -224,7 +225,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
-                        console.log("SAi10");
 
                         $scope.skillMatrix = [
                             {
@@ -236,11 +236,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             }
                         ];
 
-                        console.log($scope.skillMatrix);
                     }
                     else
                     {
-                        console.log("SAi11");
                         $scope.skillMatrix.push(
                             {
                                 "tid":0,
@@ -250,8 +248,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                                 "active_status":1
                             }
                         );
-
-                        console.log($scope.skillMatrix);
 
                         for (var nCount = 0; nCount < res.skillMatrix.length; nCount++)
                         {
@@ -298,7 +294,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 }
                 else
                 {
-                    console.log("SAi3");
                     CVAttachCtrl._CVInfo.Status = 1;
                     $scope.showLink = false;
                     $scope.skillMatrix = [
@@ -311,7 +306,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     ];
 
-                    console.log($scope.skillMatrix);
                 }
            });
     };
@@ -416,18 +410,15 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
         }).success(function (res)
             {
-                console.log("SAi7");
                 $scope.$emit('$preLoaderStop');
                 if(res.status)
                 {
-                    console.log("SAi8");
-                    for (var nCount = 0; nCount < res.data.length; nCount++)
+                   for (var nCount = 0; nCount < res.data.length; nCount++)
                     {
                         $scope.availableTags.push(res.data[nCount].SkillTitle);
                     }
                 }
            }).error(function(err){
-                console.log("SAi9");
                 $scope.$emit('$preLoaderStop');
             });
     };
@@ -507,7 +498,44 @@ angular.module('ezeidApp').controller('CVAttachController',[
             $scope.locationArrayString.push(CVAttachCtrl._CVInfo.job_location1);
             CVAttachCtrl._CVInfo.job_location1 = "";
 
-            console.log($scope.mainLocationArray);
+        }
+
+        /**
+         * Select - Unselect Function
+         */
+        $scope.selectFunction = function(_functionID)
+        {
+           if($scope.selectedFunctions.indexOf(_functionID)!=-1)
+            {
+                var index = $scope.selectedFunctions.indexOf(_functionID);
+                $scope.selectedFunctions.splice(index,1);
+            }
+            else
+            {
+                $scope.selectedFunctions.push(_functionID);
+            }
+            CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions;
+        }
+
+        // Get job Categories
+        function getJobCategories()
+        {
+            $http({
+                url : GURL + 'ewmGetCategory',
+                method : 'GET',
+                params : {
+                    LangID : 1
+                }
+            }).success(function(resp){
+
+
+                    $scope.jobCategories = resp;
+                    console.log("SAi Categories list..");
+                    console.log($scope.jobCategories);
+
+                }).error(function(err){
+
+                });
         }
 
 

@@ -195,10 +195,7 @@
             $scope.contactName = "";
             $scope.phone = "";
             $scope.emailContact = "";
-
-            $scope.validationDone = false;
-
-
+            $scope.jobCategori = 0;
 
             $scope.showModal = false;
             $scope.modalBox = {
@@ -240,9 +237,6 @@
             };
 
             $scope.editModes = [];
-
-
-
 
             $scope.loadLocationListForEzeid = function(tid){
                 var defer = $q.defer();
@@ -1718,7 +1712,6 @@
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
                 }
-
                 if($scope.phone.length < 1){
                     err.push('Phone is empty');
                 }
@@ -1729,7 +1722,9 @@
                 {
                     err.push('Not valid email!');
                 }
-
+                if($scope.jobCategori == 0){
+                    err.push('Please select Job category');
+                }
 
                 if(err.length > 0){
                     for(var i = 0; i < err.length; i++){
@@ -1738,50 +1733,16 @@
                     // Notification.error({ message : "Please enter information for Job", delay : 2000});
                     return false;
                 }
-
                 return true;
             };
 
             // save job to system
             $scope.postJob = function(){
-
-                $scope.validationDone = true;
                 if(validateItem())
                 {
                     $scope.$emit('$preLoaderStart');
-
-                    console.log($scope.jobTitle);
-                    console.log($scope.jobCode);
-                    console.log($scope.jobDescription);
-                    console.log($scope.skillKeyWords);
-                    console.log($scope.jobVacancies);
-                    console.log($scope.experienceFrom);
-                    console.log($scope.experienceTo);
-                    console.log($scope.salaryFrom);
-                    console.log($scope.salaryTo);
-                    console.log($scope.salaryType);
-                    console.log($scope.jobType);
-                    console.log($scope.contactName);
-                    console.log($scope.phone);
-                    console.log($scope.emailContact);
-
                     console.log("SAi222");
-                    console.log($scope.mainLocationArray);
-
-                    var location = [
-                        {
-                            "location_title" : "bangalore",
-                            "latitude" :  "12.453323",
-                            "longitude" : "73.4545",
-                            "country" : "india"
-                        },
-                        {
-                            "location_title" : "chennai",
-                            "latitude" :  "12.453323",
-                            "longitude" : "73.4545",
-                            "country" : "india"
-                        }
-                    ]
+                    console.log($scope.jobCategori);
 
                     $scope.jobData = {
                         token : $rootScope._userInfo.Token,
@@ -1802,7 +1763,8 @@
                         contactName : $scope.contactName,
                         email_id : $scope.emailContact,
                         mobileNo : $scope.phone,
-                        locationsList : JSON.stringify($scope.mainLocationArray)
+                        locationsList : JSON.stringify($scope.mainLocationArray),
+                        category_id : $scope.jobCategori
                     }
 
                     $http({
@@ -1839,13 +1801,10 @@
                     }
                 }).success(function(resp){
 
+
+                       $scope.jobCategories = resp;
                         console.log("SAi Categories list..");
-                        console.log(resp);
-
-                        if(resp.status)
-                        {
-
-                        }
+                        console.log($scope.jobCategories);
 
                     }).error(function(err){
 
