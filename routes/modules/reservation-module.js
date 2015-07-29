@@ -798,8 +798,8 @@ Reservation.prototype.getFeedback = function(req,res,next){
 
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
     var moduleType = req.query.module_type;
-    var transId = req.query.trans_id;
-    var resourceId = req.query.resource_id;
+    var transId = req.query.trans_id ? req.query.trans_id : 0;
+    var resourceId = req.query.resource_id ? req.query.resource_id : 0;
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
         console.log(req.query);

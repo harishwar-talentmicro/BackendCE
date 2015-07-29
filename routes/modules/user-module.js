@@ -2508,12 +2508,13 @@ User.prototype.saveResume = function(req,res,next){
         var specializationID = req.body.specialization_id;
         var yearOfPassing = req.body.year_of_passing;
         var aggregateScore = req.body.aggregate_score;
+        var institueTitle = req.body.institue_title;
 
         if(typeof(locationsList) == "string"){
             locationsList = JSON.parse(locationsList);
         }
 
-        console.log(locationsList);
+        //console.log(locationsList);
 
         if(!locationsList){
             locationsList = [];
@@ -2554,7 +2555,7 @@ User.prototype.saveResume = function(req,res,next){
                                 st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle) + ',' + st.db.escape(jobType) + ','+
                                 st.db.escape(location_id) + ',' + st.db.escape(categoryID) + ',' + st.db.escape(instituteID)
                                 + ',' + st.db.escape(educationID) + ',' + st.db.escape(specializationID) + ',' + st.db.escape(yearOfPassing)
-                                + ','+ st.db.escape(aggregateScore);
+                                + ','+ st.db.escape(aggregateScore)+ ','+ st.db.escape(institueTitle);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             console.log(query);
                             st.db.query(query, function (err, InsertResult) {
@@ -3709,43 +3710,74 @@ User.prototype.getProxmity = function(req,res,next) {
  * @param res
  * @param next
  */
-User.prototype.getInstitutes = function(req,res,next){
+User.prototype.getInstitutes = function(req,res,next) {
 
     var _this = this;
+    var token = req.query.token;
     var responseMsg = {
-        status : false,
-        data : [],
-        message : 'Unable to load Institutes ! Please try again',
-        error : {
-            server : 'An internal server error'
-        }
+        status: false,
+        data: [],
+        message: 'Unable to load Institutes ! Please try again',
+        error: {}
     };
 
-    try{
-        st.db.query('CALL pGetInstitutes()',function(err,result){
-            if(err){
-                console.log('Error : FnGetInstitutes :'+err);
-                res.status(400).json(responseMsg);
-            }
-            else{
-                console.log(result);
-                responseMsg.status = true;
-                responseMsg.message = 'Institutes loaded successfully';
-                responseMsg.error = null;
-                responseMsg.data = result[0];
-                res.status(200).json(responseMsg);
-            }
-        });
+    var validateStatus = true, error = {};
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
     }
 
-    catch(ex){
-        res.status(500).json(responseMsg);
-        console.log('Error : FnGetInstitutes '+ ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    if (!validateStatus) {
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors below';
+        res.status(400).json(responseMsg);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        st.db.query('CALL pGetInstitutes()', function (err, result) {
+                            if (err) {
+                                console.log('Error : FnGetInstitutes :' + err);
+                                res.status(400).json(responseMsg);
+                            }
+                            else {
+                                console.log(result);
+                                responseMsg.status = true;
+                                responseMsg.message = 'Institutes loaded successfully';
+                                responseMsg.error = null;
+                                responseMsg.data = result[0];
+                                res.status(200).json(responseMsg);
+                            }
+                        });
+                    }
+                    else {
+                        responseMsg.message = 'Invalid token';
+                        responseMsg.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMsg.data = null;
+                        res.status(401).json(responseMsg);
+                        console.log('FnGetInstitutes: Invalid token');
+                    }
+                }
+                else {
+                    responseMsg.error = {};
+                    responseMsg.message = 'Error in validating Token';
+                    res.status(500).json(responseMsg);
+                    console.log('FnGetInstitutes:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            res.status(500).json(responseMsg);
+            console.log('Error : FnGetInstitutes ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
     }
 };
-
 
 /**
  * @todo FnGetEducations
@@ -3754,40 +3786,72 @@ User.prototype.getInstitutes = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getEducations = function(req,res,next){
+User.prototype.getEducations = function(req,res,next) {
 
     var _this = this;
+    var token = req.query.token;
     var responseMsg = {
-        status : false,
-        data : [],
-        message : 'Unable to load Educations ! Please try again',
-        error : {
-            server : 'An internal server error'
-        }
+        status: false,
+        data: [],
+        message: 'Unable to load Institutes ! Please try again',
+        error: {}
     };
 
-    try{
-        st.db.query('CALL pGetEducations()',function(err,result){
-            if(err){
-                console.log('Error : FnGetEducations :'+err);
-                res.status(400).json(responseMsg);
-            }
-            else{
-                console.log(result);
-                responseMsg.status = true;
-                responseMsg.message = 'Educations loaded successfully';
-                responseMsg.error = null;
-                responseMsg.data = result[0];
-                res.status(200).json(responseMsg);
-            }
-        });
+    var validateStatus = true, error = {};
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
     }
 
-    catch(ex){
-        res.status(500).json(responseMsg);
-        console.log('Error : FnGetEducations '+ ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    if (!validateStatus) {
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors below';
+        res.status(400).json(responseMsg);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        st.db.query('CALL pGetEducations()', function (err, result) {
+                            if (err) {
+                                console.log('Error : FnGetEducations :' + err);
+                                res.status(400).json(responseMsg);
+                            }
+                            else {
+                                console.log(result);
+                                responseMsg.status = true;
+                                responseMsg.message = 'Educations loaded successfully';
+                                responseMsg.error = null;
+                                responseMsg.data = result[0];
+                                res.status(200).json(responseMsg);
+                            }
+                        });
+                    }
+                    else {
+                        responseMsg.message = 'Invalid token';
+                        responseMsg.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMsg.data = null;
+                        res.status(401).json(responseMsg);
+                        console.log('FnGetEducations: Invalid token');
+                    }
+                }
+                else {
+                    responseMsg.error = {};
+                    responseMsg.message = 'Error in validating Token';
+                    res.status(500).json(responseMsg);
+                    console.log('FnGetEducations:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            res.status(500).json(responseMsg);
+            console.log('Error : FnGetEducations ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
     }
 };
 
@@ -3799,41 +3863,77 @@ User.prototype.getEducations = function(req,res,next){
  * @param res
  * @param next
  */
-User.prototype.getSpecialization = function(req,res,next){
+User.prototype.getSpecialization = function(req,res,next) {
 
     var _this = this;
+    var token = req.query.token;
     var responseMsg = {
-        status : false,
-        data : [],
-        message : 'Unable to load Specialization ! Please try again',
-        error : {
-            server : 'An internal server error'
-        }
+        status: false,
+        data: [],
+        message: 'Unable to load Institutes ! Please try again',
+        error: {}
     };
 
-    try{
-        st.db.query('CALL pGetSpecialization()',function(err,result){
-            if(err){
-                console.log('Error : FnGetSpecialization :'+err);
-                res.status(400).json(responseMsg);
-            }
-            else{
-                console.log(result);
-                responseMsg.status = true;
-                responseMsg.message = 'Specialization loaded successfully';
-                responseMsg.error = null;
-                responseMsg.data = result[0];
-                res.status(200).json(responseMsg);
-            }
-        });
+    var validateStatus = true, error = {};
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
     }
 
-    catch(ex){
-        res.status(500).json(responseMsg);
-        console.log('Error : FnGetSpecialization '+ ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    if (!validateStatus) {
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors below';
+        res.status(400).json(responseMsg);
     }
-};
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        st.db.query('CALL pGetSpecialization()', function (err, result) {
+                            if (err) {
+                                console.log('Error : FnGetSpecialization :' + err);
+                                res.status(400).json(responseMsg);
+                            }
+                            else {
+                                console.log(result);
+                                responseMsg.status = true;
+                                responseMsg.message = 'Specialization loaded successfully';
+                                responseMsg.error = null;
+                                responseMsg.data = result[0];
+                                res.status(200).json(responseMsg);
+                            }
+                        });
+                    }
+                    else {
+                        responseMsg.message = 'Invalid token';
+                        responseMsg.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMsg.data = null;
+                        res.status(401).json(responseMsg);
+                        console.log('FnGetSpecialization: Invalid token');
+                    }
+                }
+                else {
+                    responseMsg.error = {};
+                    responseMsg.message = 'Error in validating Token';
+                    res.status(500).json(responseMsg);
+                    console.log('FnGetSpecialization:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            res.status(500).json(responseMsg);
+            console.log('Error : FnGetSpecialization ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+}
+
+
+
+
 
 module.exports = User;
