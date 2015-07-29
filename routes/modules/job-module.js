@@ -808,6 +808,7 @@ Job.prototype.applyJob = function(req,res,next){
         }
 
         if(!validateStatus){
+            responseMessage.error = error;
             responseMessage.message = 'Please check the errors below';
             res.status(400).json(responseMessage);
         }
@@ -901,7 +902,7 @@ Job.prototype.appliedJobList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = 'Invalid parameters';
+    var validateStatus = true, error = {};
 
     if(!jobId){
         error['jobId'] = 'Invalid job ID';
@@ -909,6 +910,7 @@ Job.prototype.appliedJobList = function(req,res,next){
     }
 
     if(!validateStatus){
+        responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
     }
@@ -983,7 +985,7 @@ Job.prototype.getJobDetails = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = 'Invalid parameters';
+    var validateStatus = true, error = {};
 
     if(!jobId){
         error['jobId'] = 'Invalid job ID';
@@ -991,6 +993,7 @@ Job.prototype.getJobDetails = function(req,res,next){
     }
 
     if(!validateStatus){
+        responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
     }
