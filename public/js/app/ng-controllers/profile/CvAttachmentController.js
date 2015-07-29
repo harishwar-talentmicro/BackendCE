@@ -36,9 +36,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 // Animation complete.
             });})
 
+            $('.dropdown-toggleSpecialization').click(function(){$( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
+                // Animation complete.
+            });})
+
             getJobCategories();
             getInstituteList();
             getEducations();
+            getSpecialization();
 
             getCVInfo();
             getAllSkills();
@@ -223,9 +228,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 {
                     CVAttachCtrl._CVInfo = res.data[0];
 
-                    //$scope.locationArrayString = [];
-                   // $scope.mainLocationArray = [];qs;
-
+                    $scope.mainLocationArray = res.job_location;
+                    for (var nCount = 0; nCount < res.job_location.length; nCount++)
+                    {
+                        $scope.locationArrayString.push(res.job_location[nCount].Locname);
+                    }
 
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
@@ -559,8 +566,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
-            console.log(resp);
-            $scope.instituteList = resp;
+            $scope.instituteList = resp.data;
         })
         .error(function(err){
 
@@ -576,31 +582,82 @@ angular.module('ezeidApp').controller('CVAttachController',[
     // Below function Call on click of institute text field
     $scope.instituteTextBoxClicked = function() {
         $scope.showInstituteDropDown = !$scope.showInstituteDropDown;
+        $scope.showEducationDropDown = false;
     }
 
     // Below function Call on selection of institute
     $scope.selectInstitute = function(instituteID,title) {
         CVAttachCtrl._CVInfo.institute = title;
         $scope.instituteId = instituteID;
+        $scope.showInstituteDropDown = false;
     }
 
-        // Get Educations list
-        function getEducations()
-        {
-            $http({
-                url : GURL + 'educations',
-                method : 'GET',
-                params : {
-                    token : $rootScope._userInfo.Token
-                }
-            }).success(function(resp){
-                    console.log(resp);
-                    $scope.educationList = resp;
-                })
-                .error(function(err){
+    // Get Educations list
+    function getEducations()
+    {
+        $http({
+            url : GURL + 'educations',
+            method : 'GET',
+            params : {
+                token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+                $scope.educationList = resp.data;
+            })
+            .error(function(err){
 
-                });
-        }
+            });
+    }
+
+    CVAttachCtrl._CVInfo.education_id = 0;
+    $scope.showEducationDropDown = false;
+    // Below function Call on key press of education text field
+    $scope.educationKeyPress = function(keyEvent) {
+        $scope.showEducationDropDown = true;
+    }
+    // Below function Call on click of education text field
+    $scope.educationTextBoxClicked = function() {
+        $scope.showEducationDropDown = !$scope.showEducationDropDown;
+        $scope.showInstituteDropDown =false;
+    }
+
+    // Below function Call on selection of education
+    $scope.selectEducation = function(instituteID,title) {
+        CVAttachCtrl._CVInfo.education = title;
+        CVAttachCtrl._CVInfo.education_id = instituteID;
+        $scope.showEducationDropDown = false;
+    }
+
+    function getSpecialization()
+    {
+        $http({
+            url : GURL + 'specialization',
+            method : 'GET',
+            params : {
+                token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+               $scope.specializationList = resp.data;
+        })
+        .error(function(err){
+
+        });
+    }
+
+    CVAttachCtrl._CVInfo.specialization_id = 0;
+    $scope.specelizationTitle = "";
+    /**
+     * Select Specialization
+     */
+    $scope.selectSpecialization = function(_SpecializationID,title)
+    {
+        CVAttachCtrl._CVInfo.specialization_id = _SpecializationID;
+        $scope.specelizationTitle = title;
+
+        $( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
+            // Animation complete.
+        });
+    }
 
 
     }]);
