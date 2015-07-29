@@ -1953,3 +1953,19 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     border: 1px solid #E6DCDC;
 }
+
+.drpFunction {
+    width: 99.89%;
+}
+.width-105 {
+    width: 105% !important;
+}
+.hpw .filter-dropdownCategory {
+    position: absolute;
+    padding-top: 3px;
+    background-color: #fff;
+    z-index: 999;
+    padding: 4px;
+    width: 25%;
+    border: 1px solid rgb(161, 161, 161);
+}
