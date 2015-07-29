@@ -23,7 +23,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
     CVAttachCtrl._CVInfo.job_location1 = "";
     CVAttachCtrl._CVInfo.experience = 0;
 
-     $scope.selectedFunctions = [];
+    $scope.selectedFunctions = [];
+    $scope.selectedCategories = [];
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
@@ -35,9 +36,13 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 // Animation complete.
             });})
 
+            getJobCategories();
+            getInstituteList();
+            getEducations();
+
             getCVInfo();
             getAllSkills();
-            getJobCategories();
+
 
         } else {
             $location.path('/');
@@ -216,7 +221,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
            {
                 if(res.status)
                 {
-
                     CVAttachCtrl._CVInfo = res.data[0];
 
                     //$scope.locationArrayString = [];
@@ -225,7 +229,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
-
                         $scope.skillMatrix = [
                             {
                                 "tid":0,
@@ -235,7 +238,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                                 "active_status":1
                             }
                         ];
-
                     }
                     else
                     {
@@ -264,15 +266,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
                        }
                     }
 
-
-
                     for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
                         $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == 1) ? true : false;
                         skillsTid.push($scope.skillMatrix[nCount].tid);
                     }
 
                     $scope.editSkill = angular.copy($scope.skillMatrix[0]);
-
 
                     if(CVAttachCtrl._CVInfo.Pin)
                     {
@@ -473,67 +472,132 @@ angular.module('ezeidApp').controller('CVAttachController',[
         $scope.mainLocationArray.splice(id,1);
     }
 
-        /**
-         * add location to array
-         */
-        $scope.addJobLocation = function(param)
+    /**
+     * add location to array
+     */
+    $scope.addJobLocation = function(param)
+    {
+        if(!param || typeof(param) == undefined)
         {
-            if(!param || typeof(param) == undefined)
-            {
-                return;
-            }
-            var tempLocationArray = [];
-            if(typeof($scope.jobLat) == undefined || typeof($scope.country) == undefined ||  !CVAttachCtrl._CVInfo.job_location1.length > 0)
-            {
-                return;
-            }
-            tempLocationArray = {
-                "location_title" : CVAttachCtrl._CVInfo.job_location1,
-                "latitude" :  $scope.jobLat,
-                "longitude" : $scope.jobLong,
-                "country" : $scope.country
-            };
-
-            $scope.mainLocationArray.push(tempLocationArray);
-            $scope.locationArrayString.push(CVAttachCtrl._CVInfo.job_location1);
-            CVAttachCtrl._CVInfo.job_location1 = "";
-
+            return;
         }
-
-        /**
-         * Select - Unselect Function
-         */
-        $scope.selectFunction = function(_functionID)
+        var tempLocationArray = [];
+        if(typeof($scope.jobLat) == undefined || typeof($scope.country) == undefined ||  !CVAttachCtrl._CVInfo.job_location1.length > 0)
         {
-           if($scope.selectedFunctions.indexOf(_functionID)!=-1)
-            {
-                var index = $scope.selectedFunctions.indexOf(_functionID);
-                $scope.selectedFunctions.splice(index,1);
-            }
-            else
-            {
-                $scope.selectedFunctions.push(_functionID);
-            }
-            CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions;
+            return;
         }
+        tempLocationArray = {
+            "location_title" : CVAttachCtrl._CVInfo.job_location1,
+            "latitude" :  $scope.jobLat,
+            "longitude" : $scope.jobLong,
+            "country" : $scope.country
+        };
 
-        // Get job Categories
-        function getJobCategories()
+        $scope.mainLocationArray.push(tempLocationArray);
+        $scope.locationArrayString.push(CVAttachCtrl._CVInfo.job_location1);
+        CVAttachCtrl._CVInfo.job_location1 = "";
+    }
+
+    /**
+     * Select - Unselect Function
+     */
+    $scope.selectFunction = function(_functionID)
+    {
+       if($scope.selectedFunctions.indexOf(_functionID)!=-1)
+        {
+            var index = $scope.selectedFunctions.indexOf(_functionID);
+            $scope.selectedFunctions.splice(index,1);
+        }
+        else
+        {
+            $scope.selectedFunctions.push(_functionID);
+        }
+        CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions;
+    }
+
+    /**
+     * Select - Unselect Job Category
+     */
+    $scope.selectJobCategories = function(_categoryID)
+    {
+        if($scope.selectedCategories.indexOf(_categoryID)!=-1)
+        {
+            var index = $scope.selectedCategories.indexOf(_categoryID);
+            $scope.selectedCategories.splice(index,1);
+        }
+        else
+        {
+            $scope.selectedCategories.push(_categoryID);
+        }
+        CVAttachCtrl._CVInfo.category_id = $scope.selectedCategories;
+    }
+
+    // Get job Categories
+    function getJobCategories()
+    {
+        $http({
+            url : GURL + 'ewmGetCategory',
+            method : 'GET',
+            params : {
+                LangID : 1
+            }
+        }).success(function(resp){
+            $scope.jobCategories = resp;
+          })
+        .error(function(err){
+
+        });
+    }
+
+    // Get Institute list
+    function getInstituteList()
+    {
+        $http({
+            url : GURL + 'institutes',
+            method : 'GET',
+            params : {
+                token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+            console.log(resp);
+            $scope.instituteList = resp;
+        })
+        .error(function(err){
+
+        });
+    }
+
+    $scope.instituteId = 0;
+    $scope.showInstituteDropDown = false;
+    // Below function Call on key press of institute text field
+    $scope.instituteKeyPress = function(keyEvent) {
+        $scope.showInstituteDropDown = true;
+    }
+    // Below function Call on click of institute text field
+    $scope.instituteTextBoxClicked = function() {
+        $scope.showInstituteDropDown = !$scope.showInstituteDropDown;
+    }
+
+    // Below function Call on selection of institute
+    $scope.selectInstitute = function(instituteID,title) {
+        CVAttachCtrl._CVInfo.institute = title;
+        $scope.instituteId = instituteID;
+    }
+
+        // Get Educations list
+        function getEducations()
         {
             $http({
-                url : GURL + 'ewmGetCategory',
+                url : GURL + 'educations',
                 method : 'GET',
                 params : {
-                    LangID : 1
+                    token : $rootScope._userInfo.Token
                 }
             }).success(function(resp){
-
-
-                    $scope.jobCategories = resp;
-                    console.log("SAi Categories list..");
-                    console.log($scope.jobCategories);
-
-                }).error(function(err){
+                    console.log(resp);
+                    $scope.educationList = resp;
+                })
+                .error(function(err){
 
                 });
         }

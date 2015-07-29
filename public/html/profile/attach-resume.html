@@ -43,7 +43,7 @@
                                         </select>-->
 
                                         <button class="btn btn-default btn-sm dropdown-toggle opt opt-2 drpFunction emptyBox">
-                                            <span class="normal-view-text">-- Select Function --</span>
+                                            <span class="normal-view-text"> Select Function </span>
                                             <span class="mobile-view-text"></span>
                                             <span class="caret"></span></button>
                                         <div class="opt opt-2">
@@ -188,19 +188,87 @@
                                         </button>
                                         <div class="opt opt-2">
                                             <div class="filter-dropdownCategory width-105 search-option-content setTableFixHeight" style="display: none;">
-                                                <div class="checkbox-dropdown" ng-repeat="category in jobCategories track by $index" ng-click="selectFunction(category.CategoryID)">
-                                                    <i class="fa " ng-class="selectedFunctions.indexOf(category.CategoryID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{category.CategoryTitle}}
+                                                <div class="checkbox-dropdown" ng-repeat="category in jobCategories track by $index" ng-click="selectJobCategories(category.CategoryID)">
+                                                    <i class="fa " ng-class="selectedCategories.indexOf(category.CategoryID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{category.CategoryTitle}}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="row">
+                                <div class="row" ng-show="locationArrayString.length">
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 location-box-border" ng-show="locationArrayString.length">
                                         <span ng-repeat="location in locationArrayString track by $index">
                                             <label  class="label label-default label-form">{{location}} <i ng-click="removeLocation($index)" class="fa fa-times text-warning"></i></label>&nbsp;
                                         </span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Institute</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
+                                        <input type="text" placeholder="Institute"
+                                              ng-model = "CVAttachCtrl._CVInfo.institute"
+                                              ng-keypress="instituteKeyPress($event.keyCode)"
+                                              ng-click = "instituteTextBoxClicked()"
+                                              class="form-control"/>
+
+                                        <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
+                                           <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:CVAttachCtrl._CVInfo.institute" ng-click="selectInstitute('institute.instituteID','institute.title')">
+                                                {{category.CategoryTitle}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                        <!--<h5 class="text-primary text-left">Job Categories</h5>-->
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
+                                        <!--<button class="btn btn-default btn-sm dropdown-toggleCategory opt opt-2 drpFunction">
+                                            <span class="normal-view-text">Job Categories</span>
+                                            <span class="mobile-view-text"></span>
+                                            <span class="caret"></span>
+                                        </button>
+                                        <div class="opt opt-2">
+                                            <div class="filter-dropdownCategory width-105 search-option-content setTableFixHeight" style="display: none;">
+                                                <div class="checkbox-dropdown" ng-repeat="category in jobCategories track by $index" ng-click="selectJobCategories(category.CategoryID)">
+                                                    <i class="fa " ng-class="selectedCategories.indexOf(category.CategoryID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{category.CategoryTitle}}
+                                                </div>
+                                            </div>
+                                        </div>-->
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Last Education</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
+                                        <input type="text" placeholder="Last Education"
+                                               ng-model = "CVAttachCtrl._CVInfo.institute"
+                                               class="form-control"/>
+                                        <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
+                                            <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:CVAttachCtrl._CVInfo.institute" ng-click="selectInstitute('institute.instituteID','institute.title')">
+                                                {{category.CategoryTitle}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                        <!--<h5 class="text-primary text-left">Job Categories</h5>-->
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
+                                        <!--<button class="btn btn-default btn-sm dropdown-toggleCategory opt opt-2 drpFunction">
+                                            <span class="normal-view-text">Job Categories</span>
+                                            <span class="mobile-view-text"></span>
+                                            <span class="caret"></span>
+                                        </button>
+                                        <div class="opt opt-2">
+                                            <div class="filter-dropdownCategory width-105 search-option-content setTableFixHeight" style="display: none;">
+                                                <div class="checkbox-dropdown" ng-repeat="category in jobCategories track by $index" ng-click="selectJobCategories(category.CategoryID)">
+                                                    <i class="fa " ng-class="selectedCategories.indexOf(category.CategoryID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{category.CategoryTitle}}
+                                                </div>
+                                            </div>
+                                        </div>-->
                                     </div>
                                 </div>
 
