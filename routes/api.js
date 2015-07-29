@@ -151,6 +151,16 @@ router.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
 router.post('/crop_imageAP',LocationManager.FnCropImageAP);
 
 
+
+/**
+ * Services for MQTT Messaging Server Interface
+ */
+router.get('/ms_auth/user',LocationManager.FnMSAuthUser);
+router.get('/ms_auth/vhost',LocationManager.FnMSAuthVHost);
+router.get('/ms_auth/resource',LocationManager.FnMSAuthResource);
+
+
+
 //EZEID VAS
 router.get('/ewtLoginVES',LocationManager.FnLoginVES);
 router.post('/ewtSaveContactVES',LocationManager.FnSaveContactVES);
