@@ -161,14 +161,26 @@
             <!-- main sorting div goes here -->
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 result-info-div">
                 <div class="sorting-block row">
-                    <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 text-left">
+                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-8 text-left">
                         {{getResultRange()}} for <b>{{searchKeyWord}}</b>
                     </div>
-                    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 text-right">
-                        <button class="btn btn-default btn-sm">
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 text-right">
+                        <button class="btn btn-default btn-sm" ng-click="sortByToggle = !sortByToggle">
                             Sort by <i class="fa fa-reorder"></i>
                         </button>
-
+                        <br>
+                        <div class="sort-content filter-dropdown text-left row width-100" ng-show="sortByToggle">
+                            <div class="individual-sort-content select-option"
+                                 ng-class="params.orderBy == 1?'selected':''"
+                                    ng-click="changeResultSorting(1)">
+                                Ascending
+                            </div>
+                            <div class="individual-sort-content select-option"
+                                 ng-class="params.orderBy == 2?'selected':''"
+                                    ng-click="changeResultSorting(2)">
+                                Descending
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -182,57 +194,56 @@
                         FILTER RESULTS
                     </div>
                 </div>
-                <div class="job-filter-content">
+                <div class="job-filter-content" ng-show="filter.location.length > 0">
                     <!-- filters goes here -->
                     <div class="filter-content-heading container">
                         <!-- Filter by location -->
                         <span class="filter-heading">
                         <i class="fa fa-globe"></i> Location
                             </span>
-                        <div class="location-individual">
-                            <i class="fa fa-check-square"></i> Bangalore
-                        </div>
-                        <div class="location-individual">
-                            <i class="fa fa-square"></i> New Delhi / NCR
-                        </div>
-                        <div class="location-individual">
-                            <i class="fa fa-square"></i> Hyderabad
+                        <div class="location-check overflow-y-100">
+                            <div class="location-individual pointer"
+                                 ng-repeat="loc in filter.location track by $index"
+                                    ng-init="filterCheck.location[$index] = false"
+                                    ng-click="filterCheck.location[$index] = !filterCheck.location[$index]">
+                                <i class="fa" ng-class="filterCheck.location[$index]?'fa-check-square':'fa-square-o'"></i> {{loc.Locname}}
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="job-filter-content">
+                <div class="job-filter-content" ng-show="filter.industry.length > 0">
                     <!-- filters goes here -->
                     <div class="filter-content-heading container">
                         <!-- Filter by location -->
                         <span class="filter-heading">
                         <i class="fa fa-briefcase"></i> Industry
                             </span>
-                        <div class="location-individual">
-                            <i class="fa fa-check-square"></i> Information Tech.
+                        <div class="salary-check overflow-y-100">
+                        <div class="location-individual pointer"
+                             ng-repeat="industry in filter.industry track by $index"
+                                title="{{industry.CategoryTitle}}"
+                             ng-init="filterCheck.industry[$index] = false"
+                             ng-click="filterCheck.industry[$index] = !filterCheck.industry[$index]"
+                                >
+                            <i class="fa" ng-class="filterCheck.industry[$index]?'fa-check-square':'fa-square-o'"></i> {{industry.CategoryTitle | textLength:15}}
                         </div>
-                        <div class="location-individual">
-                            <i class="fa fa-square"></i> Banking / Finance
-                        </div>
-                        <div class="location-individual">
-                            <i class="fa fa-square"></i> Internet / Ecommerce
-                        </div>
+                            </div>
                     </div>
                 </div>
-                <div class="job-filter-content">
+                <div class="job-filter-content" ng-show="filter.salaryArr.length > 0">
                     <!-- filters goes here -->
                     <div class="filter-content-heading container">
                         <!-- Filter by location -->
                         <span class="filter-heading">
                         <i class="fa fa-money"></i> Salary
                             </span>
-                        <div class="location-individual">
-                            <i class="fa fa-check-square"></i> 0-3 LPA
+                        <div class="salary-check overflow-y-100">
+                        <div class="location-individual pointer"
+                             ng-repeat="range in filter.salaryArr track by $index"
+                             ng-init="filterCheck.salary[$index] = false"
+                             ng-click="filterCheck.salary[$index] = !filterCheck.salary[$index]">
+                            <i class="fa" ng-class="filterCheck.salary[$index]?'fa-check-square':'fa-square-o'"></i> {{range.minSal+" - "+range.maxSal}}
                         </div>
-                        <div class="location-individual">
-                            <i class="fa fa-square"></i> 3-6 LPA
-                        </div>
-                        <div class="location-individual">
-                            <i class="fa fa-square"></i> >6 LPA
                         </div>
                     </div>
                 </div>
@@ -251,7 +262,7 @@
                                 <small class="company-name">{{job.companyname}}</small>
                             </div>
                             <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12 text-right normal-view-buttons">
-                                <img class="height-45-px" alt="Oracle India Pvt. Ltd." src="http://img.naukimg.com/logo_images/v2/16512.gif">
+                                &nbsp;<!--<img class="height-45-px" alt="Oracle India Pvt. Ltd." src="http://img.naukimg.com/logo_images/v2/16512.gif">-->
                             </div>
                         </div>
                     </div>
@@ -282,7 +293,7 @@
                     <div class="job-main-content tile-head">
                         <div class="row">
                             <div class="col-lg-7 text-info text-uppercase">
-                                 N<i class="fa fa-cog fa-spin text-danger"></i> result f<i class="fa fa-cog fa-spin text-warning"></i>und<br>
+                                N<i class="fa fa-cog fa-spin text-danger"></i> result f<i class="fa fa-cog fa-spin text-warning"></i>und<br>
                             </div>
                             <div class="col-lg-5 text-right normal-view-buttons">
                                 <!--<img class="height-45-px" alt="Oracle India Pvt. Ltd." src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRdSv2I9KbGIvimt1RmpMIhbRX9w8JGWpDfBmGdJvsrvqnuuqW3BQ">-->

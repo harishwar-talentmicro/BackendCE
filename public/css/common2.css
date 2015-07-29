@@ -3248,3 +3248,9 @@ sup.tm{
     box-shadow: 2px 2px #C5BDBD;
     background-color: #F9F7F7;
 }
+
+.hpw .overflow-y-100
+{
+    max-height: 100px;
+    overflow-y: scroll;
+}
