@@ -684,6 +684,7 @@ User.prototype.login = function(req,res,next){
         var RtnMessage = {
             Token: '',
             IsAuthenticate: false,
+            ezeone_id:'',
             FirstName: '',
             Type: 0,
             Icon: '',
@@ -716,7 +717,7 @@ User.prototype.login = function(req,res,next){
             var Query = st.db.escape(UserName);
             console.log(Query);
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
-                console.log(loginResult);
+                //console.log(loginResult);
                 if (!err) {
                     if(loginResult && Password) {
                         if (loginResult[0].length > 0) {
@@ -726,10 +727,12 @@ User.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
+                            console.log(loginDetails);
+
                             if(comparePassword(Password,loginDetails[0].Password)){
                                 st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
                                     if (!err) {
-                                        //  console.log(TokenResult);
+                                       // console.log(TokenResult);
 
                                         if (TokenResult) {
                                             //res.setHeader('Cookie','Token='+Encrypt);
@@ -737,6 +740,7 @@ User.prototype.login = function(req,res,next){
                                             res.cookie('Token', TokenResult, { maxAge: 900000, httpOnly: true });
                                             RtnMessage.Token = TokenResult;
                                             RtnMessage.IsAuthenticate = true;
+                                            RtnMessage.ezeone_id = loginDetails[0].EZEID;
                                             RtnMessage.FirstName = loginDetails[0].FirstName;
                                             RtnMessage.Type = loginDetails[0].IDTypeID;
                                             RtnMessage.Icon = loginDetails[0].Icon;
