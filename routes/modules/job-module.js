@@ -304,7 +304,9 @@ Job.prototype.create = function(req,res,next){
             });
         }
         catch(ex){
-            responseMessage.error = {};
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
             responseMessage.message = 'An error occurred !'
             console.log('FnSaveJobs:error ' + ex.description);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
@@ -332,6 +334,8 @@ Job.prototype.getAll = function(req,res,next){
     var pageCount = req.query.page_count;
     var orderBy = req.query.order_by;  // 1-ascending else descending
         //console.log(req.query);
+    var final_result=[],loc_result = [],get_result=[],get_result1,tid, location_result={},jobids,job_location;
+
     var responseMessage = {
         status: false,
         error: {},
@@ -367,34 +371,14 @@ Job.prototype.getAll = function(req,res,next){
                                 if (getresult) {
                                     if (getresult[0]) {
                                         if (getresult[0][0]) {
-
-                                            var loc_result = [];
-                                            for(var i=0; i< getresult[2].length; i++){
-                                                var jobids =  getresult[2][i].jobid;
-
-
-                                                for(var j=0; j < getresult[1].length; j++){
-                                                    var tid = getresult[1][j].tid;
-                                                    if(jobids == tid){
-
-                                                        var final_result = getresult[1][j];
-                                                       var location_result = getresult[2][i];
-                                                        loc_result.push(location_result);
-                                                        var job_location = JSON.stringify(loc_result);
-                                                        //console.log(job_location);
-                                                    }
-                                                }
-
-                                            }
-                                            console.log(job_location);
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs send successfully';
-
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
-                                                result: final_result,
+                                                result : getresult[1],
                                                 job_location: getresult[2]
+
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetJobs: Jobs send successfully');
