@@ -36,7 +36,6 @@ angular.module('ezeidApp').
             $routeParams,
             UtilityService
         ) {
-
             /**
              * All initialization goes here
              */
@@ -45,6 +44,8 @@ angular.module('ezeidApp').
             $scope.resultData = [];
             $scope.isResultEmpty = true;//YES - by default
             $scope.isProcessing = true;
+            $scope.sortByToggle = false;
+
 
             /**
              * Initilization of variabes for additional options filter elements
@@ -52,6 +53,7 @@ angular.module('ezeidApp').
             $scope.params.proximity = 0;//Default any is selected
             $scope.params.jobType = '1,2,3,4,5,6';//Checkboxes for job type
             $scope.params.searchTerm = $routeParams.searchTerm;
+            $scope.params.orderBy = 1;//1: Asc, 2: Desc
             $scope.searchKeyWord = $routeParams.searchTerm;
             $scope.activeJobType = [false,false,false,false,false,false];//Checkboxes for job type
             $scope.showProximityFilter = false;
@@ -61,13 +63,37 @@ angular.module('ezeidApp').
             //Pagination settings
             $scope.pageSize = 10;//Results per page
             $scope.pageCount = 0;//Everything starts with a 0 - 10,20,30 etc.
-            $scope.orderBy = 1;//1: Asc, 2: Desc
             $scope.totalResult = 0;//Total results
             $scope.resultThisPage = 0;//Total results you got this page
 
+
+            //Right-side additional filters initialization
+            $scope.filter = {
+                location:[],
+                industry:[],
+                salaryArr:[],
+                minSalary:0,
+                maxSalary:0
+            };
+
+            /**
+             * Nake-array for checkbox effect
+             */
+            $scope.filterCheck = {
+                location:[],
+                industry:[],
+                salary:[]
+            };
+
+            /* selected Filter options */
+            $scope.selectedFilter = {
+                locationCode:[],
+                industryCode:[],
+                salaryRange:[]
+            };
+
             //easy and default calling of functions
             initiateSearch();
-            console.log("fry pan");
 
             /***********************************************************************************************************
              /***********************************************************************************************************
@@ -132,7 +158,7 @@ angular.module('ezeidApp').
                         token: token,
                         page_size: $scope.pageSize,
                         page_count: $scope.pageCount,
-                        order_by: $scope.orderBy
+                        order_by: $scope.params.orderBy
                     }
                 }).success(function (response) {
                         $scope.isProcessing = false;
@@ -151,6 +177,10 @@ angular.module('ezeidApp').
                     $scope.totalResult = response.data.total_count;
                     /* set result data */
                     setData(response.data.result);
+                    /* Set Advance-filter [Right-side] */
+                    setJobLocationData(response.data.job_location);
+                    setSalaryData(response.data.salary);
+                    setCategoryData(response.data.category)
 
                 }).error(function(){
                     $scope.isSearchInProgress = false;
@@ -178,6 +208,88 @@ angular.module('ezeidApp').
                     $scope.resultData = data;
                     $scope.resultThisPage = data.length;
                 }
+            }
+
+            /**
+             * Set jobLocation data
+             */
+            function setJobLocationData(data)
+            {
+                if(!data.length > 0)
+                {
+                    console.log("No Location Found");
+                }
+                $scope.filter.location = data;
+            }
+
+            /**
+             * set salary range data
+             */
+            function setSalaryData(data)
+            {
+                if(data[0].maxsalary == null || data[0].maxsalary == 'null' ||
+                    data[0].minsalary == null || data[0].minsalary == 'null')
+                {
+                    console.log("No Salary Found");
+                    return;
+                }
+                var minSal = data[0].minsalary;
+                var maxSal = data[0].maxsalary;
+                /* break the salary in to various ranges */
+                breakSalary(minSal,maxSal);
+            }
+
+            /**
+             * Break the salary range
+             */
+            function breakSalary(minSal,maxSal)
+            {
+                $scope.filter.salaryArr = [];
+                var tempArr = [];
+
+                if(minSal == maxSal)
+                {
+                    tempArr = {
+                        minsal:minSal,
+                        maxSal:maxSal
+                    }
+                    $scope.filter.salaryArr.push(tempArr);
+                    return;
+                }
+
+                /* calculate the salary range */
+                var min = minSal;
+                var max = maxSal;
+                var rangeBreakPoints = 5;
+                var diff = (max - min)/rangeBreakPoints;
+
+                for(var i = 0; i < rangeBreakPoints; i++)
+                {
+                    var tempDiff = diff;
+                    if(i > 0)
+                    {
+                        tempDiff -= 1;
+                        min += 1;
+                    }
+
+                    tempArr = {
+                        minSal:min,
+                        maxSal:(min = parseInt(min) + tempDiff)
+                    };
+                    $scope.filter.salaryArr.push(tempArr);
+                }
+            }
+
+            /**
+             * Set category or Industry data
+             */
+            function setCategoryData(data)
+            {
+                if(!data.length > 0)
+                {
+                    console.log("No Category Found");
+                }
+                $scope.filter.industry = data;
             }
 
             /**
@@ -375,7 +487,6 @@ angular.module('ezeidApp').
                 /* redirect to search page */
                 var searchStr = getSearchtermString();
                 $location.url('/jobsearch?' + searchStr);
-                console.log("hyt");
                 $scope.triggerSearchOnEnterKey();
             }
 
@@ -386,7 +497,6 @@ angular.module('ezeidApp').
             {
                 var searchStr = "";
                 for (var prop in $scope.params) {
-                    console.log(prop);
                     if ($scope.params.hasOwnProperty(prop)) {
                         searchStr += (prop + '=' + encodeURIComponent($scope.params[prop]) + '&');
                     }
@@ -419,9 +529,42 @@ angular.module('ezeidApp').
                 {
                     /* trigger search */
                     $scope.triggerSearch();
-                    console.log("FIRED");
                 }
             }
 
             $scope.triggerSearchOnEnterKey();
+
+            /**
+             * select location filter
+             */
+            $scope.selectLocationFilter = function(code)
+            {
+
+            }
+
+            /**
+             * Select industry filter
+             */
+            $scope.selectIndustryFilter = function(code)
+            {
+
+            }
+
+            /**
+             * Select salary filter
+             */
+            $scope.selectSalaryFilter = function(minSal,maxSal)
+            {
+
+            }
+
+            /**
+             * change sort by order result
+             */
+            $scope.changeResultSorting = function(orderId)
+            {
+                $scope.params.orderBy = orderId;
+                /* initiate search */
+                $scope.triggerSearch();
+            }
         }]);
