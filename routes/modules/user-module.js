@@ -3859,7 +3859,6 @@ User.prototype.getEducations = function(req,res,next) {
     }
 };
 
-
 /**
  * @todo FnGetSpecialization
  * Method : GET
@@ -3934,7 +3933,7 @@ User.prototype.getSpecialization = function(req,res,next) {
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
-}
+};
 
 
 

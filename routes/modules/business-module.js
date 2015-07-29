@@ -265,7 +265,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                             + "," + st.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + st.db.escape(DeliveryAddress)
                             + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName)
                             + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ "," + st.db.escape(proabilities)
-                            + "," + st.db.escape(attachment_name);
+                            + "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type);
                         // st.db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         st.db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -349,7 +349,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                         console.log('FnSaveTranscationItems: Transaction items details save successfully');
                                         if (messagetype == 1) {
                                             fs.readFile("SalesMail.html", "utf8", function (err, data) {
-                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
+                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(EZEID);
                                                 st.db.query(query1, function (err, getResult) {
 
                                                     if (getResult[0].id == 1) {
