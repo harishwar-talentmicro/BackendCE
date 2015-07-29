@@ -1978,3 +1978,12 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     width: 25%;
     border: 1px solid rgb(161, 161, 161);
 }
+.hpw .filter-dropdownspecialization{
+    position: absolute;
+    padding-top: 3px;
+    background-color: #fff;
+    z-index: 999;
+    padding: 4px;
+    width: 25%;
+    border: 1px solid rgb(161, 161, 161);
+}
