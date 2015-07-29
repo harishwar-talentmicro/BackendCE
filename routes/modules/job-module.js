@@ -510,9 +510,9 @@ Job.prototype.searchJobs = function(req,res,next){
     var token = (req.query.token) ? req.query.token : '';
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
-    var locations = req.query.locations ? req.query.locations : 0;
-    var category = req.query.category ? req.query.category : 0;
-    var salary = req.query.salary ? req.query.salary : '';
+    var locations = req.query.locations;
+    var category = req.query.category;
+    var salary = req.query.salary;
 
     var responseMessage = {
         status: false,
