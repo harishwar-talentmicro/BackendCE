@@ -289,14 +289,18 @@ Job.prototype.create = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'Invalid token';
-                        responseMessage.error = {};
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnSaveJobs: Invalid token');
                     }
                 }
                 else {
-                    responseMessage.error = {};
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
                     console.log('FnSaveJobs:Error in processing Token' + err);
@@ -405,7 +409,9 @@ Job.prototype.getAll = function(req,res,next){
                                 }
                             }
                             else {
-                                responseMessage.error = {};
+                                responseMessage.error = {
+                                    server : 'Internal serever error'
+                                };
                                 responseMessage.message = 'Error getting from Jobs details';
                                 console.log('FnGetJobs:Error getting from Jobs details:' + err);
                                 res.status(500).json(responseMessage);
@@ -414,14 +420,18 @@ Job.prototype.getAll = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'Invalid token';
-                        responseMessage.error = {};
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnGetJobs: Invalid token');
                     }
                 }
                 else {
-                    responseMessage.error = {};
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
                     console.log('FnGetJobs:Error in processing Token' + err);
@@ -429,7 +439,9 @@ Job.prototype.getAll = function(req,res,next){
             });
         }
         catch (ex) {
-            responseMessage.error = {};
+            responseMessage.error = {
+                server : 'Internal server error'
+            };
             responseMessage.message = 'An error occured !'
             console.log('FnGetJobs:error ' + ex.description);
             var errorDate = new Date();
@@ -535,27 +547,29 @@ Job.prototype.searchJobs = function(req,res,next){
                                             else {
                                                 responseMessage.message = 'Search result not found';
                                                 responseMessage.error = {};
-                                                res.status(400).json(responseMessage);
+                                                res.status(200).json(responseMessage);
                                                 console.log('FnSearchJobs:Search result not found');
                                             }
                                         }
                                         else {
                                             responseMessage.message = 'Search result not found';
                                             responseMessage.error = {};
-                                            res.status(400).json(responseMessage);
+                                            res.status(200).json(responseMessage);
                                             console.log('FnSearchJobs:Search result not found');
                                         }
                                     }
                                     else {
                                         responseMessage.message = 'Search result not found';
                                         responseMessage.error = {};
-                                        res.status(400).json(responseMessage);
+                                        res.status(200).json(responseMessage);
                                         console.log('FnSearchJobs:Search result not found');
                                     }
                                 }
                                 else {
                                     responseMessage.message = 'An error occured ! Please try again';
-                                    responseMessage.error = {};
+                                    responseMessage.error = {
+                                        server : 'Internal server error'
+                                    };
                                     res.status(500).json(responseMessage);
                                     console.log('FnSearchJobs: error in getting job details:' + err);
                                 }
@@ -563,7 +577,9 @@ Job.prototype.searchJobs = function(req,res,next){
 
         }
         catch(ex){
-            responseMessage.error = {};
+            responseMessage.error = {
+                server : 'Internal server error'
+            };
             responseMessage.message = 'An error occurred !';
             console.log('FnSearchJobs:error ' + ex.description);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
@@ -645,7 +661,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     if (getResult) {
                         if (getResult[0]) {
                             responseMessage.status = true;
-                            responseMessage.error = null;
+                            responseMessage.error = {};
                             responseMessage.message = 'Job Seeker send successfully';
                             responseMessage.data = getResult[0];
                             res.status(200).json(responseMessage);
@@ -653,14 +669,14 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
                         }
                         else {
-                            responseMessage.error = null;
+                            responseMessage.error = {};
                             responseMessage.message = 'Job Seeker not found';
                             console.log('FnGetJobSeeker: Job Seeker not found');
                             res.status(200).json(responseMessage);
                         }
                     }
                     else {
-                        responseMessage.error = null;
+                        responseMessage.error = {};
                         responseMessage.message = 'Job Seeker not found';
                         console.log('FnGetJobSeeker: Job Seeker not found');
                         res.status(200).json(responseMessage);
@@ -748,7 +764,9 @@ Job.prototype.searchJobSeekers = function(req,res) {
         }
     }
     catch (ex) {
-        responseMessage.error = {};
+        responseMessage.error = {
+            server : 'Internal server error'
+        };
         responseMessage.message = 'An error occurred !';
         res.status(400).json(responseMessage);
         console.log('Error : FnJobSeekerSearch ' + ex.description);
@@ -815,8 +833,8 @@ Job.prototype.applyJob = function(req,res,next){
                                     }
                                     else {
                                         responseMessage.message = 'Job applied not successfully';
-                                        responseMessage.error = null;
-                                        res.status(400).json(responseMessage);
+                                        responseMessage.error = {};
+                                        res.status(200).json(responseMessage);
                                         console.log('FnApplyJob:Job applied not successfully');
                                     }
                                 }
@@ -855,7 +873,7 @@ Job.prototype.applyJob = function(req,res,next){
                     server: 'Internal Server Error'
                 };
                 responseMessage.message = 'An error occurred !'
-                res.status(500).json(responseMessage);
+                res.status(400).json(responseMessage);
                 console.log('Error : FnGetJobLocations ' + ex.description);
                 var errorDate = new Date();
                 console.log(errorDate.toTimeString() + ' ......... error ...........');
