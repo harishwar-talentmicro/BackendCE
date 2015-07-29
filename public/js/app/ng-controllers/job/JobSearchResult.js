@@ -54,6 +54,10 @@ angular.module('ezeidApp').
             $scope.params.jobType = '1,2,3,4,5,6';//Checkboxes for job type
             $scope.params.searchTerm = $routeParams.searchTerm;
             $scope.params.orderBy = 1;//1: Asc, 2: Desc
+            $scope.params.locations = "";//comma separated ids
+            $scope.params.category = "";//comma separated ids
+            $scope.params.salary = "";//1-2,5-6
+
             $scope.searchKeyWord = $routeParams.searchTerm;
             $scope.activeJobType = [false,false,false,false,false,false];//Checkboxes for job type
             $scope.showProximityFilter = false;
@@ -77,13 +81,23 @@ angular.module('ezeidApp').
             };
 
             /**
-             * Nake-array for checkbox effect
+             * Make-array for checkbox effect
              */
             $scope.filterCheck = {
                 location:[],
                 industry:[],
                 salary:[]
             };
+
+            /**
+             * Make-array for holding temporary value of selected checkbox
+             */
+            $scope.tempFilterCheck = {
+                location:[],
+                industry:[],
+                salary:[]
+            };
+
 
             /* selected Filter options */
             $scope.selectedFilter = {
@@ -122,7 +136,6 @@ angular.module('ezeidApp').
 
                 /* call the search API */
                 setSearchResult();
-
             }
 
             /**
@@ -158,10 +171,14 @@ angular.module('ezeidApp').
                         token: token,
                         page_size: $scope.pageSize,
                         page_count: $scope.pageCount,
-                        order_by: $scope.params.orderBy
+                        order_by: $scope.params.orderBy,
+                        //Exclusively for Advance filters
+                        locations: $scope.params.locations,
+                        category: $scope.params.category,
+                        salary: $scope.params.salary
                     }
                 }).success(function (response) {
-                        $scope.isProcessing = false;
+                    $scope.isProcessing = false;
                     /* YIPPE! Got response */
                     console.log(response);
                     var isEmpty = !(response.data.result.length > 0);
@@ -180,7 +197,10 @@ angular.module('ezeidApp').
                     /* Set Advance-filter [Right-side] */
                     setJobLocationData(response.data.job_location);
                     setSalaryData(response.data.salary);
-                    setCategoryData(response.data.category)
+                    setCategoryData(response.data.category);
+
+                    /* set all the advance filter */
+                    advanceFilter();
 
                 }).error(function(){
                     $scope.isSearchInProgress = false;
@@ -291,6 +311,163 @@ angular.module('ezeidApp').
                 }
                 $scope.filter.industry = data;
             }
+
+            /**
+             * Set all the advance filter
+             */
+            function advanceFilter()
+            {
+                preSetFilterLocation();
+                preSetFilterCategory();
+                preSetFilterSalary();
+            }
+
+            ////////////////////////////// LOCATION FILTER PRE - CHECK /////////////////////
+
+            /**
+             * pre-set filter-location
+             */
+            function preSetFilterLocation()
+            {
+                if($scope.params.locations)
+                {
+                    var dataArr = $scope.params.locations.split(",");
+                    var tempIndexArr = [];
+                    for(var i = 0;i < dataArr.length; i++)
+                    {
+                        tempIndexArr.push($scope.filter.location.indexOfWhere('locationid',parseInt(dataArr[i])));
+                    }
+                    $scope.tempFilterCheck.location = tempIndexArr;
+                    return;
+                }
+                else
+                {
+                    console.log('location not found');
+                }
+            }
+
+            /**
+             * A simple check for deciding weather the check boxes should be selected or not
+             */
+            $scope.filterCheckBoxLocationChecked = function(index,status)
+            {
+                if($scope.tempFilterCheck.location.length > 0)
+                {
+                    if($scope.tempFilterCheck.location.indexOf(index) >= 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                return status;
+            }
+
+            /**
+             * When user clicking for the first time delete all the temporay location array
+             * which was responsible for pre-filling of all the checkbxes when the page gets loaded
+             */
+            $scope.clearTempLocationChecks = function()
+            {
+                $scope.tempFilterCheck.location = [];
+            }
+
+
+            ////////////////////////////// INDUSTRY FILTER PRE - CHECK /////////////////////
+
+            /**
+             * pre-set filter-industry
+             */
+            function preSetFilterCategory()
+            {
+                if($scope.params.category)
+                {
+                    var dataArr = $scope.params.category.split(",");
+                    var tempIndexArr = [];
+                    console.log($scope.filter.industry);
+                    for(var i = 0;i < dataArr.length; i++)
+                    {
+                        tempIndexArr.push($scope.filter.industry.indexOfWhere('CategoryID',parseInt(dataArr[i])));
+                    }
+                    $scope.tempFilterCheck.industry = tempIndexArr;
+                }
+            }
+
+            /**
+             * A simple check for deciding weather the check boxes should be selected or not
+             */
+            $scope.filterCheckBoxIndustryChecked = function(index,status)
+            {
+                console.log(index,status);
+                if($scope.tempFilterCheck.industry.length > 0)
+                {
+                    if($scope.tempFilterCheck.industry.indexOf(index) >= 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                return status;
+            }
+
+            /**
+             * When user clicking for the first time delete all the temporay location array
+             * which was responsible for pre-filling of all the checkbxes when the page gets loaded
+             */
+            $scope.clearTempIndustryChecks = function()
+            {
+                console.log("htt");
+                $scope.tempFilterCheck.industry = [];
+            }
+
+
+            ////////////////////////////// SALARY FILTER PRE - CHECK /////////////////////
+
+            /**
+             * pre-set filter-salary
+             */
+            function preSetFilterSalary()
+            {
+                if($scope.params.salary)
+                {
+                    console.log($scope.filter);
+                    var dataArr = $scope.params.salary.split(",");
+                    console.log($scope.filter.salaryArr);
+                    var tempIndexArr = [];
+                    for(var i = 0;i < dataArr.length; i++)
+                    {
+                        var tempArr = dataArr[i].split('-');//convert "130000 - 140000" ---> [130000,140000]
+                        tempIndexArr.push($scope.filter.salaryArr.indexOfWhere('minSal',parseInt(tempArr[0])));
+                    }
+                    $scope.tempFilterCheck.salary = tempIndexArr;
+                }
+            }
+
+            /**
+             * A simple check for deciding weather the check boxes should be selected or not
+             */
+            $scope.filterCheckBoxSalaryChecked = function(index,status)
+            {
+                console.log(index,status);
+                if($scope.tempFilterCheck.salary.length > 0)
+                {
+                    if($scope.tempFilterCheck.salary.indexOf(index) >= 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                return status;
+            }
+
+            /**
+             * When user clicking for the first time delete all the temporay Salary array
+             * which was responsible for pre-filling of all the checkbxes when the page gets loaded
+             */
+            $scope.clearTempSalaryChecks = function()
+            {
+                $scope.tempFilterCheck.salary = [];
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////
 
             /**
              * Reset job type data
@@ -537,25 +714,87 @@ angular.module('ezeidApp').
             /**
              * select location filter
              */
-            $scope.selectLocationFilter = function(code)
+            $scope.selectLocationFilter = function(code,status)
             {
 
+                if(!status)
+                {
+                    var index = $scope.selectedFilter.locationCode.indexOf(code);
+                    if(index >= 0)//Got the element
+                    {
+                        $scope.selectedFilter.locationCode.splice(index, 1);
+                        console.log($scope.selectedFilter.locationCode);
+                        setFilterLocation();
+                        return;
+                    }
+                }
+                $scope.selectedFilter.locationCode.push(code);
+                setFilterLocation();
+            }
+
+            /**
+             * set the location string for the search
+             */
+            function setFilterLocation()
+            {
+                $scope.params.locations = $scope.selectedFilter.locationCode.join(",");
             }
 
             /**
              * Select industry filter
              */
-            $scope.selectIndustryFilter = function(code)
+            $scope.selectIndustryFilter = function(code, status)
             {
-
+                if(!status)
+                {
+                    var index = $scope.selectedFilter.industryCode.indexOf(code);
+                    if(index >= 0)//Got the element
+                    {
+                        $scope.selectedFilter.industryCode.splice(index, 1);
+                        setFilterIndustry();
+                        return;
+                    }
+                }
+                $scope.selectedFilter.industryCode.push(code);
+                setFilterIndustry();
+                //console.log("Industry: "+code+" status:"+status);
             }
+
+            /**
+             * set the industry string for the search
+             */
+            function setFilterIndustry()
+            {
+                $scope.params.category = $scope.selectedFilter.industryCode.join(",");
+            }
+
 
             /**
              * Select salary filter
              */
-            $scope.selectSalaryFilter = function(minSal,maxSal)
+            $scope.selectSalaryFilter = function(minSal,maxSal,status)
             {
+                var code = minSal+'-'+maxSal;
+                if(!status)
+                {
+                    var index = $scope.selectedFilter.salaryRange.indexOf(code);
+                    if(index >= 0)//Got the element
+                    {
+                        $scope.selectedFilter.salaryRange.splice(index, 1);
+                        setFilterSalary();
+                        return;
+                    }
+                }
+                $scope.selectedFilter.salaryRange.push(code);
+                setFilterSalary();
+            }
 
+            /**
+             * set the salary range string for the search
+             */
+            function setFilterSalary()
+            {
+                $scope.params.salary = $scope.selectedFilter.salaryRange.join(",");
             }
 
             /**

@@ -164,7 +164,7 @@
                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-8 text-left">
                         {{getResultRange()}} for <b>{{searchKeyWord}}</b>
                     </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 text-right">
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 text-right hidden">
                         <button class="btn btn-default btn-sm" ng-click="sortByToggle = !sortByToggle">
                             Sort by <i class="fa fa-reorder"></i>
                         </button>
@@ -172,12 +172,12 @@
                         <div class="sort-content filter-dropdown text-left row width-100" ng-show="sortByToggle">
                             <div class="individual-sort-content select-option"
                                  ng-class="params.orderBy == 1?'selected':''"
-                                    ng-click="changeResultSorting(1)">
+                                 ng-click="changeResultSorting(1)">
                                 Ascending
                             </div>
                             <div class="individual-sort-content select-option"
                                  ng-class="params.orderBy == 2?'selected':''"
-                                    ng-click="changeResultSorting(2)">
+                                 ng-click="changeResultSorting(2)">
                                 Descending
                             </div>
                         </div>
@@ -194,57 +194,73 @@
                         FILTER RESULTS
                     </div>
                 </div>
+
+                <!-- Filter by location -->
                 <div class="job-filter-content" ng-show="filter.location.length > 0">
                     <!-- filters goes here -->
                     <div class="filter-content-heading container">
-                        <!-- Filter by location -->
+
                         <span class="filter-heading">
                         <i class="fa fa-globe"></i> Location
                             </span>
                         <div class="location-check overflow-y-100">
                             <div class="location-individual pointer"
                                  ng-repeat="loc in filter.location track by $index"
-                                    ng-init="filterCheck.location[$index] = false"
-                                    ng-click="filterCheck.location[$index] = !filterCheck.location[$index]">
-                                <i class="fa" ng-class="filterCheck.location[$index]?'fa-check-square':'fa-square-o'"></i> {{loc.Locname}}
+
+                                 ng-click="clearTempLocationChecks();
+                                 (filterCheck.location[$index] = !filterCheck.location[$index]);
+                                 selectLocationFilter(loc.locationid,filterCheck.location[$index])">
+                                <i class="fa" ng-class="filterCheckBoxLocationChecked($index,filterCheck.location[$index])?'fa-check-square':'fa-square-o'"></i> {{loc.Locname}}
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Filter by Industry -->
                 <div class="job-filter-content" ng-show="filter.industry.length > 0">
                     <!-- filters goes here -->
                     <div class="filter-content-heading container">
-                        <!-- Filter by location -->
+
                         <span class="filter-heading">
                         <i class="fa fa-briefcase"></i> Industry
                             </span>
                         <div class="salary-check overflow-y-100">
-                        <div class="location-individual pointer"
-                             ng-repeat="industry in filter.industry track by $index"
-                                title="{{industry.CategoryTitle}}"
-                             ng-init="filterCheck.industry[$index] = false"
-                             ng-click="filterCheck.industry[$index] = !filterCheck.industry[$index]"
-                                >
-                            <i class="fa" ng-class="filterCheck.industry[$index]?'fa-check-square':'fa-square-o'"></i> {{industry.CategoryTitle | textLength:15}}
-                        </div>
+                            <div class="location-individual pointer"
+                                 ng-repeat="industry in filter.industry track by $index"
+                                 title="{{industry.CategoryTitle}}"
+                                 ng-click="clearTempIndustryChecks();
+                                 filterCheck.industry[$index] = !filterCheck.industry[$index];
+                                 selectIndustryFilter(industry.CategoryID,filterCheck.industry[$index])"
+                                    >
+                                <i class="fa" ng-class="filterCheckBoxIndustryChecked($index,filterCheck.industry[$index])?'fa-check-square':'fa-square-o'"></i> {{industry.CategoryTitle | textLength:15}}
                             </div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Filter by location -->
                 <div class="job-filter-content" ng-show="filter.salaryArr.length > 0">
                     <!-- filters goes here -->
                     <div class="filter-content-heading container">
-                        <!-- Filter by location -->
+
                         <span class="filter-heading">
                         <i class="fa fa-money"></i> Salary
                             </span>
                         <div class="salary-check overflow-y-100">
-                        <div class="location-individual pointer"
-                             ng-repeat="range in filter.salaryArr track by $index"
-                             ng-init="filterCheck.salary[$index] = false"
-                             ng-click="filterCheck.salary[$index] = !filterCheck.salary[$index]">
-                            <i class="fa" ng-class="filterCheck.salary[$index]?'fa-check-square':'fa-square-o'"></i> {{range.minSal+" - "+range.maxSal}}
+                            <div class="location-individual pointer"
+                                 ng-repeat="range in filter.salaryArr track by $index"
+                                 ng-click="clearTempSalaryChecks();filterCheck.salary[$index] = !filterCheck.salary[$index];selectSalaryFilter(range.minSal,range.maxSal,filterCheck.salary[$index])">
+                                <i class="fa" ng-class="filterCheckBoxSalaryChecked($index,filterCheck.salary[$index])?'fa-check-square':'fa-square-o'"></i> {{range.minSal+" - "+range.maxSal}}
+                            </div>
                         </div>
-                        </div>
+                    </div>
+                </div>
+                <!-- Apply filter button goes here -->
+                <div class="job-filter-content">
+                    <div class="p-top-10 apply-filter text-right">
+                        <button class="btn btn-primary btn-sm" ng-click="triggerSearch()" >
+                            Apply Filters  <i class="fa fa-arrow-circle-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
