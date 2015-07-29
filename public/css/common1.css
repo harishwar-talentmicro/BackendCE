@@ -1960,7 +1960,16 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .width-105 {
     width: 105% !important;
 }
-.hpw .filter-dropdownCategory {
+.hpw .filter-dropdownCategory{
+    position: absolute;
+    padding-top: 3px;
+    background-color: #fff;
+    z-index: 999;
+    padding: 4px;
+    width: 25%;
+    border: 1px solid rgb(161, 161, 161);
+}
+.hpw .filter-dropdownInstitute{
     position: absolute;
     padding-top: 3px;
     background-color: #fff;
