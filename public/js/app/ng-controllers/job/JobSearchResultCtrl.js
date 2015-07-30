@@ -57,6 +57,7 @@ angular.module('ezeidApp').
             $scope.params.locations = "";//comma separated ids
             $scope.params.category = "";//comma separated ids
             $scope.params.salary = "";//1-2,5-6
+            $scope.params.filter=0;
 
             $scope.searchKeyWord = $routeParams.searchTerm;
             $scope.activeJobType = [false,false,false,false,false,false];//Checkboxes for job type
@@ -65,7 +66,7 @@ angular.module('ezeidApp').
             $scope.advanceSearchVisibility = false;
 
             //Pagination settings
-            $scope.pageSize = 10;//Results per page
+            $scope.pageSize = 10000;//Results per page
             $scope.pageCount = 0;//Everything starts with a 0 - 10,20,30 etc.
             $scope.totalResult = 0;//Total results
             $scope.resultThisPage = 0;//Total results you got this page
@@ -176,6 +177,7 @@ angular.module('ezeidApp').
                         locations: $scope.params.locations,
                         category: $scope.params.category,
                         salary: $scope.params.salary
+                        //filter:$scope.params.filter?$scope.params.filter:0
                     }
                 }).success(function (response) {
                     $scope.isProcessing = false;
@@ -201,6 +203,8 @@ angular.module('ezeidApp').
 
                     /* set all the advance filter */
                     advanceFilter();
+
+                    $scope.jsTileHoverEffect();
 
                 }).error(function(){
                     $scope.isSearchInProgress = false;
@@ -397,7 +401,6 @@ angular.module('ezeidApp').
              */
             $scope.filterCheckBoxIndustryChecked = function(index,status)
             {
-                console.log(index,status);
                 if($scope.tempFilterCheck.industry.length > 0)
                 {
                     if($scope.tempFilterCheck.industry.indexOf(index) >= 0)
@@ -447,7 +450,6 @@ angular.module('ezeidApp').
              */
             $scope.filterCheckBoxSalaryChecked = function(index,status)
             {
-                console.log(index,status);
                 if($scope.tempFilterCheck.salary.length > 0)
                 {
                     if($scope.tempFilterCheck.salary.indexOf(index) >= 0)
@@ -658,8 +660,12 @@ angular.module('ezeidApp').
             /**
              * initiate search process
              */
-            $scope.triggerSearch = function()
+            $scope.triggerSearch = function(isTriggeredFromFilter)
             {
+                if(parseInt(isTriggeredFromFilter) == 1)
+                {
+                    $scope.params.filter = 1;
+                }
                 setJobTypeData();
                 /* redirect to search page */
                 var searchStr = getSearchtermString();
@@ -806,4 +812,47 @@ angular.module('ezeidApp').
                 /* initiate search */
                 $scope.triggerSearch();
             }
+
+            /**
+             * Hover effect && restrict the multiple calls
+             */
+            $scope.restrictJsTileHoverEffect = false;
+            $scope.jsTileHoverEffect = function()
+            {
+                var isContentAvailable = $('.job-result').length > 0;
+                if(!isContentAvailable)
+                {
+                    return;
+                }
+                if($scope.restrictJsTileHoverEffect)
+                {
+                    return;
+                }
+
+                $scope.restrictJsTileHoverEffect = true;
+                $('.job-main-content').mouseenter(function(){
+                    $(this).siblings().css('box-shadow','4px 3px 10px rgb(74, 243, 218)');
+                    $(this).css('box-shadow','4px 3px 10px rgb(74, 243, 218)');
+                    //$(this).parent().children('.job-title-icon').css('color','#0BC9FF');
+            }).
+                    mouseleave(function(){
+                        $(this).siblings().removeAttr('style');
+                        $(this).removeAttr('style');
+                        //$(this).parent().children('.job-title-icon').removeAttr('style');
+                    });
+            }
+
+            $scope.$watch('resultData', function() {
+                $scope.jsTileHoverEffect();
+            });
+
+            /**
+             * Redirect to jobDetail page
+             */
+            $scope.redirectJobDetailPage = function(tid)
+            {
+                console.log("Redirect "+tid);
+
+            }
+
         }]);

@@ -34,6 +34,54 @@
             $route,
             GoogleMap,
             UtilityService){
+
+            // Declaration for job posting
+            $scope.showJobListing = true;
+            $scope.isWrongEmailPatternFrom = false;
+            $scope.locationList = [];
+            $scope.jobTitle = "";
+            $scope.jobCode = "";
+            $scope.jobDescription = "";
+            $scope.skillKeyWords = "";
+            $scope.jobVacancies = "";
+            $scope.experienceFrom = "";
+            $scope.experienceTo = "";
+            $scope.salaryFrom = "";
+            $scope.salaryTo = "";
+            $scope.salaryType = 1;
+            $scope.jobType = 0;
+            $scope.contactName = "";
+            $scope.phone = "";
+            $scope.emailContact = "";
+            $scope.jobCategori = 0;
+            $scope.selectedEducations = [];
+            $scope.selectedSpecializations = [];
+            $scope.selectedInstitute = [];
+
+            $scope.$watch('_userInfo.IsAuthenticate', function () {
+                $('.dropdown-toggle').click(function(){$( ".filter-dropdown" ).slideToggle( "slow", function() {
+                    // Animation complete.
+                });})
+                $('.dropdown-toggleSpecialization').click(function(){$( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
+                    // Animation complete.
+                });})
+                $('.dropdown-toggleInstitute').click(function(){$( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
+                    // Animation complete.
+                });})
+            });
+
+               var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                if(!returnFormat){
+                    returnFormat = dateFormat;
+                }
+                var x = new Date(timeFromServer);
+                var mom1 = moment(x);
+                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+            };
+
             // Get all location list
             function getLocationList()
             {
@@ -55,16 +103,16 @@
             /**
              * select Resume Inquiries Tab
              */
-            $scope.TabResumeInquiries = function(){
+           /* $scope.TabResumeInquiries = function(){
                 $scope.ResumeInquiriesTab = true;
                 $scope.JobsTab = false;
                 $scope.JobSeekerTab = false;
-            };
+            };*/
 
             /**
              * select Post Job Tab
              */
-            $scope.TabPostJob = function(){
+          //  $scope.TabPostJob = function(){
                 $scope.ResumeInquiriesTab = false;
                 $scope.JobsTab = true;
                 $scope.JobSeekerTab = false;
@@ -80,7 +128,7 @@
                 getPostedJob();
 
                 // getLocationList();
-            };
+            //};
 
             /**
              * select Job Seeker Tab
@@ -117,8 +165,6 @@
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
-
-                    console.log(resp.data.result);
 
                     if(resp.status)
                     {
@@ -206,8 +252,6 @@
                 if(validateItem())
                 {
                     $scope.$emit('$preLoaderStart');
-                    console.log("SAi222");
-                    console.log($scope.jobCategori);
 
                     $scope.jobData = {
                         token : $rootScope._userInfo.Token,
@@ -229,7 +273,11 @@
                         email_id : $scope.emailContact,
                         mobileNo : $scope.phone,
                         locationsList : JSON.stringify($scope.mainLocationArray),
-                        category_id : $scope.jobCategori
+                        category_id : $scope.jobCategori,
+                        education_id : $scope.selectedEducations,
+                        specialization_id : $scope.selectedSpecializations,
+                        institute_id : $scope.selectedInstitute,
+                        aggregate_score : $scope.aggregate_score
                     }
 
                     $http({
@@ -265,11 +313,7 @@
                         LangID : 1
                     }
                 }).success(function(resp){
-
-
                     $scope.jobCategories = resp;
-                    console.log("SAi Categories list..");
-                    console.log($scope.jobCategories);
 
                 }).error(function(err){
 
@@ -280,12 +324,13 @@
             $scope.openJobPostForm = function(_index){
 
                 getJobCategories();
+                getEducations();
+                getSpecialization();
+                getInstituteList();
                 $scope.showJobListing = false;
 
                 $scope.locationArrayString = [];
                 $scope.mainLocationArray = [];
-
-
 
                 if(_index == 'add')
                 {
@@ -404,7 +449,7 @@
                 $scope.locationArrayString.push($scope.jobLocation);
                 $scope.jobLocation = "";
 
-                console.log($scope.mainLocationArray);
+        //        console.log($scope.mainLocationArray);
             }
 
             $scope.candidateModalBox = {
@@ -426,9 +471,6 @@
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
 
-                    console.log("SAi candidate list..");
-                    console.log(resp);
-
                     if(resp.status)
                     {
 
@@ -442,7 +484,7 @@
             // Open popup - list of candidate who applied for job
             $scope.openCandidateListPopup = function(_jobID)
             {
-                console.log("job id"+_jobID);
+             //   console.log("job id"+_jobID);
                 $scope.showCandidateListModal = !$scope.showCandidateListModal;
 
                 if(_jobID)
@@ -450,7 +492,120 @@
                     getCandidateList(_jobID);
                 }
             }
+
+            // Get Educations list
+            function getEducations()
+            {
+                $http({
+                    url : GURL + 'educations',
+                    method : 'GET',
+                    params : {
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                        $scope.educationList = resp.data;
+                    })
+                    .error(function(err){
+
+                    });
+            }
+
+            /**
+             * Select - Unselect Education
+             */
+            $scope.selectEducation = function(_educationID)
+            {
+                if($scope.selectedEducations.indexOf(_educationID)!=-1)
+                {
+                    var index = $scope.selectedEducations.indexOf(_educationID);
+                    $scope.selectedEducations.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedEducations.push(_educationID);
+                }
+            }
+
+            /**
+             * Select - Unselect specialization
+             */
+            $scope.selectSpecialization = function(_specializationID)
+            {
+                if($scope.selectedSpecializations.indexOf(_specializationID)!=-1)
+                {
+                    var index = $scope.selectedSpecializations.indexOf(_specializationID);
+                    $scope.selectedSpecializations.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedSpecializations.push(_specializationID);
+                }
+            }
+
+            function getSpecialization()
+            {
+                $http({
+                    url : GURL + 'specialization',
+                    method : 'GET',
+                    params : {
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                        $scope.specializationList = resp.data;
+                    })
+                    .error(function(err){
+
+                    });
+            }
+
+            // Get Institute list
+            function getInstituteList()
+            {
+                $http({
+                    url : GURL + 'institutes',
+                    method : 'GET',
+                    params : {
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                        $scope.instituteList = resp.data;
+                    })
+                    .error(function(err){
+
+                    });
+            }
+
+            /**
+             * Select - Unselect institute
+             */
+            $scope.selectInstitute = function(_instituteID)
+            {
+                if($scope.selectedInstitute.indexOf(_instituteID)!=-1)
+                {
+                    var index = $scope.selectedInstitute.indexOf(_instituteID);
+                    $scope.selectedInstitute.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedInstitute.push(_instituteID);
+                }
+            }
+
+            $scope.InstituteTextBoxLossFocus = function () {
+                console.log("SAi222");
+
+               /* $( ".filter-dropdown" ).slideToggle( "slow", function() {
+                    // Animation complete.
+                });
+                $( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
+                    // Animation complete.
+                });*/
+
+
+
+
+            };
+
+
         }]);
-
-
 })();
