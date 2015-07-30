@@ -20,7 +20,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
     $scope.availableTags = [];
 
     CVAttachCtrl._CVInfo.job_type = 0;
-    CVAttachCtrl._CVInfo.job_location1 = "";
+    $scope.locationName = "";
+    //CVAttachCtrl._CVInfo.job_location1 = "";
     CVAttachCtrl._CVInfo.experience = 0;
 
     $scope.selectedFunctions = [];
@@ -67,7 +68,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
             googleMap.getReverseGeolocation(lat,lng).then(function(resp){
                 if(resp.data){
                     var data = googleMap.parseReverseGeolocationData(resp.data);
-                    CVAttachCtrl._CVInfo.job_location1 = data.city;
+                  //  CVAttachCtrl._CVInfo.job_location1 = data.city;
+                    console.log(data.city);
+                    $scope.locationName = data.city;
                     $scope.country= data.country;
                 }
                 else{
@@ -155,6 +158,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }
 
+        CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions.toString();
+        CVAttachCtrl._CVInfo.category_id = $scope.selectedCategories.toString();
+
         CVAttachCtrl._CVInfo.skillMatrix = $scope.skillMatrix;
         CVAttachCtrl._CVInfo.skillsTid = skillsTid.toString();
 
@@ -163,6 +169,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
             CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
             CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
             CVAttachCtrl._CVInfo.job_location = $scope.mainLocationArray;
+
+
+            console.log("Sai11");
+            console.log($scope.selectedFunctions.toString());
+            console.log(CVAttachCtrl._CVInfo);
 
             $http({
                     method: "POST",
@@ -489,20 +500,21 @@ angular.module('ezeidApp').controller('CVAttachController',[
             return;
         }
         var tempLocationArray = [];
-        if(typeof($scope.jobLat) == undefined || typeof($scope.country) == undefined ||  !CVAttachCtrl._CVInfo.job_location1.length > 0)
+        /*if(typeof($scope.jobLat) == undefined || typeof($scope.country) == undefined ||  !CVAttachCtrl._CVInfo.job_location1.length > 0)*/
+        if(typeof($scope.jobLat) == undefined || typeof($scope.country) == undefined ||  !$scope.locationName.length > 0)
         {
             return;
         }
         tempLocationArray = {
-            "location_title" : CVAttachCtrl._CVInfo.job_location1,
+            "location_title" : $scope.locationName,
             "latitude" :  $scope.jobLat,
             "longitude" : $scope.jobLong,
             "country" : $scope.country
         };
 
         $scope.mainLocationArray.push(tempLocationArray);
-        $scope.locationArrayString.push(CVAttachCtrl._CVInfo.job_location1);
-        CVAttachCtrl._CVInfo.job_location1 = "";
+        $scope.locationArrayString.push($scope.locationName);
+        $scope.locationName = "";
     }
 
     /**
@@ -519,7 +531,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         {
             $scope.selectedFunctions.push(_functionID);
         }
-        CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions;
+        //CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions.toString();
     }
 
     /**
@@ -536,7 +548,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         {
             $scope.selectedCategories.push(_categoryID);
         }
-        CVAttachCtrl._CVInfo.category_id = $scope.selectedCategories;
+       // CVAttachCtrl._CVInfo.category_id = $scope.selectedCategories;
     }
 
     // Get job Categories
@@ -573,7 +585,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
         });
     }
 
-    $scope.instituteId = 0;
+    CVAttachCtrl._CVInfo.institute_id = 0;
+    $scope.instituteTitle = "";
     $scope.showInstituteDropDown = false;
     // Below function Call on key press of institute text field
     $scope.instituteKeyPress = function(keyEvent) {
@@ -582,14 +595,28 @@ angular.module('ezeidApp').controller('CVAttachController',[
     // Below function Call on click of institute text field
     $scope.instituteTextBoxClicked = function() {
         $scope.showInstituteDropDown = !$scope.showInstituteDropDown;
-        $scope.showEducationDropDown = false;
+       // $scope.showEducationDropDown = false;
     }
 
     // Below function Call on selection of institute
     $scope.selectInstitute = function(instituteID,title) {
-        CVAttachCtrl._CVInfo.institute = title;
-        $scope.instituteId = instituteID;
-        $scope.showInstituteDropDown = false;
+
+        CVAttachCtrl._CVInfo.institute_title = title;
+        CVAttachCtrl._CVInfo.institute_id = instituteID;
+
+        $scope.instituteTitle = title;
+
+        if(CVAttachCtrl._CVInfo.institute_id != 0)
+        {
+            CVAttachCtrl._CVInfo.institute_title = "";
+        }
+        else
+        {
+            CVAttachCtrl._CVInfo.institute_title = title;
+            CVAttachCtrl._CVInfo.institute_id = 0;
+        }
+
+       $scope.showInstituteDropDown = false;
     }
 
     // Get Educations list
@@ -610,7 +637,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     }
 
     CVAttachCtrl._CVInfo.education_id = 0;
-    $scope.showEducationDropDown = false;
+   /* $scope.showEducationDropDown = false;
     // Below function Call on key press of education text field
     $scope.educationKeyPress = function(keyEvent) {
         $scope.showEducationDropDown = true;
@@ -622,11 +649,25 @@ angular.module('ezeidApp').controller('CVAttachController',[
     }
 
     // Below function Call on selection of education
-    $scope.selectEducation = function(instituteID,title) {
+    $scope.selectEducation = function(educationID,title) {
+        console.log("sai99");
+        console.log(educationID);
         CVAttachCtrl._CVInfo.education = title;
-        CVAttachCtrl._CVInfo.education_id = instituteID;
+        CVAttachCtrl._CVInfo.education_id = educationID;
+
+        console.log(CVAttachCtrl._CVInfo.education_id);
         $scope.showEducationDropDown = false;
     }
+
+    // Below function Call on loss focus of education text field
+    $scope.educationTextBoxLossFocus = function() {
+     //   $scope.showEducationDropDown = false;
+        console.log(CVAttachCtrl._CVInfo.education_id);
+        if(CVAttachCtrl._CVInfo.education_id == 0)
+       {
+           CVAttachCtrl._CVInfo.education = "";
+       }
+    }*/
 
     function getSpecialization()
     {

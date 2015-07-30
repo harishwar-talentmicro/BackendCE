@@ -165,7 +165,7 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
                                         <div class="input-group">
-                                            <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "CVAttachCtrl._CVInfo.job_location1" class="form-control"/>
+                                            <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "locationName" class="form-control"/>
                                             <span class="input-group-addon noPaddingNoBorder">
                                                 <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
                                             </span>
@@ -201,14 +201,19 @@
                                         <h5 class="text-primary text-left">Institute</h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
-                                        <input type="text" placeholder="Institute"
+                                       <!-- <input type="text" placeholder="Institute"
                                               ng-model = "CVAttachCtrl._CVInfo.institute"
                                               ng-keypress="instituteKeyPress($event.keyCode)"
                                               ng-click = "instituteTextBoxClicked()"
-                                              class="form-control"/>
+                                              class="form-control"/>-->
+                                        <input type="text" placeholder="Institute"
+                                               ng-model = "instituteTitle"
+                                               ng-keypress="instituteKeyPress($event.keyCode)"
+                                               ng-click = "instituteTextBoxClicked()"
+                                               class="form-control"/>
 
                                         <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
-                                           <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:CVAttachCtrl._CVInfo.institute" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
+                                           <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
                                                 {{institute.InstituteTitle}}
                                             </div>
                                         </div>
@@ -223,18 +228,25 @@
                                         <h5 class="text-primary text-left">Last Education</h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
-                                        <input type="text"
+                                        <select class="form-control" ng-model="CVAttachCtrl._CVInfo.education_id">
+                                            <option value="0" >Select Last Education</option>
+                                            <option ng-repeat="education in educationList track by $index" value="{{education.TID}}">{{education.EducationTitle}}</option>
+                                        </select>
+                                        <!--<input type="text"
                                                placeholder="Last Education"
                                                ng-model = "CVAttachCtrl._CVInfo.education"
                                                ng-keypress="educationKeyPress($event.keyCode)"
                                                ng-click = "educationTextBoxClicked()"
+                                               ng-blur="educationTextBoxLossFocus()"
                                                class="form-control"/>
 
                                         <div ng-show="showEducationDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
                                             <div class="checkbox-dropdown" ng-repeat="education in educationList | filter:CVAttachCtrl._CVInfo.education" ng-click="selectEducation(education.TID,education.EducationTitle)">
                                                 {{education.EducationTitle}}
+
+                                                {{education}}
                                             </div>
-                                        </div>
+                                        </div>-->
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace ">
                                         <input type="text" class="form-control" numbers-only maxlength="4" ng-model="CVAttachCtrl._CVInfo.year_of_passing" placeholder="Year of Pass" aria-describedby="sizing-addon1"/>
