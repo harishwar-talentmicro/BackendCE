@@ -505,11 +505,17 @@ angular.module('ezeidApp').controller('SubuserCtrl',['$scope','$rootScope',
                         firstName : resp[i].FirstName,
                         lastName : resp[i].LastName,
                         accessRights : {
-                            'sales' : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[0] : 0,
-                            'reservation' : (resp[i].UserModuleRights)  ? (resp[i].UserModuleRights.split(''))[1] : 0,
-                            'homeDelivery' : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[2] : 0,
-                            'service' : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[3] : 0,
-                            'resume' : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[4] : 0
+                            sales : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[0] : 0,
+                            /**
+                             *  Reservation Internal rights are managed by reservation module only,
+                             *  therefore here we are putting only two types of permission
+                             *  1. Hidden (0)
+                             *  2. All (Greater than zero)
+                            */
+                            reservation : (resp[i].UserModuleRights)  ? ((parseInt((resp[i].UserModuleRights.split(''))[1]) > 0) ? 3 : 0 ) : 0,
+                            homeDelivery : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[2] : 0,
+                            service : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[3] : 0,
+                            resume : (resp[i].UserModuleRights) ? (resp[i].UserModuleRights.split(''))[4] : 0
                         },
                         rules : {
                             sales : (resp[i].SalesIDs.length > 0) ? resp[i].SalesIDs.split(',') : [],
