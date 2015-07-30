@@ -463,5 +463,20 @@ angular.module('ezeidApp').controller('ModuleSettingsCtrl',[
     $scope.loadSettings();
 
 
+        /**
+         * Accordian Effect (User Interface related functions)
+         * These are not related to any kind of functionality
+         */
+
+
+        /**
+         * Making first one visible by default
+         */
+        $(function() {
+            $( "#module-settings-accordion" ).accordion({
+                heightStyle : "content"
+            });
+        });
+
 
 }]);
