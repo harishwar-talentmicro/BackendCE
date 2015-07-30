@@ -207,12 +207,12 @@
                 controller : 'OutboxPageCtrl'
             })
             .when('/jobsearch',{
-                templateUrl: 'html/job/jobSearchResult.html',
-                controller : 'JobSearchResult'
+                templateUrl: 'html/job/job-search-result.html',
+                controller : 'JobSearchResultCtrl'
             })
             .when('/jobdetail',{
-                templateUrl: 'html/job/jobDetail.html',
-                controller : 'JobDetail'
+                templateUrl: 'html/job/job-detail.html',
+                controller : 'JobDetailCtrl'
             })
             .when('/payment',{
                 templateUrl: 'html/payment-api.html',
