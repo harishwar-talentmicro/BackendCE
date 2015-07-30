@@ -1,2 +1,2 @@
-copy bootstrap.min.css+ezeid-theme.css+common.css+common1.css+new-theme.css+component.css+common2.css+font-awesome.min.css+jquery-ui.css+ezeone-multi-select.css all-css.css
+copy bootstrap.min.css+ezeid-theme.css+common.css+common1.css+new-theme.css+component.css+common2.css+font-awesome.min.css+jquery-ui.css+ezeone-multi-select.css+override.css all-css.css
 
