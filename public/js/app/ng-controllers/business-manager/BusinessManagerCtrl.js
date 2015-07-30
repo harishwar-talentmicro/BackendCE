@@ -83,7 +83,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                 type : 'home-delivery'
             },
             {
-                title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Service',
+                title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Help Desk',
                 permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[3] : 0,
                 listType : 0,
                 message : ($rootScope._userInfo.ServiceFormMsg) ? $rootScope._userInfo.ServiceFormMsg : '',
