@@ -128,7 +128,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
         else{
             switch($routeParams['subview']){
                 case 'sales':
-                    $scope.activeTemplate = 'html/business-manager/sales/sales.html';
+                    $scope.activeTemplate = 'html/business-manager/sales/sales-master.html';
                     $scope.activeModule = 'sales';
                     break;
                 case 'reservation':
