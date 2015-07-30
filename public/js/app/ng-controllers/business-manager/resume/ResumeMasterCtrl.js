@@ -39,7 +39,12 @@
             $scope.JobsTab = false;
             $scope.JobSeekerTab = false;
 
-
+            /**
+             * Templates based on tabs in resume module
+             */
+            $scope.tplResumeEnquiries = 'html/business-manager/resume/resume.html';
+            $scope.tplJobsTab = 'html/business-manager/resume/resume-jobs.html';
+            $scope.tplJobSeekerTab = 'html/business-manager/resume/resume-job-seeker.html';
 
         }
     ]);
