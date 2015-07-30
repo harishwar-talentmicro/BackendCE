@@ -2,9 +2,8 @@
 <div class="row setRowLeftRightMarginZero post-job" ng-controller="ResumeJobsCtrl">
 
     <div ng-show="showJobListing">
-
         <!-- Top filter start -->
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero topMarginButton">
             <div class="row bottom-clearfix">
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
                     <div class="input-group tx-search-input-group">
@@ -97,7 +96,7 @@
                 <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success">
 
-                        <b class="ng-binding">{{job.totalapplied}} Applied</b>
+                        <b class="ng-binding">{{job.totalapplied}} Applicant</b>
                     </small>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
@@ -196,7 +195,7 @@
         <!--List of Job End hear-->
     </div>
 
-    <div ng-hide="showJobListing">
+    <div ng-hide="showJobListing" class="emailPannelTopMargin">
         <!-- Post new job start from hear -->
         <form name="jobPostForm" novalidate>
             <div class="job-post p-bottom-10">
@@ -218,7 +217,7 @@
                         </div>
                     </div>
                     <div class="col-lg-12 p-top-10">
-                        <div class="input-group m-bot15 p-top-10">
+                        <div class="input-group m-bot15">
                               <span class="input-group-btn">
                                 <button type="button" class="btn btn-white"><small>Job Desc.</small></button>
                               </span>
@@ -301,15 +300,13 @@
                                 <button type="button" class="btn btn-white">Job Type</button>
                               </span>
                             <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
-
                                 <option value="0"> Job Type </option>
                                 <option value="1">Full Time</option>
                                 <option value="2">Part Time</option>
                                 <option value="3">Work From Home</option>
-                                <option value="4">Internship</option>
+                                <option value="4">Internship | Project Work</option>
                                 <option value="5">Consultant</option>
                                 <option value="6">Freelancer</option>
-
                             </select>
                         </div>
                     </div>
@@ -367,6 +364,88 @@
                                 <option ng-repeat="categori in jobCategories track by categori.CategoryID" value="{{categori.CategoryID}}">{{categori.CategoryTitle}}</option>
                             </select>
                         </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10 hpw">
+                        <div class="input-group m-bot15">
+                         <span class="input-group-btn">
+                            <button type="button" class="btn btn-white">Last Education</button>
+                         </span>
+
+                            <button class="btn btn-default btn-sm dropdown-toggle opt opt-2 drpFunction">
+                                <span class="normal-view-text"> -- Select -- </span>
+                                <span class="mobile-view-text"></span>
+                                <span class="caret"></span></button>
+                            <div class="opt opt-2">
+                                <div class="filter-dropdown width-79 search-option-content setTableFixHeight" style="display: none;">
+                                    <div class="checkbox-dropdown" ng-repeat="education in educationList track by $index" ng-click="selectEducation(education.TID)">
+                                        <i class="fa " ng-class="selectedEducations.indexOf(education.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{education.EducationTitle}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10 hpw">
+                        <div class="input-group m-bot15">
+                             <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Specialization</button>
+                             </span>
+
+                            <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
+                                <span class="normal-view-text"> -- Select -- </span>
+                                <span class="mobile-view-text"></span>
+                                <span class="caret"></span></button>
+                            <div class="opt opt-2">
+                                <div class="filter-dropdownspecialization width-79 search-option-content setTableFixHeight" style="display: none;">
+                                    <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
+                                        <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10 hpw">
+                        <div class="input-group m-bot15">
+                             <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Restrict Job To Institute</button>
+                             </span>
+
+                            <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
+                                <span class="normal-view-text"> -- Select -- </span>
+                                <span class="mobile-view-text"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <div class="opt opt-2">
+                                <div class="filter-dropdownInstitute width-79 search-option-content setTableFixHeight" style="display: none;">
+                                    <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
+                                        <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Aggregate Score</button>
+                              </span>
+                                <input type="text" class="form-control" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="Ex: 87" aria-describedby="sizing-addon1"/>
+                                <span class="input-group-btn">
+                                     <button type="button" class="btn btn-white no-radius">%</button>
+                                </span>
+                        </div>
+
+
+                        <!--<div class="input-group m-bot15">
+                             <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Aggregate Score</button>
+                             </span>
+                            <input type="text" class="form-control" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="Ex: 87" aria-describedby="sizing-addon1"/>
+                            <span class="input-group-btn">
+                                    <label>%</label>
+                            </span>
+
+                        </div>-->
                     </div>
 
 

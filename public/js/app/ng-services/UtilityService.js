@@ -123,9 +123,13 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
         {
             var finalString = [];
             var amountLength = amount.toString().length;
-            if(!amountLength > 0 || amountLength < 4)//no amount found or no need to mask
+            if(!amountLength > 0 )//no amount found or no need to mask
             {
-                return ;
+                return 0;
+            }
+            else if(amountLength < 4)
+            {
+                return amount;
             }
             /* convert the digits in to individual array element */
             var tempArr = amount.toString().split('');

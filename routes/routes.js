@@ -162,10 +162,17 @@ exports.FnAppliedJobList = job.appliedJobList;
 exports.FnGetFiltersForJob = job.getFiltersForJob;
 exports.FnGetJobDetails = job.getJobDetails;
 
+var Messagebox = require('./modules/messagebox-module.js');
+var messageBox = new Messagebox(db,stdLib);
+exports.FnCreateMessageGroup = messageBox.createMessageGroup;
+exports.FnValidateGroupName = messageBox.validateGroupName;
+exports.FnUpdateUserResponse = messageBox.updateUserResponse;
+exports.FnUpdateUserRelationship = messageBox.updateUserRelationship;
+exports.FnDeleteGroup = messageBox.deleteGroup;
+
 
 var Notification = require('./modules/notification-module.js');
 var notification = new Notification(db,stdLib);
-
 exports.FnMSAuthUser = notification.authUser;
 exports.FnMSAuthVHost = notification.authVHost;
 exports.FnMSAuthResource = notification.authResource;
