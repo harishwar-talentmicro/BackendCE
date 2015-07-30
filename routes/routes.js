@@ -163,6 +163,14 @@ exports.FnGetFiltersForJob = job.getFiltersForJob;
 exports.FnGetJobDetails = job.getJobDetails;
 
 
+var Notification = require('./modules/notification-module.js');
+var notification = new Notification(db,stdLib);
+
+exports.FnMSAuthUser = notification.authUser;
+exports.FnMSAuthVHost = notification.authVHost;
+exports.FnMSAuthResource = notification.authResource;
+
+
 //ap parts
 var Auth_AP = require('./ap-modules/auth-module-ap.js');
 var authModuleAP = new Auth_AP(db,stdLib);
