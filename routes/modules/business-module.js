@@ -349,7 +349,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                         console.log('FnSaveTranscationItems: Transaction items details save successfully');
                                         if (messagetype == 1) {
                                             fs.readFile("SalesMail.html", "utf8", function (err, data) {
-                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(EZEID);
+                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(EZEID);
                                                 st.db.query(query1, function (err, getResult) {
 
                                                     if (getResult[0].id == 1) {
@@ -381,7 +381,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                                 st.db.query(queryResult, function (err, result) {
                                                                     console.log(result);
                                                                     var post = {
-                                                                        MessageType: Messagetype,
+                                                                        MessageType: messagetype,
                                                                         Priority: 3,
                                                                         ToMailID: mailOptions.to,
                                                                         Subject: mailOptions.subject,
@@ -465,7 +465,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                         }
                                         else if (messagetype == 3) {
                                             fs.readFile("homedelivery.html", "utf8", function (err, data) {
-                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
+                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(EZEID);
                                                 st.db.query(query1, function (err, getResult) {
 
                                                     if (getResult[0].id == 1) {
@@ -581,7 +581,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                         }
                                         else if (messagetype == 4) {
                                             fs.readFile("ServiceMail.html", "utf8", function (err, data) {
-                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
+                                                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(EZEID);
                                                 st.db.query(query1, function (err, getResult) {
 
                                                     if (getResult[0].id == 1) {
