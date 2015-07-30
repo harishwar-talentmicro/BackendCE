@@ -206,6 +206,13 @@ app.get('/educations',LocationManager.FnGetEducations);
 app.get('/specialization',LocationManager.FnGetSpecialization);
 
 
+//MessageBox module methods
+app.post('/create_group',LocationManager.FnCreateMessageGroup);
+app.get('/validate_groupname',LocationManager.FnValidateGroupName);
+app.put('/user_response',LocationManager.FnUpdateUserResponse);
+app.put('/user_relationship',LocationManager.FnUpdateUserRelationship);
+
+
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);
 app.get('/ewLogoutAP', LocationManager.FnLogoutAP);

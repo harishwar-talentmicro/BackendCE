@@ -64,7 +64,7 @@ Job.prototype.create = function(req,res,next){
     var educationID= (req.body.education_id) ? req.body.education_id : '';
     var specializationID = (req.body.specialization_id) ? req.body.specialization_id : '';
     var instituteID = (req.body.institute_id) ? req.body.institute_id : '';
-
+    var aggregateScore = req.body.aggregate_score;
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
@@ -168,7 +168,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
                                 + ',' + st.db.escape(categoryID)+ ',' + st.db.escape(educationID)+ ',' + st.db.escape(specializationID)
-                                + ',' + st.db.escape(instituteID);
+                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(aggregateScore);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
                                 console.log(insertresult);

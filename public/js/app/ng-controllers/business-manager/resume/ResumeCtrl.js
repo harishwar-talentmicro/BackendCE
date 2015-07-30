@@ -175,25 +175,7 @@
             $scope.txActionTypes = [];
             $scope.txFolderRules = [];
 
-            // Declaration for job posting
-            $scope.showJobListing = true;
-            $scope.isWrongEmailPatternFrom = false;
-            $scope.locationList = [];
-            $scope.jobTitle = "";
-            $scope.jobCode = "";
-            $scope.jobDescription = "";
-            $scope.skillKeyWords = "";
-            $scope.jobVacancies = "";
-            $scope.experienceFrom = "";
-            $scope.experienceTo = "";
-            $scope.salaryFrom = "";
-            $scope.salaryTo = "";
-            $scope.salaryType = 1;
-            $scope.jobType = 0;
-            $scope.contactName = "";
-            $scope.phone = "";
-            $scope.emailContact = "";
-            $scope.jobCategori = 0;
+
 
             $scope.showModal = false;
             $scope.modalBox = {
