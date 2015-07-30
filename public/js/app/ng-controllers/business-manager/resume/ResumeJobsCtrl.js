@@ -274,9 +274,9 @@
                         mobileNo : $scope.phone,
                         locationsList : JSON.stringify($scope.mainLocationArray),
                         category_id : $scope.jobCategori,
-                        education_id : $scope.selectedEducations,
-                        specialization_id : $scope.selectedSpecializations,
-                        institute_id : $scope.selectedInstitute,
+                        education_id : $scope.selectedEducations.toString(),
+                        specialization_id : $scope.selectedSpecializations.toString(),
+                        institute_id : $scope.selectedInstitute.toString(),
                         aggregate_score : $scope.aggregate_score
                     }
 
@@ -295,9 +295,9 @@
                             $scope.showJobListing = true;
                         }
                     })
-                        .error(function(data, status, headers, config) {
-                            $scope.$emit('$preLoaderStop');
-                        });
+                    .error(function(data, status, headers, config) {
+                        $scope.$emit('$preLoaderStop');
+                    });
                 }
             };
 
@@ -601,6 +601,9 @@
                     // Animation complete.
                 });*/
 
+                $( ".filter-dropdown" ).slideToggle( "slow", function() {
+                    // Animation complete.
+                });
 
 
 
