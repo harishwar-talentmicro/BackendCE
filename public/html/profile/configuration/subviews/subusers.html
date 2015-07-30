@@ -39,10 +39,10 @@
                                                 <h6 class="list-group-item-heading">Reservation</h6>
                                                 <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.reservation].title}}</p>
                                             </a>
-                                            <a class="list-group-item" ng-hide="user.accessRights.homeDelivery == 0">
-                                                <h6 class="list-group-item-heading">Home Delivery</h6>
-                                                <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.homeDelivery].title}}</p>
-                                            </a>
+                                            <!--<a class="list-group-item" ng-hide="user.accessRights.homeDelivery == 0">-->
+                                                <!--<h6 class="list-group-item-heading">Home Delivery</h6>-->
+                                                <!--<p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.homeDelivery].title}}</p>-->
+                                            <!--</a>-->
                                             <a class="list-group-item" ng-hide="user.accessRights.service == 0">
                                                 <h6 class="list-group-item-heading">Help Desk</h6>
                                                 <p class="list-group-item-text">{{accessRights[subusers[$index].accessRights.service].title}}</p>
@@ -121,7 +121,7 @@
                 </select>
             </div>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 hidden">
             <div class="form-group" data-toggle="tooltip" title="Subuser Status"  data-placement="right">
                 <select class="form-control" ng-model="modalBox.subuser.templateId">
                     <option value="0">--Select Working Hours Template--</option>
@@ -143,7 +143,7 @@
                     <h5>Sales</h5>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center bottom-clearfix text-center">
-                    <h5>Home Delivery</h5>
+                    <h5>Reservation</h5>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center bottom-clearfix text-center">
                     <h5>Help Desk</h5>
@@ -170,8 +170,9 @@
 
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-center">
                     <div class="form-group">
-                        <select class="form-control" ng-model="modalBox.subuser.accessRights.homeDelivery">
-                            <option ng-repeat="right in accessRights" value="{{right.value}}">{{right.title}}</option>
+                        <select class="form-control" ng-model="modalBox.subuser.accessRights.reservation">
+                            <option value="0">Hidden</option>
+                            <option value="3">All</option>
                         </select>
                     </div>
                 </div>
@@ -212,7 +213,7 @@
                     <div class="form-group">
                         <div class="input-group">
                             <span class="input-group-addon" id="basic-addon6">@</span>
-                            <input maxlength="150" type="text" ng-model="modalBox.subuser.homeDeliveryEmail" class="form-control" placeholder="Home Delivery Email" aria-describedby="basic-addon1">
+                            <input maxlength="150" type="text" ng-model="modalBox.subuser.reservationEmail" class="form-control" placeholder="Reservation Email" aria-describedby="basic-addon1">
                         </div>
                     </div>
                 </div>
@@ -267,12 +268,14 @@
                 <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45; RESERVATTION Rules ends &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
                 <!---------- HOME DELIVERY Rules ---------------------------------------------->
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bottom-clearfix text-left">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix" ng-repeat="rule in (rules | ruleFilter:2)">
-                        <div class="checkbox">
-                            <label >
-                                <input type="checkbox" ng-click="toggleRule($event,2)"  ng-checked="findRuleForSubuser(rule.TID,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}
-                            </label>
-                        </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-cleafix">
+                        <!--<div class="checkbox">-->
+                            <!--<label >-->
+                                <!--<input type="checkbox" ng-click="toggleRule($event,2)"  ng-checked="findRuleForSubuser(rule.TID,2)" data-tid="{{rule.TID}}"> {{rule.FolderTitle}}-->
+                            <!--</label>-->
+                        <!--</div>-->
+                        To configure reservation rights for users and subusers, please go to
+                        <span class="text text-bolder btn-link" ng-click="changeActive(pageResources)">reservation resource</span> section
                     </div>
                 </div>
                 <!---------- HOME DELIVERY Rules ends ---------------------------------------------->
