@@ -168,6 +168,7 @@ exports.FnCreateMessageGroup = messageBox.createMessageGroup;
 exports.FnValidateGroupName = messageBox.validateGroupName;
 exports.FnUpdateUserResponse = messageBox.updateUserResponse;
 exports.FnUpdateUserRelationship = messageBox.updateUserRelationship;
+exports.FnDeleteGroup = messageBox.deleteGroup;
 
 
 var Notification = require('./modules/notification-module.js');

@@ -211,6 +211,7 @@ app.post('/create_group',LocationManager.FnCreateMessageGroup);
 app.get('/validate_groupname',LocationManager.FnValidateGroupName);
 app.put('/user_response',LocationManager.FnUpdateUserResponse);
 app.put('/user_relationship',LocationManager.FnUpdateUserRelationship);
+app.delete('/group',LocationManager.FnDeleteGroup);
 
 
 //below service are for EZEIDAP

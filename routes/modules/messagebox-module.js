@@ -521,4 +521,86 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
 };
 
 
+
+/**
+ * @todo FnDeleteGroup
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for Delete Group
+ */
+MessageBox.prototype.deleteGroup = function(req,res,next){
+    var _this = this;
+
+    var groupID = req.query.group_id;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!groupID){
+        error['groupID'] = 'Invalid groupID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            console.log('CALL pDeleteGroup(' + st.db.escape(groupID) + ')');
+            st.db.query('CALL pDeleteGroup(' + st.db.escape(groupID) + ')', function (err, getResult) {
+                console.log(getResult);
+
+                if (!err) {
+                    if (getResult) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Group deleted sucessfully';
+                        responseMessage.data = {
+                            groupID : groupID
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnDeleteGroup: Group deleted sucessfully');
+                    }
+                    else {
+                        responseMessage.message = 'Group deleted not sucessfully';
+                        responseMessage.error = null;
+                        res.status(200).json(responseMessage);
+                        console.log('FnDeleteGroup:Group deleted not sucessfully');
+                    }
+
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnDeleteGroup: error in validating Group Name :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnDeleteGroup ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 module.exports = MessageBox;
