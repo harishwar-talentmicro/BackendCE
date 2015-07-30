@@ -1979,12 +1979,13 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var tid = req.query.tid;
+        var token = req.query.token;
 
         var responseMessage = {
             status: false,
             data: null,
-            error:{},
-            message:''
+            error: {},
+            message: ''
         };
 
         var validateStatus = true;
@@ -1993,65 +1994,81 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
             responseMessage.error['tid'] = 'Invalid tid';
             validateStatus *= false;
         }
+        if (!token) {
+            responseMessage.error['token'] = 'Invalid token';
+            validateStatus *= false;
+        }
         if (!validateStatus) {
             console.log('FnGetTransAttachment  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to get transaction attachment ! Please check the errors';
-            res.status(200).json(responseMessage);
+            res.status(401).json(responseMessage);
             return;
         }
 
-        if (tid) {
-
-            st.db.query('CALL pGetTransAttachment(' + st.db.escape(tid) +')', function (err, GetResult) {
+        else {
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'TransAttachment details Send successfully';
-                            console.log('FnGetTransAttachment: TransAttachment details Send successfully');
-                            res.status(200).json(responseMessage);
-                        }
-                        else {
+                    if (result) {
 
-                            responseMessage.error = {};
-                            responseMessage.message = 'No founded TransAttachment details';
-                            console.log('FnGetTransAttachment: No founded TransAttachment details');
-                            res.json(responseMessage);
-                        }
+                        st.db.query('CALL pGetTransAttachment(' + st.db.escape(tid) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult) {
+                                    if (GetResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = GetResult[0];
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'TransAttachment details Send successfully';
+                                        console.log('FnGetTransAttachment: TransAttachment details Send successfully');
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+
+                                        responseMessage.error = {};
+                                        responseMessage.message = 'No founded TransAttachment details';
+                                        console.log('FnGetTransAttachment: No founded TransAttachment details');
+                                        res.json(responseMessage);
+                                    }
+                                }
+                                else {
+
+
+                                    responseMessage.error = {};
+                                    responseMessage.message = 'No founded TransAttachment details';
+                                    console.log('FnGetTransAttachment: No founded TransAttachment details');
+                                    res.json(responseMessage);
+                                }
+
+                            }
+                            else {
+
+                                responseMessage.data = null;
+                                responseMessage.error = {};
+                                responseMessage.message = 'Error in getting TransAttachment details';
+                                console.log('FnGetTransAttachment: error in getting TransAttachment details' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
                     }
+
                     else {
-
-
-                        responseMessage.error = {};
-                        responseMessage.message = 'No founded TransAttachment details';
-                        console.log('FnGetTransAttachment: No founded TransAttachment details');
-                        res.json(responseMessage);
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveJobs: Invalid token');
                     }
-
                 }
                 else {
-
-                    responseMessage.data = null ;
-                    responseMessage.error = {};
-                    responseMessage.message = 'Error in getting TransAttachment details';
-                    console.log('FnGetTransAttachment: error in getting TransAttachment details' + err);
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
+                    console.log('FnSaveJobs:Error in processing Token' + err);
                 }
             });
-        }
-
-        else {
-            if (!tid) {
-                responseMessage.message = 'Invalid tid';
-                responseMessage.error = {
-                    tid : 'Invalid tid'
-                };
-                console.log('FnGetTransAttachment: tid is mandatory field');
-            }
-
-            res.status(401).json(responseMessage);
         }
     }
     catch (ex) {
