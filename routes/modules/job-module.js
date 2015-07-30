@@ -513,6 +513,7 @@ Job.prototype.searchJobs = function(req,res,next){
     var locations = req.query.locations;
     var category = req.query.category;
     var salary = req.query.salary;
+        var filter = req.query.filter ? req.query.filter : 0;
 
     var responseMessage = {
         status: false,
@@ -523,7 +524,7 @@ Job.prototype.searchJobs = function(req,res,next){
 
     var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)+ ',' + st.db.escape(jobType)
             + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
-            +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)+',' + st.db.escape(salary);
+            +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)+',' + st.db.escape(salary)+',' + st.db.escape(filter);
 
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
@@ -534,13 +535,21 @@ Job.prototype.searchJobs = function(req,res,next){
                                                 responseMessage.status = true;
                                                 responseMessage.error = null;
                                                 responseMessage.message = 'Jobs Search result loaded successfully';
-                                                responseMessage.data = {
-                                                    total_count: getresult[0][0].count,
-                                                    result: getresult[1],
-                                                    job_location : getresult[2],
-                                                    salary : getresult[3],
-                                                    category : getresult[4]
-                                                };
+                                                if(filter == 0) {
+                                                    responseMessage.data = {
+                                                        total_count: getresult[0][0].count,
+                                                        result: getresult[1],
+                                                        job_location: getresult[2],
+                                                        salary: getresult[3],
+                                                        category: getresult[4]
+                                                    };
+                                                }
+                                                else {
+                                                    responseMessage.data = {
+                                                        total_count: getresult[0][0].count,
+                                                        result: getresult[1]
+                                                    };
+                                                }
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnSearchJobs: Jobs Search result loaded successfully');
                                             }
@@ -787,50 +796,68 @@ Job.prototype.searchJobSeekers = function(req,res) {
 Job.prototype.applyJob = function(req,res,next){
     var _this = this;
 
-        var token = req.body.token;
-        var jobId = req.body.job_id;
+    var token = req.body.token;
+    var jobId = req.body.job_id;
 
-        var responseMessage = {
-            status: false,
-            error: {},
-            message: '',
-            data: null
-        };
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
 
-        var validateStatus = true,error = {};
-        if(!token){
-            error['token'] = 'Invalid token';
-            validateStatus *= false;
-        }
-        if(!jobId){
-            error['jobId'] = 'Invalid job ID';
-            validateStatus *= false;
-        }
+    var validateStatus = true,error = {};
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!jobId){
+        error['jobId'] = 'Invalid job ID';
+        validateStatus *= false;
+    }
 
-        if(!validateStatus){
-            responseMessage.error = error;
-            responseMessage.message = 'Please check the errors below';
-            res.status(400).json(responseMessage);
-        }
-        else {
-            try {
-                st.validateToken(token, function (err, result) {
-                    if (!err) {
-                        if (result) {
-                            var query = st.db.escape(jobId) + ',' + st.db.escape(token);
-                            console.log('CALL pApplyjob(' + query + ')');
-                            st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
-                                if (!err) {
-                                    if (insertResult) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Job applied successfully';
-                                        responseMessage.data = {
-                                            token: token,
-                                            jobId: jobId
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnApplyJob: Job applied successfully');
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var query = st.db.escape(jobId) + ',' + st.db.escape(token);
+                        console.log('CALL pApplyjob(' + query + ')');
+                        st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
+                            //console.log(insertResult);
+                            if (!err) {
+                                    if (insertResult[0]) {
+                                        console.log(insertResult[0][0].message);
+
+                                        if (insertResult[0][0]) {
+                                            if(!insertResult[0][0].message){
+
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Job applied successfully';
+                                            responseMessage.data = insertResult[0][0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnApplyJob: Job applied successfully');
+                                        }
+                                        else {
+                                                if(insertResult[0][0].message == 1){
+                                                    responseMessage.message = 'Already Applied'
+                                                }
+                                                else
+                                                {
+                                                    responseMessage.message = 'Not belong to this institute'
+                                                }
+
+                                            responseMessage.error = {};
+                                            responseMessage.data = {};
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnApplyJob:Job applied not successfully');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'Job applied not successfully';
@@ -839,6 +866,13 @@ Job.prototype.applyJob = function(req,res,next){
                                         console.log('FnApplyJob:Job applied not successfully');
                                     }
                                 }
+                                else {
+                                    responseMessage.message = 'Job applied not successfully';
+                                    responseMessage.error = {};
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnApplyJob:Job applied not successfully');
+                                }
+                            }
                                 else {
                                     responseMessage.message = 'An error occured ! Please try again';
                                     responseMessage.error = {
@@ -958,7 +992,7 @@ Job.prototype.appliedJobList = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !'
             res.status(500).json(responseMessage);
-            console.log('Error : FnGetJobLocations ' + ex.description);
+            console.log('Error : FnAppliedJobList ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
