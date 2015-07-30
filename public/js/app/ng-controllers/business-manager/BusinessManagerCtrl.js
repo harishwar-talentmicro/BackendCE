@@ -144,7 +144,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                     $scope.activeModule = 'service';
                     break;
                 case 'resume' :
-                    $scope.activeTemplate = 'html/business-manager/resume/resume.html';
+                    $scope.activeTemplate = 'html/business-manager/resume/resume-master.html';
                     $scope.activeModule = 'resume';
                     break;
                 default:

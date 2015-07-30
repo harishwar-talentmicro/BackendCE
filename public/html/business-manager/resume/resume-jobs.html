@@ -1,0 +1,386 @@
+<!-- Main job post starts here -->
+<div class="row setRowLeftRightMarginZero post-job" ng-controller="ResumeJobsCtrl">
+
+    <div ng-show="showJobListing">
+
+        <!-- Top filter start -->
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+                    <div class="input-group tx-search-input-group">
+                        <input class="form-control" ng-model="jobSearchTerm" type="text" placeholder="Search job based on Title"/>
+                        <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
+                                <i class="fa fa-times"></i>
+                        </span>
+                        <span class="input-group-btn">
+                            <button class="btn btn-info"
+                                    ng-click="searchJobTerm()"
+                                    type="button"><i class="fa fa-search"></i> Search
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+                    <div class="row">
+                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
+                             title="Order By">
+                            <label class="label label-danger">Order By</label>
+                        </div>
+                        <div class="col-lg-5 col-md-5 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
+                            <div class="form-group form-group-sm">
+                                <select class="form-control" ng-model="order_by" ng-change="searchJobTerm()">
+                                    <option value="1">By Date(Ascending)</option>
+                                    <option value="2">By Date(Descending)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
+                            <label class="label label-danger">Status</label>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
+                            <div class="form-group form-group-sm">
+                                <select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">
+                                    <!-- <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>-->
+                                    <option value="0"> Active </option>
+                                    <option value="1"> Closed(Hired) </option>
+                                    <option value="2"> Cancelled </option>
+                                    <option value="0,1,2"> All </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 bottom-clearfix">
+                            <button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" data-toggle="tooltip" title="" data-original-title="Add New Job">
+                                <span class="glyphicon glyphicon-plus-sign"></span> Add New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
+                    <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
+                        <button type="button" ng-click="getPreviousResultPage()" ng-disabled="!paginationPrevious" class="btn btn-info bt-xs no-radius">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                            Prev
+                        </button>
+                        <!-- <button type="button" class="btn btn-info bt-xs no-radius active">
+                             {{pageNumber}}
+                         </button>-->
+                        <button type="button" ng-click="getNextResultPage()" ng-disabled="!paginationNext" class="btn btn-info bt-xs no-radius">
+                            Next
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Top filter ends -->
+
+        <!--List of Job Start hear-->
+        <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero" ng-repeat="job in jobData track by $index">
+            <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
+                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                    <small class="text-success">
+                        <b class="ng-binding">{{job.jobcode}}</b>
+                    </small>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                    <small class="text-success">
+                        <b class="ng-binding">{{job.jobtitle}}</b>
+                    </small>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                    <small class="text-success">
+                        <b class="ng-binding">{{job.posteddate | ageFilter}}</b>
+                    </small>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                    <small class="text-success">
+
+                        <b class="ng-binding">{{job.totalapplied}} Applied</b>
+                    </small>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openCandidateListPopup(job.tid)" data-original-title="View Candidates" ng-disabled="!job.totalapplied">
+                                <span class="glyphicon glyphicon-fullscreen"></span>
+                                View Candidates
+                            </button>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                            <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="java" style="word-wrap:break-word;">
+                    <small class="text-success">
+                        <b class="ng-binding" ng-show="job.status == 0">Active</b>
+                        <b class="ng-binding" ng-show="job.status == 1">Closed(Hired)</b>
+                        <b class="ng-binding" ng-show="job.status == 2">Cancelled</b>
+                    </small>
+                </div>
+            </div>
+        </div>
+        <!--Applied job candidate list start-->
+        <modal mtitle="candidateModalBox.title" mclass="candidateModalBox.class" visible="showCandidateListModal">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero">
+                        <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
+                            <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    <b class="ng-binding">@krunal</b>
+                                </small>
+                            </div>
+                            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    <b class="ng-binding">{{job.jobtitle}}</b>
+                                </small>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    <b class="ng-binding">{{job.posteddate | ageFilter}}</b>
+                                </small>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    {{job.tid}}
+                                    <b class="ng-binding" ng-click="openCandidateListPopup(job.tid)">27 Applied</b>
+                                </small>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                                <div class="row">
+                                    <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                                        <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="View Details">
+                                            <span class="glyphicon glyphicon-fullscreen"></span>
+                                            Details
+                                        </button>
+                                    </div>-->
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                                        <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                            Edit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="java" style="word-wrap:break-word;">
+                                <small class="text-success">
+                                    <b class="ng-binding" ng-show="job.status == 0">Active</b>
+                                    <b class="ng-binding" ng-show="job.status == 1">Closed(Hired)</b>
+                                    <b class="ng-binding" ng-show="job.status == 2">Cancelled</b>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+                        <div class="row top-clearfix-padding-half bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button class="btn btn-danger btn-sm no-radius" ng-click="openCandidateListPopup()">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </modal>
+        <!--Applied job candidate list end-->
+        <!--List of Job End hear-->
+    </div>
+
+    <div ng-hide="showJobListing">
+        <!-- Post new job start from hear -->
+        <form name="jobPostForm" novalidate>
+            <div class="job-post p-bottom-10">
+                <div class="width-100 hpw">
+                    <div class="col-lg-6">
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Job Title</button>
+                              </span>
+                            <input type="text" maxlength="150" ng-model = "jobTitle" placeholder="Job Title" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Job Code</button>
+                              </span>
+                            <input type="text" maxlength="30" ng-model = "jobCode" placeholder="Job Code" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 p-top-10">
+                        <div class="input-group m-bot15 p-top-10">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white"><small>Job Desc.</small></button>
+                              </span>
+                            <textarea rows="5" ng-model = "jobDescription" placeholder="Job Description" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Skill Keywords</button>
+                              </span>
+                            <input type="text" maxlength="250" ng-model = "skillKeyWords" placeholder="Ex: Sales, Marketing" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">No. of Vacancies</button>
+                              </span>
+                            <input numbers-only type="text" ng-model = "jobVacancies" placeholder="No. of Vacancies" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Experience</button>
+                              </span>
+                            <input type="text" decimals-only maxlength="5" placeholder="Ex: 1" ng-model = "experienceFrom" class="form-control"/>
+                                    <span class="input-group-btn">
+                                <button type="button" class="btn btn-white no-radius">To</button>
+                              </span>
+                            <input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "experienceTo" class="form-control"/>
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-white no-radius">Yrs</button>
+                              </span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+                                <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Location</button>
+                              </span>
+                                    <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "jobLocation" class="form-control"/>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+
+                     <span ng-repeat="location in locationArrayString track by $index">
+                        <label  class="label label-default">{{location}} <i ng-click="removeLocation($index)" class="fa fa-times text-warning"></i></label>&nbsp;
+                    </span>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Salary</button>
+                              </span>
+                            <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "salaryFrom" class="form-control text-right"/>
+                                    <span class="input-group-btn">
+                                <button type="button" class="btn btn-white no-radius">To</button>
+                              </span>
+                            <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "salaryTo" class="form-control text-right"/>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-white no-radius">Per</button>
+                                </span>
+
+                            <select class="form-control" name="listType" ng-model="salaryType">
+                                <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
+                            </select>
+                        </div>
+                        <small class="text-danger">(For India, enter the amount in Rs. Lakhs)</small>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Job Type</button>
+                              </span>
+                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
+
+                                <option value="0"> Job Type </option>
+                                <option value="1">Full Time</option>
+                                <option value="2">Part Time</option>
+                                <option value="3">Work From Home</option>
+                                <option value="4">Internship</option>
+                                <option value="5">Consultant</option>
+                                <option value="6">Freelancer</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                              <span class="input-group-btn">
+                                <button type="button" class="btn btn-white">Contact Name</button>
+                              </span>
+                            <input type="text" maxlength="200" placeholder="Contact Name" ng-model = "contactName" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                                  <span class="input-group-btn">
+                                    <button type="button" class="btn btn-white">Email</button>
+                                  </span>
+                            <input type="email"
+                                   ng-model = "emailContact"
+                                   name="emailID"
+                                   maxlength="250"
+                                   placeholder="Email"
+                                   class="form-control"/>
+
+                                    <span ng-show="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1))"
+                                          ng-if="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1)) ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false"></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                                     <span class="input-group-btn">
+                                        <button type="button" class="btn btn-white">Phone</button>
+                                     </span>
+                            <input type="text" numbers-only maxlength="12" placeholder="Phone" ng-model = "phone" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                                     <span class="input-group-btn">
+                                        <button type="button" class="btn btn-white">Status</button>
+                                     </span>
+                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobStatus">
+                                <option value="0"> Active </option>
+                                <option value="1"> Closed(Hired) </option>
+                                <option value="2"> Cancelled </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 p-top-10">
+                        <div class="input-group m-bot15">
+                         <span class="input-group-btn">
+                            <button type="button" class="btn btn-white">Job Categories</button>
+                         </span>
+                            <select class="form-control" name="listType" ng-model="jobCategori">
+                                <option value="0" class="ng-binding ng-scope">Job Categories</option>
+                                <option ng-repeat="categori in jobCategories track by categori.CategoryID" value="{{categori.CategoryID}}">{{categori.CategoryTitle}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+
+
+
+
+                    <div class="col-lg-12 p-top-10">
+                        <div class="m-bot15">
+                            <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
+                            <input type="button" ng-click="cancelJobPosting()" class="btn btn-primary" value="Cancel">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

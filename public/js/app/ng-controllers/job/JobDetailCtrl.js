@@ -5,7 +5,7 @@
  * @since 20150718
  */
 angular.module('ezeidApp').
-    controller('JobDetail', [
+    controller('JobDetailCtrl', [
         '$rootScope',
         '$scope',
         '$http',
