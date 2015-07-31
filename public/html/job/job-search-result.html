@@ -15,11 +15,17 @@
                     <span class="icon-bar"></span>
                 </button>
                 <!-- next and previous button for pagination -->
-                <div class="navbar-form navbar-left hidden">
-                    <button class="btn btn-primary">
+                <div class="navbar-form navbar-left">
+                    <button class="btn"
+                            ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
+                            ng-disabled="!paginationPreviousVisibility"
+                            ng-click="paginationPreviousClick()">
                         Previous <i class="fa fa-arrow-circle-left"></i>
                     </button>
-                    <button class="btn btn-primary">
+                    <button class="btn btn-primary"
+                            ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
+                            ng-disabled="!paginationNextVisibility"
+                            ng-click="paginationNextClick()">
                         <i class="fa fa-arrow-circle-right"></i> Next
                     </button>
                 </div>

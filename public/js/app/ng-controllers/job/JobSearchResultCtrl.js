@@ -66,7 +66,7 @@ angular.module('ezeidApp').
             $scope.advanceSearchVisibility = false;
 
             //Pagination settings
-            $scope.pageSize = 10000;//Results per page
+            $scope.pageSize = 5;//Results per page
             $scope.pageCount = 0;//Everything starts with a 0 - 10,20,30 etc.
             $scope.totalResult = 0;//Total results
             $scope.resultThisPage = 0;//Total results you got this page
@@ -210,6 +210,9 @@ angular.module('ezeidApp').
 
                     /* set result data */
                     setData(response.data.result);
+
+                    /* Reset the pagination buttons */
+                    $scope.paginationVisibility();
 
                     if(requestFromFilter)
                     {
@@ -692,6 +695,7 @@ angular.module('ezeidApp').
              */
             $scope.triggerSearch = function(isTriggeredFromFilter)
             {
+                console.log("search triggered:"+isTriggeredFromFilter);
                 if(parseInt(isTriggeredFromFilter) == 1)
                 {
                     $scope.params.filter = 1;
@@ -863,7 +867,7 @@ angular.module('ezeidApp').
                 {
                     return;
                 }
-
+                console.log('JQ Executed');
                 $scope.restrictJsTileHoverEffect = true;
                 $('.job-main-content').mouseenter(function(){
                     $(this).siblings().css('box-shadow','4px 3px 10px rgb(74, 243, 218)');
@@ -877,7 +881,13 @@ angular.module('ezeidApp').
                     });
             }
 
+            function resetRestrictJsTileHoverEffectFlag()
+            {
+                $scope.restrictJsTileHoverEffect = false;
+            }
+
             $scope.$watch('resultData', function() {
+                resetRestrictJsTileHoverEffectFlag();
                 $scope.jsTileHoverEffect();
             });
 
@@ -886,8 +896,66 @@ angular.module('ezeidApp').
              */
             $scope.redirectJobDetailPage = function(tid)
             {
-                console.log("Redirect "+tid);
-
+                $location.url('/jobdetail' + '?jobid='+tid);
             }
 
+
+            /**************************
+             * Pagination button ACTION
+             */
+
+            /**
+             * load the next results
+             */
+            $scope.paginationNextClick = function()
+            {
+                $scope.pageCount += $scope.pageSize;
+                /* trigger next results */
+                $scope.triggerSearch(1);
+                $scope.paginationVisibility();
+            }
+
+            /**
+             * load the previous results
+             */
+            $scope.paginationPreviousClick = function()
+            {
+                $scope.pageCount -= $scope.pageSize;
+                /* trigger previous results */
+                $scope.triggerSearch(1);
+                $scope.paginationVisibility();
+            }
+
+            /**
+             * Toggle the visibility of the pagination buttons
+             */
+            $scope.paginationNextVisibility = true;
+            $scope.paginationPreviousVisibility = true;
+            $scope.paginationVisibility = function()
+            {
+                var totalResult = parseInt($scope.totalResult);
+                var currentCount = parseInt($scope.pageCount);
+                var resultSize = parseInt($scope.pageSize);
+
+                /* initial state */
+                if(currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = false;
+
+                }
+                else if((currentCount + resultSize) >= totalResult)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = true;
+
+                }
+                else{
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = true;
+
+                }
+
+                console.log($scope.paginationPreviousVisibility,$scope.paginationNextVisibility);
+            }
         }]);
