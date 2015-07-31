@@ -171,6 +171,8 @@ exports.FnUpdateUserResponse = messageBox.updateUserResponse;
 exports.FnUpdateUserRelationship = messageBox.updateUserRelationship;
 exports.FnDeleteGroup = messageBox.deleteGroup;
 exports.FnSendMessageRequest = messageBox.sendMessageRequest;
+exports.FnComposeMessage = messageBox.composeMessage;
+exports.FnGetMembersList = messageBox.getMembersList;
 
 
 var Notification = require('./modules/notification-module.js');

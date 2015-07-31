@@ -139,6 +139,8 @@ angular.module('ezeidApp').
                 setSearchResult();
             }
 
+
+
             /**
              * clean the data of experience
              */
@@ -938,11 +940,15 @@ angular.module('ezeidApp').
                 var resultSize = parseInt($scope.pageSize);
 
                 /* initial state */
-                if(currentCount == 0)
+                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if(currentCount == 0)
                 {
                     $scope.paginationNextVisibility = true;
                     $scope.paginationPreviousVisibility = false;
-
                 }
                 else if((currentCount + resultSize) >= totalResult)
                 {
