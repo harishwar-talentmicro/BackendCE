@@ -211,39 +211,39 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 
                             responseMessage.status = true;
                             responseMessage.error = null;
-                            responseMessage.message = 'Group Name is valid';
+                            responseMessage.message = 'Group Name is available';
                             responseMessage.data = {
                                 groupName : groupName
                             };
                             res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName: Group Name is valid');
+                            console.log('FnValidateGroupName: Group Name is available');
                         }
                         else {
-                            responseMessage.message = 'Group Name is not valid';
-                            responseMessage.error = null;
+                            responseMessage.message = 'Group Name is not available';
+                            responseMessage.error = {};
                             res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName:Group Name is not valid');
+                            console.log('FnValidateGroupName:Group Name is not available');
                         }
                     }
                     else {
-                        responseMessage.message = 'Group Name is not valid';
-                        responseMessage.error = null;
+                        responseMessage.message = 'Group Name is not available';
+                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
-                        console.log('FnValidateGroupName:Group Name is not valid');
+                        console.log('FnValidateGroupName:Group Name is not available');
                     }
                 }
                         else {
-                            responseMessage.message = 'Group Name is not valid';
-                            responseMessage.error = null;
+                            responseMessage.message = 'Group Name is not available';
+                            responseMessage.error = {};
                             res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName:Group Name is not valid');
+                            console.log('FnValidateGroupName:Group Name is not available');
                         }
                     }
                     else {
-                        responseMessage.message = 'Group Name is not valid';
-                        responseMessage.error = null;
+                        responseMessage.message = 'Group Name is not available';
+                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
-                        console.log('FnValidateGroupName:Group Name is not valid');
+                        console.log('FnValidateGroupName:Group Name is not available');
                     }
                 }
                 else {
