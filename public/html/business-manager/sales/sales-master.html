@@ -1,0 +1,27 @@
+<div class="panel panel-default" ng-controller="SalesMasterCtrl">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 tabs-row-sales">
+                <ul class="nav nav-tabs">
+                    <li ng-class="(salesEnquiryTab) ? 'active' : ''"><a ng-click="(salesStatisticsTab = false)(salesTaskTab = false)(salesEnquiryTab = true)"> <span class="glyphicon glyphicon-copy"></span> Enquiries </a></li>
+                    <li ng-class="(salesStatisticsTab) ? 'active' : ''"><a ng-click="(salesTaskTab = false)(salesEnquiryTab = false)(salesStatisticsTab = true)"> <span class="glyphicon glyphicon-signal"></span> Tracker </a></li>
+                    <li ng-class="(salesTaskTab) ? 'active' : ''"><a ng-click="(salesEnquiryTab = false)(salesStatisticsTab = false)(salesTaskTab = true)"> <span class="glyphicon glyphicon-time"></span> Task Calendar </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="salesEnquiryTab" ng-show="salesEnquiryTab" ng-include="tplSalesEnquiryTab">
+            </div>
+
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="salesStatisticsTab" ng-show="salesStatisticsTab" ng-include="tplSalesStatisticsTab">
+            </div>
+
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-if="salesTaskTab" ng-show="salesTaskTab" ng-include="tplSalesTaskTab">
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -156,8 +156,23 @@ angular.module('ezeidApp').
             /**
              * make a search Api calls
              */
-            function setSearchResult()
+            function setSearchResult(isRequestFromFilter)
             {
+                var requestFromFilter = false;
+                console.log("FILTER: "+isRequestFromFilter);
+                if(typeof(isRequestFromFilter) !== undefined && parseInt(isRequestFromFilter) == 1)
+                {
+                    requestFromFilter = true;
+                    console.log("FILTER: "+isRequestFromFilter);
+
+                }
+                else
+                {
+                    /* reset all the filters */
+                    console.log("Filter Rest");
+                    resetFilters();
+                }
+
                 var token = ($rootScope._userInfo.token)?$rootScope._userInfo.token:null;
                 /* make an API request to get the data */
                 var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
@@ -182,9 +197,7 @@ angular.module('ezeidApp').
                 }).success(function (response) {
                     $scope.isProcessing = false;
                     /* YIPPE! Got response */
-                    console.log(response);
                     var isEmpty = !(response.data.result.length > 0);
-                    console.log(isEmpty);
                     if(isEmpty)//No Result found
                     {
                         console.log("No result found");
@@ -194,8 +207,15 @@ angular.module('ezeidApp').
                     }
                     /* set the total count of the result */
                     $scope.totalResult = response.data.total_count;
+
                     /* set result data */
                     setData(response.data.result);
+
+                    if(requestFromFilter)
+                    {
+                        console.log("Filter "+$scope.params.filter);
+                        return;
+                    }
                     /* Set Advance-filter [Right-side] */
                     setJobLocationData(response.data.job_location);
                     setSalaryData(response.data.salary);
@@ -211,6 +231,16 @@ angular.module('ezeidApp').
                     Notification.error({ message : 'An error occurred', delay : MsgDelay});
                     $scope.$emit('$preLoaderStop');
                 });
+            }
+
+            /**
+             * Reset all the filters
+             */
+            function resetFilters()
+            {
+                $scope.params.salary = null;
+                $scope.params.category = null;
+                $scope.params.locations = null;
             }
 
             /**
@@ -665,12 +695,17 @@ angular.module('ezeidApp').
                 if(parseInt(isTriggeredFromFilter) == 1)
                 {
                     $scope.params.filter = 1;
+                    /* Just update the result parameter */
+                    setSearchResult(1);
                 }
-                setJobTypeData();
-                /* redirect to search page */
-                var searchStr = getSearchtermString();
-                $location.url('/jobsearch?' + searchStr);
-                $scope.triggerSearchOnEnterKey();
+                else
+                {
+                    setJobTypeData();
+                    /* redirect to search page */
+                    var searchStr = getSearchtermString();
+                    $location.url('/jobsearch?' + searchStr);
+                    $scope.triggerSearchOnEnterKey();
+                }
             }
 
             /**
