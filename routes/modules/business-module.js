@@ -60,6 +60,11 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
         var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
         var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
         var folderRules = (req.query.folder_rules) ? req.query.folder_rules : '';
+        var jobIDS = req.query.job_id ? req.query.job_id : '';
+        var institute = req.query.institute ? req.query.institute : '';
+        var expFrom = req.query.exp_from ? req.query.exp_from : '';
+        var expTo = req.query.exp_to ? req.query.exp_to : '';
+        var locationID = req.query.location_id ? req.query.location_id : '';
 
         console.log(req.query);
         var RtnMessage = {
@@ -79,7 +84,11 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
                             FromPage = 0;
                         }
 
-                        var parameters = st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(Status) + ',' + st.db.escape(FromPage) + ',' + st.db.escape(10) + ',' + st.db.escape(searchkeyword) + ',' + st.db.escape(sortBy) + ','+ st.db.escape(folderRules);
+                        var parameters = st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(Status)
+                            + ',' + st.db.escape(FromPage) + ',' + st.db.escape(10) + ',' + st.db.escape(searchkeyword)
+                            + ',' + st.db.escape(sortBy) + ','+ st.db.escape(folderRules)+ ',' + st.db.escape(jobIDS)
+                            + ',' + st.db.escape(institute) + ',' + st.db.escape(expFrom)+ ',' + st.db.escape(expTo)
+                            + ','+ st.db.escape(locationID);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
                         st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
 
