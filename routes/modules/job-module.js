@@ -197,7 +197,12 @@ Job.prototype.create = function(req,res,next){
                                             contactName: contactName,
                                             email_id: email_id,
                                             mobileNo: mobileNo,
-                                            location_id: location_id
+                                            location_id: location_id,
+                                            categoryID : categoryID,
+                                            educationID :educationID,
+                                            specializationID : specializationID,
+                                            instituteID : instituteID,
+                                            aggregateScore : aggregateScore
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveJobs: Jobs save successfully');
@@ -900,7 +905,7 @@ Job.prototype.applyJob = function(req,res,next){
                         };
                         responseMessage.message = 'Error in validating Token';
                         res.status(500).json(responseMessage);
-                        console.log('FnSaveJobs:Error in processing Token' + err);
+                        console.log('FnApplyJob:Error in processing Token' + err);
                     }
                 });
             }
@@ -910,7 +915,7 @@ Job.prototype.applyJob = function(req,res,next){
                 };
                 responseMessage.message = 'An error occurred !'
                 res.status(400).json(responseMessage);
-                console.log('Error : FnGetJobLocations ' + ex.description);
+                console.log('Error : FnApplyJob ' + ex.description);
                 var errorDate = new Date();
                 console.log(errorDate.toTimeString() + ' ......... error ...........');
             }
@@ -1153,12 +1158,8 @@ Job.prototype.jobs = function(req,res,next){
                                                     jobcode :getresult[1][i].jobcode ,
                                                     jobtitle :getresult[1][i].jobtitle
                                                 };
-
                                                 output.push(data);
                                             }
-                                            console.log('--------------');
-                                            console.log(output);
-                                            console.log('--------------');
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs loaded successfully';

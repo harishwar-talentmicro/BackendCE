@@ -62,8 +62,8 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
         var folderRules = (req.query.folder_rules) ? req.query.folder_rules : '';
         var jobIDS = req.query.job_id ? req.query.job_id : '';
         var institute = req.query.institute ? req.query.institute : '';
-        var expFrom = req.query.exp_from ? req.query.exp_from : '';
-        var expTo = req.query.exp_to ? req.query.exp_to : '';
+        var expFrom = req.query.exp_from ? req.query.exp_from : 0;
+        var expTo = req.query.exp_to ? req.query.exp_to : 0;
         var locationID = req.query.location_id ? req.query.location_id : '';
 
         console.log(req.query);
