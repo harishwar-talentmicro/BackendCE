@@ -838,59 +838,43 @@ Job.prototype.applyJob = function(req,res,next){
                         st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
                             console.log(insertResult);
                             if (!err) {
-                                    if (insertResult[0]) {
-
-                                        if (insertResult[0][0]) {
-                                            if(!insertResult[0][0].message){
-
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Job apply successfully';
-                                            responseMessage.data = insertResult[0][0];
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnApplyJob: Job apply successfully');
-                                        }
-                                        else {
-                                                if(insertResult[0][0].message == 1){
-                                                    responseMessage.message = 'Already Applied'
-                                                }
-                                                else
-                                                {
-                                                    responseMessage.message = 'Not belong to this institute'
-                                                }
-
-                                            responseMessage.error = {};
-                                            responseMessage.data = {};
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnApplyJob:Job not apply');
-                                                console.log(responseMessage);
-                                        }
+                                if (insertResult[0]) {
+                                    if (insertResult[0][0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Job apply successfully';
+                                        responseMessage.data = insertResult[0][0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnApplyJob: Job apply successfully');
                                     }
                                     else {
-                                        responseMessage.message = 'Job not apply';
+
                                         responseMessage.error = {};
+                                        responseMessage.message = 'Job not apply';
                                         res.status(200).json(responseMessage);
                                         console.log('FnApplyJob:Job not apply');
-                                            console.log(responseMessage);
+
                                     }
                                 }
                                 else {
-                                        responseMessage.message = 'Job not apply';
+                                    responseMessage.message = 'Job not apply';
                                     responseMessage.error = {};
                                     res.status(200).json(responseMessage);
-                                        console.log('FnApplyJob:Job not apply');
+                                    console.log('FnApplyJob:Job not apply');
+                                    console.log(responseMessage);
                                 }
                             }
-                                else {
-                                    responseMessage.message = 'An error occured ! Please try again';
-                                    responseMessage.error = {
-                                        server: 'Internal Server Error'
-                                    };
-                                    res.status(500).json(responseMessage);
-                                    console.log('FnApplyJob: error in saving Job applied :' + err);
-                                }
-                            });
-                        }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnApplyJob: error in saving Job applied :' + err);
+                            }
+
+                        });
+                    }
                         else {
                             responseMessage.message = 'Invalid token';
                             responseMessage.error = {
