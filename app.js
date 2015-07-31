@@ -214,6 +214,8 @@ app.put('/user_response',LocationManager.FnUpdateUserResponse);
 app.put('/user_relationship',LocationManager.FnUpdateUserRelationship);
 app.delete('/group',LocationManager.FnDeleteGroup);
 app.post('/send_message',LocationManager.FnSendMessageRequest);
+app.post('/compose_message',LocationManager.FnComposeMessage);
+app.get('/members_list',LocationManager.FnGetMembersList);
 
 
 //below service are for EZEIDAP

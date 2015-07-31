@@ -32,7 +32,7 @@ function MessageBox(db,stdLib){
 
 /**
  * @todo FnCreateMessageGroup
- * Method : GET
+ * Method : POST
  * @param req
  * @param res
  * @param next
@@ -163,7 +163,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnValidateGroupName
@@ -394,7 +393,6 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnUpdateUserRelationship
  * Method : PUT
@@ -520,8 +518,6 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
     }
 };
 
-
-
 /**
  * @todo FnDeleteGroup
  * Method : DELETE
@@ -601,8 +597,6 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
         }
     }
 };
-
-
 
 /**
  * @todo FnSendMessageRequest
@@ -728,6 +722,218 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnComposeMessage
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for compose message
+ */
+MessageBox.prototype.composeMessage = function(req,res,next){
+
+    var _this = this;
+
+    var message  = req.body.message;
+    var attachment  = req.body.attachment;
+    var attachmentFilename  = req.body.attachment_filename;
+    var priority  = req.body.priority ? req.body.priority : '';
+    var targetDate  = req.body.target_date ? req.body.target_date : null;
+    var expiryDate  =  req.body.expiry_date ? req.body.expiry_date : null;
+    var token = req.body.token;
+    var previousMessageID = req.body.previous_messageID;
+    var toID = req.body.to_id;
+    var idType = req.body.id_type;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!toID){
+        error['toID'] = 'Invalid toID';
+        validateStatus *= false;
+    }
+    if(!previousMessageID){
+        error['previousMessageID'] = 'Invalid previousMessageID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(message) + ',' + st.db.escape(attachment) + ',' + st.db.escape(attachmentFilename)
+                            + ',' + st.db.escape(priority) + ',' + st.db.escape(targetDate) + ',' + st.db.escape(expiryDate)
+                            + ',' + st.db.escape(token) + ',' + st.db.escape(previousMessageID)+ ',' + st.db.escape(toID)
+                            + ',' + st.db.escape(idType);
+                        var query = 'CALL pComposeMessage(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, insertResult) {
+                            console.log(insertResult);
+                            if (!err) {
+                                if (insertResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Message Composed successfully';
+                                    responseMessage.data = {
+                                        message  : req.body.message,
+                                        attachment  : req.body.attachment,
+                                        attachmentFilename  : req.body.attachment_filename,
+                                        priority  : req.body.priority,
+                                        targetDate  : req.body.target_date,
+                                        expiryDate  : req.body.expiry_date,
+                                        token : req.body.token,
+                                        previousMessageID : req.body.previous_messageID,
+                                        toID : req.body.to_id,
+                                        idType : req.body.id_type
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnComposeMessage: Message Composed successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Message not Composed';
+                                    responseMessage.error = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnComposeMessage:Message not Composed');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnComposeMessage: error in composing Message :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnComposeMessage: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnComposeMessage:Error in validating Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnComposeMessage ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetMembersList
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get members list
+ */
+
+MessageBox.prototype.getMembersList = function(req,res,next){
+    var _this = this;
+
+    var groupID = req.query.group_id;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!groupID){
+        error['groupID'] = 'Invalid groupID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            console.log('CALL pGetMembersList(' + st.db.escape(groupID) + ')');
+            st.db.query('CALL pGetMembersList(' + st.db.escape(groupID) + ')', function (err, getResult) {
+                console.log(getResult);
+
+                if (!err) {
+                    if (getResult) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Members List loaded sucessfully';
+                        responseMessage.data = getResult[0];
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetMembersList: Members List loaded sucessfully');
+                    }
+                    else {
+                        responseMessage.message = 'Members List not loaded';
+                        responseMessage.error = null;
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetMembersList:Members List not loaded');
+                    }
+
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetMembersList: error in getting Members:' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';s
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetMembersList ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = MessageBox;
