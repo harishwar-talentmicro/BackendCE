@@ -936,4 +936,83 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 };
 
 
+
+/**
+ * @todo FnLoadMessageBox
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for load messageBox
+ */
+
+MessageBox.prototype.loadMessageBox = function(req,res,next){
+    var _this = this;
+
+    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!ezeone_id){
+        error['ezeone_id'] = 'Invalid ezeone_id';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            console.log('CALL PLoadMessageBox(' + st.db.escape(ezeone_id) + ')');
+            st.db.query('CALL PLoadMessageBox(' + st.db.escape(ezeone_id) + ')', function (err, getResult) {
+                console.log(getResult);
+
+                if (!err) {
+                    if (getResult) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'MessageBox loaded sucessfully';
+                        responseMessage.data = getResult[0];
+                        res.status(200).json(responseMessage);
+                        console.log('FnLoadMessageBox: MessageBox loaded sucessfully');
+                    }
+                    else {
+                        responseMessage.message = 'MessageBox not loaded';
+                        responseMessage.error = null;
+                        res.status(200).json(responseMessage);
+                        console.log('FnLoadMessageBox:MessageBox not loaded');
+                    }
+
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnLoadMessageBox: error in getting Members:' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';s
+            res.status(500).json(responseMessage);
+            console.log('Error : FnLoadMessageBox ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 module.exports = MessageBox;

@@ -162,6 +162,7 @@ exports.FnAppliedJobList = jobModule.appliedJobList;
 exports.FnGetFiltersForJob = jobModule.getFiltersForJob;
 exports.FnGetJobDetails = jobModule.getJobDetails;
 exports.FnJobs = jobModule.jobs;
+exports.FnGetAppliedJob = jobModule.getAppliedJob;
 
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);
@@ -173,6 +174,7 @@ exports.FnDeleteGroup = messageBox.deleteGroup;
 exports.FnSendMessageRequest = messageBox.sendMessageRequest;
 exports.FnComposeMessage = messageBox.composeMessage;
 exports.FnGetMembersList = messageBox.getMembersList;
+exports.FnLoadMessageBox = messageBox.loadMessageBox;
 
 
 var Notification = require('./modules/notification-module.js');

@@ -1220,6 +1220,90 @@ Job.prototype.jobs = function(req,res,next){
 };
 
 
+/**
+ * @todo FnGetAppliedJob
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for applied job list
+ */
+Job.prototype.getAppliedJob = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            console.log('CALL pGetAppliedJobs(' + st.db.escape(token) + ')');
+            st.db.query('CALL pGetAppliedJobs(' + st.db.escape(token) + ')', function (err, getResult) {
+                if (!err) {
+                    if (getResult) {
+                        if(getResult[0].length){
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Applied job List loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnAppliedJobList: Applied job List loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Applied job List not loaded';
+                            responseMessage.error = null;
+                            res.status(200).json(responseMessage);
+                            console.log('FnAppliedJobList:Applied job List not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Applied job List not loaded';
+                        responseMessage.error = null;
+                        res.status(200).json(responseMessage);
+                        console.log('FnAppliedJobList:Applied job List not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnAppliedJobList: error in saving Applied job list :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnAppliedJobList ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 
 
 
