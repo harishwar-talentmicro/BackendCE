@@ -519,6 +519,7 @@ Job.prototype.searchJobs = function(req,res,next){
     var category = req.query.category;
     var salary = req.query.salary;
     var filter = req.query.filter ? req.query.filter : 0;
+    var restrictToInstitue = req.query.restrict ? req.query.restrict : 0;
 
     var responseMessage = {
         status: false,
@@ -529,7 +530,8 @@ Job.prototype.searchJobs = function(req,res,next){
 
     var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)+ ',' + st.db.escape(jobType)
             + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
-            +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)+',' + st.db.escape(salary)+',' + st.db.escape(filter);
+            +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)
+            +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue);
 
                             console.log(query);
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
