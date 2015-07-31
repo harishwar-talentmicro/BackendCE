@@ -197,16 +197,21 @@
                         {
                             resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
                         }
-                        $scope.jobData = resp.data.result;
 
-                        for(var i = 0; i < resp.data.job_location.length; i++)
+                        for(var jobCount = 0; jobCount < resp.data.result.length; jobCount++)
                         {
-                            $scope.mainLocationArray.push(resp.data.job_location[i]);
-                            $scope.locationArrayString.push(resp.data.job_location[i].Locname);
+                            resp.data.result[jobCount].locationArray = [];
+
+                            for(var i = 0; i < resp.data.job_location.length; i++)
+                            {
+                                if(resp.data.result[jobCount].tid == resp.data.job_location[i].jobid)
+                                {
+                                    resp.data.result[jobCount].locationArray.push(resp.data.job_location[i]);
+                                }
+                            }
                         }
 
-                        //  $scope.mainLocationArray.push(tempLocationArray);
-                        //     $scope.locationArrayString.push($scope.jobLocation);
+                        $scope.jobData = resp.data.result;
                     }
 
                 }).error(function(err){
@@ -393,8 +398,6 @@
                 {
                     $timeout(function()
                     {
-                        console.log($scope.jobData[_index]);
-
                         $scope.jobTid = $scope.jobData[_index].tid;
                         $scope.jobTitle = $scope.jobData[_index].jobtitle;
                         $scope.jobCode = $scope.jobData[_index].jobcode;
@@ -414,27 +417,50 @@
                         $scope.phone = $scope.jobData[_index].mobile;
                         $scope.emailContact = $scope.jobData[_index].emailid;
                         $scope.jobStatus = $scope.jobData[_index].status;
-
-                        // $scope.jobCategori = $scope.jobData[_index].jobcategory;
                         $scope.jobCategori = parseInt($scope.jobData[_index].jobcategory);
 
+                        console.log("sai111");
+                        console.log($scope.jobData[_index].locationArray);
 
-                        /* $scope.functionsArray = $scope.jobData[_index].jobcategory.split(',');
-                         for (var nCount = 0; nCount <$scope.functionsArray.length; nCount++)
-                         {
-                         $scope.selectedFunctions.push(parseInt($scope.functionsArray[nCount]));
-                         }*/
+                        for (var nCount = 0; nCount < $scope.jobData[_index].locationArray.length; nCount++)
+                        {
+                            //delete $scope.jobData[_index].locationArray[nCount].jobid;
+                            $scope.mainLocationArray.push($scope.jobData[_index].locationArray[nCount]);
+                            $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].Locname);
+                        }
 
-                        $scope.selectedEducations = [];
-                        $scope.selectedSpecializations = [];
-                        $scope.selectedInstitute = [];
-                        $scope.aggregate_score = "";
+                        console.log("sai222");
+                        console.log($scope.jobData[_index].locationArray);
 
-                        var res = $scope.jobData[_index].location.split(",");
+                        $scope.EducationArray = $scope.jobData[_index].Education.split(',');
+                        for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
+                        {
+                            $scope.selectedEducations.push(parseInt($scope.EducationArray[nCount]));
+                        }
+
+                        $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
+                        for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
+                        {
+                            $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
+                        }
+
+                        $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
+                        for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
+                        {
+                            $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
+                        }
+
+                        $scope.InstituteArray = $scope.jobData[_index].Institute.split(',');
+                        for (var nCount = 0; nCount < $scope.InstituteArray.length; nCount++)
+                        {
+                           $scope.selectedInstitute.push(parseInt($scope.InstituteArray[nCount]));
+                        }
+
+                        $scope.aggregate_score = $scope.jobData[_index].Aggregatescore;
+
+
                         $scope.$emit('$preLoaderStop');
                     },3000);
-
-
                 }
             };
 
@@ -507,8 +533,6 @@
                 $scope.mainLocationArray.push(tempLocationArray);
                 $scope.locationArrayString.push($scope.jobLocation);
                 $scope.jobLocation = "";
-
-        //        console.log($scope.mainLocationArray);
             }
 
             $scope.candidateModalBox = {
@@ -543,8 +567,7 @@
             // Open popup - list of candidate who applied for job
             $scope.openCandidateListPopup = function(_jobID)
             {
-             //   console.log("job id"+_jobID);
-                $scope.showCandidateListModal = !$scope.showCandidateListModal;
+               $scope.showCandidateListModal = !$scope.showCandidateListModal;
 
                 if(_jobID)
                 {
