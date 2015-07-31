@@ -116,6 +116,29 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
         },
 
         /**
+         * get range of everything
+         */
+        getRange : function(rangeFrom,rangeTo,code)
+        {
+            if(!parseInt(rangeFrom) > 0 && !parseInt(rangeTo) > 0)
+            {
+                return  "NA";
+            }
+            if(parseInt(rangeFrom) == parseInt(rangeTo))
+            {
+                return rangeFrom;
+            }
+            else if(parseInt(rangeFrom) < parseInt(rangeTo))
+            {
+                return rangeFrom+"-"+rangeTo;
+            }
+            else
+            {
+                return rangeTo+"-"+rangeFrom;
+            }
+        },
+
+        /**
          * Currency formater
          * convert the currency in to comma seperated string
          */

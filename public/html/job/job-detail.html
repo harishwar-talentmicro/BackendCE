@@ -13,11 +13,13 @@
                 <div class="job-main-content tile-head">
                     <div class="row">
                         <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
-                            Angular JS Developer<br>
-                            <small class="company-name no-padding">Oracle India Pvt. Ltd.</small>
+                            {{jobData.jobtitle}}<br>
+                            <small class="company-name no-padding">{{jobData.companyname}}</small>
                         </div>
                         <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12 text-right normal-view-buttons">
-                            <img class="height-45-px" alt="Oracle India Pvt. Ltd." src="http://img.naukimg.com/logo_images/v2/16512.gif">
+                            <button class="btn btn-default" disabled>
+                                {{jobData.jobcode}}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -26,23 +28,23 @@
             <div class="desc-content p-bottom-4">
                 <div class="job-main-content text-dark-gray">
                     <!-- Experience and location -->
-                    <span class="experience-title"><i class="fa fa-briefcase"></i> Exp: 0-3 Yrs</span>
-                    <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: Hyderabad</span>
+                    <span class="experience-title"><i class="fa fa-briefcase"></i> Exp: {{getRange(jobData.expfrom,jobData.expto)}} Yrs</span>
+                    <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: {{locationData}}</span>
                     <!-- Salary goes here -->
-                    <p CLASS="p-top-7"><i class="fa fa-rupee"></i> 3.5 LPA - 6 LPA</p>
+                    <p CLASS="p-top-7"><i class="fa fa-rupee"></i> {{getRange(jobData.salaryfrom,jobData.salaryto,1)}}</p>
                     <!-- Login and signup button -->
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="login-signup-btn">
-                                <button class="btn btn-primary btn-sm">SIGN IN</button>
-                                <button class="btn btn-danger btn-sm">SIGN UP</button>
-                                <button class="btn btn-primary btn-sm" ng-click="applyForJob('_tid')">APPLY</button>
+                                <button ng-show="!isLoggedIn" class="btn btn-primary btn-sm">SIGN IN</button>
+                                <button ng-show="!isLoggedIn" class="btn btn-danger btn-sm">SIGN UP</button>
+                                <button ng-show="isLoggedIn" class="btn btn-primary btn-sm" ng-click="applyForJob('_tid')">APPLY</button>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <!-- date of post -->
                             <p class="text-right">
-                                <i class="fa fa-clock-o"></i> 25 mins ago
+                                <i class="fa fa-clock-o"></i> {{jobData.LUdate}}
                             </p>
                         </div>
                     </div>
@@ -91,22 +93,22 @@
                 <!-- detailed job description goes here -->
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
-                        Salary: <span class="text-bolder">2,50,000 - 7,00,000 P.A</span>
+                        Salary: <span class="text-bolder">{{getRange(jobData.salaryfrom,jobData.salaryto,1)}} {{salaryType[jobData.salarytype]}}</span>
                     </div>
                 </div>
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
-                        Functional Area: <span class="text-bolder">IT Software - Application Programming , Maintenance</span>
+                        Functional Area: <span class="text-bolder">{{jobData.jobcategory}}</span>
                     </div>
                 </div>
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
-                        Role Category: <span class="text-bolder">Programming & Design</span>
+                        Openings: <span class="text-bolder">{{jobData.openings}}</span>
                     </div>
                 </div>
                 <div class="job-main-content text-dark-gray detailed-desc-job p-bottom-4">
                     <div class="job-desc">
-                        Role: <span class="text-bolder">Team Lead/Technical Lead</span>
+                        Role: <span class="text-bolder">{{jobData.jobtitle}}</span>
                     </div>
                 </div>
             </div>
@@ -115,11 +117,9 @@
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
                         <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
-                            <button class="btn btn-default btn-xs">JQuery</button>
-                            <button class="btn btn-default btn-xs">JavaScript</button>
-                            <button class="btn btn-default btn-xs">HTML</button>
-                            <button class="btn btn-default btn-xs">CSS</button>
-                            <button class="btn btn-default btn-xs">Angular JS</button>
+                            <span ng-repeat="skill in skillArr track by $index">
+                            <button class="btn btn-default btn-xs">{{skill}}</button>
+                                </span>
                         </p>
                     </div>
                 </div>
