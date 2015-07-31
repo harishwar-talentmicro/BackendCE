@@ -829,10 +829,9 @@ Job.prototype.applyJob = function(req,res,next){
                         var query = st.db.escape(jobId) + ',' + st.db.escape(token);
                         console.log('CALL pApplyjob(' + query + ')');
                         st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
-                            //console.log(insertResult);
+                            console.log(insertResult);
                             if (!err) {
                                     if (insertResult[0]) {
-                                        console.log(insertResult[0][0].message);
 
                                         if (insertResult[0][0]) {
                                             if(!insertResult[0][0].message){
@@ -857,20 +856,22 @@ Job.prototype.applyJob = function(req,res,next){
                                             responseMessage.data = {};
                                             res.status(200).json(responseMessage);
                                             console.log('FnApplyJob:Job applied not successfully');
+                                                console.log(responseMessage);
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'Job applied not successfully';
+                                        responseMessage.message = 'Job not applied';
                                         responseMessage.error = {};
                                         res.status(200).json(responseMessage);
-                                        console.log('FnApplyJob:Job applied not successfully');
+                                        console.log('FnApplyJob:Job not applied');
+                                            console.log(responseMessage);
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'Job applied not successfully';
+                                        responseMessage.message = 'Job not applied';
                                     responseMessage.error = {};
                                     res.status(200).json(responseMessage);
-                                    console.log('FnApplyJob:Job applied not successfully');
+                                        console.log('FnApplyJob:Job not applied');
                                 }
                             }
                                 else {

@@ -150,17 +150,18 @@ exports.FnGetFeedback = reservationModule.getFeedback;
 exports.FnResourcePicture = reservationModule.getResourcePicture;
 
 
-var JobModule = require('./modules/job-module.js');
-var job = new JobModule(db,stdLib);
-exports.FnSaveJobs = job.create;
-exports.FnGetJobs = job.getAll;
-exports.FnGetJobLocations = job.getJobLocations;
-exports.FnSearchJobs = job.searchJobs;
-exports.FnJobSeekerSearch = job.searchJobSeekers;
-exports.FnApplyJob = job.applyJob;
-exports.FnAppliedJobList = job.appliedJobList;
-exports.FnGetFiltersForJob = job.getFiltersForJob;
-exports.FnGetJobDetails = job.getJobDetails;
+var Job = require('./modules/job-module.js');
+var jobModule = new Job(db,stdLib);
+exports.FnSaveJobs = jobModule.create;
+exports.FnGetJobs = jobModule.getAll;
+exports.FnGetJobLocations = jobModule.getJobLocations;
+exports.FnSearchJobs = jobModule.searchJobs;
+exports.FnJobSeekerSearch = jobModule.searchJobSeekers;
+exports.FnApplyJob = jobModule.applyJob;
+exports.FnAppliedJobList = jobModule.appliedJobList;
+exports.FnGetFiltersForJob = jobModule.getFiltersForJob;
+exports.FnGetJobDetails = jobModule.getJobDetails;
+exports.FnJobs = jobModule.jobs;
 
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);
@@ -168,6 +169,8 @@ exports.FnCreateMessageGroup = messageBox.createMessageGroup;
 exports.FnValidateGroupName = messageBox.validateGroupName;
 exports.FnUpdateUserResponse = messageBox.updateUserResponse;
 exports.FnUpdateUserRelationship = messageBox.updateUserRelationship;
+exports.FnDeleteGroup = messageBox.deleteGroup;
+exports.FnSendMessageRequest = messageBox.sendMessageRequest;
 
 
 var Notification = require('./modules/notification-module.js');

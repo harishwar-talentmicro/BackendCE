@@ -2,3 +2,14 @@
     color: #FFF!important;
     background: #60BFD5!important;
 }
+
+.ezeone-multi-select{
+    width: 100%;
+}
+.ezeone-multi-select > .dropdown-multiselect{
+    width: 100%;
+}
+
+.ezeone-multi-select > .dropdown-multiselect > .dropdown-toggle{
+    width: 100%;
+}

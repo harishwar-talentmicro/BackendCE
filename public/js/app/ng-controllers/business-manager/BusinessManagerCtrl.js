@@ -83,7 +83,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                 type : 'home-delivery'
             },
             {
-                title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Service',
+                title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Help Desk',
                 permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[3] : 0,
                 listType : 0,
                 message : ($rootScope._userInfo.ServiceFormMsg) ? $rootScope._userInfo.ServiceFormMsg : '',
@@ -128,7 +128,7 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
         else{
             switch($routeParams['subview']){
                 case 'sales':
-                    $scope.activeTemplate = 'html/business-manager/sales/sales.html';
+                    $scope.activeTemplate = 'html/business-manager/sales/sales-master.html';
                     $scope.activeModule = 'sales';
                     break;
                 case 'reservation':
