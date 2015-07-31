@@ -619,6 +619,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
     var token  = req.body.token;
     var groupName  = req.body.group_name;
     var groupType  = req.body.group_type;
+    var auto_join = req.body.auto_join ? req.body.auto_join : 0;
     var relationType = req.body.relation_type;
     var userID = req.body.user_id ? req.body.user_id : 0;
 
@@ -655,7 +656,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(groupName) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
-                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(relationType) + ',' + st.db.escape(userID);
+                            + ',' + st.db.escape(auto_join) + ',' + st.db.escape(relationType) + ',' + st.db.escape(userID);
                         var query = 'CALL pSendMessageRequest(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
