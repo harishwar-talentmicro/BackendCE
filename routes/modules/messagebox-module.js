@@ -99,7 +99,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
 
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Message Group created successfully';
+                                    responseMessage.message = 'Group created successfully';
                                     responseMessage.data = {
                                         token: req.body.token,
                                         groupName: req.body.group_name,
@@ -111,13 +111,13 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                                         tid: req.body.tid
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnCreateMessageGroup: Message Group is created successfully');
+                                    console.log('FnCreateMessageGroup: Group created successfully');
                                 }
                                 else {
-                                    responseMessage.message = 'Message Group is not created';
+                                    responseMessage.message = 'Group is not created';
                                     responseMessage.error = null;
                                     res.status(200).json(responseMessage);
-                                    console.log('FnCreateMessageGroup:Message Group is not created');
+                                    console.log('FnCreateMessageGroup:Group is not created');
                                 }
                             }
 
@@ -127,7 +127,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnCreateMessageGroup: error in creating Message Group :' + err);
+                                console.log('FnCreateMessageGroup: error in creating Group :' + err);
                             }
                         });
                     }
@@ -147,7 +147,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnCreateMessageGroup:Error in processing Token' + err);
+                    console.log('FnCreateMessageGroup:Error in validating Token' + err);
                 }
             });
         }
@@ -202,7 +202,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
             console.log('CALL pValidateGroupName(' + st.db.escape(groupName) + ')');
             st.db.query('CALL pValidateGroupName(' + st.db.escape(groupName) + ')', function (err, getResult) {
                 console.log(getResult);
-                console.log(getResult[0][0].id);
+
                 if (!err) {
                     if (getResult) {
                         if(getResult[0]){
@@ -324,7 +324,7 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(status);
 
-                        var query = 'CALL pUpdateUserResponse(' + queryParams + ')';
+                        var query = 'CALL pUpdateUserStatus(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, updateResult) {
                             if (!err) {
@@ -410,7 +410,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
     var token  = req.body.token;
     var groupId  = req.body.group_id;
     var memberID  = req.body.member_id;
-    var relationship  = req.body.relationship;
+    var relationType  = req.body.relation_type;
 
     var responseMessage = {
         status: false,
@@ -433,8 +433,8 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
         error['memberID'] = 'Invalid memberID';
         validateStatus *= false;
     }
-    if(!relationship){
-        error['relationship'] = 'Invalid relationship';
+    if(!relationType){
+        error['relationType'] = 'Invalid relationType';
         validateStatus *= false;
     }
 
@@ -448,7 +448,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberID) + ',' + st.db.escape(relationship);
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberID) + ',' + st.db.escape(relationType);
 
                         var query = 'CALL pUpdateUserRelationship(' + queryParams + ')';
                         console.log(query);
@@ -458,22 +458,22 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
 
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'User Response updated successfully';
+                                    responseMessage.message = 'User Relationship updated successfully';
                                     responseMessage.data = {
                                         token: req.body.token,
                                         groupId: req.body.group_id,
                                         memberID: req.body.member_id,
-                                        relationship: req.body.relationship
+                                        relation_type: req.body.relation_type
 
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnUpdateUserRelationship: User Response updated successfully');
+                                    console.log('FnUpdateUserRelationship: User Relationship updated successfully');
                                 }
                                 else {
-                                    responseMessage.message = 'User Response is not updated';
+                                    responseMessage.message = 'User Relationship is not updated';
                                     responseMessage.error = null;
                                     res.status(200).json(responseMessage);
-                                    console.log('FnUpdateUserRelationship:User Response is not updated');
+                                    console.log('FnUpdateUserRelationship:User Relationship is not updated');
                                 }
                             }
 
@@ -483,7 +483,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnUpdateUserRelationship: error in updating user response :' + err);
+                                console.log('FnUpdateUserRelationship: error in updating user Relationship :' + err);
                             }
                         });
                     }
@@ -572,10 +572,10 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
                         console.log('FnDeleteGroup: Group deleted sucessfully');
                     }
                     else {
-                        responseMessage.message = 'Group deleted not sucessfully';
+                        responseMessage.message = 'Group not deleted';
                         responseMessage.error = null;
                         res.status(200).json(responseMessage);
-                        console.log('FnDeleteGroup:Group deleted not sucessfully');
+                        console.log('FnDeleteGroup:Group not deleted');
                     }
 
                 }
@@ -585,7 +585,7 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
                         server: 'Internal Server Error'
                     };
                     res.status(500).json(responseMessage);
-                    console.log('FnDeleteGroup: error in validating Group Name :' + err);
+                    console.log('FnDeleteGroup: error in deleting Group:' + err);
                 }
             });
         }
