@@ -542,7 +542,7 @@
             $scope.showCandidateListModal = false;
 
             // Get applied candidate List for job
-            function getCandidateList(_jobID)
+           /* function getCandidateList(_jobID)
             {
                 $scope.$emit('$preLoaderStart');
                 $http({
@@ -563,16 +563,24 @@
                     $scope.$emit('$preLoaderStop');
                 });
             }
-
+*/
             // Open popup - list of candidate who applied for job
-            $scope.openCandidateListPopup = function(_jobID)
+            $scope.openCandidateListPopup = function(_jobID,_totalapplie)
             {
-               $scope.showCandidateListModal = !$scope.showCandidateListModal;
+                $scope.jobTid = _jobID;
+                if(_totalapplie > 0)
+                {
+                    $scope.ResumeInquiriesTab = true;
+                    $scope.JobsTab = false;
+                    $scope.JobSeekerTab = false;
+                }
+
+                /*$scope.showCandidateListModal = !$scope.showCandidateListModal;
 
                 if(_jobID)
                 {
                     getCandidateList(_jobID);
-                }
+                }*/
             }
 
             // Get Educations list

@@ -46,6 +46,15 @@
             $scope.tplJobsTab = 'html/business-manager/resume/resume-jobs.html';
             $scope.tplJobSeekerTab = 'html/business-manager/resume/resume-job-seeker.html';
 
+
+            /**
+             * Job TID from Job Posting module (when clicked on number of candidates applied navigates to
+             * Job tracker tab with the changed value containing jobTid
+             *
+             * @type {null}
+             */
+            $scope.jobTid = null;
+
         }
     ]);
 })();

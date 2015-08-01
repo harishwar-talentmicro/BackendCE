@@ -1529,7 +1529,42 @@
              * Refreshes company data every 1 minute
              */
 
+            $scope.jobTid = 2;
+            $scope.$watch('_userInfo.IsAuthenticate', function () {
+                getCandidateList($scope.jobTid);
+            });
 
+            // Declaration for Job Applicants
+            $scope.showAppicantList = false;
+            // Get applied candidate List for job
+            function getCandidateList(_jobID)
+            {
+                if(_jobID)
+                {
+                    $scope.$emit('$preLoaderStart');
+
+                    $http({
+                        url : GURL + 'job_applied_list',
+                        method : 'GET',
+                        params : {
+                            job_id : _jobID
+                        }
+                    }).success(function(resp)
+                        {
+                            $scope.$emit('$preLoaderStop');
+                            if(resp.status)
+                            {
+                               // $scope.showAppicantList = true;
+                                $scope.ApplicantList = resp.data;
+
+                                console.log($scope.ApplicantList);
+                            }
+
+                        }).error(function(err){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                }
+            }
 
     }]);
 })();
