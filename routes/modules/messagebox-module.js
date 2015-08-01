@@ -560,12 +560,12 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
                     if (getResult) {
                         responseMessage.status = true;
                         responseMessage.error = null;
-                        responseMessage.message = 'Group deleted sucessfully';
+                        responseMessage.message = 'Group deleted successfully';
                         responseMessage.data = {
                             groupID : groupID
                         };
                         res.status(200).json(responseMessage);
-                        console.log('FnDeleteGroup: Group deleted sucessfully');
+                        console.log('FnDeleteGroup: Group deleted successfully');
                     }
                     else {
                         responseMessage.message = 'Group not deleted';
@@ -735,11 +735,11 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var _this = this;
 
     var message  = req.body.message;
-    var attachment  = req.body.attachment;
-    var attachmentFilename  = req.body.attachment_filename;
-    var priority  = req.body.priority ? req.body.priority : '';
-    var targetDate  = req.body.target_date ? req.body.target_date : null;
-    var expiryDate  =  req.body.expiry_date ? req.body.expiry_date : null;
+    var attachment  = req.body.attachment ? req.body.attachment : '';
+    var attachmentFilename  = req.body.attachment_filename ? req.body.attachment_filename : '';
+    var priority  = req.body.priority ? req.body.priority : 1;
+    var targetDate  = req.body.target_date ? req.body.target_date : '';
+    var expiryDate  =  req.body.expiry_date ? req.body.expiry_date : '';
     var token = req.body.token;
     var previousMessageID = req.body.previous_messageID;
     var toID = req.body.to_id;
@@ -899,10 +899,10 @@ MessageBox.prototype.getMembersList = function(req,res,next){
                     if (getResult) {
                         responseMessage.status = true;
                         responseMessage.error = null;
-                        responseMessage.message = 'Members List loaded sucessfully';
+                        responseMessage.message = 'Members List loaded successfully';
                         responseMessage.data = getResult[0];
                         res.status(200).json(responseMessage);
-                        console.log('FnGetMembersList: Members List loaded sucessfully');
+                        console.log('FnGetMembersList: Members List loaded successfully');
                     }
                     else {
                         responseMessage.message = 'Members List not loaded';
@@ -934,6 +934,309 @@ MessageBox.prototype.getMembersList = function(req,res,next){
         }
     }
 };
+
+
+
+/**
+ * @todo FnLoadMessageBox
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for load messageBox
+ */
+
+MessageBox.prototype.loadMessageBox = function(req,res,next){
+    var _this = this;
+
+    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!ezeone_id){
+        error['ezeone_id'] = 'Invalid ezeone_id';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            console.log('CALL PLoadMessageBox(' + st.db.escape(ezeone_id) + ')');
+            st.db.query('CALL PLoadMessageBox(' + st.db.escape(ezeone_id) + ')', function (err, getResult) {
+                console.log(getResult);
+
+                if (!err) {
+                    if (getResult) {
+                        if (getResult[0]) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'MessageBox loaded successfully';
+                        responseMessage.data = getResult[0];
+                        res.status(200).json(responseMessage);
+                        console.log('FnLoadMessageBox: MessageBox loaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'MessageBox not loaded';
+                        responseMessage.error = {};
+                        res.status(200).json(responseMessage);
+                        console.log('FnLoadMessageBox:MessageBox not loaded');
+                    }
+
+                }
+                    else {
+                        responseMessage.message = 'MessageBox not loaded';
+                        responseMessage.error = {};
+                        res.status(200).json(responseMessage);
+                        console.log('FnLoadMessageBox:MessageBox not loaded');
+                    }
+
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnLoadMessageBox: error in getting MessageBox:' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';s
+            res.status(500).json(responseMessage);
+            console.log('Error : FnLoadMessageBox ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+
+/**
+ * @todo FnChangeMessageActivity
+ * Method : PUT
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for Update message activity status
+ */
+MessageBox.prototype.changeMessageActivity = function(req,res,next){
+
+    var _this = this;
+
+
+    var messageID  = req.body.message_id;
+    var status  = req.body.status;
+    var isTrash  = req.body.is_trash;
+    var token  = req.body.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!messageID){
+        error['messageID'] = 'Invalid messageID';
+        validateStatus *= false;
+    }
+    if(!status){
+        error['status'] = 'Invalid status';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status) + ',' + st.db.escape(isTrash)+ ',' + st.db.escape(token);
+
+                        var query = 'CALL PchangeMessageActivity(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, updateResult) {
+                            if (!err) {
+                                if (updateResult) {
+
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Message status changed successfully';
+                                    responseMessage.data = {
+                                        token: token,
+                                        messageID: messageID,
+                                        status:status,
+                                        isTrash: isTrash
+
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnChangeMessageActivity: Message status changed successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Message status not changed';
+                                    responseMessage.error = {};
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnChangeMessageActivity:Message status not changed');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnChangeMessageActivity: error in updating Message status:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnChangeMessageActivity: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnChangeMessageActivity:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnChangeMessageActivity ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnLoadOutBoxMessages
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for load outbox messages
+ */
+
+MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
+    var _this = this;
+
+    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!ezeone_id){
+        error['ezeone_id'] = 'Invalid ezeone_id';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            console.log('CALL pLoadOutBoxMessages(' + st.db.escape(ezeone_id) + ')');
+            st.db.query('CALL pLoadOutBoxMessages(' + st.db.escape(ezeone_id) + ')', function (err, getResult) {
+                console.log(getResult);
+
+                if (!err) {
+                    if (getResult) {
+                        if (getResult[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'OutBox Messages loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnLoadOutBoxMessages: OutBox Messages loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'OutBox Messages not loaded';
+                            responseMessage.error = {};
+                            res.status(200).json(responseMessage);
+                            console.log('FnLoadOutBoxMessages:OutBox Messages not loaded');
+                        }
+
+                    }
+                    else {
+                        responseMessage.message = 'OutBox Messages not loaded';
+                        responseMessage.error = {};
+                        res.status(200).json(responseMessage);
+                        console.log('FnLoadOutBoxMessages:OutBox Messages not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnLoadOutBoxMessages: error in getting OutBox Messages:' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';s
+            res.status(500).json(responseMessage);
+            console.log('Error : FnLoadOutBoxMessages ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 
 module.exports = MessageBox;
