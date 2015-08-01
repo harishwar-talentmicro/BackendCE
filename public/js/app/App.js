@@ -54,6 +54,7 @@
         '/compose-message',
         '/job',
         '/jobdetail',
+        'appliedjob',
         '/access-history',
         '/:ezeond/sales',
         '/:ezeone/home_delivery',
@@ -205,6 +206,10 @@
             .when('/outbox',{
                 templateUrl: 'html/message/outbox.html',
                 controller : 'OutboxPageCtrl'
+            })
+            .when('/appliedjob',{
+                templateUrl: 'html/job/applied-job.html',
+                controller : 'AppliedJobCtrl'
             })
             .when('/jobsearch',{
                 templateUrl: 'html/job/job-search-result.html',

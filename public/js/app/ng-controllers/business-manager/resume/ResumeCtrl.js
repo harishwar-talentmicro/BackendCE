@@ -1529,7 +1529,7 @@
              * Refreshes company data every 1 minute
              */
 
-            $scope.jobTid = 2;
+           // $scope.jobTid = 2;
             $scope.$watch('_userInfo.IsAuthenticate', function () {
                 getCandidateList($scope.jobTid);
             });
@@ -1554,10 +1554,8 @@
                             $scope.$emit('$preLoaderStop');
                             if(resp.status)
                             {
-                               // $scope.showAppicantList = true;
                                 $scope.ApplicantList = resp.data;
-
-                                console.log($scope.ApplicantList);
+                                $scope.showAppicantList = true;
                             }
 
                         }).error(function(err){

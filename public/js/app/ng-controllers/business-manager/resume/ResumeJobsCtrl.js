@@ -539,31 +539,7 @@
                 title : 'View Candidate',
                 class : 'business-manager-modal'
             };
-            $scope.showCandidateListModal = false;
 
-            // Get applied candidate List for job
-           /* function getCandidateList(_jobID)
-            {
-                $scope.$emit('$preLoaderStart');
-                $http({
-                    url : GURL + 'job_applied_list',
-                    method : 'GET',
-                    params : {
-                        job_id : _jobID
-                    }
-                }).success(function(resp){
-                    $scope.$emit('$preLoaderStop');
-
-                    if(resp.status)
-                    {
-
-                    }
-
-                }).error(function(err){
-                    $scope.$emit('$preLoaderStop');
-                });
-            }
-*/
             // Open popup - list of candidate who applied for job
             $scope.openCandidateListPopup = function(_jobID,_totalapplie)
             {
@@ -574,13 +550,6 @@
                     $scope.JobsTab = false;
                     $scope.JobSeekerTab = false;
                 }
-
-                /*$scope.showCandidateListModal = !$scope.showCandidateListModal;
-
-                if(_jobID)
-                {
-                    getCandidateList(_jobID);
-                }*/
             }
 
             // Get Educations list
