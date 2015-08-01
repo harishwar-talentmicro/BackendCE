@@ -4,27 +4,6 @@ var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 var sendgrid  = require('sendgrid')('ezeid', 'Ezeid2015');
 
-//sendgrid.enable({
-//    'subscriptiontrack': {
-//        'settings': {
-//            'enable': 0
-//        }
-//    }
-//});
-
-
-var email = new sendgrid.Email();
-email.setFilters({
-    'subscriptiontrack': {
-        'settings': {
-            'enable': 0
-
-        }
-    }
-});
-
-
-
 Date.prototype.getUTCTime = function () {
     return new Date(
       this.getUTCFullYear(),

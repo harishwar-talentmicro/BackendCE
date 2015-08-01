@@ -1232,6 +1232,8 @@ Job.prototype.getAppliedJob = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
+    var pageSize = req.query.page_size;
+    var pageCount = req.query.page_count;
 
     var responseMessage = {
         status: false,
@@ -1254,8 +1256,10 @@ Job.prototype.getAppliedJob = function(req,res,next){
     }
     else {
         try {
-            console.log('CALL pGetAppliedJobs(' + st.db.escape(token) + ')');
-            st.db.query('CALL pGetAppliedJobs(' + st.db.escape(token) + ')', function (err, getResult) {
+            var queryParams = st.db.escape(token) + ',' + st.db.escape(pageSize) + ',' +  st.db.escape(pageCount)
+            var query = 'CALL pGetAppliedJobs(' + queryParams + ')';
+            console.log(query);
+            st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult) {
                         if(getResult[0].length){
