@@ -2604,7 +2604,7 @@ sup.tm{
 {
     padding: 20px;
     text-decoration: none;
-    color: #301152;
+    color: #4A4A4A;
 }
 
 .hpw .index-menu ul li .active {
@@ -2618,12 +2618,12 @@ sup.tm{
 .hpw .index-menu .group
 {
     padding-left: 10px;
-    background-color: #D4FFB6;
+    /*background-color: #D4FFB6;*/
 }
 
 .hpw .index-menu .people
 {
-    background-color: #FCFF8E;
+    /*background-color: #FCFF8E;*/
     padding-left: 10px;
 }
 
@@ -2645,7 +2645,7 @@ sup.tm{
 .hpw .index-title-group
 {
     /*background-color: rgb(119, 253, 119) !important;*/
-    background-color: rgb(161, 220, 250) !important;
+    background-color: rgb(9, 172, 255) !important;
     border-bottom: 1px solid rgb(203, 203, 203);
     padding-left:0px !important;
 }
@@ -2653,7 +2653,7 @@ sup.tm{
 .hpw .index-title-people
 {
     /*background-color: yellow !important;*/
-    background-color: rgb(161, 220, 250) !important;
+    background-color: rgb(9, 172, 255) !important;
     border-bottom: 1px solid rgb(203, 203, 203);
     padding-left:0px !important;
 }
@@ -3266,4 +3266,50 @@ sup.tm{
 {
     max-height: 100px;
     overflow-y: scroll;
+}
+
+.hpw .group-tittle
+{
+    font-size: 1.8em;
+    color: gray;
+    text-align: center;
+}
+
+.hpw .btn-addon-primary
+{
+    background-color: #078FC3 !important;
+    color: #fff !important;
+}
+
+.hpw .btn-addon-primary:hover
+{
+    background-color:rgba(7, 143, 195, 0.71) !important
+}
+
+.hpw .bg-red
+{
+    background-color: #d9534f !important;
+    color:#fff !important;
+}
+
+.hpw .bg-red:hover
+{
+    background-color: #D8332E !important;
+}
+
+.hpw .message-detail-text
+{
+    font-size: 1.2em;
+    color: #6F6C6C;
+    padding: 20px;
+}
+
+.hpw .compose-mail-menu
+{
+    background-color: rgba(255, 68, 62, 0.91) !important;
+    cursor: pointer;
+}
+.hpw .compose-mail-menu:hover
+{
+    background-color: rgba(255, 78, 28, 0.75) !important;
 }

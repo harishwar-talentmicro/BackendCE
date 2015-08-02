@@ -288,4 +288,74 @@ angular.module('ezeidApp').
                 class: 'business-manager-modal'
             };
 
+
+            /***********************************************************************************************************
+            /***********************************************************************************************************
+            /***********************************************************************************************************
+             * GROUP JS goes here
+             /***********************************************************************************************************
+             /***********************************************************************************************************
+             /***********************************************************************************************************/
+
+
+            /***********************************************************************************************************
+             * All Initialization goes here
+             * @type {string[]}
+             */
+            $scope.isGroupAdmin = false;
+            $scope.isMember = false;
+            $scope.isNewGroup = true;
+            $scope.groupActionBtn = [
+                "Delete Group",
+                "Leave Group",
+                "Create Group"
+            ];
+            $scope.accessToken = 2;
+
+            $scope.relationArr = [
+                "No Relation",
+                "Friend",
+                "Colleague",
+                "Business",
+                "Classmate",
+                "Mentor/Teacher",
+                "Family",
+                "Community"
+            ];
+
+            $scope.dummyMember = [
+                {
+                    name: "ashley",
+                    relation: 3,
+                    tid:4
+                },
+                {
+                    name: "allex",
+                    relation: 5,
+                    tid:6
+                },
+                {
+                    name: "jacob",
+                    relation: 3,
+                    tid:7
+                },
+            ];
+
+            $scope.userFormCount = [true];
+
+            /**
+             * Validate the group's relation to the logged in user
+             */
+            $scope.checkLoggedInUserAndGroup = function(groupName)
+            {
+
+            }
+
+            /**
+             * Event to trigger event on change of access control
+             */
+            $scope.accessCtrlChange = function(val)
+            {
+                $scope.accessToken = val;
+            }
         }]);

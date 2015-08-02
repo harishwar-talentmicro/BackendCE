@@ -17,9 +17,9 @@
                     <!-- All the indexes/menu goes here -->
                     <div class="index-menu">
                         <ul class="inbox-nav inbox-divider">
-                            <li class="active index-menu-item composeMailMenuItem">
+                            <li class="active index-menu-item compose-mail-menu">
                                 <!--<a ng-click="openComposeMessage()" class="pointer"> <i class="fa fa-pencil-square-o"></i> Compose</a>-->
-                                <a href="/outbox/compose" class="pointer"> <i class="fa fa-pencil-square-o"></i> Compose</a>
+                                <a href="/outbox/compose" class="pointer text-white text-bolder"> <i class="fa fa-pencil-square-o"></i> Compose</a>
                             </li>
                             <li class="active index-menu-item">
                                 <!--<a ng-click="openInbox()" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>-->
@@ -31,12 +31,12 @@
                             <li class="index-menu-item">
                                 <a href="#"><i class="fa fa-trash-o"></i> Trash</a>
                             </li>
-                            <li class="index-menu-item group index-title-group">
-                                <a>
-                                    <i class="fa fa-external-link"></i> Groups <span class="label label-info">30</span>
+                            <li class="index-menu-item group index-title-group text-bolder">
+                                <a class="text-white text-bolder">
+                                    <i class="fa fa-external-link"></i> Groups <span class="label label-warning">30</span>
                                 </a>
-                                <span class="pull-right">
-                                    <button ng-click="modalAddGroupVisibility()" class="btn btn-primary btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
+                                <span class="pull-right p-right-10">
+                                    <button ng-click="modalAddGroupVisibility()" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
                                 </span>
                             </li>
                             <!-- groups goes here -->
@@ -50,8 +50,8 @@
                                 <a href="#"><i class="fa fa-group"></i> Group 3</a>
                             </li>
                             <!-- My People -->
-                            <li class="index-menu-item people index-title-people">
-                                <a href="#"><i class="fa fa-user"></i> My People</a>
+                            <li class="index-menu-item people index-title-people text-bolder">
+                                <a class="text-white text-bolder" href="#"><i class="fa fa-user"></i> My People</a>
                             </li>
                             <li class="index-menu-item people">
                                 <a href="#"><i class="fa fa-comments"></i> User 1</a>
@@ -184,200 +184,101 @@
 
     <!-- Modal Box of Add/Edit Group -->
     <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-trash"></span>  Delete(Group)</button>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Group Title
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <div class="form-group">
-                        <input class="form-control" maxlength="50" ng-model="modalBox.item.title"/>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="form-group">
-                        <select class="form-control" name="TitleSelect">
-                            <option value = ""> -- Select Action -- </option>
-                            <option value = ""> Delete Group </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Add New Member
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    <div class="form-group">
-                        <input class="form-control" placeholder="Enter EZEOne ID or group name" maxlength="50" ng-model="modalBox.item.title"/>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                    <button class="btn btn-primary btn-block" ng-click="closeResourceModalBox()"><span class="glyphicon glyphicon-search"></span>  Find</button>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    ###### is valid
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="form-group">
-                        <select class="form-control" name="TitleSelect">
-                            <option value = ""> -- Select Action -- </option>
-                            <option value = ""> Join Group </option>
-                            <option value = ""> Add </option>
-                            <option value = ""> Delete </option>
-                            <option value = ""> Accept New Request(s) </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                    Access denied
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                    Group Members
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix" style="overflow-y: auto; height:200px; border: 1px solid #ddd;">
-                    <table class="rwd-table">
-                        <tbody>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                KRUNAL11
-                            </td>
-                            <td>
-                                Active
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                TEST10
-                            </td>
-                            <td>
-                                New Request
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                GOWRI
-                            </td>
-                            <td>
-                                Deleted
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                KRUNALPAID
-                            </td>
-                            <td>
-                                Deleted
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                IND1
-                            </td>
-                            <td>
-                                Declined
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="vehicle" value="Bike">
-                            </td>
-                            <td>
-                                TEST10
-                            </td>
-                            <td>
-                                New Request
-                            </td>
-                        </tr>
+        <section class="group-page row p-5">
 
+
+            <!-- Group Name Form goes here -->
+            <div class="container">
+                <div class="group-input-form col-lg-6">
+                    <div class="input-group p-bottom-4 width-100">
+                        <div class="input-group-addon"><i class="fa fa-plus"></i> Groups </div>
+                        <input type="text"
+                               class="form-control ng-pristine ng-untouched ng-valid"
+                               placeholder="Enter a unique Group Title"
+                               ng-model="groupName"
+                               id="group-name"
+                               ng-keypress="checkLoggedInUserAndGroup(groupName)">
+                    </div>
+                    <span class="text-danger">Group name entered is not unique</span>
+                </div>
+
+                <div class="col-lg-4">
+                    <select class="form-control" ng-model="accessControl" ng-change="accessCtrlChange(accessControl)">
+                        <option value="0">Group Admin</option>
+                        <option value="1">Group Member</option>
+                        <option value="2">New Group</option>
+                    </select>
+                </div>
+                <div class="col-lg-2">
+                    <button class="btn btn-primary">{{groupActionBtn[accessToken]}}</button>
+                </div>
+            </div>
+            <!-- Group members addition form goes here -->
+            <div class="container" ng-show="accessControl == 0 || accessControl == 2">
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-user"></i> Member
+                        </div>
+                        <input type="text" class="form-control" />
+                    </div>
+                    <span class="text-danger">Invalid EZEONE ID</span>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-tags"></i> Relation
+                        </div>
+                        <select class="form-control">
+                            <option ng-repeat="relation in relationArr track by $index">{{relation}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group member name goes here -->
+            <div class="container p-top-7">
+                <div class="col-lg-12">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                        <th width="10%">#</th>
+                        <th width="40%">Member Name</th>
+                        <th width="40%">Relation</th>
+                        <th width="10%">Action</th>
+                        </thead>
+                        <tbody ng-show="accessControl == 0 || accessControl == 1">
+                            <tr>
+                                <td>1</td>
+                                <td>Sandeep</td>
+                                <td>Classmate</td>
+                                <td class="text-center">
+                                    <button class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr ng-repeat="member in dummyMember track by $index">
+                                <td>{{$index + 2}}</td>
+                                <td>{{member.name}}</td>
+                                <td>{{relationArr[member.relation]}}</td>
+                                <td class="text-center">
+                                    <!--<button class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>-->
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- No Data found -->
+                        <tbody ng-hide="accessControl == 0 || accessControl == 1">
+                            <tr>
+                                <td colspan="4">No Data Found</td>
+                            </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
 
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
+            <div class="container text-right p-top-7">
+                <button class="btn btn-success"><i class="fa fa-save"></i> Save Group</button>
             </div>
-            <div class="row">
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 bottom-clearfix">
-                </div>
-                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
-                        <input type="checkbox" checked name="vehicle" value="Bike">
-                        Hide Declined
-                    </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix no-padding">
-                        <input type="checkbox" checked name="vehicle" value="Bike">
-                        Hide Deleted
-                    </div>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 bottom-clearfix">
-                </div>
-            </div>
-        </div>
+        </section>
     </modal>
 
     <footer-section></footer-section>
