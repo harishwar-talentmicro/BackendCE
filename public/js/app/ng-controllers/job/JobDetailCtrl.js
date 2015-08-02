@@ -175,6 +175,8 @@ angular.module('ezeidApp').
                 }).success(function (data) {
                     $scope.$emit('$preLoaderStop');
 
+                        console.log("sai88");
+                        console.log(data);
                     if(data.status)
                     {
                         Notification.success({ message: "Applied Success..", delay : 2000});
