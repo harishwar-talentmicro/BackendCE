@@ -38,13 +38,13 @@
                             <div class="login-signup-btn">
                                 <button ng-show="!isLoggedIn" class="btn btn-primary btn-sm">SIGN IN</button>
                                 <button ng-show="!isLoggedIn" class="btn btn-danger btn-sm">SIGN UP</button>
-                                <button ng-show="isLoggedIn" class="btn btn-primary btn-sm" ng-click="applyForJob('_tid')">APPLY</button>
+                                <button ng-show="isLoggedIn" class="btn btn-primary btn-sm" ng-click="applyForJob(jobData.tid)">APPLY</button>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <!-- date of post -->
                             <p class="text-right">
-                                <i class="fa fa-clock-o"></i> {{jobData.LUdate}}
+                                <i class="fa fa-clock-o"></i> {{jobData.LUdate | ageFilter}}
                             </p>
                         </div>
                     </div>

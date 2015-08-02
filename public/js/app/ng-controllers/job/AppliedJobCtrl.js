@@ -56,13 +56,15 @@ angular.module('ezeidApp').
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
 
+                        console.log("sai88");
+
                         console.log(resp);
+
                     if(resp.status)
                     {
 
 
                     }
-
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                 });

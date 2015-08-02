@@ -61,6 +61,18 @@ angular.module('ezeidApp').
                 getJobDetail($routeParams.jobid);
             }
 
+            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                if(!returnFormat){
+                    returnFormat = dateFormat;
+                }
+                var x = new Date(timeFromServer);
+                var mom1 = moment(x);
+                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+            };
+
             // Get job details
             function getJobDetail(_jobID)
             {
@@ -76,6 +88,8 @@ angular.module('ezeidApp').
                     if(resp.status)
                     {
                         var data = resp.data[0];
+                        resp.data[0].LUdate = convertTimeToLocal(data.LUdate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
+
                         if(data.companyname)
                         {
                             $scope.isResultEmpty = false;
@@ -160,31 +174,28 @@ angular.module('ezeidApp').
 
             // Apply for job
             $scope.applyForJob = function(_tid){
-
                 $scope.$emit('$preLoaderStart');
-
                 $scope.jobData = {
                     token : $rootScope._userInfo.Token,
                     job_id : $scope.jobTid
                 }
-
                 $http({
                     method: "POST",
-                    url: GURL + 'job',
-                    data:  $scope.jobData
+                    url: GURL + 'job_apply',
+                    data :{
+                            token:$rootScope._userInfo.Token,
+                            job_id:_tid
+                          }
                 }).success(function (data) {
                     $scope.$emit('$preLoaderStop');
-
-                        console.log("sai88");
-                        console.log(data);
                     if(data.status)
                     {
                         Notification.success({ message: "Applied Success..", delay : 2000});
                     }
                 })
-                    .error(function(data, status, headers, config) {
-                        $scope.$emit('$preLoaderStop');
-                    });
+                .error(function(data, status, headers, config) {
+                    $scope.$emit('$preLoaderStop');
+                });
             };
 
         }]);
