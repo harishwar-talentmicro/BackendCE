@@ -667,9 +667,10 @@ Job.prototype.searchJobSeekers = function(req,res) {
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
             console.log(query);
             st.db.query(query, function (err, getResult) {
+                console.log(getResult);
                 if (!err) {
                     if (getResult) {
-                        if (getResult[0]) {
+                        if (getResult[0].length >0 ) {
                             responseMessage.status = true;
                             responseMessage.message = 'Job Seeker send successfully';
                             responseMessage.data = getResult[0];
@@ -932,7 +933,7 @@ Job.prototype.appliedJobList = function(req,res,next){
             st.db.query('CALL pgetlistofcandappliedforjob(' + st.db.escape(jobId) + ')', function (err, getResult) {
                 if (!err) {
                     if (getResult) {
-                        if(getResult[0].length){
+                        if(getResult[0].length > 0 ){
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Applied job List loaded successfully';
@@ -1014,7 +1015,7 @@ Job.prototype.getJobDetails = function(req,res,next){
                 console.log(getResult);
                 if (!err) {
                     if (getResult) {
-                        if(getResult[0].length){
+                        if(getResult[0].length > 0){
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Job Details loaded successfully';
