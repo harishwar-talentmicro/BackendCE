@@ -210,29 +210,29 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 
                             responseMessage.status = true;
                             responseMessage.error = null;
-                            responseMessage.message = 'Group Name is available';
+                            responseMessage.message = 'Name is available';
                             responseMessage.data = {
                                 groupName : name
                             };
                             res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName: Group Name is available');
+                            console.log('FnValidateGroupName: Name is available');
                         }
                         else {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Group Name is available';
+                                    responseMessage.message = 'Name is available';
                                     responseMessage.data = {
                                         id : getResult[0][0].id,
                                         name : getResult[0][0].name
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnValidateGroupName: Group Name is available');
+                                    console.log('FnValidateGroupName: Name is available');
                         }
                     }
                     else {
-                        responseMessage.message = 'Group Name is not available';
+                        responseMessage.message = 'Name is not available';
                         res.status(200).json(responseMessage);
-                        console.log('FnValidateGroupName:Group Name is not available');
+                        console.log('FnValidateGroupName:Name is not available');
                     }
                 }
                         else {

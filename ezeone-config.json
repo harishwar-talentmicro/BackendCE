@@ -3,5 +3,8 @@
   "DOMAIN" : "www.ezeone.com",
   "PASS_RESET_PAGE_LINK" : "reset_password",
   "DB_PASS" : "",
-  "DB_HOST" : ""
+  "DB_HOST" : "",
+  "MQTT" : {
+    "ADMIN" : ["@indrajeet", "@hvj", "@ind1","@sandeep"]
+  }
 }
