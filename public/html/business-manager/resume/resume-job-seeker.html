@@ -7,70 +7,170 @@
                     <i class="fa fa-search"></i>  Find Job Seekers
                 </div>
                 <div class="panel-default panel-body">
-                    <!-- seacrh bar to search job keyword by skill keywords -->
-                    <div class="container p-bottom-10">
-                        <div class="col-lg-4">
-                            <input type="text" class="form-control" placeholder="Skill Keyword" ng-model = "jobSeekerSkillKeyword" />
-                        </div>
-                        <!-- Job type and salary range -->
-                        <div class="col-lg-8">
-                            <!-- Job Type -->
-                            <div class="col-lg-4 no-left-padding">
-                                <select class="form-control" ng-model = "jobSeekerJobType">
-                                    <option value="0"> Job Type </option>
-                                    <option value="1">Full Time</option>
-                                    <option value="2">Part Time</option>
-                                    <option value="3">Work From Home</option>
-                                    <option value="4">Internship</option>
-                                    <option value="5">Consultant</option>
-                                    <option value="6">Freelancer</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-8 no-padding">
-                                <div class="input-group">
-                                    <span class="input-group-addon">Salary From</span>
-                                    <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "jobSeekerSalaryFrom" class="form-control text-right"/>
-                                    <span class="input-group-addon">To</span>
-                                    <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "jobSeekerSalaryTo" class="form-control text-right"/>
-                                        <span class="btn btn-default input-group-addon  dropdown-toggle" data-toggle="dropdown">{{salaryTypeArray[activeSalaryType]}}
-                                            <span class="caret"></span>
-                                        </span>
-                                    <ul class="dropdown-menu salary-filter-type">
-                                        <li><a ng-click="activeSalaryType = 0">per Hour</a></li>
-                                        <li><a  ng-click="activeSalaryType = 1">per Month</a></li>
-                                        <li><a  ng-click="activeSalaryType = 2">per Annum</a></li>
-                                    </ul>
+                    <!-- search bar to search job keyword by skill keywords -->
+                    <hr>
+                        <div class="container p-bottom-10">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <input type="text" class="form-control" placeholder="Skill Keywords" ng-model = "jobSeekerSkillKeyword" />
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                    <select class="form-control" ng-model = "jobSeekerJobType">
+                                        <option value="0"> -- Select -- </option>
+                                        <option value="1">Full Time</option>
+                                        <option value="2">Part Time</option>
+                                        <option value="3">Work From Home</option>
+                                        <option value="4">Internship | Project Work</option>
+                                        <option value="5">Consultant</option>
+                                        <option value="6">Freelancer</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center topMarginButton">
+                                            Salary
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "jobSeekerSalaryFrom" class="form-control text-right"/>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 text-center topMarginButton">
+                                            to
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "jobSeekerSalaryTo" class="form-control text-right"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                    <select class="form-control" ng-model = "jobSeekerSalaryType">
+                                        <option value="0"> Per Hour </option>
+                                        <option value="1"> Per Month</option>
+                                        <option value="2"> Per Annual</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="container p-bottom-10">
-                        <!-- Country -->
-                        <div class="col-lg-4">
-                            <select class="form-control" disabled>
-                                <option value="">India</option>
-                                <option>UAE</option>
-                                <option>Ireland</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-8 no-padding">
-                            <!-- Locations -->
-                            <div class="col-lg-4">
-                                <input type="text" id="google-map-search-box1" placeholder="Ex: Banglore" ng-model = "jobSeekerLocation" class="form-control"/>
-                            </div>
-                            <!-- Experiences -->
-                            <div class="col-lg-8 no-left-padding">
-                                <div class="input-group">
-                                    <span class="input-group-addon">Experience</span>
-                                    <input type="text" decimals-only maxlength="5" placeholder="Ex: 1" ng-model = "jobSeekerExperienceFrom" class="form-control"/>
-                                    <span class="input-group-addon">To</span>
-                                    <input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "jobSeekerExperienceTo" class="form-control"/>
-                                    <span class="input-group-addon">years</span>
-                                    <span class="btn btn-dark-orange input-group-addon"><i class="fa fa-search"></i> Search</span>
+                        <div class="container p-bottom-10">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <select class="form-control">
+                                        <option value="">India</option>
+                                        <option>UAE</option>
+                                        <option>Ireland</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                    <!--<input type="text" id="google-map-search-box11" placeholder="Ex: Banglore" ng-model = "jobSeekerLocation" class="form-control"/>-->
+                                    <button class="btn btn-default btn-sm dropdown-toggleCity opt opt-2 drpFunction">
+                                        <span class="normal-view-text"> -- Select -- </span>
+                                        <span class="mobile-view-text"></span>
+                                        <span class="caret selectImg"></span></button>
+                                    <div class="opt opt-2">
+                                        <div class="filter-dropdownCity width-79 search-option-content setTableFixHeight" style="display: none;">
+                                            <div class="checkbox-dropdown" ng-repeat="city in cityList track by $index" ng-click="selectCity(city.tid)">
+                                                <i class="fa " ng-class="selectedCitys.indexOf(city.tid)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{city.Locname}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center topMarginButton">
+                                            Experience
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" decimals-only maxlength="5" placeholder="Ex: 1" ng-model = "jobSeekerExperienceFrom" class="form-control"/>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 text-center topMarginButton">
+                                            to
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "jobSeekerExperienceTo" class="form-control"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                                    Years
                                 </div>
                             </div>
                         </div>
+                        <div class="container p-bottom-10">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <button class="btn btn-default btn-sm dropdown-toggle opt opt-2 drpFunction">
+                                        <span class="normal-view-text"> -- Select -- </span>
+                                        <span class="mobile-view-text"></span>
+                                        <span class="caret selectImg"></span></button>
+                                    <div class="opt opt-2">
+                                        <div class="filter-dropdown width-79 search-option-content setTableFixHeight" style="display: none;">
+                                            <div class="checkbox-dropdown" ng-repeat="education in educationList track by $index" ng-click="selectEducation(education.TID)">
+                                                <i class="fa " ng-class="selectedEducations.indexOf(education.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{education.EducationTitle}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                    <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
+                                        <span class="normal-view-text"> -- Select -- </span>
+                                        <span class="mobile-view-text"></span>
+                                        <span class="caret selectImg"></span></button>
+                                    <div class="opt opt-2">
+                                        <div class="filter-dropdownspecialization width-79 search-option-content setTableFixHeight" style="display: none;">
+                                            <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
+                                                <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12">
+                                            <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
+                                                <span class="normal-view-text"> -- Select -- </span>
+                                                <span class="mobile-view-text"></span>
+                                                <span class="caret selectImg"></span>
+                                            </button>
+                                            <div class="opt opt-2">
+                                                <div class="filter-dropdownInstitute width-79 search-option-content setTableFixHeight" style="display: none;">
+                                                    <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
+                                                        <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 text-center topMarginButton">
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                            <!--<span class="btn btn-dark-orange input-group-addon"><i class="fa fa-search"></i> Search</span>-->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container p-bottom-10">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                <!--<span class="btn btn-dark-orange input-group-addon"><i class="fa fa-search"></i> Search</span>-->
+                                <button class="btn btn-primary btn-dark-orange" ng-click="searchJobSeeker()"><i class="fa fa-search"></i> Search</button>
+                                <button class="btn btn-primary btn-dark-orange"><i class="fa fa-eraser"></i> Clear</button>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                Score
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                                <!--<input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "score" class="form-control"/>-->
+                                <input type="text" class="form-control ng-valid ng-valid-maxlength ng-touched ng-dirty ng-valid-parse" numbers-only="" maxlength="3" ng-model="score" placeholder="Ex: 87" aria-describedby="sizing-addon1">
+                            </div>
+                        </div>
                     </div>
+                    <hr>
+
+
                     <div class="container">
                         <div class="col-lg-12">
                             <hr>
