@@ -601,37 +601,24 @@ Job.prototype.searchJobs = function(req,res,next){
  * @description api code for job seeker search
  */
 Job.prototype.searchJobSeekers = function(req,res) {
-    /**
-     * @todo Code API for Job seeker search
-     */
-    //res.send('API in progress');
+
     try {
-        var keyword = req.query.keyword;
+        var keyword = req.query.keyword ? req.query.keyword  : '';
         var jobType = req.query.job_type;
         var salaryFrom = req.query.salary_from;
         var salaryTo = req.query.salary_to;
         var salaryType = req.query.salary_type;
         var experienceFrom = req.query.experience_from;
         var experienceTo = req.query.experience_to;
-        var locationsList = req.query.locations;
+        var locationIds = req.query.location_ids;
         var educations = req.query.educations ? req.query.educations : '';
         var specializationId =  req.query.specialization_id ? req.query.specialization_id : '';
         var instituteId =  req.query.institute_id ? req.query.institute_id : '';
         var score = req.query.score ? req.query.score : 0;
 
-        if (typeof(locationsList) == "string") {
-            locationsList = JSON.parse(locationsList);
-        }
-
-        if (!locationsList) {
-            locationsList = [];
-        }
-
         /**
          * Validations
          */
-        keyword = (keyword) ? keyword : null;
-        jobType = (jobType) ? jobType : null; // Comma Separated
         salaryFrom = (parseFloat(salaryFrom) !== NaN && parseFloat(salaryFrom) > 0) ? parseFloat(salaryFrom) : 0;
         salaryTo = (parseFloat(salaryTo) !== NaN && parseFloat(salaryTo) > 0) ? parseFloat(salaryTo) : 0;
         salaryType = (parseInt(salaryType) !== NaN && parseInt(salaryType) > 0) ? parseInt(salaryType) : 1;
@@ -647,17 +634,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
         };
 
 
-        var queryParams = [];
-        var locationIds = '';
-        var locCount = 0;
-        var locationDetails = locationsList[locCount];
-
-        /**
-         * Job search for job seeker
-         */
-        var jobSeekerJobSearch = function () {
-            //PROCEDURE `pGetjobseekers`(IN tKeyWordsForSearch text,In tjobtype INT,IN tsalaryfrom DECIMAL(14,2),IN tsalaryTo DECIMAL(14,2),IN tsalarytype INT,In tlocations VARCHAR(150),In tExpfrom DECIMAL(14,2),IN tExpto DECIMAL(14,2))
-            locationIds = locationIds.substr(0, locationIds.length - 1);
             var queryParams = st.db.escape(keyword) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                 + ',' + st.db.escape(salaryType) +',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
                 + ',' + st.db.escape(experienceTo)+ ',' + st.db.escape(educations)+ ',' + st.db.escape(specializationId)
@@ -699,75 +675,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     res.status(500).json(responseMessage);
                 }
             });
-        };
-
-        /**
-         * Finds and return location id and if not in database then insert and return the tid
-         */
-        var insertLocations = function (locationDetails) {
-            var list = {
-                location_title: locationDetails.location_title,
-                latitude: locationDetails.latitude,
-                longitude: locationDetails.longitude,
-                country: locationDetails.country
-            };
-            var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country);
-
-            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
-
-                if (results) {
-                    if (results[0]) {
-                        if (results[0][0]) {
-                            console.log(results[0][0].id);
-                            locationIds += results[0][0].id + ',';
-                            locCount += 1;
-                            if (locCount < locationsList.length) {
-                                insertLocations(locationsList[locCount]);
-                            }
-                            else {
-                                jobSeekerJobSearch();
-                            }
-                        }
-                        else {
-                            console.log('FnSaveJobLocation:results no found');
-                            responseMessage.message = 'results no found';
-                            console.log('FnSaveJobLocation: results no found');
-                            res.status(200).json(responseMessage);
-                        }
-                    }
-                    else {
-                        console.log('FnSaveJobLocation:results no found');
-                        responseMessage.message = 'results no found';
-                        console.log('FnSaveJobLocation: results no found');
-                        res.status(200).json(responseMessage);
-                    }
-                }
-                else {
-                    console.log('FnSaveJobLocation:results no found');
-                    responseMessage.error = {};
-                    responseMessage.message = 'results no found';
-                    console.log('FnSaveJobLocation: results no found');
-                    res.status(200).json(responseMessage);
-                }
-            });
-        };
-        //calling function at first time
-        if (locationsList) {
-            if (locationsList.length > 0) {
-                insertLocations(locationDetails);
-            }
-            else {
-                locationIds = '';
-                jobSeekerJobSearch();
-            }
-
-        }
-
-        else {
-            locationIds = '';
-            jobSeekerJobSearch();
-        }
     }
     catch (ex) {
         responseMessage.error = {
