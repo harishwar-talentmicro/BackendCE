@@ -176,6 +176,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 
 
     var name = req.query.group_name;
+    var token = req.query.token;
 
     var responseMessage = {
         status: false,
@@ -190,6 +191,10 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
         error['name'] = 'Invalid name';
         validateStatus *= false;
     }
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
 
     if(!validateStatus){
         responseMessage.error = error;
@@ -198,8 +203,9 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
     }
     else {
         try {
-            console.log('CALL pValidateGroupName(' + st.db.escape(name) + ')');
-            st.db.query('CALL pValidateGroupName(' + st.db.escape(name) + ')', function (err, getResult) {
+            var queryParams = st.db.escape(name) + ',' + + st.db.escape(token);
+            var query = 'CALL pValidateGroupName(' + queryParams + ')'
+            st.db.query(query, function (err, getResult) {
                 console.log(getResult);
 
                 if (!err) {
@@ -212,6 +218,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                             responseMessage.error = null;
                             responseMessage.message = 'Name is available';
                             responseMessage.data = {
+                                id : 0,
                                 groupName : name
                             };
                             res.status(200).json(responseMessage);
