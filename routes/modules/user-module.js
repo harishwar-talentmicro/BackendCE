@@ -872,20 +872,14 @@ User.prototype.logout = function(req,res,next){
                         /**
                          * @todo Please check if the code is working or not
                          */
-                        if(result.affectedRows){
+
                             RtnMessage.IsAuthenticate = false;
                             console.log('FnLogout: tmaster: Logout success');
                             res.clearCookie('Token');
                             res.send(RtnMessage);
                         }
                     }
-                    else{
-                        res.statusCode = 500;
-                        console.log('FnLogout:tmaster:' + err);
-                        res.send(RtnMessage);
-                    }
-                }
-                else {
+                    else {
                     res.statusCode = 500;
                     console.log('FnLogout:tmaster:' + err);
                     res.send(RtnMessage);

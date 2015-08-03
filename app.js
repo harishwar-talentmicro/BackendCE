@@ -204,6 +204,8 @@ app.get('/job_details',LocationManager.FnGetJobDetails);
 app.get('/institutes',LocationManager.FnGetInstitutes);
 app.get('/educations',LocationManager.FnGetEducations);
 app.get('/specialization',LocationManager.FnGetSpecialization);
+app.get('/jobs',LocationManager.FnJobs);
+app.get('/applied_job',LocationManager.FnGetAppliedJob);
 
 
 //MessageBox module methods
@@ -212,6 +214,14 @@ app.get('/validate_groupname',LocationManager.FnValidateGroupName);
 app.put('/user_response',LocationManager.FnUpdateUserResponse);
 app.put('/user_relationship',LocationManager.FnUpdateUserRelationship);
 app.delete('/group',LocationManager.FnDeleteGroup);
+app.post('/message_request',LocationManager.FnSendMessageRequest);
+app.post('/compose_message',LocationManager.FnComposeMessage);
+app.get('/members_list',LocationManager.FnGetMembersList);
+app.get('/messagebox',LocationManager.FnLoadMessageBox);
+app.put('/message_activity',LocationManager.FnChangeMessageActivity);
+app.get('/outbox_messages',LocationManager.FnLoadOutBoxMessages);
+app.get('/suggestion_list',LocationManager.FnGetSuggestionList);
+
 
 
 //below service are for EZEIDAP

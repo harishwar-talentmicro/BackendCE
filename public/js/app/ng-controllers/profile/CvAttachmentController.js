@@ -122,7 +122,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
 
         if(errorList.length>0){
-
             for(var i = errorList.length; i>0;i--)
             {
                 Notification.error({ message: errorList[i-1], delay: MsgDelay });

@@ -58,14 +58,39 @@
             $scope.selectedSpecializations = [];
             $scope.selectedInstitute = [];
 
+            /**
+             * Hide all the open dropdown
+             */
+            function hideAllDropdoowns(id)
+            {
+                if(parseInt(id) != 1)
+                {
+                    $('.filter-dropdown').hide();
+                }
+                if(parseInt(id) != 2)
+                {
+                    $('.filter-dropdownspecialization').hide();
+                }
+                if(parseInt(id) != 3)
+                {
+                    $('.filter-dropdownInstitute').hide();
+                }
+            }
+
             $scope.$watch('_userInfo.IsAuthenticate', function () {
-                $('.dropdown-toggle').click(function(){$( ".filter-dropdown" ).slideToggle( "slow", function() {
+                $('.dropdown-toggle').click(function(){
+                    hideAllDropdoowns(1);
+                    $( ".filter-dropdown" ).slideToggle( "slow", function() {
                     // Animation complete.
                 });})
-                $('.dropdown-toggleSpecialization').click(function(){$( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
+                $('.dropdown-toggleSpecialization').click(function(){
+                    hideAllDropdoowns(2);
+                    $( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
                     // Animation complete.
                 });})
-                $('.dropdown-toggleInstitute').click(function(){$( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
+                $('.dropdown-toggleInstitute').click(function(){
+                    hideAllDropdoowns(3);
+                    $( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
                     // Animation complete.
                 });})
             });
@@ -172,16 +197,21 @@
                         {
                             resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
                         }
-                        $scope.jobData = resp.data.result;
 
-                        for(var i = 0; i < resp.data.job_location.length; i++)
+                        for(var jobCount = 0; jobCount < resp.data.result.length; jobCount++)
                         {
-                            $scope.mainLocationArray.push(resp.data.job_location[i]);
-                            $scope.locationArrayString.push(resp.data.job_location[i].Locname);
+                            resp.data.result[jobCount].locationArray = [];
+
+                            for(var i = 0; i < resp.data.job_location.length; i++)
+                            {
+                                if(resp.data.result[jobCount].tid == resp.data.job_location[i].jobid)
+                                {
+                                    resp.data.result[jobCount].locationArray.push(resp.data.job_location[i]);
+                                }
+                            }
                         }
 
-                        //  $scope.mainLocationArray.push(tempLocationArray);
-                        //     $scope.locationArrayString.push($scope.jobLocation);
+                        $scope.jobData = resp.data.result;
                     }
 
                 }).error(function(err){
@@ -191,8 +221,8 @@
 
             // Validation function
             function validateItem(){
-
                 var err = [];
+
                 if($scope.jobTitle.length < 1 ){
                     err.push('Job Title is empty');
                 }
@@ -205,11 +235,18 @@
                 if($scope.skillKeyWords.length < 1){
                     err.push('Skill Keywords is empty');
                 }
+                if($scope.jobVacancies.length < 1)
+                {
+                    err.push('Job Vacancies is empty');
+                }
                 if($scope.experienceFrom.length < 1){
                     err.push('Experience From is empty');
                 }
                 if($scope.experienceTo.length < 1){
                     err.push('Experience To is empty');
+                }
+                if($scope.mainLocationArray.length == 0){
+                    err.push('Location is empty');
                 }
                 if($scope.salaryFrom.length < 1){
                     err.push('Salary From is empty');
@@ -314,7 +351,6 @@
                     }
                 }).success(function(resp){
                     $scope.jobCategories = resp;
-
                 }).error(function(err){
 
                 });
@@ -322,18 +358,19 @@
 
             // Show job posting form
             $scope.openJobPostForm = function(_index){
-
+                $scope.$emit('$preLoaderStart');
                 getJobCategories();
                 getEducations();
                 getSpecialization();
                 getInstituteList();
-                $scope.showJobListing = false;
 
+                $scope.showJobListing = false;
                 $scope.locationArrayString = [];
                 $scope.mainLocationArray = [];
 
                 if(_index == 'add')
                 {
+                    $scope.$emit('$preLoaderStop');
                     $scope.jobTid = 0;
                     $scope.jobTitle = "";
                     $scope.jobCode = "";
@@ -351,32 +388,80 @@
                     $scope.phone = "";
                     $scope.emailContact = "";
                     $scope.jobStatus = 0;
+                    $scope.jobCategori = 0;
+                    $scope.selectedEducations = [];
+                    $scope.selectedSpecializations = [];
+                    $scope.selectedInstitute = [];
+                    $scope.aggregate_score = "";
                 }
                 else
                 {
-                    $scope.jobTid = $scope.jobData[_index].tid;
-                    $scope.jobTitle = $scope.jobData[_index].jobtitle;
-                    $scope.jobCode = $scope.jobData[_index].jobcode;
-                    $scope.jobDescription = $scope.jobData[_index].jobdescription;
-                    $scope.skillKeyWords = $scope.jobData[_index].keyskills;
-                    $scope.jobVacancies = $scope.jobData[_index].openings;
-                    $scope.experienceFrom = $scope.jobData[_index].expfrom;
-                    $scope.experienceTo = $scope.jobData[_index].expto;
+                    $timeout(function()
+                    {
+                        $scope.jobTid = $scope.jobData[_index].tid;
+                        $scope.jobTitle = $scope.jobData[_index].jobtitle;
+                        $scope.jobCode = $scope.jobData[_index].jobcode;
+                        $scope.jobDescription = $scope.jobData[_index].jobdescription;
+                        $scope.skillKeyWords = $scope.jobData[_index].keyskills;
+                        $scope.jobVacancies = $scope.jobData[_index].openings;
+                        $scope.experienceFrom = $scope.jobData[_index].expfrom;
+                        $scope.experienceTo = $scope.jobData[_index].expto;
 
-                    //    $scope.jobLocation = $scope.jobData[_index].location;
+                        //    $scope.jobLocation = $scope.jobData[_index].location;
 
-                    $scope.salaryFrom = $scope.jobData[_index].salaryfrom;
-                    $scope.salaryTo = $scope.jobData[_index].salaryto;
-                    $scope.salaryType = $scope.jobData[_index].salarytype;
-                    $scope.jobType = $scope.jobData[_index].jobtype;
-                    $scope.contactName = $scope.jobData[_index].contactname;
-                    $scope.phone = $scope.jobData[_index].mobile;
-                    $scope.emailContact = $scope.jobData[_index].emailid;
-                    $scope.jobStatus = $scope.jobData[_index].status;
+                        $scope.salaryFrom = $scope.jobData[_index].salaryfrom;
+                        $scope.salaryTo = $scope.jobData[_index].salaryto;
+                        $scope.salaryType = $scope.jobData[_index].salarytype;
+                        $scope.jobType = $scope.jobData[_index].jobtype;
+                        $scope.contactName = $scope.jobData[_index].contactname;
+                        $scope.phone = $scope.jobData[_index].mobile;
+                        $scope.emailContact = $scope.jobData[_index].emailid;
+                        $scope.jobStatus = $scope.jobData[_index].status;
+                        $scope.jobCategori = parseInt($scope.jobData[_index].jobcategory);
 
-                    var res = $scope.jobData[_index].location.split(",");
+                        console.log("sai111");
+                        console.log($scope.jobData[_index].locationArray);
+
+                        for (var nCount = 0; nCount < $scope.jobData[_index].locationArray.length; nCount++)
+                        {
+                            //delete $scope.jobData[_index].locationArray[nCount].jobid;
+                            $scope.mainLocationArray.push($scope.jobData[_index].locationArray[nCount]);
+                            $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].Locname);
+                        }
+
+                        console.log("sai222");
+                        console.log($scope.jobData[_index].locationArray);
+
+                        $scope.EducationArray = $scope.jobData[_index].Education.split(',');
+                        for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
+                        {
+                            $scope.selectedEducations.push(parseInt($scope.EducationArray[nCount]));
+                        }
+
+                        $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
+                        for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
+                        {
+                            $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
+                        }
+
+                        $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
+                        for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
+                        {
+                            $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
+                        }
+
+                        $scope.InstituteArray = $scope.jobData[_index].Institute.split(',');
+                        for (var nCount = 0; nCount < $scope.InstituteArray.length; nCount++)
+                        {
+                           $scope.selectedInstitute.push(parseInt($scope.InstituteArray[nCount]));
+                        }
+
+                        $scope.aggregate_score = $scope.jobData[_index].Aggregatescore;
+
+
+                        $scope.$emit('$preLoaderStop');
+                    },3000);
                 }
-
             };
 
             // Cancel job posting form
@@ -448,48 +533,22 @@
                 $scope.mainLocationArray.push(tempLocationArray);
                 $scope.locationArrayString.push($scope.jobLocation);
                 $scope.jobLocation = "";
-
-        //        console.log($scope.mainLocationArray);
             }
 
             $scope.candidateModalBox = {
                 title : 'View Candidate',
                 class : 'business-manager-modal'
             };
-            $scope.showCandidateListModal = false;
-
-            // Get applied candidate List for job
-            function getCandidateList(_jobID)
-            {
-                $scope.$emit('$preLoaderStart');
-                $http({
-                    url : GURL + 'job_applied_list',
-                    method : 'GET',
-                    params : {
-                        job_id : _jobID
-                    }
-                }).success(function(resp){
-                    $scope.$emit('$preLoaderStop');
-
-                    if(resp.status)
-                    {
-
-                    }
-
-                }).error(function(err){
-                    $scope.$emit('$preLoaderStop');
-                });
-            }
 
             // Open popup - list of candidate who applied for job
-            $scope.openCandidateListPopup = function(_jobID)
+            $scope.openCandidateListPopup = function(_jobID,_totalapplie)
             {
-             //   console.log("job id"+_jobID);
-                $scope.showCandidateListModal = !$scope.showCandidateListModal;
-
-                if(_jobID)
+                $scope.jobTid = _jobID;
+                if(_totalapplie > 0)
                 {
-                    getCandidateList(_jobID);
+                    $scope.ResumeInquiriesTab = true;
+                    $scope.JobsTab = false;
+                    $scope.JobSeekerTab = false;
                 }
             }
 
@@ -592,7 +651,6 @@
             }
 
             $scope.InstituteTextBoxLossFocus = function () {
-                console.log("SAi222");
 
                /* $( ".filter-dropdown" ).slideToggle( "slow", function() {
                     // Animation complete.
@@ -601,9 +659,9 @@
                     // Animation complete.
                 });*/
 
-                $( ".filter-dropdown" ).slideToggle( "slow", function() {
+             /*   $( ".filter-dropdown" ).slideToggle( "slow", function() {
                     // Animation complete.
-                });
+                });*/
 
 
 

@@ -721,7 +721,8 @@ body {
 }
 .setTableFixHeight
 {
-    height: 300px;
+    /*height: 300px;*/
+    max-height: 300px;
     overflow-y: auto;
 }
 .leftMargin2
@@ -1989,4 +1990,20 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .width-79 {
     width: 79% !important;
+}
+
+.jobpost .btn-group-sm>.btn, .btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.9;
+    border-radius: 3px;
+}
+.top-mar-minnus82
+{
+    margin-top: -82px;
+}
+.selectImg
+{
+    float: right;
+    margin-top: 2%;
 }

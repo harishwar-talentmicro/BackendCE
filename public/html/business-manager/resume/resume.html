@@ -1,499 +1,528 @@
+
 <div class="row" ng-controller="ResumeCtrl">
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 topMarginButton">
-        <div class="row bottom-clearfix">
-            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
-                <div class="input-group tx-search-input-group">
-                    <input class="form-control" ng-model="txSearchTerm" type="text" placeholder="Search records based on EZEOne ID or message"/>
-                                        <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
-                                                <i class="fa fa-times"></i>
-                                        </span>
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-info"
-                                                    ng-click="triggerStatusFilter(1,filterStatus)"
-                                                    type="button"><i class="fa fa-search"></i> Search</button>
-                                        </span>
-                </div>
-            </div>
-
-            <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
-                <div class="row">
-                    <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
-                         title="Order By">
-                        <label class="label label-danger">Order By</label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
-                        <div class="form-group form-group-sm">
-                            <select class="form-control" ng-model="sortBy">
-                                <option value="0"> By Task Date </option>
-                                <option value="1"> By Action Date </option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
-                        <label class="label label-danger">Status</label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
-                        <div class="form-group form-group-sm">
-                            <select class="form-control" ng-model="filterStatus" ng-change="triggerStatusFilter(pageNumber,filterStatus)">
-                                <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
-                         title="Folders">
-                        <label class="label label-danger">Folders</label>
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="By Folders">
-                        <!--{{myFolders}}-->
-                        <!--<br/>-->
-                        <div class="form-group form-group-sm">
-
-                            <select class="form-control"
-                                    ng-model="myFolders"
-                                    style="height:auto;max-height: 100px;;" multiple>
-                                <option ng-repeat="userFolder in userFolders track by userFolder.TID" value="{{userFolder.TID}}">{{userFolder.FolderTitle}}</option>
-                            </select>
-                        </div>
+    <div ng-hide="showAppicantList">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 topMarginButton">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 bottom-clearfix">
+                    <div class="input-group tx-search-input-group">
+                        <input class="form-control" ng-model="txSearchTerm" type="text" placeholder="Search records based on EZEOne ID or message"/>
+                                            <span class="input-group-addon btn-link" title="Clear" ng-show="txSearchTerm" ng-click="clearSearchTerm(1,statusType)">
+                                                    <i class="fa fa-times"></i>
+                                            </span>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-info"
+                                                        ng-click="triggerStatusFilter(1,filterStatus)"
+                                                        type="button"><i class="fa fa-search"></i> Search</button>
+                                            </span>
                     </div>
                 </div>
-            </div>
 
-
-            <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
-                <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
-                    <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
-                        <span class="glyphicon glyphicon-chevron-left"></span>
-                        Prev
-                    </button>
-                    <button type="button" class="btn btn-info bt-xs no-radius active">
-                        {{pageNumber}}
-                    </button>
-                    <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                        Next
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div ng-show="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in txList track by tx.TID">
-        <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}}" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="{{$index+1}}">
-            <!---------- Single Transaction Entry ---------------------->
-
-            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix">
-                <div class="row">
-                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">-->
-                    <!--<small>{{tx.TrnNo}}</small>-->
-                    <!--</div>-->
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <small>
-                            {{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}
-                            <!--{{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
-                        </small>
-                        <br/>
-                        <small class="text-danger" ng-hide="editModes[$index]"><b>{{(tx.statustitle) ? tx.statustitle : 'New' | uppercase}}</b></small>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <b class="font-roboto" ng-class="{'hidden' : (!tx.RequesterEZEID)}">{{ (tx.RequesterEZEID) ? (tx.RequesterEZEID | uppercase) : ''}}</b>
-                        <br/>
-                        <small class="text-info">
-                            {{(tx.RequesterEZEID) ? ((tx.ContactInfo.split(',').length > 1) ?
-                            tx.ContactInfo.split(',')[1] : tx.ContactInfo) : tx.ContactInfo}}
-                        </small>
-
-                    </div>
-                </div>
-            </div>
-
-
-            <!--<div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
-            <!--<small>{{tx.DeliveryAddress}}</small>-->
-            <!--</div>-->
-
-            <div class="col-lg-2  col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}" style="word-wrap:break-word;">
-                <small class="text-success">
-                    <b>{{tx.Message | truncate:100:'...'}}</b>
-                </small>
-            </div>
-
-            <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix"
-                 ng-hide="editModes[$index]" ng-dblclick="((resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0)">
-                <div class="row">
-                    <div ng-show="moduleConf.listType == 4" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
-                         title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
-                        <label class="label label-info">{{tx.Amount | formatDecimal:' ':2}}</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix"
-                 title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
-                 ng-hide="editModes[$index]"
-                 ng-dblclick="(resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0">
-                <div class="row">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                        <small ng-class="{'hidden': (!tx.ActionTitle) }"><b>{{tx.ActionTitle}}</b></small>
-                        <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No action yet</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
-                        <small class="text-danger" ng-class="{'hidden': (!tx.ActionTitle) }">
-                            {{tx.NextActionDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}
-                        </small>
-                    </div>
-                </div>
-            </div>
-
-
-
-            <!-- Edit Mode -->
-            <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
-                <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <label class="tiny">Transaction Stage</label>
-                        <br/>
-                        <div class="form-group form-group-sm">
-                            <select class="form-control" ng-model="modalBox.tx.statusType">
-                                <option value="0">New</option>
-                                <option value="">--Select Status Type--</option>
-                                <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <label class="tiny">Folder</label>
-                        <br/>
-                        <div class="form-group form-group-sm">
-                            <select class="form-control" ng-model="modalBox.tx.folderRule">
-                                <option value="0">Default Folder</option>
-                                <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">-->
-                    <!--<div class="form-group form-group-sm">-->
-                    <!--<input type="text" class="form-control"  placeholder="Amount" ng-model="modalBox.tx.orderAmount" decimals-only />-->
-                    <!--</div>-->
-                    <!--</div>-->
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <label class="tiny">Next Action to be taken</label>
-                        <div class="form-group form-group-sm">
-                            <select class="form-control"  ng-model="modalBox.tx.nextAction">
-                                <option value="0">--Select Next Action--</option>
-                                <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                        <label class="tiny">Next Action Date</label>
-                        <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
-                                                                                    "format" : "d M Y H:m",
-                                                                                    "timepicker" : true,
-                                                                                    "mask" : false,
-                                                                                    "hours12" : false,
-                                                                                    "minDate" : "-1970/01/01"
-                                                                                    }'></date-time-picker>
-                    </div>
-
-                </div>
-
-
-
-            </div>
-
-            <!-- end: Edit Mode -->
-
-
-
-            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
-                <div class="row">
-                    <!--<div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
-                    <!--<small class="text-info tiny">-->
-                    <!--Updated By-->
-                    <!--<br/>-->
-                    <!--</small>-->
-                    <!--<small class="text-danger tiny">-->
-                    <!--{{tx.UpdatedUser | truncate:8:'..'}}-->
-                    <!--<br/>-->
-                    <!--{{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM-YY"}}-->
-                    <!--<br/>-->
-                    <!--{{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
-                    <!--</small>-->
-
-                    <!--</div>-->
-
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
-                        <button class="btn btn-xs btn-block btn-info no-radius"
-                                data-toggle="tooltip" title="View Details" ng-click="toggleModalBox($event,$index)">
-                            <span class="glyphicon glyphicon-fullscreen"></span>
-                            Details
-                        </button>
-
-                    </div>
-
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
-
-                        <button ng-click="updateTransaction()"
-
-                                class="btn btn-xs btn-block btn-success no-radius" data-toggle="tooltip" title="Save">
-                            <span class="glyphicon glyphicon-floppy-save"></span>
-                            Save
-                        </button>
-                    </div>
-
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
-                        <button  ng-click="(editModes[$index] = false)(resetModalBox())" class="btn btn-xs btn-block btn-danger no-radius" data-toggle="tooltip" title="Save">
-                            <span class="glyphicon glyphicon-remove"></span>
-                            Cancel
-                        </button>
-                    </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
-                        <button  ng-disabled="!resumePermissionConf.txUpdate"
-                                 title="{{(resumePermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
-                                 ng-click="(resumePermissionConf.txUpdate) ? (toggleAllEditMode($index,false,false,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius">
-                            <span class="glyphicon glyphicon-pencil"></span>
-                            Edit
-                        </button>
-                    </div>
-
-
-                </div>
-            </div>
-
-            <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                <a target="_blank"
-                   title="Download Resume"
-                   href="{{('/' + tx.RequesterEZEID + '.CV') + ((tx.Pin) ?
-                                       ((tx.Pin.trim()) ? ('.'+ tx.Pin.trim()) : '' ) : '') }}" class="btn btn-default btn-xs">Download
-                    <br/>
-                    Resume</a>
-            </div>
-
-        </div>
-
-        <!----------end : Single Transaction Entry ---------------------->
-    </div>
-    <hr/>
-    <div ng-hide="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12 text-center">
-        <small class="text-center text-warning">No records found</small>
-    </div>
-
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <div class="row bottom-clearfix">
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-0">
-
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 pull-right" ng-show="txList.length">
-                <div class="btn-group pull-right" role="group" aria-label="First group">
-                    <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
-                        <span class="glyphicon glyphicon-chevron-left"></span>
-                        Prev
-                    </button>
-                    <button type="button" class="btn btn-info bt-xs no-radius active">
-                        {{pageNumber}}
-                    </button>
-                    <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                        Next
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <modal mtitle="modalBox.title" mclass="modalBox.class" visible="showModal">
-        <div class="container-fluid">
-            <div class="row">
-
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
                     <div class="row">
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>EZEOne</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group form-group-sm ">
-                                        <input type="text" class="form-control no-radius"
-                                               ezeid-only
-                                               name="ezeid"
-                                               ng-disabled="modalBox.editMode"
-                                               ng-model="modalBox.tx.ezeid"
-                                               ng-change="(modalBox.tx.contactInfo = '')"
-                                               ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }" />
-                                    </div>
-                                </div>
+                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
+                             title="Order By">
+                            <label class="label label-danger">Order By</label>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
+                            <div class="form-group form-group-sm">
+                                <select class="form-control" ng-model="sortBy">
+                                    <option value="0"> By Task Date </option>
+                                    <option value="1"> By Action Date </option>
+                                </select>
                             </div>
                         </div>
 
-
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Company</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
-                                     ng-if="!modalBox.editMode" ng-show="!modalBox.editMode">
-                                    <autocomplete
-                                            list="companySuggestionList"
-                                            company-id="modalBox.tx.companyId"
-                                            company-name="modalBox.tx.companyName"
-                                            load-suggestion="loadSuggestion"></autocomplete>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
-                                    <div class="form-group form-group-sm">
-                                        <input class="form-control" disabled type="text" value="{{modalBox.tx.companyName}}"/>
-                                    </div>
-                                </div>
+                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
+                            <label class="label label-danger">Status</label>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
+                            <div class="form-group form-group-sm">
+                                <select class="form-control" ng-model="filterStatus" ng-change="triggerStatusFilter(pageNumber,filterStatus)">
+                                    <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
+                                </select>
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Contact Information</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group form-group-sm ">
-                                        <input type="text"
-                                               class="form-control no-radius"
-                                               placeholder="Contact Information"
-                                               name="contactInfo"
-                                               ng-disabled="modalBox.tx.ezeid"
-                                               ng-model="modalBox.tx.contactInfo" />
-                                    </div>
-
-                                </div>
-
-                            </div>
+                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
+                             title="Folders">
+                            <label class="label label-danger">Folders</label>
                         </div>
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Transaction Status</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group form-group-sm ">
-                                        <select class="form-control" ng-model="modalBox.tx.statusType">
-                                            <!--<option value="">&#45;&#45;Select Status of Transaction&#45;&#45;</option>-->
-                                            <option value="0">New</option>
-                                            <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{::txStatus.TID}}">{{::txStatus.StatusTitle}}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="By Folders">
+                            <!--{{myFolders}}-->
+                            <!--<br/>-->
+                            <div class="form-group form-group-sm">
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Next Action</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group form-group-sm ">
-                                        <select class="form-control" ng-model="modalBox.tx.nextAction" name="nextAction">
-                                            <option value="0">--Select Next Action to be taken--</option>
-                                            <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Next Action Date and Time</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group form-group-sm ">
-                                        <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
-                                                            "format" : "d M Y H:m:s",
-                                                            "timepicker" : true,
-                                                            "mask" : false,
-                                                            "hours12" : false,
-                                                            "minDate" : "-1970/01/01"
-                                                            }'></date-time-picker>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Folder Rules</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group form-group-sm ">
-                                        <select class="form-control" ng-model="modalBox.tx.folderRule" name="folderRule">
-                                            <option value="0">--Select Folder Rule from list--</option>
-                                            <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label> Message</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Notes</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-
-                                    <textarea rows="1" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
-
-                                </div>
+                                <select class="form-control"
+                                        ng-model="myFolders"
+                                        style="height:auto;max-height: 100px;;" multiple>
+                                    <option ng-repeat="userFolder in userFolders track by userFolder.TID" value="{{userFolder.TID}}">{{userFolder.FolderTitle}}</option>
+                                </select>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="row top-clearfix-padding-half bottom-clearfix">
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode && (!resumePermissionConf.txUpdate)">
-                            <small class="text-danger">You do not have permission to edit the application</small>
+
+                <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
+                    <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
+                        <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                            Prev
+                        </button>
+                        <button type="button" class="btn btn-info bt-xs no-radius active">
+                            {{pageNumber}}
+                        </button>
+                        <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div ng-show="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in txList track by tx.TID">
+            <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}}" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="{{$index+1}}">
+                <!---------- Single Transaction Entry ---------------------->
+
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix">
+                    <div class="row">
+                        <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">-->
+                        <!--<small>{{tx.TrnNo}}</small>-->
+                        <!--</div>-->
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <small>
+                                {{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}
+                                <!--{{tx.TaskDateTime | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
+                            </small>
+                            <br/>
+                            <small class="text-danger" ng-hide="editModes[$index]"><b>{{(tx.statustitle) ? tx.statustitle : 'New' | uppercase}}</b></small>
                         </div>
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode" ng-click="saveTransaction()">
-                                <span class="glyphicon glyphicon-hand-right"></span>
-                                Submit Resume Application
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <b class="font-roboto" ng-class="{'hidden' : (!tx.RequesterEZEID)}">{{ (tx.RequesterEZEID) ? (tx.RequesterEZEID | uppercase) : ''}}</b>
+                            <br/>
+                            <small class="text-info">
+                                {{(tx.RequesterEZEID) ? ((tx.ContactInfo.split(',').length > 1) ?
+                                tx.ContactInfo.split(',')[1] : tx.ContactInfo) : tx.ContactInfo}}
+                            </small>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <!--<div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                <!--<small>{{tx.DeliveryAddress}}</small>-->
+                <!--</div>-->
+
+                <div class="col-lg-2  col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}" style="word-wrap:break-word;">
+                    <small class="text-success">
+                        <b>{{tx.Message | truncate:100:'...'}}</b>
+                    </small>
+                </div>
+
+                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix"
+                     ng-hide="editModes[$index]" ng-dblclick="((resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0)">
+                    <div class="row">
+                        <div ng-show="moduleConf.listType == 4" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                             title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}">
+                            <label class="label label-info">{{tx.Amount | formatDecimal:' ':2}}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix"
+                     title="{{(resumePermissionConf.txUpdate) ? 'Double click to edit' : 'Do not have permission to edit'}}"
+                     ng-hide="editModes[$index]"
+                     ng-dblclick="(resumePermissionConf.txUpdate) ? toggleAllEditMode($index,false,false,true) : 0">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <small ng-class="{'hidden': (!tx.ActionTitle) }"><b>{{tx.ActionTitle}}</b></small>
+                            <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No action yet</small>
+                        </div>
+                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                            <small class="text-danger" ng-class="{'hidden': (!tx.ActionTitle) }">
+                                {{tx.NextActionDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Edit Mode -->
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="tiny">Transaction Stage</label>
+                            <br/>
+                            <div class="form-group form-group-sm">
+                                <select class="form-control" ng-model="modalBox.tx.statusType">
+                                    <option value="0">New</option>
+                                    <option value="">--Select Status Type--</option>
+                                    <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="tiny">Folder</label>
+                            <br/>
+                            <div class="form-group form-group-sm">
+                                <select class="form-control" ng-model="modalBox.tx.folderRule">
+                                    <option value="0">Default Folder</option>
+                                    <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">-->
+                        <!--<div class="form-group form-group-sm">-->
+                        <!--<input type="text" class="form-control"  placeholder="Amount" ng-model="modalBox.tx.orderAmount" decimals-only />-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="tiny">Next Action to be taken</label>
+                            <div class="form-group form-group-sm">
+                                <select class="form-control"  ng-model="modalBox.tx.nextAction">
+                                    <option value="0">--Select Next Action--</option>
+                                    <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="tiny">Next Action Date</label>
+                            <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
+                                                                                        "format" : "d M Y H:m",
+                                                                                        "timepicker" : true,
+                                                                                        "mask" : false,
+                                                                                        "hours12" : false,
+                                                                                        "minDate" : "-1970/01/01"
+                                                                                        }'></date-time-picker>
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+
+                <!-- end: Edit Mode -->
+
+
+
+                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                    <div class="row">
+                        <!--<div class="col-lg-5 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                        <!--<small class="text-info tiny">-->
+                        <!--Updated By-->
+                        <!--<br/>-->
+                        <!--</small>-->
+                        <!--<small class="text-danger tiny">-->
+                        <!--{{tx.UpdatedUser | truncate:8:'..'}}-->
+                        <!--<br/>-->
+                        <!--{{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM-YY"}}-->
+                        <!--<br/>-->
+                        <!--{{tx.updatedDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "hh:mm A"}}-->
+                        <!--</small>-->
+
+                        <!--</div>-->
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                            <button class="btn btn-xs btn-block btn-info no-radius"
+                                    data-toggle="tooltip" title="View Details" ng-click="toggleModalBox($event,$index)">
+                                <span class="glyphicon glyphicon-fullscreen"></span>
+                                Details
                             </button>
-                            <button ng-click="saveTransaction()"
-                                    class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
-                                    title="(resumePermissionConf.txUpdate) ? 'Update resume application' : 'You do not have editing permission'"
-                                    ng-disabled="(!resumePermissionConf.txUpdate)">
-                                <span class="glyphicon glyphicon-ok-circle"></span>
-                                Update Resume Application
+
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
+
+                            <button ng-click="updateTransaction()"
+
+                                    class="btn btn-xs btn-block btn-success no-radius" data-toggle="tooltip" title="Save">
+                                <span class="glyphicon glyphicon-floppy-save"></span>
+                                Save
                             </button>
-                            <button class="btn btn-danger btn-sm no-radius" ng-click="toggleModalBox()">
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-show="editModes[$index]">
+                            <button  ng-click="(editModes[$index] = false)(resetModalBox())" class="btn btn-xs btn-block btn-danger no-radius" data-toggle="tooltip" title="Save">
                                 <span class="glyphicon glyphicon-remove"></span>
                                 Cancel
                             </button>
                         </div>
-                    </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                            <button  ng-disabled="!resumePermissionConf.txUpdate"
+                                     title="{{(resumePermissionConf.txUpdate) ? 'Edit' : 'You do not have permission to edit'}}"
+                                     ng-click="(resumePermissionConf.txUpdate) ? (toggleAllEditMode($index,false,false,true)) : 0" class="btn btn-xs btn-block btn-warning no-radius">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                Edit
+                            </button>
+                        </div>
 
+
+                    </div>
+                </div>
+
+                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
+                    <a target="_blank"
+                       title="Download Resume"
+                       href="{{('/' + tx.RequesterEZEID + '.CV') + ((tx.Pin) ?
+                                           ((tx.Pin.trim()) ? ('.'+ tx.Pin.trim()) : '' ) : '') }}" class="btn btn-default btn-xs">Download
+                        <br/>
+                        Resume</a>
                 </div>
 
             </div>
+
+            <!----------end : Single Transaction Entry ---------------------->
         </div>
-    </modal>
+        <hr/>
+        <div ng-hide="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12 text-center">
+            <small class="text-center text-warning">No records found</small>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="row bottom-clearfix">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-0">
+
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 pull-right" ng-show="txList.length">
+                    <div class="btn-group pull-right" role="group" aria-label="First group">
+                        <button type="button" ng-disabled="pageNumber <= 1" class="btn btn-info bt-xs no-radius" ng-click="decrementPage()">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                            Prev
+                        </button>
+                        <button type="button" class="btn btn-info bt-xs no-radius active">
+                            {{pageNumber}}
+                        </button>
+                        <button type="button" ng-disabled="(pageNumber >= totalPages)" class="btn btn-info bt-xs no-radius"  ng-click="incrementPage()">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <modal mtitle="modalBox.title" mclass="modalBox.class" visible="showModal">
+            <div class="container-fluid">
+                <div class="row">
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>EZEOne</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <input type="text" class="form-control no-radius"
+                                                   ezeid-only
+                                                   name="ezeid"
+                                                   ng-disabled="modalBox.editMode"
+                                                   ng-model="modalBox.tx.ezeid"
+                                                   ng-change="(modalBox.tx.contactInfo = '')"
+                                                   ng-model-options="{updateOn : 'blur',debounce : { 'blur' : 0} }" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
 
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Company</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+                                         ng-if="!modalBox.editMode" ng-show="!modalBox.editMode">
+                                        <autocomplete
+                                                list="companySuggestionList"
+                                                company-id="modalBox.tx.companyId"
+                                                company-name="modalBox.tx.companyName"
+                                                load-suggestion="loadSuggestion"></autocomplete>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
+                                        <div class="form-group form-group-sm">
+                                            <input class="form-control" disabled type="text" value="{{modalBox.tx.companyName}}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Contact Information</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <input type="text"
+                                                   class="form-control no-radius"
+                                                   placeholder="Contact Information"
+                                                   name="contactInfo"
+                                                   ng-disabled="modalBox.tx.ezeid"
+                                                   ng-model="modalBox.tx.contactInfo" />
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Transaction Status</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <select class="form-control" ng-model="modalBox.tx.statusType">
+                                                <!--<option value="">&#45;&#45;Select Status of Transaction&#45;&#45;</option>-->
+                                                <option value="0">New</option>
+                                                <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{::txStatus.TID}}">{{::txStatus.StatusTitle}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Next Action</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <select class="form-control" ng-model="modalBox.tx.nextAction" name="nextAction">
+                                                <option value="0">--Select Next Action to be taken--</option>
+                                                <option ng-repeat="txAction in txActionTypes track by txAction.TID" value="{{txAction.TID}}">{{txAction.ActionTitle}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Next Action Date and Time</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
+                                                                "format" : "d M Y H:m:s",
+                                                                "timepicker" : true,
+                                                                "mask" : false,
+                                                                "hours12" : false,
+                                                                "minDate" : "-1970/01/01"
+                                                                }'></date-time-picker>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Folder Rules</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <div class="form-group form-group-sm ">
+                                            <select class="form-control" ng-model="modalBox.tx.folderRule" name="folderRule">
+                                                <option value="0">--Select Folder Rule from list--</option>
+                                                <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label> Message</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label>Notes</label>
+                                    </div>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+                                        <textarea rows="1" class="form-control no-radius" ng-model="modalBox.tx.notes" name="notes"></textarea>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row top-clearfix-padding-half bottom-clearfix">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode && (!resumePermissionConf.txUpdate)">
+                                <small class="text-danger">You do not have permission to edit the application</small>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button class="btn btn-info btn-sm no-radius" ng-hide="modalBox.editMode" ng-click="saveTransaction()">
+                                    <span class="glyphicon glyphicon-hand-right"></span>
+                                    Submit Resume Application
+                                </button>
+                                <button ng-click="saveTransaction()"
+                                        class="btn btn-success btn-sm no-radius" ng-show="modalBox.editMode"
+                                        title="(resumePermissionConf.txUpdate) ? 'Update resume application' : 'You do not have editing permission'"
+                                        ng-disabled="(!resumePermissionConf.txUpdate)">
+                                    <span class="glyphicon glyphicon-ok-circle"></span>
+                                    Update Resume Application
+                                </button>
+                                <button class="btn btn-danger btn-sm no-radius" ng-click="toggleModalBox()">
+                                    <span class="glyphicon glyphicon-remove"></span>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </modal>
+    </div>
+    <!--List of Job applicant Start hear-->
+    <div  ng-show="showAppicantList" class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero" ng-repeat="Applicant in ApplicantList track by $index">
+        <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <small class="text-success">
+                    <b class="ng-binding">{{Applicant.ezeid}}</b>
+                </small>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <small class="text-success">
+                    <b class="ng-binding">{{Applicant.FirstName}}</b>
+                </small>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <small class="text-success">
+                    <b class="ng-binding">{{Applicant.LastName}}</b>
+                </small>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <small class="text-success pointer">
+                    <b class="ng-binding showPointer">{{Applicant.keyskills}}</b>
+                </small>
+            </div>
+        </div>
+    </div>
+    <!--List of Job applicant End hear--->
 </div>
+
+

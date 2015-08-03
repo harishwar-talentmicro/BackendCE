@@ -37,12 +37,41 @@ angular.module('ezeidApp').
             UtilityService
         ) {
 
+
+            /***********************************************************************************************************
+             /***********************************************************************************************************
+             /***********************************************************************************************************
+             * INITIALIZATIONS goes here
+             */
+            $scope.jobData = [];
+            $scope.locationData = "NA";
+            $scope.isResultEmpty = true;
+            $scope.skillArr = [];
+            $scope.salaryType = ["","per Hour","per Month","per Annum"]
+
+            $scope.isLoggedIn = $rootScope._userInfo;
+
+            /***********************************************************************************************************
+             /***********************************************************************************************************
+             /***********************************************************************************************************
+             * All ACTIONS Goes here
+             */
             if($routeParams.jobid)
             {
                 getJobDetail($routeParams.jobid);
             }
 
-
+            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                if(!returnFormat){
+                    returnFormat = dateFormat;
+                }
+                var x = new Date(timeFromServer);
+                var mom1 = moment(x);
+                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+            };
 
             // Get job details
             function getJobDetail(_jobID)
@@ -55,48 +84,118 @@ angular.module('ezeidApp').
                         job_id : _jobID
                     }
                 }).success(function(resp){
-                        $scope.$emit('$preLoaderStop');
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.status)
+                    {
+                        var data = resp.data[0];
+                        resp.data[0].LUdate = convertTimeToLocal(data.LUdate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
 
-                        console.log("SAi candidate list..");
-                        console.log(resp);
-
-                        if(resp.status)
+                        if(data.companyname)
                         {
-
+                            $scope.isResultEmpty = false;
+                            /* set all the data */
+                            $scope.jobData = data;
+                            console.log(data);
+                            /* set the location data */
+                            setLocation();
+                            /* set the skill array */
+                            setSkillsArray();
+                        }
+                        else{
+                            invalidUrlRedirection();
                         }
 
-                    }).error(function(err){
-                        $scope.$emit('$preLoaderStop');
-                    });
+                    }
+
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                });
+            }
+
+            /**
+             * redirect to home page in case there is no result
+             */
+            function invalidUrlRedirection()
+            {
+                /* show the Error Message */
+                Notification.error({ message : 'Invalid request', delay : MsgDelay});
+                /* redirect to home page */
+                $location.url('');
+            }
+
+            /**
+             * Get the range of anything
+             */
+            $scope.getRange = function(rangeFrom,rangeTo,code)
+            {
+                if(typeof code !== undefined && parseInt(code) == 1)
+                {
+                    var amountRange = UtilityService.getRange(rangeFrom,rangeTo);
+                    if(parseInt(rangeFrom) === parseInt(rangeTo))
+                    {
+                        return UtilityService.currencyStyleConverter(rangeFrom);
+                    }
+                    var amountArr = amountRange.split('-');
+                    for(var i = 0;i < amountArr.length; i++)
+                    {
+                        amountArr[i] = UtilityService.currencyStyleConverter(amountArr[i]);
+                    }
+                    return amountArr.join('-');
+                }
+                return UtilityService.getRange(rangeFrom,rangeTo);
+            }
+
+            /**
+             * set location data
+             */
+            function setLocation()
+            {
+                if($scope.jobData)
+                {
+                    var location = $scope.jobData.location;
+                    if(!location.trim().length > 0)
+                    {
+                        $scope.locationData = "NA";
+                    }
+                    $scope.locationData = location;
+                }
+            }
+
+            /**
+             * Set skills in the array
+             */
+            function setSkillsArray()
+            {
+                if($scope.jobData)
+                {
+                    $scope.skillArr = $scope.jobData.keyskills.split(',');
+                }
             }
 
             // Apply for job
             $scope.applyForJob = function(_tid){
-
                 $scope.$emit('$preLoaderStart');
-
                 $scope.jobData = {
                     token : $rootScope._userInfo.Token,
                     job_id : $scope.jobTid
                 }
-
                 $http({
                     method: "POST",
-                    url: GURL + 'job',
-                    data:  $scope.jobData
+                    url: GURL + 'job_apply',
+                    data :{
+                            token:$rootScope._userInfo.Token,
+                            job_id:_tid
+                          }
                 }).success(function (data) {
                     $scope.$emit('$preLoaderStop');
-
                     if(data.status)
                     {
-                      Notification.success({ message: "Applied Success..", delay : 2000});
+                        Notification.success({ message: "Applied Success..", delay : 2000});
                     }
                 })
                 .error(function(data, status, headers, config) {
                     $scope.$emit('$preLoaderStop');
                 });
-
-
             };
 
         }]);
