@@ -105,6 +105,8 @@ Notification.prototype.authVHost = function(req,res,next){
 };
 
 Notification.prototype.authResource = function(req,res,next){
+    console.log(req.query);
+    console.log(req.params);
     var ezeoneId = req.query.username;
     var token = req.query.password;
 
