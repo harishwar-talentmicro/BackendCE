@@ -1195,7 +1195,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
                         }
                         else {
                             responseMessage.message = 'OutBox Messages not loaded';
-                            responseMessage.error = {};
                             res.status(200).json(responseMessage);
                             console.log('FnLoadOutBoxMessages:OutBox Messages not loaded');
                         }
@@ -1231,5 +1230,90 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
 };
 
 
+/**
+ * @todo FnGetSuggestionList
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get Suggestion list
+ */
+
+MessageBox.prototype.getSuggestionList = function(req,res,next){
+    var _this = this;
+
+    var keywordsForSearch = req.query.keywordsForSearch;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!keywordsForSearch){
+        error['keyword'] = 'Invalid keyword';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            console.log('CALL pGetMessageboxSuggestionList(' + st.db.escape(keywordsForSearch) + ')');
+            st.db.query('CALL pGetMessageboxSuggestionList(' + st.db.escape(keywordsForSearch) + ')', function (err, getResult) {
+                console.log(getResult);
+
+                if (!err) {
+                    if (getResult) {
+                        if (getResult[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'SuggestionList loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetSuggestionList: SuggestionList loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'SuggestionList not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetSuggestionList:SuggestionList not loaded');
+                        }
+
+                    }
+                    else {
+                        responseMessage.message = 'SuggestionList not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetSuggestionList:SuggestionList not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetSuggestionList: error in getting OutBox Messages:' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetSuggestionList ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = MessageBox;

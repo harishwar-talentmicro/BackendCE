@@ -220,6 +220,7 @@ app.get('/members_list',LocationManager.FnGetMembersList);
 app.get('/messagebox',LocationManager.FnLoadMessageBox);
 app.put('/message_activity',LocationManager.FnChangeMessageActivity);
 app.get('/outbox_messages',LocationManager.FnLoadOutBoxMessages);
+app.get('/suggestion_list',LocationManager.FnGetSuggestionList);
 
 
 

@@ -1272,7 +1272,7 @@ Job.prototype.getAppliedJob = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !'
+            responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnAppliedJobList ' + ex.description);
             var errorDate = new Date();
