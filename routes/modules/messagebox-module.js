@@ -213,29 +213,20 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                     if (getResult) {
                         if(getResult[0]){
                             if(getResult[0][0]){
-                                if(getResult[0][0].id == 0){
+                                //if(getResult[0][0].message == -1){
 
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Name is available';
-                            responseMessage.data = {
-                                id : 0,
-                                groupName : name
-                            };
+                            responseMessage.data = getResult[0];
                             res.status(200).json(responseMessage);
                             console.log('FnValidateGroupName: Name is available');
                         }
-                        else {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Name is available';
-                                    responseMessage.data = {
-                                        id : getResult[0][0].id,
-                                        name : getResult[0][0].name
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnValidateGroupName: Name is available');
-                        }
+                            else {
+                                responseMessage.message = 'Name is not available';
+                                res.status(200).json(responseMessage);
+                                console.log('FnValidateGroupName:Name is not available');
+                            }
                     }
                     else {
                         responseMessage.message = 'Name is not available';
@@ -243,12 +234,6 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                         console.log('FnValidateGroupName:Name is not available');
                     }
                 }
-                        else {
-                            responseMessage.message = 'Group Name is not available';
-                            res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName:Group Name is not available');
-                        }
-                    }
                     else {
                         responseMessage.message = 'Group Name is not available';
                         res.status(200).json(responseMessage);
