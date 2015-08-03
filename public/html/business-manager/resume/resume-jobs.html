@@ -100,12 +100,6 @@
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
                     <div class="row">
-                        <!--<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                            <button class="btn btn-xs btn-block btn-info no-radius" data-toggle="tooltip" title="" ng-click="openCandidateListPopup(job.tid)" data-original-title="View Candidates" ng-disabled="!job.totalapplied">
-                                <span class="glyphicon glyphicon-fullscreen"></span>
-                                View Candidates
-                            </button>
-                        </div>-->
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
                             <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
                                 <span class="glyphicon glyphicon-pencil"></span>
@@ -123,7 +117,6 @@
                 </div>
             </div>
         </div>
-
         <!--List of Job End hear-->
     </div>
 
@@ -203,7 +196,7 @@
                         </div>
 
                      <span ng-repeat="location in locationArrayString track by $index">
-                        <label  class="label label-default">{{location}} <i ng-click="removeLocation($index)" class="fa fa-times text-warning"></i></label>&nbsp;
+                        <label  class="label label-default">{{location}}&nbsp;&nbsp;  <i class="fa fa-map-marker" ng-click="modalVisibility()"></i>  &nbsp;&nbsp; <i ng-click="removeLocation($index)" class="fa fa-times text-warning"></i></label>&nbsp;
                     </span>
                     </div>
                     <div class="col-lg-6 p-top-10">
@@ -374,9 +367,22 @@
                             <input type="button" ng-click="cancelJobPosting()" class="btn btn-primary" value="Cancel">
                         </div>
                     </div>
-
                 </div>
             </div>
         </form>
+
+        <!--Modal for map-->
+        <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
+            <div class="row">
+                <!-- Map goes here -->
+                <div id="modal-map-ctrl" class="col-lg-12">
+                </div>
+                <!-- Map ends here -->
+                <div class="col-lg-12 text-right">
+                    <button class="btn btn-primary text-right" ng-click="modalVisibility()">OK</button>
+                </div>
+            </div>
+        </modal>
+
     </div>
 </div>
