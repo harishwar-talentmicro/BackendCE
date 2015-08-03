@@ -177,6 +177,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 
     var name = req.query.group_name;
     var token = req.query.token;
+    var groupType = req.query.group_type ? req.query.group_type : 0;
 
     var responseMessage = {
         status: false,
@@ -203,8 +204,8 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
     }
     else {
         try {
-            var queryParams = st.db.escape(name) + ',' + + st.db.escape(token);
-            var query = 'CALL pValidateGroupName(' + queryParams + ')'
+            var queryParams = st.db.escape(name) + ',' +  st.db.escape(token)+ ',' +  st.db.escape(groupType);
+            var query = 'CALL pValidateGroupName(' + queryParams + ')';
             st.db.query(query, function (err, getResult) {
                 console.log(getResult);
 
