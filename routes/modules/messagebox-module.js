@@ -115,7 +115,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Group is not created';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnCreateMessageGroup:Group is not created');
                                 }
@@ -219,28 +218,24 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                         }
                         else {
                             responseMessage.message = 'Group Name is not available';
-                            responseMessage.error = {};
                             res.status(200).json(responseMessage);
                             console.log('FnValidateGroupName:Group Name is not available');
                         }
                     }
                     else {
                         responseMessage.message = 'Group Name is not available';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnValidateGroupName:Group Name is not available');
                     }
                 }
                         else {
                             responseMessage.message = 'Group Name is not available';
-                            responseMessage.error = {};
                             res.status(200).json(responseMessage);
                             console.log('FnValidateGroupName:Group Name is not available');
                         }
                     }
                     else {
                         responseMessage.message = 'Group Name is not available';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnValidateGroupName:Group Name is not available');
                     }
@@ -344,7 +339,6 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'User Response is not updated';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserResponse:User Response is not updated');
                                 }
@@ -469,7 +463,6 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'User Relationship is not updated';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserRelationship:User Relationship is not updated');
                                 }
@@ -569,7 +562,6 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'Group not deleted';
-                        responseMessage.error = null;
                         res.status(200).json(responseMessage);
                         console.log('FnDeleteGroup:Group not deleted');
                     }
@@ -673,7 +665,6 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Message Request not send';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnSendMessageRequest:Message Request not send');
                                 }
@@ -807,7 +798,6 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Message not Composed';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnComposeMessage:Message not Composed');
                                 }
@@ -897,6 +887,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 
                 if (!err) {
                     if (getResult) {
+                        if(getResult[0]){
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Members List loaded successfully';
@@ -906,7 +897,13 @@ MessageBox.prototype.getMembersList = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'Members List not loaded';
-                        responseMessage.error = null;
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetMembersList:Members List not loaded');
+                    }
+
+                }
+                    else {
+                        responseMessage.message = 'Members List not loaded';
                         res.status(200).json(responseMessage);
                         console.log('FnGetMembersList:Members List not loaded');
                     }
@@ -988,7 +985,6 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'MessageBox not loaded';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnLoadMessageBox:MessageBox not loaded');
                     }
@@ -996,7 +992,6 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
                 }
                     else {
                         responseMessage.message = 'MessageBox not loaded';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnLoadMessageBox:MessageBox not loaded');
                     }
@@ -1100,7 +1095,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Message status not changed';
-                                    responseMessage.error = {};
                                     res.status(200).json(responseMessage);
                                     console.log('FnChangeMessageActivity:Message status not changed');
                                 }
@@ -1209,7 +1203,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'OutBox Messages not loaded';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnLoadOutBoxMessages:OutBox Messages not loaded');
                     }
@@ -1228,7 +1221,7 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !';s
+            responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnLoadOutBoxMessages ' + ex.description);
             var errorDate = new Date();
