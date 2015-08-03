@@ -1242,6 +1242,7 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
 MessageBox.prototype.getSuggestionList = function(req,res,next){
     var _this = this;
 
+    var token = req.query.token;
     var keywordsForSearch = req.query.keywordsForSearch;
 
     var responseMessage = {
@@ -1266,40 +1267,63 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
     }
     else {
         try {
-            console.log('CALL pGetMessageboxSuggestionList(' + st.db.escape(keywordsForSearch) + ')');
-            st.db.query('CALL pGetMessageboxSuggestionList(' + st.db.escape(keywordsForSearch) + ')', function (err, getResult) {
-                console.log(getResult);
-
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (getResult) {
-                        if (getResult[0]) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'SuggestionList loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetSuggestionList: SuggestionList loaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'SuggestionList not loaded';
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetSuggestionList:SuggestionList not loaded');
-                        }
+                    if (result) {
+                        var queryParams = st.db.escape(keywordsForSearch) + ','  + st.db.escape(token);
+                        var query = 'CALL pGetMessageboxSuggestionList(' + queryParams + ')'
+                            st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'SuggestionList loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetSuggestionList: SuggestionList loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'SuggestionList not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetSuggestionList:SuggestionList not loaded');
+                                    }
 
+                                }
+                                else {
+                                    responseMessage.message = 'SuggestionList not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetSuggestionList:SuggestionList not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetSuggestionList: error in getting OutBox Messages:' + err);
+                            }
+                        });
                     }
                     else {
-                        responseMessage.message = 'SuggestionList not loaded';
-                        res.status(200).json(responseMessage);
-                        console.log('FnGetSuggestionList:SuggestionList not loaded');
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetSuggestionList: Invalid token');
                     }
                 }
                 else {
-                    responseMessage.message = 'An error occured ! Please try again';
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server : 'Internal server error'
                     };
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnGetSuggestionList: error in getting OutBox Messages:' + err);
+                    console.log('FnGetSuggestionList:Error in processing Token' + err);
                 }
             });
         }
