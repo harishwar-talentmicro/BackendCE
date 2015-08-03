@@ -614,6 +614,10 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var experienceFrom = req.query.experience_from;
         var experienceTo = req.query.experience_to;
         var locationsList = req.query.locations;
+        var educations = req.query.educations ? req.query.educations : '';
+        var specializationId =  req.query.specialization_id ? req.query.specialization_id : '';
+        var instituteId =  req.query.institute_id ? req.query.institute_id : '';
+        var score = req.query.score ? req.query.score : 0;
 
         if (typeof(locationsList) == "string") {
             locationsList = JSON.parse(locationsList);
@@ -655,8 +659,9 @@ Job.prototype.searchJobSeekers = function(req,res) {
             //PROCEDURE `pGetjobseekers`(IN tKeyWordsForSearch text,In tjobtype INT,IN tsalaryfrom DECIMAL(14,2),IN tsalaryTo DECIMAL(14,2),IN tsalarytype INT,In tlocations VARCHAR(150),In tExpfrom DECIMAL(14,2),IN tExpto DECIMAL(14,2))
             locationIds = locationIds.substr(0, locationIds.length - 1);
             var queryParams = st.db.escape(keyword) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
-                + ',' + st.db.escape(salaryType) +
-                ',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom) + ',' + st.db.escape(experienceTo);
+                + ',' + st.db.escape(salaryType) +',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
+                + ',' + st.db.escape(experienceTo)+ ',' + st.db.escape(educations)+ ',' + st.db.escape(specializationId)
+                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(score);
 
 
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
