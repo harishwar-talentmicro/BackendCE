@@ -115,7 +115,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Group is not created';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnCreateMessageGroup:Group is not created');
                                 }
@@ -175,7 +174,8 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
 MessageBox.prototype.validateGroupName = function(req,res,next){
     var _this = this;
 
-    var groupName = req.query.group_name;
+
+    var name = req.query.group_name;
 
     var responseMessage = {
         status: false,
@@ -186,8 +186,8 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!groupName){
-        error['groupName'] = 'Invalid groupName';
+    if(!name){
+        error['name'] = 'Invalid name';
         validateStatus *= false;
     }
 
@@ -198,8 +198,8 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
     }
     else {
         try {
-            console.log('CALL pValidateGroupName(' + st.db.escape(groupName) + ')');
-            st.db.query('CALL pValidateGroupName(' + st.db.escape(groupName) + ')', function (err, getResult) {
+            console.log('CALL pValidateGroupName(' + st.db.escape(name) + ')');
+            st.db.query('CALL pValidateGroupName(' + st.db.escape(name) + ')', function (err, getResult) {
                 console.log(getResult);
 
                 if (!err) {
@@ -210,37 +210,39 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 
                             responseMessage.status = true;
                             responseMessage.error = null;
-                            responseMessage.message = 'Group Name is available';
+                            responseMessage.message = 'Name is available';
                             responseMessage.data = {
-                                groupName : groupName
+                                groupName : name
                             };
                             res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName: Group Name is available');
+                            console.log('FnValidateGroupName: Name is available');
                         }
                         else {
-                            responseMessage.message = 'Group Name is not available';
-                            responseMessage.error = {};
-                            res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName:Group Name is not available');
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Name is available';
+                                    responseMessage.data = {
+                                        id : getResult[0][0].id,
+                                        name : getResult[0][0].name
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnValidateGroupName: Name is available');
                         }
                     }
                     else {
-                        responseMessage.message = 'Group Name is not available';
-                        responseMessage.error = {};
+                        responseMessage.message = 'Name is not available';
                         res.status(200).json(responseMessage);
-                        console.log('FnValidateGroupName:Group Name is not available');
+                        console.log('FnValidateGroupName:Name is not available');
                     }
                 }
                         else {
                             responseMessage.message = 'Group Name is not available';
-                            responseMessage.error = {};
                             res.status(200).json(responseMessage);
                             console.log('FnValidateGroupName:Group Name is not available');
                         }
                     }
                     else {
                         responseMessage.message = 'Group Name is not available';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnValidateGroupName:Group Name is not available');
                     }
@@ -344,7 +346,6 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'User Response is not updated';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserResponse:User Response is not updated');
                                 }
@@ -469,7 +470,6 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'User Relationship is not updated';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserRelationship:User Relationship is not updated');
                                 }
@@ -569,7 +569,6 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'Group not deleted';
-                        responseMessage.error = null;
                         res.status(200).json(responseMessage);
                         console.log('FnDeleteGroup:Group not deleted');
                     }
@@ -673,7 +672,6 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Message Request not send';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnSendMessageRequest:Message Request not send');
                                 }
@@ -807,7 +805,6 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Message not Composed';
-                                    responseMessage.error = null;
                                     res.status(200).json(responseMessage);
                                     console.log('FnComposeMessage:Message not Composed');
                                 }
@@ -897,6 +894,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 
                 if (!err) {
                     if (getResult) {
+                        if(getResult[0]){
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Members List loaded successfully';
@@ -906,7 +904,13 @@ MessageBox.prototype.getMembersList = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'Members List not loaded';
-                        responseMessage.error = null;
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetMembersList:Members List not loaded');
+                    }
+
+                }
+                    else {
+                        responseMessage.message = 'Members List not loaded';
                         res.status(200).json(responseMessage);
                         console.log('FnGetMembersList:Members List not loaded');
                     }
@@ -988,7 +992,6 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'MessageBox not loaded';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnLoadMessageBox:MessageBox not loaded');
                     }
@@ -996,7 +999,6 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
                 }
                     else {
                         responseMessage.message = 'MessageBox not loaded';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnLoadMessageBox:MessageBox not loaded');
                     }
@@ -1100,7 +1102,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Message status not changed';
-                                    responseMessage.error = {};
                                     res.status(200).json(responseMessage);
                                     console.log('FnChangeMessageActivity:Message status not changed');
                                 }
@@ -1201,7 +1202,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
                         }
                         else {
                             responseMessage.message = 'OutBox Messages not loaded';
-                            responseMessage.error = {};
                             res.status(200).json(responseMessage);
                             console.log('FnLoadOutBoxMessages:OutBox Messages not loaded');
                         }
@@ -1209,7 +1209,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
                     }
                     else {
                         responseMessage.message = 'OutBox Messages not loaded';
-                        responseMessage.error = {};
                         res.status(200).json(responseMessage);
                         console.log('FnLoadOutBoxMessages:OutBox Messages not loaded');
                     }
@@ -1228,7 +1227,7 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !';s
+            responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnLoadOutBoxMessages ' + ex.description);
             var errorDate = new Date();
@@ -1238,5 +1237,114 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
 };
 
 
+/**
+ * @todo FnGetSuggestionList
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get Suggestion list
+ */
+
+MessageBox.prototype.getSuggestionList = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var keywordsForSearch = req.query.keywordsForSearch;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!keywordsForSearch){
+        error['keyword'] = 'Invalid keyword';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(keywordsForSearch) + ','  + st.db.escape(token);
+                        var query = 'CALL pGetMessageboxSuggestionList(' + queryParams + ')'
+                            st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'SuggestionList loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetSuggestionList: SuggestionList loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'SuggestionList not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetSuggestionList:SuggestionList not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'SuggestionList not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetSuggestionList:SuggestionList not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetSuggestionList: error in getting OutBox Messages:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetSuggestionList: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetSuggestionList:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetSuggestionList ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = MessageBox;

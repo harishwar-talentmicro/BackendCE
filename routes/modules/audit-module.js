@@ -551,6 +551,8 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
         var BCCMailIDS = req.body.BCCMailIDS;
         var Subject  = req.body.Subject;
         var Body = req.body.Body;
+        var templateType = req.body.template_type ? req.body.template_type : 1; //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer
+        var tid = req.body.tid;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -562,7 +564,8 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
                     if (Result != null) {
 
                         var query = st.db.escape(Token) + ', ' +st.db.escape(Title) + ',' + st.db.escape(FromName) + ',' + st.db.escape(FromEmailID)
-                            + ',' + st.db.escape(CCMailIDS) + ',' + st.db.escape(BCCMailIDS) + ',' + st.db.escape(Subject) + ',' + st.db.escape(Body);
+                            + ',' + st.db.escape(CCMailIDS) + ',' + st.db.escape(BCCMailIDS) + ',' + st.db.escape(Subject)
+                            + ',' + st.db.escape(Body)+ ',' + st.db.escape(templateType)+ ',' + st.db.escape(tid);
                         st.db.query('CALL pSaveMailTemplate(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
@@ -647,13 +650,14 @@ Audit.prototype.getMailTemplate = function(req,res,next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
+        var templateType = req.query.template_type; //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer
 
         if (Token != null) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
 
-                        st.db.query('CALL pgetAllMailtemplate(' + st.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pgetAllMailtemplate(' + st.db.escape(Token) + ',' + st.db.escape(templateType) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult != null) {
                                     if (GetResult[0].length > 0) {
