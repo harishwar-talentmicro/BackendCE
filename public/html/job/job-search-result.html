@@ -41,7 +41,8 @@
                                 <!-- Change Location btn -->
                                 <button type="button"
                                         class="btn btn-info"
-                                        title="Click to change Search Location">
+                                        title="Click to change Search Location"
+                                        ng-click="modalVisibility()">
                                     <i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b>
                                 </button>
                             </div>
@@ -304,7 +305,7 @@
                                 <i class="fa fa-rupee"></i> {{getSalaryRange(job.salaryfrom,job.salaryto)}}
                             </div>
                             <div class="posted-on text-right col-lg-5">
-                                <i class="fa fa-clock-o"></i> {{job.LUdate}}
+                                <i class="fa fa-clock-o"></i> {{job.LUdate | ageFilter}}
                             </div>
                         </div>
                     </div>
@@ -339,6 +340,17 @@
     <div class="hidden">
         {{jsTileHoverEffect()}}
     </div>
+    <!-- Modal Box content for map -->
+    <modal mtitle="modal.title" mclass="modal.class" visible="modalVisible">
+        <div class="row">
+            <!-- Map goes here -->
+            <div id="modal-map-ctrl" class="col-lg-12"></div>
+            <!-- Map ends here -->
+            <div class="col-lg-12 text-right">
+                <button class="btn btn-info text-right" ng-click="modalVisibility()">OK</button>
+            </div>
+        </div>
+    </modal>
     <!-- Footer goes here -->
     <footer-section></footer-section>
 </section>
