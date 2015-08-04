@@ -62,7 +62,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(!groupName){
+    if(parseInt(groupName) == NaN){
         error['groupName'] = 'Invalid groupName';
         validateStatus *= false;
     }
@@ -87,12 +87,13 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                         st.db.query(query, function (err, insertResult) {
                             console.log(insertResult);
                             if (!err) {
-                                if (insertResult) {
+                                if (insertResult[0]) {
 
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Group created successfully';
                                     responseMessage.data = {
+                                        id : insertResult[0][0].ID,
                                         token: req.body.token,
                                         groupName: req.body.group_name,
                                         groupType: req.body.group_type,

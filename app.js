@@ -209,6 +209,7 @@ app.get('/applied_job',LocationManager.FnGetAppliedJob);
 app.get('/job_country',LocationManager.FnGetJobcountry);
 app.get('/job_city',LocationManager.FnGetjobcity);
 app.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
+app.get('/alarm_messages',LocationManager.FnGetAlarmMessages);
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);
 app.get('/validate_groupname',LocationManager.FnValidateGroupName);
