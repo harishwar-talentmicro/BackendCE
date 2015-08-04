@@ -485,8 +485,10 @@
             // send sales enquiry mail
             $scope.SendJobSeekerMail = function () {
 
+                $scope.$emit('$preLoaderStart');
                 if($scope.selectedTidToMail.length > 10)
                 {
+                    $scope.$emit('$preLoaderStop');
                     Notification.error({ message: 'Maximum Limit: 10 Job Seeker…', delay: MsgDelay });
                 }
                 else
@@ -504,24 +506,27 @@
                             }
                         }).success(function (data)
                             {
+                                $scope.$emit('$preLoaderStop');
                                 if (data != 'null')
                                 {
                                     clearSearchFilter();
 
                                     $scope.showCreateMailTemplate = false;
-
                                     document.getElementById("FromName").className = "form-control emptyBox";
                                     document.getElementById("FromEmailID").className = "form-control emptyBox";
                                     document.getElementById("Title").className = "form-control emptyBox";
                                     document.getElementById("Subject").className = "form-control emptyBox";
                                     document.getElementById("Body").className = "form-control emptyBox";
-
                                     Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
                                 }
-
+                            }).error(function(err){
+                                $scope.$emit('$preLoaderStop');
                             });
+                        $scope.$emit('$preLoaderStop');
                     }
-                    else {
+                    else
+                    {
+                        $scope.$emit('$preLoaderStop');
                         Notification.error({message: "Please select a Job Seeker !", delay: MsgDelay});
                     }
                 }
