@@ -947,8 +947,7 @@
                  * to make ui and requested data consistent
                  */
 
-                console.log($scope.userFolders);
-                console.log($scope.myFolders);
+
                 var folderRuleArr = [];
                 for(var i = 0; i < $scope.myFolders.length; i++){
                     folderRuleArr.push($scope.myFolders[i].id);
