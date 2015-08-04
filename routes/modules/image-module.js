@@ -358,4 +358,113 @@ Image.prototype.imageURL = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetPictureOfEzeid
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get picture of ezeid
+ */
+Image.prototype.getPictureOfEzeid = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(ezeone_id);
+                        var query = 'CALL pgetpictureofEZEID(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Picture loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetPictureOfEzeid: Picture loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Picture not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetPictureOfEzeid:Picture not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'Picture not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetPictureOfEzeid:Picture not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetPictureOfEzeid: error in getting picture:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetPictureOfEzeid: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetPictureOfEzeid:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetPictureOfEzeid ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 module.exports = Image;

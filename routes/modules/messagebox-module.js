@@ -922,8 +922,6 @@ MessageBox.prototype.getMembersList = function(req,res,next){
     }
 };
 
-
-
 /**
  * @todo FnLoadMessageBox
  * Method : Get
@@ -932,7 +930,6 @@ MessageBox.prototype.getMembersList = function(req,res,next){
  * @param next
  * @description api code for load messageBox
  */
-
 MessageBox.prototype.loadMessageBox = function(req,res,next){
     var _this = this;
 
@@ -1009,8 +1006,6 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
         }
     }
 };
-
-
 
 /**
  * @todo FnChangeMessageActivity
@@ -1133,7 +1128,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnLoadOutBoxMessages
  * Method : Get
@@ -1142,7 +1136,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
  * @param next
  * @description api code for load outbox messages
  */
-
 MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
     var _this = this;
 
@@ -1219,7 +1212,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetSuggestionList
  * Method : Get
@@ -1228,7 +1220,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
  * @param next
  * @description api code for get Suggestion list
  */
-
 MessageBox.prototype.getSuggestionList = function(req,res,next){
     var _this = this;
 
@@ -1330,15 +1321,13 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
     }
 };
 
-
-
 /**
  * @todo FnAddGroupMembers
  * Method : POST
  * @param req
  * @param res
  * @param next
- * @description api code for create message group
+ * @description api code for Add Group Members
  */
 MessageBox.prototype.addGroupMembers = function(req,res,next){
 

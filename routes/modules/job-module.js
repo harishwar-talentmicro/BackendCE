@@ -69,7 +69,8 @@ Job.prototype.create = function(req,res,next){
         locationsList = JSON.parse(locationsList);
     }
     var location_id = '';
-
+    console.log('******************');
+    console.log(locationsList);
     var responseMessage = {
         status: false,
         error: {},
@@ -227,24 +228,36 @@ Job.prototype.create = function(req,res,next){
                                 location_title: locationDetails.location_title,
                                 latitude: locationDetails.latitude,
                                 longitude: locationDetails.longitude,
-                                country: locationDetails.country
+                                country: locationDetails.country,
+                                maptype : locationDetails.maptype
                             };
+
+                            console.log(list);
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country);
+                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
 
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
-
+                                console.log(results);
                                 if (results) {
                                     if (results[0]) {
                                         if (results[0][0]) {
 
                                             console.log(results[0][0].id);
+
                                             location_id += results[0][0].id + ',';
                                             locCount +=1;
+                                            console.log('---------------');
+                                            console.log(location_id);
+                                            console.log(locCount);
+                                            console.log('---------------********');
+                                            console.log(locationsList.length);
                                             if(locCount < locationsList.length){
+                                                console.log('sucess..............1');
                                                 insertLocations(locationsList[locCount]);
                                             }
                                             else{
+                                                console.log('sucess..............2');
+                                                console.log(location_id);
                                                 createJobPosting();
                                             }
                                         }
@@ -448,11 +461,21 @@ Job.prototype.getAll = function(req,res,next){
     }
     };
 
+/**
+ * @todo FnGetJobLocations
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description  api code for job locations
+ */
 Job.prototype.getJobLocations = function(req,res,next){
-    /**
-     * @todo FnGetJobLocations
-     */
+
     var _this = this;
+
+    var token = req.query.token;
+    var mapType = req.query.map_type;
+
     var responseMsg = {
         status : false,
         data : [],
@@ -1195,7 +1218,97 @@ Job.prototype.getAppliedJob = function(req,res,next){
 };
 
 
+/**
+ * @todo FnGetJobcountry
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description  api code for job locations
+ */
+Job.prototype.getJobcountry = function(req,res,next){
 
+    var _this = this;
+
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to load Job country ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        st.db.query('CALL pGetJobcountryList()',function(err,result){
+            if(err){
+                console.log('Error : FnGetJobcountry: '+ err);
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'Country loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnGetJobcountry '+ ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+/**
+ * @todo FnGetjobcity
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description  api code for job locations
+ */
+Job.prototype.getjobcity = function(req,res,next){
+
+    var _this = this;
+
+    var countryTitle = req.query.country_title;
+
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to Get job city ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        st.db.query('CALL pGetjobcities(' + st.db.escape(countryTitle) + ')',function(err,result){
+            if(err){
+                console.log('Error : FnGetjobcity: '+ err);
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'City loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnGetjobcity '+ ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
 
 
 
