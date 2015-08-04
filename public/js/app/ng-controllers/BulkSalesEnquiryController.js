@@ -116,6 +116,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
     salesEnquiry.saveMailTemplate = function () {
 
         salesEnquiry._info.Token = $rootScope._userInfo.Token;
+        salesEnquiry._info.template_type = 1;//TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer
 
         if(isValidate())
         {
@@ -202,7 +203,11 @@ angular.module('ezeidApp').controller('bulksalesController',[
     {
         $http({
             method: 'get',
-            url: GURL + 'ewtTemplateList?Token=' + $rootScope._userInfo.Token
+            url: GURL + 'ewtTemplateList',
+            params : {
+                Token : $rootScope._userInfo.Token,
+                template_type : 1 //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer
+            }
         }).success(function (data) {
                 if(data !== "null")
                 {

@@ -40,6 +40,8 @@
                   UtilityService)
         {
 
+            $scope.validationMode = 0;
+
             clearSearchFilter();
 
             function clearSearchFilter()
@@ -60,11 +62,11 @@
                 $scope.score = "";
             }
 
-
             getEducations();
             getSpecialization();
             getInstituteList();
             getCityList();
+            getTemplateList();
 
             /**
              * Hide all the open dropdown
@@ -249,6 +251,7 @@
              */
             $scope.searchJobSeeker = function()
             {
+                $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'job_seeker_search',
                     method : 'GET',
@@ -267,10 +270,190 @@
                         score : $scope.score
                     }
                 }).success(function(resp){
-                        $scope.instituteList = resp.data;
+                        console.log(resp);
+                        console.log("SAi nath...");
+                        //$scope.instituteList = resp.data;
+                        $scope.$emit('$preLoaderStop');
                 })
                 .error(function(err){
+                        $scope.$emit('$preLoaderStop');
                 });
+            };
+
+            // Create new mail template
+            $scope.addNewTemplateForm = function (_NewEdit) {
+                if(_NewEdit == 'new')
+                {
+                    $scope.validationMode = 1;
+                    // window.location.href = "#/create-template";
+                    $scope.FromName = "";
+                    $scope.FromEmailID = "";
+                    $scope.Title = "";
+                    $scope.Subject = "";
+                    $scope.Body = "";
+                    $scope.TID = "";
+                    $scope.CCMailIDS = "";
+                    $scope.BCCMailIDS = "";
+                   $scope.showCreateMailTemplate = true;
+                }
+                else
+                {
+                    $scope.validationMode = 2;
+                    $scope.showCreateMailTemplate = true;
+                }
+            };
+
+            // Close Create Mail Template Form
+            $scope.closeCreateMailTemplateForm = function () {
+                $scope.formTitle = "Bulk Sales Enquiry";
+                $scope.showCreateMailTemplate = false;
+                $scope.validationMode = 0;
+
+                $scope.FromName = "";
+                $scope.FromEmailID = "";
+                $scope.Title = "";
+                $scope.Subject = "";
+                $scope.Body = "";
+                $scope.TID = "";
+                $scope.CCMailIDS = "";
+                $scope.BCCMailIDS = "";
+            };
+
+            // Validation function for creating mail template
+            function isValidate()
+            {
+                var notificationMessage = "";
+                var errorList  = [];
+                // Check validations
+                if(!$scope.Title)
+                {
+                    errorList.push('Template title is Required');
+                }
+
+                if(!$scope.FromName)
+                {
+                    errorList.push('From name Required');
+                }
+                if(!$scope.FromEmailID)
+                {
+                    errorList.push('From email is Required');
+                }
+                if(!$scope.Subject)
+                {
+                    errorList.push('Subject is Required');
+                }
+                if(!$scope.Body)
+                {
+                    errorList.push('Body is Required');
+                }
+                if($scope.isWrongEmailPatternFrom)
+                {
+                    errorList.push('Not valid email!');
+                }
+                if($scope.isWrongEmailPatternCc)
+                {
+                    errorList.push('Not valid email!');
+                }
+                if($scope.isWrongEmailPatternBcc)
+                {
+                    errorList.push('Not valid email!');
+                }
+                if(errorList.length>0){
+                    for(var i = errorList.length; i>0;i--)
+                    {
+                        Notification.error({ message: errorList[i-1], delay: MsgDelay });
+                    }
+                };
+                //Return false if errorList is greater than zero
+                return (errorList.length>0)? false : true;
+            }
+            $scope.mailTemplateTid = 0;
+            // save mail template
+            $scope.saveMailTemplate = function () {
+
+                $scope.Token = $rootScope._userInfo.Token;
+
+                if(isValidate())
+                {
+                    $http({ method: 'post',
+                        url: GURL + 'ewtTemplateDetails',
+                        data :{
+                                Token : $rootScope._userInfo.Token,
+                                Title : $scope.Title,
+                                FromName : $scope.FromName,
+                                FromEmailID : $scope.FromEmailID,
+                                CCMailIDS : $scope.CCMailIDS,
+                                BCCMailIDS : $scope.BCCMailIDS,
+                                Subject : $scope.Subject,
+                                Body : $scope.Body,
+                                template_type  : 2, //(TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer), tid <int> [while creating time tid is 0]
+                                tid :  $scope.mailTemplateTid
+                             }
+                    }).success(function (data)
+                        {
+                            if (data != 'null') {
+                                //salesEnquiry._info = {};
+
+                                $scope.FromName = "";
+                                $scope._info.FromEmailID = "";
+                                $scope.Title = "";
+                                $scope.Subject = "";
+                                $scope.Body = "";
+                                $scope.mailTemplateTid = "";
+                                $scope.CCMailIDS = "";
+                                $scope.BCCMailIDS = "";
+
+                                getTemplateList();
+                                Notification.success({ message: 'Template save success...', delay: MsgDelay });
+                                $scope.showCreateMailTemplate = false;
+                                $scope.validationMode = 0;
+                            }
+                            else {
+                                // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
+
+                            }
+                        });
+                }
+            };
+
+            // Api call for getting list of all mail templates, for displaing in dropdown
+            function getTemplateList()
+            {
+                $http({
+                    method: 'get',
+                    url: GURL + 'ewtTemplateList',
+                    params : {
+                        Token : $rootScope._userInfo.Token,
+                        template_type : 2 //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer
+                    }
+                }).success(function (data) {
+
+                        if(data !== "null")
+                        {
+                            if($rootScope._userInfo.Token == false) {
+                                var _obj = { TID: 0, Title: '--Select Template--' };
+                                data.splice(0, 0, _obj);
+                                $scope.mailTemplateTid = _obj.TID;
+                            }
+                            $scope.templates = data;
+                        }
+                    });
+            }
+
+            // get template details
+            $scope.getTemplateDetails = function (Tid) {
+
+                if(Tid != undefined)
+                {
+                    $http({
+                        method: 'get',
+                        url: GURL + 'ewtTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid}).success(function (data) {
+                            if(data !== "null")
+                            {
+                                salesEnquiry._info = data[0];
+                            }
+                        });
+                }
             };
 
 

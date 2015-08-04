@@ -108,7 +108,7 @@
                 return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
             };
 
-            // Get all location list
+            /*// Get all location list
             function getLocationList()
             {
                 $http({
@@ -124,7 +124,7 @@
                 }).error(function(err){
                     //  defer.reject();
                 });
-            }
+            }*/
 
             $scope.ResumeInquiriesTab = false;
             $scope.JobsTab = true;
@@ -483,7 +483,8 @@
                     "location_title" : $scope.jobLocation,
                     "latitude" :  $scope.jobLat,
                     "longitude" : $scope.jobLong,
-                    "country" : $scope.country
+                    "country" : $scope.country,
+                    "maptype" : 0
                 };
 
                 $scope.mainLocationArray.push(tempLocationArray);
