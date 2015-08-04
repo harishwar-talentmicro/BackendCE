@@ -57,6 +57,7 @@
             $scope.selectedEducations = [];
             $scope.selectedSpecializations = [];
             $scope.selectedInstitute = [];
+            var placeDetail = [];
 
             /**
              * Hide all the open dropdown
@@ -107,7 +108,7 @@
                 return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
             };
 
-            // Get all location list
+            /*// Get all location list
             function getLocationList()
             {
                 $http({
@@ -123,37 +124,21 @@
                 }).error(function(err){
                     //  defer.reject();
                 });
-            }
+            }*/
 
-            /**
-             * select Resume Inquiries Tab
-             */
-           /* $scope.TabResumeInquiries = function(){
-                $scope.ResumeInquiriesTab = true;
-                $scope.JobsTab = false;
-                $scope.JobSeekerTab = false;
-            };*/
+            $scope.ResumeInquiriesTab = false;
+            $scope.JobsTab = true;
+            $scope.JobSeekerTab = false;
+            $scope.showJobListing = true;
 
-            /**
-             * select Post Job Tab
-             */
-          //  $scope.TabPostJob = function(){
-                $scope.ResumeInquiriesTab = false;
-                $scope.JobsTab = true;
-                $scope.JobSeekerTab = false;
-                $scope.showJobListing = true;
+            $scope.jobSearchTerm= "";
+            $scope.jobFilterStatus = 0;
+            //Per page record is 10
+            $scope.page_size = 10;
+            $scope.page_count = 0;
+            $scope.order_by = 1;
 
-                $scope.jobSearchTerm= "";
-                $scope.jobFilterStatus = 0;
-                //Per page record is 10
-                $scope.page_size = 10;
-                $scope.page_count = 0;
-                $scope.order_by = 1;
-
-                getPostedJob();
-
-                // getLocationList();
-            //};
+            getPostedJob();
 
             /**
              * select Job Seeker Tab
@@ -163,7 +148,6 @@
                 $scope.JobsTab = false;
                 $scope.JobSeekerTab = true;
             };
-
 
             /**
              * search for job term
@@ -419,18 +403,12 @@
                         $scope.jobStatus = $scope.jobData[_index].status;
                         $scope.jobCategori = parseInt($scope.jobData[_index].jobcategory);
 
-                        console.log("sai111");
-                        console.log($scope.jobData[_index].locationArray);
-
                         for (var nCount = 0; nCount < $scope.jobData[_index].locationArray.length; nCount++)
                         {
                             //delete $scope.jobData[_index].locationArray[nCount].jobid;
                             $scope.mainLocationArray.push($scope.jobData[_index].locationArray[nCount]);
                             $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].Locname);
                         }
-
-                        console.log("sai222");
-                        console.log($scope.jobData[_index].locationArray);
 
                         $scope.EducationArray = $scope.jobData[_index].Education.split(',');
                         for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
@@ -472,32 +450,10 @@
             $scope.locationArrayString = [];
             $scope.mainLocationArray = [];
 
-            //For fatching location to post job
-            var googleMap = new GoogleMap();
-            googleMap.addSearchBox('google-map-search-box');
-            //   googleMap.addSearchBox('google-map-search-box1');
-            googleMap.listenOnMapControls(null,function(lat,lng){
-                $scope.jobLat = lat;
-                $scope.jobLong = lng;
-                googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                    if(resp.data){
-                        var data = googleMap.parseReverseGeolocationData(resp.data);
-                        $scope.jobLocation = data.city;
-                        $scope.country = data.country;
-                    }
-                    else{
-                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                    }
-                },function(){
-                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                    defer.resolve();
-                });
-            },false);
-
             /***
              * Pre settings
              */
-            $scope.salaryTypeArray = ['per Hour', 'per Month', 'per Annual'];
+            $scope.salaryTypeArray = ['Per Hour', 'Per Month', 'Per Annual'];
             $scope.activeSalaryType = 1;
 
             /**
@@ -527,18 +483,14 @@
                     "location_title" : $scope.jobLocation,
                     "latitude" :  $scope.jobLat,
                     "longitude" : $scope.jobLong,
-                    "country" : $scope.country
+                    "country" : $scope.country,
+                    "maptype" : 0
                 };
 
                 $scope.mainLocationArray.push(tempLocationArray);
                 $scope.locationArrayString.push($scope.jobLocation);
                 $scope.jobLocation = "";
             }
-
-            $scope.candidateModalBox = {
-                title : 'View Candidate',
-                class : 'business-manager-modal'
-            };
 
             // Open popup - list of candidate who applied for job
             $scope.openCandidateListPopup = function(_jobID,_totalapplie)
@@ -667,6 +619,145 @@
 
             };
 
+            /**
+             * Load map in the modal box to change the preferred search location
+             * @type {boolean}
+             */
+            var isMapInitialized = false;
+            $scope.modalVisible = false;
+            $scope.modalVisibility = function () {
+                /* toggle map visibility status */
+                $scope.modalVisible = !$scope.modalVisible;
+            };
+
+            $scope.$watch('modalVisible', function (newVal, oldVal) {
+                if (newVal) {
+                    /* check for the map initialzation */
+                    if (!isMapInitialized) {
+                        initializeMap();
+                        isMapInitialized = true;
+                    }
+                    else {
+                        $timeout(function () {
+                            $scope.googleMap.resizeMap();
+                            $scope.googleMap.setMarkersInBounds();
+                        }, 1500);
+                    }
+                }
+            });
+
+            /* modal box for loading map and change the searched map loacaion */
+            $scope.modal = {
+                title: 'Set Job Location',
+                class: 'business-manager-modal'
+            };
+
+            var handleNoGeolocation = function () {};
+
+            $scope.googleMap = new GoogleMap();
+            $scope.googleMap.addSearchBox('google-map-search-box');
+            $scope.googleMap.listenOnMapControls(null,function(lat,lng)
+            {
+                $scope.jobLat = lat;
+                $scope.jobLong = lng;
+
+                $scope.googleMap.getReverseGeolocation(lat,lng).then(function(resp)
+                {
+                    if(resp.data)
+                    {
+                        var data = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                        $scope.jobLocation = data.city;
+                        $scope.country = data.country;
+                    }
+                    else
+                    {
+                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                    }
+                },function()
+                {
+                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                    defer.resolve();
+                });
+            },false);
+
+            /* Callback function for get current location functionality */
+            $scope.findCurrentLocation = function(){
+                $scope.googleMap.getCurrentLocation().then(function(){
+                    $scope.googleMap.placeCurrentLocationMarker(null,null,true);
+                },function(){
+                    $scope.googleMap.placeCurrentLocationMarker(null,null,true);
+                });
+            };
+
+            /* Load the map in the modal box */
+            /* Google map integration */
+            var initializeMap = function () {
+                $scope.googleMap.setSettings({
+                    mapElementClass: "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
+                    searchElementClass: "form-control pull-left pac-input",
+                    currentLocationElementClass: "link-btn pac-loc",
+                    controlsContainerClass: "col-lg-6 col-md-6'"
+                });
+                $scope.googleMap.createMap("modal-map-ctrl", $scope, "findCurrentLocation()");
+
+                $scope.googleMap.renderMap();
+                $scope.googleMap.mapIdleListener().then(function () {
+                    $scope.googleMap.pushMapControls();
+                    $scope.googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
+
+                    /* place the present location marker on map */
+                    if($routeParams['lat']){
+                        $scope.googleMap.currentMarkerPosition.latitude = $routeParams['lat'];
+                        $scope.googleMap.currentMarkerPosition.longitude = $routeParams['lng'];
+                        $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
+
+                        /* if this modal box map is opened from search result page: Add marker for additional */
+                        $scope.googleMap.resizeMap();
+                    }
+                    else{
+                        $scope.googleMap.getCurrentLocation().then(function (e) {
+
+                            $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
+
+                            /* if this modal box map is opened from search result page: Add marker for additional */
+                            $scope.googleMap.resizeMap();
+                            $scope.googleMap.setMarkersInBounds();
+                        }, function () {
+
+                        });
+                    }
+                });
+            };
+
+            /* update the coordinates on drag event of map marker */
+            var getNewCoordinates = function (lat, lng) {
+
+                $scope.jobLat = lat;
+                $scope.jobLong = lng;
+
+                /* get new location string */
+                $scope.googleMap.getReverseGeolocation(lat, lng).then(function (resp) {
+                    if (resp)
+                    {
+                        placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+
+                        var options = {
+                            route : true,
+                            sublocality3 : true,
+                            sublocality2 : true,
+                            area : true,
+                            city : true,
+                            state : true,
+                            country : false,
+                            postalCode : false
+                        };
+                        $scope.locationString = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
+                        $scope.location = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
+                        $scope.jobLocation = placeDetail.city;
+                        $scope.country = placeDetail.country;
+                    }
+                });
+            };
 
         }]);
 })();

@@ -552,7 +552,7 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
         var Subject  = req.body.Subject;
         var Body = req.body.Body;
         var templateType = req.body.template_type ? req.body.template_type : 1; //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer
-        var tid = req.body.tid;
+        var tid = req.body.tid ? req.body.tid : 0;
 
         var RtnMessage = {
             IsSuccessfull: false
@@ -566,6 +566,8 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
                         var query = st.db.escape(Token) + ', ' +st.db.escape(Title) + ',' + st.db.escape(FromName) + ',' + st.db.escape(FromEmailID)
                             + ',' + st.db.escape(CCMailIDS) + ',' + st.db.escape(BCCMailIDS) + ',' + st.db.escape(Subject)
                             + ',' + st.db.escape(Body)+ ',' + st.db.escape(templateType)+ ',' + st.db.escape(tid);
+
+                        console.log('CALL pSaveMailTemplate(' + query + ')');
                         st.db.query('CALL pSaveMailTemplate(' + query + ')', function (err, InsertResult) {
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {

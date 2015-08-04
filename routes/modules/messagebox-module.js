@@ -47,8 +47,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var groupType  = req.body.group_type;
     var aboutGroup  = req.body.about_group ? req.body.about_group : '';
     var autoJoin  = req.body.auto_join ? req.body.auto_join : 0;
-    var memberID  = req.body.member_id;
-    var relationType = req.body.relation_type;
     var tid = req.body.tid ? req.body.tid : 0;
 
     var responseMessage = {
@@ -64,19 +62,14 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(!groupName){
+    if(parseInt(groupName) == NaN){
         error['groupName'] = 'Invalid groupName';
         validateStatus *= false;
     }
     if(!groupType){
-        error['groupName'] = 'Invalid groupName';
+        error['groupType'] = 'Invalid groupType';
         validateStatus *= false;
     }
-    if(!memberID){
-        error['groupName'] = 'Invalid groupName';
-        validateStatus *= false;
-    }
-
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -88,26 +81,24 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(groupName) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
-                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(memberID)
-                            + ',' + st.db.escape(relationType) + ',' + st.db.escape(tid);
+                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(tid);
                         var query = 'CALL pCreateMessageGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
                             console.log(insertResult);
                             if (!err) {
-                                if (insertResult) {
+                                if (insertResult[0]) {
 
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Group created successfully';
                                     responseMessage.data = {
+                                        id : insertResult[0][0].ID,
                                         token: req.body.token,
                                         groupName: req.body.group_name,
                                         groupType: req.body.group_type,
                                         aboutGroup: req.body.about_group,
                                         autoJoin: req.body.auto_join,
-                                        memberID: req.body.member_id,
-                                        relationType: req.body.relation_type,
                                         tid: req.body.tid
                                     };
                                     res.status(200).json(responseMessage);
@@ -176,6 +167,8 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 
 
     var name = req.query.group_name;
+    var token = req.query.token;
+    var groupType = req.query.group_type ? req.query.group_type : 0;
 
     var responseMessage = {
         status: false,
@@ -190,6 +183,10 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
         error['name'] = 'Invalid name';
         validateStatus *= false;
     }
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
 
     if(!validateStatus){
         responseMessage.error = error;
@@ -198,36 +195,29 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
     }
     else {
         try {
-            console.log('CALL pValidateGroupName(' + st.db.escape(name) + ')');
-            st.db.query('CALL pValidateGroupName(' + st.db.escape(name) + ')', function (err, getResult) {
+            var queryParams = st.db.escape(name) + ',' +  st.db.escape(token)+ ',' +  st.db.escape(groupType);
+            var query = 'CALL pValidateGroupName(' + queryParams + ')';
+            st.db.query(query, function (err, getResult) {
                 console.log(getResult);
 
                 if (!err) {
                     if (getResult) {
                         if(getResult[0]){
                             if(getResult[0][0]){
-                                if(getResult[0][0].id == 0){
+                                //if(getResult[0][0].message == -1){
 
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Name is available';
-                            responseMessage.data = {
-                                groupName : name
-                            };
+                            responseMessage.data = getResult[0];
                             res.status(200).json(responseMessage);
                             console.log('FnValidateGroupName: Name is available');
                         }
-                        else {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Name is available';
-                                    responseMessage.data = {
-                                        id : getResult[0][0].id,
-                                        name : getResult[0][0].name
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnValidateGroupName: Name is available');
-                        }
+                            else {
+                                responseMessage.message = 'Name is not available';
+                                res.status(200).json(responseMessage);
+                                console.log('FnValidateGroupName:Name is not available');
+                            }
                     }
                     else {
                         responseMessage.message = 'Name is not available';
@@ -235,12 +225,6 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                         console.log('FnValidateGroupName:Name is not available');
                     }
                 }
-                        else {
-                            responseMessage.message = 'Group Name is not available';
-                            res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName:Group Name is not available');
-                        }
-                    }
                     else {
                         responseMessage.message = 'Group Name is not available';
                         res.status(200).json(responseMessage);
@@ -939,8 +923,6 @@ MessageBox.prototype.getMembersList = function(req,res,next){
     }
 };
 
-
-
 /**
  * @todo FnLoadMessageBox
  * Method : Get
@@ -949,7 +931,6 @@ MessageBox.prototype.getMembersList = function(req,res,next){
  * @param next
  * @description api code for load messageBox
  */
-
 MessageBox.prototype.loadMessageBox = function(req,res,next){
     var _this = this;
 
@@ -1026,8 +1007,6 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
         }
     }
 };
-
-
 
 /**
  * @todo FnChangeMessageActivity
@@ -1150,7 +1129,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnLoadOutBoxMessages
  * Method : Get
@@ -1159,7 +1137,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
  * @param next
  * @description api code for load outbox messages
  */
-
 MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
     var _this = this;
 
@@ -1236,7 +1213,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetSuggestionList
  * Method : Get
@@ -1245,7 +1221,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
  * @param next
  * @description api code for get Suggestion list
  */
-
 MessageBox.prototype.getSuggestionList = function(req,res,next){
     var _this = this;
 
@@ -1346,5 +1321,92 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
         }
     }
 };
+
+/**
+ * @todo FnAddGroupMembers
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for Add Group Members
+ */
+MessageBox.prototype.addGroupMembers = function(req,res,next){
+
+    var _this = this;
+
+    var groupId = req.body.group_id;
+    var memberId  = req.body.member_id;
+    var relationType  = req.body.relation_type;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!groupId){
+        error['groupId'] = 'Invalid groupId';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberId) + ',' + st.db.escape(relationType);
+            var query = 'CALL pAddMemberstoGroup(' + queryParams + ')';
+            console.log(query);
+            st.db.query(query, function (err, insertResult) {
+                console.log(insertResult);
+                if (!err) {
+                    if (insertResult) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Group Members added successfully';
+                        responseMessage.data = {
+                            groupId: groupId,
+                            memberId: memberId,
+                            relationType: relationType
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnAddGroupMembers: Group Members added successfully');
+                    }
+                    else {
+                        responseMessage.message = 'Group Members not added';
+                        res.status(200).json(responseMessage);
+                        console.log('FnAddGroupMembers:Group Members not added');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnAddGroupMembers: error in adding GroupMembers :' + err);
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnAddGroupMembers ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 module.exports = MessageBox;
