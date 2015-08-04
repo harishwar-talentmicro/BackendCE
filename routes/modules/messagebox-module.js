@@ -176,6 +176,8 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 
 
     var name = req.query.group_name;
+    var token = req.query.token;
+    var groupType = req.query.group_type ? req.query.group_type : 0;
 
     var responseMessage = {
         status: false,
@@ -190,6 +192,10 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
         error['name'] = 'Invalid name';
         validateStatus *= false;
     }
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
 
     if(!validateStatus){
         responseMessage.error = error;
@@ -198,36 +204,29 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
     }
     else {
         try {
-            console.log('CALL pValidateGroupName(' + st.db.escape(name) + ')');
-            st.db.query('CALL pValidateGroupName(' + st.db.escape(name) + ')', function (err, getResult) {
+            var queryParams = st.db.escape(name) + ',' +  st.db.escape(token)+ ',' +  st.db.escape(groupType);
+            var query = 'CALL pValidateGroupName(' + queryParams + ')';
+            st.db.query(query, function (err, getResult) {
                 console.log(getResult);
 
                 if (!err) {
                     if (getResult) {
                         if(getResult[0]){
                             if(getResult[0][0]){
-                                if(getResult[0][0].id == 0){
+                                //if(getResult[0][0].message == -1){
 
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Name is available';
-                            responseMessage.data = {
-                                groupName : name
-                            };
+                            responseMessage.data = getResult[0];
                             res.status(200).json(responseMessage);
                             console.log('FnValidateGroupName: Name is available');
                         }
-                        else {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Name is available';
-                                    responseMessage.data = {
-                                        id : getResult[0][0].id,
-                                        name : getResult[0][0].name
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnValidateGroupName: Name is available');
-                        }
+                            else {
+                                responseMessage.message = 'Name is not available';
+                                res.status(200).json(responseMessage);
+                                console.log('FnValidateGroupName:Name is not available');
+                            }
                     }
                     else {
                         responseMessage.message = 'Name is not available';
@@ -235,12 +234,6 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                         console.log('FnValidateGroupName:Name is not available');
                     }
                 }
-                        else {
-                            responseMessage.message = 'Group Name is not available';
-                            res.status(200).json(responseMessage);
-                            console.log('FnValidateGroupName:Group Name is not available');
-                        }
-                    }
                     else {
                         responseMessage.message = 'Group Name is not available';
                         res.status(200).json(responseMessage);
