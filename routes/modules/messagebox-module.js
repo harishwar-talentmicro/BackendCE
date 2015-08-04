@@ -255,14 +255,14 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 };
 
 /**
- * @todo FnUpdateUserResponse
+ * @todo FnUpdateUserStatus
  * Method : PUT
  * @param req
  * @param res
  * @param next
- * @description api code for Update User Response
+ * @description api code for Update User status
  */
-MessageBox.prototype.updateUserResponse = function(req,res,next){
+MessageBox.prototype.updateUserStatus = function(req,res,next){
 
     var _this = this;
 
@@ -326,12 +326,12 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
 
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnUpdateUserResponse: User Response updated successfully');
+                                    console.log('FnUpdateUserStatus: User Response updated successfully');
                                 }
                                 else {
                                     responseMessage.message = 'User Response is not updated';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnUpdateUserResponse:User Response is not updated');
+                                    console.log('FnUpdateUserStatus:User Response is not updated');
                                 }
                             }
 
@@ -341,7 +341,7 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnUpdateUserResponse: error in updating user response :' + err);
+                                console.log('FnUpdateUserStatus: error in updating user response :' + err);
                             }
                         });
                     }
@@ -352,7 +352,7 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
                         };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('FnUpdateUserResponse: Invalid token');
+                        console.log('FnUpdateUserStatus: Invalid token');
                     }
                 }
                 else {
@@ -361,7 +361,7 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnUpdateUserResponse:Error in processing Token' + err);
+                    console.log('FnUpdateUserStatus:Error in processing Token' + err);
                 }
             });
         }
@@ -371,7 +371,7 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !'
             res.status(500).json(responseMessage);
-            console.log('Error : FnUpdateUserResponse ' + ex.description);
+            console.log('Error : FnUpdateUserStatus ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

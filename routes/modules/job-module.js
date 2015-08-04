@@ -1317,16 +1317,23 @@ Job.prototype.getjobcity = function(req,res,next){
  * @param res
  * @param next
  * @description api code for Get Job Seekers Mail Details
- */
+*/
 Job.prototype.getJobSeekersMailDetails = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var tid = areq.query.tid;
+    var ids = req.query.ids;
+    var templateId = req.query.template_id;
+    var id,i;
 
+    if(ids){
+        id = ids.split(",");
+        console.log(id.length);
+        console.log(id);
+    }
 
     var responseMessage = {
-        status: false,
+        status: true,
         error: {},
         message: '',
         data: null
@@ -1346,49 +1353,130 @@ Job.prototype.getJobSeekersMailDetails = function(req,res,next){
     }
     else {
         try {
-            var queryParams = st.db.escape(token) + ',' + st.db.escape(tid);
-            var query = 'CALL pGetAppliedJobs(' + queryParams + ')';
-            console.log(query);
-            st.db.query(query, function (err, getResult) {
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (getResult) {
-                        if(getResult[0].length){
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Applied job List loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnAppliedJobList: Applied job List loaded successfully');
+                    if (result) {
+                        for (i = 0; i < id.length; ++i) {
+                            var tid = id[i];
+                            console.log(id[i]);
+                            var queryParams = st.db.escape(token) + ',' + st.db.escape(tid);
+                            var query = 'CALL pGetjobseekersmailDetails(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, getResult) {
+
+                                if (!err) {
+                                    if (getResult) {
+                                        if (getResult[0].length > 0) {
+
+                                            if(getResult[0][0].AdminEmailID) {
+                                                console.log(getResult[0]);
+
+                                                console.log('FnGetJobSeekersMailDetails: Result loaded successfully');
+
+                                                var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(templateId);
+                                                st.db.query(templateQuery, function (err, TemplateResult) {
+
+                                                    if (!err) {
+                                                        if (TemplateResult) {
+                                                            if (TemplateResult.length > 0) {
+                                                                console.log(TemplateResult);
+                                                                var mailOptions = {
+                                                                    replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
+                                                                    to: getResult[0][0].AdminEmailID,
+                                                                    subject: TemplateResult[0].Subject,
+                                                                    html: TemplateResult[0].Body // html body
+                                                                };
+                                                                mailOptions.html = mailOptions.html.replace("[FirstName]", getResult[0].FirstName);
+                                                                mailOptions.html = mailOptions.html.replace("[LastName]", getResult[0].LastName);
+                                                                mailOptions.html = mailOptions.html.replace("[CompanyName]", getResult[0].CompanyName);
+                                                                var post = {
+                                                                    MessageType: 9,
+                                                                    Priority: 5,
+                                                                    ToMailID: mailOptions.to,
+                                                                    Subject: mailOptions.subject,
+                                                                    Body: mailOptions.html,
+                                                                    Replyto: mailOptions.replyto
+                                                                };
+
+                                                                console.log(post);
+                                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                    // Neat!
+                                                                    if (!err) {
+                                                                        //console.log(result);
+                                                                        console.log('FnSendMailer: Mail saved Successfully');
+                                                                        //CallBack(null, RtnMessage);
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSendMailer: Mail not Saved Successfully');
+                                                                        // CallBack(null, null);
+                                                                    }
+                                                                });
+                                                                console.log('FnSendMailer:Mail details sent for processing');
+                                                                //console.log(mailOptions);
+                                                            }
+                                                            else {
+                                                                console.log('FnGetJobSeekersMailDetails: Result not loaded');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnGetJobSeekersMailDetails: Result not loaded');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnGetJobSeekersMailDetails:error:' + err);
+                                                    }
+                                                });
+                                            }
+                                            else {
+                                                console.log('FnSendMailer:Mail Id is empty');
+                                            }
+                                        }
+                                        else {
+                                            console.log('FnGetJobSeekersMailDetails: Result not loaded');
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnGetJobSeekersMailDetails: Result not loaded');
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetJobSeekersMailDetails: error:' + err);
+                                }
+
+                            });
                         }
-                        else {
-                            responseMessage.message = 'Applied job List not loaded';
-                            res.status(200).json(responseMessage);
-                            console.log('FnAppliedJobList:Applied job List not loaded');
-                        }
-                    }
-                    else {
-                        responseMessage.message = 'Applied job List not loaded';
+
+                        responseMessage.message = 'Mail send Successfully';
                         res.status(200).json(responseMessage);
-                        console.log('FnAppliedJobList:Applied job List not loaded');
                     }
-                }
+
                 else {
-                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.message = 'Invalid token';
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        token: 'invalid token'
                     };
-                    res.status(500).json(responseMessage);
-                    console.log('FnAppliedJobList: error in saving Applied job list :' + err);
+                    responseMessage.data = null;
+                    res.status(401).json(responseMessage);
+                    console.log('FnGetJobSeekersMailDetails: Invalid token');
                 }
-            });
-        }
+            }
+        else {
+                responseMessage.error = {
+                    server : 'Internal server error'
+                };
+                responseMessage.message = 'Error in validating Token';
+                res.status(500).json(responseMessage);
+                console.log('FnGetJobSeekersMailDetails:Error in processing Token' + err);
+            }
+        });
+    }
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error : FnAppliedJobList ' + ex.description);
+            console.log('Error : FnGetJobSeekersMailDetails ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

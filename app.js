@@ -209,10 +209,11 @@ app.get('/applied_job',LocationManager.FnGetAppliedJob);
 app.get('/job_country',LocationManager.FnGetJobcountry);
 app.get('/job_city',LocationManager.FnGetjobcity);
 app.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
+app.get('/jobseeker_mail',LocationManager.FnGetJobSeekersMailDetails);
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);
 app.get('/validate_groupname',LocationManager.FnValidateGroupName);
-app.put('/user_response',LocationManager.FnUpdateUserResponse);
+app.put('/user_status',LocationManager.FnUpdateUserStatus);
 app.put('/user_relationship',LocationManager.FnUpdateUserRelationship);
 app.delete('/group',LocationManager.FnDeleteGroup);
 app.post('/message_request',LocationManager.FnSendMessageRequest);
