@@ -178,6 +178,7 @@ exports.FnLoadMessageBox = messageBox.loadMessageBox;
 exports.FnChangeMessageActivity = messageBox.changeMessageActivity;
 exports.FnLoadOutBoxMessages = messageBox.loadOutBoxMessages;
 exports.FnGetSuggestionList = messageBox.getSuggestionList;
+exports.FnAddGroupMembers = messageBox.addGroupMembers;
 
 
 var Notification = require('./modules/notification-module.js');

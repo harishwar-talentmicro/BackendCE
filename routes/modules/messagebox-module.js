@@ -1330,4 +1330,93 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
     }
 };
 
+
+
+/**
+ * @todo FnAddGroupMembers
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for create message group
+ */
+MessageBox.prototype.addGroupMembers = function(req,res,next){
+
+    var _this = this;
+
+    var groupId = req.body.group_id;
+    var memberId  = req.body.member_id;
+    var relationType  = req.body.relation_type;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!groupId){
+        error['groupId'] = 'Invalid groupId';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberId) + ',' + st.db.escape(relationType);
+            var query = 'CALL pAddMemberstoGroup(' + queryParams + ')';
+            console.log(query);
+            st.db.query(query, function (err, insertResult) {
+                console.log(insertResult);
+                if (!err) {
+                    if (insertResult) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Group Members added successfully';
+                        responseMessage.data = {
+                            groupId: groupId,
+                            memberId: memberId,
+                            relationType: relationType
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnAddGroupMembers: Group Members added successfully');
+                    }
+                    else {
+                        responseMessage.message = 'Group Members not added';
+                        res.status(200).json(responseMessage);
+                        console.log('FnAddGroupMembers:Group Members not added');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnAddGroupMembers: error in adding GroupMembers :' + err);
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnAddGroupMembers ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 module.exports = MessageBox;

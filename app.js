@@ -206,8 +206,6 @@ app.get('/educations',LocationManager.FnGetEducations);
 app.get('/specialization',LocationManager.FnGetSpecialization);
 app.get('/jobs',LocationManager.FnJobs);
 app.get('/applied_job',LocationManager.FnGetAppliedJob);
-
-
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);
 app.get('/validate_groupname',LocationManager.FnValidateGroupName);
@@ -221,6 +219,7 @@ app.get('/messagebox',LocationManager.FnLoadMessageBox);
 app.put('/message_activity',LocationManager.FnChangeMessageActivity);
 app.get('/outbox_messages',LocationManager.FnLoadOutBoxMessages);
 app.get('/suggestion_list',LocationManager.FnGetSuggestionList);
+app.post('/group_members',LocationManager.FnAddGroupMembers);
 
 
 
