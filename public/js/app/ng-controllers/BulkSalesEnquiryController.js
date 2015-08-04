@@ -273,7 +273,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
                     {
                         if($scope.searchResult[nCountResult].TID == $scope.selectedTID[nCountTid])
                         {
-                             if(selectedMasterIds.indexOf($scope.searchResult[nCountResult].MasterID) == -1)
+                            if(selectedMasterIds.indexOf($scope.searchResult[nCountResult].MasterID) == -1)
                             {
                                 selectedMasterIds.push($scope.searchResult[nCountResult].MasterID);
                             }
@@ -281,7 +281,16 @@ angular.module('ezeidApp').controller('bulksalesController',[
                     }
                 }
                /* $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: $scope.selectedTID, TemplateID: salesEnquiry._info.TID }}).success(function (data)*/
-                $http({ method: 'post', url: GURL + 'ewtSendBulkMailer', data: { Token: $rootScope._userInfo.Token, TID: selectedMasterIds, TemplateID: salesEnquiry._info.TID }}).success(function (data)
+                $http({
+                    method: 'post',
+                    url: GURL + 'ewtSendBulkMailer',
+                    data:
+                    {
+                        Token: $rootScope._userInfo.Token,
+                        TID: selectedMasterIds,
+                        TemplateID: salesEnquiry._info.TID
+                    }
+                }).success(function (data)
                 {
                      if (data != 'null')
                      {

@@ -1,4 +1,7 @@
 <div ng-controller="SalesCtrl" class="row transactions-row setTopMargin">
+    {{userFolders}}
+    {{myFolders}}
+
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-xs hidden-sm transaction-filter-row">
                 <div class="row bottom-clearfix">
 
@@ -59,7 +62,7 @@
 
                                     <span class="input-group-btn">
                                         <button class="btn btn-danger"
-                                                ng-click=""
+                                                ng-click="triggerStatusFilter(1,filterStatus)"
                                                 data-toggle="tooltip" title="Go">
                                             Go
                                         </button>
@@ -162,9 +165,8 @@
                                 <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>
                             </select>
 
-                                    <span class="input-group-btn">
+                                    <span class="input-group-btn" ng-click="triggerStatusFilter(1,filterStatus)">
                                         <button class="btn btn-danger"
-                                                ng-click=""
                                                 data-toggle="tooltip" title="Go">
                                             Go
                                         </button>

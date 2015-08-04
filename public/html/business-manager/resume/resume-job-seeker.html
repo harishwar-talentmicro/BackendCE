@@ -52,10 +52,11 @@
                         <div class="container p-bottom-10">
                             <div class="row">
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <select class="form-control">
-                                        <option value="">India</option>
-                                        <option>UAE</option>
-                                        <option>Ireland</option>
+
+                                    <select class="form-control" name="countrySelect" ng-model="countrySelect"
+                                            ng-change="getCityListOfCountry(countrySelect)"
+                                            ng-options="country.countryname as country.countryname for country in countryLists" required>
+                                        <option value = ""> -- Select -- </option>
                                     </select>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
@@ -151,257 +152,190 @@
                         </div>
                         <div class="container p-bottom-10">
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <!--<span class="btn btn-dark-orange input-group-addon"><i class="fa fa-search"></i> Search</span>-->
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                     <button class="btn btn-primary btn-dark-orange" ng-click="searchJobSeeker()"><i class="fa fa-search"></i> Search</button>
-                                    <button class="btn btn-primary btn-dark-orange"><i class="fa fa-eraser"></i> Clear</button>
+                                    <button class="btn btn-primary btn-dark-orange" ng-click="resetJobSeekerSearch()"><i class="fa fa-eraser"></i> Clear</button>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"></div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"></div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer"></div>
                             </div>
                         </div>
                     <hr>
 
-
-                    <div class="container">
-                        <div class="col-lg-12">
-                        </div>
-                        <div class="col-lg-6">
-                            Showing 1-10 of 120 results
-                        </div>
-                        <div class="col-lg-6 text-right">
-                            <button class="btn btn-primary"><i class="fa fa-arrow-circle-left"></i></button>
-                            <button class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i></button>
-                        </div>
-                    </div>
-                    <div class="container">
-                        <!-- main table goes here -->
-                        <div class="main-table p-top-20 col-lg-12">
-                            <div class="col-lg-12 table-head">
-                                <div class="col-lg-1">
-                                    <i class="fa fa-square-o"></i> #
-                                </div>
-                                <div class="col-lg-2">
-                                    Name
-                                </div>
-                                <div class="col-lg-1">
-                                    Location
-                                </div>
-                                <div class="col-lg-3">
-                                    Skills
-                                </div>
-                                <div class="col-lg-1">
-                                    Experience
-                                </div>
-                                <div class="col-lg-3">
-                                    Preferred Job Type
-                                </div>
-                                <div class="col-lg-1">
-                                    Freshness
-                                </div>
+                    <div ng-show="jobSeekerResults">
+                        <div class="container">
+                            <div class="col-lg-12">
                             </div>
-                            <div class="col-lg-12 table-body">
-                                <div class="col-lg-1">
-                                    <i class="fa fa-check-square-o"></i> 1
-                                </div>
-                                <div class="col-lg-2">
-                                    Chandra Shekar
-                                </div>
-                                <div class="col-lg-1">
-                                    Bengaluru
-                                </div>
-                                <div class="col-lg-3">
-                                    J2ee, Oracle, C++, SQL
-                                </div>
-                                <div class="col-lg-1">
-                                    3.5 Yrs
-                                </div>
-                                <div class="col-lg-3">
-                                    Full Time, Consultant, Freelancer
-                                </div>
-                                <div class="col-lg-1">
-                                    5 Day
-                                </div>
+                            <div class="col-lg-6">
+                                Showing 1-10 of 120 results
                             </div>
-
-                            <div class="col-lg-12 table-body table-striped-bg">
-                                <div class="col-lg-1">
-                                    <i class="fa fa-check-square-o"></i> 2
-                                </div>
-                                <div class="col-lg-2">
-                                    Shweta
-                                </div>
-                                <div class="col-lg-1">
-                                    Bengaluru
-                                </div>
-                                <div class="col-lg-3">
-                                    J2ee, Oracle, C++, SQL
-                                </div>
-                                <div class="col-lg-1">
-                                    3.5 Yrs
-                                </div>
-                                <div class="col-lg-3">
-                                    Full Time, Consultant, Freelancer
-                                </div>
-                                <div class="col-lg-1">
-                                    5 Day
-                                </div>
+                            <div class="col-lg-6 text-right">
+                                <button class="btn btn-primary"><i class="fa fa-arrow-circle-left"></i></button>
+                                <button class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i></button>
                             </div>
-
-                            <div class="col-lg-12 table-body">
-                                <div class="col-lg-1">
-                                    <i class="fa fa-square-o"></i> 3
+                        </div>
+                        <div class="container">
+                            <!-- main table goes here -->
+                            <div class="main-table p-top-20 col-lg-12">
+                                <div class="col-lg-12 table-head">
+                                    <div class="col-lg-1">
+                                    </div>
+                                    <div class="col-lg-2">
+                                        Name
+                                    </div>
+                                    <div class="col-lg-1">
+                                        Location
+                                    </div>
+                                    <div class="col-lg-3">
+                                        Skills
+                                    </div>
+                                    <div class="col-lg-1">
+                                        Experience
+                                    </div>
+                                    <div class="col-lg-3">
+                                        Preferred Job Type
+                                    </div>
+                                    <div class="col-lg-1">
+                                        Freshness
+                                    </div>
                                 </div>
-                                <div class="col-lg-2">
-                                    Ramesh Shekar
-                                </div>
-                                <div class="col-lg-1">
-                                    Bengaluru
-                                </div>
-                                <div class="col-lg-3">
-                                    J2ee, Oracle, C++, SQL
-                                </div>
-                                <div class="col-lg-1">
-                                    3.5 Yrs
-                                </div>
-                                <div class="col-lg-3">
-                                    Full Time, Consultant, Freelancer
-                                </div>
-                                <div class="col-lg-1">
-                                    5 Day
+                                <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}"  ng-repeat="jobSeeker in jobSeekerResults track by $index">
+                                    <div class="col-lg-1">
+                                        <input type="checkbox"
+                                               name="service"
+                                               ng-click="selectTidToMail(jobSeeker.tid)"/>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        {{jobSeeker.Name}}
+                                    </div>
+                                    <div class="col-lg-1">
+                                        {{jobSeeker.location}}
+                                    </div>
+                                    <div class="col-lg-3">
+                                        {{jobSeeker.Skills}}
+                                    </div>
+                                    <div class="col-lg-1">
+                                        {{jobSeeker.Exp}} Yrs
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <span ng-show="jobSeeker.jobtype == 1">Full Time</span>
+                                        <span ng-show="jobSeeker.jobtype == 2">Part Time</span>
+                                        <span ng-show="jobSeeker.jobtype == 3">Work From Home</span>
+                                        <span ng-show="jobSeeker.jobtype == 4">Internship | Project Work</span>
+                                        <span ng-show="jobSeeker.jobtype == 5">Consultant</span>
+                                        <span ng-show="jobSeeker.jobtype == 6">Freelancer</span>
+                                    </div>
+                                    <div class="col-lg-1">
+                                        {{jobSeeker.freshness == 0 ? 'Today' : jobSeeker.freshness+' Days'}}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
-                <div class="panel-danger panel-footer text-white">
-                    <i class="fa fa-envelope"></i> Compose Mail <label class="label label-primary">2</label>
-                </div>
-                <!--new design of mail template-->
-                <div style="text-align: center">
-                    <div class="well-lg templateBoxContainer">
-                        <!--<div class="well well-lg templateBoxContainer">-->
-                        <form name="MailTemplateForm" novalidate >
-                            <div class="row setRowLeftRightMarginZero centerAlign">
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                    Template
-                                </div>
-                                <div ng-hide="showCreateMailTemplate">
-                                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 searchHeaderAlignment ">
-                                        <select class="form-control" name="TitleSeelect" ng-model="TID"
-                                                ng-change="getTemplateDetails(TID)"
-                                                ng-options="template.TID as template.Title for template in templates" required>
-                                            <option value = ""> -- Select Template -- </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
-                                        <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('new')" >New</button>
-                                    </div>
-                                    <div ng-show="TID" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
-                                        <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('edit')" >Edit</button>
-                                    </div>
-                                </div>
 
-                                <div ng-show="showCreateMailTemplate">
-                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                        <input type="text" name="Title" id="Title" ng-model="Title"
-                                               class="form-control emptyBox"  ng-class="MailTemplateForm.Title.$touched && !Title.length ? 'mandatoryTextBox' : ''"
-                                               placeholder="Template title" maxlength="100" required>
+                <div ng-show="jobSeekerResults">
+                    <div class="panel-danger panel-footer text-white">
+                        <i class="fa fa-envelope"></i> Compose Mail <label class="label label-primary">{{selectedTidToMail.length}}</label>
+                    </div>
+                    <!--new design of mail template-->
+                    <div style="text-align: center">
+                        <div class="well-lg templateBoxContainer">
+                            <form name="MailTemplateForm" novalidate >
+                                <div class="row setRowLeftRightMarginZero centerAlign">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                        Template
                                     </div>
-                                </div>
+                                    <div ng-hide="showCreateMailTemplate">
+                                        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 searchHeaderAlignment ">
+                                            <select class="form-control" name="TitleSeelect" ng-model="mailTemplateTid"
+                                                    ng-change="getTemplateDetails(mailTemplateTid)"
+                                                    ng-options="template.TID as template.Title for template in templates" required>
+                                                <option value = ""> -- Select Template -- </option>
+                                            </select>
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                            <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('new')" >New</button>
+                                        </div>
+                                        <div ng-show="TID" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                            <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('edit')" >Edit</button>
+                                        </div>
+                                    </div>
 
-                            </div><br/>
-                            <div class="row setRowLeftRightMarginZero centerAlign">
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                    Name
-                                </div>
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
-                                    <input type="text" name="FromName" ng-model="FromName"
-                                           ng-class="MailTemplateForm.FromName.$touched && !FromName.length && validationMode > 0  ? 'mandatoryTextBox' : ''"
-                                           class="form-control emptyBox" id="FromName" placeholder="From name" maxlength="100" ng-readonly="validationMode == 0" required>
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton keyWordText">
-                                    From
-                                </div>
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">
-                                    <input type="text" name="FromEmailID" class="form-control emptyBox"
-                                           id="FromEmailID" ng-model="FromEmailID"
-                                           ng-class="MailTemplateForm.FromEmailID.$touched && !FromEmailID.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                           placeholder="From email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-readonly="validationMode == 0" required>
-                                    <span ng-show="MailTemplateForm.FromEmailID.$error.email" ng-if="MailTemplateForm.FromEmailID.$error.email == true ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false"></span>
-                                </div>
-                            </div><br/>
-                            <div class="row setRowLeftRightMarginZero centerAlign">
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                    Cc
-                                </div>
-                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                    <input type="email" name="CCMailIDS" class="form-control"
-                                           id="CCMailIDS" ng-model="CCMailIDS" ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/"
-                                           placeholder="Cc email" maxlength="100" ng-readonly="validationMode == 0" required>
-                                    <span ng-show="MailTemplateForm.CCMailIDS.$error.email" ng-if="MailTemplateForm.CCMailIDS.$error.email == true ? isWrongEmailPatternCc = true : isWrongEmailPatternCc = false"></span>
-                                </div>
-                            </div><br/>
-                            <div class="row setRowLeftRightMarginZero centerAlign">
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                    Bcc
-                                </div>
-                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                    <input type="email" name="BCCMailIDS" class="form-control"
-                                           id="BCCMailIDS" ng-model="BCCMailIDS" class="form-control"
-                                           ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/"  placeholder="Bcc email" maxlength="100" ng-readonly="validationMode == 0" required>
+                                    <div ng-show="showCreateMailTemplate">
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
+                                            <input type="text" name="Title" id="Title" ng-model="Title"
+                                                   class="form-control emptyBox"  ng-class="MailTemplateForm.Title.$touched && !Title.length ? 'mandatoryTextBox' : ''"
+                                                   placeholder="Template title" maxlength="100" required>
+                                        </div>
+                                    </div>
 
-                                    <span ng-show="MailTemplateForm.BCCMailIDS.$error.email" ng-if="MailTemplateForm.BCCMailIDS.$error.email == true ? isWrongEmailPatternBcc = true : isWrongEmailPatternBcc = false"></span>
-                                </div>
-                            </div><br/>
-                            <div class="row setRowLeftRightMarginZero centerAlign">
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                    Subject
-                                </div>
-                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                    <input type="text" name="Subject" id="Subject" ng-model="Subject"
-                                           class="form-control emptyBox"  ng-class="MailTemplateForm.Subject.$touched && !Subject.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                           placeholder="Subject" maxlength="250" ng-readonly="validationMode == 0" required>
-                                </div>
-                            </div><br/>
-                            <div class="row setRowLeftRightMarginZero centerAlign">
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                    Body <a class="showPointer" ng-click="profile.openTermsAndConditionForm()" id="termConditions" data-toggle="tooltip" data-placement="top" title="Tags Supported: {FirstName}, {LastName}, {CompanyName}">  <u>?</u> </a>
-                                </div>
-                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
-                                    <textarea rows="10" cols="92" name="Body" id="Body" ng-model="Body"
-                                              class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !Body.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                              placeholder="Type here" ng-readonly="validationMode == 0" required></textarea>
-                                </div>
-                            </div><br/>
-                            <div class="row setRowLeftRightMarginZero centerAlign" >
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer">
+                                </div><br/>
+                                <div class="row setRowLeftRightMarginZero centerAlign">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                        Name
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 searchHeaderAlignment">
+                                        <input type="text" name="FromName" ng-model="FromName"
+                                               ng-class="MailTemplateForm.FromName.$touched && !FromName.length && validationMode > 0  ? 'mandatoryTextBox' : ''"
+                                               class="form-control emptyBox" id="FromName" placeholder="From name" maxlength="100" ng-readonly="validationMode == 0" required>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton keyWordText">
+                                        From
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 searchHeaderAlignment">
+                                        <input type="text" name="FromEmailID" class="form-control emptyBox"
+                                               id="FromEmailID" ng-model="FromEmailID"
+                                               ng-class="MailTemplateForm.FromEmailID.$touched && !FromEmailID.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
+                                               placeholder="From email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-readonly="validationMode == 0" required>
+                                        <span ng-show="MailTemplateForm.FromEmailID.$error.email" ng-if="MailTemplateForm.FromEmailID.$error.email == true ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false"></span>
+                                    </div>
+                                </div><br/>
 
-                                </div>
-                                <div ng-hide="showCreateMailTemplate">
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                        <button type="submit" class="btn btn-primary" ng-click="bulksalesController.SendEnquiryMail()"
-                                                ng-disabled="!TID" >Send</button>
+                                <div class="row setRowLeftRightMarginZero centerAlign">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                        Subject
                                     </div>
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                        <button type="button" class="btn btn-primary" ng-click="bulksalesController.closeSalesEnquiryForm()" >Close</button>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
+                                        <input type="text" name="Subject" id="Subject" ng-model="Subject"
+                                               class="form-control emptyBox"  ng-class="MailTemplateForm.Subject.$touched && !Subject.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
+                                               placeholder="Subject" maxlength="250" ng-readonly="validationMode == 0" required>
                                     </div>
-                                </div>
+                                </div><br/>
+                                <div class="row setRowLeftRightMarginZero centerAlign">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                        Body <a class="showPointer" ng-click="profile.openTermsAndConditionForm()" id="termConditions" data-toggle="tooltip" data-placement="top" title="Tags Supported: {FirstName}, {LastName}">  <u>?</u> </a>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
+                                        <textarea rows="10" cols="92" name="Body" id="Body" ng-model="Body"
+                                                  class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !Body.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
+                                                  placeholder="Type here" ng-readonly="validationMode == 0" required></textarea>
+                                    </div>
+                                </div><br/>
+                                <div class="row setRowLeftRightMarginZero centerAlign" >
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer">
+                                    </div>
+                                    <div ng-hide="showCreateMailTemplate">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                            <button type="submit" class="btn btn-primary" ng-click="SendJobSeekerMail()"
+                                                    ng-disabled="!mailTemplateTid" >Send</button>
+                                            <button type="button" class="btn btn-primary" ng-click="closeSalesEnquiryForm()" >Close</button>
+                                        </div>
+                                    </div>
 
-                                <div ng-show="showCreateMailTemplate">
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                        <button type="submit" class="btn btn-primary" ng-click="saveMailTemplate()"
-                                                ng-disabled="!Title || !FromName || !FromEmailID || !Subject || !Body">Save</button>
-                                    </div>
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                        <button type="button" class="btn btn-primary" ng-click="closeCreateMailTemplateForm()" >Cancel</button>
+                                    <div ng-show="showCreateMailTemplate">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                            <button type="submit" class="btn btn-primary" ng-click="saveMailTemplate()"
+                                                    ng-disabled="!Title || !FromName || !FromEmailID || !Subject || !Body">Save</button>
+                                            <button type="button" class="btn btn-primary" ng-click="closeCreateMailTemplateForm()" >Cancel</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
+
+
             </div>
         </div>
 

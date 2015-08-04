@@ -7,14 +7,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var MsgDelay = 2000;
     // Add more skills
     $scope.skillMatrix = [];
-        $scope.editMode = [];
-        $scope.editSkill = {
-            "tid":0,
-            "skillname":"",
-            "expertiseLevel":0,
-            "exp":0.00,
-            "active_status":true
-        };
+    $scope.editMode = [];
+    $scope.editSkill = {
+        "tid":0,
+        "skillname":"",
+        "expertiseLevel":0,
+        "exp":0.00,
+        "active_status":true
+    };
 
     var skillsTid = [];
     $scope.availableTags = [];
@@ -262,6 +262,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
+                    console.log("SAi 1111");
+                    console.log(res.skillMatrix);
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
                         $scope.skillMatrix = [
@@ -328,8 +330,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 }
                 else
                 {
-                    CVAttachCtrl._CVInfo.Status = 1;
-                    $scope.showLink = false;
                     $scope.skillMatrix = [
                         {
                             "tid":0,
@@ -339,6 +339,10 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             "active_status":1
                         }
                     ];
+                    console.log("SAi 222");
+                    CVAttachCtrl._CVInfo.Status = 1;
+                    $scope.showLink = false;
+
 
                 }
            });
@@ -526,7 +530,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
             "location_title" : $scope.locationName,
             "latitude" :  $scope.jobLat,
             "longitude" : $scope.jobLong,
-            "country" : $scope.country
+            "country" : $scope.country,
+            "maptype" : 0
         };
 
         $scope.mainLocationArray.push(tempLocationArray);
