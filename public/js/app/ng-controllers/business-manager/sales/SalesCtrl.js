@@ -165,6 +165,7 @@
             $scope.modalBox = {
               title : 'Create New Lead',
               class : 'business-manager-modal',
+              contactType : 0, // Shows that transaction is made by EZEID (1) or by Contact Name Only (2), zero means have to select
               editMode : false,
               locationList : [],
               tx : {
@@ -489,12 +490,14 @@
                         $scope.$emit('$preLoaderStart');
                         loadTransactionItems(editTx.TID).then(function(resp){
                             editTx.itemList = resp;
+
                             $scope.showModal = !$scope.showModal;
                             //UI updation is not happening properly because ui is not rendered, and model bind before it
                             //therefore once again updating data after ui rendered
                             $timeout(function(){
                                 $scope.modalBox.title = 'Update Lead';
                                 $scope.modalBox.tx = editTx;
+                                $scope.modalBox.contactType = ($scope.modalBox.tx.ezeid) ? 1 : 2;
                                 $scope.$emit('$preLoaderStop');
                             },1500);
                         },function(){
@@ -620,72 +623,6 @@
                 }
             });
 
-
-            ///**
-            // *  Resolves geolocation and sets geolocation address in modalbox for particular transaction
-            // */
-            //$scope.resolveGeolocationAddress = function(){
-            //    var defer = $q.defer();
-            //    $scope.modalBox.tx.address = '';
-            //    if(!$scope.modalBox.tx.locId){
-            //        $timeout(function(){
-            //            defer.resolve();
-            //        },500);
-            //        return defer.promise;
-            //    }
-            //
-            //    //$scope.$emit('$preLoaderStart');
-            //    var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
-            //    if(locIndex === -1){
-            //        $timeout(function(){
-            //            defer.resolve();
-            //        },500);
-            //        return defer.promise;
-            //    }
-            //    var lat = $scope.modalBox.locationList[locIndex].Latitude;
-            //    var lng = $scope.modalBox.locationList[locIndex].Longitude;
-            //
-            //    $scope.modalBox.tx.latitude = lat;
-            //    $scope.modalBox.tx.longitude = lng;
-            //
-            //    $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
-            //        $scope.modalBox.locationList[locIndex].AddressLine2;
-            //
-            //    var googleMap = new GoogleMap();
-            //    try{
-            //        googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-            //            //$scope.$emit('$preLoaderStop');
-            //            if(resp.data){
-            //                var data = googleMap.parseReverseGeolocationData(resp.data);
-            //                $scope.modalBox.tx.city = data.city;
-            //                $scope.modalBox.tx.state = data.state;
-            //                $scope.modalBox.tx.country = data.country;
-            //                $scope.modalBox.tx.area = data.area;
-            //
-            //
-            //            }
-            //            else{
-            //                //$scope.$emit('$preLoaderStop');
-            //                Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-            //            }
-            //            defer.resolve();
-            //
-            //        },function(){
-            //            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-            //            //$scope.$emit('$preLoaderStop');
-            //            defer.resolve();
-            //        });
-            //    }
-            //    catch(ex){
-            //        $timeout(function(){
-            //            Notification.error({message : 'Unable to resolve geolocation',delay : MsgDelay});
-            //            defer.resolve();
-            //        },400);
-            //    }
-            //    return defer.promise;
-            //};
-
-
             $scope.$watch('showModal',function(newVal,oldVal){
                 $scope.cartAmount = 0.00;
                 $scope.cartString = '';
@@ -698,6 +635,7 @@
                 $scope.modalBox = {
                     title : 'Create New Lead',
                     class : 'business-manager-modal',
+                    contactType : 0,
                     locationList : [],
                     editMode : false,
                     tx : {
@@ -889,10 +827,27 @@
                     var indx = companyList.indexOfWhere('id',n);
                     ////console.log(indx);
                     if(indx !== -1){
-                        $scope.modalBox.tx.ezeid = companyList[indx].ezeid;
+                        /**
+                         * Code is commented intentionally to prevent watcher from executing
+                         * when company id is selected
+                         */
+                        //$scope.modalBox.tx.ezeid = companyList[indx].ezeid;
                     }
                 }
             });
+
+            /**
+             * Radion buttons for creating lead by ezeoneid or by contact information
+             * @param contactType 1: EZEOne ID , 2: Contact Information
+             */
+            $scope.selectContactType = function(contactType){
+                $scope.modalBox.contactType = contactType;
+                $scope.modalBox.tx.ezeid = "";
+                $scope.modalBox.tx.companyId = 0;
+                $scope.modalBox.tx.companyName = "";
+
+                $scope.modalBox.tx.contactInfo = "";
+            };
 
 
             $scope.$watch('modalBox.tx.ezeid',function(newVal,oldVal){
@@ -992,10 +947,12 @@
                  * to make ui and requested data consistent
                  */
 
+
                 var folderRuleArr = [];
-                for(var i = 0; i < $scope.myFolders; i++){
+                for(var i = 0; i < $scope.myFolders.length; i++){
                     folderRuleArr.push($scope.myFolders[i].id);
                 }
+
                 var folderRules = (folderRuleArr) ? folderRuleArr.join(',') : '';
                 /**
                  * Commented as we don't have to load anything if user is not having folder assigned

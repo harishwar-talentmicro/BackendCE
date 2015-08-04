@@ -47,8 +47,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var groupType  = req.body.group_type;
     var aboutGroup  = req.body.about_group ? req.body.about_group : '';
     var autoJoin  = req.body.auto_join ? req.body.auto_join : 0;
-    var memberID  = req.body.member_id;
-    var relationType = req.body.relation_type;
     var tid = req.body.tid ? req.body.tid : 0;
 
     var responseMessage = {
@@ -64,19 +62,14 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
+    if(parseInt(groupType) == NaN){
+        error['groupType'] = 'Invalid groupType';
+        validateStatus *= false;
+    }
     if(!groupName){
         error['groupName'] = 'Invalid groupName';
         validateStatus *= false;
     }
-    if(!groupType){
-        error['groupName'] = 'Invalid groupName';
-        validateStatus *= false;
-    }
-    if(!memberID){
-        error['groupName'] = 'Invalid groupName';
-        validateStatus *= false;
-    }
-
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -88,26 +81,24 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(groupName) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
-                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(memberID)
-                            + ',' + st.db.escape(relationType) + ',' + st.db.escape(tid);
+                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(tid);
                         var query = 'CALL pCreateMessageGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
                             console.log(insertResult);
                             if (!err) {
-                                if (insertResult) {
+                                if (insertResult[0]) {
 
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Group created successfully';
                                     responseMessage.data = {
+                                        id : insertResult[0][0].ID,
                                         token: req.body.token,
                                         groupName: req.body.group_name,
                                         groupType: req.body.group_type,
                                         aboutGroup: req.body.about_group,
                                         autoJoin: req.body.auto_join,
-                                        memberID: req.body.member_id,
-                                        relationType: req.body.relation_type,
                                         tid: req.body.tid
                                     };
                                     res.status(200).json(responseMessage);
@@ -301,7 +292,7 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
         error['ezeone_id'] = 'Invalid ezeone_id';
         validateStatus *= false;
     }
-    if(!status){
+    if(parseInt(status) == NaN){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
@@ -425,7 +416,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
         error['memberID'] = 'Invalid memberID';
         validateStatus *= false;
     }
-    if(!relationType){
+    if(parseInt(relationType) == NaN){
         error['relationType'] = 'Invalid relationType';
         validateStatus *= false;
     }
@@ -626,8 +617,8 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
         error['groupName'] = 'Invalid groupName';
         validateStatus *= false;
     }
-    if(!groupType){
-        error['groupName'] = 'Invalid groupName';
+    if(parseInt(groupType) == NaN){
+        error['groupType'] = 'Invalid groupType';
         validateStatus *= false;
     }
 
@@ -932,8 +923,6 @@ MessageBox.prototype.getMembersList = function(req,res,next){
     }
 };
 
-
-
 /**
  * @todo FnLoadMessageBox
  * Method : Get
@@ -942,7 +931,6 @@ MessageBox.prototype.getMembersList = function(req,res,next){
  * @param next
  * @description api code for load messageBox
  */
-
 MessageBox.prototype.loadMessageBox = function(req,res,next){
     var _this = this;
 
@@ -1019,8 +1007,6 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
         }
     }
 };
-
-
 
 /**
  * @todo FnChangeMessageActivity
@@ -1143,7 +1129,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnLoadOutBoxMessages
  * Method : Get
@@ -1152,7 +1137,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
  * @param next
  * @description api code for load outbox messages
  */
-
 MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
     var _this = this;
 
@@ -1229,7 +1213,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetSuggestionList
  * Method : Get
@@ -1238,7 +1221,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
  * @param next
  * @description api code for get Suggestion list
  */
-
 MessageBox.prototype.getSuggestionList = function(req,res,next){
     var _this = this;
 
@@ -1339,5 +1321,200 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
         }
     }
 };
+
+/**
+ * @todo FnAddGroupMembers
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for Add Group Members
+ */
+MessageBox.prototype.addGroupMembers = function(req,res,next){
+
+    var _this = this;
+
+    var groupId = req.body.group_id;
+    var memberId  = req.body.member_id;
+    var relationType  = req.body.relation_type;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!groupId){
+        error['groupId'] = 'Invalid groupId';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberId) + ',' + st.db.escape(relationType);
+            var query = 'CALL pAddMemberstoGroup(' + queryParams + ')';
+            console.log(query);
+            st.db.query(query, function (err, insertResult) {
+                console.log(insertResult);
+                if (!err) {
+                    if (insertResult) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Group Members added successfully';
+                        responseMessage.data = {
+                            groupId: groupId,
+                            memberId: memberId,
+                            relationType: relationType
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnAddGroupMembers: Group Members added successfully');
+                    }
+                    else {
+                        responseMessage.message = 'Group Members not added';
+                        res.status(200).json(responseMessage);
+                        console.log('FnAddGroupMembers:Group Members not added');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnAddGroupMembers: error in adding GroupMembers :' + err);
+                }
+            });
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnAddGroupMembers ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetPendingRequest
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get Pending Request
+ */
+MessageBox.prototype.getPendingRequest = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token);
+                        var query = 'CALL pGetPendingRequest(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'PendingList loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetPendingRequest: PendingList loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'PendingList not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetPendingRequest:PendingList not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'PendingList not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetPendingRequest:PendingList not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetPendingRequest: error in getting OutBox Messages:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetPendingRequest: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetPendingRequest:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetPendingRequest ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 module.exports = MessageBox;

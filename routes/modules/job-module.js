@@ -69,7 +69,8 @@ Job.prototype.create = function(req,res,next){
         locationsList = JSON.parse(locationsList);
     }
     var location_id = '';
-
+    console.log('******************');
+    console.log(locationsList);
     var responseMessage = {
         status: false,
         error: {},
@@ -227,24 +228,36 @@ Job.prototype.create = function(req,res,next){
                                 location_title: locationDetails.location_title,
                                 latitude: locationDetails.latitude,
                                 longitude: locationDetails.longitude,
-                                country: locationDetails.country
+                                country: locationDetails.country,
+                                maptype : locationDetails.maptype
                             };
+
+                            console.log(list);
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country);
+                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
 
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
-
+                                console.log(results);
                                 if (results) {
                                     if (results[0]) {
                                         if (results[0][0]) {
 
                                             console.log(results[0][0].id);
+
                                             location_id += results[0][0].id + ',';
                                             locCount +=1;
+                                            console.log('---------------');
+                                            console.log(location_id);
+                                            console.log(locCount);
+                                            console.log('---------------********');
+                                            console.log(locationsList.length);
                                             if(locCount < locationsList.length){
+                                                console.log('sucess..............1');
                                                 insertLocations(locationsList[locCount]);
                                             }
                                             else{
+                                                console.log('sucess..............2');
+                                                console.log(location_id);
                                                 createJobPosting();
                                             }
                                         }
@@ -448,11 +461,21 @@ Job.prototype.getAll = function(req,res,next){
     }
     };
 
+/**
+ * @todo FnGetJobLocations
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description  api code for job locations
+ */
 Job.prototype.getJobLocations = function(req,res,next){
-    /**
-     * @todo FnGetJobLocations
-     */
+
     var _this = this;
+
+    var token = req.query.token;
+    var mapType = req.query.map_type;
+
     var responseMsg = {
         status : false,
         data : [],
@@ -507,9 +530,9 @@ Job.prototype.searchJobs = function(req,res,next){
     var token = (req.query.token) ? req.query.token : '';
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
-    var locations = req.query.locations;
-    var category = req.query.category;
-    var salary = req.query.salary;
+    var locations = req.query.locations ? req.query.locations : '';
+    var category = req.query.category ? req.query.category : '';
+    var salary = req.query.salary ? req.query.salary : '';
     var filter = req.query.filter ? req.query.filter : 0;
     var restrictToInstitue = req.query.restrict ? req.query.restrict : 0;
 
@@ -1195,8 +1218,182 @@ Job.prototype.getAppliedJob = function(req,res,next){
 };
 
 
+/**
+ * @todo FnGetJobcountry
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description  api code for job locations
+ */
+Job.prototype.getJobcountry = function(req,res,next){
+
+    var _this = this;
+
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to load Job country ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        st.db.query('CALL pGetJobcountryList()',function(err,result){
+            if(err){
+                console.log('Error : FnGetJobcountry: '+ err);
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'Country loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnGetJobcountry '+ ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+/**
+ * @todo FnGetjobcity
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description  api code for job locations
+ */
+Job.prototype.getjobcity = function(req,res,next){
+
+    var _this = this;
+
+    var countryTitle = req.query.country_title;
+
+    var responseMsg = {
+        status : false,
+        data : [],
+        message : 'Unable to Get job city ! Please try again',
+        error : {
+            server : 'An internal server error'
+        }
+    };
+
+    try{
+        st.db.query('CALL pGetjobcities(' + st.db.escape(countryTitle) + ')',function(err,result){
+            if(err){
+                console.log('Error : FnGetjobcity: '+ err);
+                res.status(400).json(responseMsg);
+            }
+            else{
+                responseMsg.status = true;
+                responseMsg.message = 'City loaded successfully';
+                responseMsg.error = null;
+                responseMsg.data = result[0];
+                res.status(200).json(responseMsg);
+            }
+        });
+    }
+
+    catch(ex){
+        res.status(500).json(responseMsg);
+        console.log('Error : FnGetjobcity '+ ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
+/**
+ * @todo FnGetJobSeekersMailDetails
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for Get Job Seekers Mail Details
+ */
+Job.prototype.getJobSeekersMailDetails = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var tid = areq.query.tid;
 
 
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            var queryParams = st.db.escape(token) + ',' + st.db.escape(tid);
+            var query = 'CALL pGetAppliedJobs(' + queryParams + ')';
+            console.log(query);
+            st.db.query(query, function (err, getResult) {
+                if (!err) {
+                    if (getResult) {
+                        if(getResult[0].length){
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Applied job List loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnAppliedJobList: Applied job List loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Applied job List not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnAppliedJobList:Applied job List not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Applied job List not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnAppliedJobList:Applied job List not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnAppliedJobList: error in saving Applied job list :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnAppliedJobList ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = Job;

@@ -89,6 +89,7 @@ exports.FnGetTransAttachment = businessManager.getTransAttachment;
 exports.FnSalesStatistics = businessManager.salesStatistics;
 
 
+
 var Configuration = require('./modules/configuration-module.js');
 var configurationModule = new Configuration(db,stdLib);
 exports.FnSaveConfig = configurationModule.save;
@@ -136,6 +137,7 @@ var Image = require('./modules/image-module.js');
 var imageModule = new Image(db,stdLib);
 exports.FnCropImage = imageModule.cropImage;
 exports.FnImageURL = imageModule.imageURL;
+exports.FnGetPictureOfEzeid = imageModule.getPictureOfEzeid;
 
 var Reservation = require('./modules/reservation-module.js');
 var reservationModule = new Reservation(db,stdLib);
@@ -163,6 +165,9 @@ exports.FnGetFiltersForJob = jobModule.getFiltersForJob;
 exports.FnGetJobDetails = jobModule.getJobDetails;
 exports.FnJobs = jobModule.jobs;
 exports.FnGetAppliedJob = jobModule.getAppliedJob;
+exports.FnGetJobcountry = jobModule.getJobcountry;
+exports.FnGetjobcity = jobModule.getjobcity;
+
 
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);
@@ -178,6 +183,8 @@ exports.FnLoadMessageBox = messageBox.loadMessageBox;
 exports.FnChangeMessageActivity = messageBox.changeMessageActivity;
 exports.FnLoadOutBoxMessages = messageBox.loadOutBoxMessages;
 exports.FnGetSuggestionList = messageBox.getSuggestionList;
+exports.FnAddGroupMembers = messageBox.addGroupMembers;
+exports.FnGetPendingRequest = messageBox.getPendingRequest;
 
 
 var Notification = require('./modules/notification-module.js');

@@ -278,8 +278,48 @@ angular.module('ezeidApp').
 
             $scope.modalAddGroupVisible = false;
             /* toggle Add/edit Group Popup */
-            $scope.modalAddGroupVisibility = function () {
+            $scope.modalAddGroupVisibility = function (code) {
                 $scope.modalAddGroupVisible = !$scope.modalAddGroupVisible;
+                resetDefaultSettings();
+                if(parseInt(code) == 1)//Create new group
+                {
+                    $scope.groupFormVisible = true;
+                    $scope.groupCreateBtnVisible = true;
+                    $scope.groupMemberVisible = false;
+                    $scope.groupDescVisible = false;
+                    $scope.joinGroupBtnVisible = false;
+                    $scope.editGroupBtnVisible = false;
+                    $scope.deleteGroupBtnVisible = false;
+                    ////////////////////////////////////
+                    resetModule();
+                    $scope.module.createGroup = true;
+                }
+                else if(code == 2)//join group
+                {
+                    $scope.groupFormVisible = true;
+                    $scope.groupCreateBtnVisible = false;
+                    $scope.groupMemberVisible = false;
+                    $scope.groupDescVisible = false;
+                    $scope.joinGroupBtnVisible = true;
+                    $scope.editGroupBtnVisible = false;
+                    $scope.deleteGroupBtnVisible = false;
+                    ////////////////////////////////////
+                    resetModule();
+                    $scope.module.joinGroup = true;
+                }
+                else if(code == 3)//edit group
+                {
+                    $scope.groupFormVisible = true;
+                    $scope.groupCreateBtnVisible = false;
+                    $scope.groupMemberVisible = false;
+                    $scope.groupDescVisible = false;
+                    $scope.joinGroupBtnVisible = false;
+                    $scope.editGroupBtnVisible = true;
+                    $scope.deleteGroupBtnVisible = false;
+                    ////////////////////////////////////
+                    resetModule();
+                    $scope.module.editGroup = true;
+                }
             };
 
             /* modal box for loading Add/edit/join Group */
@@ -290,8 +330,8 @@ angular.module('ezeidApp').
 
 
             /***********************************************************************************************************
-            /***********************************************************************************************************
-            /***********************************************************************************************************
+             /***********************************************************************************************************
+             /***********************************************************************************************************
              * GROUP JS goes here
              /***********************************************************************************************************
              /***********************************************************************************************************
@@ -305,12 +345,34 @@ angular.module('ezeidApp').
             $scope.isGroupAdmin = false;
             $scope.isMember = false;
             $scope.isNewGroup = true;
+            $scope.isGroupNameUnique = false;
             $scope.groupActionBtn = [
                 "Delete Group",
                 "Leave Group",
                 "Create Group"
             ];
-            $scope.accessToken = 2;
+
+            $scope.isPublicGroup = false;
+
+
+            /* module visibility variable *//////////////////////////////
+            $scope.groupFormVisible = true;
+            $scope.groupCreateBtnVisible = true;
+            $scope.groupMemberVisible = false;
+            $scope.groupDescVisible = false;
+            $scope.joinGroupBtnVisible = true;
+            $scope.editGroupBtnVisible = false;
+            $scope.deleteGroupBtnVisible = false;
+            /////////////////////////////////////////////////////////////
+            ///////////////////MODULES///////////////////////////////////
+            $scope.module = [
+                {
+                    joinGroup : false,
+                    createGroup : false,
+                    editGroup : false,
+                    viewGroup : false
+                }
+            ];
 
             $scope.relationArr = [
                 "No Relation",
@@ -322,6 +384,7 @@ angular.module('ezeidApp').
                 "Family",
                 "Community"
             ];
+
 
             $scope.dummyMember = [
                 {
@@ -341,14 +404,107 @@ angular.module('ezeidApp').
                 },
             ];
 
-            $scope.userFormCount = [true];
+
+            /////////////////////////////////////////////////////////////
+
+            resetSuggestions();
+            resetDefaultSettings();
 
             /**
              * Validate the group's relation to the logged in user
              */
-            $scope.checkLoggedInUserAndGroup = function(groupName)
+            $scope.groupSearchAction = function()
             {
+                var groupName = $('#group-name').val();
+                if(!parseInt(groupName.length) > 0)
+                {
+                    negetiveGroupNameAction();
+                    return ;
+                }
+                console.log('hello');
+                //For group creation module
+                if($scope.module.createGroup)
+                {
+                    checkGroupNameUniqueness(groupName);
+                }
+                else if($scope.module.editGroup)
+                {
+                    /* call API for fetching suggestion */
+                    getSuggestionList(groupName);
+                }
+                else if($scope.module.viewGroup)
+                {
+                    /* call API for fetching suggestion */
+                    getSuggestionList(groupName);
+                }
+                else if($scope.module.joinGroup)
+                {
+                    /* call API for fetching suggestion */
+                    getSuggestionList(groupName);
+                }
+            }
 
+            /**
+             * Get the group type
+             * 0: group
+             * 1: EZEOne ID
+             */
+            function getGroupNameType(groupName)
+            {
+                var grp = groupName.toString();
+                var grpArr = grp.split("");
+                if(grpArr[0] == '@')
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+
+            /**
+             * Action when group name is already exists or name alreay there
+             */
+            function negetiveGroupNameAction()
+            {
+                $scope.isGroupNameUnique = false;
+                changeCheckBtn(1);
+                $scope.groupDescVisible = false;
+                return;
+            }
+
+            /**
+             * API call for checking weather the group name is unique or not
+             */
+            function checkGroupNameUniqueness(groupName)
+            {
+                $http({
+                    url : GURL + 'validate_groupname',
+                    method : "GET",
+                    params :{
+                        group_name:groupName,
+                        token : $rootScope._userInfo.Token,
+                        group_type: getGroupNameType(groupName)
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    console.log(resp.data[0].status);
+                    if(resp.data[0].status && resp.data[0].status == -1)
+                    {
+                        $scope.isGroupNameUnique = true;
+                        changeCheckBtn(2);
+                        $scope.groupDescVisible = true;
+                    }
+                    else
+                    {
+                        negetiveGroupNameAction();
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
             }
 
             /**
@@ -357,5 +513,158 @@ angular.module('ezeidApp').
             $scope.accessCtrlChange = function(val)
             {
                 $scope.accessToken = val;
+            }
+
+            /**
+             * API call to get the suggestion list
+             */
+            function getSuggestionList(keyword)
+            {
+                $http({
+                    url : GURL + 'suggestion_list',
+                    method : "GET",
+                    params :{
+                        keywordsForSearch:keyword,
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data)
+                    {
+                        moduleWiseAction(1,resp.data);
+                    }
+                    else
+                    {
+                        moduleWiseAction(2,resp.data);
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+            }
+
+            /**
+             * Module-wise ACTIONS based on the search result
+             * 1:Found result
+             * 2:No result Found
+             */
+            function moduleWiseAction(resType,data)
+            {
+                if(parseInt(resType) == 1)//Result Found
+                {
+                    setSuggestionListData(data);
+                }
+                else//No Result Found
+                {
+                    $scope.groupSuggestionOpen = false;
+                    changeCheckBtn(1);
+                    console.log("No result found");
+                }
+            }
+
+            /**
+             * set the response data and show suggestion list
+             */
+            function setSuggestionListData(data)
+            {
+                /* show suggestions if the request is not for creating new group */
+                $scope.groupSuggestionOpen = true;
+                $scope.suggestedGroup = data;
+            }
+
+            /**
+             * reset the data for group suggestions
+             */
+            function resetSuggestions()
+            {
+                $scope.suggestedGroup = [];
+            }
+
+            /**
+             * reset all default settings
+             */
+            function resetDefaultSettings()
+            {
+                $scope.groupSuggestionOpen = false;
+                $scope.checkBtnIcon = 1;//1:fa-search,2:fa-check
+                $scope.accessToken = 2;
+                $scope.groupName = "";
+                $('#group-name').val($scope.groupName);
+                $scope.isGroupNameUnique = true;
+            }
+
+            /**
+             * Reset modules
+             */
+            function resetModule()
+            {
+                $scope.module = [
+                    {
+                        joinGroup : false,
+                        createGroup : false,
+                        editGroup : false,
+                        viewGroup : false
+                    }
+                ];
+            }
+
+            /**
+             * Select a group from a suggestion list
+             */
+            $scope.selectGroupFromSuggestionList = function(index)
+            {
+                var isAdmin = parseInt($scope.suggestedGroup[index].isAdmin) > 0?true:false;
+                var isMember = parseInt($scope.suggestedGroup[index].isMember) > 0?true:false;
+                /* populate the input box with the selected input */
+                $scope.groupName = $scope.suggestedGroup[index].GroupName;
+                $('#group-name').val($scope.groupName);
+                /* close the suggestion */
+                $scope.groupSuggestionOpen = false;
+                /* change the check btn icon */
+                changeCheckBtn(2);
+            }
+
+            /**
+             * Change the check btn
+             */
+            function changeCheckBtn(code)
+            {
+                $scope.checkBtnIcon = code;
+            }
+
+            /**
+             * Create a group
+             */
+            $scope.createGroupRequest = function()
+            {
+                $http({
+                    url : GURL + 'create_group',
+                    method : "POST",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        group_name:grp,
+                        group_type:grp,
+                        about_group:grp,
+                        auto_join:grp,
+                        member_id:grp,
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data)
+                    {
+                        moduleWiseAction(1,resp.data);
+                    }
+                    else
+                    {
+                        moduleWiseAction(2,resp.data);
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
             }
         }]);
