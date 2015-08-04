@@ -23,10 +23,10 @@
             restrict : 'EA',
             replace : true,
             scope : {
-                list : '=',
-                companyId : '=',
-                companyName : '=',
-                loadSuggestion : '='
+                list : '=?',
+                companyId : '=?',
+                companyName : '=?',
+                loadSuggestion : '=?'
             },
             link : function(scope,element,attrs){
                 var companyFlag = false;

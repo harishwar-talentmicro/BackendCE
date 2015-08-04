@@ -2827,3 +2827,25 @@ h4.front-business-form.warning-text{
 .btn-label-white{
     color:#FFFFFF!important;
 }
+.transaction-details-box .btn-info.active,
+.transaction-details-box  .btn-info.focus,
+.transaction-details-box  .btn-info:active,
+.transaction-details-box .btn-info:focus,
+.transaction-details-box .btn-info:hover,
+.transaction-details-box .open>.dropdown-toggle.btn-info{
+    background-color: #FF6700;
+    border-color: #EF7522;
+}
+
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) {
+    .transaction-filter-row{
+        height: 35px;
+    }
+}
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
+    .transaction-filter-row{
+        height: 35px;
+    }
+}
