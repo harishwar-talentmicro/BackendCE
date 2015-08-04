@@ -72,11 +72,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         error['groupName'] = 'Invalid groupName';
         validateStatus *= false;
     }
-    if(!memberID){
-        error['groupName'] = 'Invalid groupName';
-        validateStatus *= false;
-    }
-
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
