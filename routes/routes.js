@@ -167,13 +167,13 @@ exports.FnJobs = jobModule.jobs;
 exports.FnGetAppliedJob = jobModule.getAppliedJob;
 exports.FnGetJobcountry = jobModule.getJobcountry;
 exports.FnGetjobcity = jobModule.getjobcity;
-
+exports.FnGetJobSeekersMailDetails = jobModule.getJobSeekersMailDetails;
 
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);
 exports.FnCreateMessageGroup = messageBox.createMessageGroup;
 exports.FnValidateGroupName = messageBox.validateGroupName;
-exports.FnUpdateUserResponse = messageBox.updateUserResponse;
+exports.FnUpdateUserStatus = messageBox.updateUserStatus;
 exports.FnUpdateUserRelationship = messageBox.updateUserRelationship;
 exports.FnDeleteGroup = messageBox.deleteGroup;
 exports.FnSendMessageRequest = messageBox.sendMessageRequest;
