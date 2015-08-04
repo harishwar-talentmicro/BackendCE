@@ -36,7 +36,9 @@
                                     <i class="fa fa-external-link"></i> Groups <span class="label label-warning">30</span>
                                 </a>
                                 <span class="pull-right p-right-10">
-                                    <button ng-click="modalAddGroupVisibility()" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
+                                    <button ng-click="modalAddGroupVisibility(1)" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
+                                    <button ng-click="modalAddGroupVisibility(2)" class="btn btn-default btn-xs no-radius"><i class="fa fa-thumbs-up"></i> Join</button>
+                                    <button ng-click="modalAddGroupVisibility(3)" class="btn btn-default btn-xs no-radius"><i class="fa fa-edit"></i> Edit</button>
                                 </span>
                             </li>
                             <!-- groups goes here -->
@@ -186,68 +188,115 @@
     <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
         <section class="group-page row p-5">
 
-
-            <!-- Group Name Form goes here -->
-            <div class="container">
-                <div class="group-input-form col-lg-6">
-                    <div class="input-group p-bottom-4 width-100">
-                        <div class="input-group-addon"><i class="fa fa-plus"></i> Groups </div>
-                        <input type="text"
-                               class="form-control ng-pristine ng-untouched ng-valid"
-                               placeholder="Enter a unique Group Title"
-                               ng-model="groupName"
-                               id="group-name"
-                               ng-keypress="checkLoggedInUserAndGroup(groupName)">
-                    </div>
-                    <span class="text-danger">Group name entered is not unique</span>
-                </div>
-
-                <div class="col-lg-4">
-                    <select class="form-control" ng-model="accessControl" ng-change="accessCtrlChange(accessControl)">
-                        <option value="0">Group Admin</option>
-                        <option value="1">Group Member</option>
-                        <option value="2">New Group</option>
-                    </select>
-                </div>
-                <div class="col-lg-2">
-                    <button class="btn btn-primary">{{groupActionBtn[accessToken]}}</button>
-                </div>
-            </div>
-            <!-- Group members addition form goes here -->
-            <div class="container" ng-show="accessControl == 0 || accessControl == 2">
-                <div class="col-lg-6">
-                    <div class="input-group">
-                        <div class="input-group-addon">
-                            <i class="fa fa-user"></i> Member
+            <section id="group-action-form-module" ng-show="groupFormVisible">
+                <!-- Group Name Form goes here -->
+                <div class="container">
+                    <div class="group-input-form col-lg-10">
+                        <div class="input-group p-bottom-4 width-100">
+                            <div class="input-group-addon"><i class="fa fa-users"></i> Groups&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>
+                            <input type="text"
+                                   class="form-control ng-pristine ng-untouched ng-valid"
+                                   placeholder="Enter a unique Group Title"
+                                   ng-model="groupName"
+                                   id="group-name"
+                                   ng-keypress="($event.charCode==13)?groupSearchAction():return">
+                            <div class="input-group-addon no-padding-and-border">
+                                <button class="btn no-radius"
+                                        title="search group"
+                                        ng-click="groupSearchAction()"
+                                        ng-class="checkBtnIcon == 1?'btn-danger':'btn-success'">
+                                    <i class="fa" ng-class="checkBtnIcon == 1?'fa-search':'fa-check-circle'"></i> Check
+                                </button>
+                            </div>
                         </div>
-                        <input type="text" class="form-control" />
-                    </div>
-                    <span class="text-danger">Invalid EZEONE ID</span>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="input-group">
-                        <div class="input-group-addon">
-                            <i class="fa fa-tags"></i> Relation
+                        <!-- group name suggestion list -->
+                        <div class="group-name-suggestion" ng-show="groupSuggestionOpen">
+                            <div ng-repeat="grp in suggestedGroup track by $index"
+                                 class="group-suggestion pointer"
+                                 ng-click="selectGroupFromSuggestionList($index)">
+                                {{grp.GroupName}}
+                            </div>
                         </div>
-                        <select class="form-control">
-                            <option ng-repeat="relation in relationArr track by $index">{{relation}}</option>
-                        </select>
+                        <!-- group name error message -->
+                        <span class="text-danger" ng-show="!isGroupNameUnique">Group name entered is empty or not unique</span>
+                    </div>
+                    <!-- Group description goes here -->
+                    <div class="col-lg-10" ng-show="groupDescVisible" >
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="fa fa-quote-right"></i> Description </div>
+                            <textarea class="form-control" ng-model="groupDesc" rows="5"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-10 p-top-7" ng-show="groupDescVisible" >
+                            <button class="btn btn-default btn-xs" ng-click="isPublicGroup = !isPublicGroup">
+                                <i class="fa" ng-class="isPublicGroup?'fa-check-square':'fa-square-o'"></i>
+                            </button>
+                            <b>Make it public</b>
+                            <small>(Member requests accepted automatically)</small>
+
+                    </div>
+                    <!--<div class="col-lg-2">-->
+                    <!--<select class="form-control"-->
+                    <!--ng-model="accessControl"-->
+                    <!--ng-change="accessCtrlChange(accessControl)">-->
+                    <!--<option value="0">Group Admin</option>-->
+                    <!--<option value="1">Group Member</option>-->
+                    <!--<option value="2">New Group</option>-->
+                    <!--</select>-->
+                    <!--</div>-->
+                    <div class="col-lg-12 text-left p-top-7">
+                        <button class="btn btn-primary"  ng-show="groupCreateBtnVisible">
+                            <i class="fa fa-plus"></i> Create Group
+                        </button>
+                        <button class="btn btn-info"  ng-show="joinGroupBtnVisible">
+                            <i class="fa fa-thumbs-up"></i> Join Group
+                        </button>
+                        <button class="btn btn-info"  ng-show="editGroupBtnVisible">
+                            <i class="fa fa-edit"></i> Edit Group
+                        </button>
+                        <button class="btn btn-danger"  ng-show="deleteGroupBtnVisible">
+                            <i class="fa fa-delete"></i> Delete Group
+                        </button>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Group member name goes here -->
-            <div class="container p-top-7">
-                <div class="col-lg-12">
-                    <table class="table table-bordered table-striped">
-                        <thead>
-                        <th width="10%">#</th>
-                        <th width="40%">Member Name</th>
-                        <th width="40%">Relation</th>
-                        <th width="10%">Action</th>
-                        </thead>
-                        <tbody ng-show="accessControl == 0 || accessControl == 1">
+            <section id="member-action-form-module" ng-show="groupMemberVisible">
+                <!-- Group members addition form goes here -->
+                <div class="container" ng-show="accessControl == 0 || accessControl == 2">
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-user"></i> Member
+                            </div>
+                            <input type="text" class="form-control" />
+                        </div>
+                        <span class="text-danger">Invalid EZEONE ID</span>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-tags"></i> Relation
+                            </div>
+                            <select class="form-control">
+                                <option ng-repeat="relation in relationArr track by $index">{{relation}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group member name goes here -->
+                <div class="container p-top-7">
+                    <div class="col-lg-12">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <th width="10%">#</th>
+                            <th width="40%">Member Name</th>
+                            <th width="40%">Relation</th>
+                            <th width="10%">Action</th>
+                            </thead>
+                            <tbody ng-show="accessControl == 0 || accessControl == 1">
                             <tr>
                                 <td>1</td>
                                 <td>Sandeep</td>
@@ -264,20 +313,21 @@
                                     <!--<button class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>-->
                                 </td>
                             </tr>
-                        </tbody>
-                        <!-- No Data found -->
-                        <tbody ng-hide="accessControl == 0 || accessControl == 1">
+                            </tbody>
+                            <!-- No Data found -->
+                            <tbody ng-hide="accessControl == 0 || accessControl == 1">
                             <tr>
                                 <td colspan="4">No Data Found</td>
                             </tr>
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-
-            <div class="container text-right p-top-7">
-                <button class="btn btn-success"><i class="fa fa-save"></i> Save Group</button>
-            </div>
+                <!-- Save or update group button -->
+                <div class="container text-right p-top-7">
+                    <button class="btn btn-success"><i class="fa fa-save"></i> Save Group</button>
+                </div>
+            </section>
         </section>
     </modal>
 

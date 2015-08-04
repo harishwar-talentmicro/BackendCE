@@ -3313,3 +3313,27 @@ sup.tm{
 {
     background-color: rgba(255, 78, 28, 0.75) !important;
 }
+
+.hpw .group-name-suggestion
+{
+    text-align: right;
+    position: absolute;
+    background-color: #fff;
+    width: 84%;
+    box-shadow: 2px 2px 2px #B1ACAC;
+    border: 1px solid #E7D9D9;
+    padding: 2px;
+    z-index: 999;
+}
+
+.hpw .group-suggestion
+{
+    padding-right: 2%;
+
+}
+
+.hpw .group-suggestion:hover
+{
+    background-color: #0B848E;
+    color: #fff;
+}
