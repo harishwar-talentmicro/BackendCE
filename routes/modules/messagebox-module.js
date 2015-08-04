@@ -62,12 +62,12 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(parseInt(groupName) == NaN){
-        error['groupName'] = 'Invalid groupName';
+    if(parseInt(groupType) == NaN){
+        error['groupType'] = 'Invalid groupType';
         validateStatus *= false;
     }
-    if(!groupType){
-        error['groupType'] = 'Invalid groupType';
+    if(!groupName){
+        error['groupName'] = 'Invalid groupName';
         validateStatus *= false;
     }
     if(!validateStatus){
@@ -292,7 +292,7 @@ MessageBox.prototype.updateUserResponse = function(req,res,next){
         error['ezeone_id'] = 'Invalid ezeone_id';
         validateStatus *= false;
     }
-    if(!status){
+    if(parseInt(status) == NaN){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
@@ -416,7 +416,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
         error['memberID'] = 'Invalid memberID';
         validateStatus *= false;
     }
-    if(!relationType){
+    if(parseInt(relationType) == NaN){
         error['relationType'] = 'Invalid relationType';
         validateStatus *= false;
     }
@@ -617,8 +617,8 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
         error['groupName'] = 'Invalid groupName';
         validateStatus *= false;
     }
-    if(!groupType){
-        error['groupName'] = 'Invalid groupName';
+    if(parseInt(groupType) == NaN){
+        error['groupType'] = 'Invalid groupType';
         validateStatus *= false;
     }
 
@@ -1402,6 +1402,114 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
             responseMessage.message = 'An error occurred !'
             res.status(500).json(responseMessage);
             console.log('Error : FnAddGroupMembers ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetPendingRequest
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get Pending Request
+ */
+MessageBox.prototype.getPendingRequest = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token);
+                        var query = 'CALL pGetPendingRequest(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'PendingList loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetPendingRequest: PendingList loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'PendingList not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetPendingRequest:PendingList not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'PendingList not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetPendingRequest:PendingList not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetPendingRequest: error in getting OutBox Messages:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetPendingRequest: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetPendingRequest:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetPendingRequest ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

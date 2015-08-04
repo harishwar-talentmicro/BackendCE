@@ -87,7 +87,7 @@ exports.FnGetCompanyDetails = businessManager.getCompanyDetails;
 exports.FnGetEZEOneIDInfo = businessManager.getEZEOneIDInfo;
 exports.FnGetTransAttachment = businessManager.getTransAttachment;
 exports.FnSalesStatistics = businessManager.salesStatistics;
-exports.FnGetAlarmMessages = businessManager.getAlarmMessages;
+
 
 
 var Configuration = require('./modules/configuration-module.js');
@@ -184,6 +184,7 @@ exports.FnChangeMessageActivity = messageBox.changeMessageActivity;
 exports.FnLoadOutBoxMessages = messageBox.loadOutBoxMessages;
 exports.FnGetSuggestionList = messageBox.getSuggestionList;
 exports.FnAddGroupMembers = messageBox.addGroupMembers;
+exports.FnGetPendingRequest = messageBox.getPendingRequest;
 
 
 var Notification = require('./modules/notification-module.js');

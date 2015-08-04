@@ -362,114 +362,129 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(EZEID);
                                                 st.db.query(query1, function (err, getResult) {
 
-                                                    if (getResult[0].id == 1) {
-                                                        if (getResult[0].EZEIDVerifiedID == 1) {
-                                                            verified = 'Not Verified';
-                                                        }
-                                                        else {
-                                                            verified = 'Verified';
-                                                        }
+                                                    if(getResult) {
+                                                        if (getResult[0]) {
+                                                            if (getResult[0].id == 1) {
+                                                                if (getResult[0].EZEIDVerifiedID == 1) {
+                                                                    verified = 'Not Verified';
+                                                                    console.log('FnSalesMail: not verified')
+                                                                }
+                                                                else {
+                                                                    verified = 'Verified';
+                                                                    console.log('FnSalesMail: not verified');
+                                                                }
 
-                                                        data = data.replace("[IsVerified]", verified);
-                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
-                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                        data = data.replace("[Message]", MessageText);
+                                                                data = data.replace("[IsVerified]", verified);
+                                                                data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                                data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                                data = data.replace("[Message]", MessageText);
 
-                                                        var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+                                                                var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
 
-                                                        st.db.query(mail_query, function (err, get_result) {
-                                                            console.log(get_result);
-                                                            if (get_result) {
-                                                                var mailOptions = {
-                                                                    from: 'noreply@ezeone.com',
-                                                                    to: get_result[0].EMailID,
-                                                                    subject: 'Sales Enquiry from ' + ToEZEID,
-                                                                    html: data // html body
-                                                                };
-                                                                //console.log(mailOptions);
-                                                                var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(ToEZEID);
-                                                                st.db.query(queryResult, function (err, result) {
-                                                                    console.log(result);
-                                                                    var post = {
-                                                                        MessageType: messagetype,
-                                                                        Priority: 3,
-                                                                        ToMailID: mailOptions.to,
-                                                                        Subject: mailOptions.subject,
-                                                                        Body: mailOptions.html,
-                                                                        SentbyMasterID: result[0].TID
-                                                                    };
+                                                                st.db.query(mail_query, function (err, get_result) {
+                                                                    console.log(get_result);
+                                                                    if (get_result) {
+                                                                        var mailOptions = {
+                                                                            from: 'noreply@ezeone.com',
+                                                                            to: get_result[0].EMailID,
+                                                                            subject: 'Sales Enquiry from ' + ToEZEID,
+                                                                            html: data // html body
+                                                                        };
+                                                                        //console.log(mailOptions);
+                                                                        var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(ToEZEID);
+                                                                        st.db.query(queryResult, function (err, result) {
+                                                                            console.log(result);
+                                                                            var post = {
+                                                                                MessageType: messagetype,
+                                                                                Priority: 3,
+                                                                                ToMailID: mailOptions.to,
+                                                                                Subject: mailOptions.subject,
+                                                                                Body: mailOptions.html,
+                                                                                SentbyMasterID: result[0].TID
+                                                                            };
 
-                                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                        // Neat!
-                                                                        if (!err) {
-                                                                            console.log('FnMessageMail: Mail saved Successfully....1');
-                                                                        }
-                                                                        else {
-                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+                                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                                // Neat!
+                                                                                if (!err) {
+                                                                                    console.log('FnMessageMail: Mail saved Successfully....1');
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnMessageMail: Mail not Saved Successfully');
 
-                                                                        }
-                                                                    });
+                                                                                }
+                                                                            });
+                                                                        });
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSendMail:getting error from EmailID ');
+                                                                    }
                                                                 });
                                                             }
                                                             else {
-                                                                console.log('FnSendMail:getting error from EmailID ');
+                                                                if (getResult[0].EZEIDVerifiedID == 1) {
+                                                                    verified = 'Not Verified';
+                                                                    console.log('FnSalesMail: not verified');
+                                                                }
+                                                                else {
+                                                                    verified = 'Verified';
+                                                                    console.log('FnSalesMail:verified');
+                                                                }
+                                                                data = data.replace("[IsVerified]", verified);
+                                                                data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                                data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                                data = data.replace("[Message]", MessageText);
+
+                                                                var mail_query = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                                                console.log(mail_query);
+                                                                st.db.query(mail_query, function (err, get_result) {
+
+                                                                    if (get_result) {
+                                                                        var mailOptions = {
+                                                                            from: 'noreply@ezeone.com',
+                                                                            to: get_result[0].SalesMailID,
+                                                                            subject: 'Sales Enquiry from ' + ToEZEID,
+                                                                            html: data // html body
+                                                                        };
+                                                                        //console.log(mailOptions);
+                                                                        var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(ToEZEID);
+                                                                        st.db.query(queryResult, function (err, result) {
+
+                                                                            var post = {
+                                                                                MessageType: messagetype,
+                                                                                Priority: 3,
+                                                                                ToMailID: mailOptions.to,
+                                                                                Subject: mailOptions.subject,
+                                                                                Body: mailOptions.html,
+                                                                                SentbyMasterID: result[0].TID
+                                                                            };
+                                                                            //console.log(post);
+                                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                                // Neat!
+                                                                                if (!err) {
+                                                                                    console.log('FnMessageMail: Mail saved Successfully....1');
+
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                                }
+                                                                            });
+                                                                        });
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSendMail:getting error from EmailID ');
+                                                                    }
+                                                                });
                                                             }
-                                                        });
-                                                    }
+                                                        }
                                                     else {
-                                                        if (getResult[0].EZEIDVerifiedID == 1) {
-                                                            verified = 'Not Verified';
-                                                        }
-                                                        else {
-                                                            verified = 'Verified';
-                                                        }
-                                                        data = data.replace("[IsVerified]", verified);
-                                                        data = data.replace("[EZEOneID]", getResult[0].EZEID);
-                                                        data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                        data = data.replace("[Message]", MessageText);
-
-                                                        var mail_query = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
-                                                        console.log(mail_query);
-                                                        st.db.query(mail_query, function (err, get_result) {
-
-                                                            if (get_result) {
-                                                                var mailOptions = {
-                                                                    from: 'noreply@ezeone.com',
-                                                                    to: get_result[0].SalesMailID,
-                                                                    subject: 'Sales Enquiry from ' + ToEZEID,
-                                                                    html: data // html body
-                                                                };
-                                                                //console.log(mailOptions);
-                                                                var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(ToEZEID);
-                                                                st.db.query(queryResult, function (err, result) {
-
-                                                                    var post = {
-                                                                        MessageType: messagetype,
-                                                                        Priority: 3,
-                                                                        ToMailID: mailOptions.to,
-                                                                        Subject: mailOptions.subject,
-                                                                        Body: mailOptions.html,
-                                                                        SentbyMasterID: result[0].TID
-                                                                    };
-                                                                    //console.log(post);
-                                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                        // Neat!
-                                                                        if (!err) {
-                                                                            console.log('FnMessageMail: Mail saved Successfully....1');
-
-                                                                        }
-                                                                        else {
-                                                                            console.log('FnMessageMail: Mail not Saved Successfully');
-
-                                                                        }
-                                                                    });
-                                                                });
-                                                            }
-                                                            else {
-                                                                console.log('FnSendMail:getting error from EmailID ');
-                                                            }
-                                                        });
+                                                        console.log('FnSalesMail:error from getting id');
                                                     }
+                                                }
+                                                else
+                                                {
+                                                    console.log('FnSalesMail:error from getting id');
+                                                }
                                                 });
                                             });
                                         }
@@ -2242,113 +2257,4 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
 };
 
 
-
-/**
- * @todo FnGetAlarmMessages
- * Method : Get
- * @param req
- * @param res
- * @param next
- * @description api code for get alarm messages
- */
-BusinessManager.prototype.getAlarmMessages = function(req,res,next){
-    var _this = this;
-
-    var token = req.query.token;
-
-
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-
-    var validateStatus = true, error = {};
-
-    if(!token){
-        error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
-
-    if(!validateStatus){
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-        try {
-            st.validateToken(token, function (err, result) {
-                if (!err) {
-                    if (result) {
-
-                        var query = 'CALL pGetAlarmMessages()';
-                        st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
-                            if (!err) {
-                                if (getResult) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Alarm Messages loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlarmMessages: Alarm Messages loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Alarm Messages not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlarmMessages:Alarm Messages not loaded');
-                                    }
-
-                                }
-                                else {
-                                    responseMessage.message = 'Alarm Messages not loaded';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetAlarmMessages:Alarm Messages not loaded');
-                                }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnGetAlarmMessages: error in getting Alarm Messages:' + err);
-                            }
-                        });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {
-                            token: 'invalid token'
-                        };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetAlarmMessages: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error = {
-                        server : 'Internal server error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetAlarmMessages:Error in processing Token' + err);
-                }
-            });
-        }
-        catch (ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error : FnGetAlarmMessages ' + ex.description);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-        }
-    }
-};
 module.exports = BusinessManager;

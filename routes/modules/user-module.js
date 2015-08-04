@@ -2666,10 +2666,11 @@ User.prototype.saveResume = function(req,res,next){
                                 location_title: locationDetails.location_title,
                                 latitude: locationDetails.latitude,
                                 longitude: locationDetails.longitude,
-                                country: locationDetails.country
+                                country: locationDetails.country,
+                                mapType : locationDetails.mapType
                             };
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country);
+                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.mapType);
 
                             console.log(queryParams);
 
