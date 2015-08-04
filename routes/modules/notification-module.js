@@ -19,6 +19,9 @@ function Notification(db,stdLib){
  *
  */
 Notification.prototype.authUser = function(req,res,next){
+    console.log(req.query);
+    console.log(req.params);
+
     var ezeoneId = req.query.username;
     var token = req.query.password;
     var status = true;
@@ -63,6 +66,9 @@ Notification.prototype.authUser = function(req,res,next){
 };
 
 Notification.prototype.authVHost = function(req,res,next){
+    console.log(req.query);
+    console.log(req.params);
+
     var ezeoneId = req.query.username;
     var token = req.query.password;
     var status = true;
@@ -76,24 +82,25 @@ Notification.prototype.authVHost = function(req,res,next){
     }
 
     try{
-        st.validateToken(token,function(err,result){
-            if(err){
-                console.log('Error : Notification Module authUser - while token validation');
-                console.log(err);
-                var errorDate = new Date();
-                console.log(errorDate.toTimeString() + ' ......... error ...........');
-                res.send('deny');
-            }
-            else{
-                if(result){
-                    res.send('allow');
-                }
-                else{
-                    console.log('Access Denied : Notification Module authUser - while token validation');
-                    res.send('deny');
-                }
-            }
-        });
+        //st.validateToken(token,function(err,result){
+        //    if(err){
+        //        console.log('Error : Notification Module authUser - while token validation');
+        //        console.log(err);
+        //        var errorDate = new Date();
+        //        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        //        res.send('deny');
+        //    }
+        //    else{
+        //        if(result){
+        //            res.send('allow');
+        //        }
+        //        else{
+        //            console.log('Access Denied : Notification Module authUser - while token validation');
+        //            res.send('deny');
+        //        }
+        //    }
+        //});
+        res.send('allow')
     }
     catch(ex){
         console.log('Error : Notification Module authUser');
@@ -107,8 +114,6 @@ Notification.prototype.authVHost = function(req,res,next){
 Notification.prototype.authResource = function(req,res,next){
     console.log(req.query);
     console.log(req.params);
-    var ezeoneId = req.query.username;
-    var token = req.query.password;
 
     // RabbitMQ virtual host
     var vHost = req.query.vhost;
@@ -124,41 +129,34 @@ Notification.prototype.authResource = function(req,res,next){
 
     var status = true;
 
-    if(!token){
-        status *= false;
-    }
-
-    if(!ezeoneId){
-        status *= false;
-    }
-
-    if(resourcePermission == 'configure'){
-        status *= false;
-    }
+    //if(resourcePermission == 'configure'){
+    //    status *= false;
+    //}
 
     if(!status){
         res.status(200).send('deny');
     }
     else{
         try{
-            st.validateToken(token,function(err,result){
-                if(err){
-                    console.log('Error : Notification Module authUser - while token validation');
-                    console.log(err);
-                    var errorDate = new Date();
-                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                    res.status(200).send('deny');
-                }
-                else{
-                    if(result){
-                        res.status(200).send('allow');
-                    }
-                    else{
-                        console.log('Access Denied : Notification Module authUser - while token validation');
-                        res.status(200).send('deny');
-                    }
-                }
-            });
+            //st.validateToken(token,function(err,result){
+            //    if(err){
+            //        console.log('Error : Notification Module authUser - while token validation');
+            //        console.log(err);
+            //        var errorDate = new Date();
+            //        console.log(errorDate.toTimeString() + ' ......... error ...........');
+            //        res.status(200).send('deny');
+            //    }
+            //    else{
+            //        if(result){
+            //            res.status(200).send('allow');
+            //        }
+            //        else{
+            //            console.log('Access Denied : Notification Module authUser - while token validation');
+            //            res.status(200).send('deny');
+            //        }
+            //    }
+            //});
+            res.send('allow');
         }
         catch(ex){
             console.log('Error : Notification Module authUser');
