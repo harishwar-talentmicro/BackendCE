@@ -47,8 +47,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var groupType  = req.body.group_type;
     var aboutGroup  = req.body.about_group ? req.body.about_group : '';
     var autoJoin  = req.body.auto_join ? req.body.auto_join : 0;
-    var memberID  = req.body.member_id;
-    var relationType = req.body.relation_type;
     var tid = req.body.tid ? req.body.tid : 0;
 
     var responseMessage = {
@@ -69,14 +67,9 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         validateStatus *= false;
     }
     if(!groupType){
-        error['groupName'] = 'Invalid groupName';
+        error['groupType'] = 'Invalid groupType';
         validateStatus *= false;
     }
-    if(!memberID){
-        error['groupName'] = 'Invalid groupName';
-        validateStatus *= false;
-    }
-
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -88,8 +81,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(groupName) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
-                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(memberID)
-                            + ',' + st.db.escape(relationType) + ',' + st.db.escape(tid);
+                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(tid);
                         var query = 'CALL pCreateMessageGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
@@ -106,8 +98,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                                         groupType: req.body.group_type,
                                         aboutGroup: req.body.about_group,
                                         autoJoin: req.body.auto_join,
-                                        memberID: req.body.member_id,
-                                        relationType: req.body.relation_type,
                                         tid: req.body.tid
                                     };
                                     res.status(200).json(responseMessage);
