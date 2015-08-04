@@ -947,10 +947,13 @@
                  * to make ui and requested data consistent
                  */
 
+                console.log($scope.userFolders);
+                console.log($scope.myFolders);
                 var folderRuleArr = [];
-                for(var i = 0; i < $scope.myFolders; i++){
+                for(var i = 0; i < $scope.myFolders.length; i++){
                     folderRuleArr.push($scope.myFolders[i].id);
                 }
+
                 var folderRules = (folderRuleArr) ? folderRuleArr.join(',') : '';
                 /**
                  * Commented as we don't have to load anything if user is not having folder assigned
