@@ -364,6 +364,7 @@ angular.module('ezeidApp').
             /* toggle Add/edit Group Popup */
             $scope.modalAddGroupVisibility = function (code) {
                 $scope.modalAddGroupVisible = !$scope.modalAddGroupVisible;
+                $scope.groupNameDisable = false;
                 resetDefaultSettings();
                 if(parseInt(code) == 1)//Create new group
                 {
@@ -785,9 +786,8 @@ angular.module('ezeidApp').
             }
 
             /**
-             * Add individual member into group member
+             * Add individual member into group member[called from DOM]
              */
-
             $scope.addMember = function()
             {
                 if(!parseInt($scope.activeEzeOneId)>0)
@@ -807,16 +807,19 @@ angular.module('ezeidApp').
                     id:$scope.activeEzeOneId
                 };
                 /* Add group member */
-                addMemberApiCall().then(function(){/////////////////////////////@todo
+                addMemberApiCall().then(function(){
                     $scope.groupMember.push(temp);
-                    addMemberForm();
+                    clearAddMemberForm();
+                },
+                function(){
+                    Notification.error({ message: "Failed to add this mmember, Please try again  later", delay: MsgDelay });
                 });
             }
 
             /**
              * clear add-member form
              */
-            function addMemberForm()
+            function clearAddMemberForm()
             {
                 $scope.activeEzeOneName = "";
                 $scope.modalBox.selectedRelation = 0;
@@ -825,19 +828,26 @@ angular.module('ezeidApp').
                 $scope.addMemberDisabled = true;
             }
 
+
             /**
-             * Remove a group member  while creating group
+             * Remove individual member from group[called from DOM]
              */
-            $scope.removeMemberAtGroupCreation = function(id)
+            $scope.removeGroupMember = function(id)
             {
                 var index = $scope.groupMember.indexOfWhere('id',id);
-                console.log(index);
                 if(index >= 0)
                 {
-                    $scope.groupMember.splice(index,1);
+                    var data = $scope.groupMember[index];
+                    removeMemberApiCall(data.id).then(function(){
+                        $scope.groupMember.splice(index,1);
+                    },
+                    function(){
+                        Notification.error({ message: "Failed to remove this member, Try again later", delay: MsgDelay });
+                    });
+
                     return;
                 }
-                Notification.error({ message: "Failed to remove this member, Try again later", delay: MsgDelay });
+
             }
 
             /**
@@ -848,7 +858,7 @@ angular.module('ezeidApp').
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
-                    url : GURL + 'create_group',
+                    url : GURL + 'group_members',
                     method : "POST",
                     data :{
                         group_id : $scope.activeGroupId,
@@ -856,10 +866,15 @@ angular.module('ezeidApp').
                         relation_type : $scope.modalBox.selectedRelation
                     }
                 }).success(function(resp){
-
-                    $scope.$emit('$preLoaderStop');
-                    console.log(resp);
-                    defer.resolve();
+                    if(resp.status)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        defer.resolve();
+                    }
+                    else
+                    {
+                        defer.reject();
+                    }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
@@ -871,8 +886,34 @@ angular.module('ezeidApp').
             /**
              * Remove member API call
              */
-            function removeMemberApiCall()
+            function removeMemberApiCall(ezeoneId)
             {
-
+                var defer = $q.defer();
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'user_status',
+                    method : "PUT",
+                    data :{
+                        token : $rootScope._userInfo.Token,
+                        group_id : $scope.activeGroupId,
+                        master_id : ezeoneId,
+                        status : 4
+                    }
+                }).success(function(resp){
+                    if(resp.status)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        defer.resolve();
+                    }
+                    else
+                    {
+                        defer.reject();
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
             }
         }]);
