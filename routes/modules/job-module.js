@@ -1164,39 +1164,62 @@ Job.prototype.getAppliedJob = function(req,res,next){
     }
     else {
         try {
-            var queryParams = st.db.escape(token) + ',' + st.db.escape(pageSize) + ',' +  st.db.escape(pageCount)
-            var query = 'CALL pGetAppliedJobs(' + queryParams + ')';
-            console.log(query);
-            st.db.query(query, function (err, getResult) {
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (getResult) {
-                        if(getResult[0]){
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Applied job List loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnAppliedJobList: Applied job List loaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'Applied job List not loaded';
-                            res.status(200).json(responseMessage);
-                            console.log('FnAppliedJobList:Applied job List not loaded');
-                        }
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
+                        var query = 'CALL pGetAppliedJobs(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Applied job List loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnAppliedJobList: Applied job List loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Applied job List not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnAppliedJobList:Applied job List not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Applied job List not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnAppliedJobList:Applied job List not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnAppliedJobList: error in saving Applied job list :' + err);
+                            }
+                        });
                     }
                     else {
-                        responseMessage.message = 'Applied job List not loaded';
-                        res.status(200).json(responseMessage);
-                        console.log('FnAppliedJobList:Applied job List not loaded');
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnAppliedJobList: Invalid token');
                     }
                 }
                 else {
-                    responseMessage.message = 'An error occured ! Please try again';
                     responseMessage.error = {
-                        server: 'Internal Server Error'
+                        server: 'Internal server error'
                     };
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnAppliedJobList: error in saving Applied job list :' + err);
+                    console.log('FnAppliedJobList:Error in processing Token' + err);
                 }
             });
         }
