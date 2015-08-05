@@ -637,7 +637,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var educations = req.query.educations ? req.query.educations : '';
         var specializationId =  req.query.specialization_id ? req.query.specialization_id : '';
         var instituteId =  req.query.institute_id ? req.query.institute_id : '';
-        var score = req.query.score ? req.query.score : 0;
+        var scoreFrom = req.query.score_from ? req.query.score_from : 0;
+        var scoreTo = req.query.score_to ? req.query.score_to : 0;
 
         /**
          * Validations
@@ -660,7 +661,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             var queryParams = st.db.escape(keyword) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                 + ',' + st.db.escape(salaryType) +',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
                 + ',' + st.db.escape(experienceTo)+ ',' + st.db.escape(educations)+ ',' + st.db.escape(specializationId)
-                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(score);
+                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(score_from)+ ',' + st.db.escape(score_to);
 
 
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
@@ -1344,6 +1345,7 @@ Job.prototype.getJobSeekersMessage = function(req,res,next){
     var token = req.query.token;
     var ids = req.query.ids;
     var templateId = req.query.template_id;
+    var jobId = req.query.job_id;
     var id,i=0,tid,jobResult;
 
     if(ids){
@@ -1388,7 +1390,7 @@ Job.prototype.getJobSeekersMessage = function(req,res,next){
                         var mailDetails = function(i) {
                             if(i < id.length) {
                                 tid = id[i];
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(tid);
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(tid)+ ',' + st.db.escape(jobId);
                                 var query = 'CALL pGetjobseekersmailDetails(' + queryParams + ')';
                                 console.log(query);
                                 st.db.query(query, function (err, getResult) {
@@ -1435,6 +1437,8 @@ Job.prototype.getJobSeekersMessage = function(req,res,next){
                                                     subject: TemplateResult[0].Subject,
                                                     html: TemplateResult[0].Body // html body
                                                 };
+                                                mailOptions.subject = mailOptions.subject.replace("[JobTitle]",jobResult[0][0].jobtitle);
+                                                mailOptions.html = mailOptions.html.replace("[JobTitle]",jobResult[0][0].jobtitle);
                                                 mailOptions.html = mailOptions.html.replace("[FirstName]", jobResult[0][0].FirstName);
                                                 mailOptions.html = mailOptions.html.replace("[LastName]", jobResult[0][0].LastName);
                                                 mailOptions.html = mailOptions.html.replace("[CompanyName]", jobResult[0][0].CompanyName);
