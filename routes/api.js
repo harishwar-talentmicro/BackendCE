@@ -150,6 +150,7 @@ router.get('/job_country',LocationManager.FnGetJobcountry);
 router.get('/job_city',LocationManager.FnGetjobcity);
 router.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
 router.get('/jobseeker_message',LocationManager.FnGetJobSeekersMessage);
+router.get('/jobs_list',LocationManager.FnGetListOfJobs);
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);
 router.get('/validate_groupname',LocationManager.FnValidateGroupName);

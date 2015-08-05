@@ -210,6 +210,7 @@ app.get('/job_country',LocationManager.FnGetJobcountry);
 app.get('/job_city',LocationManager.FnGetjobcity);
 app.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
 app.get('/jobseeker_message',LocationManager.FnGetJobSeekersMessage);
+app.get('/jobs_list',LocationManager.FnGetListOfJobs);
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);
 app.get('/validate_groupname',LocationManager.FnValidateGroupName);
