@@ -1170,7 +1170,7 @@ Job.prototype.getAppliedJob = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult) {
-                        if(getResult[0].length){
+                        if(getResult[0]){
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Applied job List loaded successfully';
@@ -1308,20 +1308,20 @@ Job.prototype.getjobcity = function(req,res,next){
 };
 
 /**
- * @todo FnGetJobSeekersMailDetails
+ * @todo FnGetJobSeekersMessage
  * Method : GET
  * @param req
  * @param res
  * @param next
  * @description api code for Get Job Seekers Mail Details
 */
-Job.prototype.getJobSeekersMailDetails = function(req,res,next){
+Job.prototype.getJobSeekersMessage = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
     var ids = req.query.ids;
     var templateId = req.query.template_id;
-    var id,i= 0,tid,jobResult;
+    var id,i=0,tid,jobResult;
 
     if(ids){
         id = ids.split(",");
@@ -1340,6 +1340,14 @@ Job.prototype.getJobSeekersMailDetails = function(req,res,next){
 
     if(!token){
         error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!ids){
+        error['ids'] = 'Invalid ids';
+        validateStatus *= false;
+    }
+    if(!templateId){
+        error['templateId'] = 'Invalid templateId';
         validateStatus *= false;
     }
 
@@ -1365,7 +1373,6 @@ Job.prototype.getJobSeekersMailDetails = function(req,res,next){
                                     if (!err) {
                                         if (getResult) {
                                             if (getResult[0].length > 0) {
-
                                                 console.log('FnGetJobSeekersMailDetails: Result loaded successfully');
                                                 sendJobMessage(getResult,tid);
                                             }
@@ -1423,9 +1430,7 @@ Job.prototype.getJobSeekersMailDetails = function(req,res,next){
                                                             var query = 'CALL pUpdateMailCountForCV(' + st.db.escape(tid) + ')';
                                                             st.db.query(query, function (err, result) {
                                                                 if(!err){
-                                                                    console.log('***********');
                                                                     console.log(result);
-                                                                    console.log('***********');
                                                                 }
                                                                 else{console.log(err);}
                                                             });
