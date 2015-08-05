@@ -40,11 +40,10 @@
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
                             <div class="form-group form-group-sm">
                                 <select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">
-                                    <!-- <option ng-repeat="sfilter in filterStatusTypes track by $index" value="{{sfilter.TID}}">{{sfilter.StatusTitle}}</option>-->
                                     <option value="0"> Active </option>
                                     <option value="1"> Closed(Hired) </option>
                                     <option value="2"> Cancelled </option>
-                                    <option value="0,1,2"> All </option>
+                                    <!-- <option value="0,1,2"> All </option>-->
                                 </select>
                             </div>
                         </div>
@@ -120,255 +119,259 @@
         <!--List of Job End hear-->
     </div>
 
-    <div ng-hide="showJobListing" class="emailPannelTopMargin">
+    <div ng-hide="showJobListing" class="emailPannelTopMargin postJob">
         <!-- Post new job start from hear -->
         <form name="jobPostForm" novalidate>
-            <div class="job-post p-bottom-10">
-                <div class="width-100 hpw">
-                    <div class="col-lg-6">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Job Title</button>
-                              </span>
-                            <input type="text" maxlength="150" ng-model = "jobTitle" placeholder="Job Title" class="form-control"/>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Job Code</button>
-                              </span>
-                            <input type="text" maxlength="30" ng-model = "jobCode" placeholder="Job Code" class="form-control"/>
-                        </div>
-                    </div>
-                    <div class="col-lg-12 p-top-10">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white top-mar-minnus82"><small>Job Desc.</small></button>
-                              </span>
-                            <textarea rows="5" ng-model = "jobDescription" placeholder="Job Description" class="form-control"></textarea>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Skill Keywords</button>
-                              </span>
-                            <input type="text" maxlength="250" ng-model = "skillKeyWords" placeholder="Ex: Sales, Marketing" class="form-control"/>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">No. of Vacancies</button>
-                              </span>
-                            <input numbers-only type="text" ng-model = "jobVacancies" placeholder="No. of Vacancies" class="form-control"/>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Experience</button>
-                              </span>
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Job Title</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <input type="text" maxlength="150" ng-model = "jobTitle" placeholder="Job Title" class="form-control"/>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Job Code</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <input type="text" maxlength="30" ng-model = "jobCode" placeholder="Job Code" class="form-control"/>
+                </div>
+            </div>
+            <div class="row topMarginButton">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Job Description</label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                    <textarea rows="5" ng-model = "jobDescription" placeholder="Job Description" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="row topMarginButton">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Skill Keywords</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <input type="text" maxlength="250" ng-model = "skillKeyWords" placeholder="Ex: Sales, Marketing" class="form-control"/>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>No. of Vacancies</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <input numbers-only type="text" ng-model = "jobVacancies" placeholder="No. of Vacancies" class="form-control"/>
+                </div>
+            </div>
+            <div class="row topMarginButton">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Experience</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                             <input type="text" decimals-only maxlength="5" placeholder="Ex: 1" ng-model = "experienceFrom" class="form-control"/>
-                                    <span class="input-group-btn">
-                                <button type="button" class="btn btn-white no-radius">To</button>
-                              </span>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setTopMarginOneNhalf text-center">
+                            to
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                             <input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "experienceTo" class="form-control"/>
-                            <span class="input-group-btn">
-                                <button type="button" class="btn btn-white no-radius">Yrs</button>
-                              </span>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setTopMarginOneNhalf">
+                            Years
                         </div>
                     </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="row">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
-                                <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Location</button>
-                              </span>
-                                    <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "jobLocation" class="form-control"/>
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
-                                </span>
-                                </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Location</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="row">
+                        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                            <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "jobLocation" class="form-control"/>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-right">
+                            <button type="button" class="btn btn-primary" ng-disabled="disabledAddLocation" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
+                        </div>
+                    </div>
+                    <div class="row topMargin-three setBorderColor setRowLeftRightMarginZero locationListBox" ng-show="locationArrayString.length">
+                        <div class="row setRowLeftRightMarginZero" ng-repeat="location in locationArrayString track by $index">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                {{location}}
                             </div>
-                        </div>
-
-                     <span ng-repeat="location in locationArrayString track by $index">
-                        <label  class="label label-default">{{location}}&nbsp;&nbsp;  <i class="fa fa-map-marker" ng-click="modalVisibility()"></i>  &nbsp;&nbsp; <i ng-click="removeLocation($index)" class="fa fa-times text-warning"></i></label>&nbsp;
-                    </span>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Salary</button>
-                              </span>
-                            <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "salaryFrom" class="form-control text-right"/>
-                                    <span class="input-group-btn">
-                                <button type="button" class="btn btn-white no-radius">To</button>
-                              </span>
-                            <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "salaryTo" class="form-control text-right"/>
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-white no-radius">Per</button>
-                                </span>
-
-                            <select class="form-control" name="listType" ng-model="salaryType">
-                                <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
-                            </select>
-                        </div>
-                        <small class="text-danger">(For India, enter the amount in Rs. Lakhs)</small>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Job Type</button>
-                              </span>
-                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
-                                <option value="0"> -- Select -- </option>
-                                <option value="1">Full Time</option>
-                                <option value="2">Part Time</option>
-                                <option value="3">Work From Home</option>
-                                <option value="4">Internship | Project Work</option>
-                                <option value="5">Consultant</option>
-                                <option value="6">Freelancer</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                              <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Contact Name</button>
-                              </span>
-                            <input type="text" maxlength="200" placeholder="Contact Name" ng-model = "contactName" class="form-control"/>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                                  <span class="input-group-btn">
-                                    <button type="button" class="btn btn-white">Email</button>
-                                  </span>
-                            <input type="email"
-                                   ng-model = "emailContact"
-                                   name="emailID"
-                                   maxlength="250"
-                                   placeholder="Email"
-                                   class="form-control"/>
-
-                                    <span ng-show="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1))"
-                                          ng-if="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1)) ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false"></span>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                                     <span class="input-group-btn">
-                                        <button type="button" class="btn btn-white">Phone</button>
-                                     </span>
-                            <input type="text" numbers-only maxlength="12" placeholder="Phone" ng-model = "phone" class="form-control"/>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                                     <span class="input-group-btn">
-                                        <button type="button" class="btn btn-white">Status</button>
-                                     </span>
-                            <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobStatus">
-                                <option value="0"> Active </option>
-                                <option value="1"> Closed(Hired) </option>
-                                <option value="2"> Cancelled </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-                        <div class="input-group m-bot15">
-                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-white">Job Categories</button>
-                         </span>
-                            <select class="form-control" name="listType" ng-model="jobCategori">
-                                <option value="0"> -- Select -- </option>
-                                <!--<option ng-repeat="categori in jobCategories track by categori.CategoryID" value="{{categori.CategoryID}}">{{categori.CategoryTitle}}</option>-->
-                                <option ng-repeat="categori in jobCategories track by $index" value="{{categori.CategoryID}}">{{categori.CategoryTitle}}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10 hpw jobpost">
-                        <div class="input-group m-bot15">
-                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-white">Last Education</button>
-                         </span>
-
-                            <button class="btn btn-default btn-sm dropdown-toggle opt opt-2 drpFunction">
-                                <span class="normal-view-text"> -- Select -- </span>
-                                <span class="mobile-view-text"></span>
-                                <span class="caret selectImg"></span></button>
-                            <div class="opt opt-2">
-                                <div class="filter-dropdown width-79 search-option-content setTableFixHeight" style="display: none;">
-                                    <div class="checkbox-dropdown" ng-repeat="education in educationList track by $index" ng-click="selectEducation(education.TID)">
-                                        <i class="fa " ng-class="selectedEducations.indexOf(education.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{education.EducationTitle}}
-                                    </div>
-                                </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                <a class="showPointer"><i class="fa fa-map-marker" ng-click="modalVisibility($index)"> {{$index}}Set Location</i></a>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10 hpw">
-                        <div class="input-group m-bot15">
-                             <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Specialization</button>
-                             </span>
-
-                            <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
-                                <span class="normal-view-text"> -- Select -- </span>
-                                <span class="mobile-view-text"></span>
-                                <span class="caret selectImg"></span></button>
-                            <div class="opt opt-2">
-                                <div class="filter-dropdownspecialization width-79 search-option-content setTableFixHeight" style="display: none;">
-                                    <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
-                                        <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
-                                    </div>
-                                </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                <span class="showPointer"><img src="/images/Droped_Red_16.png" ng-click="removeLocation($index)" class="width-100-px"></span>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10 hpw">
-                        <div class="input-group m-bot15">
-                             <span class="input-group-btn">
-                                <button type="button" class="btn btn-white">Restrict Job To Institute</button>
-                             </span>
-
-                            <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
-                                <span class="normal-view-text"> -- Select -- </span>
-                                <span class="mobile-view-text"></span>
-                                <span class="caret selectImg"></span>
-                            </button>
-                            <div class="opt opt-2">
-                                <div class="filter-dropdownInstitute width-79 search-option-content setTableFixHeight" style="display: none;">
-                                    <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
-                                        <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 p-top-10">
-
-                        <div class="input-group m-bot15">
-                            <span class="input-group-btn">
-                                 <button type="button" class="btn btn-white">Aggregate Score</button>
-                            </span>
-                                <input type="text" class="form-control" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="Ex: 87" aria-describedby="sizing-addon1"/>
-                            <span class="input-group-btn">
-                                 <button type="button" class="btn btn-white no-radius">%</button>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="col-lg-12 p-top-10">
-                        <div class="m-bot15">
-                            <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
-                            <input type="button" ng-click="cancelJobPosting()" class="btn btn-primary" value="Cancel">
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="row topMarginButton">
+                <div class="row setRowLeftRightMarginZero">
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                        <label>Salary</label>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                        <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "salaryFrom" class="form-control text-right"/>
+                    </div>
+                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer text-center">
+                        to
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                        <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "salaryTo" class="form-control text-right"/>
+                    </div>
+                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer text-center">
+                        Per
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                        <select class="form-control" name="listType" ng-model="salaryType">
+                            <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row setRowLeftRightMarginZero">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <small class="text-danger">(For India, enter the amount in Rs. Lakhs)</small>
+                    </div>
+                </div>
+            </div>
+            <div class="row topMarginButton">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Job Type</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
+                        <option value="0"> -- Select -- </option>
+                        <option value="1">Full Time</option>
+                        <option value="2">Part Time</option>
+                        <option value="3">Work From Home</option>
+                        <option value="4">Internship | Project Work</option>
+                        <option value="5">Consultant</option>
+                        <option value="6">Freelancer</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Contact Name</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <input type="text" maxlength="200" placeholder="Contact Name" ng-model = "contactName" class="form-control"/>
+                </div>
+            </div>
+            <div class="row topMarginButton">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Email</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <input type="email"
+                           ng-model = "emailContact"
+                           name="emailID"
+                           maxlength="250"
+                           placeholder="Email"
+                           class="form-control"/>
+
+                    <span ng-show="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1))"
+                          ng-if="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1)) ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false">
+                    </span>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Phone</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <input type="text" numbers-only maxlength="12" placeholder="Phone" ng-model = "phone" class="form-control"/>
+                </div>
+            </div>
+            <div class="row topMarginButton">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Status</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">
+                        <option value="0"> Active </option>
+                        <option value="1"> Closed(Hired) </option>
+                        <option value="2"> Cancelled </option>
+                        <option value="0,1,2"> All </option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Job Categories</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <select class="form-control" name="listType" ng-model="jobCategori">
+                        <option value="0"> -- Select -- </option>
+                        <option ng-repeat="categori in jobCategories track by $index" value="{{categori.CategoryID}}">{{categori.CategoryTitle}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row topMarginButton">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Last Education</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
+                    <button class="btn btn-default btn-sm dropdown-toggle opt opt-2 drpFunction">
+                        <span class="normal-view-text"> -- Select -- </span>
+                        <span class="mobile-view-text"></span>
+                        <span class="caret selectImg"></span></button>
+                    <div class="opt opt-2">
+                        <div class="filter-dropdown width-79 search-option-content setTableFixHeight" style="display: none;">
+                            <div class="checkbox-dropdown" ng-repeat="education in educationList track by $index" ng-click="selectEducation(education.TID)">
+                                <i class="fa " ng-class="selectedEducations.indexOf(education.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{education.EducationTitle}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Specialization</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
+                    <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
+                        <span class="normal-view-text"> -- Select -- </span>
+                        <span class="mobile-view-text"></span>
+                        <span class="caret selectImg"></span></button>
+                    <div class="opt opt-2">
+                        <div class="filter-dropdownspecialization width-79 search-option-content setTableFixHeight" style="display: none;">
+                            <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
+                                <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row topMarginButton">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Restrict Job To Institute</label>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
+                    <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
+                        <span class="normal-view-text"> -- Select -- </span>
+                        <span class="mobile-view-text"></span>
+                        <span class="caret selectImg"></span>
+                    </button>
+                    <div class="opt opt-2">
+                        <div class="filter-dropdownInstitute width-79 search-option-content setTableFixHeight" style="display: none;">
+                            <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
+                                <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                    <label>Aggregate Score</label>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 ">
+                    <input type="text" class="form-control" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="Ex: 87" aria-describedby="sizing-addon1"/>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer">
+                    %
+                </div>
+            </div>
+            <div class="row topMarginButton">
+            <div class="col-lg-3 col-md-3 col-sm-2 col-xs-12">
+                <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
+                <input type="button" ng-click="cancelJobPosting()" class="btn btn-primary" value="Cancel">
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"></div>
+            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"></div>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 "></div>
+        </div>
         </form>
 
         <!--Modal for map-->
@@ -379,7 +382,8 @@
                 </div>
                 <!-- Map ends here -->
                 <div class="col-lg-12 text-right">
-                    <button class="btn btn-primary text-right" ng-click="modalVisibility()">OK</button>
+                    <button class="btn btn-primary text-right" ng-click="addJobLocationFrmoMap(locIndexToEdit)">Add</button>
+                    <button class="btn btn-primary text-right" ng-click="modalVisibility()">Cancel</button>
                 </div>
             </div>
         </modal>

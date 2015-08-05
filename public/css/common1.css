@@ -410,7 +410,6 @@ body {
 .fotterButtonContainer
 {
     margin-top: 0.5%;
-    /*margin-right: 7%;*/
 }
 .msgButtonContainer
 {
@@ -2015,4 +2014,19 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     padding: 4px;
     width: 25%;
     border: 1px solid rgb(161, 161, 161);
+}
+.topMargin-three
+{
+    margin-top: 3%;
+}
+.locationListBox {
+    overflow-y: scroll;
+    height: 100px;
+    overflow-x: hidden;
+}
+.postJob label
+{
+    font-family: 'Roboto', sans-serif;
+    font-weight: normal;
+    color: #11A300;
 }

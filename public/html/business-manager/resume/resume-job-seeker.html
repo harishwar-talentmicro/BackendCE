@@ -13,9 +13,9 @@
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <input type="text" class="form-control" placeholder="Skill Keywords" ng-model = "jobSeekerSkillKeyword" />
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <select class="form-control" ng-model = "jobSeekerJobType">
-                                        <option value="0"> -- Select -- </option>
+                                        <option value="0"> -- Select Job Type -- </option>
                                         <option value="1">Full Time</option>
                                         <option value="2">Part Time</option>
                                         <option value="3">Work From Home</option>
@@ -24,7 +24,7 @@
                                         <option value="6">Freelancer</option>
                                     </select>
                                 </div>
-                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                     <div class="row">
                                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center topMarginButton">
                                             Salary
@@ -56,13 +56,12 @@
                                     <select class="form-control" name="countrySelect" ng-model="countrySelect"
                                             ng-change="getCityListOfCountry(countrySelect)"
                                             ng-options="country.countryname as country.countryname for country in countryLists" required>
-                                        <option value = ""> -- Select -- </option>
+                                        <option value = ""> -- Select Country -- </option>
                                     </select>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                    <!--<input type="text" id="google-map-search-box11" placeholder="Ex: Banglore" ng-model = "jobSeekerLocation" class="form-control"/>-->
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <button class="btn btn-default btn-sm dropdown-toggleCity opt opt-2 drpFunction">
-                                        <span class="normal-view-text"> -- Select -- </span>
+                                        <span class="normal-view-text"> -- Select City -- </span>
                                         <span class="mobile-view-text"></span>
                                         <span class="caret selectImg"></span></button>
                                     <div class="opt opt-2">
@@ -73,7 +72,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                     <div class="row">
                                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center topMarginButton">
                                             Experience
@@ -97,8 +96,22 @@
                         <div class="container p-bottom-10">
                             <div class="row">
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
+                                        <span class="normal-view-text"> -- Select Institute -- </span>
+                                        <span class="mobile-view-text"></span>
+                                        <span class="caret selectImg"></span>
+                                    </button>
+                                    <div class="opt opt-2">
+                                        <div class="filter-dropdownInstitute width-79 search-option-content setTableFixHeight" style="display: none;">
+                                            <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
+                                                <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <button class="btn btn-default btn-sm dropdown-toggle opt opt-2 drpFunction">
-                                        <span class="normal-view-text"> -- Select -- </span>
+                                        <span class="normal-view-text"> -- Select Education -- </span>
                                         <span class="mobile-view-text"></span>
                                         <span class="caret selectImg"></span></button>
                                     <div class="opt opt-2">
@@ -109,9 +122,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
-                                        <span class="normal-view-text"> -- Select -- </span>
+                                        <span class="normal-view-text"> -- Select Specialization -- </span>
                                         <span class="mobile-view-text"></span>
                                         <span class="caret selectImg"></span></button>
                                     <div class="opt opt-2">
@@ -122,31 +135,26 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12">
-                                            <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
-                                                <span class="normal-view-text"> -- Select -- </span>
-                                                <span class="mobile-view-text"></span>
-                                                <span class="caret selectImg"></span>
-                                            </button>
-                                            <div class="opt opt-2">
-                                                <div class="filter-dropdownInstitute width-79 search-option-content setTableFixHeight" style="display: none;">
-                                                    <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
-                                                        <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 text-center topMarginButton">
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 text-center setTopMargin">
+
+
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <div class="row setRowLeftRightMarginZero">
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setLeftRightPaddingZero setTopMargin">
                                             Score
                                         </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center topMarginButton setLeftRightPaddingZero">
+                                            <input type="text" class="form-control" numbers-only maxlength="3" ng-model="scoreFrom" placeholder="Ex: 75" aria-describedby="sizing-addon1">
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 text-center topMargin-three">
+                                            to
+                                        </div>
+                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center topMarginButton setLeftRightPaddingZero">
+                                            <input type="text" class="form-control" numbers-only maxlength="3" ng-model="scoreTo" placeholder="Ex: 95" aria-describedby="sizing-addon1">
+                                        </div>
+                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 text-center topMargin-three setLeftRightPaddingZero">
+                                            %
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
-                                    <input type="text" class="form-control" numbers-only maxlength="3" ng-model="score" placeholder="Ex: 87" aria-describedby="sizing-addon1">
                                 </div>
                             </div>
                         </div>
