@@ -11,6 +11,14 @@ var router = express.Router();
 var LocationManager = require('../routes/routes.js');
 
 
+/**
+ * Services for MQTT Messaging Server Interface
+ */
+router.get('/ms_auth/user',LocationManager.FnMSAuthUser);
+router.get('/ms_auth/vhost',LocationManager.FnMSAuthVHost);
+router.get('/ms_auth/resource',LocationManager.FnMSAuthResource);
+
+
 //this part is for passenger
 router.post('/ewLogin', LocationManager.FnLogin);
 router.get('/ewLogout', LocationManager.FnLogout);
@@ -36,6 +44,7 @@ router.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 router.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
 router.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
 router.post('/pass_reset_code',LocationManager.FnVerifyResetPasswordLink);
+router.post('/verify_secret_code',LocationManager.FnVerifySecretCode);
 router.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
 router.post('/ewtChangePassword', LocationManager.FnChangePassword);
 router.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);
@@ -123,6 +132,40 @@ router.get('/transaction_attachment',LocationManager.FnGetTransAttachment);
 router.get('/sales_statistics',LocationManager.FnSalesStatistics);
 router.get('/location_image',LocationManager.FnGetLocationPicture);
 router.get('/resource_image',LocationManager.FnResourcePicture);
+router.post('/job',LocationManager.FnSaveJobs);
+router.get('/job',LocationManager.FnGetJobs);
+router.get('/job_locations',LocationManager.FnGetJobLocations);
+router.get('/job_search',LocationManager.FnSearchJobs);
+router.get('/job_seeker_search',LocationManager.FnJobSeekerSearch);
+router.post('/job_apply',LocationManager.FnApplyJob);
+router.get('/job_applied_list',LocationManager.FnAppliedJobList);
+router.get('/feedback',LocationManager.FnGetFeedback);
+router.get('/job_details',LocationManager.FnGetJobDetails);
+router.get('/institutes',LocationManager.FnGetInstitutes);
+router.get('/educations',LocationManager.FnGetEducations);
+router.get('/specialization',LocationManager.FnGetSpecialization);
+router.get('/jobs',LocationManager.FnJobs);
+router.get('/applied_job',LocationManager.FnGetAppliedJob);
+router.get('/job_country',LocationManager.FnGetJobcountry);
+router.get('/job_city',LocationManager.FnGetjobcity);
+router.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
+router.get('/jobseeker_mail',LocationManager.FnGetJobSeekersMailDetails);
+//MessageBox module methods
+router.post('/create_group',LocationManager.FnCreateMessageGroup);
+router.get('/validate_groupname',LocationManager.FnValidateGroupName);
+router.put('/user_status',LocationManager.FnUpdateUserStatus);
+router.put('/user_relationship',LocationManager.FnUpdateUserRelationship);
+router.delete('/group',LocationManager.FnDeleteGroup);
+router.post('/message_request',LocationManager.FnSendMessageRequest);
+router.post('/compose_message',LocationManager.FnComposeMessage);
+router.get('/members_list',LocationManager.FnGetMembersList);
+router.get('/messagebox',LocationManager.FnLoadMessageBox);
+router.put('/message_activity',LocationManager.FnChangeMessageActivity);
+router.get('/outbox_messages',LocationManager.FnLoadOutBoxMessages);
+router.get('/suggestion_list',LocationManager.FnGetSuggestionList);
+router.post('/group_members',LocationManager.FnAddGroupMembers);
+router.get('/pending_request',LocationManager.FnGetPendingRequest);
+
 
 
 //below service are for EZEIDAP
@@ -151,16 +194,6 @@ router.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
 router.post('/crop_imageAP',LocationManager.FnCropImageAP);
 
 
-
-/**
- * Services for MQTT Messaging Server Interface
- */
-router.get('/ms_auth/user',LocationManager.FnMSAuthUser);
-router.get('/ms_auth/vhost',LocationManager.FnMSAuthVHost);
-router.get('/ms_auth/resource',LocationManager.FnMSAuthResource);
-
-
-
 //EZEID VAS
 router.get('/ewtLoginVES',LocationManager.FnLoginVES);
 router.post('/ewtSaveContactVES',LocationManager.FnSaveContactVES);
@@ -173,5 +206,7 @@ router.get('/ewtGetGatesVES',LocationManager.FnGetGatesVES);
 router.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
 router.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
 router.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
+
+
 
 module.exports = router;
