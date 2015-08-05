@@ -683,6 +683,7 @@ User.prototype.login = function(req,res,next){
             req.connection.socket.remoteAddress;
         var RtnMessage = {
             Token: '',
+            TID:'',
             IsAuthenticate: false,
             ezeone_id:'',
             FirstName: '',
@@ -705,7 +706,12 @@ User.prototype.login = function(req,res,next){
             UserModuleRights: '',
             VisibleModules: '',
             FreshersAccepted: '',
-            HomeDeliveryItemListType : ''
+            HomeDeliveryItemListType : '',
+            PersonalEZEID:'',
+            ReservationDisplayFormat:'',
+            mobilenumber:'',
+            ISPrimaryLocAdded:''
+
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -744,6 +750,7 @@ User.prototype.login = function(req,res,next){
                                             RtnMessage.ezeone_id = loginDetails[0].EZEID;
                                             RtnMessage.FirstName = loginDetails[0].FirstName;
                                             RtnMessage.Password = loginDetails[0].Password;
+                                            RtnMessage.CompanyName = loginDetails[0].CompanyName;
                                             RtnMessage.Type = loginDetails[0].IDTypeID;
                                             RtnMessage.Icon = loginDetails[0].Icon;
                                             RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
@@ -762,9 +769,13 @@ User.prototype.login = function(req,res,next){
                                             RtnMessage.RefreshInterval= loginDetails[0].RefreshInterval;
                                             RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
                                             RtnMessage.MasterID= loginDetails[0].ParentMasterID;
+                                            RtnMessage.PersonalEZEID= loginDetails[0].PersonalEZEID;
                                             RtnMessage.VisibleModules= loginDetails[0].VisibleModules;
                                             RtnMessage.FreshersAccepted= loginDetails[0].FreshersAccepted;
                                             RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                            RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                            RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                            RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
                                             res.send(RtnMessage);
                                             console.log('FnLogin:tmaster: Login success');
                                         }
