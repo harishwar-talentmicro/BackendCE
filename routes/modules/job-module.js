@@ -661,7 +661,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             var queryParams = st.db.escape(keyword) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                 + ',' + st.db.escape(salaryType) +',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
                 + ',' + st.db.escape(experienceTo)+ ',' + st.db.escape(educations)+ ',' + st.db.escape(specializationId)
-                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(score_from)+ ',' + st.db.escape(score_to);
+                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(scoreTo);
 
 
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
