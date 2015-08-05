@@ -995,18 +995,18 @@ angular.module('ezeidApp').
 
             $scope.googleMap = new GoogleMap();
 
-            var promise = $scope.googleMap.getCurrentLocation()
+         /*   var promise = $scope.googleMap.getCurrentLocation()
             promise.then(function (resp) {
                 if (resp) {
 
-                    /* get the current location coordinates and if it don't exists then update with the present Coordinates */
-                    var coordinates = getSearchedCoordinates($scope.googleMap.currentMarkerPosition.latitude,$scope.googleMap.currentMarkerPosition.longitude);
+                    *//* get the current location coordinates and if it don't exists then update with the present Coordinates *//*
+                  //  var coordinates = getSearchedCoordinates($scope.googleMap.currentMarkerPosition.latitude,$scope.googleMap.currentMarkerPosition.longitude);
 
                     $scope.googleMap.getReverseGeolocation(coordinates[0],coordinates[1]).then(function (resp) {
                         if (resp) {
                             $rootScope.coordinatesLat = $scope.googleMap.currentMarkerPosition.latitude;
                             $rootScope.coordinatesLng = $scope.googleMap.currentMarkerPosition.longitude;
-                            placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                     //       placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
 
                             //$scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
                             var options = {
@@ -1021,7 +1021,7 @@ angular.module('ezeidApp').
                             };
                             $scope.locationString = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
                             $scope.location = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
-                            /* Setting up default lattitude & longitude of the map */
+                            *//* Setting up default lattitude & longitude of the map *//*
                             $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
                             $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
                         }
@@ -1046,7 +1046,7 @@ angular.module('ezeidApp').
                 }
                 handleNoGeolocation();
             });
-
+*/
 
             /* Callback function for get current location functionality */
             $scope.findCurrentLocation = function(){
@@ -1099,27 +1099,12 @@ angular.module('ezeidApp').
                 });
             };
 
-            /* place this marker if the preffered search location is different from your present location */
-
-            var populateMarkers = function () {
-                $scope.googleMap.resizeMap();
-                $scope.googleMap.setMarkersInBounds();
-                //$scope.googleMap.toggleMapControls();
-
-                /* place markers on map for different searched coordinates */
-                var markerImage = '../../images/business-icon_48.png';
-                var pos = $scope.googleMap.createGMapPosition($routeParams.lat, $routeParams.lng);
-                var marker = $scope.googleMap.createMarker(pos, "Current Searched Location", markerImage, false, null);
-                $scope.googleMap.placeMarker(marker);
-
-                $scope.googleMap.setMarkersInBounds();
-            };
             /* update the coordinates on drag event of map marker */
             var getNewCoordinates = function (lat, lng) {
-                $rootScope.coordinatesLat = $scope.searchParams.lat = lat;
-                $rootScope.coordinatesLng = $scope.searchParams.lng = lng;
+                $scope.params.lat = lat;
+                $scope.params.lng = lng;
 
-                /* get new location string */
+                    /* get new location string */
                 $scope.googleMap.getReverseGeolocation(lat, lng).then(function (resp) {
                     if (resp) {
 

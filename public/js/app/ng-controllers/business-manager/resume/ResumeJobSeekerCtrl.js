@@ -41,7 +41,6 @@
         {
 
             $scope.validationMode = 0;
-
             clearSearchFilter();
 
             function clearSearchFilter()
@@ -70,6 +69,7 @@
             getInstituteList();
             //getCityList();
             getTemplateList();
+            getJobList();
 
             /**
              * Hide all the open dropdown
@@ -381,7 +381,9 @@
                 //Return false if errorList is greater than zero
                 return (errorList.length>0)? false : true;
             }
+
             $scope.mailTemplateTid = 0;
+            $scope.job_id = 0;
             // save mail template
             $scope.saveMailTemplate = function () {
 
@@ -484,10 +486,44 @@
                 clearSearchFilter();
             };
 
+            // Validation function
+            function validateItem(){
+                var err = [];
+
+               /* if(($scope.selectedTidToMail.length > 0) && ($scope.mailTemplateTid > 0) && ($scope.job_id > 0))
+                {
+                }*/
+
+
+
+                if($scope.selectedTidToMail.length <= 1 ){
+                    err.push('Select Job Seeker');
+                }
+                if($scope.mailTemplateTid == 0){
+                    err.push('Select Mail Template');
+                }
+                if($scope.job_id == 0){
+                    err.push('Select Job');
+                }
+
+                if(err.length > 0){
+                    for(var i = 0; i < err.length; i++){
+                        Notification.error({ message : err[i], delay : 2000});
+                    }
+                    // Notification.error({ message : "Please enter information for Job", delay : 2000});
+                    return false;
+                }
+                return true;
+            };
+
             // send sales enquiry mail
             $scope.SendJobSeekerMail = function () {
 
-                $scope.$emit('$preLoaderStart');
+                console.log("SAiiiiiiiiii");
+                console.log($scope.job_id);
+                console.log($scope.job_id);
+
+
                 if($scope.selectedTidToMail.length > 10)
                 {
                     $scope.$emit('$preLoaderStop');
@@ -495,41 +531,39 @@
                 }
                 else
                 {
-                    if(($scope.selectedTidToMail.length > 0) && ($scope.mailTemplateTid > 0))
+                    if(validateItem())
                     {
-                        $http({
-                            method: 'post',
-                            url: GURL + 'jobseeker_mail',
-                            data:
-                            {
-                                token : $rootScope._userInfo.Token,
-                                ids : $scope.selectedTidToMail.toString(),
-                                template_id : $scope.mailTemplateTid
-                            }
-                        }).success(function (data)
-                            {
-                                $scope.$emit('$preLoaderStop');
-                                if (data != 'null')
-                                {
-                                    clearSearchFilter();
+                            $scope.$emit('$preLoaderStart');
 
-                                    $scope.showCreateMailTemplate = false;
-                                    document.getElementById("FromName").className = "form-control emptyBox";
-                                    document.getElementById("FromEmailID").className = "form-control emptyBox";
-                                    document.getElementById("Title").className = "form-control emptyBox";
-                                    document.getElementById("Subject").className = "form-control emptyBox";
-                                    document.getElementById("Body").className = "form-control emptyBox";
-                                    Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                            $http({
+                                method: 'post',
+                                url: GURL + 'jobseeker_message',
+                                data:
+                                {
+                                    token : $rootScope._userInfo.Token,
+                                    ids : $scope.selectedTidToMail.toString(),
+                                    template_id : $scope.mailTemplateTid,
+                                    job_id : $scope.job_id
                                 }
-                            }).error(function(err){
-                                $scope.$emit('$preLoaderStop');
-                            });
-                        $scope.$emit('$preLoaderStop');
-                    }
-                    else
-                    {
-                        $scope.$emit('$preLoaderStop');
-                        Notification.error({message: "Please select a Job Seeker !", delay: MsgDelay});
+                            }).success(function (data)
+                                {
+                                    $scope.$emit('$preLoaderStop');
+                                    if (data != 'null')
+                                    {
+                                        clearSearchFilter();
+
+                                        $scope.showCreateMailTemplate = false;
+                                        document.getElementById("FromName").className = "form-control emptyBox";
+                                        document.getElementById("FromEmailID").className = "form-control emptyBox";
+                                        document.getElementById("Title").className = "form-control emptyBox";
+                                        document.getElementById("Subject").className = "form-control emptyBox";
+                                        document.getElementById("Body").className = "form-control emptyBox";
+                                        Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                                    }
+                                }).error(function(err){
+                                    $scope.$emit('$preLoaderStop');
+                                });
+                            $scope.$emit('$preLoaderStop');
                     }
                 }
             };
@@ -548,6 +582,26 @@
                 {
                     $scope.selectedTidToMail.push(_TID);
                 }
+            }
+
+            // Get Job list
+            function getJobList()
+            {
+                $http({
+                    url : GURL + 'jobs_list',
+                    method : 'GET',
+                    params : {
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                        console.log(resp);
+                        if(resp.status)
+                        {
+                            $scope.jobLists = resp.data;
+                        }
+                    })
+                    .error(function(err){
+                    });
             }
 
         }]);

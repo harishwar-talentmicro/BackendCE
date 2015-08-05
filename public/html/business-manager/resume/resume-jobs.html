@@ -43,7 +43,7 @@
                                     <option value="0"> Active </option>
                                     <option value="1"> Closed(Hired) </option>
                                     <option value="2"> Cancelled </option>
-                                    <!-- <option value="0,1,2"> All </option>-->
+                                     <option value="0,1,2"> All </option>
                                 </select>
                             </div>
                         </div>
@@ -79,12 +79,12 @@
             <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
                 <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success">
-                        <b class="ng-binding">{{job.jobcode}}</b>
+                        <b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}">{{job.jobcode | textLength:7}}</b>
                     </small>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success">
-                        <b class="ng-binding">{{job.jobtitle}}</b>
+                        <b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:50}}</b>
                     </small>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
@@ -97,17 +97,21 @@
                         <b class="ng-binding showPointer" ng-click="openCandidateListPopup(job.tid,job.totalapplied)" data-toggle="tooltip" title="" data-original-title="View Applicant">{{job.totalapplied}} Applicant</b>
                     </small>
                 </div>
-                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
-                    <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" ng-hide="editModes[$index]">
+                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
+                    <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                        Edit
+                    </button>
+                    <!--<div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                             <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 Edit
                             </button>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
-                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" title="java" style="word-wrap:break-word;">
+                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix text-center">
                     <small class="text-success">
                         <b class="ng-binding" ng-show="job.status == 0">Active</b>
                         <b class="ng-binding" ng-show="job.status == 1">Closed(Hired)</b>
@@ -288,7 +292,7 @@
                         <option value="0"> Active </option>
                         <option value="1"> Closed(Hired) </option>
                         <option value="2"> Cancelled </option>
-                        <option value="0,1,2"> All </option>
+                        <!--<option value="0,1,2"> All </option>-->
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
