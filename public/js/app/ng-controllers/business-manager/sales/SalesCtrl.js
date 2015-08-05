@@ -874,22 +874,22 @@
                     resp.LastName  +
                         ((resp.MobileNumber && resp.MobileNumber !== 'null') ? ', ' + resp.MobileNumber : '');
                     $scope.modalBox.tx.ezeidTid = resp.TID;
-                    var cIndex = companyList.indexOf(resp.CompanyName)
-                    if(cIndex !== -1){
-                        $scope.modalBox.tx.companyId = companyList[cIndex].tid;
-                        $scope.modalBox.tx.companyName =  resp.CompanyName;
-                    }
-                    else{
-                        $scope.modalBox.tx.companyId = 0;
-                        $scope.modalBox.tx.companyName = resp.CompanyName;
-                    }
 
-                    //$scope.loadLocationListForEzeid(resp.TID).then(function(){
-                    //    $scope.$emit('$preLoaderStop');
-                    //},function(){
-                    //    $scope.$emit('$preLoaderStop');
-                    //    //Notification.error({ message : 'Unable to load location list for this user', delay : MsgDelay});
-                    //});
+                    /**
+                     * If EZEID type is business then only consider the company and fill up the company details
+                     * else make it empty only
+                     */
+                    if(resp.IDTypeID == 2){
+                        var cIndex = companyList.indexOf(resp.CompanyName)
+                        if(cIndex !== -1){
+                            $scope.modalBox.tx.companyId = companyList[cIndex].tid;
+                            $scope.modalBox.tx.companyName =  resp.CompanyName;
+                        }
+                        else{
+                            $scope.modalBox.tx.companyId = 0;
+                            $scope.modalBox.tx.companyName = resp.CompanyName;
+                        }
+                    }
 
                 },function(){
                     $scope.$emit('$preLoaderStop');
