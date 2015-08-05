@@ -727,7 +727,7 @@ User.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
-                            console.log(loginDetails);
+                            //console.log(loginDetails);
 
                             if(comparePassword(Password,loginDetails[0].Password)){
                                 st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
@@ -2667,10 +2667,10 @@ User.prototype.saveResume = function(req,res,next){
                                 latitude: locationDetails.latitude,
                                 longitude: locationDetails.longitude,
                                 country: locationDetails.country,
-                                mapType : locationDetails.mapType
+                                maptype : locationDetails.maptype
                             };
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.mapType);
+                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
 
                             console.log(queryParams);
 

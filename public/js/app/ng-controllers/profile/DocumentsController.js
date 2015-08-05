@@ -108,8 +108,11 @@ angular.module('ezeidApp').controller('DocumentController',[
             method: 'get',
             url: GURL + 'ewtGetDocPin?TokenNo=' + $rootScope._userInfo.Token
         }).success(function (data) {
-            ////console.log(data);
-               $scope.Pin = data[0].DocPIN;
+                if(data)
+                {
+                    $scope.Pin = data[0].DocPIN;
+                }
+
                 userDetailsLoaded = true;
                 if(userDetailsLoaded && documentDetailsLoaded){
                     $scope.$emit('$preLoaderStop');
@@ -253,25 +256,30 @@ angular.module('ezeidApp').controller('DocumentController',[
                             $scope.form.RefExpiryDate = "";
                             $scope.form.RefDoc = "";
                             if($scope.OptionSelected==1){
+                                console.log("SAii9999");
+                                console.log(data);
                                 $scope.IdPlaceHolder = "Enter ID Card number";
-                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.form.RefFileName = (data) ? data[0].DocFilename : "";
                                 $scope.showDownloadLink = $scope.form.RefNo == "" || $scope.form.RefNo == 'undefined' ? false : true;
+
+                                console.log("SAii888888");
+                                console.log($scope.form.RefFileName);
                             }
                             else if($scope.OptionSelected==2){
                                 $scope.IdPlaceHolder = "Enter Passport number";
-                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.form.RefFileName = (data) ? data[0].DocFilename : "";
                                 $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                             }else if($scope.OptionSelected==3){
                                 $scope.IdPlaceHolder = "Enter Driver's Licence number";
-                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.form.RefFileName = (data) ? data[0].DocFilename : "";
                                 $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                             }else if($scope.OptionSelected==4){
                                 $scope.IdPlaceHolder = "Reference No. for Document #1";
-                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.form.RefFileName = (data) ? data[0].DocFilename : "";
                                 $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                             }else if($scope.OptionSelected==5){
                                 $scope.IdPlaceHolder = "Reference No. for Document #2";
-                                $scope.form.RefFileName = data[0].DocFilename;
+                                $scope.form.RefFileName = (data) ? data[0].DocFilename : "";
                                 $scope.showDownloadLink = $scope.form.RefNo == "" ? false : true;
                             }
                         }

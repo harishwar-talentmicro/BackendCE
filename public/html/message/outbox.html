@@ -199,11 +199,15 @@
                                    placeholder="Enter a unique Group Title"
                                    ng-model="groupName"
                                    id="group-name"
+                                   ng-disabled="groupNameDisable"
+                                   ng-click="invalidateGroupId()"
                                    ng-keypress="($event.charCode==13)?groupSearchAction():return">
                             <div class="input-group-addon no-padding-and-border">
                                 <button class="btn no-radius"
                                         title="search group"
+                                        id="group-check-btn"
                                         ng-click="groupSearchAction()"
+                                        ng-disabled="groupNameDisable"
                                         ng-class="checkBtnIcon == 1?'btn-danger':'btn-success'">
                                     <i class="fa" ng-class="checkBtnIcon == 1?'fa-search':'fa-check-circle'"></i> Check
                                 </button>
@@ -224,15 +228,15 @@
                     <div class="col-lg-10" ng-show="groupDescVisible" >
                         <div class="input-group">
                             <div class="input-group-addon"><i class="fa fa-quote-right"></i> Description </div>
-                            <textarea class="form-control" ng-model="groupDesc" rows="5"></textarea>
+                            <textarea id="group-description" ng-model="modalBox.groupDesc" rows="5" class="form-control"></textarea>
                         </div>
                     </div>
                     <div class="col-lg-10 p-top-7" ng-show="groupDescVisible" >
-                            <button class="btn btn-default btn-xs" ng-click="isPublicGroup = !isPublicGroup">
-                                <i class="fa" ng-class="isPublicGroup?'fa-check-square':'fa-square-o'"></i>
-                            </button>
-                            <b>Make it public</b>
-                            <small>(Member requests accepted automatically)</small>
+                        <button class="btn btn-default btn-xs" ng-click="modalBox.isPublicGroup = !modalBox.isPublicGroup">
+                            <i class="fa" ng-class="modalBox.isPublicGroup?'fa-check-square':'fa-square-o'"></i>
+                        </button>
+                        <b>Make it public</b>
+                        <small>(Member requests accepted automatically)</small>
 
                     </div>
                     <!--<div class="col-lg-2">-->
@@ -245,7 +249,7 @@
                     <!--</select>-->
                     <!--</div>-->
                     <div class="col-lg-12 text-left p-top-7">
-                        <button class="btn btn-primary"  ng-show="groupCreateBtnVisible">
+                        <button ng-click="createGroupRequest()" ng-disabled="saveGroupBtnDisabled" class="btn btn-primary"  ng-show="groupCreateBtnVisible">
                             <i class="fa fa-plus"></i> Create Group
                         </button>
                         <button class="btn btn-info"  ng-show="joinGroupBtnVisible">
@@ -261,17 +265,28 @@
                 </div>
             </section>
 
-            <section id="member-action-form-module" ng-show="groupMemberVisible">
+            <section id="member-action-form-module" class="p-top-7" ng-show="groupMemberVisible">
                 <!-- Group members addition form goes here -->
-                <div class="container" ng-show="accessControl == 0 || accessControl == 2">
+                <div class="container">
                     <div class="col-lg-6">
                         <div class="input-group">
                             <div class="input-group-addon">
                                 <i class="fa fa-user"></i> Member
                             </div>
-                            <input type="text" class="form-control" />
+                            <input type="text"
+                                   ng-model="ezeone"
+                                   class="form-control"
+                                   id="ezeone-id"
+                                   ng-focus="invalidateEzeOneId()"
+                                   ng-keypress="($event.charCode==13)?validateEzeOneId(ezeone):return" />
+                            <div class="input-group-addon no-padding-and-border">
+                                <button class="btn btn-default no-radius"
+                                        ng-click="validateEzeOneId(ezeone)">
+                                <i class="fa fa-check"></i> Check
+                                    </button>
+                            </div>
                         </div>
-                        <span class="text-danger">Invalid EZEONE ID</span>
+                        <span class="text-danger" ng-show="!isEzeOneIdValid">Invalid EZEONE ID</span>
                     </div>
 
                     <div class="col-lg-6">
@@ -279,9 +294,16 @@
                             <div class="input-group-addon">
                                 <i class="fa fa-tags"></i> Relation
                             </div>
-                            <select class="form-control">
-                                <option ng-repeat="relation in relationArr track by $index">{{relation}}</option>
+                            <select ng-model="modalBox.selectedRelation" class="form-control" id="ezeone-relationship">
+                                <option ng-repeat="relation in relationArr track by $index" value="{{$index}}">{{relation}}</option>
                             </select>
+                            <div class="input-group-addon no-padding-and-border">
+                                <button class="btn btn-primary no-border"
+                                        ng-disabled="addMemberDisabled"
+                                        ng-click="addMember()">
+                                Add  <i class="fa fa-arrow-circle-right"></i>
+                                    </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -296,26 +318,18 @@
                             <th width="40%">Relation</th>
                             <th width="10%">Action</th>
                             </thead>
-                            <tbody ng-show="accessControl == 0 || accessControl == 1">
-                            <tr>
-                                <td>1</td>
-                                <td>Sandeep</td>
-                                <td>Classmate</td>
-                                <td class="text-center">
-                                    <button class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
-                                </td>
-                            </tr>
-                            <tr ng-repeat="member in dummyMember track by $index">
-                                <td>{{$index + 2}}</td>
+                            <tbody>
+                            <tr ng-repeat="member in groupMember track by $index">
+                                <td>{{$index + 1}}</td>
                                 <td>{{member.name}}</td>
                                 <td>{{relationArr[member.relation]}}</td>
                                 <td class="text-center">
-                                    <!--<button class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>-->
+                                    <button ng-show="isAdmin" ng-click="removeGroupMember(member.id)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
                                 </td>
                             </tr>
                             </tbody>
                             <!-- No Data found -->
-                            <tbody ng-hide="accessControl == 0 || accessControl == 1">
+                            <tbody ng-hide="groupMember.length > 0">
                             <tr>
                                 <td colspan="4">No Data Found</td>
                             </tr>
@@ -324,7 +338,7 @@
                     </div>
                 </div>
                 <!-- Save or update group button -->
-                <div class="container text-right p-top-7">
+                <div class="container text-right p-top-7 hidden">
                     <button class="btn btn-success"><i class="fa fa-save"></i> Save Group</button>
                 </div>
             </section>

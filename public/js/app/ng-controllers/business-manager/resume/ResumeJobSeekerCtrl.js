@@ -60,12 +60,14 @@
                 $scope.selectedInstitute = [];
                 $scope.selectedCitys = [];
                 $scope.score = "";
+                $scope.selectedTidToMail = [];
             }
 
+            getCountryList();
             getEducations();
             getSpecialization();
             getInstituteList();
-            getCityList();
+            //getCityList();
             getTemplateList();
 
             /**
@@ -117,6 +119,55 @@
                     });})
             });
 
+            // Get Country list
+            function getCountryList()
+            {
+                $http({
+                    url : GURL + 'job_country',
+                    method : 'GET',
+                    params : {}
+                }).success(function(resp){
+                    if(resp.status)
+                    {
+                        $scope.countryLists = resp.data;
+                    }
+                })
+                .error(function(err){
+                });
+            }
+
+            // Get City list by country title
+            $scope.getCityListOfCountry = function (_title) {
+                if(_title != undefined)
+                {
+                    $http({
+                        method: 'get',
+                        url: GURL + 'job_city?country_title=' + _title}).success(function (data) {
+                            if(data.status)
+                            {
+                                $scope.cityList = data.data;
+                            }
+                        });
+                }
+            };
+
+            /**
+             * Select - Unselect Education
+             */
+            $scope.selectCity = function(_cityID)
+            {
+                if($scope.selectedCitys.indexOf(_cityID)!=-1)
+                {
+                    var index = $scope.selectedCitys.indexOf(_cityID);
+                    $scope.selectedCitys.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedCitys.push(_cityID);
+                }
+            };
+
+            // Get Education list
             function getEducations()
             {
                 $http({
@@ -149,6 +200,7 @@
                 }
             }
 
+            // Get Specialization list
             function getSpecialization()
             {
                 $http({
@@ -213,39 +265,6 @@
                 }
             }
 
-            // Get Institute list
-            function getCityList()
-            {
-                $http({
-                    url : GURL + 'job_locations',
-                    method : 'GET',
-                    params : {}
-                }).success(function(resp){
-                       // $scope.instituteList = resp.data;
-                        console.log(resp.data);
-                        $scope.cityList = resp.data;
-                })
-                .error(function(err){
-                });
-            }
-
-            /**
-             * Select - Unselect Education
-             */
-            $scope.selectCity = function(_cityID)
-            {
-                if($scope.selectedCitys.indexOf(_cityID)!=-1)
-                {
-                    var index = $scope.selectedCitys.indexOf(_cityID);
-                    $scope.selectedCitys.splice(index,1);
-                }
-                else
-                {
-                    $scope.selectedCitys.push(_cityID);
-                }
-                console.log($scope.selectedCitys);
-            };
-
             /**
              * Search job seeker
              */
@@ -256,24 +275,29 @@
                     url : GURL + 'job_seeker_search',
                     method : 'GET',
                     params : {
-                        keyword : $scope.jobSeekerSkillKeyword,
-                        job_type : $scope.jobSeekerJobType,
-                        salary_from : $scope.jobSeekerSalaryFrom,
-                        salary_to : $scope.jobSeekerSalaryTo,
-                        salary_type : $scope.jobSeekerSalaryType,
-                        experience_from : $scope.jobSeekerExperienceFrom,
-                        experience_to : $scope.jobSeekerExperienceTo,
-                        location_ids : $scope.selectedCitys.toString(),
-                        educations : $scope.selectedEducations.toString(),
-                        specialization_id : $scope.selectedSpecializations.toString(),
-                        institute_id : $scope.selectedInstitute.toString(),
-                        score : $scope.score
-                    }
+                                keyword : $scope.jobSeekerSkillKeyword,
+                                job_type : $scope.jobSeekerJobType,
+                                salary_from : $scope.jobSeekerSalaryFrom,
+                                salary_to : $scope.jobSeekerSalaryTo,
+                                salary_type : $scope.jobSeekerSalaryType,
+                                experience_from : $scope.jobSeekerExperienceFrom,
+                                experience_to : $scope.jobSeekerExperienceTo,
+                                location_ids : $scope.selectedCitys.toString(),
+                                educations : $scope.selectedEducations.toString(),
+                                specialization_id : $scope.selectedSpecializations.toString(),
+                                institute_id : $scope.selectedInstitute.toString(),
+                                score : $scope.score
+                            }
                 }).success(function(resp){
-                        console.log(resp);
-                        console.log("SAi nath...");
-                        //$scope.instituteList = resp.data;
-                        $scope.$emit('$preLoaderStop');
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.status)
+                    {
+                        $scope.jobSeekerResults = resp.data;
+
+                        console.log("Search result");
+                        console.log($scope.jobSeekerResults);
+                    }
+
                 })
                 .error(function(err){
                         $scope.$emit('$preLoaderStop');
@@ -292,9 +316,7 @@
                     $scope.Subject = "";
                     $scope.Body = "";
                     $scope.TID = "";
-                    $scope.CCMailIDS = "";
-                    $scope.BCCMailIDS = "";
-                   $scope.showCreateMailTemplate = true;
+                    $scope.showCreateMailTemplate = true;
                 }
                 else
                 {
@@ -315,8 +337,6 @@
                 $scope.Subject = "";
                 $scope.Body = "";
                 $scope.TID = "";
-                $scope.CCMailIDS = "";
-                $scope.BCCMailIDS = "";
             };
 
             // Validation function for creating mail template
@@ -350,14 +370,6 @@
                 {
                     errorList.push('Not valid email!');
                 }
-                if($scope.isWrongEmailPatternCc)
-                {
-                    errorList.push('Not valid email!');
-                }
-                if($scope.isWrongEmailPatternBcc)
-                {
-                    errorList.push('Not valid email!');
-                }
                 if(errorList.length>0){
                     for(var i = errorList.length; i>0;i--)
                     {
@@ -382,8 +394,8 @@
                                 Title : $scope.Title,
                                 FromName : $scope.FromName,
                                 FromEmailID : $scope.FromEmailID,
-                                CCMailIDS : $scope.CCMailIDS,
-                                BCCMailIDS : $scope.BCCMailIDS,
+                                CCMailIDS : "",
+                                BCCMailIDS : "",
                                 Subject : $scope.Subject,
                                 Body : $scope.Body,
                                 template_type  : 2, //(TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer), tid <int> [while creating time tid is 0]
@@ -395,13 +407,11 @@
                                 //salesEnquiry._info = {};
 
                                 $scope.FromName = "";
-                                $scope._info.FromEmailID = "";
+                                $scope.FromEmailID = "";
                                 $scope.Title = "";
                                 $scope.Subject = "";
                                 $scope.Body = "";
                                 $scope.mailTemplateTid = "";
-                                $scope.CCMailIDS = "";
-                                $scope.BCCMailIDS = "";
 
                                 getTemplateList();
                                 Notification.success({ message: 'Template save success...', delay: MsgDelay });
@@ -450,12 +460,93 @@
                         url: GURL + 'ewtTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid}).success(function (data) {
                             if(data !== "null")
                             {
-                                salesEnquiry._info = data[0];
+                                $scope.FromName = data[0].FromName;
+                                $scope.FromEmailID = data[0].FromEmailID;
+                                $scope.Title = data[0].Title;
+                                $scope.Subject = data[0].Subject;
+                                $scope.Body = data[0].Body;
+                                $scope.mailTemplateTid = data[0].TID;
                             }
                         });
                 }
             };
 
+            // Close Create Mail Template Form
+            $scope.closeSalesEnquiryForm = function () {
+                $location.path("/");
+            };
+
+            // Reset job seeker search filter
+            $scope.resetJobSeekerSearch = function()
+            {
+                clearSearchFilter();
+            };
+
+            // send sales enquiry mail
+            $scope.SendJobSeekerMail = function () {
+
+                $scope.$emit('$preLoaderStart');
+                if($scope.selectedTidToMail.length > 10)
+                {
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: 'Maximum Limit: 10 Job Seeker…', delay: MsgDelay });
+                }
+                else
+                {
+                    if(($scope.selectedTidToMail.length > 0) && ($scope.mailTemplateTid > 0))
+                    {
+                        $http({
+                            method: 'post',
+                            url: GURL + 'jobseeker_mail',
+                            data:
+                            {
+                                token : $rootScope._userInfo.Token,
+                                ids : $scope.selectedTidToMail.toString(),
+                                template_id : $scope.mailTemplateTid
+                            }
+                        }).success(function (data)
+                            {
+                                $scope.$emit('$preLoaderStop');
+                                if (data != 'null')
+                                {
+                                    clearSearchFilter();
+
+                                    $scope.showCreateMailTemplate = false;
+                                    document.getElementById("FromName").className = "form-control emptyBox";
+                                    document.getElementById("FromEmailID").className = "form-control emptyBox";
+                                    document.getElementById("Title").className = "form-control emptyBox";
+                                    document.getElementById("Subject").className = "form-control emptyBox";
+                                    document.getElementById("Body").className = "form-control emptyBox";
+                                    Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                                }
+                            }).error(function(err){
+                                $scope.$emit('$preLoaderStop');
+                            });
+                        $scope.$emit('$preLoaderStop');
+                    }
+                    else
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        Notification.error({message: "Please select a Job Seeker !", delay: MsgDelay});
+                    }
+                }
+            };
+
+            /**
+             * Select - Unselect job seeker
+             */
+            $scope.selectTidToMail = function(_TID)
+            {
+                if($scope.selectedTidToMail.indexOf(_TID)!=-1)
+                {
+                    var index = $scope.selectedTidToMail.indexOf(_TID);
+                    $scope.selectedTidToMail.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedTidToMail.push(_TID);
+                }
+            }
 
         }]);
 })();
