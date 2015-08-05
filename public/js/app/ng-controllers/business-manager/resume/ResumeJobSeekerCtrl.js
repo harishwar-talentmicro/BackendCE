@@ -59,7 +59,8 @@
                 $scope.selectedSpecializations = [];
                 $scope.selectedInstitute = [];
                 $scope.selectedCitys = [];
-                $scope.score = "";
+                $scope.scoreFrom = "";
+                $scope.scoreTo = "";
                 $scope.selectedTidToMail = [];
             }
 
@@ -286,7 +287,8 @@
                                 educations : $scope.selectedEducations.toString(),
                                 specialization_id : $scope.selectedSpecializations.toString(),
                                 institute_id : $scope.selectedInstitute.toString(),
-                                score : $scope.score
+                                score_from : $scope.scoreFrom,
+                                score_to : $scope.scoreTo
                             }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');

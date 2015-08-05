@@ -58,6 +58,8 @@
             $scope.selectedSpecializations = [];
             $scope.selectedInstitute = [];
             var placeDetail = [];
+            $scope.locIndexToEdit = "";
+            $scope.disabledAddLocation = true;
 
             /**
              * Hide all the open dropdown
@@ -470,7 +472,9 @@
              */
             $scope.addJobLocation = function(param)
             {
-                if(!param || typeof(param) == undefined)
+                $scope.disabledAddLocation = true;
+
+               if(!param || typeof(param) == undefined)
                 {
                     return;
                 }
@@ -490,7 +494,36 @@
                 $scope.mainLocationArray.push(tempLocationArray);
                 $scope.locationArrayString.push($scope.jobLocation);
                 $scope.jobLocation = "";
-            }
+            };
+
+            /**
+             * add location to array from map
+             */
+            $scope.addJobLocationFrmoMap = function(_locArrayIndex)
+            {
+                $scope.modalVisible = false;
+                $scope.locIndexToEdit = "";
+                if(_locArrayIndex)
+                {
+                    var tempLocationArray = [];
+
+                    tempLocationArray = {
+                        "location_title" : $scope.jobLocation,
+                        "latitude" :  $scope.jobLat,
+                        "longitude" : $scope.jobLong,
+                        "country" : $scope.country,
+                        "maptype" : 0
+                    };
+
+                    $scope.mainLocationArray[_locArrayIndex] = tempLocationArray;
+                    $scope.locationArrayString[_locArrayIndex] = $scope.jobLocation;
+                    $scope.jobLocation = "";
+                }
+                else
+                {
+                    return;
+                }
+            };
 
             // Open popup - list of candidate who applied for job
             $scope.openCandidateListPopup = function(_jobID,_totalapplie)
@@ -625,20 +658,28 @@
              */
             var isMapInitialized = false;
             $scope.modalVisible = false;
-            $scope.modalVisibility = function () {
-                /* toggle map visibility status */
+            $scope.modalVisibility = function (_locIndex)
+            {
+                if(_locIndex)
+                {
+                    $scope.locIndexToEdit = _locIndex;
+                    $scope.latForMap = $scope.mainLocationArray[_locIndex].latitude;
+                    $scope.longForMap = $scope.mainLocationArray[_locIndex].longitude;
+                }
                 $scope.modalVisible = !$scope.modalVisible;
             };
 
             $scope.$watch('modalVisible', function (newVal, oldVal) {
-                if (newVal) {
-                    /* check for the map initialzation */
+
+                if (newVal)
+                {
+                   /* check for the map initialzation */
                     if (!isMapInitialized) {
                         initializeMap();
                         isMapInitialized = true;
                     }
                     else {
-                        $timeout(function () {
+                       $timeout(function () {
                             $scope.googleMap.resizeMap();
                             $scope.googleMap.setMarkersInBounds();
                         }, 1500);
@@ -660,7 +701,6 @@
             {
                 $scope.jobLat = lat;
                 $scope.jobLong = lng;
-
                 $scope.googleMap.getReverseGeolocation(lat,lng).then(function(resp)
                 {
                     if(resp.data)
@@ -668,6 +708,7 @@
                         var data = $scope.googleMap.parseReverseGeolocationData(resp.data);
                         $scope.jobLocation = data.city;
                         $scope.country = data.country;
+                        $scope.disabledAddLocation = false;
                     }
                     else
                     {
@@ -706,16 +747,17 @@
                     $scope.googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
 
                     /* place the present location marker on map */
-                    if($routeParams['lat']){
-                        $scope.googleMap.currentMarkerPosition.latitude = $routeParams['lat'];
-                        $scope.googleMap.currentMarkerPosition.longitude = $routeParams['lng'];
+                    if(($scope.latForMap) && ($scope.longForMap))
+                    {
+                        $scope.googleMap.currentMarkerPosition.latitude = $scope.latForMap;
+                        $scope.googleMap.currentMarkerPosition.longitude = $scope.longForMap;
                         $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
 
                         /* if this modal box map is opened from search result page: Add marker for additional */
                         $scope.googleMap.resizeMap();
                     }
                     else{
-                        $scope.googleMap.getCurrentLocation().then(function (e) {
+                            $scope.googleMap.getCurrentLocation().then(function (e) {
 
                             $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
 
