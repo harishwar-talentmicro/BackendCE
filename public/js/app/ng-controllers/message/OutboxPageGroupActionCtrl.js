@@ -1,0 +1,686 @@
+/**
+ * Controller to manage group actions
+ *
+ * @author: Sandeep[EZE ID]
+ * @since 20150526
+ */
+angular.module('ezeidApp').
+    controller('OutboxPageGroupActionCtrl', [
+        '$rootScope',
+        '$scope',
+        '$http',
+        '$q',
+        '$timeout',
+        'Notification',
+        '$filter',
+        '$window',
+        'GURL',
+        '$interval',
+        'MsgDelay',
+        '$location',
+        '$routeParams',
+        'UtilityService',
+        function (
+            $rootScope,
+            $scope,
+            $http,
+            $q,
+            $timeout,
+            Notification,
+            $filter,
+            $window,
+            GURL,
+            $interval,
+            MsgDelay,
+            $location,
+            $routeParams,
+            UtilityService
+        ) {
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////CREATE GROUP//////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////INITIALIZATIONS/////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            $scope.modalAddGroupVisible = false;
+            $scope.isGroupAdmin = false;
+            $scope.isMember = false;
+            $scope.isNewGroup = true;
+            $scope.isGroupNameUnique = false;
+            $scope.groupActionBtn = [
+                "Delete Group",
+                "Leave Group",
+                "Create Group"
+            ];
+            $scope.groupNameDisable = false;
+            /* post creation of group */
+            $scope.activeGroupId = 0;
+            $scope.isEzeOneIdValid = true;
+            /* Add member */
+            $scope.addMemberDisabled = true;
+            $scope.saveGroupBtnDisabled = true;
+            $scope.activeEzeOneId = 0;
+            $scope.activeEzeOneName = "";
+            $scope.isAdmin = false;
+
+            /* module visibility variable */
+            $scope.groupFormVisible = true;
+            $scope.groupCreateBtnVisible = true;
+            $scope.groupMemberVisible = false;
+            $scope.groupDescVisible = false;
+            $scope.joinGroupBtnVisible = true;
+            $scope.editGroupBtnVisible = false;
+            $scope.deleteGroupBtnVisible = false;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////MODULES//////////////////////////////////////////////////////////////////////////////////
+            $scope.module = [
+                {
+                    joinGroup : false,
+                    createGroup : false,
+                    editGroup : false,
+                    viewGroup : false,
+                    requestContact : false
+                }
+            ];
+
+            $scope.relationArr = [
+                "No Relation",
+                "Friend",
+                "Colleague",
+                "Business",
+                "Classmate",
+                "Mentor/Teacher",
+                "Family",
+                "Community"
+            ];
+
+
+            $scope.groupMember = [];
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////default calls///////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            resetSuggestions();
+            resetDefaultSettings();
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////THE MASTER FUNCTION/////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /* toggle Add/edit Group Popup */
+            $scope.modalAddGroupVisibility = function (code) {
+                $scope.modalAddGroupVisible = !$scope.modalAddGroupVisible;
+                $scope.groupNameDisable = false;
+                resetDefaultSettings();
+                if(parseInt(code) == 1)//Create new group
+                {
+                    $scope.groupFormVisible = true;
+                    $scope.groupCreateBtnVisible = true;
+                    $scope.groupMemberVisible = false;
+                    $scope.groupDescVisible = false;
+                    $scope.joinGroupBtnVisible = false;
+                    $scope.editGroupBtnVisible = false;
+                    $scope.deleteGroupBtnVisible = false;
+                    $scope.isAdmin = true;
+                    ////////////////////////////////////
+                    resetModule();
+                    $scope.module.createGroup = true;
+                }
+                else if(code == 2)//join group
+                {
+                    $scope.groupFormVisible = true;
+                    $scope.groupCreateBtnVisible = false;
+                    $scope.groupMemberVisible = false;
+                    $scope.groupDescVisible = false;
+                    $scope.joinGroupBtnVisible = true;
+                    $scope.editGroupBtnVisible = false;
+                    $scope.deleteGroupBtnVisible = false;
+                    ////////////////////////////////////
+                    resetModule();
+                    $scope.module.joinGroup = true;
+                }
+                else if(code == 3)//edit group
+                {
+                    $scope.groupFormVisible = true;
+                    $scope.groupCreateBtnVisible = false;
+                    $scope.groupMemberVisible = false;
+                    $scope.groupDescVisible = false;
+                    $scope.joinGroupBtnVisible = false;
+                    $scope.editGroupBtnVisible = true;
+                    $scope.deleteGroupBtnVisible = false;
+                    ////////////////////////////////////
+                    resetModule();
+                    $scope.module.editGroup = true;
+                }
+            };
+
+
+
+            /**
+             * Validate the group's relation to the logged in user [called from DOM]
+             */
+            $scope.groupSearchAction = function()
+            {
+                var groupName = $('#group-name').val();
+                if(!parseInt(groupName.length) > 0)
+                {
+                    negetiveGroupNameAction();
+                    return ;
+                }
+                //For group creation module
+                if($scope.module.createGroup)
+                {
+                    checkGroupNameUniqueness(groupName);
+                }
+                else if($scope.module.editGroup)
+                {
+                    /* call API for fetching suggestion */
+                    getSuggestionList(groupName);
+                }
+                else if($scope.module.viewGroup)
+                {
+                    /* call API for fetching suggestion */
+                    getSuggestionList(groupName);
+                }
+                else if($scope.module.joinGroup)
+                {
+                    /* call API for fetching suggestion */
+                    getSuggestionList(groupName);
+                }
+            }
+
+            /**
+             * Get the group type
+             * 0: group
+             * 1: EZEOne ID
+             */
+            function getGroupNameType(groupName)
+            {
+                var grp = groupName.toString();
+                var grpArr = grp.split("");
+                if(grpArr[0] == '@')
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+
+            /**
+             * Action when group name is already exists or name alreay there
+             */
+            function negetiveGroupNameAction()
+            {
+                $scope.isGroupNameUnique = false;
+                changeCheckBtn(1);
+                $scope.groupDescVisible = false;
+                return;
+            }
+
+            /**
+             * API call for checking weather the group name is unique or not
+             */
+            function checkGroupNameUniqueness(groupName)
+            {
+                $http({
+                    url : GURL + 'validate_groupname',
+                    method : "GET",
+                    params :{
+                        group_name:groupName,
+                        token : $rootScope._userInfo.Token,
+                        group_type: getGroupNameType(groupName)
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data[0].status && resp.data[0].status == -1)
+                    {
+                        /* Group name is Unique: passed the validity test! */
+                        $scope.isGroupNameUnique = true;
+                        changeCheckBtn(2);
+                        $scope.groupDescVisible = true;
+                        $scope.saveGroupBtnDisabled = false;
+                        $('#group-check-btn').focus();
+                    }
+                    else
+                    {
+                        /* already existing group name */
+                        negetiveGroupNameAction();
+                        $scope.saveGroupBtnDisabled = true;
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+            }
+
+            /**
+             * Event to trigger event on change of access control
+             */
+            $scope.accessCtrlChange = function(val)
+            {
+                $scope.accessToken = val;
+            }
+
+            /**
+             * reset all default settings
+             */
+            function resetDefaultSettings()
+            {
+                $scope.activeGroupId = 0;
+                $scope.activeEzeOneId = 0;
+                $scope.activeEzeOneName = "";
+                $scope.groupSuggestionOpen = false;
+                $scope.checkBtnIcon = 1;//1:fa-search,2:fa-check
+                $scope.accessToken = 2;
+                $scope.groupName = "";
+                $('#group-name').val($scope.groupName);
+                $scope.isGroupNameUnique = true;
+                $scope.addMemberDisabled = true;
+                $scope.saveGroupBtnDisabled = true;
+                $scope.groupMember = [];
+            }
+
+            /**
+             * Reset modules
+             */
+            function resetModule()
+            {
+                $scope.module = [
+                    {
+                        joinGroup : false,
+                        createGroup : false,
+                        editGroup : false,
+                        viewGroup : false,
+                        requestContact : false
+                    }
+                ];
+            }
+
+            /**
+             * Select a group from a suggestion list [called from DOM]
+             */
+            $scope.selectGroupFromSuggestionList = function(index)
+            {
+                var isAdmin = parseInt($scope.suggestedGroup[index].isAdmin) > 0?true:false;
+                var isMember = parseInt($scope.suggestedGroup[index].isMember) > 0?true:false;
+                /* populate the input box with the selected input */
+                $scope.groupName = $scope.suggestedGroup[index].GroupName;
+                $('#group-name').val($scope.groupName);
+                /* close the suggestion */
+                $scope.groupSuggestionOpen = false;
+                /* change the check btn icon */
+                changeCheckBtn(2);
+            }
+
+            /**
+             * Change the check btn
+             */
+            function changeCheckBtn(code)
+            {
+                $scope.checkBtnIcon = code;
+            }
+
+            /**
+             * Create a group API calls [called from DOM]
+             */
+            $scope.createGroupRequest = function()
+            {
+                var groupName = $('#group-name').val();
+                var groupType = getGroupNameType(groupName);
+                $http({
+                    url : GURL + 'create_group',
+                    method : "POST",
+                    data :{
+                        token : $rootScope._userInfo.Token,
+                        group_name:groupName,
+                        group_type:groupType,
+                        about_group:$scope.modalBox.groupDesc,
+                        auto_join:$scope.modalBox.isPublicGroup?1:0,
+                        tid:0
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data.id && resp.data.id > 0)
+                    {
+                        $scope.activeGroupId = resp.data.id;
+                        $scope.groupNameDisable = true;
+                        toggleCreateGroupFormVisibility(1);
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+            }
+
+            /**
+             * Toggle visibility of (description and public checkbox) with (member - add form)
+             */
+            function toggleCreateGroupFormVisibility(code)
+            {
+
+                if(parseInt(code) === 1)
+                {
+                    /* show group table */
+                    $scope.groupMemberVisible = true;
+                    /* hide description & public check Box */
+                    $scope.groupDescVisible = false;
+                    /* hide create group btn */
+                    $scope.groupCreateBtnVisible = false;
+                }
+                else /* hide member add-form module */
+                {
+                    /* hide group table */
+                    $scope.groupMemberVisible = false;
+                    /* show  description & public check Box */
+                    $scope.groupDescVisible = true;
+                }
+            }
+
+            /**
+             * API call for validating EZEONE ID [called from DOM]
+             * @return: 1: valid [test passed],
+             *          2: invalid ezeone
+             *          3: mapping already exists
+             */
+            $scope.validateEzeOneId = function(ezeone)
+            {
+                console.log(ezeone);
+                var ezeone = parseInt(getGroupNameType(ezeone)) ==  0?"@"+ezeone:ezeone;
+                $('#ezeone-id').val(ezeone);
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'validate_groupname',
+                    method : "GET",
+                    params :{
+                        group_name:ezeone,
+                        token : $rootScope._userInfo.Token,
+                        group_type: 1
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data[0].status && resp.data[0].status == -1)
+                    {
+                        /* Group name is Unique: passed the validity test! */
+                        ezeOneValidationAction(1);
+                        $scope.activeEzeOneId = resp.data[0].masterid;
+                        $scope.activeEzeOneName = resp.data[0].name;
+                    }
+                    else if(resp.data[0].status && resp.data[0].status == -2)
+                    {
+                        /* EZEONE does not exists */
+                        ezeOneValidationAction(2);
+                        $scope.activeEzeOneId = 0;
+                        $scope.activeEzeOneName = "";
+                        Notification.error({ message: "EZEONE doesn't exists in the system", delay: MsgDelay });
+                    }
+                    else
+                    {
+                        ezeOneValidationAction(3);
+                        $scope.activeEzeOneId = 0;
+                        $scope.activeEzeOneName = "";
+                        Notification.error({ message: "You are already connected to this user", delay: MsgDelay });
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                });
+            }
+
+
+            /**
+             * Take action on the basis of the response you got from the validation of the EZEONE ID
+             */
+            function ezeOneValidationAction(code)
+            {
+                $scope.addMemberDisabled = false;
+                if(parseInt(code) === 1)
+                {
+                    $scope.addMemberDisabled = true;
+                    $scope.isEzeOneIdValid = true;
+                    $scope.addMemberDisabled = false;
+                    $('#ezeone-relationship').focus();
+                }
+                else
+                {
+                    $scope.isEzeOneIdValid = false;
+                    $scope.addMemberDisabled = true;
+                }
+            }
+
+            /**
+             * invalidate ezeoneId
+             */
+            $scope.invalidateEzeOneId = function()
+            {
+                $scope.addMemberDisabled = true;
+            }
+
+            $scope.invalidateGroupId = function()
+            {
+                $scope.saveGroupBtnDisabled = true;
+            }
+
+            /**
+             * Add individual member into group member[called from DOM]
+             */
+            $scope.addMember = function()
+            {
+                if(!parseInt($scope.activeEzeOneId)>0)
+                {
+                    Notification.error({ message: "Please select the group member once again", delay: MsgDelay });
+                    return;
+                }
+                /* check for repetition */
+                if(parseInt($scope.groupMember.indexOfWhere('id',$scope.activeEzeOneId)) >= 0)
+                {
+                    Notification.error({ message: "You can't add the same member again", delay: MsgDelay });
+                    return;
+                }
+                var temp = {
+                    name:$scope.activeEzeOneName,
+                    relation:$scope.modalBox.selectedRelation,
+                    id:$scope.activeEzeOneId
+                };
+                /* Add group member */
+                addMemberApiCall().then(function(){
+                        $scope.groupMember.push(temp);
+                        clearAddMemberForm();
+                    },
+                    function(){
+                        Notification.error({ message: "Failed to add this mmember, Please try again  later", delay: MsgDelay });
+                    });
+            }
+
+            /**
+             * clear add-member form
+             */
+            function clearAddMemberForm()
+            {
+                $scope.activeEzeOneName = "";
+                $scope.modalBox.selectedRelation = 0;
+                $scope.activeEzeOneId = 0;
+                $('#ezeone-id').val('');
+                $scope.addMemberDisabled = true;
+            }
+
+
+            /**
+             * Remove individual member from group[called from DOM]
+             */
+            $scope.removeGroupMember = function(id)
+            {
+                var index = $scope.groupMember.indexOfWhere('id',id);
+                if(index >= 0)
+                {
+                    var data = $scope.groupMember[index];
+                    removeMemberApiCall(data.id).then(function(){
+                            $scope.groupMember.splice(index,1);
+                        },
+                        function(){
+                            Notification.error({ message: "Failed to remove this member, Try again later", delay: MsgDelay });
+                        });
+
+                    return;
+                }
+
+            }
+
+            /**
+             * Add member API call
+             */
+            function addMemberApiCall()
+            {
+                var defer = $q.defer();
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'group_members',
+                    method : "POST",
+                    data :{
+                        group_id : $scope.activeGroupId,
+                        member_id : $scope.activeEzeOneId,
+                        relation_type : $scope.modalBox.selectedRelation
+                    }
+                }).success(function(resp){
+                    if(resp.status)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        defer.resolve();
+                    }
+                    else
+                    {
+                        defer.reject();
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Remove member API call
+             */
+            function removeMemberApiCall(ezeoneId)
+            {
+                var defer = $q.defer();
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'user_status',
+                    method : "PUT",
+                    data :{
+                        token : $rootScope._userInfo.Token,
+                        group_id : $scope.activeGroupId,
+                        master_id : ezeoneId,
+                        status : 4
+                    }
+                }).success(function(resp){
+                    if(resp.status)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        defer.resolve();
+                    }
+                    else
+                    {
+                        defer.reject();
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////////JOIN GROUP////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            /**
+             * API call to get the suggestion list
+             */
+            function getSuggestionList(keyword)
+            {
+                $http({
+                    url : GURL + 'suggestion_list',
+                    method : "GET",
+                    params :{
+                        keywordsForSearch:keyword,
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data)
+                    {
+                        moduleWiseAction(1,resp.data);
+                    }
+                    else
+                    {
+                        moduleWiseAction(2,resp.data);
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+            }
+
+            /**
+             * Module-wise ACTIONS based on the search result
+             * 1:Found result
+             * 2:No result Found
+             */
+            function moduleWiseAction(resType,data)
+            {
+                if(parseInt(resType) == 1)//Result Found
+                {
+                    setSuggestionListData(data);
+                }
+                else//No Result Found
+                {
+                    $scope.groupSuggestionOpen = false;
+                    changeCheckBtn(1);
+                    console.log("No result found");
+                }
+            }
+
+            /**
+             * set the response data and show suggestion list
+             */
+            function setSuggestionListData(data)
+            {
+                /* show suggestions if the request is not for creating new group */
+                $scope.groupSuggestionOpen = true;
+                $scope.suggestedGroup = data;
+            }
+
+            /**
+             * reset the data for group suggestions
+             */
+            function resetSuggestions()
+            {
+                $scope.suggestedGroup = [];
+            }
+        }
+    ]);
