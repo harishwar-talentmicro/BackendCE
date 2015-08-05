@@ -727,7 +727,7 @@ User.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
-                            //console.log(loginDetails);
+                            console.log(loginDetails);
 
                             if(comparePassword(Password,loginDetails[0].Password)){
                                 st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
@@ -740,8 +740,10 @@ User.prototype.login = function(req,res,next){
                                             res.cookie('Token', TokenResult, { maxAge: 900000, httpOnly: true });
                                             RtnMessage.Token = TokenResult;
                                             RtnMessage.IsAuthenticate = true;
+                                            RtnMessage.TID = loginDetails[0].TID;
                                             RtnMessage.ezeone_id = loginDetails[0].EZEID;
                                             RtnMessage.FirstName = loginDetails[0].FirstName;
+                                            RtnMessage.Password = loginDetails[0].Password;
                                             RtnMessage.Type = loginDetails[0].IDTypeID;
                                             RtnMessage.Icon = loginDetails[0].Icon;
                                             RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;

@@ -2849,3 +2849,21 @@ h4.front-business-form.warning-text{
         height: 35px;
     }
 }
+
+.tx-modalbox-custom-btn-group .input-group-addon, .tx-modalbox-custom-btn-group .input-group-btn{
+    width: inherit;
+}
+
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) {
+    .tx-modalbox-custom-btn-group #google-map-search-box{
+        min-width : 350px;
+    }
+}
+
+
+/* ----------- Retina Screens ----------- */
+@media screen and (min-device-width: 1200px) and (max-device-width: 1600px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
+    .tx-modalbox-custom-btn-group #google-map-search-box{
+        min-width : 400px;
+    }
+}

@@ -76,126 +76,132 @@
                     </div>
                 </div>
             </div>
-            <h3>Reservation</h3>
-            <div>
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                        <label>Module Title</label>
-                        <br/>
-                        <small class="text-primary">(Appearing to end user)</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                        <div class="form-group">
-                            <input maxlength="15" type="text" class="form-control" placeholder="Reservation Module Title" ng-model="settings.reservation.title"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                        <label>Reservation Weblink </label>
-                        <br/>
-                        <small class="text-primary">(If you want the reservation(booking) link to be redirected to your own website)</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                        <div class="form-group">
-                            <input maxlength="250" type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.reservation.url" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                        <label>Module Visibility</label>
-                        <br/>
-                        <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEOne search)</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                        <div class="form-group">
-                            <select class="form-control" name="reservation-access-rights" ng-model="settings.reservation.visibility">
-                                <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+            <!-- Turn on reservation module settings by uncommenting this code block -->
+            <!--<h3>Reservation</h3>-->
+            <!--<div>-->
                 <!--<div class="row bottom-clearfix">-->
-                <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
-                <!--<label>Scheduler Display Format</label>-->
-                <!--<br/>-->
-                <!--<small class="text-primary">(Schedules to be displayed in hours, days or months)</small>-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                        <!--<label>Module Title</label>-->
+                        <!--<br/>-->
+                        <!--<small class="text-primary">(Appearing to end user)</small>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                        <!--<div class="form-group">-->
+                            <!--<input maxlength="15" type="text" class="form-control" placeholder="Reservation Module Title" ng-model="settings.reservation.title"/>-->
+                        <!--</div>-->
+                    <!--</div>-->
                 <!--</div>-->
-                <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
-                <!--<div class="form-group">-->
-                <!--<select class="form-control" name="reservation-display-format" ng-model="settings.reservation.displayFormat">-->
-                <!--<option ng-repeat="format in reservationDisplayFormat" value="{{format.value}}">{{format.title}}</option>-->
-                <!--</select>-->
+                <!--<div class="row bottom-clearfix">-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                        <!--<label>Reservation Weblink </label>-->
+                        <!--<br/>-->
+                        <!--<small class="text-primary">(If you want the reservation(booking) link to be redirected to your own website)</small>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                        <!--<div class="form-group">-->
+                            <!--<input maxlength="250" type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.reservation.url" />-->
+                        <!--</div>-->
+                    <!--</div>-->
                 <!--</div>-->
+                <!--<div class="row bottom-clearfix">-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                        <!--<label>Module Visibility</label>-->
+                        <!--<br/>-->
+                        <!--<small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEOne search)</small>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                        <!--<div class="form-group">-->
+                            <!--<select class="form-control" name="reservation-access-rights" ng-model="settings.reservation.visibility">-->
+                                <!--<option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    <!--</div>-->
                 <!--</div>-->
+                <!--&lt;!&ndash;<div class="row bottom-clearfix">&ndash;&gt;-->
+                <!--&lt;!&ndash;<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">&ndash;&gt;-->
+                <!--&lt;!&ndash;<label>Scheduler Display Format</label>&ndash;&gt;-->
+                <!--&lt;!&ndash;<br/>&ndash;&gt;-->
+                <!--&lt;!&ndash;<small class="text-primary">(Schedules to be displayed in hours, days or months)</small>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--&lt;!&ndash;<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">&ndash;&gt;-->
+                <!--&lt;!&ndash;<div class="form-group">&ndash;&gt;-->
+                <!--&lt;!&ndash;<select class="form-control" name="reservation-display-format" ng-model="settings.reservation.displayFormat">&ndash;&gt;-->
+                <!--&lt;!&ndash;<option ng-repeat="format in reservationDisplayFormat" value="{{format.value}}">{{format.title}}</option>&ndash;&gt;-->
+                <!--&lt;!&ndash;</select>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                <!--<div class="row bottom-clearfix">-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                        <!--<label>Reservation Message</label>-->
+                        <!--<br/>-->
+                        <!--<small class="text-primary">Default reservation message to be appearing to end user</small>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                        <!--<div class="form-group">-->
+                            <!--<textarea maxlength="250" class="form-control" ng-model="settings.reservation.defaultFormMsg"></textarea>-->
+                        <!--</div>-->
+                    <!--</div>-->
                 <!--</div>-->
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                        <label>Reservation Message</label>
-                        <br/>
-                        <small class="text-primary">Default reservation message to be appearing to end user</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                        <div class="form-group">
-                            <textarea maxlength="250" class="form-control" ng-model="settings.reservation.defaultFormMsg"></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <h3>Help Desk</h3>
-            <div>
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                        <label>Module Title</label>
-                        <br/>
-                        <small class="text-primary">(Appearing to end user)</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                        <div class="form-group">
-                            <input maxlength="15" type="text" class="form-control" placeholder="Help Desk Module Title" ng-model="settings.service.title"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                        <label>Help Desk Weblink </label>
-                        <br/>
-                        <small class="text-primary">(If you want the Help Desk link to be redirected to your own website)</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                        <div class="form-group">
-                            <input maxlength="250" type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.service.url" />
-                        </div>
-                    </div>
-                </div>
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                        <label>Module Visibility</label>
-                        <br/>
-                        <small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEOne search)</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                        <div class="form-group">
-                            <select class="form-control" name="service-access-rights" ng-model="settings.service.visibility">
-                                <option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="row bottom-clearfix">
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
-                        <label>Help Desk Message</label>
-                        <br/>
-                        <small class="text-primary">Default Help Desk message to be appearing to end user</small>
-                    </div>
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">
-                        <div class="form-group">
-                            <textarea maxlength="250" class="form-control" ng-model="settings.service.defaultFormMsg"></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!--</div>-->
+            <!-- end - Turn on reservation module settings by uncommenting this code block -->
+
+            <!-- Turn on help desk module settings by uncommenting this code block -->
+            <!--<h3>Help Desk</h3>-->
+            <!--<div>-->
+                <!--<div class="row bottom-clearfix">-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                        <!--<label>Module Title</label>-->
+                        <!--<br/>-->
+                        <!--<small class="text-primary">(Appearing to end user)</small>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                        <!--<div class="form-group">-->
+                            <!--<input maxlength="15" type="text" class="form-control" placeholder="Help Desk Module Title" ng-model="settings.service.title"/>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="row bottom-clearfix">-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                        <!--<label>Help Desk Weblink </label>-->
+                        <!--<br/>-->
+                        <!--<small class="text-primary">(If you want the Help Desk link to be redirected to your own website)</small>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                        <!--<div class="form-group">-->
+                            <!--<input maxlength="250" type="url" class="form-control" placeholder="http://www.example.com/sales" ng-model="settings.service.url" />-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="row bottom-clearfix">-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                        <!--<label>Module Visibility</label>-->
+                        <!--<br/>-->
+                        <!--<small class="text-primary">(Visibility setting for module which decides whether this module is visible to end user or not at the time of EZEOne search)</small>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                        <!--<div class="form-group">-->
+                            <!--<select class="form-control" name="service-access-rights" ng-model="settings.service.visibility">-->
+                                <!--<option ng-repeat="right in visibilities" value="{{right.value}}">{{right.title}}</option>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <!--<div class="row bottom-clearfix">-->
+                    <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">-->
+                        <!--<label>Help Desk Message</label>-->
+                        <!--<br/>-->
+                        <!--<small class="text-primary">Default Help Desk message to be appearing to end user</small>-->
+                    <!--</div>-->
+                    <!--<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-clearfix">-->
+                        <!--<div class="form-group">-->
+                            <!--<textarea maxlength="250" class="form-control" ng-model="settings.service.defaultFormMsg"></textarea>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!-- end - Turn on help desk module settings by uncommenting this code block -->
+
             <h3>Recruitment</h3>
             <div>
                 <div class="row bottom-clearfix">

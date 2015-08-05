@@ -263,13 +263,16 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
  * @description api code for Update User status
  */
 MessageBox.prototype.updateUserStatus = function(req,res,next){
-
+    console.log('hai...........');
+    console.log(req.body);
     var _this = this;
 
     var token  = req.body.token;
-    var groupId  = req.body.group_id;
-    var ezeone_id  = alterEzeoneId(req.body.ezeone_id);
-    var status  = req.body.status;
+    var groupId  = parseInt(req.body.group_id);
+    var masterId  = req.body.master_id;
+    var status  = parseInt(req.body.status);
+
+    console.log(req.body);
 
     var responseMessage = {
         status: false,
@@ -288,8 +291,8 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
         error['groupId'] = 'Invalid groupId';
         validateStatus *= false;
     }
-    if(!ezeone_id){
-        error['ezeone_id'] = 'Invalid ezeone_id';
+    if(!masterId){
+        error['masterId'] = 'Invalid masterId';
         validateStatus *= false;
     }
     if(parseInt(status) == NaN){
@@ -307,7 +310,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(status);
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(masterId) + ',' + st.db.escape(status);
 
                         var query = 'CALL pUpdateUserStatus(' + queryParams + ')';
                         console.log(query);
@@ -317,21 +320,21 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
 
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'User Response updated successfully';
+                                    responseMessage.message = 'User status updated successfully';
                                     responseMessage.data = {
                                         token: req.body.token,
                                         groupId: req.body.group_id,
-                                        ezeone_id: req.body.ezeone_id,
+                                        masterId: masterId,
                                         status: req.body.status
 
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnUpdateUserStatus: User Response updated successfully');
+                                    console.log('FnUpdateUserStatus: User status updated successfully');
                                 }
                                 else {
-                                    responseMessage.message = 'User Response is not updated';
+                                    responseMessage.message = 'User status is not updated';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnUpdateUserStatus:User Response is not updated');
+                                    console.log('FnUpdateUserStatus:User status is not updated');
                                 }
                             }
 
@@ -341,7 +344,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnUpdateUserStatus: error in updating user response :' + err);
+                                console.log('FnUpdateUserStatus: error in updating user status :' + err);
                             }
                         });
                     }
@@ -1366,7 +1369,7 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
             st.db.query(query, function (err, insertResult) {
                 console.log(insertResult);
                 if (!err) {
-                    if (insertResult) {
+                    if (insertResult. affectedRows > 0) {
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Group Members added successfully';
@@ -1379,9 +1382,9 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
                         console.log('FnAddGroupMembers: Group Members added successfully');
                     }
                     else {
-                        responseMessage.message = 'Group Members not added';
+                        responseMessage.message = 'Members already added';
                         res.status(200).json(responseMessage);
-                        console.log('FnAddGroupMembers:Group Members not added');
+                        console.log('FnAddGroupMembers:Members already added');
                     }
                 }
                 else {
