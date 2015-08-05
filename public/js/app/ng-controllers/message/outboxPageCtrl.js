@@ -155,7 +155,8 @@ angular.module('ezeidApp').
                 class : 'business-manager-modal',
                 groupDesc : '',
                 isPublicGroup : false,
-                selectedRelation:0
+                selectedRelation:0,
+                selectedJoinGroupRelation:0
             };
 
             $scope.initiateDetail = function(tid)
@@ -281,6 +282,5 @@ angular.module('ezeidApp').
                 title: 'Groups',
                 class: 'business-manager-modal'
             };
-
 
         }]);
