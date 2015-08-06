@@ -1,12 +1,13 @@
-<div id="wrapper">
-    <header-section></header-section>
-</div>
+
 
 
 
 <!-- Start of design for finding - Job Seekers -->
-<section id="job-seeker-search" class="jss hpw job-seeker-bg">
-    <div class="container width-90">
+<section id="job-seeker-search" class="jss hpw job-seeker-bg hpw ">
+    <div id="wrapper">
+        <header-section></header-section>
+    </div>
+    <div class="container width-90 page-content">
         <div class="panel">
             <div class="panel-primary panel-heading">
                 <i class="fa fa-th-list"></i>  Applied Job
@@ -31,25 +32,31 @@
                     <div class="main-table p-top-20 col-lg-12">
                         <div class="col-lg-12 table-head">
 
-                            <div class="col-lg-4">
+                            <div class="col-lg-2">
                                 Job Code
                             </div>
                             <div class="col-lg-4">
                                 Title
                             </div>
                             <div class="col-lg-4">
+                                Skills
+                            </div>
+                            <div class="col-lg-2">
                                 Date
                             </div>
                         </div>
-                        <div class="col-lg-12 table-body">
-                            <div class="col-lg-4">
-                                Chandra Shekar
+                        <div class="col-lg-12 table-body" ng-repeat="job in jobData track by $index">
+                            <div class="col-lg-2" data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}">
+                                {{job.jobcode | textLength:16}}
+                            </div>
+                            <div class="col-lg-4" data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">
+                                {{job.jobtitle | textLength:35}}
                             </div>
                             <div class="col-lg-4">
-                                Bengaluru
+                                {{job.keyskills | textLength:35}}
                             </div>
-                            <div class="col-lg-4">
-                                J2ee, Oracle, C++, SQL
+                            <div class="col-lg-2">
+                                {{job.TaskDateTime | ageFilter}}
                             </div>
                         </div>
                     </div>

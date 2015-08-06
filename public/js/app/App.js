@@ -55,6 +55,7 @@
         '/job',
         '/jobdetail',
         'appliedjob',
+        'jobappliedsuccess',
         '/access-history',
         '/:ezeond/sales',
         '/:ezeone/home_delivery',
@@ -210,6 +211,10 @@
             .when('/appliedjob',{
                 templateUrl: 'html/job/applied-job.html',
                 controller : 'AppliedJobCtrl'
+            })
+            .when('/jobappliedsuccess',{
+                templateUrl: 'html/job/job-applied-success.html',
+                controller : 'JobAppliedSuccessCtrl'
             })
             .when('/jobsearch',{
                 templateUrl: 'html/job/job-search-result.html',

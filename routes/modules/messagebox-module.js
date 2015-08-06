@@ -1256,7 +1256,7 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(keywordsForSearch) + ','  + st.db.escape(token);
-                        var query = 'CALL pGetMessageboxSuggestionList(' + queryParams + ')'
+                        var query = 'CALL pGetMessageboxSuggestionList(' + queryParams + ')';
                             st.db.query(query, function (err, getResult) {
                             console.log(getResult);
                             if (!err) {
@@ -1340,6 +1340,7 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
     var groupId = req.body.group_id;
     var memberId  = req.body.member_id;
     var relationType  = req.body.relation_type;
+    var requester = req.body.requester; // 1 for group, 2 for user
 
 
     var responseMessage = {
@@ -1363,13 +1364,13 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
     }
     else {
         try {
-            var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberId) + ',' + st.db.escape(relationType);
+            var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberId) + ',' + st.db.escape(relationType)+ ',' + st.db.escape(requester);
             var query = 'CALL pAddMemberstoGroup(' + queryParams + ')';
             console.log(query);
             st.db.query(query, function (err, insertResult) {
                 console.log(insertResult);
                 if (!err) {
-                    if (insertResult. affectedRows > 0) {
+                    if (insertResult.affectedRows > 0) {
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Group Members added successfully';

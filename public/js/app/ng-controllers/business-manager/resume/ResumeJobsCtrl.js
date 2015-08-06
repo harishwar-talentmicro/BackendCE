@@ -61,6 +61,13 @@
             $scope.locIndexToEdit = "";
             $scope.disabledAddLocation = true;
 
+            //Pagination settings
+            $scope.pageSize = 5;//Results per page
+            $scope.pageCount = 0;//Everything starts with a 0 - 10,20,30 etc.
+            $scope.totalResult = 0;//Total results
+            $scope.resultThisPage = 0;//Total results you got this page
+
+
             /**
              * Hide all the open dropdown
              */
@@ -110,24 +117,6 @@
                 return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
             };
 
-            /*// Get all location list
-            function getLocationList()
-            {
-                $http({
-                    url : GURL + 'ewtGetLocationListForEZEID',
-                    method : 'GET',
-                    params : {
-                        Token : $rootScope._userInfo.Token
-                    }
-                }).success(function(resp){
-
-
-
-                }).error(function(err){
-                    //  defer.reject();
-                });
-            }*/
-
             $scope.ResumeInquiriesTab = false;
             $scope.JobsTab = true;
             $scope.JobSeekerTab = false;
@@ -135,10 +124,7 @@
 
             $scope.jobSearchTerm= "";
             $scope.jobFilterStatus = 0;
-            //Per page record is 10
-            $scope.page_size = 10;
-            $scope.page_count = 0;
-            $scope.order_by = 1;
+            $scope.order_by = 2;
 
             getPostedJob();
 
@@ -170,8 +156,8 @@
                         ezeone_id : $rootScope._userInfo.ezeid,
                         keywordsForSearch : $scope.jobSearchTerm,
                         status : $scope.jobFilterStatus,
-                        page_size : $scope.page_size,
-                        page_count : $scope.page_count,
+                        page_size : $scope.pageSize,
+                        page_count : $scope.pageCount,
                         order_by : $scope.order_by
                     }
                 }).success(function(resp){
@@ -179,6 +165,14 @@
 
                     if(resp.status)
                     {
+                        console.log("sai1122");
+                        console.log(resp);
+                        $scope.totalResult = resp.data.total_count;
+                        $scope.resultThisPage = resp.data.result.length;
+
+                        console.log($scope.totalResult);
+                        console.log($scope.resultThisPage);
+
                         for(var i = 0; i < resp.data.result.length; i++)
                         {
                             resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
@@ -800,6 +794,83 @@
                     }
                 });
             };
+
+            /*Code for pagging*/
+            /**
+             * Incerement the page count of the pagination after every pagination: NEXT
+             */
+            function incrementPageCount()
+            {
+                $scope.pageCount += $scope.pageSize;
+            }
+
+            /**
+             * Decrement the page count of the pagination after every pagination: PREVIOUS
+             */
+            function decrementPageCount()
+            {
+                $scope.pageCount -= $scope.pageSize;
+            }
+
+            /**
+             * load the next results
+             */
+            $scope.paginationNextClick = function()
+            {
+                $scope.pageCount += $scope.pageSize;
+                /* trigger next results */
+                $scope.triggerSearch(1);
+                $scope.paginationVisibility();
+            }
+
+            /**
+             * load the previous results
+             */
+            $scope.paginationPreviousClick = function()
+            {
+                $scope.pageCount -= $scope.pageSize;
+                /* trigger previous results */
+                $scope.triggerSearch(1);
+                $scope.paginationVisibility();
+            }
+
+            /**
+             * Toggle the visibility of the pagination buttons
+             */
+            $scope.paginationNextVisibility = true;
+            $scope.paginationPreviousVisibility = true;
+            $scope.paginationVisibility = function()
+            {
+                var totalResult = parseInt($scope.totalResult);
+                var currentCount = parseInt($scope.pageCount);
+                var resultSize = parseInt($scope.pageSize);
+
+                /* initial state */
+                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if(currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if((currentCount + resultSize) >= totalResult)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = true;
+
+                }
+                else{
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = true;
+
+                }
+
+                console.log($scope.paginationPreviousVisibility,$scope.paginationNextVisibility);
+            }
+
 
         }]);
 })();
