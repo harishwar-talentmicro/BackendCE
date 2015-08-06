@@ -656,6 +656,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             status: false,
             error: {},
             message: '',
+            count : '',
             data: null
         };
 
@@ -676,7 +677,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
                         if (getResult[0].length >0 ) {
                             responseMessage.status = true;
                             responseMessage.message = 'Job Seeker send successfully';
-                            responseMessage.data = getResult[0];
+                            responseMessage.data = getResult[1];
+                            responseMessage.count = getResult[0][0].count;
                             res.status(200).json(responseMessage);
                             console.log('FnGetJobSeeker: Job Seeker send successfully');
 
