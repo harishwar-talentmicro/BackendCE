@@ -37,8 +37,8 @@
             'ngAnimate'
         ]);
 
-   /* ezeid.value('GURL',"/");*/
-    ezeid.value('GURL',"http://104.199.128.226:3001/");
+   ezeid.value('GURL',"/");
+    //ezeid.value('GURL',"http://104.199.128.226:3001/");
     ezeid.value('MsgDelay',2000);
 
     /**
@@ -152,6 +152,11 @@
 
 
     ezeid.config(['$routeProvider','$httpProvider','$locationProvider',function($routeProvider,$httpProvider,$locationProvider){
+
+        angular.element(function () {
+            angular.element('[data-toggle="popover"]').popover()
+        });
+
         $routeProvider
             .when('/',{
                 templateUrl: 'html/landing.html',
