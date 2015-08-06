@@ -149,7 +149,7 @@ router.get('/applied_job',LocationManager.FnGetAppliedJob);
 router.get('/job_country',LocationManager.FnGetJobcountry);
 router.get('/job_city',LocationManager.FnGetjobcity);
 router.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
-router.get('/jobseeker_message',LocationManager.FnGetJobSeekersMessage);
+router.post('/jobseeker_message',LocationManager.FnGetJobSeekersMessage);
 router.get('/jobs_list',LocationManager.FnGetListOfJobs);
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);

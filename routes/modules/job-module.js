@@ -1333,7 +1333,7 @@ Job.prototype.getjobcity = function(req,res,next){
 
 /**
  * @todo FnGetJobSeekersMessage
- * Method : GET
+ * Method : post
  * @param req
  * @param res
  * @param next
@@ -1342,10 +1342,10 @@ Job.prototype.getjobcity = function(req,res,next){
 Job.prototype.getJobSeekersMessage = function(req,res,next){
     var _this = this;
 
-    var token = req.query.token;
-    var ids = req.query.ids;
-    var templateId = req.query.template_id;
-    var jobId = req.query.job_id;
+    var token = req.body.token;
+    var ids = req.body.ids;
+    var templateId = req.body.template_id;
+    var jobId = req.body.job_id;
     var id,i=0,tid,jobResult;
 
     if(ids){
@@ -1386,7 +1386,6 @@ Job.prototype.getJobSeekersMessage = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-
                         var mailDetails = function(i) {
                             if(i < id.length) {
                                 tid = id[i];
