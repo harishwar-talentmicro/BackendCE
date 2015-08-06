@@ -226,6 +226,7 @@ app.get('/outbox_messages',LocationManager.FnLoadOutBoxMessages);
 app.get('/suggestion_list',LocationManager.FnGetSuggestionList);
 app.post('/group_members',LocationManager.FnAddGroupMembers);
 app.get('/pending_request',LocationManager.FnGetPendingRequest);
+app.get('/group_list',LocationManager.FnGetGroupList);
 
 
 
