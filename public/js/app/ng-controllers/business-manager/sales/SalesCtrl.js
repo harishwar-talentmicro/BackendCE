@@ -16,6 +16,7 @@
         '$route',
         'GoogleMaps',
         'UtilityService',
+        'FileToBase64',
         function (
             $rootScope,
             $scope,
@@ -32,7 +33,8 @@
             $routeParams,
             $route,
             GoogleMap,
-            UtilityService
+            UtilityService,
+            FileToBase64
             ) {
 
             $scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
@@ -197,7 +199,10 @@
                   durationScale : 0,
                   itemList : [],     // This is transaction item list
                   companyName : '',
-                  companyId : 0
+                  companyId : 0,
+                  attachment : "",
+                  attachmentName : "",
+                  attachmentMimeType : ""
               }
             };
 
@@ -310,7 +315,11 @@
                         itemList : [],
                         companyId : (changeUserDetails) ? 0 : tx.company_id,
                         companyName : (changeUserDetails) ? '' : tx.company_name,
-                        amount : (parseFloat(tx.Amount) !== NaN) ? parseFloat(tx.Amount,2) : 0.00
+                        amount : (parseFloat(tx.Amount) !== NaN) ? parseFloat(tx.Amount,2) : 0.00,
+
+                        attachment : "",
+                        attachmentName : "",
+                        attachmentMimeType : ""
                 };
                 return editModeTx;
 
@@ -667,7 +676,11 @@
                         durationScale : 0,
                         itemList : [],
                         companyName : '',
-                        companyId : 0
+                        companyId : 0,
+
+                        attachment : "",
+                        attachmentName : "",
+                        attachmentMimeType : ""
                     }
                 };
 
@@ -1544,7 +1557,10 @@
                     company_id : $scope.modalBox.tx.companyId,
                     Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
                         ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
-                        calculateTxAmount($scope.modalBox.tx.itemList)
+                        calculateTxAmount($scope.modalBox.tx.itemList),
+                    attachment : $scope.modalBox.tx.attachment,
+                    attachment_name : $scope.modalBox.tx.attachmentName,
+                    mime_type : $scope.modalBox.tx.attachmentMimeType
                 };
                 return preparedTx;
             };
@@ -1737,8 +1753,57 @@
             },700);
 
 
+            /**
+             * If somebody want to remove attachment after adding it before lead creation
+             * this function will reset all the values related to attachment of that particular transaction
+             */
+            $scope.resetAttachment = function(){
+                $scope.modalBox.tx.attachment = "";
+                $scope.modalBox.tx.attachmentName = "";
+                $scope.modalBox.tx.attachmentMimeType = "";
+            };
 
 
+            /**
+             * Function fired when file is selected from the input
+             */
+            $scope.attachDocument = function(){
+                var elem = $('#tx-attachment');
+                var attachmentFile = angular.element(elem)[0].files;
+                if(parseInt(attachmentFile[0].size/(1024*1024)) > 2){
+                    Notification.error({ title : 'File size exceeds', message : 'Maximum file size allowed is 2 MB', delay : MsgDelay});
+                }
+                else{
+                    $scope.modalBox.tx.attachmentName = attachmentFile[0].name;
+                    $scope.modalBox.tx.attachmentMimeType = attachmentFile[0].type;
+                    FileToBase64.fileToDataUrl(attachmentFile).then(function(data){
+                        $scope.modalBox.tx.attachment  = data;
+                    });
+                }
+            };
+
+            /**
+             * Triggers file attachment selection by generating a click event on the file input (attachment hidden field)
+             */
+            $scope.triggerFileAttachment = function(){
+                $timeout(function(){
+                    $('#tx-attachment').trigger('click');
+                },1000);
+            };
+
+            /**
+             * Downloads attachment for a particular transaction
+             * @param txId
+             */
+            $scope.downloadAttachment = function(txId){
+                $window.open(GURL + '/transaction_attachment?tid='+txId);
+            };
+
+
+            /**
+             * Settings for Mutli select control (used for folder rules in view)
+             * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
+             */
             $scope.multiSelectDropDownSettings = {
                 smartButtonMaxItems: 3,
                 smartButtonTextConverter: function(itemText, originalItem) {

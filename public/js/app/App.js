@@ -152,6 +152,11 @@
 
 
     ezeid.config(['$routeProvider','$httpProvider','$locationProvider',function($routeProvider,$httpProvider,$locationProvider){
+
+        angular.element(function () {
+            angular.element('[data-toggle="popover"]').popover()
+        });
+
         $routeProvider
             .when('/',{
                 templateUrl: 'html/landing.html',
