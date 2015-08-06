@@ -61,13 +61,20 @@
                 $scope.scoreFrom = "";
                 $scope.scoreTo = "";
                 $scope.selectedTidToMail = [];
+                $scope.mailTemplateTid = 0;
+                $scope.job_id = 0;
             }
+
+            //Pagination settings
+            $scope.pageSize = 10;//Results per page
+            $scope.pageCount = 0;//Everything starts with a 0 - 10,20,30 etc.
+            $scope.totalResult = 0;//Total results
+            $scope.resultThisPage = 0;//Total results you got this page
 
             getCountryList();
             getEducations();
             getSpecialization();
             getInstituteList();
-            //getCityList();
             getTemplateList();
             getJobList();
 
@@ -95,7 +102,7 @@
             }
 
             $scope.$watch('_userInfo.IsAuthenticate', function () {
-                $('.dropdown-toggle').click(function(){
+                $('.dropdown-toggle1').click(function(){
                     hideAllDropdoowns(1);
                     $( ".filter-dropdown" ).slideToggle( "slow", function() {
                         // Animation complete.
@@ -288,21 +295,24 @@
                                 specialization_id : $scope.selectedSpecializations.toString(),
                                 institute_id : $scope.selectedInstitute.toString(),
                                 score_from : $scope.scoreFrom,
-                                score_to : $scope.scoreTo
+                                score_to : $scope.scoreTo,
+                                page_size : $scope.pageSize,
+                                page_count : $scope.pageCount
                             }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
                     if(resp.status)
                     {
+                        $scope.totalResult = resp.count;
+                        $scope.resultThisPage = resp.data.length;
+                        $scope.paginationVisibility();
+
                         $scope.jobSeekerResults = resp.data;
-
-                        console.log("Search result");
-                        console.log($scope.jobSeekerResults);
                     }
-
                 })
-                .error(function(err){
-                        $scope.$emit('$preLoaderStop');
+                .error(function(err)
+                {
+                    $scope.$emit('$preLoaderStop');
                 });
             };
 
@@ -382,8 +392,8 @@
                 return (errorList.length>0)? false : true;
             }
 
-            $scope.mailTemplateTid = 0;
-            $scope.job_id = 0;
+            /*$scope.mailTemplateTid = 0;
+            $scope.job_id = 0;*/
             // save mail template
             $scope.saveMailTemplate = function () {
 
@@ -490,13 +500,7 @@
             function validateItem(){
                 var err = [];
 
-               /* if(($scope.selectedTidToMail.length > 0) && ($scope.mailTemplateTid > 0) && ($scope.job_id > 0))
-                {
-                }*/
-
-
-
-                if($scope.selectedTidToMail.length <= 1 ){
+                if($scope.selectedTidToMail.length == 0){
                     err.push('Select Job Seeker');
                 }
                 if($scope.mailTemplateTid == 0){
@@ -519,11 +523,6 @@
             // send sales enquiry mail
             $scope.SendJobSeekerMail = function () {
 
-                console.log("SAiiiiiiiiii");
-                console.log($scope.job_id);
-                console.log($scope.job_id);
-
-
                 if($scope.selectedTidToMail.length > 10)
                 {
                     $scope.$emit('$preLoaderStop');
@@ -533,37 +532,44 @@
                 {
                     if(validateItem())
                     {
-                            $scope.$emit('$preLoaderStart');
+                        $scope.$emit('$preLoaderStart');
 
-                            $http({
-                                method: 'post',
-                                url: GURL + 'jobseeker_message',
-                                data:
+                        $http({
+                            method: 'post',
+                            url: GURL + 'jobseeker_message',
+                            data:
+                            {
+                                token : $rootScope._userInfo.Token,
+                                ids : $scope.selectedTidToMail.toString(),
+                                template_id : $scope.mailTemplateTid,
+                                job_id : $scope.job_id
+                            }
+                        }).success(function (data)
+                            {
+                                $scope.$emit('$preLoaderStop');
+                                if(data.status)
                                 {
-                                    token : $rootScope._userInfo.Token,
-                                    ids : $scope.selectedTidToMail.toString(),
-                                    template_id : $scope.mailTemplateTid,
-                                    job_id : $scope.job_id
+                                    $scope.FromName = "";
+                                    $scope.FromEmailID = "";
+                                    $scope.Subject = "";
+                                    $scope.Body = "";
+
+                                    clearSearchFilter();
+
+                                    $scope.showCreateMailTemplate = false;
+                                    document.getElementById("FromName").className = "form-control emptyBox";
+                                    document.getElementById("FromEmailID").className = "form-control emptyBox";
+                                    document.getElementById("Title").className = "form-control emptyBox";
+                                    document.getElementById("Subject").className = "form-control emptyBox";
+                                    document.getElementById("Body").className = "form-control emptyBox";
+                                    Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+
+                                    $scope.jobSeekerResults = "";
                                 }
-                            }).success(function (data)
-                                {
-                                    $scope.$emit('$preLoaderStop');
-                                    if (data != 'null')
-                                    {
-                                        clearSearchFilter();
-
-                                        $scope.showCreateMailTemplate = false;
-                                        document.getElementById("FromName").className = "form-control emptyBox";
-                                        document.getElementById("FromEmailID").className = "form-control emptyBox";
-                                        document.getElementById("Title").className = "form-control emptyBox";
-                                        document.getElementById("Subject").className = "form-control emptyBox";
-                                        document.getElementById("Body").className = "form-control emptyBox";
-                                        Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
-                                    }
-                                }).error(function(err){
-                                    $scope.$emit('$preLoaderStop');
-                                });
-                            $scope.$emit('$preLoaderStop');
+                            }).error(function(err){
+                                $scope.$emit('$preLoaderStop');
+                            });
+                        $scope.$emit('$preLoaderStop');
                     }
                 }
             };
@@ -594,7 +600,6 @@
                         token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                        console.log(resp);
                         if(resp.status)
                         {
                             $scope.jobLists = resp.data;
@@ -603,6 +608,82 @@
                     .error(function(err){
                     });
             }
+
+            /*Code for pagging*/
+            /**
+             * Incerement the page count of the pagination after every pagination: NEXT
+             */
+            function incrementPageCount()
+            {
+                $scope.pageCount += $scope.pageSize;
+            }
+
+            /**
+             * Decrement the page count of the pagination after every pagination: PREVIOUS
+             */
+            function decrementPageCount()
+            {
+                $scope.pageCount -= $scope.pageSize;
+            }
+
+            /**
+             * load the next results
+             */
+            $scope.paginationNextClick = function()
+            {
+                $scope.pageCount += $scope.pageSize;
+                /* trigger next results */
+                // $scope.triggerSearch(1);
+                $scope.searchJobSeeker();
+                $scope.paginationVisibility();
+            }
+
+            /**
+             * load the previous results
+             */
+            $scope.paginationPreviousClick = function()
+            {
+                $scope.pageCount -= $scope.pageSize;
+                /* trigger previous results */
+                // $scope.triggerSearch(1);
+                $scope.searchJobSeeker();
+                $scope.paginationVisibility();
+            }
+
+            /**
+             * Toggle the visibility of the pagination buttons
+             */
+            $scope.paginationPreviousVisibility = false;
+            $scope.paginationNextVisibility = false;
+
+            $scope.paginationVisibility = function()
+            {
+                var totalResult = parseInt($scope.totalResult);
+                var currentCount = parseInt($scope.pageCount);
+                var resultSize = parseInt($scope.pageSize);
+
+                /* initial state */
+                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if(currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if((currentCount + resultSize) >= totalResult)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = true;
+                }
+                else{
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = true;
+                }
+            }
+
 
         }]);
 })();

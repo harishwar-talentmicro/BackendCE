@@ -235,8 +235,9 @@ Job.prototype.create = function(req,res,next){
                             console.log(list);
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
-
+console.log('CALL psavejoblocation(' + queryParams + ')');
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                                console.log('---------------********');
                                 console.log(results);
                                 if (results) {
                                     if (results[0]) {
@@ -249,7 +250,7 @@ Job.prototype.create = function(req,res,next){
                                             console.log('---------------');
                                             console.log(location_id);
                                             console.log(locCount);
-                                            console.log('---------------********');
+
                                             console.log(locationsList.length);
                                             if(locCount < locationsList.length){
                                                 console.log('sucess..............1');
