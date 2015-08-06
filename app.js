@@ -209,7 +209,7 @@ app.get('/applied_job',LocationManager.FnGetAppliedJob);
 app.get('/job_country',LocationManager.FnGetJobcountry);
 app.get('/job_city',LocationManager.FnGetjobcity);
 app.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
-app.get('/jobseeker_message',LocationManager.FnGetJobSeekersMessage);
+app.post('/jobseeker_message',LocationManager.FnGetJobSeekersMessage);
 app.get('/jobs_list',LocationManager.FnGetListOfJobs);
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);
@@ -226,6 +226,7 @@ app.get('/outbox_messages',LocationManager.FnLoadOutBoxMessages);
 app.get('/suggestion_list',LocationManager.FnGetSuggestionList);
 app.post('/group_members',LocationManager.FnAddGroupMembers);
 app.get('/pending_request',LocationManager.FnGetPendingRequest);
+app.get('/group_list',LocationManager.FnGetGroupList);
 
 
 

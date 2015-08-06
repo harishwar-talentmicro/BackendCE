@@ -640,6 +640,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var instituteId =  req.query.institute_id ? req.query.institute_id : '';
         var scoreFrom = req.query.score_from ? req.query.score_from : 0;
         var scoreTo = req.query.score_to ? req.query.score_to : 0;
+        var pageSize = req.query.page_size ? req.query.page_size : 10;
+        var pageCount = req.query.page_count ? req.query.page_count : 0;
 
         /**
          * Validations
@@ -655,6 +657,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             status: false,
             error: {},
             message: '',
+            count : '',
             data: null
         };
 
@@ -662,7 +665,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
             var queryParams = st.db.escape(keyword) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                 + ',' + st.db.escape(salaryType) +',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
                 + ',' + st.db.escape(experienceTo)+ ',' + st.db.escape(educations)+ ',' + st.db.escape(specializationId)
-                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(scoreTo);
+                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(scoreTo)
+                + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount);
 
 
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
@@ -674,7 +678,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
                         if (getResult[0].length >0 ) {
                             responseMessage.status = true;
                             responseMessage.message = 'Job Seeker send successfully';
-                            responseMessage.data = getResult[0];
+                            responseMessage.data = getResult[1];
+                            responseMessage.count = getResult[0][0].count;
                             res.status(200).json(responseMessage);
                             console.log('FnGetJobSeeker: Job Seeker send successfully');
 
@@ -1334,7 +1339,7 @@ Job.prototype.getjobcity = function(req,res,next){
 
 /**
  * @todo FnGetJobSeekersMessage
- * Method : GET
+ * Method : post
  * @param req
  * @param res
  * @param next
@@ -1343,10 +1348,10 @@ Job.prototype.getjobcity = function(req,res,next){
 Job.prototype.getJobSeekersMessage = function(req,res,next){
     var _this = this;
 
-    var token = req.query.token;
-    var ids = req.query.ids;
-    var templateId = req.query.template_id;
-    var jobId = req.query.job_id;
+    var token = req.body.token;
+    var ids = req.body.ids;
+    var templateId = req.body.template_id;
+    var jobId = req.body.job_id;
     var id,i=0,tid,jobResult;
 
     if(ids){
@@ -1387,7 +1392,6 @@ Job.prototype.getJobSeekersMessage = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-
                         var mailDetails = function(i) {
                             if(i < id.length) {
                                 tid = id[i];

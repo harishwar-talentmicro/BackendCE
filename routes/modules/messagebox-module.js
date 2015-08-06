@@ -848,7 +848,6 @@ MessageBox.prototype.composeMessage = function(req,res,next){
  * @param next
  * @description api code for get members list
  */
-
 MessageBox.prototype.getMembersList = function(req,res,next){
     var _this = this;
 
@@ -881,7 +880,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 
                 if (!err) {
                     if (getResult) {
-                        if(getResult[0]){
+                        if(getResult[0].length > 0){
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Members List loaded successfully';
@@ -1026,7 +1025,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
 
     var messageID  = req.body.message_id;
     var status  = req.body.status;
-    var isTrash  = req.body.is_trash;
+    var trash  = req.body.trash;
     var token  = req.body.token;
 
     var responseMessage = {
@@ -1061,7 +1060,8 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status) + ',' + st.db.escape(isTrash)+ ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status)
+                            + ',' + st.db.escape(trash)+ ',' + st.db.escape(token);
 
                         var query = 'CALL PchangeMessageActivity(' + queryParams + ')';
                         console.log(query);
@@ -1288,7 +1288,7 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnGetSuggestionList: error in getting OutBox Messages:' + err);
+                                console.log('FnGetSuggestionList: error in getting SuggestionList:' + err);
                             }
                         });
                     }
@@ -1514,6 +1514,109 @@ MessageBox.prototype.getPendingRequest = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnGetPendingRequest ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetGroupList
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get group list
+ */
+MessageBox.prototype.getGroupList = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token);
+                        var query = 'CALL pGetGroupAndIndividuals(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'GroupList loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetGroupList: GroupList loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'GroupList not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetGroupList:GroupList not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'GroupList not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetGroupList:GroupList not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetGroupList: error in getting GroupList:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetGroupList: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetGroupList:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetGroupList ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
