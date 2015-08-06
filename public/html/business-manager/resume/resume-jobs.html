@@ -20,7 +20,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-clearfix">
                     <div class="row">
                         <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
                              title="Order By">
@@ -29,8 +29,8 @@
                         <div class="col-lg-5 col-md-5 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
                             <div class="form-group form-group-sm">
                                 <select class="form-control" ng-model="order_by" ng-change="searchJobTerm()">
-                                    <option value="1">By Date(Ascending)</option>
-                                    <option value="2">By Date(Descending)</option>
+                                    <option value="2"> Date (Latest)</option>
+                                    <option value="1"> Date (Oldest)</option>
                                 </select>
                             </div>
                         </div>
@@ -43,7 +43,7 @@
                                     <option value="0"> Active </option>
                                     <option value="1"> Closed(Hired) </option>
                                     <option value="2"> Cancelled </option>
-                                     <option value="0,1,2"> All </option>
+                                    <option value="0,1,2"> All </option>
                                 </select>
                             </div>
                         </div>
@@ -55,20 +55,36 @@
                     </div>
                 </div>
 
-                <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12 pull-right">
-                    <div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 pull-right">
+                    <!--<div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
                         <button type="button" ng-click="getPreviousResultPage()" ng-disabled="!paginationPrevious" class="btn btn-info bt-xs no-radius">
                             <span class="glyphicon glyphicon-chevron-left"></span>
                             Prev
                         </button>
-                        <!-- <button type="button" class="btn btn-info bt-xs no-radius active">
+                        &lt;!&ndash; <button type="button" class="btn btn-info bt-xs no-radius active">
                              {{pageNumber}}
-                         </button>-->
+                         </button>&ndash;&gt;
                         <button type="button" ng-click="getNextResultPage()" ng-disabled="!paginationNext" class="btn btn-info bt-xs no-radius">
                             Next
                             <span class="glyphicon glyphicon-chevron-right"></span>
                         </button>
-                    </div>
+                    </div>-->
+
+                   <!-- <div class="navbar-form navbar-left">-->
+                        <button class="btn"
+                                ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
+                                ng-disabled="!paginationPreviousVisibility"
+                                ng-click="paginationPreviousClick()">
+                            Previous <i class="fa fa-arrow-circle-left"></i>
+                        </button>
+                        <button class="btn btn-primary"
+                                ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
+                                ng-disabled="!paginationNextVisibility"
+                                ng-click="paginationNextClick()">
+                            <i class="fa fa-arrow-circle-right"></i> Next
+                        </button>
+                    <!--</div>-->
+
                 </div>
             </div>
         </div>
@@ -391,6 +407,5 @@
                 </div>
             </div>
         </modal>
-
     </div>
 </div>
