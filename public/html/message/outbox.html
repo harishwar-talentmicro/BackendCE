@@ -1,408 +1,437 @@
 <!-- Outbox module goes here -->
 <section id="outbox-wrapper" class="hpw ow"  ng-controller="OutboxPageGroupActionCtrl">
-    <!-- Header menu goes here -->
-    <header-section></header-section>
-    <section class="page-content">
-        <!-- NEW DESIGN GOES HERE -->
-        <div class="container width-100 ">
+    <div ng-controller="OutboxPageJoinEzeoneCtrl">
+        <!-- Header menu goes here -->
+        <header-section></header-section>
 
-            <div class="panel-body ">
-                <!-- Left Side Content: Messages Indexes -->
-                <!--<div class="col-lg-3 no-padding hidden">-->
-                <div class="col-lg-3 no-padding">
-                    <!-- main indexes -->
-                    <div class="inbox-head-left main-index inbox-head-left-bg">
-                        <h3 class="text-white text-center"><i class="fa fa-envelope"></i> MessageBox</h3>
-                    </div>
-                    <!-- All the indexes/menu goes here -->
-                    <div class="index-menu">
-                        <ul class="inbox-nav inbox-divider">
-                            <li class="active index-menu-item compose-mail-menu">
-                                <!--<a ng-click="openComposeMessage()" class="pointer"> <i class="fa fa-pencil-square-o"></i> Compose</a>-->
-                                <a href="/outbox/compose" class="pointer text-white text-bolder"> <i class="fa fa-pencil-square-o"></i> Compose</a>
-                            </li>
-                            <li class="active index-menu-item">
-                                <!--<a ng-click="openInbox()" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>-->
-                                <a href="/outbox/inbox" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>
-                            </li>
-                            <li class="index-menu-item">
-                                <a href="#"><i class="fa fa-envelope-o"></i> Outbox</a>
-                            </li>
-                            <li class="index-menu-item">
-                                <a href="#"><i class="fa fa-trash-o"></i> Trash</a>
-                            </li>
-                            <li class="index-menu-item group index-title-group text-bolder">
-                                <a class="text-white text-bolder">
-                                    <i class="fa fa-external-link"></i> Groups <span class="label label-warning">30</span>
-                                </a>
-                                <span class="pull-right p-right-10">
-                                    <button ng-click="modalAddGroupVisibility(1)" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
-                                    <button ng-click="modalAddGroupVisibility(2)" class="btn btn-default btn-xs no-radius"><i class="fa fa-thumbs-up"></i> Join</button>
-                                    <button ng-click="modalAddGroupVisibility(3)" class="btn btn-default btn-xs no-radius"><i class="fa fa-edit"></i> Edit</button>
-                                </span>
-                            </li>
-                            <!-- groups goes here -->
-                            <li class="index-menu-item group">
-                                <a href="#"><i class="fa fa-group"></i> Group 1</a>
-                            </li>
-                            <li class="index-menu-item group">
-                                <a href="#"><i class="fa fa-group"></i> Group 2</a>
-                            </li>
-                            <li class="index-menu-item group">
-                                <a href="#"><i class="fa fa-group"></i> Group 3</a>
-                            </li>
-                            <!-- My People -->
-                            <li class="index-menu-item people index-title-people text-bolder">
-                                <a class="text-white text-bolder" href="#"><i class="fa fa-user"></i> My People</a>
-                                <span class="pull-right p-right-10">
-                                    <button class="btn btn-default btn-xs no-radius"><i class="fa fa-plus-circle"></i> Request</button>
-                                </span>
-                            </li>
-                            <li class="index-menu-item people">
-                                <a href="#"><i class="fa fa-comments"></i> User 1</a>
-                            </li>
-                            <li class="index-menu-item people">
-                                <a href="#"><i class="fa fa-comments"></i> User 1</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- Right Side Content: Messages Indexes -->
-                <!--<div class="col-lg-9 no-padding  message-content hidden">-->
-                <div class="col-lg-9 no-padding  message-content">
-                    <div class="inbox-head-new">
-                        <h3 class="text-white">{{titleText}} </h3>
-                    </div>
-                    <!-- All messages goes here -->
+        <section class="page-content">
+            <!-- NEW DESIGN GOES HERE -->
+            <div class="container width-100 ">
 
-                    <!--Active Template Comes here-->
-                    <div ng-include="activeTemplate">
-                    </div>
-
-                </div>
-
-                <div class="review-form-test hidden">
-                    <review-form> </review-form>
-                </div>
-
-                <!--- Old Design Goes Here //////////////////////////////////////////////////////////////////////////////// --->
-                <!-- MAIN SECTION OF OUTBOX MODULE -->
-                <div class="width-75 container p-top-30 hidden">
-                    <div class="panel panel-default shadow-border">
-                        <div class="panel-heading text-center menu-text">
-                            <h3 class="text-center font-roboto"><i class="fa fa-check-square-o"></i> Your Transactions</h3>
+                <div class="panel-body ">
+                    <!-- Left Side Content: Messages Indexes -->
+                    <!--<div class="col-lg-3 no-padding hidden">-->
+                    <div class="col-lg-3 no-padding">
+                        <!-- main indexes -->
+                        <div class="inbox-head-left main-index inbox-head-left-bg">
+                            <h3 class="text-white text-center"><i class="fa fa-envelope"></i> MessageBox</h3>
                         </div>
-                        <div class="panel-body">
-                            <!-- Side menu goes here -->
-                            <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style">
-                                <ul class="list-unstyled">
-                                    <li ng-click="changeSelectedModule(0)"><p ng-class="presentSelectedModule == 0?'active':''"><i class="fa fa-briefcase"></i> Sales</p></li>
-                                    <!--<li ng-click="changeSelectedModule(1)"><p ng-class="presentSelectedModule == 1?'active':''"><i class="fa fa-check-square"></i> Reservation</p></li>-->
-                                    <li ng-click="changeSelectedModule(2)"><p ng-class="presentSelectedModule == 2?'active':''"><i class="fa fa-truck" ></i> Home Delivery</p></li>
-                                    <li ng-click="changeSelectedModule(3)"><p ng-class="presentSelectedModule == 3?'active':''"><i class="fa fa-wrench" ></i> Help Desk</p></li>
-                                    <li ng-click="changeSelectedModule(4)"><p ng-class="presentSelectedModule == 4?'active':''"><i class="fa fa-file-word-o"></i> Resume</p></li>
-                                </ul>
+                        <!-- All the indexes/menu goes here -->
+                        <div class="index-menu">
+                            <ul class="inbox-nav inbox-divider">
+                                <li class="active index-menu-item compose-mail-menu">
+                                    <!--<a ng-click="openComposeMessage()" class="pointer"> <i class="fa fa-pencil-square-o"></i> Compose</a>-->
+                                    <a href="/outbox/compose" class="pointer text-white text-bolder"> <i class="fa fa-pencil-square-o"></i> Compose</a>
+                                </li>
+                                <li class="active index-menu-item">
+                                    <!--<a ng-click="openInbox()" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>-->
+                                    <a href="/outbox/inbox" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>
+                                </li>
+                                <li class="index-menu-item">
+                                    <a href="#"><i class="fa fa-envelope-o"></i> Outbox</a>
+                                </li>
+                                <li class="index-menu-item">
+                                    <a href="#"><i class="fa fa-trash-o"></i> Trash</a>
+                                </li>
+                                <li class="index-menu-item group index-title-group text-bolder">
+                                    <a class="text-white text-bolder">
+                                        <i class="fa fa-external-link"></i> Groups <span class="label label-warning">30</span>
+                                    </a>
+                                <span class="pull-right p-right-10">
+                                    <button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(1)" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
+                                    <button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(2)" class="btn btn-default btn-xs no-radius"><i class="fa fa-thumbs-up"></i> Join</button>
+                                    <button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(3)" class="btn btn-default btn-xs no-radius"><i class="fa fa-edit"></i> Edit</button>
+                                </span>
+                                </li>
+                                <!-- groups goes here -->
+                                <li class="index-menu-item group">
+                                    <a href="#"><i class="fa fa-group"></i> Group 1</a>
+                                </li>
+                                <li class="index-menu-item group">
+                                    <a href="#"><i class="fa fa-group"></i> Group 2</a>
+                                </li>
+                                <li class="index-menu-item group">
+                                    <a href="#"><i class="fa fa-group"></i> Group 3</a>
+                                </li>
+                                <!-- My People -->
+                                <li class="index-menu-item people index-title-people text-bolder">
+                                    <a class="text-white text-bolder" href="#"><i class="fa fa-user"></i> My People</a>
+                                <span class="pull-right p-right-10">
+                                    <button class="btn btn-default btn-xs no-radius"
+                                            ng-click="toggleEzeoneModalVisibility()"><i class="fa fa-plus-circle"></i> Request</button>
+                                </span>
+                                </li>
+                                <li class="index-menu-item people">
+                                    <a href="#"><i class="fa fa-comments"></i> User 1</a>
+                                </li>
+                                <li class="index-menu-item people">
+                                    <a href="#"><i class="fa fa-comments"></i> User 1</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Right Side Content: Messages Indexes -->
+                    <!--<div class="col-lg-9 no-padding  message-content hidden">-->
+                    <div class="col-lg-9 no-padding  message-content">
+                        <div class="inbox-head-new">
+                            <h3 class="text-white">{{titleText}} </h3>
+                        </div>
+                        <!-- All messages goes here -->
+
+                        <!--Active Template Comes here-->
+                        <div ng-include="activeTemplate">
+                        </div>
+
+                    </div>
+
+                    <div class="review-form-test hidden">
+                        <review-form> </review-form>
+                    </div>
+
+                    <!--- Old Design Goes Here //////////////////////////////////////////////////////////////////////////////// --->
+                    <!-- MAIN SECTION OF OUTBOX MODULE -->
+                    <div class="width-75 container p-top-30 hidden">
+                        <div class="panel panel-default shadow-border">
+                            <div class="panel-heading text-center menu-text">
+                                <h3 class="text-center font-roboto"><i class="fa fa-check-square-o"></i> Your Transactions</h3>
                             </div>
-                            <!-- Main content goes here -->
-                            <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 ">
-                                <div class="outbox-main-content">
-                                    <!-- Transaction history goes here -->
-                                    <div class="pagination input-group text-right" ng-show="paginationStatus">
-                                        <button ng-disabled="!paginationPrevious" ng-click="getPreviousResultPage()" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
-                                        <button ng-disabled="!paginationNext" ng-click="getNextResultPage()" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
+                            <div class="panel-body">
+                                <!-- Side menu goes here -->
+                                <div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 menu-style">
+                                    <ul class="list-unstyled">
+                                        <li ng-click="changeSelectedModule(0)"><p ng-class="presentSelectedModule == 0?'active':''"><i class="fa fa-briefcase"></i> Sales</p></li>
+                                        <!--<li ng-click="changeSelectedModule(1)"><p ng-class="presentSelectedModule == 1?'active':''"><i class="fa fa-check-square"></i> Reservation</p></li>-->
+                                        <li ng-click="changeSelectedModule(2)"><p ng-class="presentSelectedModule == 2?'active':''"><i class="fa fa-truck" ></i> Home Delivery</p></li>
+                                        <li ng-click="changeSelectedModule(3)"><p ng-class="presentSelectedModule == 3?'active':''"><i class="fa fa-wrench" ></i> Help Desk</p></li>
+                                        <li ng-click="changeSelectedModule(4)"><p ng-class="presentSelectedModule == 4?'active':''"><i class="fa fa-file-word-o"></i> Resume</p></li>
+                                    </ul>
+                                </div>
+                                <!-- Main content goes here -->
+                                <div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 ">
+                                    <div class="outbox-main-content">
+                                        <!-- Transaction history goes here -->
+                                        <div class="pagination input-group text-right" ng-show="paginationStatus">
+                                            <button ng-disabled="!paginationPrevious" ng-click="getPreviousResultPage()" class="btn btn-primary">Previous <i class="fa fa-arrow-circle-left"></i></button>
+                                            <button ng-disabled="!paginationNext" ng-click="getNextResultPage()" class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i> Next &nbsp;&nbsp;</button>
+                                        </div>
+                                        <!-- Individual Strips starts here -->
+                                        <div class="individual-transaction" ng-repeat="res in result track by $index">
+                                            <transaction-history-item ng-to="res.ToEzeid"
+                                                                      ng-initiate-detail="initiateDetail(res.tid)"
+                                                                      ng-message="res.Message"
+                                                                      ng-quantity="res.statustitle"
+                                                                      ng-date="convertTimeToLocal(res.TaskDateTime)"
+                                                                      ng-id="res.tid"
+                                                                      ng-status="res.statustitle"
+                                                                      ng-udate="convertTimeToLocal(res.updatedDate)"> </transaction-history-item>
+                                        </div>
+                                        <!-- Individual Strips ends here -->
+                                        <h4 class="text text-danger text-center" ng-show="!result.length > 0"><i class="fa fa-warning"></i> No Tranaction Found</h4>
                                     </div>
-                                    <!-- Individual Strips starts here -->
-                                    <div class="individual-transaction" ng-repeat="res in result track by $index">
-                                        <transaction-history-item ng-to="res.ToEzeid"
-                                                                  ng-initiate-detail="initiateDetail(res.tid)"
-                                                                  ng-message="res.Message"
-                                                                  ng-quantity="res.statustitle"
-                                                                  ng-date="convertTimeToLocal(res.TaskDateTime)"
-                                                                  ng-id="res.tid"
-                                                                  ng-status="res.statustitle"
-                                                                  ng-udate="convertTimeToLocal(res.updatedDate)"> </transaction-history-item>
-                                    </div>
-                                    <!-- Individual Strips ends here -->
-                                    <h4 class="text text-danger text-center" ng-show="!result.length > 0"><i class="fa fa-warning"></i> No Tranaction Found</h4>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <!-- details modal of the transaction history item goes here -->
-    <modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
-        <div class="row">
-            <!-- Detail goes here -->
-            <div class="container">
-                <!-- Start date goes here -->
-                <div class="start-date text-center text-bolder">{{convertTimeToLocal(activeTransactionBasicInfo.TaskDateTime)}}</div>
-                <!-- main content -->
-                <div class="main-content">
-                    <p>To: <b>{{activeTransactionBasicInfo.ToEzeid}}</b></p>
-                    <br>
-                    <p>Message:</p>
-                    <p>
-                        {{activeTransactionBasicInfo.Message}}
-                    </p>
-                    <br>
-                    <p>Status: <b>{{checkIfEmpty(activeTransactionBasicInfo.statustitle,"New")}}</b></p>
-                    <p>Last Updated: <b>{{convertTimeToLocal(activeTransactionBasicInfo.updatedDate)}}</b></p>
-                </div>
-            </div>
-
-            <!-- Item goes here -->
-            <div class="container" ng-hide="accessRight == 0">
-                <h4>Transaction Items</h4>
-
-                <div class="individual-transaction-items ">
-                    <!-- Individual items -->
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th width="5%">Id</th>
-                            <th width="40%">Item</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2)">Quantity</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Unit Price</th>
-                            <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Total Price</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="info in activeTransactionDetailedInfo track by $index">
-                            <td>{{$index + 1}}</td>
-                            <td>{{info.ItemName}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2)">{{info.Qty}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Rate}}</td>
-                            <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Amount}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- Detail ends here -->
-        </div>
-    </modal>
-    <!-- transaction history item modal ends here -->
-    <!-- Footer goes here -->
-
-    <!-- Modal Box of Add/Edit Group -->
-    <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
-        <section class="group-page row p-5">
-
-            <section id="group-action-form-module" ng-show="groupFormVisible">
-                <!-- Group Name Form goes here -->
+        </section>
+        <!-- details modal of the transaction history item goes here -->
+        <modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
+            <div class="row">
+                <!-- Detail goes here -->
                 <div class="container">
-                    <div class="group-input-form col-lg-10">
-                        <div class="input-group p-bottom-4 width-100">
-                            <div class="input-group-addon"><i class="fa fa-users"></i> Groups&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>
-                            <input type="text"
-                                   class="form-control ng-pristine ng-untouched ng-valid"
-                                   placeholder="Enter a unique Group Title"
-                                   ng-model="groupName"
-                                   id="group-name"
-                                   ng-disabled="groupNameDisable"
-                                   ng-click="invalidateGroupId()"
-                                   ng-keypress="($event.charCode==13)?groupSearchAction():return">
-                            <div class="input-group-addon no-padding-and-border">
-                                <button class="btn no-radius"
-                                        title="search group"
-                                        id="group-check-btn"
-                                        ng-click="groupSearchAction()"
-                                        ng-disabled="groupNameDisable"
-                                        ng-class="checkBtnIcon == 1?'btn-danger':'btn-success'">
-                                    <i class="fa" ng-class="checkBtnIcon == 1?'fa-search':'fa-check-circle'"></i> Check
-                                </button>
+                    <!-- Start date goes here -->
+                    <div class="start-date text-center text-bolder">{{convertTimeToLocal(activeTransactionBasicInfo.TaskDateTime)}}</div>
+                    <!-- main content -->
+                    <div class="main-content">
+                        <p>To: <b>{{activeTransactionBasicInfo.ToEzeid}}</b></p>
+                        <br>
+                        <p>Message:</p>
+                        <p>
+                            {{activeTransactionBasicInfo.Message}}
+                        </p>
+                        <br>
+                        <p>Status: <b>{{checkIfEmpty(activeTransactionBasicInfo.statustitle,"New")}}</b></p>
+                        <p>Last Updated: <b>{{convertTimeToLocal(activeTransactionBasicInfo.updatedDate)}}</b></p>
+                    </div>
+                </div>
+
+                <!-- Item goes here -->
+                <div class="container" ng-hide="accessRight == 0">
+                    <h4>Transaction Items</h4>
+
+                    <div class="individual-transaction-items ">
+                        <!-- Individual items -->
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th width="5%">Id</th>
+                                <th width="40%">Item</th>
+                                <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2)">Quantity</th>
+                                <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Unit Price</th>
+                                <th width="20%" ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">Total Price</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="info in activeTransactionDetailedInfo track by $index">
+                                <td>{{$index + 1}}</td>
+                                <td>{{info.ItemName}}</td>
+                                <td ng-hide="(accessRight == 1 || accessRight == 2)">{{info.Qty}}</td>
+                                <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Rate}}</td>
+                                <td ng-hide="(accessRight == 1 || accessRight == 2 || accessRight == 3)">{{info.Amount}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Detail ends here -->
+            </div>
+        </modal>
+        <!-- transaction history item modal ends here -->
+        <!-- Footer goes here -->
+        <!-- Modal Box of Add/Edit Group -->
+        <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
+            <section class="group-page row p-5">
+
+                <section id="group-action-form-module" ng-show="groupFormVisible">
+                    <!-- Group Name Form goes here -->
+                    <div class="container">
+                        <div class="group-input-form col-lg-10">
+                            <div class="input-group p-bottom-4 width-100">
+                                <div class="input-group-addon"><i class="fa fa-users"></i> Groups&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </div>
+                                <input type="text"
+                                       class="form-control ng-pristine ng-untouched ng-valid"
+                                       placeholder="Enter a unique Group Title"
+                                       ng-model="groupName"
+                                       id="group-name"
+                                       ng-disabled="groupNameDisable"
+                                       ng-click="invalidateGroupId()"
+                                       ng-keypress="($event.charCode==13)?groupSearchAction():return">
+                                <div class="input-group-addon no-padding-and-border">
+                                    <button class="btn no-radius"
+                                            title="search group"
+                                            id="group-check-btn"
+                                            ng-click="groupSearchAction()"
+                                            ng-disabled="groupNameDisable"
+                                            ng-class="checkBtnIcon == 1?'btn-danger':'btn-success'">
+                                        <i class="fa" ng-class="checkBtnIcon == 1?'fa-search':'fa-check-circle'"></i> Check
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <!-- group name suggestion list -->
-                        <div class="group-name-suggestion" ng-show="groupSuggestionOpen">
-                            <div ng-repeat="grp in suggestedGroup track by $index"
-                                 class="group-suggestion pointer"
-                                 ng-click="selectGroupFromSuggestionList($index)">
-                                {{grp.GroupName}}
+                            <!-- group name suggestion list -->
+                            <div class="group-name-suggestion" ng-show="groupSuggestionOpen">
+                                <div ng-repeat="grp in suggestedGroup track by $index"
+                                     class="group-suggestion pointer"
+                                     ng-click="selectGroupFromSuggestionList($index)">
+                                    {{grp.GroupName}}
+                                </div>
                             </div>
-                        </div>
                         <span class="text text-danger" ng-show="noSuggestionError">
                             No result found<br>
                         </span>
                         <span class="text text-danger" ng-show="emptyGroupNameStringError && !noSuggestionError && !groupName.length > 0">
                             Can't search an empty string.
                         </span>
-                        <!-- group name error message -->
-                        <span class="text-danger" ng-show="groupName.length > 0 && !isGroupNameUnique">Group name entered is empty or not unique</span>
-                    </div>
-
-                    <!-- JOIN GROUP MODULE: Choose relationship form goes here -->
-                    <div class="group-input-form col-lg-10 p-top-7" ng-show="groupRelationShipFormVisibility">
-                        <div class="input-group p-bottom-4 width-100">
-                            <div class="input-group-addon"><i class="fa fa-users"></i> Relationship</div>
-                            <select class="form-control" ng-model="modalBox.selectedJoinGroupRelation">
-                                <option ng-repeat="relation in relationArr track by $index" value="{{$index}}">{{relation}}</option>
-                            </select>
+                            <!-- group name error message -->
+                            <span class="text-danger" ng-show="groupName.length > 0 && !isGroupNameUnique">Group name entered is empty or not unique</span>
                         </div>
-                    </div>
 
-                    <!-- Group description goes here -->
-                    <div class="col-lg-10" ng-show="groupDescVisible" >
-                        <div class="input-group">
-                            <div class="input-group-addon"><i class="fa fa-quote-right"></i> Description </div>
-                            <textarea id="group-description" ng-model="modalBox.groupDesc" rows="5" class="form-control"></textarea>
+                        <!-- JOIN GROUP MODULE: Choose relationship form goes here -->
+                        <div class="group-input-form col-lg-10 p-top-7" ng-show="groupRelationShipFormVisibility">
+                            <div class="input-group p-bottom-4 width-100">
+                                <div class="input-group-addon"><i class="fa fa-users"></i> Relationship</div>
+                                <select class="form-control" ng-model="modalBox.selectedJoinGroupRelation">
+                                    <option ng-repeat="relation in relationArr track by $index" value="{{$index}}">{{relation}}</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-10 p-top-7" ng-show="groupDescVisible" >
-                        <button class="btn btn-default btn-xs" ng-click="modalBox.isPublicGroup = !modalBox.isPublicGroup">
-                            <i class="fa" ng-class="modalBox.isPublicGroup?'fa-check-square':'fa-square-o'"></i>
-                        </button>
-                        <b>Make it public</b>
-                        <small>(Member requests accepted automatically)</small>
 
-                    </div>
+                        <!-- Group description goes here -->
+                        <div class="col-lg-10" ng-show="groupDescVisible" >
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="fa fa-quote-right"></i> Description </div>
+                                <textarea id="group-description" ng-model="modalBox.groupDesc" rows="5" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-10 p-top-7" ng-show="groupDescVisible" >
+                            <button class="btn btn-default btn-xs" ng-click="modalBox.isPublicGroup = !modalBox.isPublicGroup">
+                                <i class="fa" ng-class="modalBox.isPublicGroup?'fa-check-square':'fa-square-o'"></i>
+                            </button>
+                            <b>Make it public</b>
+                            <small>(Member requests accepted automatically)</small>
 
-
-                    <!-- Informative messages -->
-                    <div class="col-lg-10" ng-show="pendingRequestMsg">
-                        <i class="fa fa-puzzle-piece text-danger text-center"></i> <i>Following request is waiting for your response.</i>
-                    </div>
-                    <div class="col-lg-10" ng-show="isMember && !isAdmin">
-                        <i class="fa fa-star text-dark-blue text-center"></i> <i>you have already subscribed to this group</i>
-                    </div>
-                    <div class="col-lg-10" ng-show="groupAdminMsg">
-                        <i class="fa fa-info-circle text-danger text-center"></i> <i>you are admin of this group</i>
-                    </div>
+                        </div>
 
 
+                        <!-- Informative messages -->
+                        <div class="col-lg-10" ng-show="pendingRequestMsg">
+                            <i class="fa fa-puzzle-piece text-danger text-center"></i> <i>Following request is waiting for your response.</i>
+                        </div>
+                        <div class="col-lg-10" ng-show="isMember && !isAdmin">
+                            <i class="fa fa-star text-dark-blue text-center"></i> <i>you have already subscribed to this group</i>
+                        </div>
+                        <div class="col-lg-10" ng-show="groupAdminMsg">
+                            <i class="fa fa-info-circle text-danger text-center"></i> <i>you are admin of this group</i>
+                        </div>
 
-                    <!-- JOIN GROUP REQUEST MODULE -->
-                    <div class="group-join-respnse-module col-lg-10 p-top-7 text-center" ng-show="groupJoinResponseBtn">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary"
-                                    ng-click="joinGroupResponse(1)">
-                                <i class="fa fa-check-circle"></i> Accept
+
+
+                        <!-- JOIN GROUP REQUEST MODULE -->
+                        <div class="group-join-respnse-module col-lg-10 p-top-7 text-center" ng-show="groupJoinResponseBtn">
+                            <div class="input-group-btn">
+                                <button class="btn btn-primary"
+                                        ng-click="joinGroupResponse(1)">
+                                    <i class="fa fa-check-circle"></i> Accept
+                                </button>
+                                <button class="btn btn-danger"
+                                        ng-click="joinGroupResponse(2)">
+                                    <i class="fa fa-times-circle"></i> Reject
+                                </button>
+                                <button class="btn btn-warning"
+                                        ng-click="joinGroupResponse(3)">
+                                    <i class="fa fa-power-off"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-12 text-left p-top-7">
+                            <button ng-click="createGroupRequest()" ng-disabled="saveGroupBtnDisabled" class="btn btn-primary"  ng-show="groupCreateBtnVisible">
+                                <i class="fa fa-plus"></i> Create Group
+                            </button>
+                            <button class="btn btn-info"
+                                    ng-show="joinGroupBtnVisible && !isAdmin && !isMember"
+                                    ng-click="requestJoinGroup()">
+                                <i class="fa fa-thumbs-up"></i> Join Group
                             </button>
                             <button class="btn btn-danger"
-                                    ng-click="joinGroupResponse(2)">
-                                <i class="fa fa-times-circle"></i> Reject
+                                    ng-show="leaveGroupBtnVisible"
+                                    ng-click="leaveGroup()">
+                                <i class="fa fa-thumbs-down"></i> Leave Group
                             </button>
-                            <button class="btn btn-warning"
-                                    ng-click="joinGroupResponse(3)">
-                                <i class="fa fa-power-off"></i> Cancel
+                            <button class="btn btn-info"  ng-show="editGroupBtnVisible">
+                                <i class="fa fa-edit"></i> Edit Group
+                            </button>
+                            <button class="btn btn-danger"  ng-show="deleteGroupBtnVisible">
+                                <i class="fa fa-delete"></i> Delete Group
                             </button>
                         </div>
                     </div>
+                </section>
 
-
-                    <div class="col-lg-12 text-left p-top-7">
-                        <button ng-click="createGroupRequest()" ng-disabled="saveGroupBtnDisabled" class="btn btn-primary"  ng-show="groupCreateBtnVisible">
-                            <i class="fa fa-plus"></i> Create Group
-                        </button>
-                        <button class="btn btn-info"
-                                ng-show="joinGroupBtnVisible && !isAdmin && !isMember"
-                                ng-click="requestJoinGroup()">
-                            <i class="fa fa-thumbs-up"></i> Join Group
-                        </button>
-                        <button class="btn btn-danger"
-                                ng-show="leaveGroupBtnVisible"
-                                ng-click="leaveGroup()">
-                            <i class="fa fa-thumbs-down"></i> Leave Group
-                        </button>
-                        <button class="btn btn-info"  ng-show="editGroupBtnVisible">
-                            <i class="fa fa-edit"></i> Edit Group
-                        </button>
-                        <button class="btn btn-danger"  ng-show="deleteGroupBtnVisible">
-                            <i class="fa fa-delete"></i> Delete Group
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <section id="member-action-form-module" class="p-top-7">
-                <!-- Group members addition form goes here -->
-                <div class="container" ng-show="groupMemberFormVisible">
-                    <div class="col-lg-6">
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-user"></i> Member
+                <section id="member-action-form-module" class="p-top-7">
+                    <!-- Group members addition form goes here -->
+                    <div class="container" ng-show="groupMemberFormVisible">
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-user"></i> Member
+                                </div>
+                                <input type="text"
+                                       ng-model="ezeone"
+                                       class="form-control"
+                                       id="ezeone-id"
+                                       ng-focus="invalidateEzeOneId()"
+                                       ng-keypress="($event.charCode==13)?validateEzeOneId(ezeone):return" />
+                                <div class="input-group-addon no-padding-and-border">
+                                    <button class="btn btn-default no-radius"
+                                            ng-click="validateEzeOneId(ezeone)">
+                                        <i class="fa fa-check"></i> Check
+                                    </button>
+                                </div>
                             </div>
-                            <input type="text"
-                                   ng-model="ezeone"
-                                   class="form-control"
-                                   id="ezeone-id"
-                                   ng-focus="invalidateEzeOneId()"
-                                   ng-keypress="($event.charCode==13)?validateEzeOneId(ezeone):return" />
-                            <div class="input-group-addon no-padding-and-border">
-                                <button class="btn btn-default no-radius"
-                                        ng-click="validateEzeOneId(ezeone)">
-                                    <i class="fa fa-check"></i> Check
-                                </button>
-                            </div>
+                            <span class="text-danger" ng-show="!isEzeOneIdValid">Invalid EZEONE ID</span>
                         </div>
-                        <span class="text-danger" ng-show="!isEzeOneIdValid">Invalid EZEONE ID</span>
-                    </div>
 
-                    <div class="col-lg-6">
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <i class="fa fa-tags"></i> Relationship
-                            </div>
-                            <select ng-model="modalBox.selectedRelation" class="form-control" id="ezeone-relationship">
-                                <option ng-repeat="relation in relationArr track by $index" value="{{$index}}">{{relation}}</option>
-                            </select>
-                            <div class="input-group-addon no-padding-and-border">
-                                <button class="btn btn-primary no-border"
-                                        ng-disabled="addMemberDisabled"
-                                        ng-click="addMember()">
-                                    Add  <i class="fa fa-arrow-circle-right"></i>
-                                </button>
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-tags"></i> Relationship
+                                </div>
+                                <select ng-model="modalBox.selectedRelation" class="form-control" id="ezeone-relationship">
+                                    <option ng-repeat="relation in relationArr track by $index" value="{{$index}}">{{relation}}</option>
+                                </select>
+                                <div class="input-group-addon no-padding-and-border">
+                                    <button class="btn btn-primary no-border"
+                                            ng-disabled="addMemberDisabled"
+                                            ng-click="addMember()">
+                                        Add  <i class="fa fa-arrow-circle-right"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Group member name goes here -->
-                <div class="container p-top-7" ng-show="groupMemberVisible">
-                    <div class="col-lg-12">
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                            <th width="10%">#</th>
-                            <th width="40%">Member Name</th>
-                            <th width="20%">Relation</th>
-                            <th width="20%">Status</th>
-                            <th width="10%">Action</th>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="member in groupMember track by $index">
-                                <td>{{$index + 1}}</td>
-                                <td>{{member.name}}</td>
-                                <td>{{relationArr[member.relation]}}</td>
-                                <td>{{memberStatus[member.status]}}</td>
-                                <td class="text-center">
-                                    <button ng-show="isAdmin && member.status == 0 && member.requester == 2"
-                                            ng-click="joinGroupResponse(1,member.id)" title="Accept Request" class="btn btn-primary btn-xs"><i class="fa fa-check-circle"></i></button>
-                                    <button ng-show="isAdmin && member.status == 0 && member.requester == 2"
-                                            ng-click="joinGroupResponse(2,member.id)" title="Reject Request" class="btn btn-warning btn-xs"><i class="fa fa-times-circle"></i></button>
-                                    <button ng-show="isAdmin && ((member.status == 0 && member.requester == 1) || member.status == 1)"
-                                            ng-click="removeGroupMember(member.id)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
-                                </td>
-                            </tr>
-                            </tbody>
-                            <!-- No Data found -->
-                            <tbody ng-hide="groupMember.length > 0">
-                            <tr>
-                                <td colspan="5">No Data Found</td>
-                            </tr>
-                            </tbody>
-                        </table>
+                    <!-- Group member name goes here -->
+                    <div class="container p-top-7" ng-show="groupMemberVisible">
+                        <div class="col-lg-12">
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                <th width="10%">#</th>
+                                <th width="40%">Member Name</th>
+                                <th width="20%">Relation</th>
+                                <th width="20%">Status</th>
+                                <th width="10%">Action</th>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="member in groupMember track by $index">
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{member.name}}</td>
+                                    <td>{{relationArr[member.relation]}}</td>
+                                    <td>{{memberStatus[member.status]}}</td>
+                                    <td class="text-center">
+                                        <button ng-show="isAdmin && member.status == 0 && member.requester == 2"
+                                                ng-click="joinGroupResponse(1,member.id)" title="Accept Request" class="btn btn-primary btn-xs"><i class="fa fa-check-circle"></i></button>
+                                        <button ng-show="isAdmin && member.status == 0 && member.requester == 2"
+                                                ng-click="joinGroupResponse(2,member.id)" title="Reject Request" class="btn btn-warning btn-xs"><i class="fa fa-times-circle"></i></button>
+                                        <button ng-show="isAdmin && ((member.status == 0 && member.requester == 1) || member.status == 1)"
+                                                ng-click="removeGroupMember(member.id)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                                <!-- No Data found -->
+                                <tbody ng-hide="groupMember.length > 0">
+                                <tr>
+                                    <td colspan="5">No Data Found</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                <!-- Save or update group button -->
-                <div class="container text-right p-top-7 hidden">
-                    <button class="btn btn-success"><i class="fa fa-save"></i> Save Group</button>
-                </div>
+                    <!-- Save or update group button -->
+                    <div class="container text-right p-top-7 hidden">
+                        <button class="btn btn-success"><i class="fa fa-save"></i> Save Group</button>
+                    </div>
+                </section>
             </section>
-        </section>
-    </modal>
+        </modal>
 
-    <footer-section></footer-section>
+        <!-- modal box for request or response to ONE to ONE contacts -->
+        <modal mtitle="ezeOneModalBox.title" mclass="ezeOneModalBox.class" visible="modalAddEzeoneVisible">
+            <div class="container">
+                <!-- search button for members goes here -->
+                <div class="col-lg-10">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-user"></i> Member
+                        </div>
+                        <input type="text"
+                               ng-model="ezeOneModalBox.ezeone"
+                               class="form-control"
+                               ng-focus="invalidateEzeOneId()"
+                               ng-keypress="($event.charCode==13)?validateEzeOneId(ezeOneModalBox.ezeone):return" />
+                        <div class="input-group-addon no-padding-and-border">
+                            <button class="btn btn-default no-radius"
+                                    ng-click="validateEzeOneId(ezeOneModalBox.ezeone);">
+                                <i class="fa fa-check"></i> Check
+                            </button>
+                        </div>
+                    </div>
+                    <span class="text-danger" ng-show="!isEzeOneIdValid">Invalid EZEONE ID</span>
+                </div>
+            </div>
+        </modal>
+
+        <footer-section></footer-section>
+    </div>
 </section>

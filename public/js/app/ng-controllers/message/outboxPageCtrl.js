@@ -230,7 +230,7 @@ angular.module('ezeidApp').
              */
             function setDetailedTransaction(tid)
             {
-                $scope.$emit('$preLoaderStart');
+                //$scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'ewtGetTranscationItems',
                     method : "GET",
