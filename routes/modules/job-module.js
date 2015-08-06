@@ -639,6 +639,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var instituteId =  req.query.institute_id ? req.query.institute_id : '';
         var scoreFrom = req.query.score_from ? req.query.score_from : 0;
         var scoreTo = req.query.score_to ? req.query.score_to : 0;
+        var pageSize = req.query.page_size ? req.query.page_size : 10;
+        var pageCount = req.query.page_count ? req.query.page_count : 0;
 
         /**
          * Validations
@@ -661,7 +663,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
             var queryParams = st.db.escape(keyword) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                 + ',' + st.db.escape(salaryType) +',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
                 + ',' + st.db.escape(experienceTo)+ ',' + st.db.escape(educations)+ ',' + st.db.escape(specializationId)
-                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(scoreTo);
+                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(scoreTo)
+                + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount);
 
 
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
