@@ -62,11 +62,10 @@
             $scope.disabledAddLocation = true;
 
             //Pagination settings
-            $scope.pageSize = 5;//Results per page
+            $scope.pageSize = 10;//Results per page
             $scope.pageCount = 0;//Everything starts with a 0 - 10,20,30 etc.
             $scope.totalResult = 0;//Total results
             $scope.resultThisPage = 0;//Total results you got this page
-
 
             /**
              * Hide all the open dropdown
@@ -88,7 +87,7 @@
             }
 
             $scope.$watch('_userInfo.IsAuthenticate', function () {
-                $('.dropdown-toggle').click(function(){
+                $('.dropdown-toggle1').click(function(){
                     hideAllDropdoowns(1);
                     $( ".filter-dropdown" ).slideToggle( "slow", function() {
                     // Animation complete.
@@ -105,7 +104,7 @@
                 });})
             });
 
-               var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
                 if(!dateFormat){
                     dateFormat = 'DD-MMM-YYYY hh:mm A';
                 }
@@ -162,16 +161,12 @@
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
-
                     if(resp.status)
                     {
-                        console.log("sai1122");
-                        console.log(resp);
                         $scope.totalResult = resp.data.total_count;
                         $scope.resultThisPage = resp.data.result.length;
 
-                        console.log($scope.totalResult);
-                        console.log($scope.resultThisPage);
+                        $scope.paginationVisibility();
 
                         for(var i = 0; i < resp.data.result.length; i++)
                         {
@@ -401,37 +396,51 @@
 
                         for (var nCount = 0; nCount < $scope.jobData[_index].locationArray.length; nCount++)
                         {
-                            //delete $scope.jobData[_index].locationArray[nCount].jobid;
+                            delete $scope.jobData[_index].locationArray[nCount].jobid;
                             $scope.mainLocationArray.push($scope.jobData[_index].locationArray[nCount]);
                             $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].Locname);
                         }
 
-                        $scope.EducationArray = $scope.jobData[_index].Education.split(',');
-                        for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
+                        if($scope.jobData[_index].Education)
                         {
-                            $scope.selectedEducations.push(parseInt($scope.EducationArray[nCount]));
+                            $scope.EducationArray = $scope.jobData[_index].Education.split(',');
+                            for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
+                            {
+                                $scope.selectedEducations.push(parseInt($scope.EducationArray[nCount]));
+                            }
+                        }
+                        else
+                        {
+                             $scope.selectedEducations = [];
                         }
 
-                        $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
-                        for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
+                        if($scope.jobData[_index].Specialization)
                         {
-                            $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
+                            $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
+                            for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
+                            {
+                                $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
+                            }
+                        }
+                        else
+                        {
+                           $scope.selectedSpecializations = [];
                         }
 
-                        $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
-                        for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
+                        if($scope.jobData[_index].Institute)
                         {
-                            $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
+                            $scope.InstituteArray = $scope.jobData[_index].Institute.split(',');
+                            for (var nCount = 0; nCount < $scope.InstituteArray.length; nCount++)
+                            {
+                                $scope.selectedInstitute.push(parseInt($scope.InstituteArray[nCount]));
+                            }
                         }
-
-                        $scope.InstituteArray = $scope.jobData[_index].Institute.split(',');
-                        for (var nCount = 0; nCount < $scope.InstituteArray.length; nCount++)
+                        else
                         {
-                           $scope.selectedInstitute.push(parseInt($scope.InstituteArray[nCount]));
+                            $scope.selectedInstitute = [];
                         }
 
                         $scope.aggregate_score = $scope.jobData[_index].Aggregatescore;
-
 
                         $scope.$emit('$preLoaderStop');
                     },3000);
@@ -506,7 +515,7 @@
                         "latitude" :  $scope.jobLat,
                         "longitude" : $scope.jobLong,
                         "country" : $scope.country,
-                        "maptype" : 0
+                        "maptype" : 1
                     };
 
                     $scope.mainLocationArray[_locArrayIndex] = tempLocationArray;
@@ -819,7 +828,8 @@
             {
                 $scope.pageCount += $scope.pageSize;
                 /* trigger next results */
-                $scope.triggerSearch(1);
+               // $scope.triggerSearch(1);
+                 getPostedJob();
                 $scope.paginationVisibility();
             }
 
@@ -830,15 +840,17 @@
             {
                 $scope.pageCount -= $scope.pageSize;
                 /* trigger previous results */
-                $scope.triggerSearch(1);
+               // $scope.triggerSearch(1);
+                getPostedJob();
                 $scope.paginationVisibility();
             }
 
             /**
              * Toggle the visibility of the pagination buttons
              */
-            $scope.paginationNextVisibility = true;
-            $scope.paginationPreviousVisibility = true;
+            $scope.paginationPreviousVisibility = false;
+            $scope.paginationNextVisibility = false;
+
             $scope.paginationVisibility = function()
             {
                 var totalResult = parseInt($scope.totalResult);
@@ -860,15 +872,11 @@
                 {
                     $scope.paginationNextVisibility = false;
                     $scope.paginationPreviousVisibility = true;
-
                 }
                 else{
                     $scope.paginationNextVisibility = true;
                     $scope.paginationPreviousVisibility = true;
-
                 }
-
-                console.log($scope.paginationPreviousVisibility,$scope.paginationNextVisibility);
             }
 
 

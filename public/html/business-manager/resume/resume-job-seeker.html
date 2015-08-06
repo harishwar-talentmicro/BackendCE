@@ -109,7 +109,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <button class="btn btn-default btn-sm dropdown-toggle opt opt-2 drpFunction">
+                                    <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
                                         <span class="normal-view-text"> -- Select Education -- </span>
                                         <span class="mobile-view-text"></span>
                                         <span class="caret selectImg"></span></button>
@@ -167,16 +167,30 @@
                         </div>
                     <hr>
 
-                    <div ng-show="jobSeekerResults">
+                    <div ng-show="jobSeekerResults.length">
                         <div class="container">
                             <div class="col-lg-12">
                             </div>
                             <div class="col-lg-6">
-                                Showing 1-10 of 120 results
+                                Showing {{pageCount}}-{{pageSize}} of {{totalResult}} results
                             </div>
                             <div class="col-lg-6 text-right">
-                                <button class="btn btn-primary"><i class="fa fa-arrow-circle-left"></i></button>
-                                <button class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i></button>
+
+                                <button class="btn"
+                                        ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
+                                        ng-disabled="!paginationPreviousVisibility"
+                                        ng-click="paginationPreviousClick()">
+                                    Previous <i class="fa fa-arrow-circle-left"></i>
+                                </button>
+                                <button class="btn btn-primary"
+                                        ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
+                                        ng-disabled="!paginationNextVisibility"
+                                        ng-click="paginationNextClick()">
+                                    <i class="fa fa-arrow-circle-right"></i> Next
+                                </button>
+
+                                <!--<button class="btn btn-primary"><i class="fa fa-arrow-circle-left"></i></button>
+                                <button class="btn btn-primary"><i class="fa fa-arrow-circle-right"></i></button>-->
                             </div>
                         </div>
                         <div class="container">
@@ -188,7 +202,7 @@
                                     <div class="col-lg-2">
                                         Name
                                     </div>
-                                    <div class="col-lg-1">
+                                    <div class="col-lg-2">
                                         Location
                                     </div>
                                     <div class="col-lg-3">
@@ -197,7 +211,7 @@
                                     <div class="col-lg-1">
                                         Experience
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         Preferred Job Type
                                     </div>
                                     <div class="col-lg-1">
@@ -211,18 +225,18 @@
                                                ng-click="selectTidToMail(jobSeeker.tid)"/>
                                     </div>
                                     <div class="col-lg-2">
-                                        {{jobSeeker.Name}}
+                                        <span data-toggle="tooltip" title="" data-original-title="{{jobSeeker.Name}}">{{jobSeeker.Name | textLength:15}}</span>
                                     </div>
-                                    <div class="col-lg-1">
-                                        {{jobSeeker.location}}
+                                    <div class="col-lg-2">
+                                        <span data-toggle="tooltip" title="" data-original-title="{{jobSeeker.location}}">{{jobSeeker.location | textLength:15}}</span>
                                     </div>
                                     <div class="col-lg-3">
-                                        {{jobSeeker.Skills}}
+                                        <span data-toggle="tooltip" title="" data-original-title="{{jobSeeker.Skills}}">{{jobSeeker.Skills | textLength:20}}</span>
                                     </div>
                                     <div class="col-lg-1">
                                         {{jobSeeker.Exp}} Yrs
                                     </div>
-                                    <div class="col-lg-3">
+                                    <div class="col-lg-2">
                                         <span ng-show="jobSeeker.jobtype == 1">Full Time</span>
                                         <span ng-show="jobSeeker.jobtype == 2">Part Time</span>
                                         <span ng-show="jobSeeker.jobtype == 3">Work From Home</span>
@@ -240,7 +254,7 @@
 
                 </div>
 
-                <div ng-show="jobSeekerResults">
+                <div ng-show="jobSeekerResults.length">
                     <div class="panel-danger panel-footer text-white">
                         <i class="fa fa-envelope"></i> Compose Mail <label class="label label-primary">{{selectedTidToMail.length}}</label>
                     </div>
@@ -277,7 +291,7 @@
                                     <div ng-show="showCreateMailTemplate">
                                         <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
                                             <input type="text" name="Title" id="Title" ng-model="Title"
-                                                   class="form-control emptyBox"  ng-class="MailTemplateForm.Title.$touched && !Title.length ? 'mandatoryTextBox' : ''"
+                                                   class="form-control emptyBox" ng-class="MailTemplateForm.Title.$touched && !Title.length ? 'mandatoryTextBox' : ''"
                                                    placeholder="Template title" maxlength="100" required>
                                         </div>
                                     </div>

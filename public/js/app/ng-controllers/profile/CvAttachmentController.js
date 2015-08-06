@@ -31,7 +31,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
-            $('.dropdown-toggle').click(function(){$( ".filter-dropdown" ).slideToggle( "slow", function() {
+            $('.dropdown-toggle1').click(function(){$( ".filter-dropdown" ).slideToggle( "slow", function() {
                 // Animation complete.
             });})
 

@@ -212,11 +212,15 @@
                     </div>
                     <div class="row topMargin-three setBorderColor setRowLeftRightMarginZero locationListBox" ng-show="locationArrayString.length">
                         <div class="row setRowLeftRightMarginZero" ng-repeat="location in locationArrayString track by $index">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                {{location}}
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                <span data-toggle="tooltip" title="" data-original-title="{{location}}">{{location | textLength:15}}</span>
                             </div>
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                <a class="showPointer"><i class="fa fa-map-marker" ng-click="modalVisibility($index)"> {{$index}}Set Location</i></a>
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                <a class="showPointer">
+                                    <i class="fa fa-map-marker" ng-click="modalVisibility($index)">
+                                        {{mainLocationArray[$index].maptype == 0 ? 'Set Location' : 'Change Location'}}
+                                    </i>
+                                </a>
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                                 <span class="showPointer"><img src="/images/Droped_Red_16.png" ng-click="removeLocation($index)" class="width-100-px"></span>
@@ -326,7 +330,7 @@
                     <label>Last Education</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
-                    <button class="btn btn-default btn-sm dropdown-toggle opt opt-2 drpFunction">
+                    <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
                         <span class="normal-view-text"> -- Select -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span></button>

@@ -95,7 +95,7 @@ angular.module('ezeidApp').
             $scope.joinGroupBtnVisible = false;
             $scope.editGroupBtnVisible = false;
             $scope.deleteGroupBtnVisible = false;
-
+            $scope.ezeOneValidationStatus = 0;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///////////////////MODULES//////////////////////////////////////////////////////////////////////////////////
             $scope.module = [
@@ -135,7 +135,7 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /* toggle Add/edit Group Popup */
             $scope.modalAddGroupVisibility = function (code) {
-                $scope.modalAddGroupVisible = !$scope.modalAddGroupVisible;
+                //$scope.modalAddGroupVisible = !$scope.modalAddGroupVisible;
                 $scope.groupNameDisable = false;
                 resetDefaultSettings();
                 if(parseInt(code) == 1)//Create new group
@@ -406,7 +406,6 @@ angular.module('ezeidApp').
              */
             $scope.validateEzeOneId = function(ezeone)
             {
-                console.log(ezeone);
                 var ezeone = parseInt(getGroupNameType(ezeone)) ==  0?"@"+ezeone:ezeone;
                 $('#ezeone-id').val(ezeone);
                 $scope.$emit('$preLoaderStart');
@@ -420,6 +419,7 @@ angular.module('ezeidApp').
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    $scope.ezeOneValidationStatus = resp.data[0].status;
                     if(resp.data[0].status && resp.data[0].status == -1)
                     {
                         /* Group name is Unique: passed the validity test! */
@@ -949,6 +949,5 @@ angular.module('ezeidApp').
                     $scope.groupMember[index].status = status;
                 }
             }
-
         }
     ]);
