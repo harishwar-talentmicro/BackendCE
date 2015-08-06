@@ -60,6 +60,13 @@ angular.module('ezeidApp').
                 "Leave Group",
                 "Create Group"
             ];
+            $scope.memberStatus = [
+                "Pending Request",
+                "Active Member",
+                "Rejected",
+                "Left Group",
+                "Removed"
+            ];
             $scope.groupNameDisable = false;
             /* post creation of group */
             $scope.activeGroupId = 0;
@@ -76,6 +83,8 @@ angular.module('ezeidApp').
             $scope.noSuggestionError = false;
             $scope.emptyGroupNameStringError = false;
             $scope.groupAdminMsg = false;
+            $scope.groupJoinResponseBtn = false;
+            $scope.pendingRequestMsg = false;
 
             /* module visibility variable */
             $scope.groupFormVisible = true;
@@ -300,6 +309,10 @@ angular.module('ezeidApp').
                 $scope.groupAdminMsg = false;
                 $scope.groupMemberVisible = false;
                 $scope.groupMemberFormVisible = false;
+                $scope.isAdmin = false;
+                $scope.isMember = false;
+                $scope.groupJoinResponseBtn = false;
+                $scope.pendingRequestMsg = false;
             }
 
             /**
@@ -488,7 +501,9 @@ angular.module('ezeidApp').
                 var temp = {
                     name:$scope.activeEzeOneName,
                     relation:$scope.modalBox.selectedRelation,
-                    id:$scope.activeEzeOneId
+                    id:$scope.activeEzeOneId,
+                    status:0,
+                    requester:1
                 };
 
                 /* check if the added ezeone id is not a logged in user */
@@ -526,6 +541,7 @@ angular.module('ezeidApp').
              */
             $scope.removeGroupMember = function(id)
             {
+                console.log($scope.groupMember);
                 var index = $scope.groupMember.indexOfWhere('id',id);
                 if(index >= 0)
                 {
@@ -696,7 +712,8 @@ angular.module('ezeidApp').
             $scope.selectGroupFromSuggestionList = function(index)
             {
                 var isAdmin = parseInt($scope.suggestedGroup[index].isAdmin) > 0?true:false;
-                var isMember = parseInt($scope.suggestedGroup[index].isMember) > 0?true:false;
+                var isMember = parseInt($scope.suggestedGroup[index].Status) == 1?true:false;
+                var isJoinRequestPending = parseInt($scope.suggestedGroup[index].Status) == 0?true:false;
                 /* populate the input box with the selected input */
                 $scope.groupName = $scope.suggestedGroup[index].GroupName;
                 $scope.activeGroupId = $scope.suggestedGroup[index].tid;
@@ -708,6 +725,7 @@ angular.module('ezeidApp').
                 /* set access rights */
                 $scope.isAdmin = isAdmin;
                 $scope.isMember = isMember;
+                $scope.isJoinRequestPending = isJoinRequestPending;
                 /* show the remaining form */
                 enteredGroupNameValidAction();
             }
@@ -736,32 +754,67 @@ angular.module('ezeidApp').
              */
             function enteredGroupNameValidAction()
             {
+                /* reset the whole form */
+                resetJoinGroupForm();
+
                 /* if MEMBER: give information */
                 if($scope.isMember && !$scope.isAdmin)
                 {
+                    console.log("Is member");
                     $scope.leaveGroupBtnVisible = true;
                     return;
                 }
                 /* if ADMIN: load all group member */
                 if($scope.isAdmin)
                 {
+                    console.log("isAdmin");
                     /* populate group member data */
                     getGroupMembersApi().then(function(data){
                         setGroupData(data);
                     });
-
                     /* make the group member visible */
                     $scope.groupMemberVisible = true;
                     $scope.groupMemberFormVisible = true;
+
                     $scope.groupAdminMsg = true;
+                    console.log("hello"+$scope.groupRelationShipFormVisibility+" "+$scope.joinGroupBtnVisible);
                     return;
                 }
 
+                /* if the request is pending */
+                if($scope.isJoinRequestPending)
+                {
+                    console.log("pending");
+                    $scope.groupJoinResponseBtn = true;
+                    $scope.pendingRequestMsg = true;
+                    return;
+                }
+                console.log("normal");
                 //JOIN GROUP MODULES
                 /* enable relationship dropdown */
                 $scope.groupRelationShipFormVisibility = true;
                 /* enable join button */
                 $scope.joinGroupBtnVisible = true;
+            }
+
+
+            /**
+             * reset join group forms
+             */
+            function resetJoinGroupForm()
+            {
+                /* form to join group */
+                $scope.groupRelationShipFormVisibility = false;
+                $scope.joinGroupBtnVisible = false;
+                /* hide members */
+                $scope.groupMemberVisible = false;
+                $scope.groupMemberFormVisible = false;
+                /* messages */
+                $scope.groupAdminMsg = false;
+                $scope.leaveGroupBtnVisible = false;
+                /* hide join group response buttons */
+                $scope.groupJoinResponseBtn = false;
+                $scope.pendingRequestMsg = false;
             }
 
             /**
@@ -779,7 +832,9 @@ angular.module('ezeidApp').
                     var temp = {
                         name:val.name,
                         relation:val.RelationType,
-                        tid:val.MemberID
+                        id:val.MemberID,
+                        status:val.Status,
+                        requester:val.requester
                     };
                     $scope.groupMember.push(temp);
                 });
@@ -841,6 +896,58 @@ angular.module('ezeidApp').
                     function(){
                         Notification.error({ message: "Failed to leave the group, Try again later", delay: MsgDelay });
                     });
+            }
+
+            /**
+             * response to the join group request
+             * 1:Accept
+             * 2:Reject
+             * 3:cancel
+             */
+            $scope.joinGroupResponse = function(response,id)
+            {
+                var msgType = "rejected";
+                var userId  = $rootScope._userInfo.TID;
+                if(parseInt(response) === 1)
+                {
+                    msgType = "accepted";
+                }
+
+                if(id)//Called from admin-side
+                {
+                    /* update the member list data */
+                    updateMemberListLiveData(response,id);
+                    userId = id;
+                }
+                else//called from the user side
+                {
+                    /* close the modal in any of the case */
+                    $scope.modalAddGroupVisible = false;
+                }
+
+                /* don't execute furthur if cancel is clicked */
+                if(parseInt(response) === 3)
+                    return;
+
+                    /* send an API request with the new status */
+                    updateMemberStatusApiCall(userId,response).then(function(){
+                            Notification.success({ message: "You have successfuly "+msgType+" the group join request!", delay: MsgDelay });
+                        },
+                        function(){
+                    Notification.error({ message: "Failed to respond to the group joining request, Try again later", delay: MsgDelay });
+                });
+            }
+
+            /**
+             * Update the live membership data
+             */
+            function updateMemberListLiveData(status,id)
+            {
+                var index = $scope.groupMember.indexOfWhere('id',id);
+                if($scope.groupMember[index])
+                {
+                    $scope.groupMember[index].status = status;
+                }
             }
 
         }
