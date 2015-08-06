@@ -221,9 +221,26 @@
                                 {{grp.GroupName}}
                             </div>
                         </div>
+                        <span class="text text-danger" ng-show="noSuggestionError">
+                            No result found<br>
+                        </span>
+                        <span class="text text-danger" ng-show="emptyGroupNameStringError && !noSuggestionError && !groupName.length > 0">
+                            Can't search an empty string.
+                        </span>
                         <!-- group name error message -->
-                        <span class="text-danger" ng-show="!isGroupNameUnique">Group name entered is empty or not unique</span>
+                        <span class="text-danger" ng-show="groupName.length > 0 && !isGroupNameUnique">Group name entered is empty or not unique</span>
                     </div>
+
+                    <!-- JOIN GROUP MODULE: Choose relationship form goes here -->
+                    <div class="group-input-form col-lg-10 p-top-7" ng-show="groupRelationShipFormVisibility">
+                        <div class="input-group p-bottom-4 width-100">
+                            <div class="input-group-addon"><i class="fa fa-users"></i> Relationship</div>
+                            <select class="form-control" ng-model="modalBox.selectedJoinGroupRelation">
+                                <option ng-repeat="relation in relationArr track by $index" value="{{$index}}">{{relation}}</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Group description goes here -->
                     <div class="col-lg-10" ng-show="groupDescVisible" >
                         <div class="input-group">
@@ -239,21 +256,27 @@
                         <small>(Member requests accepted automatically)</small>
 
                     </div>
-                    <!--<div class="col-lg-2">-->
-                    <!--<select class="form-control"-->
-                    <!--ng-model="accessControl"-->
-                    <!--ng-change="accessCtrlChange(accessControl)">-->
-                    <!--<option value="0">Group Admin</option>-->
-                    <!--<option value="1">Group Member</option>-->
-                    <!--<option value="2">New Group</option>-->
-                    <!--</select>-->
-                    <!--</div>-->
+
+                    <div class="col-lg-10" ng-show="isMember && !isAdmin">
+                        <i class="fa fa-star text-dark-blue text-center"></i> <i>you have already subscribed to this group</i>
+                    </div>
+                    <div class="col-lg-10" ng-show="groupAdminMsg">
+                        <i class="fa fa-info-circle text-danger text-center"></i> <i>you are admin of this group</i>
+                    </div>
+
                     <div class="col-lg-12 text-left p-top-7">
                         <button ng-click="createGroupRequest()" ng-disabled="saveGroupBtnDisabled" class="btn btn-primary"  ng-show="groupCreateBtnVisible">
                             <i class="fa fa-plus"></i> Create Group
                         </button>
-                        <button class="btn btn-info"  ng-show="joinGroupBtnVisible">
+                        <button class="btn btn-info"
+                                ng-show="joinGroupBtnVisible && !isAdmin && !isMember"
+                                ng-click="requestJoinGroup()">
                             <i class="fa fa-thumbs-up"></i> Join Group
+                        </button>
+                        <button class="btn btn-danger"
+                                ng-show="leaveGroupBtnVisible"
+                                ng-click="leaveGroup()">
+                            <i class="fa fa-thumbs-down"></i> Leave Group
                         </button>
                         <button class="btn btn-info"  ng-show="editGroupBtnVisible">
                             <i class="fa fa-edit"></i> Edit Group
@@ -265,9 +288,9 @@
                 </div>
             </section>
 
-            <section id="member-action-form-module" class="p-top-7" ng-show="groupMemberVisible">
+            <section id="member-action-form-module" class="p-top-7">
                 <!-- Group members addition form goes here -->
-                <div class="container">
+                <div class="container" ng-show="groupMemberFormVisible">
                     <div class="col-lg-6">
                         <div class="input-group">
                             <div class="input-group-addon">
@@ -282,8 +305,8 @@
                             <div class="input-group-addon no-padding-and-border">
                                 <button class="btn btn-default no-radius"
                                         ng-click="validateEzeOneId(ezeone)">
-                                <i class="fa fa-check"></i> Check
-                                    </button>
+                                    <i class="fa fa-check"></i> Check
+                                </button>
                             </div>
                         </div>
                         <span class="text-danger" ng-show="!isEzeOneIdValid">Invalid EZEONE ID</span>
@@ -292,7 +315,7 @@
                     <div class="col-lg-6">
                         <div class="input-group">
                             <div class="input-group-addon">
-                                <i class="fa fa-tags"></i> Relation
+                                <i class="fa fa-tags"></i> Relationship
                             </div>
                             <select ng-model="modalBox.selectedRelation" class="form-control" id="ezeone-relationship">
                                 <option ng-repeat="relation in relationArr track by $index" value="{{$index}}">{{relation}}</option>
@@ -301,15 +324,15 @@
                                 <button class="btn btn-primary no-border"
                                         ng-disabled="addMemberDisabled"
                                         ng-click="addMember()">
-                                Add  <i class="fa fa-arrow-circle-right"></i>
-                                    </button>
+                                    Add  <i class="fa fa-arrow-circle-right"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Group member name goes here -->
-                <div class="container p-top-7">
+                <div class="container p-top-7" ng-show="groupMemberVisible">
                     <div class="col-lg-12">
                         <table class="table table-bordered table-striped">
                             <thead>
