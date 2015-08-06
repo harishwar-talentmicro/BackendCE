@@ -2,10 +2,10 @@
  * Controller to view all the Applied Job
  *
  * @author: Krunal[EZE ONE]
- * @since 20150801
+ * @since 20150806
  */
 angular.module('ezeidApp').
-    controller('AppliedJobCtrl', [
+    controller('JobAppliedSuccessCtrl', [
         '$rootScope',
         '$scope',
         '$http',
@@ -39,22 +39,10 @@ angular.module('ezeidApp').
 
             $scope.pageSize = 10;
             $scope.pageCount = 0;
-            getAppliedJob();
-
-            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
-                if(!dateFormat){
-                    dateFormat = 'DD-MMM-YYYY hh:mm A';
-                }
-                if(!returnFormat){
-                    returnFormat = dateFormat;
-                }
-                var x = new Date(timeFromServer);
-                var mom1 = moment(x);
-                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
-            };
+        //
 
             // Get Applied Job list
-            function getAppliedJob()
+          /*  function getAppliedJob()
             {
                 $scope.$emit('$preLoaderStart');
                 $http({
@@ -68,22 +56,20 @@ angular.module('ezeidApp').
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
 
+                        console.log("sai88");
+
                         console.log(resp);
 
                     if(resp.status)
                     {
-                        $scope.jobData = resp.data;
-                        for(var nCount = 0; nCount < resp.data.length; nCount++)
-                        {
-                            resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
-                        }
+
 
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                 });
             }
-
+*/
 
 
         }]);
