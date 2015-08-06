@@ -880,7 +880,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 
                 if (!err) {
                     if (getResult) {
-                        if(getResult[0]){
+                        if(getResult[0].length > 0){
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Members List loaded successfully';
@@ -1025,7 +1025,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
 
     var messageID  = req.body.message_id;
     var status  = req.body.status;
-    var isTrash  = req.body.is_trash;
+    var trash  = req.body.trash;
     var token  = req.body.token;
 
     var responseMessage = {
@@ -1060,7 +1060,8 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status) + ',' + st.db.escape(isTrash)+ ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status)
+                            + ',' + st.db.escape(trash)+ ',' + st.db.escape(token);
 
                         var query = 'CALL PchangeMessageActivity(' + queryParams + ')';
                         console.log(query);
