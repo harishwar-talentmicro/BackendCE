@@ -1795,8 +1795,49 @@
              * Downloads attachment for a particular transaction
              * @param txId
              */
-            $scope.downloadAttachment = function(txId){
-                $window.open(GURL + '/transaction_attachment?tid='+txId);
+            $scope.downloadAttachment = function(index,e){
+                //e.preventDefault();
+                console.log(e.currentTarget);
+                $timeout(function(){
+                    $(e.currentTarget).siblings('a').trigger('click');
+                },1000);
+
+                $http({
+                    method : 'GET',
+                    url : GURL + 'transaction_attachment',
+                    params : {
+                        token : $rootScope._userInfo.Token,
+                        tid : $scope.txList[parseInt(index)].TID
+                    }
+                }).success(function(resp){
+                    console.log(resp);
+                    if(resp){
+                        if(resp.status){
+                            if(resp[0]){
+                                $scope.txList[parseInt(index)].attachmentLink = resp[0].attachment;
+                                console.log(e.currentTarget);
+                                $(e.currentTarget).siblings('a').trigger('click');
+                            }
+                        }
+                        else{
+
+                        }
+                    }
+                }).error(function(err){
+                    if(err){
+                        if(err.status){
+                            if(err[0]){
+                                $scope.txList[parseInt(index)].attachmentLink = resp[0].attachment;
+                                console.log(e.currentTarget);
+                                $(e.currentTarget).siblings('a').trigger('click');
+                            }
+                        }
+                        else{
+
+                        }
+                    }
+                });
+                //$window.open(GURL + 'transaction_attachment?tid='+txId + "&token="+$rootScope._userInfo.Token);
             };
 
 
