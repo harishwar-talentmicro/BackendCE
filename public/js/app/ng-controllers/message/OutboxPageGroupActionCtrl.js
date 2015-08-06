@@ -495,6 +495,7 @@ angular.module('ezeidApp').
                 if($scope.activeEzeOneId == $rootScope._userInfo.TID)
                 {
                     Notification.error({ message: "You are the owner of the group, Try adding someone else", delay: MsgDelay });
+                    return;
                 }
 
                 /* Add group member */
@@ -614,7 +615,7 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //////////////////////////////////////////JOIN GROUP////////////////////////////////////////////////////////
+            ////////////////////////////////////JOIN GROUP & LEAVE GROUP////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -745,10 +746,13 @@ angular.module('ezeidApp').
                 if($scope.isAdmin)
                 {
                     /* populate group member data */
-                    getGroupMembersApi();
+                    getGroupMembersApi().then(function(data){
+                        setGroupData(data);
+                    });
 
                     /* make the group member visible */
                     $scope.groupMemberVisible = true;
+                    $scope.groupMemberFormVisible = true;
                     $scope.groupAdminMsg = true;
                     return;
                 }
@@ -758,6 +762,27 @@ angular.module('ezeidApp').
                 $scope.groupRelationShipFormVisibility = true;
                 /* enable join button */
                 $scope.joinGroupBtnVisible = true;
+            }
+
+            /**
+             * Set all the data of the group members
+             */
+            function setGroupData(data)
+            {
+                if(!data.length > 0)
+                {
+                    return;
+                }
+                /* Inserting data in to member data */
+                $scope.groupMember = [];
+                data.forEach(function(val){
+                    var temp = {
+                        name:val.name,
+                        relation:val.RelationType,
+                        tid:val.MemberID
+                    };
+                    $scope.groupMember.push(temp);
+                });
             }
 
             /**
@@ -773,8 +798,14 @@ angular.module('ezeidApp').
                         group_id:$scope.activeGroupId
                     }
                 }).success(function(resp){
-                    console.log(resp);
-                    defer.resolve();
+                    if(resp.data)
+                    {
+                        defer.resolve(resp.data);
+                    }
+                    else
+                    {
+                        defer.reject();
+                    }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
