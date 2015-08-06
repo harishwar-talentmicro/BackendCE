@@ -880,7 +880,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 
                 if (!err) {
                     if (getResult) {
-                        if(getResult[0]){
+                        if(getResult[0].length > 0){
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Members List loaded successfully';
