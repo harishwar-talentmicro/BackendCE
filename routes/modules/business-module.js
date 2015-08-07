@@ -222,6 +222,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var attachment_name = req.body.attachment_name ? req.body.attachment_name : '' ;
         var mime_type = req.body.mime_type ? req.body.mime_type : '' ;
         var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
+        var targetDate = req.body.target_date ? req.body.target_date : '';
         var messagetype,verified;
 
         if (FunctionType == 0){
@@ -275,7 +276,8 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                             + "," + st.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + st.db.escape(DeliveryAddress)
                             + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName)
                             + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ "," + st.db.escape(proabilities)
-                            + "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type)+ "," + st.db.escape(alarmDuration);
+                            + "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type)+ "," + st.db.escape(alarmDuration)
+                            + "," + st.db.escape(targetDate);
                         // st.db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
                         st.db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
@@ -794,6 +796,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
         var nextActionDateTime = new Date(req.body.nextActionDateTime);
         var Token = req.body.Token;
         var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
+        var targetDate = req.body.alarm_duration ? req.body.target_date : '';
 
 
         var responseMessage = {
@@ -807,7 +810,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
 
             var query = st.db.escape(TID) + ', ' + st.db.escape(status) + ',' + st.db.escape(folderRuleID)
                 + ',' + st.db.escape(nextAction) + ',' + st.db.escape(nextActionDateTime)
-                + ', ' + st.db.escape(Token)+ ', ' + st.db.escape(alarmDuration);
+                + ', ' + st.db.escape(Token)+ ', ' + st.db.escape(alarmDuration)+ ', ' + st.db.escape(targetDate);
             st.db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
                     if (updateResult) {

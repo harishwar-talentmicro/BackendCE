@@ -635,14 +635,14 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupName) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(groupName) + ',' + st.db.escape(groupType)
                             + ',' + st.db.escape(auto_join) + ',' + st.db.escape(relationType) + ',' + st.db.escape(userID);
                         var query = 'CALL pSendMessageRequest(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
                             console.log(insertResult);
                             if (!err) {
-                                if (insertResult) {
+                                if (insertResult.affectedRows > 0) {
 
                                     responseMessage.status = true;
                                     responseMessage.error = null;
