@@ -41,6 +41,20 @@
             $scope.txSearchTerm = '';
 
             /**
+             * Probability Values are mapped in this fashion
+             * @type {string[]}
+             *
+             * Index of this array start from 0, therefore for display purposes conversions are done in html template file only
+             */
+
+            $scope.probabilityMapping = [
+                'Less Likely',      // 1
+                'Likely',           // 2 (Default probability for every lead)
+                'More Likely',      // 3
+                'Definite'          // 4
+            ];
+
+            /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
             var moduleIndex = $scope.modules.indexOfWhere('type','sales');
@@ -202,7 +216,9 @@
                   companyId : 0,
                   attachment : "",
                   attachmentName : "",
-                  attachmentMimeType : ""
+                  attachmentMimeType : "",
+                  probability : 2,
+                  targetDate : moment().format('YYYY-MM-DD')
               }
             };
 
@@ -284,6 +300,7 @@
              * @return editModeTx
              */
             var prepareEditTransaction = function(tx,changeUserDetails){
+                console.log(tx);
                 var editModeTx =  {
                         orderAmount : (!isNaN(parseFloat(tx.Amount))) ? parseFloat(tx.Amount) : 0.00,
                         trnNo : tx.TrnNo,
@@ -316,7 +333,9 @@
                         companyId : (changeUserDetails) ? 0 : tx.company_id,
                         companyName : (changeUserDetails) ? '' : tx.company_name,
                         amount : (parseFloat(tx.Amount) !== NaN) ? parseFloat(tx.Amount,2) : 0.00,
-
+                        targetDate : (tx.target_date) ? tx.target_date :  moment().format('YYYY-MM-DD'),
+                        probability : (parseInt(tx.probability) !== NaN && parseInt(tx.probability) !== 0) ?
+                        parseInt(tx.probability) : 2,
                         attachment : "",
                         attachmentName : "",
                         attachmentMimeType : ""
@@ -399,7 +418,9 @@
                         nextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
                         nextActionDateTime : UtilityService.convertTimeToUTC(($scope.modalBox.tx.nextActionDateTime)
                                 ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
-                        Token : $rootScope._userInfo.Token
+                        Token : $rootScope._userInfo.Token,
+                        target_date : $scope.modalBox.tx.targetDate,
+                        probability : (parseInt($scope.modalBox.tx.probability)) ? $scope.modalBox.tx.probability : 2
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -432,6 +453,10 @@
                             resp.data.nextActionDateTime = UtilityService.convertTimeToLocal(date,'DD MMM YYYY hh:mm A');
                         }
                         $scope.txList[id].NextActionDate = resp.data.nextActionDateTime;
+
+                        $scope.txList[id].target_date = $scope.modalBox.tx.targetDate;
+                        $scope.txList[id].probability = (parseInt($scope.modalBox.tx.probability)) ? parseInt($scope.modalBox.tx.probability) : 2
+
                     }
                     else{
                         var msg = 'Something went wrong! Please try again';
@@ -680,7 +705,9 @@
 
                         attachment : "",
                         attachmentName : "",
-                        attachmentMimeType : ""
+                        attachmentMimeType : "",
+                        probability : 2,
+                        targetDate : moment().format('YYYY-MM-DD')
                     }
                 };
 
@@ -1558,6 +1585,8 @@
                     Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
                         ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
                         calculateTxAmount($scope.modalBox.tx.itemList),
+                    proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) == 0 ) ? $scope.modalBox.tx.probability : 2 ,
+                    target_date : ($scope.modalBox.tx.targetDate) ? $scope.modalBox.tx.targetDate :  moment().format('YYYY-MM-DD'),
                     attachment : $scope.modalBox.tx.attachment,
                     attachment_name : $scope.modalBox.tx.attachmentName,
                     mime_type : $scope.modalBox.tx.attachmentMimeType
