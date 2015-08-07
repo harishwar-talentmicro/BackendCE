@@ -112,6 +112,7 @@ angular.module('ezeidApp').
                 $scope.ezeOneModalBox.ezeone = ezeone;
                 var membershipStatus = $scope.ezeOneMembershipStatus;
                 /* take suitable action */
+                resetVisibilityVar();
                 hideAllMsg();
                 hideConnectFormElements();
                 hideJoinGroupResponseForm();
@@ -119,6 +120,7 @@ angular.module('ezeidApp').
                 {
                     $scope.visibilityBtn.connectBtn = true;
                     $scope.visibilityForm.relation = true;
+                    $scope.isEzeOneIdValid = true;
                 }
                 else if(parseInt($scope.ezeOneValidationStatus) == 1)//mapping already exists
                 {
@@ -134,8 +136,6 @@ angular.module('ezeidApp').
                     {
                         $scope.visibilityMsg.alreadyRequestedMsg = true;
                     }
-
-
                     $scope.isEzeOneIdValid = true;
                 }
             });

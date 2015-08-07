@@ -35,7 +35,7 @@
                                 </li>
                                 <li class="index-menu-item group index-title-group text-bolder">
                                     <a class="text-white text-bolder">
-                                        <i class="fa fa-external-link"></i> Groups <span class="label label-warning">30</span>
+                                        <i class="fa fa-external-link"></i> Groups <span class="label label-warning">{{groupListData.length}}</span>
                                     </a>
                                 <span class="pull-right p-right-10">
                                     <button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(1)" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
@@ -44,15 +44,18 @@
                                 </span>
                                 </li>
                                 <!-- groups goes here -->
-                                <li class="index-menu-item group">
-                                    <a href="#"><i class="fa fa-group"></i> Group 1</a>
-                                </li>
-                                <li class="index-menu-item group">
-                                    <a href="#"><i class="fa fa-group"></i> Group 2</a>
-                                </li>
-                                <li class="index-menu-item group">
-                                    <a href="#"><i class="fa fa-group"></i> Group 3</a>
-                                </li>
+                                <div class="group-list grp-hover overflow-y-250">
+                                    <li class="index-menu-item group" ng-repeat="grp in groupListData track by $index">
+                                        <a href="#"><i class="fa fa-group"></i> {{grp.GroupName}}</a>
+                                        <span class="pull-right p-right-10" ng-show="grp.isAdmin == 1">
+                                            <button title="edit group" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></button>
+                                            <button disabled title="you are admin" class="btn btn-primary btn-xs"><i class="fa fa-shield"></i></button>
+                                        </span>
+                                    </li>
+                                    <li class="index-menu-item group" ng-show="!groupListData.length > 0">
+                                        <a href="#"><i class="fa fa-group"></i> No Groups Available</a>
+                                    </li>
+                                </div>
                                 <!-- My People -->
                                 <li class="index-menu-item people index-title-people text-bolder">
                                     <a class="text-white text-bolder" href="#"><i class="fa fa-user"></i> My People</a>
@@ -61,12 +64,15 @@
                                             ng-click="toggleEzeoneModalVisibility()"><i class="fa fa-plus-circle"></i> Request</button>
                                 </span>
                                 </li>
-                                <li class="index-menu-item people">
-                                    <a href="#"><i class="fa fa-comments"></i> User 1</a>
-                                </li>
-                                <li class="index-menu-item people">
-                                    <a href="#"><i class="fa fa-comments"></i> User 1</a>
-                                </li>
+                                <!-- Individual list goes here -->
+                                <div class="individual-member-list grp-hover overflow-y-250">
+                                    <li class="index-menu-item people" ng-repeat="member in individualMember track by $index">
+                                        <a href="#"><i class="fa fa-comments"></i> {{member.GroupName}}</a>
+                                    </li>
+                                    <li class="index-menu-item people bg-danger text-white" ng-show="!individualMember.length > 0">
+                                        <a href="#"><i class="fa fa-comments"></i> No Contacts Available</a>
+                                    </li>
+                                </div>
                             </ul>
                         </div>
                     </div>
