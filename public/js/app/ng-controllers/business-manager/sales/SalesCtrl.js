@@ -54,6 +54,21 @@
                 'Definite'          // 4
             ];
 
+
+            $scope.alarmDurationList = [
+                "--Select Alarm Duration--",
+                "15 Minutes",
+                "30 Minutes",
+                "1 Hour",
+                "2 Hours",
+                "3 Hours",
+                "4 Hours",
+                "1 Day",
+                "7 Days",
+                "1 Week",
+                "1 Month"
+            ];
+
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
@@ -1560,8 +1575,8 @@
                     MessageText : $scope.modalBox.tx.message,
                     Status : $scope.modalBox.tx.statusType,
                     TaskDateTime : (!editMode) ?
-                        UtilityService._convertTimeToServer(moment().format('DD MMM YYYY hh:mm:ss'),'DD MMM YYYY hh:mm:ss','DD MMM YYYY hh:mm:ss'):
-                        UtilityService._convertTimeToServer($scope.modalBox.tx.taskDateTime,'DD MMM YYYY hh:mm:ss','DD MMM YYYY hh:mm:ss'),
+                        UtilityService._convertTimeToServer(moment().format('DD MMM YYYY hh:mm:ss A'),'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'):
+                        UtilityService._convertTimeToServer($scope.modalBox.tx.taskDateTime,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
                     Notes : $scope.modalBox.tx.notes,
                     LocID : ($scope.modalBox.tx.locId) ? $scope.modalBox.tx.locId : 0,
                     Country : $scope.modalBox.tx.country,
@@ -1590,7 +1605,7 @@
                     Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
                         ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
                         calculateTxAmount($scope.modalBox.tx.itemList),
-                    proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) == 0 ) ? $scope.modalBox.tx.probability : 2 ,
+                    proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) !== 0 ) ? $scope.modalBox.tx.probability : 2 ,
                     target_date : ($scope.modalBox.tx.targetDate) ? $scope.modalBox.tx.targetDate :  moment().format('YYYY-MM-DD'),
                     attachment : $scope.modalBox.tx.attachment,
                     attachment_name : $scope.modalBox.tx.attachmentName,
@@ -1826,17 +1841,36 @@
                 },1000);
             };
 
+
+            /**
+             * Function for downloading blob
+             * @param data
+             * @param mimeType
+             * @param fileName
+             */
+
+                var downloadBlob = function (data, fileName,mimeType) {
+                    $timeout(function(){
+                        console.log('a');
+                        var a = document.createElement("a");
+                        document.body.appendChild(a);
+                        a.style = "display: none";
+                        var blob = UtilityService._convertBase64ToBlob(data,mimeType);
+                        console.log(blob);
+                        var url = window.URL.createObjectURL(blob);
+                        a.href = url;
+                        a.download = fileName;
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    },1000);
+
+            };
             /**
              * Downloads attachment for a particular transaction
              * @param txId
              */
             $scope.downloadAttachment = function(index,e){
-                //e.preventDefault();
-                console.log(e.currentTarget);
-                $timeout(function(){
-                    $(e.currentTarget).siblings('a').trigger('click');
-                },1000);
-
+                $scope.txList[parseInt(index)].downloadProgress = true;
                 $http({
                     method : 'GET',
                     url : GURL + 'transaction_attachment',
@@ -1845,13 +1879,12 @@
                         tid : $scope.txList[parseInt(index)].TID
                     }
                 }).success(function(resp){
-                    console.log(resp);
+                    $scope.txList[parseInt(index)].downloadProgress = null;
                     if(resp){
                         if(resp.status){
-                            if(resp[0]){
-                                $scope.txList[parseInt(index)].attachmentLink = resp[0].attachment;
-                                console.log(e.currentTarget);
-                                $(e.currentTarget).siblings('a').trigger('click');
+                            if(resp.data[0]){
+                                resp.data[0].attachment = resp.data[0].attachment.split('base64,')[1];
+                                downloadBlob(resp.data[0].attachment, resp.data[0].file_name,resp.data[0].mime_type);
                             }
                         }
                         else{

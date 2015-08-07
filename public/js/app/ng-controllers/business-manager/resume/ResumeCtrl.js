@@ -16,6 +16,7 @@
         '$route',
         'GoogleMaps',
         'UtilityService',
+        'FileToBase64',
         function (
             $rootScope,
             $scope,
@@ -32,22 +33,52 @@
             $routeParams,
             $route,
             GoogleMap,
-            UtilityService
-            ) {
+            UtilityService,
+            FileToBase64
+        ) {
 
-            //$scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
+            $scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
             $scope.txSearchTerm = '';
 
+            /**
+             * Probability Values are mapped in this fashion
+             * @type {string[]}
+             *
+             * Index of this array start from 0, therefore for display purposes conversions are done in html template file only
+             */
+
+            $scope.probabilityMapping = [
+                'Less Likely',      // 1
+                'Likely',           // 2 (Default probability for every lead)
+                'More Likely',      // 3
+                'Definite'          // 4
+            ];
+
+
+            $scope.alarmDurationList = [
+                "--Select Alarm Duration--",
+                "15 Minutes",
+                "30 Minutes",
+                "1 Hour",
+                "2 Hours",
+                "3 Hours",
+                "4 Hours",
+                "1 Day",
+                "7 Days",
+                "1 Week",
+                "1 Month"
+            ];
 
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
-            var moduleIndex = $scope.modules.indexOfWhere('type','resume');
+            var moduleIndex = $scope.modules.indexOfWhere('type','sales');
             var permission = parseInt($scope.modules[moduleIndex].permission);
             if(permission.isNaN || permission === 0 )
             {
                 $location.path('/business-manager');
             };
+
 
             /**
              * Permission Configuration for what fields and button should be visible and what should be hidden
@@ -89,8 +120,6 @@
                     txList : true,
                     txUpdate : false
                 },
-
-
             ];
 
             /**
@@ -132,25 +161,11 @@
 
 
             $scope.moduleConf = $scope.modules[moduleIndex];
-            $scope.resumeListConf = listConf[$scope.modules[moduleIndex].listType];
-            $scope.resumePermissionConf = permissionConf[$scope.modules[moduleIndex].permission];
+            $scope.salesListConf = listConf[$scope.modules[moduleIndex].listType];
+            $scope.salesPermissionConf = permissionConf[$scope.modules[moduleIndex].permission];
 
             $scope.$emit('$preLoaderStart');
 
-            /**
-             * Function for converting UTC time from server to LOCAL timezone
-             */
-            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
-                if(!dateFormat){
-                    dateFormat = 'DD-MMM-YYYY hh:mm A';
-                }
-                if(!returnFormat){
-                    returnFormat = dateFormat;
-                }
-                var x = new Date(timeFromServer);
-                var mom1 = moment(x);
-                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
-            };
 
             $(document).on('click','.popover-close',function(){
                 $('*[data-toggle="popover"]').popover('hide');
@@ -168,7 +183,7 @@
             $scope.moduleItems = [];
 
             $scope.totalPages = 1;
-            $scope.filterStatus = -2;
+            $scope.filterStatus = -2;   // Show all at first
             $scope.sortBy = 0;
             $scope.filterStatusTypes = [];
             $scope.txStatusTypes = [];
@@ -179,8 +194,9 @@
 
             $scope.showModal = false;
             $scope.modalBox = {
-                title : 'Add Resume Application',
+                title : 'Create New Lead',
                 class : 'business-manager-modal',
+                contactType : 0, // Shows that transaction is made by EZEID (1) or by Contact Name Only (2), zero means have to select
                 editMode : false,
                 locationList : [],
                 tx : {
@@ -189,7 +205,7 @@
                     ezeidTid : 0,
 
                     TID : 0,
-                    functionType : 4, // Function Type will be 0 for resume
+                    functionType : 0, // Function Type will be 0 for sales
                     ezeid : '',
                     statusType : 0,
                     notes : '',
@@ -199,47 +215,99 @@
                     city : '',
                     area : '',
                     contactInfo : '',
-                    deliveryAddress : '',
+                    DeliveryAddress : '',
                     nextAction : 0,
                     nextActionDateTime : '',
                     taskDateTime : '',
                     folderRule : 0,
                     message : '',
-                    messageType : 0,
+                    messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
                     latitude : 0,
                     longitude : 0,
                     duration : 0,
                     durationScale : 0,
                     itemList : [],     // This is transaction item list
                     companyName : '',
-                    companyId : 0
+                    companyId : 0,
+                    attachment : "",
+                    attachmentName : "",
+                    attachmentMimeType : "",
+                    probability : 2,
+                    targetDate : moment().format('YYYY-MM-DD'),
+                    alarmDuration : 0
                 }
             };
 
             $scope.editModes = [];
 
-            $scope.loadLocationListForEzeid = function(tid){
+
+
+            $scope.getEzeidLocationDetails = function(ezeoneId){
                 var defer = $q.defer();
+                $scope.$emit('$preLoaderStart');
                 $http({
-                    url : GURL + 'ewtGetLocationListForEZEID',
+                    url : GURL + 'ezeoneid',
                     method : 'GET',
                     params : {
-                        Token : $rootScope._userInfo.Token,
-                        TID :   tid
+                        ezeoneid : ezeoneId,
+                        token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                        if(resp && resp !== 'null'){
-                            $scope.modalBox.locationList = resp.Result;
-                            defer.resolve(resp.Result);
-                        }
-                        else{
-                            defer.reject();
-                        }
-                    }).error(function(err){
-                        defer.reject();
-                    });
+                    $scope.$emit('$preLoaderStop');
+                    if(resp && resp.status){
+                        angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-error').addClass('has-success');
+                        $scope.modalBox.tx.address = resp.data.AddressLine1;
+                        $scope.modalBox.tx.area = resp.data.AddressLine1;
+                        $scope.modalBox.tx.city = resp.data.CityTitle;
+                        $scope.modalBox.tx.state = resp.data.StateTitle;
+                        $scope.modalBox.tx.country = resp.data.CountryTitle;
+                        $scope.modalBox.tx.pinCode = resp.data.PostalCode;
+                        $scope.modalBox.tx.latitude = resp.data.Latitude;
+                        $scope.modalBox.tx.longitude = resp.data.Longitude;
+
+                        $scope.modalBox.tx.DeliveryAddress = makeAddress();
+                    }
+                    else{
+                        Notification.error({ title : 'Error', message : 'EZEOne ID not found', delay : MsgDelay});
+                    }
+
+                    defer.resolve(resp);
+                }).error(function(err,statusCode){
+                    $scope.$emit('$preLoaderStop');
+                    var msg = 'EZEOne ID not found';
+                    if(!statusCode){
+                        msg = 'Unable to reach the server ! Please check your connection';
+                    }
+                    if(statusCode == 400){
+                        Notification.error({ title : 'Error', message : msg, delay : MsgDelay});
+                    }
+
+                    defer.resolve(null);
+                });
                 return defer.promise;
             };
+
+            /**
+             * Eliminates the rate and item description from the message
+             * so that it can be recalculated and saved when internal user changes or updates the order
+             * @param msg
+             * @usage parameter msg will be like
+             * msg = 'this is message text for this sales enquiry     Nuts(7), Bolts(6)
+             * alteredMsg = 'this is message text for this sales enquiry'
+             */
+            var alterTransactionMessageToEdit = function(msg){
+                var alteredMsg = '';
+                var str = '   '; //30 characters
+                var indexStr = msg.lastIndexOf(str);
+                if(indexStr !== -1){
+                    alteredMsg = msg.substr(0,indexStr);
+                }
+                else{
+                    alteredMsg = msg;
+                }
+                return alteredMsg;
+            };
+
             /**
              * Copies the transaction properties to editMode Object
              * @param tx
@@ -248,15 +316,16 @@
              * @return editModeTx
              */
             var prepareEditTransaction = function(tx,changeUserDetails){
-
+                console.log(tx);
                 var editModeTx =  {
                     orderAmount : (!isNaN(parseFloat(tx.Amount))) ? parseFloat(tx.Amount) : 0.00,
                     trnNo : tx.TrnNo,
+                    ezeid : (changeUserDetails) ? '' :  tx.RequesterEZEID,
                     ezeidTid : (tx.EZEID) ? true : 0,
 
                     TID : tx.TID,
-                    functionType : 4, // Function Type will be 0 for resume
-                    ezeid : (changeUserDetails) ? '' :  tx.RequesterEZEID,
+                    functionType : 0, // Function Type will be 0 for sales
+
                     statusType : (tx.Status) ? tx.Status : 0,
                     notes : tx.Notes,
                     locId : tx.LocID,
@@ -265,20 +334,28 @@
                     city : '',
                     area : '',
                     contactInfo : tx.ContactInfo,
-                    deliveryAddress : tx.DeliveryAddress,
+                    DeliveryAddress : tx.DeliveryAddress,
                     nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
-                    nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
+                    nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm A','DD MMM YYYY HH:mm'),
                     taskDateTime : tx.TaskDateTime,
                     folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
-                    message : tx.Message,
-                    messageType : 0,
+                    message : alterTransactionMessageToEdit(tx.Message),
+                    messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
                     latitude : 0,
                     longitude : 0,
                     duration : 0,
                     durationScale : 0,
                     itemList : [],
                     companyId : (changeUserDetails) ? 0 : tx.company_id,
-                    companyName : (changeUserDetails) ? '' : tx.company_name
+                    companyName : (changeUserDetails) ? '' : tx.company_name,
+                    amount : (parseFloat(tx.Amount) !== NaN) ? parseFloat(tx.Amount,2) : 0.00,
+                    targetDate : (tx.target_date) ? tx.target_date :  moment().format('YYYY-MM-DD'),
+                    probability : (parseInt(tx.probability) !== NaN && parseInt(tx.probability) !== 0) ?
+                        parseInt(tx.probability) : 2,
+                    attachment : "",
+                    attachmentName : "",
+                    attachmentMimeType : "",
+                    alarmDuration : (parseInt(tx.alarm_duration)) ? parseInt(tx.alarm_duration) : 0
                 };
                 return editModeTx;
 
@@ -356,55 +433,65 @@
                         status : ($scope.modalBox.tx.statusType) ? $scope.modalBox.tx.statusType : 0,
                         folderRuleID : ($scope.modalBox.tx.folderRule) ? $scope.modalBox.tx.folderRule : 0,
                         nextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
-                        nextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
-                        Token : $rootScope._userInfo.Token
+                        nextActionDateTime : UtilityService._convertTimeToServer(($scope.modalBox.tx.nextActionDateTime)
+                            ? moment($scope.modalBox.tx.nextActionDateTime,'DD MMM YYYY hh:mm:ss A').format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss'),
+                        Token : $rootScope._userInfo.Token,
+                        target_date : $scope.modalBox.tx.targetDate,
+                        probability : (parseInt($scope.modalBox.tx.probability)) ? $scope.modalBox.tx.probability : 2,
+                        alarm_duration : (parseInt($scope.modalBox.tx.alarmDuration)) ? parseInt($scope.modalBox.tx.alarmDuration) : 0
                     }
                 }).success(function(resp){
-                        $scope.$emit('$preLoaderStop');
-                        if(resp && resp.status && resp!= 'null'){
-                            Notification.success({ message : 'Record updated successfully', delay : MsgDelay});
-                            $scope.resetModalBox();
-                            $scope.toggleAllEditMode();
+                    $scope.$emit('$preLoaderStop');
+                    if(resp && resp.status && resp!= 'null'){
+                        Notification.success({ message : 'Record updated successfully', delay : MsgDelay});
+                        $scope.resetModalBox();
+                        $scope.toggleAllEditMode();
 
-                            var id = $scope.txList.indexOfWhere('TID',parseInt(resp.data.TID));
-                            $scope.txList[id].FolderRuleID = parseInt(resp.data.folderRuleID);
-                            $scope.txList[id].Status = parseInt(resp.data.status);
+                        var id = $scope.txList.indexOfWhere('TID',parseInt(resp.data.TID));
+                        $scope.txList[id].FolderRuleID = parseInt(resp.data.folderRuleID);
+                        $scope.txList[id].Status = parseInt(resp.data.status);
 
-                            $scope.txList[id].statustitle = ($scope.txStatusTypes.indexOfWhere('TID', parseInt(resp.data.status)) !== -1)
-                                ? $scope.txStatusTypes[$scope.txStatusTypes.indexOfWhere('TID', parseInt(resp.data.status))].StatusTitle : '',
+                        $scope.txList[id].statustitle = ($scope.txStatusTypes.indexOfWhere('TID', parseInt(resp.data.status)) !== -1)
+                            ? $scope.txStatusTypes[$scope.txStatusTypes.indexOfWhere('TID', parseInt(resp.data.status))].StatusTitle : '',
 
-                                $scope.txList[id].FolderTitle = ($scope.txFolderRules.indexOfWhere('TID', parseInt(resp.data.folderRuleID)) !== -1)
-                                    ? $scope.txFolderRules[$scope.txFolderRules.indexOfWhere('TID', parseInt(resp.data.folderRuleID))].FolderTitle : '',
+                            $scope.txList[id].FolderTitle = ($scope.txFolderRules.indexOfWhere('TID', parseInt(resp.data.folderRuleID)) !== -1)
+                                ? $scope.txFolderRules[$scope.txFolderRules.indexOfWhere('TID', parseInt(resp.data.folderRuleID))].FolderTitle : '',
 
-                                $scope.txList[id].ActionTitle = ($scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction)) !== -1)
-                                    ? $scope.txActionTypes[$scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction))].ActionTitle : '',
+                            $scope.txList[id].ActionTitle = ($scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction)) !== -1)
+                                ? $scope.txActionTypes[$scope.txActionTypes.indexOfWhere('TID', parseInt(resp.data.nextAction))].ActionTitle : '',
 
-                                $scope.txList[id].NextActionID = (parseInt(resp.data.nextAction)!== NaN ) ? parseInt(resp.data.nextAction) : 0 ;
-                            var date = moment().format('DD MMM YYYY hh:mm');
-                            try{
-                                date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD hh:mm:ss').format('DD MMM YYYY hh:mm');
-                            }
-                            catch(ex){
-
-                            }
-                            $scope.txList[id].NextActionDate = resp.data.nextActionDateTime;
+                            $scope.txList[id].NextActionID = (parseInt(resp.data.nextAction)!== NaN ) ? parseInt(resp.data.nextAction) : 0 ;
+                        var date = moment().format('DD MMM YYYY hh:mm A');
+                        try{
+                            date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD HH:mm:ss').format('DD MMM YYYY hh:mm A');
+                            resp.data.nextActionDateTime = UtilityService._convertTimeToLocal(date,'DD MMM YYYY hh:mm A','DD MMM YYYY hh:mm A');
                         }
-                        else{
-                            var msg = 'Something went wrong! Please try again';
-                            Notification.error({ message : msg, delay : MsgDelay});
+                        catch(ex){
+                            var date = moment().format('YYYY-MM-DD HH:mm:ss A').format('DD MMM YYYY hh:mm A');
+                            resp.data.nextActionDateTime = UtilityService._convertTimeToLocal(date,'DD MMM YYYY hh:mm A','DD MMM YYYY hh:mm A');
                         }
+                        $scope.txList[id].NextActionDate = resp.data.nextActionDateTime;
 
-                    }).error(function(err,statusCode){
-                        $scope.$emit('$preLoaderStop');
+                        $scope.txList[id].target_date = resp.data.target_date;
+                        $scope.txList[id].probability = (parseInt(resp.data.probability)) ? parseInt(resp.data.probability) : 2
+
+                    }
+                    else{
                         var msg = 'Something went wrong! Please try again';
-                        if(statusCode === 403) {
-                            msg = 'You do not have permission to update this transaction';
-                        }
-                        if(statusCode === 0){
-                            msg = 'Unable to reach server ! Please check your connection';
-                        }
                         Notification.error({ message : msg, delay : MsgDelay});
-                    });
+                    }
+
+                }).error(function(err,statusCode){
+                    $scope.$emit('$preLoaderStop');
+                    var msg = 'Something went wrong! Please try again';
+                    if(statusCode === 403) {
+                        msg = 'You do not have permission to update this transaction';
+                    }
+                    if(statusCode === 0){
+                        msg = 'Unable to reach server ! Please check your connection';
+                    }
+                    Notification.error({ message : msg, delay : MsgDelay});
+                });
             };
 
             /**
@@ -422,17 +509,17 @@
                         MessageID : txId
                     }
                 }).success(function(resp){
-                        if(resp && resp.length > 0 && resp !== 'null'){
-                            $scope.modalBox.tx.itemList = resp;
-                            defer.resolve(resp);
-                        }
-                        else{
-                            defer.resolve([]);
-                        }
-                    }).error(function(err){
-                        Notification.error({ message : 'Unable to load items for this enquiry ! Please try again', delay : MsgDelay});
-                        defer.reject();
-                    });
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        $scope.modalBox.tx.itemList = resp;
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                }).error(function(err){
+                    Notification.error({ message : 'Unable to load items for this enquiry ! Please try again', delay : MsgDelay});
+                    defer.reject();
+                });
                 return defer.promise;
             };
 
@@ -455,12 +542,14 @@
                         $scope.$emit('$preLoaderStart');
                         loadTransactionItems(editTx.TID).then(function(resp){
                             editTx.itemList = resp;
+
                             $scope.showModal = !$scope.showModal;
                             //UI updation is not happening properly because ui is not rendered, and model bind before it
                             //therefore once again updating data after ui rendered
                             $timeout(function(){
-                                $scope.modalBox.title = 'Update Resume Application';
+                                $scope.modalBox.title = 'Update Lead';
                                 $scope.modalBox.tx = editTx;
+                                $scope.modalBox.contactType = ($scope.modalBox.tx.ezeid) ? 1 : 2;
                                 $scope.$emit('$preLoaderStop');
                             },1500);
                         },function(){
@@ -472,8 +561,6 @@
                         });
                     }
                     else{
-                        $scope.modalBox.title = 'Update Resume application';
-                        $scope.modalBox.tx = editTx;
                         $scope.showModal = !$scope.showModal;
                     }
                 }
@@ -483,85 +570,114 @@
                 }
             };
 
-            /**
-             * Finds address using geolocation lat lng
-             * called on change of location
-             */
-            $scope.findAddress = function(){
-                $scope.$emit('$preLoaderStart');
-                $scope.resolveGeolocationAddress().then(function(){
-                    $scope.$emit('$preLoaderStop');
-                },function(){
-                    $scope.$emit('$preLoaderStop');
-                });
-            };
+            ///**
+            // * Finds address using geolocation lat lng
+            // * called on change of location
+            // */
+            //$scope.findAddress = function(){
+            //    $scope.$emit('$preLoaderStart');
+            //    $scope.resolveGeolocationAddress().then(function(){
+            //        $scope.$emit('$preLoaderStop');
+            //    },function(){
+            //        $scope.$emit('$preLoaderStop');
+            //    });
+            //};
 
-            /**
-             *  Resolves geolocation and sets geolocation address in modalbox for particular transaction
-             */
-            $scope.resolveGeolocationAddress = function(){
-                var defer = $q.defer();
-                $scope.modalBox.tx.address = '';
-                if(!$scope.modalBox.tx.locId){
-                    $timeout(function(){
-                        defer.resolve();
-                    },500);
-                    return defer.promise;
-                }
 
-                //$scope.$emit('$preLoaderStart');
-                var locIndex = $scope.modalBox.locationList.indexOfWhere("TID",parseInt($scope.modalBox.tx.locId));
-                if(locIndex === -1){
-                    $timeout(function(){
-                        defer.resolve();
-                    },500);
-                    return defer.promise;
-                }
-                var lat = $scope.modalBox.locationList[locIndex].Latitude;
-                var lng = $scope.modalBox.locationList[locIndex].Longitude;
 
-                $scope.modalBox.tx.latitude = lat;
-                $scope.modalBox.tx.longitude = lng;
-
-                $scope.modalBox.tx.address = $scope.modalBox.locationList[locIndex].AddressLine1+' ' +
-                    $scope.modalBox.locationList[locIndex].AddressLine2;
-
-                var googleMap = new GoogleMap();
-                try{
+            var googleMap = new GoogleMap();
+            $timeout(function(){
+                googleMap.addSearchBox('google-map-search-box');
+                googleMap.listenOnMapControls(null,function(lat,lng){
+                    $scope.modalBox.tx.latitude = lat;
+                    $scope.modalBox.tx.longitude = lat;
                     googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                        //$scope.$emit('$preLoaderStop');
                         if(resp.data){
                             var data = googleMap.parseReverseGeolocationData(resp.data);
                             $scope.modalBox.tx.city = data.city;
                             $scope.modalBox.tx.state = data.state;
                             $scope.modalBox.tx.country = data.country;
                             $scope.modalBox.tx.area = data.area;
+                            $scope.modalBox.tx.pinCode = data.postalCode;
+                            $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
+                                route : true,
+                                sublocality3 : true,
+                                sublocality2 : true,
+                                area : false,
+                                city : false,
+                                state : false,
+                                country : false,
+                                postalCode : false
+                            });
 
-
+                            $scope.modalBox.tx.DeliveryAddress = makeAddress();
                         }
                         else{
-                            //$scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
+                            Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
                         }
-                        defer.resolve();
 
                     },function(){
-                        Notification.error({message : 'Please enable geolocation settings n your browser',delay : MsgDelay});
-                        //$scope.$emit('$preLoaderStop');
+                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
                         defer.resolve();
                     });
-                }
-                catch(ex){
-                    $timeout(function(){
-                        Notification.error({message : 'Unable to resolve geolocation',delay : MsgDelay});
-                        defer.resolve();
-                    },400);
-                }
-                return defer.promise;
-            };
+                },false);
+            },3000);
 
+
+
+            /**
+             * Selecting address selection method whether using EZEOne ID or other address
+             * @type {number} 0 : EZEOne ID location
+             * 1 : Other address (Google map autocomplete active)
+             */
+            $scope.addressSelectionType = 0;
+
+            /**
+             * EZEOne ID from which address will be fetched
+             * @type {string}
+             */
+            $scope.ezeoneAddressId = '';
+            var timeoutPromise = null;
+            $scope.$watch('ezeoneAddressId',function(n,v){
+                //console.log(n);
+                //console.log(v);
+                if(n && (n !== v)){
+                    //console.log('hello');
+                    if(timeoutPromise){
+                        $timeout.cancel(timeoutPromise);
+                    }
+                    angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
+                    $scope.modalBox.tx.address = '';
+                    $scope.modalBox.tx.area = '';
+                    $scope.modalBox.tx.city = '';
+                    $scope.modalBox.tx.state = '';
+                    $scope.modalBox.tx.country = '';
+                    $scope.modalBox.tx.pinCode = '';
+                    $scope.modalBox.tx.latitude = 0;
+                    $scope.modalBox.tx.longitude = 0;
+                    $scope.modalBox.tx.DeliveryAddress = '';
+                    timeoutPromise = $timeout(function(){
+                        $scope.getEzeidLocationDetails($scope.ezeoneAddressId);
+                    },2000);
+
+                }
+                else if(!n){
+                    angular.element('#ezeoneAddressId').parent('.input-group').removeClass('has-success').addClass('has-error');
+                    $scope.modalBox.tx.address = '';
+                    $scope.modalBox.tx.area = '';
+                    $scope.modalBox.tx.city = '';
+                    $scope.modalBox.tx.state = '';
+                    $scope.modalBox.tx.country = '';
+                    $scope.modalBox.tx.pinCode = '';
+                    $scope.modalBox.tx.latitude = 0;
+                    $scope.modalBox.tx.longitude = 0;
+                    $scope.modalBox.tx.DeliveryAddress ='';
+                }
+            });
 
             $scope.$watch('showModal',function(newVal,oldVal){
+                $scope.cartAmount = 0.00;
+                $scope.cartString = '';
                 if(!newVal){
                     $scope.resetModalBox();
                 }
@@ -569,8 +685,9 @@
 
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Add Resume Application',
+                    title : 'Create New Lead',
                     class : 'business-manager-modal',
+                    contactType : 0,
                     locationList : [],
                     editMode : false,
                     tx : {
@@ -579,7 +696,7 @@
                         ezeidTid : 0,
 
                         TID : 0,
-                        functionType : 4, // Function Type will be 0 for resume
+                        functionType : 0, // Function Type will be 0 for sales
                         ezeid : '',
                         statusType : 0,
                         notes : '',
@@ -589,22 +706,32 @@
                         city : '',
                         area : '',
                         contactInfo : '',
-                        deliveryAddress : '',
+                        DeliveryAddress : '',
                         nextAction : 0,
                         nextActionDateTime : '',
                         taskDateTime : '',
                         folderRule : 0,
                         message : '',
-                        messageType :  0,
+                        messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
                         durationScale : 0,
                         itemList : [],
                         companyName : '',
-                        companyId : 0
+                        companyId : 0,
+
+                        attachment : "",
+                        attachmentName : "",
+                        attachmentMimeType : "",
+                        probability : 2,
+                        targetDate : moment().format('YYYY-MM-DD'),
+                        alarmDuration  : 0
                     }
                 };
+
+                $scope.cartAmount = 0.00;
+                $scope.cartString = '';
             };
 
             /**
@@ -665,6 +792,7 @@
              */
             $scope.removeItem = function(txItem){
                 var txItemIndex  = $scope.modalBox.tx.itemList.indexOfWhere('ItemID',txItem.ItemID);
+                ////////////console.log(txItemIndex);
                 $scope.modalBox.tx.itemList.splice(txItemIndex,1);
             };
 
@@ -684,15 +812,15 @@
                         EZEID :   ezeid
                     }
                 }).success(function(resp){
-                        if(resp && resp !== 'null' && resp.length > 0){
-                            defer.resolve(resp[0]);
-                        }
-                        else{
-                            defer.reject();
-                        }
-                    }).error(function(err){
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        defer.resolve(resp[0]);
+                    }
+                    else{
                         defer.reject();
-                    });
+                    }
+                }).error(function(err){
+                    defer.reject();
+                });
                 return defer.promise;
             };
 
@@ -719,45 +847,66 @@
                     url : GURL + 'company_details',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        functiontype : 4
+                        functiontype : 0
                     }
 
                 }).success(function(resp){
-                        if(resp && resp.status && resp.data){
-                            for(var a=0; a < resp.data.length; a++){
-                                var suggestion = {
-                                    id : resp.data[a].tid,
-                                    duration : resp.data[a].idledays,
-                                    user : resp.data[a].updateduser,
-                                    name : resp.data[a].company_name,
-                                    ezeid : resp.data[a].RequesterEZEID
-                                };
-                                companyList[a] = suggestion;
-                            }
+                    if(resp && resp.status && resp.data){
+                        for(var a=0; a < resp.data.length; a++){
+                            var suggestion = {
+                                id : resp.data[a].tid,
+                                duration : resp.data[a].idledays,
+                                user : resp.data[a].updateduser,
+                                name : resp.data[a].company_name,
+                                ezeid : resp.data[a].RequesterEZEID
+                            };
+                            companyList[a] = suggestion;
                         }
-                    }).error(function(err,statusCode){
-                        var msg = '';
-                        if(statusCode == 0){
-                            msg = 'Unable to reach server ! Please check your connection';
-                            Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
-                        }
-                    });
+                    }
+                }).error(function(err,statusCode){
+                    var msg = '';
+                    if(statusCode == 0){
+                        msg = 'Unable to reach server ! Please check your connection';
+                        Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
+                    }
+                });
             };
 
             /**
              * Loads company list as soon as controller is initialized
              */
-                //    loadCompany();
+            loadCompany();
+
 
 
             $scope.$watch('modalBox.tx.companyId',function(n,v){
+                ////console.log(n);
                 if(n){
+                    ////console.log(companyList);
                     var indx = companyList.indexOfWhere('id',n);
+                    ////console.log(indx);
                     if(indx !== -1){
-                        $scope.modalBox.tx.ezeid = companyList[indx].ezeid;
+                        /**
+                         * Code is commented intentionally to prevent watcher from executing
+                         * when company id is selected
+                         */
+                        //$scope.modalBox.tx.ezeid = companyList[indx].ezeid;
                     }
                 }
             });
+
+            /**
+             * Radion buttons for creating lead by ezeoneid or by contact information
+             * @param contactType 1: EZEOne ID , 2: Contact Information
+             */
+            $scope.selectContactType = function(contactType){
+                $scope.modalBox.contactType = contactType;
+                $scope.modalBox.tx.ezeid = "";
+                $scope.modalBox.tx.companyId = 0;
+                $scope.modalBox.tx.companyName = "";
+
+                $scope.modalBox.tx.contactInfo = "";
+            };
 
 
             $scope.$watch('modalBox.tx.ezeid',function(newVal,oldVal){
@@ -778,27 +927,28 @@
             $scope.checkEzeidInfo = function(ezeid){
                 $scope.$emit('$preLoaderStart');
                 $scope.getEzeidDetails(ezeid).then(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     $scope.modalBox.tx.ezeid = $filter('uppercase')(ezeid);
                     $scope.modalBox.tx.contactInfo = resp.FirstName + ' ' +
                         resp.LastName  +
                         ((resp.MobileNumber && resp.MobileNumber !== 'null') ? ', ' + resp.MobileNumber : '');
                     $scope.modalBox.tx.ezeidTid = resp.TID;
-                    var cIndex = companyList.indexOf(resp.CompanyName)
-                    if(cIndex !== -1){
-                        $scope.modalBox.tx.companyId = companyList[cIndex].tid;
-                        $scope.modalBox.tx.companyName =  resp.CompanyName;
-                    }
-                    else{
-                        $scope.modalBox.tx.companyId = 0;
-                        $scope.modalBox.tx.companyName = resp.CompanyName;
-                    }
 
-                    $scope.loadLocationListForEzeid(resp.TID).then(function(){
-                        $scope.$emit('$preLoaderStop');
-                    },function(){
-                        $scope.$emit('$preLoaderStop');
-                        //Notification.error({ message : 'Unable to load location list for this user', delay : MsgDelay});
-                    });
+                    /**
+                     * If EZEID type is business then only consider the company and fill up the company details
+                     * else make it empty only
+                     */
+                    if(resp.IDTypeID == 2){
+                        var cIndex = companyList.indexOf(resp.CompanyName)
+                        if(cIndex !== -1){
+                            $scope.modalBox.tx.companyId = companyList[cIndex].tid;
+                            $scope.modalBox.tx.companyName =  resp.CompanyName;
+                        }
+                        else{
+                            $scope.modalBox.tx.companyId = 0;
+                            $scope.modalBox.tx.companyName = resp.CompanyName;
+                        }
+                    }
 
                 },function(){
                     $scope.$emit('$preLoaderStop');
@@ -855,27 +1005,48 @@
                  * which are assigned to him and assign them to the data model of myFolders also
                  * to make ui and requested data consistent
                  */
-                var folderRules = ($scope.myFolders) ? $scope.myFolders.join(',') : '';
-                if(!folderRules){
-                    var fr = [];
-                    for(var x=0; x<$scope.userFolders.length;x++){
-                        fr[x] = $scope.userFolders[x].TID.toString();
-                    }
-                    $scope.myFolders = fr;
-                    folderRules = (fr.length > 0) ? fr.join(',') : '';
 
-                    if(parseInt($rootScope._userInfo.MasterID) == 0){
-                        folderRules = '';
-                    }
+
+                var folderRuleArr = [];
+                for(var i = 0; i < $scope.myFolders.length; i++){
+                    folderRuleArr.push($scope.myFolders[i].id);
                 }
+
+                var folderRules = (folderRuleArr) ? folderRuleArr.join(',') : '';
+                /**
+                 * Commented as we don't have to load anything if user is not having folder assigned
+                 * because from now onwards default folder will always be there
+                 */
+
+                //if(!folderRules){
+                //    var fr = [];
+                //    var frArr = []; //Folder Rule Array
+                //    for(var x=0; x<$scope.userFolders.length;x++){
+                //        fr[x] = $scope.userFolders[x].TID.toString();
+                //    }
+                //    for(var x =0; x < fr.length;x++){
+                //        frArr[x] = {id : parseInt(fr[x])};
+                //    }
+                //    $scope.myFolders = frArr;
+                //    folderRules = (fr.length > 0) ? fr.join(',') : '';
+                //
+                //    /**
+                //     * Commented as we don't have to load anything if user is not having folder assigned
+                //     * because from now onwards default folder will always be there
+                //     */
+                //}
 
                 /**
-                 * If user is master user, then let him see default folder transaction also which actually
-                 * doesn't belong to any rule
+                 * Commented as we don't have to load anything if user is not having folder assigned
+                 * because from now onwards default folder will always be there
                  */
-                if($scope.myFolders.length === $scope.userFolders.length && parseInt($rootScope._userInfo.MasterID) == 0){
-                    folderRules = '';
-                }
+                ///**
+                // * If user is master user, then let him see default folder transaction also which actually
+                // * doesn't belong to any rule
+                // */
+                //if($scope.myFolders.length === $scope.userFolders.length && parseInt($rootScope._userInfo.MasterID) == 0){
+                //    folderRules = '';
+                //}
 
                 /**
                  * If user is subuser and he is not having any rules assigned to him then don't allow him to
@@ -886,8 +1057,6 @@
                     $timeout(function(){
                         defer.resolve([]);
                         $scope.txList = [];
-                        //$scope.totalPages = 1;
-                        //$scope.pageNumber = 1;
                     },300);
                 }
                 else{
@@ -898,44 +1067,46 @@
                             Token : $rootScope._userInfo.Token,
                             Page : (pageNo) ? pageNo : 1,
                             Status : (statusType) ? statusType : '',
-                            FunctionType : 4,    // For resume
+                            FunctionType : 0,    // For Sales
                             searchkeyword : txSearchKeyword,
                             sort_by : (sortBy) ? sortBy : 0,
                             folder_rules : folderRules
                         }
                     }).success(function(resp){
-                            if(resp && resp !== 'null'){
-                                /**
-                                 * Change
-                                 * 1. $scope.totalPages
-                                 * 2. $scope.pageNumber
-                                 * 3. $scope.txList
-                                 */
-                                $scope.totalPages = parseInt(resp.TotalPage);
-                                $scope.pageNumber = pageNo;
-                                if(resp.Result && angular.isArray(resp.Result)){
-                                    for(var a = 0; a < resp.Result.length; a++){
-                                        $scope.editModes.push(false);
-                                        resp.Result[a].TaskDateTime = UtilityService.convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A');
-                                        resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ? UtilityService.convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A') :
-                                            UtilityService.convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
-                                    }
-                                    $scope.txList = resp.Result;
-
+                        if(resp && resp !== 'null'){
+                            /**
+                             * Change
+                             * 1. $scope.totalPages
+                             * 2. $scope.pageNumber
+                             * 3. $scope.txList
+                             */
+                            $scope.totalPages = parseInt(resp.TotalPage);
+                            $scope.pageNumber = pageNo;
+                            if(resp.Result && angular.isArray(resp.Result)){
+                                for(var a = 0; a < resp.Result.length; a++){
+                                    $scope.editModes.push(false);
+                                    resp.Result[a].TaskDateTime = UtilityService._convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A');
+                                    resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ?
+                                        UtilityService._convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A') :
+                                        UtilityService._convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
                                 }
-                            }
-                            else{
+                                $scope.txList = resp.Result;
 
-                                $scope.txList = [];
-                                $scope.totalPages = 1;
-                                $scope.pageNumber = 1;
                             }
-                            defer.resolve(resp);
-                        }).error(function(err){
+
+                        }
+                        else{
+
+                            $scope.txList = [];
                             $scope.totalPages = 1;
                             $scope.pageNumber = 1;
-                            defer.resolve([]);
-                        });
+                        }
+                        defer.resolve(resp);
+                    }).error(function(err){
+                        $scope.totalPages = 1;
+                        $scope.pageNumber = 1;
+                        defer.resolve([]);
+                    });
                 }
                 return defer.promise;
             };
@@ -952,25 +1123,25 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 4    // For resume
+                        FunctionType : 0    // For Sales
                     }
                 }).success(function(resp){
-                        if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
+                    if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
 
-                            if(resp.Result && resp.Result.length > 0){
-                                $scope.filterStatusTypes = resp.Result;
-                            }
+                        if(resp.Result && resp.Result.length > 0){
+                            $scope.filterStatusTypes = resp.Result;
                         }
-                        else{
-                            $scope.filterStatusTypes = [
-                                {TID : -1, StatusTitle : 'All Open'},
-                                {TID : -2, StatusTitle : 'All'}
-                            ];
-                        }
-                        defer.resolve(resp);
-                    }).error(function(err){
-                        defer.reject();
-                    });
+                    }
+                    else{
+                        $scope.filterStatusTypes = [
+                            {TID : -1, StatusTitle : 'All Open'},
+                            {TID : -2, StatusTitle : 'All'}
+                        ];
+                    }
+                    defer.resolve(resp);
+                }).error(function(err){
+                    defer.reject();
+                });
                 return defer.promise;
             };
 
@@ -985,20 +1156,20 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 4   // For resume
+                        FunctionType : 0    // For Sales
                     }
                 }).success(function(resp){
-                        if(resp && resp !== 'null' && resp.length > 0){
-                            $scope.txActionTypes = resp;
-                        }
-                        else{
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        $scope.txActionTypes = resp;
+                    }
+                    else{
 
-                            $scope.txActionTypes = [];
-                        }
-                        defer.resolve(resp);
-                    }).error(function(err){
-                        defer.reject();
-                    });
+                        $scope.txActionTypes = [];
+                    }
+                    defer.resolve(resp);
+                }).error(function(err){
+                    defer.reject();
+                });
                 return defer.promise;
             };
 
@@ -1014,32 +1185,32 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 4    // For resume
+                        FunctionType : 0    // For Sales
                     }
                 }).success(function(resp){
-                        if(resp && resp !== 'null' && resp.length > 0){
-                            /**
-                             * Change
-                             * 1. $scope.totalPages
-                             * 2. $scope.pageNumber
-                             * 3. $scope.txList
-                             */
-                            $scope.txStatusTypes = resp;
-                        }
-                        else{
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        /**
+                         * Change
+                         * 1. $scope.totalPages
+                         * 2. $scope.pageNumber
+                         * 3. $scope.txList
+                         */
+                        $scope.txStatusTypes = resp;
+                    }
+                    else{
 
-                            $scope.txStatusTypes = [];
-                        }
-                        $scope.filterStatusTypes = [
-                            {TID : -2, StatusTitle : 'All'},
-                            {TID : -1, StatusTitle : 'All Open'}
-                        ];
-                        $scope.filterStatusTypes = $scope.filterStatusTypes.concat(resp);
+                        $scope.txStatusTypes = [];
+                    }
+                    $scope.filterStatusTypes = [
+                        {TID : -2, StatusTitle : 'All'},
+                        {TID : -1, StatusTitle : 'All Open'}
+                    ];
+                    $scope.filterStatusTypes = $scope.filterStatusTypes.concat(resp);
 
-                        defer.resolve(resp);
-                    }).error(function(err){
-                        defer.reject();
-                    });
+                    defer.resolve(resp);
+                }).error(function(err){
+                    defer.reject();
+                });
                 return defer.promise;
             };
 
@@ -1055,20 +1226,20 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 4    // resume
+                        FunctionType : 0    // Sales
                     }
                 }).success(function(resp){
-                        if(resp && resp !== 'null' && resp.length > 0){
-                            $scope.moduleItems = resp;
-                            defer.resolve(resp);
-                        }
-                        else{
-                            //$rootScope._userInfo.SalesItemListType = 0;
-                            defer.resolve([]);
-                        }
-                    }).error(function(err){
-                        defer.reject();
-                    });
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        $scope.moduleItems = resp;
+                        defer.resolve(resp);
+                    }
+                    else{
+                        $rootScope._userInfo.SalesItemListType = 0;
+                        defer.resolve([]);
+                    }
+                }).error(function(err){
+                    defer.reject();
+                });
                 return defer.promise;
             };
 
@@ -1095,40 +1266,54 @@
                     var _findex = $scope.txFolderRules.indexOfWhere('TID',userFoldersList[b]);
                     if(_findex !== -1){
                         var folder = angular.copy($scope.txFolderRules[_findex]);
+                        folder.id = parseInt(folder.TID);
+                        folder.label = folder.FolderTitle;
                         $scope.userFolders.push(folder);
-                        $scope.myFolders.push(folder.TID);
+                        $scope.myFolders.push({ id : folder.id});
                     }
                 }
             };
 
-            var watchMyFolders = function(){
-                $scope.$watch('myFolders',function(n,v){
-                    ////console.log(n);
-                    if(!n){
-                        ////console.log(n);
-                        for(var c=0;c<$scope.userFolders.length;c++){
-                            $scope.myFolders = $scope.userFolders[c].TID;
-                        }
-
-                        $scope.$emit('$preLoaderStart');
-                        $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                            $scope.$emit('$preLoaderStop');
-                        },function(){
-                            $scope.$emit('$preLoaderStop');
-                        });
-                    }
-                    else{
-                        if(n!==v){
-                            $scope.$emit('$preLoaderStart');
-                            $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                                $scope.$emit('$preLoaderStop');
-                            },function(){
-                                $scope.$emit('$preLoaderStop');
-                            });
-                        }
-                    }
-                });
-            };
+            //var watchMyFolders = function(){
+            //    console.log('i exec');
+            //    $scope.$watch('myFolders',function(n,v){
+            //        console.log('myFodlers');
+            //        console.log(n);
+            //        if(!n){
+            //
+            //            console.log('myFodlers if');
+            //            ////console.log(n);
+            //            var myFolders = [];
+            //            for(var c=0;c<$scope.userFolders.length;c++){
+            //                 myFolders[c] = { id : parseInt($scope.userFolders[c].TID) };
+            //            }
+            //
+            //            $scope.myFolders = myFolders;
+            //            //$scope.$emit('$preLoaderStart');
+            //            //console.log('In watchMyFolders');
+            //            //console.log($scope.myFolders);
+            //            //$scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+            //            //    $scope.$emit('$preLoaderStop');
+            //            //},function(){
+            //            //    $scope.$emit('$preLoaderStop');
+            //            //});
+            //        }
+            //        else{
+            //            console.log('myFodlers else');
+            //            console.log(n);
+            //            console.log(v);
+            //            if((n !== v) && (n) ){
+            //                console.log('myFodlers else if');
+            //                $scope.$emit('$preLoaderStart');
+            //                $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+            //                    $scope.$emit('$preLoaderStop');
+            //                },function(){
+            //                    $scope.$emit('$preLoaderStop');
+            //                });
+            //            }
+            //        }
+            //    });
+            //};
             /**
              * Loading user list to fetch rules that are specific to the subuser who logged in
              * (Folder list of logged in user can be fetched by selecting the logged in user from response
@@ -1144,35 +1329,35 @@
                         Token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
-                        if(resp && resp.length > 0 && resp !== 'null'){
-                            var index = resp.indexOfWhere('EZEID',$rootScope._userInfo.ezeid);
-                            if(index !== -1){
-                                var userFolders = (resp[index].ResumeIDs) ? resp[index].ResumeIDs.split(',') : [];
-                                ////console.log(userFolders);
-                                for(var b=0;b<userFolders.length;b++){
-                                    userFolders[b] = parseInt(userFolders[b]);
-                                }
-                                userFoldersList = userFolders;
+                    if(resp && resp.length > 0 && resp !== 'null'){
+                        var index = resp.indexOfWhere('EZEID',$rootScope._userInfo.ezeid);
+                        if(index !== -1){
+                            var userFolders = (resp[index].SalesIDs) ? resp[index].SalesIDs.split(',') : [];
+                            ////console.log(userFolders);
+                            for(var b=0;b<userFolders.length;b++){
+                                userFolders[b] = parseInt(userFolders[b]);
                             }
+                            userFoldersList = userFolders;
                         }
-                        userFoldersLoaded = true;
-                        if(allFoldersLoaded && userFoldersLoaded){
-                            assignUserFolders();
-                        }
-                        defer.resolve(resp);
-                    }).error(function(err,statusCode){
-                        $scope.userFolders = [];
-                        userFoldersLoaded = true;
-                        if(allFoldersLoaded && userFoldersLoaded){
-                            assignUserFolders();
-                        }
-                        defer.resolve([]);
-                    });
+                    }
+                    userFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
+                    defer.resolve(resp);
+                }).error(function(err,statusCode){
+                    $scope.userFolders = [];
+                    userFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
+                    defer.resolve([]);
+                });
                 return defer.promise;
             };
 
             /**
-             * Loads FolderRules for resume
+             * Loads FolderRules for Sales
              * @return {*|promise}
              */
             $scope.loadFolderRules = function(){
@@ -1182,27 +1367,27 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 4    // resume
+                        FunctionType : 0    // Sales
                     }
                 }).success(function(resp){
-                        if(resp && resp !== 'null' && resp.length > 0){
-                            $scope.txFolderRules = resp;
-                            defer.resolve(resp);
-                        }
-                        else{
-                            defer.resolve([]);
-                        }
-                        allFoldersLoaded  = true;
-                        if(allFoldersLoaded && userFoldersLoaded){
-                            assignUserFolders();
-                        }
-                    }).error(function(err){
-                        defer.reject();
-                        allFoldersLoaded = true;
-                        if(allFoldersLoaded && userFoldersLoaded){
-                            assignUserFolders();
-                        }
-                    });
+                    if(resp && resp !== 'null' && resp.length > 0){
+                        $scope.txFolderRules = resp;
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                    allFoldersLoaded  = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
+                }).error(function(err){
+                    defer.reject();
+                    allFoldersLoaded = true;
+                    if(allFoldersLoaded && userFoldersLoaded){
+                        assignUserFolders();
+                    }
+                });
                 return defer.promise;
             };
 
@@ -1252,17 +1437,17 @@
                         MessageID : txId    // Transaction TID
                     }
                 }).success(function(resp){
-                        if(resp && resp !== 'null' && resp.length > 0){
+                    if(resp && resp !== 'null' && resp.length > 0){
 
-                            defer.resolve(resp);
-                        }
-                        else{
-                            defer.resolve([]);
-                        }
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
 
-                    }).error(function(err){
-                        defer.reject();
-                    });
+                }).error(function(err){
+                    defer.reject();
+                });
                 return defer.promise;
             };
 
@@ -1273,43 +1458,31 @@
 
 
             var init = function(){
-                //$scope.loadfilterStatusTypes().then(function(resp){
-///
-//                $scope.loadFolderRules().then(function(){
-//                    $scope.$emit('$preLoaderStop');
-//                },function(){
-//                    $scope.$emit('$preLoaderStop');
-//                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
-//                });
-
-                ///
                 $scope.loadFolderRules().then(function(){
                     getSubUserList().then(function(){
                         $scope.loadTxActionTypes().then(function(){
                             $scope.loadTxStatusTypes().then(function(){
                                 $scope.loadTransaction(1,-2,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                                    $scope.$emit('$preLoaderStop');
                                     watchPageNumber();
                                     watchSortBy();
-                                    watchMyFolders();
-                                    //$scope.loadItemList().then(function(){
-                                    //    $scope.$emit('$preLoaderStop');
-                                    //},function(){
-                                    //    $scope.$emit('$preLoaderStop');
-                                    //    Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
-                                    //});
-                                    $scope.$emit('$preLoaderStop');
+                                    //watchMyFolders();
+                                    $scope.loadItemList().then(function(){
+                                        $scope.$emit('$preLoaderStop');
+                                    },function(){
+                                        $scope.$emit('$preLoaderStop');
+                                        Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                                    });
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load resume applications list', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load sales transaction list', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load resume applications status types', delay : MsgDelay} );
+                                Notification.error({message : 'Unable to load sales transaction status types', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load resume applications action list', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
@@ -1346,9 +1519,41 @@
                 if($scope.modalBox.tx.country){
                     address.push($scope.modalBox.tx.country);
                 }
-                return address.join(', ');
+                address =  address.join(', ');
+                if($scope.modalBox.tx.pinCode){
+                    address += (' - '+ $scope.modalBox.tx.pinCode);
+                }
+                return address;
             };
 
+            /**
+             * Calculates the amount while saving any lead
+             * @param itemList
+             * @returns {number}
+             */
+            var calculateTxAmount = function(itemList){
+                if(!itemList){
+                    return 0.00;
+                }
+                if(parseInt($rootScope._userInfo.SalesItemListType) > 3){
+                    var amount = 0.00;
+                    for(var i=0; i<itemList.length; i++){
+                        var qty = parseInt(itemList[i].Qty);
+                        var rate = parseFloat(itemList[i].Rate,2);
+                        if(qty == NaN){
+                            qty = 1;
+                        }
+                        if(rate == NaN){
+                            rate = 0.00
+                        }
+                        amount += (qty*rate);
+                    }
+                    return amount;
+                }
+                else{
+                    return 0.00;
+                }
+            };
             /**
              * Preparing data for saving transaction
              * @param tx
@@ -1369,14 +1574,16 @@
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,
                     Status : $scope.modalBox.tx.statusType,
-                    TaskDateTime : (!editMode) ? moment().format('DD MMM YYYY hh:mm:ss') : $scope.modalBox.tx.taskDateTime,
+                    TaskDateTime : (!editMode) ?
+                        UtilityService._convertTimeToServer(moment().format('DD MMM YYYY hh:mm:ss A'),'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'):
+                        UtilityService._convertTimeToServer($scope.modalBox.tx.taskDateTime,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
                     Notes : $scope.modalBox.tx.notes,
                     LocID : ($scope.modalBox.tx.locId) ? $scope.modalBox.tx.locId : 0,
                     Country : $scope.modalBox.tx.country,
                     State : $scope.modalBox.tx.state,
                     City : $scope.modalBox.tx.city,
                     Area : $scope.modalBox.tx.area,
-                    FunctionType : 4,   // For sales
+                    FunctionType : 0,   // For sales
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $scope.modalBox.tx.ezeid,
@@ -1385,13 +1592,25 @@
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
-                    NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD hh:mm:ss'),
+                    NextActionDateTime  : UtilityService._convertTimeToServer(($scope.modalBox.tx.nextActionDateTime)
+                        ? moment($scope.modalBox.tx.nextActionDateTime,'DD MMM YYYY hh:mm:ss A').format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss'),
+                    //NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
+                    //    moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
                     item_list_type : $rootScope._userInfo.SalesItemListType,
                     DeliveryAddress : (!editMode) ?
-                        makeAddress() : $scope.modalBox.tx.deliveryAddress,
-                    company_name : $scope.modalBox.tx.companyName,
-                    company_id : $scope.modalBox.tx.companyId
+                        makeAddress() : $scope.modalBox.tx.DeliveryAddress,
+                    companyName : $scope.modalBox.tx.companyName,
+                    company_id : $scope.modalBox.tx.companyId,
+                    Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
+                        ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
+                        calculateTxAmount($scope.modalBox.tx.itemList),
+                    proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) == 0 ) ? $scope.modalBox.tx.probability : 2 ,
+                    target_date : ($scope.modalBox.tx.targetDate) ? $scope.modalBox.tx.targetDate :  moment().format('YYYY-MM-DD'),
+                    attachment : $scope.modalBox.tx.attachment,
+                    attachment_name : $scope.modalBox.tx.attachmentName,
+                    mime_type : $scope.modalBox.tx.attachmentMimeType,
+                    alarm_duration : (parseInt($scope.modalBox.tx.alarmDuration)) ? parseInt($scope.modalBox.tx.alarmDuration) : 0
                 };
                 return preparedTx;
             };
@@ -1413,7 +1632,8 @@
                 }
 
 
-                if($scope.modalBox.tx.message.length < 1 && $scope.modules[moduleIndex].listType > 0){
+                if($scope.modules[moduleIndex].listType > 0){
+                    var separationStr = '     ';
                     var itemList = [];
                     try{
                         itemList = JSON.parse(data.ItemsList);
@@ -1424,16 +1644,16 @@
                     var msg = '';
                     for(var ct = 0; ct < itemList.length; ct++){
                         msg += itemList[ct]['ItemName'];
-                        if(itemList[ct]['Qty']){
+                        if(itemList[ct]['Qty'] && $scope.modules[moduleIndex].listType > 2){
                             msg += ' ('+ itemList[ct]['Qty'] + ')';
                         }
-                        if(itemList[ct]['Amount']){
+                        if(itemList[ct]['Amount'] && $scope.modules[moduleIndex].listType > 3){
                             msg += ' : '+ itemList[ct]['Amount'];
                         }
                         msg += ', ';
                     }
                     msg = msg.substring(0, msg.length - 2);
-                    data.MessageText = msg;
+                    data.MessageText += (separationStr + msg);
                 }
 
                 $scope.$emit('$preLoaderStart');
@@ -1442,42 +1662,42 @@
                     method : 'POST',
                     data : data
                 }).success(function(resp){
-                        if(resp && resp.hasOwnProperty('IsSuccessfull')){
-                            if(resp.IsSuccessfull){
-                                var msg = 'Enquiry is posted successfully';
-                                if($scope.modalBox.editMode){
-                                    msg = 'Enquiry is updated successfully';
-                                }
+                    if(resp && resp.hasOwnProperty('IsSuccessfull')){
+                        if(resp.IsSuccessfull){
+                            var msg = 'Enquiry is posted successfully';
+                            if($scope.modalBox.editMode){
+                                msg = 'Enquiry is updated successfully';
+                            }
 
-                                if($scope.editModes.indexOf(true) !== -1){
-                                    msg = 'Enquiry is updated successfully';
-                                }
-                                Notification.success({ message : msg, delay : MsgDelay});
-                                if($scope.showModal){
-                                    $scope.showModal = !$scope.showModal;
-                                }
-                                $scope.resetModalBox();
-                                $scope.toggleAllEditMode();
-                                $scope.$emit('$preLoaderStart');
-                                $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                                    $scope.$emit('$preLoaderStop');
-                                },function(){
-                                    $scope.$emit('$preLoaderStop');
-                                });
+                            if($scope.editModes.indexOf(true) !== -1){
+                                msg = 'Enquiry is updated successfully';
                             }
-                            else{
-                                Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                            Notification.success({ message : msg, delay : MsgDelay});
+                            if($scope.showModal){
+                                $scope.showModal = !$scope.showModal;
                             }
+                            $scope.resetModalBox();
+                            $scope.toggleAllEditMode();
+                            $scope.$emit('$preLoaderStart');
+                            $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                $scope.$emit('$preLoaderStop');
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                            });
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
                         }
+                    }
+                    else{
+                        Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});
+                    }
 
-                        $scope.$emit('$preLoaderStop');
-                    }).error(function(err){
-                        $scope.$emit('$preLoaderStop');
-                        Notification.error({ message : err, delay : MsgDelay});
-                    });
+                    $scope.$emit('$preLoaderStop');
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message : err, delay : MsgDelay});
+                });
             };
 
             $scope.incrementPage = function(){
@@ -1523,47 +1743,172 @@
                     _domLoaded = true;
                 }
             };
-
-            init();
             /**
              * Refreshes company data every 1 minute
              */
+            $interval(function(){
+                loadCompany();
+            },60000);
 
-           // $scope.jobTid = 2;
-            $scope.$watch('_userInfo.IsAuthenticate', function () {
-                getCandidateList($scope.jobTid);
-            });
 
-            // Declaration for Job Applicants
-            $scope.showAppicantList = false;
-            // Get applied candidate List for job
-            function getCandidateList(_jobID)
-            {
-                if(_jobID)
-                {
-                    $scope.$emit('$preLoaderStart');
+            $scope.cartAmount = 0.00;
+            $scope.cartString = '';
 
-                    $http({
-                        url : GURL + 'job_applied_list',
-                        method : 'GET',
-                        params : {
-                            job_id : _jobID
-                        }
-                    }).success(function(resp)
-                        {
-                            $scope.$emit('$preLoaderStop');
-                            if(resp.status)
-                            {
-                                $scope.ApplicantList = resp.data;
-                                $scope.showAppicantList = true;
-                            }
-
-                        }).error(function(err){
-                            $scope.$emit('$preLoaderStop');
-                        });
+            function calculateCartDetails (){
+                if(!$scope.showModal){
+                    return;
                 }
-            }
+                var amount = 0.00;
+                var qty = 0;
+                for(var ct = 0; ct < $scope.modalBox.tx.itemList.length; ct++){
+                    if($scope.modalBox.tx.itemList[ct]['Qty'] &&
+                        (parseInt($rootScope._userInfo.SalesItemListType) == 3 || parseInt($rootScope._userInfo.SalesItemListType) == 4)){
+                        var ab  = parseInt($scope.modalBox.tx.itemList[ct]['Qty']);
+                        if(ab !== NaN){
+                            qty += ab;
+                        }
+                        else{
+                            qty += 1;
+                        }
+                    }
+                    else{
+                        qty += 1;
+                    }
+                    if($scope.modalBox.tx.itemList[ct]['Amount'] && parseInt($rootScope._userInfo.SalesItemListType) == 4){
+                        var am = 0.00;
+                        var qt = 1;
+                        var rt = parseFloat($scope.modalBox.tx.itemList[ct]['Rate']);
+                        if(rt !== NaN){
+                            qt = parseInt($scope.modalBox.tx.itemList[ct]['Qty']);
+                        }
+                        am = parseFloat(rt*qt);
+                        amount += am;
+                    }
+                }
 
-    }]);
+                var cartString = 'No items selected';
+                if(qty == 1){
+                    cartString = '1 item selected';
+                }
+                if(qty > 1){
+                    cartString = qty.toString() + ' items selected';
+                }
+
+                $scope.cartAmount = amount.toFixed(2);
+                $scope.cartItemString = cartString;
+            };
+
+            $interval(function(){
+                calculateCartDetails();
+            },700);
+
+
+            /**
+             * If somebody want to remove attachment after adding it before lead creation
+             * this function will reset all the values related to attachment of that particular transaction
+             */
+            $scope.resetAttachment = function(){
+                $scope.modalBox.tx.attachment = "";
+                $scope.modalBox.tx.attachmentName = "";
+                $scope.modalBox.tx.attachmentMimeType = "";
+            };
+
+
+            /**
+             * Function fired when file is selected from the input
+             */
+            $scope.attachDocument = function(){
+                var elem = $('#tx-attachment');
+                var attachmentFile = angular.element(elem)[0].files;
+                if(parseInt(attachmentFile[0].size/(1024*1024)) > 2){
+                    Notification.error({ title : 'File size exceeds', message : 'Maximum file size allowed is 2 MB', delay : MsgDelay});
+                }
+                else{
+                    $scope.modalBox.tx.attachmentName = attachmentFile[0].name;
+                    $scope.modalBox.tx.attachmentMimeType = attachmentFile[0].type;
+                    FileToBase64.fileToDataUrl(attachmentFile).then(function(data){
+                        $scope.modalBox.tx.attachment  = data;
+                    });
+                }
+            };
+
+            /**
+             * Triggers file attachment selection by generating a click event on the file input (attachment hidden field)
+             */
+            $scope.triggerFileAttachment = function(){
+                $timeout(function(){
+                    $('#tx-attachment').trigger('click');
+                },1000);
+            };
+
+            /**
+             * Downloads attachment for a particular transaction
+             * @param txId
+             */
+            $scope.downloadAttachment = function(index,e){
+                //e.preventDefault();
+                console.log(e.currentTarget);
+                $timeout(function(){
+                    $(e.currentTarget).siblings('a').trigger('click');
+                },1000);
+
+                $http({
+                    method : 'GET',
+                    url : GURL + 'transaction_attachment',
+                    params : {
+                        token : $rootScope._userInfo.Token,
+                        tid : $scope.txList[parseInt(index)].TID
+                    }
+                }).success(function(resp){
+                    console.log(resp);
+                    if(resp){
+                        if(resp.status){
+                            if(resp[0]){
+                                $scope.txList[parseInt(index)].attachmentLink = resp[0].attachment;
+                                console.log(e.currentTarget);
+                                $(e.currentTarget).siblings('a').trigger('click');
+                            }
+                        }
+                        else{
+
+                        }
+                    }
+                }).error(function(err){
+                    if(err){
+                        if(err.status){
+                            if(err[0]){
+                                $scope.txList[parseInt(index)].attachmentLink = resp[0].attachment;
+                                console.log(e.currentTarget);
+                                $(e.currentTarget).siblings('a').trigger('click');
+                            }
+                        }
+                        else{
+
+                        }
+                    }
+                });
+                //$window.open(GURL + 'transaction_attachment?tid='+txId + "&token="+$rootScope._userInfo.Token);
+            };
+
+
+            /**
+             * Settings for Mutli select control (used for folder rules in view)
+             * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
+             */
+            $scope.multiSelectDropDownSettings = {
+                smartButtonMaxItems: 3,
+                smartButtonTextConverter: function(itemText, originalItem) {
+                    if (itemText === 'Jhon') {
+                        return 'Jhonny!';
+                    }
+
+                    return itemText;
+                }
+            };
+
+            $scope.multiSelectTransText = {buttonDefaultText: 'Select Folders'};
+
+        }]);
+
 })();
 

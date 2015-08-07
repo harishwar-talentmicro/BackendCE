@@ -2867,3 +2867,15 @@ h4.front-business-form.warning-text{
         min-width : 400px;
     }
 }
+
+
+.label-tx-attachment,.label-tx-alarm{
+    border : 1px solid #000;
+    color: #FFF;
+    background: #276a76;
+}
+
+.label-tx-alarm{
+    background: #f4d916;
+    color:#000;
+}
