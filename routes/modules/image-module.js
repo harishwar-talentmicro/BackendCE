@@ -403,7 +403,7 @@ Image.prototype.getPictureOfEzeid = function(req,res,next){
                             console.log(getResult);
                             if (!err) {
                                 if (getResult) {
-                                    if (getResult[0].length > 0) {
+                                    if (getResult[0]) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Picture loaded successfully';

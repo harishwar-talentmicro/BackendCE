@@ -2508,18 +2508,18 @@ User.prototype.saveResume = function(req,res,next){
          */
         var salary = req.body.salary;  // Float (Decimal)
         var noticePeriod = req.body.notice_period; // Integer, in days
-        var experience = req.body.experience; //
-        var currentEmployeer = req.body.current_employeer;
-        var currentJobTitle = req.body.current_job_title;
+        var experience = req.body.experience ? req.body.experience : 0; //
+        var currentEmployeer = req.body.current_employeer ? req.body.current_employeer : '';
+        var currentJobTitle = req.body.current_job_title ? req.body.current_job_title : '';
         var jobType = req.body.job_type;
         var locationsList = req.body.job_location;
-        var categoryID = req.body.category_id;
-        var instituteID = req.body.institute_id;
-        var educationID = req.body.education_id;
-        var specializationID = req.body.specialization_id;
+        var categoryID = req.body.category_id ? req.body.category_id : 0;
+        var instituteID = req.body.institute_id ? institute_id : 0;
+        var educationID = req.body.education_id ? req.body.education_id : 0;
+        var specializationID = req.body.specialization_id ? req.body.specialization_id :0;
         var yearOfPassing = req.body.year_of_passing;
         var aggregateScore = req.body.aggregate_score;
-        var institueTitle = req.body.institue_title;
+        var institueTitle = req.body.institue_title ? req.body.institue_title : '';
 
         if(typeof(locationsList) == "string"){
             locationsList = JSON.parse(locationsList);

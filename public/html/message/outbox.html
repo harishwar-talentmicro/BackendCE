@@ -428,6 +428,43 @@
                         </div>
                     </div>
                     <span class="text-danger" ng-show="!isEzeOneIdValid">Invalid EZEONE ID</span>
+                    <span class="text-italics" ng-show="visibilityMsg.alreadyMemberMsg" ><i class="fa fa-heart text-danger"></i> You are already connected to this user.</span>
+                    <span class="text-italics" ng-show="visibilityMsg.alreadyRequestedMsg" ><i class="fa fa-signal text-danger"></i> You have already requested this user for connection.</span>
+                </div>
+                <!-- relation form -->
+                <div class="col-lg-10 p-top-7" ng-show="visibilityForm.relation">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-tags"></i> Relationship
+                        </div>
+                        <select ng-model="ezeOneModalBox.relation" class="form-control">
+                            <option ng-repeat="relation in relationArr track by $index" value="{{$index}}">{{relation}}</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Connect people message -->
+                <div class="col-lg-10 text-right p-bottom-10 p-top-7" ng-show="visibilityBtn.connectBtn">
+                    <button class="btn btn-primary"
+                            ng-click="connectToEzeOne()">
+                        <i class="fa fa-envelope"></i> Connect
+                    </button>
+                </div>
+                <!-- JOIN GROUP REQUEST MODULE -->
+                <div class="group-join-respnse-module col-lg-10 p-top-7 text-center" ng-show="visibilityForm.groupJoinRequestForm">
+                    <div class="input-group-btn">
+                        <button class="btn btn-primary"
+                                ng-click="joinGroupResponse(1,id)">
+                            <i class="fa fa-check-circle"></i> Accept
+                        </button>
+                        <button class="btn btn-danger"
+                                ng-click="joinGroupResponse(2,id)">
+                            <i class="fa fa-times-circle"></i> Reject
+                        </button>
+                        <button class="btn btn-warning"
+                                ng-click="joinGroupResponse(3,id)">
+                            <i class="fa fa-power-off"></i> Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
         </modal>
