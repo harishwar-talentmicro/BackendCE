@@ -52,6 +52,24 @@ angular.module('ezeidApp').
             $scope.activeTransactionDetailedInfo = '';
             $scope.permissiontype = '';
 
+            /* Loading the messages */
+            $scope.dashBoardMsg = [];
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////GET GROUPS & INDIVIDUALS////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            $scope.groupListData = [];
+            $scope.individualMember = [];
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////Default Function Calls//////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            loadDashBoardMessages();
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             $scope.inboxListing = "html/message/inbox.html";
             $scope.composeMessage = "html/message/composeMessage.html";
             $scope.detailMessage = "html/message/detailMessage.html";
@@ -92,6 +110,11 @@ angular.module('ezeidApp').
             getTransactionHistory().then(function(){
                 reConfigurePaginationButton();
             });
+
+            /**
+             * getting all the groups of the logged in user
+             */
+            getGroups();
 
             /* http request to get all the transaction history */
             function getTransactionHistory()
@@ -283,4 +306,101 @@ angular.module('ezeidApp').
                 class: 'business-manager-modal'
             };
 
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////GET GROUPS & INDIVIDUALS////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /**
+             * Get all the groups
+             */
+            function getGroups()
+            {
+                getGroupApiCall().then(function(data){
+                    data.forEach(function(val){
+                        if(val.GroupType == 1)//Individual group
+                        {
+                            setIndividualMemerList(val);
+                        }
+                        else//normal group
+                        {
+                            setGroupListData(val);
+                        }
+                    });
+                    console.log($scope.groupList);
+                });
+            }
+
+            /**
+             * set individual member data//@todo
+             */
+            function setIndividualMemerList(data)
+            {
+                $scope.individualMember.push(data);
+            }
+
+            /**
+             * set group data
+             */
+            function setGroupListData(data)
+            {
+                $scope.groupListData.push(data);
+            }
+            /**
+             * Call group ApI calls for getting all the groups of the logged in user
+             */
+            function getGroupApiCall()
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'group_list',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+
+                return defer.promise;
+            }
+
+            /**
+             * Load all the recent messages
+             */
+            function loadDashBoardMessages()
+            {
+                loadMessageApi().then(function(data){
+                    $scope.dashBoardMsg = data;
+                });
+
+            }
+
+            /**
+             * Call load messages API
+             */
+            function loadMessageApi()
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'messagebox',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        ezeone_id : $rootScope._userInfo.ezeone_id
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
         }]);

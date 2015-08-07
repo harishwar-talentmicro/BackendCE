@@ -1,8 +1,8 @@
 /**
- * Controller to view all the Applied Job
+ * Controller to manage all the functionaloties in OUTBOX
  *
  * @author: Krunal[EZE ONE]
- * @since 20150806
+ * @since 20150718
  */
 angular.module('ezeidApp').
     controller('JobAppliedSuccessCtrl', [
@@ -35,41 +35,75 @@ angular.module('ezeidApp').
             $location,
             $routeParams,
             UtilityService
-        ) {
+            ) {
 
-            $scope.pageSize = 10;
-            $scope.pageCount = 0;
-        //
 
-            // Get Applied Job list
-          /*  function getAppliedJob()
+
+            $scope.showSuccessMsg = false;
+            if(!$rootScope._userInfo.IsAuthenticate)
+            {
+                var defer = $q.defer();
+                $rootScope.loginPromise = defer;
+                console.log("Sai88");
+                $timeout(function ()
+                {
+
+                    angular.element('#SignIn_popup').css({'position':'fixed'});
+                    angular.element('#SignIn_popup > .window_page').css({'position':'relative'});
+                    angular.element('#SignIn_popup').slideDown();
+                },2000);
+
+                defer.promise.then(function(){
+                    applayJob($routeParams.jobid);
+                });
+
+            }
+            else
+            {
+                if($routeParams.jobid)
+                {
+                    applayJob($routeParams.jobid);
+                }
+            }
+
+            // Apply for job
+            function applayJob(_jobId)
             {
                 $scope.$emit('$preLoaderStart');
+                $scope.jobData = {
+                    token : $rootScope._userInfo.Token,
+                    job_id : $scope.jobTid
+                }
                 $http({
-                    url : GURL + 'applied_job',
-                    method : 'GET',
-                    params : {
-                        token : $rootScope._userInfo.Token,
-                        page_size : $scope.pageSize,
-                        page_count : $scope.pageCount
+                    method: "POST",
+                    url: GURL + 'job_apply',
+                    data :{
+                        token:$rootScope._userInfo.Token,
+                        job_id:_jobId
                     }
-                }).success(function(resp){
-                    $scope.$emit('$preLoaderStop');
+                }).success(function (data) {
+                        $scope.$emit('$preLoaderStop');
 
-                        console.log("sai88");
+                        if(data.status)
+                        {
+                            if(data.data.Status == -2)
+                            {
+                                $scope.showSuccessMsg = false;
+                            }
+                            else
+                            {
+                                $scope.showSuccessMsg = true;
+                                Notification.success({ message: "Applied Success..", delay : 2000});
+                            }
+                        }
 
-                        console.log(resp);
-
-                    if(resp.status)
-                    {
-
-
-                    }
-                }).error(function(err){
-                    $scope.$emit('$preLoaderStop');
-                });
+                    })
+                    .error(function(data, status, headers, config) {
+                        $scope.$emit('$preLoaderStop');
+                    });
             }
-*/
+
+
 
 
         }]);

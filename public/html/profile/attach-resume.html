@@ -149,7 +149,7 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
                                         <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "CVAttachCtrl._CVInfo.job_type">
-                                            <option value=""> Job Type </option>
+                                            <option value="0"> Job Type </option>
                                             <option value="1">Full Time</option>
                                             <option value="2">Part Time</option>
                                             <option value="3">Work From Home</option>
@@ -229,7 +229,7 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
                                         <select class="form-control" ng-model="CVAttachCtrl._CVInfo.education_id">
-                                            <option value = "" >Select Last Education</option>
+                                            <option value = "0" >Select Last Education</option>
                                             <option ng-repeat="education in educationList track by $index" value="{{education.TID}}">{{education.EducationTitle}}</option>
                                         </select>
                                         <!--<input type="text"
@@ -268,7 +268,7 @@
                                             </div>
                                         </div>-->
                                         <select class="form-control" ng-model="CVAttachCtrl._CVInfo.specialization_id">
-                                            <option value = "" >Select Specialization</option>
+                                            <option value = "0" >Select Specialization</option>
                                             <option ng-repeat="specialization in specializationList track by $index" value="{{specialization.TID}}">{{specialization.Title}}</option>
                                         </select>
                                     </div>
