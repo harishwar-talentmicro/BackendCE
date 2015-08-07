@@ -398,7 +398,8 @@
                         </div>
                       </div>
                   <div class="col-lg-1 col-md-1 col-sm-1 col-xs-2" ng-show="tx.has_attachment">
-                      <i class="fa fa-paperclip" title="{{tx.attachment_name}}" ng-click="downloadAttachment(tx.TID)"></i>
+                      <i class="fa fa-paperclip" title="{{tx.attachment_name}}" ng-click="downloadAttachment($index,$event)"></i>
+                      <a class="hidden" ng-href="{{tx.attachmentLink}}"></a>
                   </div>
 
                 </div>
