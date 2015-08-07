@@ -69,8 +69,7 @@ Job.prototype.create = function(req,res,next){
         locationsList = JSON.parse(locationsList);
     }
     var location_id = '';
-    console.log('******************');
-    console.log(locationsList);
+
     var responseMessage = {
         status: false,
         error: {},
@@ -232,13 +231,10 @@ Job.prototype.create = function(req,res,next){
                                 maptype : locationDetails.maptype
                             };
 
-                            console.log(list);
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
-console.log('CALL psavejoblocation(' + queryParams + ')');
+
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
-                                console.log('---------------********');
-                                console.log(results);
                                 if (results) {
                                     if (results[0]) {
                                         if (results[0][0]) {
@@ -247,18 +243,10 @@ console.log('CALL psavejoblocation(' + queryParams + ')');
 
                                             location_id += results[0][0].id + ',';
                                             locCount +=1;
-                                            console.log('---------------');
-                                            console.log(location_id);
-                                            console.log(locCount);
-
-                                            console.log(locationsList.length);
                                             if(locCount < locationsList.length){
-                                                console.log('sucess..............1');
                                                 insertLocations(locationsList[locCount]);
                                             }
                                             else{
-                                                console.log('sucess..............2');
-                                                console.log(location_id);
                                                 createJobPosting();
                                             }
                                         }
