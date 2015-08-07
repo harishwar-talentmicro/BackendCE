@@ -673,7 +673,6 @@
             };
 
             $scope.$watch('modalVisible', function (newVal, oldVal) {
-
                 if (newVal)
                 {
                    /* check for the map initialzation */
