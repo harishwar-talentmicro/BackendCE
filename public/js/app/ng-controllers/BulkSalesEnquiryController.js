@@ -305,7 +305,7 @@ angular.module('ezeidApp').controller('bulksalesController',[
                          document.getElementById("Subject").className = "form-control emptyBox";
                          document.getElementById("Body").className = "form-control emptyBox";
 
-                         Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                         Notification.success({message: "Mail sent successfully..", delay: MsgDelay});
                          $window.localStorage.removeItem("searchResult");
                          $window.localStorage.removeItem("selectedTids");
                      }

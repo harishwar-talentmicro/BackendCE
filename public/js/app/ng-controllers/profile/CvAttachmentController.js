@@ -37,6 +37,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     CVAttachCtrl._CVInfo.KeySkills = "";
     CVAttachCtrl._CVInfo.current_employeer = "";
     CVAttachCtrl._CVInfo.current_job_title = "";
+    CVAttachCtrl._CVInfo.exp_salary = 0;
 
     $scope.selectedFunctions = [];
     $scope.selectedCategories = [];
@@ -60,9 +61,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
             getInstituteList();
             getEducations();
 
-
-            getCVInfo();
-            getAllSkills();
+            $timeout(function ()
+            {
+                getCVInfo();
+                getAllSkills();
+            },2000);
 
         } else {
             $location.path('/');
@@ -127,7 +130,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         var errorList  = [];
         if(CVAttachCtrl._CVInfo.Pin)
         {
-            if(CVAttachCtrl._CVInfo.Pin<100)
+            if(CVAttachCtrl._CVInfo.Pin < 100)
             {
                 errorList.push('Pin should greater or equal 100');
             }
@@ -137,6 +140,17 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
         if(CVAttachCtrl._CVInfo.KeySkills.length < 1){
             errorList.push('Key Skills is empty');
+        }
+        if(CVAttachCtrl._CVInfo.exp_salary)
+        {
+            if(CVAttachCtrl._CVInfo.exp_salary == 0)
+            {
+                errorList.push('Expected Salary is empty');
+            }
+        }
+        else
+        {
+            errorList.push('Expected Salary is empty');
         }
 
         if(errorList.length>0){
@@ -275,14 +289,10 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     }
 
                     $scope.categoryArray = CVAttachCtrl._CVInfo.category_id.split(',');
-                    for (var nCount = 0; nCount <$scope.categoryArray.length; nCount++)
+                    for (var nCount = 0; nCount < $scope.categoryArray.length; nCount++)
                     {
                         $scope.selectedCategories.push(parseInt($scope.categoryArray[nCount]));
                     }
-
-                    console.log("Sai1");
-                    console.log(res.job_location[0]);
-                    console.log("Sai22");
 
                     if((res.job_location[0].country) && (res.job_location[0].latitude) && (res.job_location[0].location_title))
                     {
@@ -294,7 +304,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-                    console.log($scope.mainLocationArray);
+                    console.log("SAi9999");
+                    console.log(res);
 
                     for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                     {
