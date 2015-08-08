@@ -255,7 +255,8 @@ angular.module('ezeidApp').
                     params :{
                         group_name:groupName,
                         token : $rootScope._userInfo.Token,
-                        group_type: getGroupNameType(groupName)
+                        group_type: getGroupNameType(groupName),
+                        group_id: getGroupNameType(groupName) == 0?$scope.activeGroupId:null
                     }
                 }).success(function(resp){
 
@@ -411,6 +412,12 @@ angular.module('ezeidApp').
             {
                 var ezeone = parseInt(getGroupNameType(ezeone)) ==  0?"@"+ezeone:ezeone;
                 $('#ezeone-id').val(ezeone);
+
+                var groupId = null;
+                if($scope.module.join)
+                {
+                    groupId = $scope.activeGroupId;
+                }
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'validate_groupname',
@@ -418,21 +425,23 @@ angular.module('ezeidApp').
                     params :{
                         group_name:ezeone,
                         token : $rootScope._userInfo.Token,
-                        group_type: 1
+                        group_type: 1,
+                        group_id: groupId
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
                     $scope.ezeOneValidationStatus = resp.data[0].status;
                     $scope.ezeOneMembershipStatus = resp.data[0].userstatus;
                     $scope.isLoggedInUserRequeser = resp.data[0].isrequester;
-                    if(resp.data[0].status && resp.data[0].status == -1)
+                    $scope.currentGroupId = resp.data[0].GroupID;
+                    if(resp.data[0].userstatus && resp.data[0].userstatus == -1)
                     {
                         /* Group name is Unique: passed the validity test! */
                         ezeOneValidationAction(1);
                         $scope.activeEzeOneId = resp.data[0].masterid;
                         $scope.activeEzeOneName = resp.data[0].name;
                     }
-                    else if(resp.data[0].status && resp.data[0].status == -2)
+                    else if(resp.data[0].userstatus && resp.data[0].userstatus == -2)
                     {
                         /* EZEONE does not exists */
                         ezeOneValidationAction(2);
@@ -446,7 +455,7 @@ angular.module('ezeidApp').
                         $scope.activeEzeOneId = 0;
                         $scope.activeEzeOneName = "";
                         if($scope.ezeOneMembershipStatus == 1)
-                            Notification.error({ message: "You are already connected to this user", delay: MsgDelay });
+                            Notification.error({ message: "You are already connected to this user/group", delay: MsgDelay });
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
@@ -955,5 +964,11 @@ angular.module('ezeidApp').
                     $scope.groupMember[index].status = status;
                 }
             }
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////API/////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         }
     ]);

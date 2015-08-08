@@ -51,7 +51,7 @@ angular.module('ezeidApp').
             $scope.activeTransactionBasicInfo = '';
             $scope.activeTransactionDetailedInfo = '';
             $scope.permissiontype = '';
-
+            $scope.loggedInUserEzeone = $rootScope._userInfo.ezeone_id;
             /* Loading the messages */
             $scope.dashBoardMsg = [];
 
@@ -60,11 +60,15 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             $scope.groupListData = [];
             $scope.individualMember = [];
+            /* pending list init */
+            $scope.pendingRequestCount = 0;
+            $scope.pendingRequestData = [];
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////Default Function Calls//////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             loadDashBoardMessages();
+            getPendingRequestUserList();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
@@ -316,6 +320,9 @@ angular.module('ezeidApp').
             function getGroups()
             {
                 getGroupApiCall().then(function(data){
+                    if(!data || !data.length)
+                        return;
+
                     data.forEach(function(val){
                         if(val.GroupType == 1)//Individual group
                         {
@@ -345,6 +352,48 @@ angular.module('ezeidApp').
             {
                 $scope.groupListData.push(data);
             }
+
+            /**
+             * Load all the recent messages
+             */
+            function loadDashBoardMessages()
+            {
+                loadMessageApi().then(function(data){
+                    $scope.dashBoardMsg = data;
+                });
+
+            }
+
+            /**
+             * get all the pending requests for the logged in user
+             */
+            function getPendingRequestUserList()
+            {
+                loadPendingRequestApi().then(function(data){
+                    if(!data)
+                    {
+                        return;
+                    }
+                    $scope.pendingRequestData = data;
+                    /* get the pending list count */
+                    var count = 0;
+                    data.forEach(function(val){
+                        if(parseInt(val.requester) == 2)
+                        {
+                            count++;
+                            $scope.pendingRequestData.push(val);
+                        }
+                    });
+                    $scope.pendingRequestCount = count;
+                });
+            }
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////ALL API CALLS///////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
             /**
              * Call group ApI calls for getting all the groups of the logged in user
              */
@@ -370,18 +419,7 @@ angular.module('ezeidApp').
             }
 
             /**
-             * Load all the recent messages
-             */
-            function loadDashBoardMessages()
-            {
-                loadMessageApi().then(function(data){
-                    $scope.dashBoardMsg = data;
-                });
-
-            }
-
-            /**
-             * Call load messages API
+             * Call load DASHOARD messages API
              */
             function loadMessageApi()
             {
@@ -400,6 +438,87 @@ angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
                     defer.resolve();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * get all the messages for INBOX API
+             * @param messageType:1->Group message, 0->Individual message
+             * @param groupOrIndividualId: TID of the group or indivdual
+             * @returns {*}
+             */
+            function loadGroupMsgApi(messageType,groupOrIndividualId)
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'load_group_message',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        id : groupOrIndividualId,
+                        group_type: messageType
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Get the list of all the  groups or individuals with pending request
+             * @returns {*}
+             */
+            function loadPendingRequestApi()
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'pending_request',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Api to handle all the request to [mark as read,mark as unread,trash]
+             * @param messageId: message ID of the messages for which this request is called
+             * @param status:: 1: read, 2: unread
+             * @param trash: 1:YES, 0: NO
+             */
+            function messageActivityApi(messageId,status,trash)
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'message_activity',
+                    method : "POST",
+                    data :{
+                        token : $rootScope._userInfo.Token,
+                        message_id:messageId,
+                        status:status,
+                        trash:trash
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve(resp.data);
                 });
                 return defer.promise;
             }
