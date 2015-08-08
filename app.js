@@ -227,8 +227,7 @@ app.get('/suggestion_list',LocationManager.FnGetSuggestionList);
 app.post('/group_members',LocationManager.FnAddGroupMembers);
 app.get('/pending_request',LocationManager.FnGetPendingRequest);
 app.get('/group_list',LocationManager.FnGetGroupList);
-
-
+app.get('/messages',LocationManager.FnLoadMessages);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);

@@ -795,8 +795,9 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
         var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
         var nextActionDateTime = new Date(req.body.nextActionDateTime);
         var Token = req.body.Token;
-        var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
-        var targetDate = req.body.alarm_duration ? req.body.target_date : '';
+        var alarmDuration = (parseInt(req.body.alarm_duration) !== NaN) ? parseInt(req.body.alarm_duration) : 0;
+        var probability = (parseInt(req.body.probability) !== NaN && parseInt(req.body.probability) !== 0) ? parseInt(req.body.probability) : 2 ;
+        var targetDate = req.body.target_date ? req.body.target_date : null;
 
 
         var responseMessage = {
@@ -810,7 +811,8 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
 
             var query = st.db.escape(TID) + ', ' + st.db.escape(status) + ',' + st.db.escape(folderRuleID)
                 + ',' + st.db.escape(nextAction) + ',' + st.db.escape(nextActionDateTime)
-                + ', ' + st.db.escape(Token)+ ', ' + st.db.escape(alarmDuration)+ ', ' + st.db.escape(targetDate);
+                + ', ' + st.db.escape(Token)+ ', ' + st.db.escape(alarmDuration)+ ', ' + st.db.escape(probability)+ ', ' + st.db.escape(targetDate);
+            console.log(query);
             st.db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
                     if (updateResult) {
@@ -822,7 +824,12 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
                             status : req.body.status,
                             folderRuleID : req.body.folderRuleID,
                             nextAction : (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0,
-                            nextActionDateTime : req.body.nextActionDateTime
+                            nextActionDateTime : req.body.nextActionDateTime,
+                            token : Token,
+                            alarm_duration : alarmDuration,
+                            probability : probability,
+                            target_date : targetDate
+
                         };
                         res.status(200).json(responseMessage);
                         console.log('FnUpdateTransaction: Transaction details update successfully');

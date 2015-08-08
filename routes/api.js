@@ -167,7 +167,7 @@ router.get('/suggestion_list',LocationManager.FnGetSuggestionList);
 router.post('/group_members',LocationManager.FnAddGroupMembers);
 router.get('/pending_request',LocationManager.FnGetPendingRequest);
 router.get('/group_list',LocationManager.FnGetGroupList);
-
+router.get('/messages',LocationManager.FnLoadMessages);
 
 
 //below service are for EZEIDAP
