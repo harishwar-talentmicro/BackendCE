@@ -47,7 +47,6 @@ angular.module('ezeidApp').
                 console.log("Sai88");
                 $timeout(function ()
                 {
-
                     angular.element('#SignIn_popup').css({'position':'fixed'});
                     angular.element('#SignIn_popup > .window_page').css({'position':'relative'});
                     angular.element('#SignIn_popup').slideDown();

@@ -37,9 +37,9 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
                                          <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction emptyBox">
-                                            <span class="normal-view-text"> Select Function </span>
+                                            <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
                                             <span class="mobile-view-text"></span>
-                                            <span class="caret"></span></button>
+                                            <span class="caret selectImg"></span></button>
                                         <div class="opt opt-2">
                                             <div class="filter-dropdown width-105 search-option-content setTableFixHeight" style="display: none;">
                                                 <div class="checkbox-dropdown" ng-repeat="function in CVAttachCtrl.Functions track by $index" ng-click="selectFunction(function.FunctionID)">
@@ -81,7 +81,7 @@
 
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpaceMiddle label">
                                         <h5 class="text-primary text-left">
-                                            <input type="checkbox" ng-click="CVAttachCtrl.securePinCliked()" ng-model="CVAttachCtrl.EnablePin"/>Enable PIN
+                                            <input type="checkbox" ng-click="CVAttachCtrl.securePinCliked()" ng-model="CVAttachCtrl.EnablePin"/><span> Enable PIN</span>
                                         </h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 cvBottomSpaceMiddle">
@@ -94,11 +94,11 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 ">
                                         <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
-                                        Active(Access is Active)
+                                        <span> &nbsp; Active(Access is Active)</span>
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8 " style="padding-left: 0px;">
                                         <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="NotVisible" class="check-box pull-left" value="2" style="margin-top: 0px;"/>
-                                        Inactive(Access Denied/Not Looking for Change)
+                                        <span> &nbsp; Inactive(Access Denied/Not Looking for Change)</span>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -112,9 +112,9 @@
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
                                         <h5 class="text-primary text-left">Notice Period</h5>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-8 cvBottomSpace">
                                        <div class="input-group">
-                                            <input type="text" class="form-control" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.notice_period" placeholder="Notice Period" aria-describedby="sizing-addon1"/>
+                                            <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.notice_period" placeholder="Notice Period" aria-describedby="sizing-addon1"/>
                                             <span class="input-group-addon" id="sizing-addon1">in days</span>
                                         </div>
                                     </div>
@@ -123,11 +123,13 @@
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
                                         <h5 class="text-primary text-left">Experience</h5>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-8 cvBottomSpace">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.experience" placeholder="Experience" aria-describedby="sizing-addon1"/>
+                                            <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.experience" placeholder="Experience" aria-describedby="sizing-addon1"/>
                                             <span class="input-group-addon" id="sizing-addon2">in years</span>
                                         </div>
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-8">
                                     </div>
 
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
@@ -165,29 +167,19 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
                                         <div class="input-group">
-                                            <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "locationName" class="form-control"/>
+                                            <input type="text" id="google-map-search-box" placeholder="Bangalore" ng-model = "locationName" class="form-control"/>
                                             <span class="input-group-addon noPaddingNoBorder">
                                                 <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
                                             </span>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Job Categories</h5>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Expected Salary</h5>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
-                                        <button class="btn btn-default btn-sm dropdown-toggleCategory opt opt-2 drpFunction">
-                                            <span class="normal-view-text">Job Categories</span>
-                                            <span class="mobile-view-text"></span>
-                                            <span class="caret"></span>
-                                        </button>
-                                        <div class="opt opt-2">
-                                            <div class="filter-dropdownCategory width-105 search-option-content setTableFixHeight" style="display: none;">
-                                                <div class="checkbox-dropdown" ng-repeat="category in jobCategories track by $index" ng-click="selectJobCategories(category.CategoryID)">
-                                                    <i class="fa " ng-class="selectedCategories.indexOf(category.CategoryID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{category.CategoryTitle}}
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                       <input type="text" decimals-only maxlength="17" name="exp_salary" class="form-control text-right emptyBox" ng-model="CVAttachCtrl._CVInfo.exp_salary" placeholder="Expected Salary"/>
                                     </div>
+
                                 </div>
                                 <div class="row cvBottomSpace" ng-show="locationArrayString.length">
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 location-box-border" ng-show="locationArrayString.length">
@@ -197,6 +189,23 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                        <h5 class="text-primary text-left">Job Categories</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
+                                        <button class="btn btn-default btn-sm dropdown-toggleCategory opt opt-2 drpFunction">
+                                            <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
+                                            <span class="mobile-view-text"></span>
+                                            <span class="caret selectImg"></span>
+                                        </button>
+                                        <div class="opt opt-2">
+                                            <div class="filter-dropdownCategory width-105 search-option-content setTableFixHeight" style="display: none;">
+                                                <div class="checkbox-dropdown" ng-repeat="category in jobCategories track by $index" ng-click="selectJobCategories(category.CategoryID)">
+                                                    <i class="fa " ng-class="selectedCategories.indexOf(category.CategoryID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{category.CategoryTitle}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
                                         <h5 class="text-primary text-left">Institute</h5>
                                     </div>
@@ -218,10 +227,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
-                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
@@ -229,7 +234,7 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
                                         <select class="form-control" ng-model="CVAttachCtrl._CVInfo.education_id">
-                                            <option value = "0" >Select Last Education</option>
+                                            <option value = "0" > -- Select -- </option>
                                             <option ng-repeat="education in educationList track by $index" value="{{education.TID}}">{{education.EducationTitle}}</option>
                                         </select>
                                         <!--<input type="text"
@@ -249,7 +254,7 @@
                                         </div>-->
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace ">
-                                        <input type="text" class="form-control" numbers-only maxlength="4" ng-model="CVAttachCtrl._CVInfo.year_of_passing" placeholder="Year of Pass" aria-describedby="sizing-addon1"/>
+                                        <input type="text" class="form-control text-right" numbers-only maxlength="4" ng-model="CVAttachCtrl._CVInfo.year_of_passing" placeholder="Year of Pass" aria-describedby="sizing-addon1"/>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
                                         <!--<button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
@@ -268,7 +273,7 @@
                                             </div>
                                         </div>-->
                                         <select class="form-control" ng-model="CVAttachCtrl._CVInfo.specialization_id">
-                                            <option value = "0" >Select Specialization</option>
+                                            <option value = "0" > -- Select -- </option>
                                             <option ng-repeat="specialization in specializationList track by $index" value="{{specialization.TID}}">{{specialization.Title}}</option>
                                         </select>
                                     </div>
@@ -278,15 +283,12 @@
                                         <h5 class="text-primary text-left">Aggregate Score</h5>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace">
-                                        <input type="text" class="form-control" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.aggregate_score" placeholder="Ex: 87" aria-describedby="sizing-addon1"/>
+                                        <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.aggregate_score" placeholder="87" aria-describedby="sizing-addon1"/>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace setLeftRightPaddingZero">
                                         <label class="imgTopMargin">%</label>
                                     </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
-                                    </div>
+
                                 </div>
                             </div>
                             <div class="row setRowLeftRightMarginZero" ng-show="true">
