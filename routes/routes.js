@@ -167,7 +167,7 @@ exports.FnJobs = jobModule.jobs;
 exports.FnGetAppliedJob = jobModule.getAppliedJob;
 exports.FnGetJobcountry = jobModule.getJobcountry;
 exports.FnGetjobcity = jobModule.getjobcity;
-exports.FnGetJobSeekersMessage = jobModule.getJobSeekersMessage;
+exports.FnJobSeekersMessage = jobModule.jobSeekersMessage;
 exports.FnGetListOfJobs = jobModule.getListOfJobs;
 
 var Messagebox = require('./modules/messagebox-module.js');
@@ -187,6 +187,7 @@ exports.FnGetSuggestionList = messageBox.getSuggestionList;
 exports.FnAddGroupMembers = messageBox.addGroupMembers;
 exports.FnGetPendingRequest = messageBox.getPendingRequest;
 exports.FnGetGroupList = messageBox.getGroupList;
+exports.FnLoadMessages = messageBox.loadMessages;
 
 
 var Notification = require('./modules/notification-module.js');
