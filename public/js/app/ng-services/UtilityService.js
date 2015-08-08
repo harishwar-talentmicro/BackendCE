@@ -217,6 +217,24 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
             var x = new Date(timeFromServer);
             var mom1 = moment(x);
             return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+        },
+
+        _convertBase64ToBlob : function(base64Data,mimeType){
+
+            var byteCharacters = atob(base64Data);
+            if(!mimeType){
+                mimeType = "application/octet-stream";
+            }
+
+            var byteNumbers = new Array(byteCharacters.length);
+            for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+
+            var bbByteArray = new Uint8Array(byteNumbers);
+
+            var blob = new Blob([bbByteArray], {type: mimeType});
+            return blob;
         }
 
     };

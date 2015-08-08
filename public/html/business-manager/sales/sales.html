@@ -235,12 +235,20 @@
                         </div>
                     </div>
 
-
-                    <!--<div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
-                        <!--<small>{{tx.DeliveryAddress}}</small>-->
-                    <!--</div>-->
-
                     <div class="col-lg-2  col-md-12 col-sm-12 col-xs-12 bottom-clearfix" title="{{tx.Message}}" style="word-wrap:break-word;">
+
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="editModes[$index]">
+                                <label class="tiny">Transaction Stage</label>
+                                <div class="form-group form-group-sm">
+                                    <select class="form-control" ng-model="modalBox.tx.statusType">
+                                        <option value="0">New</option>
+                                        <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <small class="text-success">
                             <b>{{tx.Message | truncate:55:'...'}}</b>
                         </small>
@@ -255,8 +263,7 @@
                                 <label class="label label-info">{{tx.Amount | formatDecimal:' ':2}}</label>
                             </div>
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" title="Probability"   ng-hide="editModes[$index]">
-                                <small class="tiny text-warning">{{(parseInt(tx.probability)) ?
-                                    probabilityMapping[parseInt(tx.probability)-1] : probabilityMapping[2-1] | uppercase}}</small>
+                                <small class="tiny text-warning">{{(tx.probability) ? probabilityMapping[(tx.probability - 1)] : probabilityMapping[(2-1)] | uppercase}}</small>
                             </div>
                         </div>
                     </div>
@@ -278,7 +285,7 @@
                         <div class="row">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                 <small ng-class="{'hidden': (!tx.ActionTitle) }"><b>{{tx.ActionTitle}}</b> at <b>{{tx.NextActionDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}</b></small>
-                                <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No action yet</small>
+                                <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No next action</small>
                             </div>
 
                         </div>
@@ -292,17 +299,6 @@
                     <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="editModes[$index]">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                <label class="tiny">Transaction Stage</label>
-                                <br/>
-                                <div class="form-group form-group-sm">
-                                    <select class="form-control" ng-model="modalBox.tx.statusType">
-                                        <option value="0">New</option>
-                                        <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                                 <label class="tiny">Folder</label>
                                 <br/>
                                 <div class="form-group form-group-sm">
@@ -311,6 +307,21 @@
                                         <option ng-repeat="txFolderRule in txFolderRules track by txFolderRule.TID" value="{{txFolderRule.TID}}">{{txFolderRule.FolderTitle}}</option>
                                     </select>
                                 </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+
+                                <label class="tiny">Probability</label>
+                                <br/>
+                                <div class="form-group form-group-sm">
+                                    <select class="form-control"  ng-model="modalBox.tx.probability">
+                                        <option value="1">Less Likely</option>
+                                        <option value="2">Likely</option>
+                                        <option value="3">More Likely</option>
+                                        <option value="4">Definite</option>
+                                    </select>
+                                </div>
+
                             </div>
                             <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="moduleConf.listType == 4">-->
                                 <!--<div class="form-group form-group-sm">-->
@@ -336,7 +347,7 @@
                                                                         <!--"hours12" : true,-->
                                                                         <!--"minDate" : "-1970/01/01"-->
                                                                         <!--}'></date-time-picker>-->
-                                <date-time-picker recipient="modalBox.tx.nextActionDateTime" settings='{
+                                <date-time-picker input-group-class="input-group-sm" recipient="modalBox.tx.nextActionDateTime" settings='{
                                                                         "format" : "d M Y H:m",
                                                                         "timepicker" : true,
                                                                         "mask" : false,
@@ -373,51 +384,69 @@
                                     Edit
                                 </button>
                             </div>
-
-
                         </div>
 
                         <div class="row" ng-if="editModes[$index]" ng-show="editModes[$index]">
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                              <label class="tiny">Probability</label>
-                              <br/>
-                              <div class="form-group form-group-sm">
-                                  <select class="form-control"  ng-model="modalBox.tx.probability">
-                                      <option value="1">Less Likely</option>
-                                      <option value="2">Likely</option>
-                                      <option value="3">More Likely</option>
-                                      <option value="4">Definite</option>
-                                  </select>
-                              </div>
-                          </div>
+                              <div class="row">
+                                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
 
-                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                              <label class="tiny">Expected Date of Closure</label>
-                              <br/>
-                              <date-time-picker recipient="modalBox.tx.targetDate" settings='{
+
+                                      <label class="tiny">Expected Date of Closure</label>
+                                      <br/>
+                                      <date-time-picker input-group-class="input-group-sm bottom-clearfix" recipient="modalBox.tx.targetDate" settings='{
                                                                         "format" : "Y-m-d",
                                                                         "timepicker" : false,
                                                                         "mask" : false,
                                                                         "hours12" : false
                                                                         }'></date-time-picker>
+
+                                  </div>
+
+                                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                      <label class="tiny">Alarm Duration (for Next Action)</label>
+                                      <br/>
+                                      <div class="form-group form-group-sm">
+                                          <select class="form-control"  ng-model="modalBox.tx.alarmDuration">
+                                              <option ng-repeat="duration in alarmDurationList track by $index" value="{{$index}}">{{duration}}</option>
+                                          </select>
+                                      </div>
+                                  </div>
+                              </div>
                           </div>
+
 
                         </div>
 
 
                       </div>
-                  <div class="col-lg-1 col-md-1 col-sm-1 col-xs-2"  ng-hide="editModes[$index]">
-                      <div class="row">
-                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="tx.has_attachment">
-                              <i class="fa fa-paperclip" title="{{tx.attachment_name}}" ng-click="downloadAttachment($index,$event)"></i>
-                              <a class="hidden" ng-href="{{tx.attachmentLink}}"></a>
+
+                  <div class="col-lg-1 col-md-1 col-sm-4 col-xs-6">
+
+                      <div class="row"  ng-hide="editModes[$index]">
+                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="tx.has_attachment">
+                              <label class="label label-tx-attachment" style="cursor:pointer;"
+                                     title="{{tx.attachment_name}}"
+                                     ng-click="downloadAttachment($index,$event)">
+                                  <small class="">
+                                      <i class="fa fa-paperclip" ng-class="(tx.downloadProgress) ? 'fa-spin': ''"></i> {{tx.attachment_name | truncate:10:'...'}}
+                                      <a class="hidden" ng-href="{{tx.attachmentLink}}"></a>
+                                  </small>
+                              </label>
+
                           </div>
+
+                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="tx.alarm_duration">
+                              <label class="label label-tx-alarm" title="{{tx.attachment_name}}">
+                                  <small class="">
+                                      <i class="fa fa-bell-o"></i> {{alarmDurationList[tx.alarm_duration]}}
+                                  </small>
+                              </label>
+                          </div>
+
                       </div>
-                  </div>
 
-
-                  <div class="col-lg-1 col-md-1 col-sm-4 col-xs-6" ng-show="editModes[$index]">
-                      <div class="row">
+                      <div class="row" ng-show="editModes[$index]">
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
 
                               <button class="btn btn-xs btn-block btn-success no-radius"
@@ -642,6 +671,40 @@
                                     </div>
                                 </div>
 
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                            <label>Probability</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm">
+                                                <select class="form-control"  ng-model="modalBox.tx.probability">
+                                                    <option value="1">Less Likely</option>
+                                                    <option value="2">Likely</option>
+                                                    <option value="3">More Likely</option>
+                                                    <option value="4">Definite</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                            <label>Alarm Duration</label>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <div class="form-group form-group-sm ">
+                                                    <select class="form-control"  ng-model="modalBox.tx.alarmDuration">
+                                                        <option ng-repeat="duration in alarmDurationList track by $index" value="{{$index}}">{{duration}}</option>
+                                                    </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
                                 <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
                                 <!--<div class="row">-->
                                 <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
@@ -711,7 +774,7 @@
                                         </div>
 
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
-                                            <textarea  rows="4" class="form-control" ng-model="modalBox.tx.DeliveryAddress"></textarea>
+                                            <textarea  rows="1" class="form-control" ng-model="modalBox.tx.DeliveryAddress"></textarea>
                                         </div>
                                     </div>
                                 </div>

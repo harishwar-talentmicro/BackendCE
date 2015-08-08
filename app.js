@@ -209,7 +209,7 @@ app.get('/applied_job',LocationManager.FnGetAppliedJob);
 app.get('/job_country',LocationManager.FnGetJobcountry);
 app.get('/job_city',LocationManager.FnGetjobcity);
 app.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
-app.post('/jobseeker_message',LocationManager.FnGetJobSeekersMessage);
+app.post('/jobseeker_message',LocationManager.FnJobSeekersMessage);
 app.get('/jobs_list',LocationManager.FnGetListOfJobs);
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);
@@ -227,8 +227,7 @@ app.get('/suggestion_list',LocationManager.FnGetSuggestionList);
 app.post('/group_members',LocationManager.FnAddGroupMembers);
 app.get('/pending_request',LocationManager.FnGetPendingRequest);
 app.get('/group_list',LocationManager.FnGetGroupList);
-
-
+app.get('/load_group_message',LocationManager.FnLoadMessages);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);

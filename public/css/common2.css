@@ -2615,6 +2615,12 @@ sup.tm{
     background-color: #E7E7E7;
 }
 
+
+.hpw .grp-hover > li:hover
+{
+    background-color: #E7E7E7;
+}
+
 .hpw .index-menu .group
 {
     padding-left: 10px;
@@ -3265,6 +3271,12 @@ sup.tm{
 .hpw .overflow-y-100
 {
     max-height: 100px;
+    overflow-y: scroll;
+}
+
+.hpw .overflow-y-250
+{
+    max-height: 250px;
     overflow-y: scroll;
 }
 

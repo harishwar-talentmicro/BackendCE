@@ -55,6 +55,9 @@
              */
             $scope.jobTid = null;
 
+
+            $scope.defaultApplicantImage = '/images/grey-background.jpg';
+
         }
     ]);
 })();

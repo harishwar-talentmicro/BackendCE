@@ -9,10 +9,11 @@ angular.module('ezeidApp').directive('dateTimePicker', function() {
             minTime : '=',
             maxTime : '=',
             placeholder : '@',
-            onChange : '&'
+            onChange : '&',
+            inputGroupClass : '@'
         },
         template:
-            '<div class="input-group datetimepicker">'+
+            '<div class="input-group datetimepicker {{(inputGroupClass) ? inputGroupClass : \'\'}}">'+
                 '<input type="text" class="form-control" placeholder="{{(placeholder) ? placeholder : \'Date\'}}"  id="datetimepicker1"  name="recipientDateTime" />'+
                 '<span class="input-group-addon"><span class="glyphicon glyphicon-calendar" >'+
                 '</span>'+

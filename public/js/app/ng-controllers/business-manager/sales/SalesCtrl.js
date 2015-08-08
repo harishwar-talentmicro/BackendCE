@@ -54,6 +54,21 @@
                 'Definite'          // 4
             ];
 
+
+            $scope.alarmDurationList = [
+                "--Select Alarm Duration--",
+                "15 Minutes",
+                "30 Minutes",
+                "1 Hour",
+                "2 Hours",
+                "3 Hours",
+                "4 Hours",
+                "1 Day",
+                "7 Days",
+                "1 Week",
+                "1 Month"
+            ];
+
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
@@ -218,7 +233,8 @@
                   attachmentName : "",
                   attachmentMimeType : "",
                   probability : 2,
-                  targetDate : moment().format('YYYY-MM-DD')
+                  targetDate : moment().format('YYYY-MM-DD'),
+                  alarmDuration : 0
               }
             };
 
@@ -338,7 +354,8 @@
                         parseInt(tx.probability) : 2,
                         attachment : "",
                         attachmentName : "",
-                        attachmentMimeType : ""
+                        attachmentMimeType : "",
+                        alarmDuration : (parseInt(tx.alarm_duration)) ? parseInt(tx.alarm_duration) : 0
                 };
                 return editModeTx;
 
@@ -416,11 +433,12 @@
                         status : ($scope.modalBox.tx.statusType) ? $scope.modalBox.tx.statusType : 0,
                         folderRuleID : ($scope.modalBox.tx.folderRule) ? $scope.modalBox.tx.folderRule : 0,
                         nextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
-                        nextActionDateTime : UtilityService.convertTimeToUTC(($scope.modalBox.tx.nextActionDateTime)
-                                ? $scope.modalBox.tx.nextActionDateTime : moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
+                        nextActionDateTime : UtilityService._convertTimeToServer(($scope.modalBox.tx.nextActionDateTime)
+                                ? moment($scope.modalBox.tx.nextActionDateTime,'DD MMM YYYY hh:mm:ss A').format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss'),
                         Token : $rootScope._userInfo.Token,
                         target_date : $scope.modalBox.tx.targetDate,
-                        probability : (parseInt($scope.modalBox.tx.probability)) ? $scope.modalBox.tx.probability : 2
+                        probability : (parseInt($scope.modalBox.tx.probability)) ? $scope.modalBox.tx.probability : 2,
+                        alarm_duration : (parseInt($scope.modalBox.tx.alarmDuration)) ? parseInt($scope.modalBox.tx.alarmDuration) : 0
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -446,16 +464,16 @@
                         var date = moment().format('DD MMM YYYY hh:mm A');
                         try{
                             date = moment(resp.data.nextActionDateTime,'YYYY-MM-DD HH:mm:ss').format('DD MMM YYYY hh:mm A');
-                            resp.data.nextActionDateTime = UtilityService.convertTimeToLocal(date,'DD MMM YYYY hh:mm A');
+                            resp.data.nextActionDateTime = UtilityService._convertTimeToLocal(date,'DD MMM YYYY hh:mm A','DD MMM YYYY hh:mm A');
                         }
                         catch(ex){
-                            var date = moment().format('YYYY-MM-DD HH:mm:ss A');
-                            resp.data.nextActionDateTime = UtilityService.convertTimeToLocal(date,'DD MMM YYYY hh:mm A');
+                            var date = moment().format('YYYY-MM-DD HH:mm:ss A').format('DD MMM YYYY hh:mm A');
+                            resp.data.nextActionDateTime = UtilityService._convertTimeToLocal(date,'DD MMM YYYY hh:mm A','DD MMM YYYY hh:mm A');
                         }
                         $scope.txList[id].NextActionDate = resp.data.nextActionDateTime;
 
-                        $scope.txList[id].target_date = $scope.modalBox.tx.targetDate;
-                        $scope.txList[id].probability = (parseInt($scope.modalBox.tx.probability)) ? parseInt($scope.modalBox.tx.probability) : 2
+                        $scope.txList[id].target_date = resp.data.target_date;
+                        $scope.txList[id].probability = (parseInt(resp.data.probability)) ? parseInt(resp.data.probability) : 2
 
                     }
                     else{
@@ -707,7 +725,8 @@
                         attachmentName : "",
                         attachmentMimeType : "",
                         probability : 2,
-                        targetDate : moment().format('YYYY-MM-DD')
+                        targetDate : moment().format('YYYY-MM-DD'),
+                        alarmDuration  : 0
                     }
                 };
 
@@ -1066,10 +1085,10 @@
                             if(resp.Result && angular.isArray(resp.Result)){
                                 for(var a = 0; a < resp.Result.length; a++){
                                     $scope.editModes.push(false);
-                                    resp.Result[a].TaskDateTime = UtilityService.convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A');
+                                    resp.Result[a].TaskDateTime = UtilityService._convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A');
                                     resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ?
-                                        UtilityService.convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A') :
-                                        UtilityService.convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
+                                        UtilityService._convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A') :
+                                        UtilityService._convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
                                 }
                                 $scope.txList = resp.Result;
 
@@ -1555,8 +1574,9 @@
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,
                     Status : $scope.modalBox.tx.statusType,
-                    TaskDateTime : (!editMode) ? UtilityService.convertTimeToUTC(moment().format('DD MMM YYYY hh:mm:ss'),'DD MMM YYYY hh:mm:ss') :
-                        UtilityService.convertTimeToUTC($scope.modalBox.tx.taskDateTime),
+                    TaskDateTime : (!editMode) ?
+                        UtilityService._convertTimeToServer(moment().format('DD MMM YYYY hh:mm:ss A'),'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'):
+                        UtilityService._convertTimeToServer($scope.modalBox.tx.taskDateTime,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
                     Notes : $scope.modalBox.tx.notes,
                     LocID : ($scope.modalBox.tx.locId) ? $scope.modalBox.tx.locId : 0,
                     Country : $scope.modalBox.tx.country,
@@ -1572,8 +1592,8 @@
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : ($scope.modalBox.tx.nextAction) ? $scope.modalBox.tx.nextAction : 0,
-                    NextActionDateTime : UtilityService.convertTimeToUTC(($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
-                            moment().format('DD MMM YYYY HH:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
+                    NextActionDateTime  : UtilityService._convertTimeToServer(($scope.modalBox.tx.nextActionDateTime)
+                    ? moment($scope.modalBox.tx.nextActionDateTime,'DD MMM YYYY hh:mm:ss A').format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss'),
                     //NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
                     //    moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
@@ -1585,11 +1605,12 @@
                     Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
                         ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
                         calculateTxAmount($scope.modalBox.tx.itemList),
-                    proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) == 0 ) ? $scope.modalBox.tx.probability : 2 ,
+                    proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) !== 0 ) ? $scope.modalBox.tx.probability : 2 ,
                     target_date : ($scope.modalBox.tx.targetDate) ? $scope.modalBox.tx.targetDate :  moment().format('YYYY-MM-DD'),
                     attachment : $scope.modalBox.tx.attachment,
                     attachment_name : $scope.modalBox.tx.attachmentName,
-                    mime_type : $scope.modalBox.tx.attachmentMimeType
+                    mime_type : $scope.modalBox.tx.attachmentMimeType,
+                    alarm_duration : (parseInt($scope.modalBox.tx.alarmDuration)) ? parseInt($scope.modalBox.tx.alarmDuration) : 0
                 };
                 return preparedTx;
             };
@@ -1820,17 +1841,36 @@
                 },1000);
             };
 
+
+            /**
+             * Function for downloading blob
+             * @param data
+             * @param mimeType
+             * @param fileName
+             */
+
+                var downloadBlob = function (data, fileName,mimeType) {
+                    $timeout(function(){
+                        console.log('a');
+                        var a = document.createElement("a");
+                        document.body.appendChild(a);
+                        a.style = "display: none";
+                        var blob = UtilityService._convertBase64ToBlob(data,mimeType);
+                        console.log(blob);
+                        var url = window.URL.createObjectURL(blob);
+                        a.href = url;
+                        a.download = fileName;
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    },1000);
+
+            };
             /**
              * Downloads attachment for a particular transaction
              * @param txId
              */
             $scope.downloadAttachment = function(index,e){
-                //e.preventDefault();
-                console.log(e.currentTarget);
-                $timeout(function(){
-                    $(e.currentTarget).siblings('a').trigger('click');
-                },1000);
-
+                $scope.txList[parseInt(index)].downloadProgress = true;
                 $http({
                     method : 'GET',
                     url : GURL + 'transaction_attachment',
@@ -1839,13 +1879,12 @@
                         tid : $scope.txList[parseInt(index)].TID
                     }
                 }).success(function(resp){
-                    console.log(resp);
+                    $scope.txList[parseInt(index)].downloadProgress = null;
                     if(resp){
                         if(resp.status){
-                            if(resp[0]){
-                                $scope.txList[parseInt(index)].attachmentLink = resp[0].attachment;
-                                console.log(e.currentTarget);
-                                $(e.currentTarget).siblings('a').trigger('click');
+                            if(resp.data[0]){
+                                resp.data[0].attachment = resp.data[0].attachment.split('base64,')[1];
+                                downloadBlob(resp.data[0].attachment, resp.data[0].file_name,resp.data[0].mime_type);
                             }
                         }
                         else{

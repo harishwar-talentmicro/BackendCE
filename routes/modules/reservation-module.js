@@ -116,156 +116,160 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveReservTransaction: Resource Transaction details save successfully');
+                                    }
 
-                                        if (messagetype == 2) {
+                                        /*if (messagetype == 2) {
                                             fs.readFile("Reservation.html", "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
                                                 st.db.query(query1, function (err, getResult) {
-                                                    if (getResult[0].id == 1) {
-                                                        if (getResult[0].EZEIDVerifiedID == 1) {
-                                                            verified = 'Not Verified';
+                                                    if(getResult[0]) {
+                                                        if (getResult[0].id == 1) {
+                                                            if (getResult[0].EZEIDVerifiedID == 1) {
+                                                                verified = 'Not Verified';
+                                                            }
+                                                            else {
+                                                                verified = 'Verified';
+                                                            }
+                                                            //here passing date with 00:00:00 time for getting the reservation data that only date format is put like that
+                                                            var date = moment(new Date(req.body.res_datetime)).format('YYYY-MM-DD 00:00:00.000');
+                                                            st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, res_result) {
+                                                                if (res_result) {
+                                                                    var i = res_result[0].length - 1;
+                                                                    console.log(res_result[0][i]);
+                                                                    messageText = res_result[0][i].service;
+                                                                    duration = res_result[0][i].duration;
+                                                                }
+
+                                                                else {
+                                                                    console.log('FnGetTransDetails::Error getting form get trans details');
+                                                                }
+
+
+                                                                data = data.replace("[IsVerified]", verified);
+                                                                data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                                data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                                data = data.replace("[Message]", messageText);
+                                                                data = data.replace("[Duration]", duration);
+                                                                data = data.replace("[ActionDate]", res_datetime.toLocaleString());
+                                                                var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
+
+                                                                st.db.query(mail_query, function (err, get_result) {
+                                                                    console.log(get_result);
+                                                                    if (get_result) {
+                                                                        var mailOptions = {
+                                                                            from: 'noreply@ezeone.com',
+                                                                            to: get_result[0].EMailID,
+                                                                            subject: 'Reservation Request from ' + toEzeid,
+                                                                            html: data // html body
+                                                                        };
+                                                                        //console.log(mailOptions);
+                                                                        var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(toEzeid);
+                                                                        st.db.query(queryResult, function (err, result) {
+                                                                            console.log(result);
+                                                                            var post = {
+                                                                                MessageType: messagetype,
+                                                                                Priority: 3,
+                                                                                ToMailID: mailOptions.to,
+                                                                                Subject: mailOptions.subject,
+                                                                                Body: mailOptions.html,
+                                                                                SentbyMasterID: result[0].TID
+                                                                            };
+
+                                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                                // Neat!
+                                                                                if (!err) {
+                                                                                    console.log('FnMessageMail: Reservation Mail saved Successfully....');
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                                }
+                                                                            });
+                                                                        });
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSendMail:getting error from EmailID ');
+                                                                    }
+                                                                });
+                                                            });
                                                         }
                                                         else {
-                                                            verified = 'Verified';
-                                                        }
-                                                        //here passing date with 00:00:00 time for getting the reservation data that only date format is put like that
-                                                        var date = moment(new Date(req.body.res_datetime)).format('YYYY-MM-DD 00:00:00.000');
-                                                        st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, res_result) {
-                                                            if (res_result) {
-                                                                var i = res_result[0].length - 1;
-                                                                console.log(res_result[0][i]);
-                                                                messageText = res_result[0][i].service;
-                                                                duration = res_result[0][i].duration;
+                                                            if (getResult[0].EZEIDVerifiedID == 1) {
+                                                                verified = 'Not Verified';
                                                             }
-
                                                             else {
-                                                                console.log('FnGetTransDetails::Error getting form get trans details');
+                                                                verified = 'Verified';
                                                             }
-
-
-                                                            data = data.replace("[IsVerified]", verified);
-                                                            data = data.replace("[EZEOneID]", getResult[0].EZEID);
-                                                            data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                            data = data.replace("[Message]", messageText);
-                                                            data = data.replace("[Duration]", duration);
-                                                            data = data.replace("[ActionDate]", res_datetime.toLocaleString());
-                                                            var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
-
-                                                            st.db.query(mail_query, function (err, get_result) {
-                                                                console.log(get_result);
-                                                                if (get_result) {
-                                                                    var mailOptions = {
-                                                                        from: 'noreply@ezeone.com',
-                                                                        to: get_result[0].EMailID,
-                                                                        subject: 'Reservation Request from ' + toEzeid,
-                                                                        html: data // html body
-                                                                    };
-                                                                    //console.log(mailOptions);
-                                                                    var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(toEzeid);
-                                                                    st.db.query(queryResult, function (err, result) {
-                                                                        console.log(result);
-                                                                        var post = {
-                                                                            MessageType: messagetype,
-                                                                            Priority: 3,
-                                                                            ToMailID: mailOptions.to,
-                                                                            Subject: mailOptions.subject,
-                                                                            Body: mailOptions.html,
-                                                                            SentbyMasterID: result[0].TID
-                                                                        };
-
-                                                                        var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                            // Neat!
-                                                                            if (!err) {
-                                                                                console.log('FnMessageMail: Reservation Mail saved Successfully....');
-                                                                            }
-                                                                            else {
-                                                                                console.log('FnMessageMail: Mail not Saved Successfully');
-
-                                                                            }
-                                                                        });
-                                                                    });
+                                                            //here passing date with 00:00:00 time for getting the reservation data that only date format is put like that
+                                                            var date = moment(new Date(req.body.res_datetime)).format('YYYY-MM-DD 00:00:00.000');
+                                                            st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, res_result) {
+                                                                if (res_result) {
+                                                                    var i = res_result[0].length - 1;
+                                                                    messageText = res_result[0][i].service;
+                                                                    duration = res_result[0][i].duration;
                                                                 }
+
                                                                 else {
-                                                                    console.log('FnSendMail:getting error from EmailID ');
+                                                                    console.log('FnGetTransDetails::Error getting form get trans details');
                                                                 }
-                                                            });
-                                                        });
-                                                    }
-                                                    else {
-                                                        if (getResult[0].EZEIDVerifiedID == 1) {
-                                                            verified = 'Not Verified';
-                                                        }
-                                                        else {
-                                                            verified = 'Verified';
-                                                        }
-                                                        //here passing date with 00:00:00 time for getting the reservation data that only date format is put like that
-                                                        var date = moment(new Date(req.body.res_datetime)).format('YYYY-MM-DD 00:00:00.000');
-                                                        st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, res_result) {
-                                                            if (res_result) {
-                                                                var i = res_result[0].length - 1;
-                                                                messageText = res_result[0][i].service;
-                                                                duration = res_result[0][i].duration;
-                                                            }
+                                                                data = data.replace("[IsVerified]", verified);
+                                                                data = data.replace("[EZEOneID]", getResult[0].EZEID);
+                                                                data = data.replace("[EZEID]", getResult[0].EZEID);
+                                                                data = data.replace("[Message]", messageText);
+                                                                data = data.replace("[Duration]", duration);
+                                                                data = data.replace("[ActionDate]", res_datetime.toLocaleString());
+                                                                var mail_query = 'Select EZEID,ifnull(ReservationMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
+                                                                console.log(mail_query);
+                                                                st.db.query(mail_query, function (err, get_result) {
 
-                                                            else {
-                                                                console.log('FnGetTransDetails::Error getting form get trans details');
-                                                            }
-                                                            data = data.replace("[IsVerified]", verified);
-                                                            data = data.replace("[EZEOneID]", getResult[0].EZEID);
-                                                            data = data.replace("[EZEID]", getResult[0].EZEID);
-                                                            data = data.replace("[Message]", messageText);
-                                                            data = data.replace("[Duration]", duration);
-                                                            data = data.replace("[ActionDate]", res_datetime.toLocaleString());
-                                                            var mail_query = 'Select EZEID,ifnull(ReservationMailID," ") as MailID from tmaster where TID=' + getResult[0].TID;
-                                                            console.log(mail_query);
-                                                            st.db.query(mail_query, function (err, get_result) {
-
-                                                                if (get_result) {
-                                                                    var mailOptions = {
-                                                                        from: 'noreply@ezeone.com',
-                                                                        to: get_result[0].MailID,
-                                                                        subject: 'Reservation Request from ' + toEzeid,
-                                                                        html: data // html body
-                                                                    };
-                                                                    //console.log(mailOptions);
-                                                                    var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(toEzeid);
-                                                                    st.db.query(queryResult, function (err, result) {
-
-                                                                        var post = {
-                                                                            MessageType: Messagetype,
-                                                                            Priority: 3,
-                                                                            ToMailID: mailOptions.to,
-                                                                            Subject: mailOptions.subject,
-                                                                            Body: mailOptions.html,
-                                                                            SentbyMasterID: result[0].TID
+                                                                    if (get_result) {
+                                                                        var mailOptions = {
+                                                                            from: 'noreply@ezeone.com',
+                                                                            to: get_result[0].MailID,
+                                                                            subject: 'Reservation Request from ' + toEzeid,
+                                                                            html: data // html body
                                                                         };
-                                                                        //console.log(post);
-                                                                        var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                            // Neat!
-                                                                            if (!err) {
-                                                                                console.log('FnMessageMail: Mail saved Successfully....1');
+                                                                        //console.log(mailOptions);
+                                                                        var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(toEzeid);
+                                                                        st.db.query(queryResult, function (err, result) {
 
-                                                                            }
-                                                                            else {
-                                                                                console.log('FnMessageMail: Mail not Saved Successfully');
+                                                                            var post = {
+                                                                                MessageType: Messagetype,
+                                                                                Priority: 3,
+                                                                                ToMailID: mailOptions.to,
+                                                                                Subject: mailOptions.subject,
+                                                                                Body: mailOptions.html,
+                                                                                SentbyMasterID: result[0].TID
+                                                                            };
+                                                                            //console.log(post);
+                                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                                // Neat!
+                                                                                if (!err) {
+                                                                                    console.log('FnMessageMail: Mail saved Successfully....1');
 
-                                                                            }
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnMessageMail: Mail not Saved Successfully');
+
+                                                                                }
+                                                                            });
                                                                         });
-                                                                    });
-                                                                }
-                                                                else {
-                                                                    console.log('FnSendMail:getting error from EmailID ');
-                                                                }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSendMail:getting error from EmailID ');
+                                                                    }
+                                                                });
                                                             });
-                                                        });
-                                                    }
+                                                        }
+
                                                 });
+
                                             });
                                         }
                                         else {
                                             console.log('FnSaveReservMail::Message type is invalid');
                                         }
-                                    }
+                                    }*/
                                     else {
                                         responseMessage.message = insertResult[0][0];
                                         responseMessage.error = {};
