@@ -91,7 +91,6 @@ angular.module('ezeidApp').controller('DocumentController',[
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
-            ////console.log(Date.now());
             GetUserDetails();
         }
         else {
@@ -256,15 +255,10 @@ angular.module('ezeidApp').controller('DocumentController',[
                             $scope.form.RefExpiryDate = "";
                             $scope.form.RefDoc = "";
                             if($scope.OptionSelected==1){
-                                console.log("SAii9999");
-                                console.log(data);
                                 $scope.IdPlaceHolder = "Enter ID Card number";
                                 $scope.form.RefFileName = (data) ? data[0].DocFilename : "";
                                 $scope.showDownloadLink = $scope.form.RefNo == "" || $scope.form.RefNo == 'undefined' ? false : true;
-
-                                console.log("SAii888888");
-                                console.log($scope.form.RefFileName);
-                            }
+                             }
                             else if($scope.OptionSelected==2){
                                 $scope.IdPlaceHolder = "Enter Passport number";
                                 $scope.form.RefFileName = (data) ? data[0].DocFilename : "";

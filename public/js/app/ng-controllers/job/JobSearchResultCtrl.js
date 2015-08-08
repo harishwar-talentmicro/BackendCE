@@ -67,6 +67,8 @@ angular.module('ezeidApp').
             $scope.params.salary = "";//1-2,5-6
             $scope.params.filter=0;
 
+            $scope.filterCollege = false;
+
             $scope.searchKeyWord = $routeParams.searchTerm;
             $scope.activeJobType = [false,false,false,false,false,false];//Checkboxes for job type
             $scope.showProximityFilter = false;
@@ -211,7 +213,8 @@ angular.module('ezeidApp').
                         //Exclusively for Advance filters
                         locations: $scope.params.locations,
                         category: $scope.params.category,
-                        salary: $scope.params.salary
+                        salary: $scope.params.salary,
+                        restrict: $scope.filterCollege == false ? 0 : 1
                         //filter:$scope.params.filter?$scope.params.filter:0
                     }
                 }).success(function (response) {
@@ -1162,6 +1165,11 @@ angular.module('ezeidApp').
                 class: 'business-manager-modal'
             };
 
+            /*Filter for my college only*/
+            $scope.filterMyCollege = function () {
+                $scope.filterCollege = !$scope.filterCollege;
+                console.log($scope.filterCollege);
+            };
 
 
         }]);

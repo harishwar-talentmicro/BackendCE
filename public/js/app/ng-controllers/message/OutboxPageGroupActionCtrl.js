@@ -96,6 +96,9 @@ angular.module('ezeidApp').
             $scope.editGroupBtnVisible = false;
             $scope.deleteGroupBtnVisible = false;
             $scope.ezeOneValidationStatus = 0;
+            $scope.ezeOneMembershipStatus = -1;
+            $scope.isLoggedInUserRequeser = -1;
+            $scope.currentGroupId = -1;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///////////////////MODULES//////////////////////////////////////////////////////////////////////////////////
             $scope.module = [
@@ -420,6 +423,8 @@ angular.module('ezeidApp').
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
                     $scope.ezeOneValidationStatus = resp.data[0].status;
+                    $scope.ezeOneMembershipStatus = resp.data[0].userstatus;
+                    $scope.isLoggedInUserRequeser = resp.data[0].isrequester;
                     if(resp.data[0].status && resp.data[0].status == -1)
                     {
                         /* Group name is Unique: passed the validity test! */
@@ -440,7 +445,8 @@ angular.module('ezeidApp').
                         ezeOneValidationAction(3);
                         $scope.activeEzeOneId = 0;
                         $scope.activeEzeOneName = "";
-                        Notification.error({ message: "You are already connected to this user", delay: MsgDelay });
+                        if($scope.ezeOneMembershipStatus == 1)
+                            Notification.error({ message: "You are already connected to this user", delay: MsgDelay });
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');

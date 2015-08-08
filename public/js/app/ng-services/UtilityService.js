@@ -177,6 +177,64 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
             }
 
            return strArr.join('');
+        },
+
+        /**
+         * Converts local (browser ) timings to server timings, based on timezone of client
+         * ##Fully Tested and implemented
+         * @param localTime
+         * @param dateFormat
+         * @param returnFormat
+         * @returns {*}
+         * @private
+         */
+        _convertTimeToServer : function(localTime,dateFormat,returnFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            if(!returnFormat){
+                returnFormat = dateFormat;
+            }
+            return moment(localTime,dateFormat).utc().format(returnFormat);
+        },
+
+        /**
+         * Converts server timings to local timings (browser), based on timezone
+         * ##Fully tested and implemented
+         * @param timeFromServer
+         * @param dateFormat
+         * @param returnFormat
+         * @returns {*}
+         * @private
+         */
+        _convertTimeToLocal : function(timeFromServer,dateFormat,returnFormat){
+            if(!dateFormat){
+                dateFormat = 'DD-MMM-YYYY hh:mm A';
+            }
+            if(!returnFormat){
+                returnFormat = dateFormat;
+            }
+            var x = new Date(timeFromServer);
+            var mom1 = moment(x);
+            return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+        },
+
+        _convertBase64ToBlob : function(base64Data,mimeType){
+
+            var byteCharacters = atob(base64Data);
+            if(!mimeType){
+                mimeType = "application/octet-stream";
+            }
+
+            var byteNumbers = new Array(byteCharacters.length);
+            for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+
+            var bbByteArray = new Uint8Array(byteNumbers);
+
+            var blob = new Blob([bbByteArray], {type: mimeType});
+            return blob;
         }
 
     };

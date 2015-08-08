@@ -7,6 +7,15 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var MsgDelay = 2000;
     // Add more skills
     $scope.skillMatrix = [];
+       /* $scope.skillMatrix.push(
+            {
+                "tid":0,
+                "skillname":"",
+                "expertiseLevel":0,
+                "exp":"",
+                "active_status":1
+            }
+        );*/
     $scope.editMode = [];
     $scope.editSkill = {
         "tid":0,
@@ -19,12 +28,15 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var skillsTid = [];
     $scope.availableTags = [];
 
-    CVAttachCtrl._CVInfo.job_type = 0;
+    CVAttachCtrl._CVInfo.job_type = 1;
     $scope.locationName = "";
     //CVAttachCtrl._CVInfo.job_location1 = "";
     CVAttachCtrl._CVInfo.experience = 0;
     CVAttachCtrl._CVInfo.education_id = 0;
     CVAttachCtrl._CVInfo.specialization_id = 0;
+    CVAttachCtrl._CVInfo.KeySkills = "";
+    CVAttachCtrl._CVInfo.current_employeer = "";
+    CVAttachCtrl._CVInfo.current_job_title = "";
 
     $scope.selectedFunctions = [];
     $scope.selectedCategories = [];
@@ -58,13 +70,13 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     });
 
-        $scope.locationArrayString = [];
-        $scope.mainLocationArray = [];
+    $scope.locationArrayString = [];
+    $scope.mainLocationArray = [];
 
-        //For fatching location to post job
-        var googleMap = new GoogleMap();
-        googleMap.addSearchBox('google-map-search-box');
-        googleMap.listenOnMapControls(null,function(lat,lng){
+    //For fatching location to post job
+    var googleMap = new GoogleMap();
+    googleMap.addSearchBox('google-map-search-box');
+    googleMap.listenOnMapControls(null,function(lat,lng){
             $scope.jobLat = lat;
             $scope.jobLong = lng;
             googleMap.getReverseGeolocation(lat,lng).then(function(resp){
@@ -120,6 +132,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 errorList.push('Pin should greater or equal 100');
             }
         }
+        if(CVAttachCtrl._CVInfo.FunctionID.length < 1){
+            errorList.push('Select Function');
+        }
+        if(CVAttachCtrl._CVInfo.KeySkills.length < 1){
+            errorList.push('Key Skills is empty');
+        }
 
         if(errorList.length>0){
             for(var i = errorList.length; i>0;i--)
@@ -133,30 +151,32 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     this.saveCVDocInfo=function(){
 
-       $scope.$emit('$preLoaderStart');
-
-        CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 0;
-       // CVAttachCtrl._CVInfo.job_location = (CVAttachCtrl._CVInfo.job_location) ? CVAttachCtrl._CVInfo.job_location : [];
+        CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 1;
         CVAttachCtrl._CVInfo.experience = (CVAttachCtrl._CVInfo.experience) ? CVAttachCtrl._CVInfo.experience : 0;
 
        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
        }
 
-        if(($scope.skillMatrix[0].skillname == "") && ($scope.skillMatrix[0].exp == ""))
+        if($scope.skillMatrix[0])
         {
-            var index = 0;
-
-            if (index > -1) {
-                $scope.skillMatrix.splice(index, 1);
-                skillsTid.splice(index,1);
-            }
-            if($scope.skillMatrix.length == 0)
+            if((!$scope.skillMatrix[0].skillname) && (!$scope.skillMatrix[0].exp))
             {
-                $scope.skillMatrix = [];
-                skillsTid = [];
+                var index = 0;
+                if (index > -1)
+                {
+                    $scope.skillMatrix.splice(index, 1);
+                    skillsTid.splice(index,1);
+                }
+                if($scope.skillMatrix.length == 0)
+                {
+                    $scope.skillMatrix = [];
+                    skillsTid = [];
+                }
             }
         }
+
+        console.log($scope.skillMatrix);
 
         CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions.toString();
         CVAttachCtrl._CVInfo.category_id = $scope.selectedCategories.toString();
@@ -166,6 +186,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
         if(isValidate())
         {
+            $scope.$emit('$preLoaderStart');
+
             CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
             CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
             CVAttachCtrl._CVInfo.job_location = $scope.mainLocationArray;
@@ -190,6 +212,16 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
                     }else{
                         Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
+                        $scope.skillMatrix.push(
+                            {
+                                "tid":0,
+                                "skillname":"",
+                                "expertiseLevel":0,
+                                "exp":"",
+                                "active_status":1
+                            }
+                        );
+                        $scope.editMode[0] = true;
                         $scope.$emit('$preLoaderStop');
                     }
                 })
@@ -248,11 +280,21 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         $scope.selectedCategories.push(parseInt($scope.categoryArray[nCount]));
                     }
 
-                    $scope.mainLocationArray = res.job_location;
-                    for (var nCount = 0; nCount < res.job_location.length; nCount++)
+                    console.log("Sai1");
+                    console.log(res.job_location[0]);
+                    console.log("Sai22");
+
+                    if((res.job_location[0].country) && (res.job_location[0].latitude) && (res.job_location[0].location_title))
                     {
-                        $scope.locationArrayString.push(res.job_location[nCount].Locname);
+                        for (var nCount = 0; nCount < res.job_location.length; nCount++)
+                        {
+                            delete res.job_location[nCount].CityID;
+                            $scope.mainLocationArray.push(res.job_location[nCount]);
+                            $scope.locationArrayString.push(res.job_location[nCount].location_title);
+                        }
                     }
+
+                    console.log($scope.mainLocationArray);
 
                     for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                     {
@@ -262,19 +304,18 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-                    console.log("SAi 1111");
-                    console.log(res.skillMatrix);
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
-                        $scope.skillMatrix = [
+                        $scope.skillMatrix.push(
                             {
                                 "tid":0,
                                 "skillname":"",
                                 "expertiseLevel":0,
-                                "exp":0,
+                                "exp":"",
                                 "active_status":1
                             }
-                        ];
+                        );
+                        $scope.editMode[0] = true;
                     }
                     else
                     {
@@ -294,16 +335,20 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-                    for(var ct=0; ct < $scope.skillMatrix.length; ct++){
-                       if(ct == 0){
+                    for(var ct=0; ct < $scope.skillMatrix.length; ct++)
+                    {
+                       if(ct == 0)
+                       {
                            $scope.editMode[ct] = true;
                        }
-                        else{
+                       else
+                       {
                            $scope.editMode[ct] = false;
                        }
                     }
 
-                    for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
+                    for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++)
+                    {
                         $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == 1) ? true : false;
                         skillsTid.push($scope.skillMatrix[nCount].tid);
                     }
@@ -330,20 +375,19 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 }
                 else
                 {
-                    $scope.skillMatrix = [
+                    $scope.skillMatrix.push(
                         {
                             "tid":0,
                             "skillname":"",
                             "expertiseLevel":0,
-                            "exp":0,
+                            "exp":"",
                             "active_status":1
                         }
-                    ];
-                    console.log("SAi 222");
+                    );
+
+                    $scope.editMode[0] = true;
                     CVAttachCtrl._CVInfo.Status = 1;
                     $scope.showLink = false;
-
-
                 }
            });
     };
