@@ -1,4 +1,4 @@
-<div ng-controller="SalesCtrl" class="row transactions-row setTopMargin">
+<div ng-controller="ResumeCtrl" class="row transactions-row setTopMargin">
 
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-xs hidden-sm transaction-filter-row">
         <div class="row bottom-clearfix">
@@ -309,17 +309,27 @@
                         </small>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                        <small class="tiny text-warning">{{(tx.probability) ? probabilityMapping[(tx.probability - 1)] : probabilityMapping[(2-1)] | uppercase}}</small>
+                        <small class="tiny text-warning"><b>{{(tx.probability) ? probabilityMapping[(tx.probability - 1)] : probabilityMapping[(2-1)] | uppercase}}</b></small>
                     </div>
 
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
-                        <label ng-show="tx.salary" title="Salary" class="label label-info label-tx-salary-exp">
-                            <b> {{tx.salary | formatDecimal:' ':2}} </b> p.a. with
-                            {{(tx.Exp) ? tx.Exp : 0}} years exp.
-                        </label>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                        <small ng-show="tx.salary" title="Salary" class="text-primary">
+                            <!--<b> {{tx.salary | formatDecimal:' ':2}} </b> -->
+                            <b> {{tx.salary | formatDecimal:' ':2}} </b>
+                            p.a. with
+                            {{(tx.Exp) ? ((tx.Exp == 1 || tx.Exp < 1) ? tx.Exp + ' year' : tx.Exp + ' years' ) : ' no experience'}} exp.
+                        </small>
+                    </div>
+
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                        <a target="_blank"
+                           title="Download Resume"
+                           href="{{('/' + tx.RequesterEZEID + '.CV') + ((tx.Pin) ?
+                           ((tx.Pin.trim()) ? ('.'+ tx.Pin.trim()) : '' ) : '') }}" class="btn btn-default btn-xs tiny">
+                            <i class="fa fa-download"></i> Resume</a>
                     </div>
 
                 </div>

@@ -1,5 +1,5 @@
 (function(){
-    angular.module('ezeidApp').controller('SalesCtrl',[
+    angular.module('ezeidApp').controller('ResumeCtrl',[
         '$rootScope',
         '$scope',
         '$http',
