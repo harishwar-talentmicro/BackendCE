@@ -99,6 +99,16 @@
                 </div>
             </div>
 
+
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-addon">Institutes</span>
+                    <div ng-dropdown-multiselect="" class="ezeone-multi-select" options="userFolders"
+                         translation-texts="multiSelectTransText"
+                         selected-model="myFolders" extra-settings="multiSelectDropDownSettings"></div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -289,7 +299,7 @@
                 <div class="row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <small ng-class="{'hidden': (!tx.ActionTitle) }"><b>{{tx.ActionTitle}}</b> at <b>{{tx.NextActionDate | dateTimeFilter : "DD MMM YYYY hh:mm:ss A" : "DD-MMM hh:mm A"}}</b></small>
-                        <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No action yet</small>
+                            <small class="tiny" ng-class="{'hidden': (tx.ActionTitle) }">No next action</small>
                     </div>
 
                 </div>
@@ -302,20 +312,20 @@
                  ng-hide="editModes[$index]">
 
                 <div class="row">
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                         <small class="text-danger tiny" title="Expected date of joining">
                             Expected Joining on :
                             {{(tx.target_date)? tx.target_date : moment().format('YYYY-MM-DD') | dateTimeFilter : "YYYY-MM-DD" : "MMM DD, YYYY"}}
                         </small>
                     </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <small class="tiny text-warning"><b>{{(tx.probability) ? probabilityMapping[(tx.probability - 1)] : probabilityMapping[(2-1)] | uppercase}}</b></small>
                     </div>
 
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
                         <small ng-show="tx.salary" title="Salary" class="text-primary">
                             <!--<b> {{tx.salary | formatDecimal:' ':2}} </b> -->
                             <b> {{tx.salary | formatDecimal:' ':2}} </b>
@@ -324,7 +334,7 @@
                         </small>
                     </div>
 
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 bottom-clearfix">
                         <a target="_blank"
                            title="Download Resume"
                            href="{{('/' + tx.RequesterEZEID + '.CV') + ((tx.Pin) ?

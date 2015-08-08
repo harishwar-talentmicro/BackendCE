@@ -1006,47 +1006,24 @@
                  * to make ui and requested data consistent
                  */
 
-
                 var folderRuleArr = [];
                 for(var i = 0; i < $scope.myFolders.length; i++){
                     folderRuleArr.push($scope.myFolders[i].id);
                 }
 
                 var folderRules = (folderRuleArr) ? folderRuleArr.join(',') : '';
-                /**
-                 * Commented as we don't have to load anything if user is not having folder assigned
-                 * because from now onwards default folder will always be there
-                 */
-
-                //if(!folderRules){
-                //    var fr = [];
-                //    var frArr = []; //Folder Rule Array
-                //    for(var x=0; x<$scope.userFolders.length;x++){
-                //        fr[x] = $scope.userFolders[x].TID.toString();
-                //    }
-                //    for(var x =0; x < fr.length;x++){
-                //        frArr[x] = {id : parseInt(fr[x])};
-                //    }
-                //    $scope.myFolders = frArr;
-                //    folderRules = (fr.length > 0) ? fr.join(',') : '';
-                //
-                //    /**
-                //     * Commented as we don't have to load anything if user is not having folder assigned
-                //     * because from now onwards default folder will always be there
-                //     */
-                //}
 
                 /**
-                 * Commented as we don't have to load anything if user is not having folder assigned
-                 * because from now onwards default folder will always be there
+                 * If user has not selected any institutes to display then by default select all the institutes
+                 * which are assigned to him and assign them to the data model of myFolders also
+                 * to make ui and requested data consistent
                  */
-                ///**
-                // * If user is master user, then let him see default folder transaction also which actually
-                // * doesn't belong to any rule
-                // */
-                //if($scope.myFolders.length === $scope.userFolders.length && parseInt($rootScope._userInfo.MasterID) == 0){
-                //    folderRules = '';
-                //}
+                var instituteArr = [];
+                for(var i = 0; i < $scope.myInstitutes.length; i++){
+                    instituteArr.push($scope.myInstitutes[i].id);
+                }
+
+                var institutes = (instituteArr) ? instituteArr.join(',') : '';
 
                 /**
                  * If user is subuser and he is not having any rules assigned to him then don't allow him to
@@ -1249,6 +1226,7 @@
              * @type {string}
              */
             $scope.myFolders = [];
+            $scope.myInstitutes = [];
 
 
             /**
@@ -1260,6 +1238,10 @@
             var userFoldersLoaded = false;
             var allFoldersLoaded = false;
 
+            $scope.institutesList = [];
+            var institutesList = [];
+            var institutesLoaded = false;
+
 
             var assignUserFolders = function(){
                 for(var b=0; b < userFoldersList.length;b++){
@@ -1270,6 +1252,20 @@
                         folder.label = folder.FolderTitle;
                         $scope.userFolders.push(folder);
                         $scope.myFolders.push({ id : folder.id});
+                    }
+                }
+            };
+
+
+            var assignInstitutes = function(){
+                for(var b=0; b < institutesList.length;b++){
+                    var _findex = $scope.txFolderRules.indexOfWhere('TID',institutesList[b]);
+                    if(_findex !== -1){
+                        var institute = angular.copy($scope.txFolderRules[_findex]);
+                        institute.id = parseInt(institute.TID);
+                        institute.label = institute.InstituteTitle;
+                        $scope.institutesList.push(institute);
+                        $scope.myInstitutes.push({ id : institute.id});
                     }
                 }
             };
