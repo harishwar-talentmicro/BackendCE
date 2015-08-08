@@ -167,7 +167,7 @@ exports.FnJobs = jobModule.jobs;
 exports.FnGetAppliedJob = jobModule.getAppliedJob;
 exports.FnGetJobcountry = jobModule.getJobcountry;
 exports.FnGetjobcity = jobModule.getjobcity;
-exports.FnGetJobSeekersMessage = jobModule.getJobSeekersMessage;
+exports.FnJobSeekersMessage = jobModule.jobSeekersMessage;
 exports.FnGetListOfJobs = jobModule.getListOfJobs;
 
 var Messagebox = require('./modules/messagebox-module.js');

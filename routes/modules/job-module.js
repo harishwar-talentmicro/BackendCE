@@ -1326,14 +1326,14 @@ Job.prototype.getjobcity = function(req,res,next){
 };
 
 /**
- * @todo FnGetJobSeekersMessage
+ * @todo FnJobSeekersMessage
  * Method : post
  * @param req
  * @param res
  * @param next
  * @description api code for Get Job Seekers Mail Details
 */
-Job.prototype.getJobSeekersMessage = function(req,res,next){
+Job.prototype.jobSeekersMessage = function(req,res,next){
     var _this = this;
 
     var token = req.body.token;
@@ -1430,12 +1430,16 @@ Job.prototype.getJobSeekersMessage = function(req,res,next){
                                                     subject: TemplateResult[0].Subject,
                                                     html: TemplateResult[0].Body // html body
                                                 };
+
+                                                var link = 'http://104.199.128.226:3001/job_id=' + jobid;
                                                 mailOptions.subject = mailOptions.subject.replace("[JobTitle]",jobResult[0][0].jobtitle);
                                                 mailOptions.html = mailOptions.html.replace("[JobTitle]",jobResult[0][0].jobtitle);
                                                 mailOptions.html = mailOptions.html.replace("[FirstName]", jobResult[0][0].FirstName);
                                                 mailOptions.html = mailOptions.html.replace("[LastName]", jobResult[0][0].LastName);
                                                 mailOptions.html = mailOptions.html.replace("[CompanyName]", jobResult[0][0].CompanyName);
-
+                                                mailOptions.html = mailOptions.html.replace("[Link]",'https://www.ezeone.com/' +linkContent);
+                                                console.log('-----------------');
+                                                console.log(mailOptions.html);
                                                 var queryParams = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                     + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                     + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
@@ -1487,7 +1491,7 @@ Job.prototype.getJobSeekersMessage = function(req,res,next){
                         responseMessage.message = 'JobSeeker Message Send Successfully';
                         responseMessage.data = null;
                         res.status(200).json(responseMessage);
-                        console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully...1');
+                        console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully..');
 
                         if (id.length > 0) {
                             mailDetails(i);
