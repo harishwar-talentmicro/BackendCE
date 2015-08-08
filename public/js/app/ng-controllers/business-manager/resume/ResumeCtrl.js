@@ -1,5 +1,5 @@
 (function(){
-    angular.module('ezeidApp').controller('ResumeCtrl',[
+    angular.module('ezeidApp').controller('SalesCtrl',[
         '$rootScope',
         '$scope',
         '$http',
@@ -177,7 +177,7 @@
 
             /**
              *
-             * Sales items present for this user
+             * recruitmentitems present for this user
              * @type {Array}
              */
             $scope.moduleItems = [];
@@ -205,7 +205,7 @@
                     ezeidTid : 0,
 
                     TID : 0,
-                    functionType : 0, // Function Type will be 0 for sales
+                    functionType : 4, // Function Type will be 4 for recruitment (resume)
                     ezeid : '',
                     statusType : 0,
                     notes : '',
@@ -292,8 +292,8 @@
              * so that it can be recalculated and saved when internal user changes or updates the order
              * @param msg
              * @usage parameter msg will be like
-             * msg = 'this is message text for this sales enquiry     Nuts(7), Bolts(6)
-             * alteredMsg = 'this is message text for this sales enquiry'
+             * msg = 'this is message text for this recruitmentenquiry     Nuts(7), Bolts(6)
+             * alteredMsg = 'this is message text for this recruitment enquiry'
              */
             var alterTransactionMessageToEdit = function(msg){
                 var alteredMsg = '';
@@ -324,7 +324,7 @@
                     ezeidTid : (tx.EZEID) ? true : 0,
 
                     TID : tx.TID,
-                    functionType : 0, // Function Type will be 0 for sales
+                    functionType : 4, // Function Type will be 4 for recruitment (resume)
 
                     statusType : (tx.Status) ? tx.Status : 0,
                     notes : tx.Notes,
@@ -696,7 +696,7 @@
                         ezeidTid : 0,
 
                         TID : 0,
-                        functionType : 0, // Function Type will be 0 for sales
+                        functionType : 4, // Function Type will be 4 for recruitment (resume)
                         ezeid : '',
                         statusType : 0,
                         notes : '',
@@ -847,7 +847,7 @@
                     url : GURL + 'company_details',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        functiontype : 0
+                        functiontype : 4
                     }
 
                 }).success(function(resp){
@@ -1067,7 +1067,7 @@
                             Token : $rootScope._userInfo.Token,
                             Page : (pageNo) ? pageNo : 1,
                             Status : (statusType) ? statusType : '',
-                            FunctionType : 0,    // For Sales
+                            FunctionType : 4,    // For Sales
                             searchkeyword : txSearchKeyword,
                             sort_by : (sortBy) ? sortBy : 0,
                             folder_rules : folderRules
@@ -1123,7 +1123,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // For Sales
+                        FunctionType : 4    // For Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.hasOwnProperty('Result')){
@@ -1156,7 +1156,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // For Sales
+                        FunctionType : 4    // For Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -1185,7 +1185,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // For Sales
+                        FunctionType : 4    // For Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -1226,7 +1226,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // Sales
+                        FunctionType : 4    // Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -1367,7 +1367,7 @@
                     method : 'GET',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        FunctionType : 0    // Sales
+                        FunctionType : 4    // Sales
                     }
                 }).success(function(resp){
                     if(resp && resp !== 'null' && resp.length > 0){
@@ -1474,15 +1474,15 @@
                                     });
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load sales transaction list', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load applicant list', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load sales transaction status types', delay : MsgDelay} );
+                                Notification.error({message : 'Unable to load applicant status types', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load sales next actions list', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load recruitmentnext actions list', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
@@ -1583,7 +1583,7 @@
                     State : $scope.modalBox.tx.state,
                     City : $scope.modalBox.tx.city,
                     Area : $scope.modalBox.tx.area,
-                    FunctionType : 0,   // For sales
+                    FunctionType : 4,   // For sales
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $scope.modalBox.tx.ezeid,
@@ -1605,7 +1605,7 @@
                     Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
                         ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
                         calculateTxAmount($scope.modalBox.tx.itemList),
-                    proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) == 0 ) ? $scope.modalBox.tx.probability : 2 ,
+                    proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) !== 0 ) ? $scope.modalBox.tx.probability : 2 ,
                     target_date : ($scope.modalBox.tx.targetDate) ? $scope.modalBox.tx.targetDate :  moment().format('YYYY-MM-DD'),
                     attachment : $scope.modalBox.tx.attachment,
                     attachment_name : $scope.modalBox.tx.attachmentName,
@@ -1841,17 +1841,36 @@
                 },1000);
             };
 
+
+            /**
+             * Function for downloading blob
+             * @param data
+             * @param mimeType
+             * @param fileName
+             */
+
+            var downloadBlob = function (data, fileName,mimeType) {
+                $timeout(function(){
+                    console.log('a');
+                    var a = document.createElement("a");
+                    document.body.appendChild(a);
+                    a.style = "display: none";
+                    var blob = UtilityService._convertBase64ToBlob(data,mimeType);
+                    console.log(blob);
+                    var url = window.URL.createObjectURL(blob);
+                    a.href = url;
+                    a.download = fileName;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                },1000);
+
+            };
             /**
              * Downloads attachment for a particular transaction
              * @param txId
              */
             $scope.downloadAttachment = function(index,e){
-                //e.preventDefault();
-                console.log(e.currentTarget);
-                $timeout(function(){
-                    $(e.currentTarget).siblings('a').trigger('click');
-                },1000);
-
+                $scope.txList[parseInt(index)].downloadProgress = true;
                 $http({
                     method : 'GET',
                     url : GURL + 'transaction_attachment',
@@ -1860,13 +1879,12 @@
                         tid : $scope.txList[parseInt(index)].TID
                     }
                 }).success(function(resp){
-                    console.log(resp);
+                    $scope.txList[parseInt(index)].downloadProgress = null;
                     if(resp){
                         if(resp.status){
-                            if(resp[0]){
-                                $scope.txList[parseInt(index)].attachmentLink = resp[0].attachment;
-                                console.log(e.currentTarget);
-                                $(e.currentTarget).siblings('a').trigger('click');
+                            if(resp.data[0]){
+                                resp.data[0].attachment = resp.data[0].attachment.split('base64,')[1];
+                                downloadBlob(resp.data[0].attachment, resp.data[0].file_name,resp.data[0].mime_type);
                             }
                         }
                         else{
