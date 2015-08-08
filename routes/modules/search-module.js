@@ -1066,7 +1066,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
                                     console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
 
 
-                                    var getQuery = 'select TID from tmaster where Token='+st.db.escape(token);
+                                    var getQuery = 'select masterid from tloginout where Token='+st.db.escape(token);
                                     st.db.query(getQuery, function (err, getResult) {
                                         if(!err){
                                             var tid = getResult[0].TID;
