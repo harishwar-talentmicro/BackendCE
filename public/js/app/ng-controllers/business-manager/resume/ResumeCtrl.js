@@ -241,7 +241,8 @@
                     attachmentMimeType : "",
                     probability : 2,
                     targetDate : moment().format('YYYY-MM-DD'),
-                    alarmDuration : 0
+                    alarmDuration : 0,
+                    instituteId : 0
                 }
             };
 
@@ -572,20 +573,6 @@
                 }
             };
 
-            ///**
-            // * Finds address using geolocation lat lng
-            // * called on change of location
-            // */
-            //$scope.findAddress = function(){
-            //    $scope.$emit('$preLoaderStart');
-            //    $scope.resolveGeolocationAddress().then(function(){
-            //        $scope.$emit('$preLoaderStop');
-            //    },function(){
-            //        $scope.$emit('$preLoaderStop');
-            //    });
-            //};
-
-
 
             var googleMap = new GoogleMap();
             $timeout(function(){
@@ -728,7 +715,8 @@
                         attachmentMimeType : "",
                         probability : 2,
                         targetDate : moment().format('YYYY-MM-DD'),
-                        alarmDuration  : 0
+                        alarmDuration  : 0,
+                        instituteId : 0
                     }
                 };
 

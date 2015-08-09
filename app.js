@@ -228,6 +228,13 @@ app.post('/group_members',LocationManager.FnAddGroupMembers);
 app.get('/pending_request',LocationManager.FnGetPendingRequest);
 app.get('/group_list',LocationManager.FnGetGroupList);
 app.get('/load_group_message',LocationManager.FnLoadMessages);
+/**
+ * Validates Group Member
+ * @service-param  token
+ * @service-param ezeone_id
+ * @service_param group_id
+ */
+app.get('/validate_group_member',LocationManager.FnValidateGroupMember);
 
 //below service are for EZEIDAP
 app.post('/ewLoginAP', LocationManager.FnLoginAP);

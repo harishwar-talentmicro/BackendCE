@@ -649,22 +649,22 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 transaction-details-box bottom-clearfix" ng-show="!modalBox.editMode">
                     <!--<h4 class="font-roboto">Create Lead Based on</h4>-->
                     <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-8 col-xs-12">
+                        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                             <div class="input-group input-group-sm">
-                                        <span class="input-group-addon font-roboto">
-                                            Create Lead Based on
-                                        </span>
-                                        <span class="input-group-btn">
-                                            <div class="btn-group" data-toggle="buttons">
-                                                <label class="btn btn-sm btn-label-white btn-info no-radius"  ng-click="selectContactType(1)">
+                                <span class="input-group-addon font-roboto">
+                                    Add new applicant
+                                </span>
+                                <span class="input-group-btn">
+                                    <div class="btn-group" data-toggle="buttons">
+                                        <label class="btn btn-sm btn-label-white btn-info no-radius"  ng-click="selectContactType(1)">
 
-                                                    <input type="radio" name="options" id="option1" autocomplete="off"> <i class="fa fa-check-circle {{(modalBox.contactType == 1) ? '' : 'hidden'}}"></i> EZEOne ID
-                                                </label>
-                                                <label class="btn btn-sm btn-label-white btn-info no-radius" ng-click="selectContactType(2)">
-                                                    <input type="radio" name="options" id="option2" autocomplete="off"> <i class="fa fa-check-circle {{(modalBox.contactType == 2) ? '' : 'hidden'}}"></i>  Company
-                                                </label>
-                                            </div>
-                                        </span>
+                                            <input type="radio" name="options" id="option1" autocomplete="off"> <i class="fa fa-check-circle {{(modalBox.contactType == 1) ? '' : 'hidden'}}"></i> with EZEOne ID
+                                        </label>
+                                        <label class="btn btn-sm btn-label-white btn-info no-radius" ng-click="selectContactType(2)">
+                                            <input type="radio" name="options" id="option2" autocomplete="off"> <i class="fa fa-check-circle {{(modalBox.contactType == 2) ? '' : 'hidden'}}"></i> without EZEOne ID
+                                        </label>
+                                    </div>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -695,35 +695,6 @@
                             </div>
                         </div>
 
-
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.contactType == 2" ng-show="modalBox.contactType == 2">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Company</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
-                                     ng-if="!modalBox.editMode" ng-show="!modalBox.editMode">
-                                    <!--<div class="form-group form-group-sm ">-->
-                                    <!--<input type="text" class="form-control no-radius"-->
-                                    <!--placeholder="Company Name"-->
-                                    <!--ng-disabled="modalBox.tx.ezeid"-->
-                                    <!--ng-model="modalBox.tx.companyName"-->
-                                    <!--ng-model-options="{updateOn : 'blur',debounce : {'blur': 0} }"/>-->
-                                    <!--</div>-->
-                                    <autocomplete
-                                            list="companySuggestionList"
-                                            company-id="modalBox.tx.companyId"
-                                            company-name="modalBox.tx.companyName"
-                                            load-suggestion="loadSuggestion"></autocomplete>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
-                                    <div class="form-group form-group-sm">
-                                        <input class="form-control" disabled type="text" value="{{modalBox.tx.companyName}}"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -735,12 +706,28 @@
                                                class="form-control no-radius"
                                                placeholder="Contact Information"
                                                name="contactInfo"
-                                               ng-disabled="modalBox.tx.ezeid"
+                                               ng-disabled="modalBox.tx.ezeid || modalBox.contactType == 1"
                                                ng-model="modalBox.tx.contactInfo" />
                                     </div>
 
                                 </div>
 
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Institute</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.instituteId">
+                                            <option value="0">--Select Institute--</option>
+                                            <option ng-repeat="institute in institutesList track by institute.id" value="{{institute.id}}">{{institute.label}}</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -800,7 +787,7 @@
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                    <label>Amount</label>
+                                    <label>Salary</label>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">
@@ -863,17 +850,18 @@
 
                         <!--</div>-->
                         <!--</div>-->
+                        <!-- Message will not be there in case of recruitment -->
 
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label> Message</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>
-                                </div>
-                            </div>
-                        </div>
+                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                    <!--<label> Message</label>-->
+                                <!--</div>-->
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                    <!--<textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
 
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                             <div class="row">
@@ -889,38 +877,39 @@
                         </div>
 
 
+                        <!-- Address is not required for recruitment as CV will already be having the candidate's address ---->
 
-                        <div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="(!modalBox.editMode)">
-                                    <div class="input-group input-group-sm no-radius tx-modalbox-custom-btn-group" ng-class="(addressSelectionType == 0) ? 'has-error' : ''">
-                                        <span class="input-group-addon">Delivery Address</span>
-                                                <span class="input-group-btn">
-                                                    <div class="btn-group btn-group-sm no-radius" data-toggle="buttons">
-                                                        <label class="btn btn-sm btn-label-white btn-info no-radius"  style="border-radius: 0px;"  ng-click="(addressSelectionType = 0)">
-                                                            <input type="radio" name="options" id="option-13" autocomplete="off" ng-checked="!addressSelectionType"> <i class="fa fa-check-circle {{(addressSelectionType == 0) ? '' : 'hidden'}}"></i> I have EZEOne ID
-                                                        </label>
-                                                        <label class="btn btn-sm btn-label-white btn-info no-radius" style="border-radius: 0px;" ng-click="(addressSelectionType = 1)">
-                                                            <input type="radio" name="options" id="option-14" autocomplete="off" ng-checked="addressSelectionType"> <i class="fa fa-check-circle {{(addressSelectionType == 1) ? '' : 'hidden'}}"></i>  Address
-                                                        </label>
-                                                    </div>
-                                                </span>
-                                        <input ng-show="addressSelectionType == 0" type="text" class="form-control" maxlength="20" ng-model="ezeoneAddressId"
-                                               name="ezeoneAddressId"
-                                               id="ezeoneAddressId"
-                                               placeholder="EZEOne ID"/>
-                                        <input ng-show="addressSelectionType == 1" class="form-control" type="text" id="google-map-search-box" placeholder="Type here your address" />
-                                                <span class="input-group-btn" ng-show="addressSelectionType == 0">
-                                                    <button class="btn btn-success" ng-click="getEzeidLocationDetails(ezeoneAddressId)">Go</button>
-                                                </span>
-                                    </div>
-                                </div>
+                        <!--<div class="col-lg-12 col-md-12 col-sm-6 col-xs-12">-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix" ng-show="(!modalBox.editMode)">-->
+                                    <!--<div class="input-group input-group-sm no-radius tx-modalbox-custom-btn-group" ng-class="(addressSelectionType == 0) ? 'has-error' : ''">-->
+                                        <!--<span class="input-group-addon">Delivery Address</span>-->
+                                                <!--<span class="input-group-btn">-->
+                                                    <!--<div class="btn-group btn-group-sm no-radius" data-toggle="buttons">-->
+                                                        <!--<label class="btn btn-sm btn-label-white btn-info no-radius"  style="border-radius: 0px;"  ng-click="(addressSelectionType = 0)">-->
+                                                            <!--<input type="radio" name="options" id="option-13" autocomplete="off" ng-checked="!addressSelectionType"> <i class="fa fa-check-circle {{(addressSelectionType == 0) ? '' : 'hidden'}}"></i> I have EZEOne ID-->
+                                                        <!--</label>-->
+                                                        <!--<label class="btn btn-sm btn-label-white btn-info no-radius" style="border-radius: 0px;" ng-click="(addressSelectionType = 1)">-->
+                                                            <!--<input type="radio" name="options" id="option-14" autocomplete="off" ng-checked="addressSelectionType"> <i class="fa fa-check-circle {{(addressSelectionType == 1) ? '' : 'hidden'}}"></i>  Address-->
+                                                        <!--</label>-->
+                                                    <!--</div>-->
+                                                <!--</span>-->
+                                        <!--<input ng-show="addressSelectionType == 0" type="text" class="form-control" maxlength="20" ng-model="ezeoneAddressId"-->
+                                               <!--name="ezeoneAddressId"-->
+                                               <!--id="ezeoneAddressId"-->
+                                               <!--placeholder="EZEOne ID"/>-->
+                                        <!--<input ng-show="addressSelectionType == 1" class="form-control" type="text" id="google-map-search-box" placeholder="Type here your address" />-->
+                                                <!--<span class="input-group-btn" ng-show="addressSelectionType == 0">-->
+                                                    <!--<button class="btn btn-success" ng-click="getEzeidLocationDetails(ezeoneAddressId)">Go</button>-->
+                                                <!--</span>-->
+                                    <!--</div>-->
+                                <!--</div>-->
 
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">
-                                    <textarea  rows="1" class="form-control" ng-model="modalBox.tx.DeliveryAddress"></textarea>
-                                </div>
-                            </div>
-                        </div>
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="modalBox.editMode">-->
+                                    <!--<textarea  rows="1" class="form-control" ng-model="modalBox.tx.DeliveryAddress"></textarea>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
 
 
                         <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
@@ -938,80 +927,82 @@
 
                     </div>
 
-                    <hr ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" />
-                    <div ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" class="row bottom-clearfix">
+                    <!-- Item List will never be there in case of recruitment module------------------------>
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <h4 class="text-center font-roboto text-warning">Item List</h4>
+                    <!--<hr ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" />-->
+                    <!--<div ng-show="moduleItems.length > 0 &&  _userInfo.SalesItemListType > 0" class="row bottom-clearfix">-->
 
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                                    <div class="input-group form-group-sm">
-                                        <span class="input-group-addon">
-                                            <i class="fa fa-search"></i>
-                                        </span>
-                                        <input type="text" placeholder="Enter item name" class="form-control" ng-model="busItemSearch" />
-                                    </div>
-                                </div>
-                            </div>
+                        <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 item-list-box">-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                    <!--<h4 class="text-center font-roboto text-warning">Item List</h4>-->
 
-                            <div class="row" id="bus-item-list-container">
+                                <!--</div>-->
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
+                                    <!--<div class="input-group form-group-sm">-->
+                                        <!--<span class="input-group-addon">-->
+                                            <!--<i class="fa fa-search"></i>-->
+                                        <!--</span>-->
+                                        <!--<input type="text" placeholder="Enter item name" class="form-control" ng-model="busItemSearch" />-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</div>-->
 
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <bussiness-item
-                                            ng-repeat="item in moduleItems | filter:busItemSearch track by item.TID"
-                                            item-index="$index"
-                                            item="item" item-list-type="_userInfo.SalesItemListType"
-                                            add-item="addItem(item)" edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">
-                                    </bussiness-item>
-                                </div>
+                            <!--<div class="row" id="bus-item-list-container">-->
 
-                            </div>
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                    <!--<bussiness-item-->
+                                            <!--ng-repeat="item in moduleItems | filter:busItemSearch track by item.TID"-->
+                                            <!--item-index="$index"-->
+                                            <!--item="item" item-list-type="_userInfo.SalesItemListType"-->
+                                            <!--add-item="addItem(item)" edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">-->
+                                    <!--</bussiness-item>-->
+                                <!--</div>-->
 
-                        </div>
+                            <!--</div>-->
 
-                        <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 tx-item-list-box">
-                            <div class="row">
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <h4 class="text-center font-roboto text-success">Selected Items </h4>
-                                </div>
-                            </div>
+                        <!--</div>-->
 
-                            <div class="row" id="tx-item-list-container">
+                        <!--<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 tx-item-list-box">-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
+                                    <!--<h4 class="text-center font-roboto text-success">Selected Items </h4>-->
+                                <!--</div>-->
+                            <!--</div>-->
 
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">
-                                    <small class="font-open-sans text-warning">No item selected</small>
-                                </div>
+                            <!--<div class="row" id="tx-item-list-container">-->
 
-                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">
-                                    <transaction-item
-                                            item="item" item-list-type="_userInfo.SalesItemListType"
-                                            remove-item="removeItem(item)"
-                                            edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">
-                                    </transaction-item>
-                                </div>
+                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center" ng-hide="modalBox.tx.itemList.length > 0">-->
+                                    <!--<small class="font-open-sans text-warning">No item selected</small>-->
+                                <!--</div>-->
 
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 col-sm-12 col-xs-12 front-business-form cart-details" ng-show="modalBox.tx.itemList && modalBox.tx.itemList.length > 0">
-                                    <b><i class="fa fa-shopping-cart"></i> {{cartItemString}}
-                                                <span class="pull-right"
-                                                      ng-show="_userInfo.SalesItemListType > 3">
-                                                    {{cartAmount}}
-                                                </span>
-                                    </b>
-                                </div>
-                            </div>
+                                <!--<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" ng-repeat="item in modalBox.tx.itemList track by item.ItemID">-->
+                                    <!--<transaction-item-->
+                                            <!--item="item" item-list-type="_userInfo.SalesItemListType"-->
+                                            <!--remove-item="removeItem(item)"-->
+                                            <!--edit-permission="salesPermissionConf.txUpdate" edit-mode="modalBox.editMode">-->
+                                    <!--</transaction-item>-->
+                                <!--</div>-->
 
-                        </div>
+                            <!--</div>-->
+                            <!--<div class="row">-->
+                                <!--<div class="col-md-12 col-sm-12 col-xs-12 front-business-form cart-details" ng-show="modalBox.tx.itemList && modalBox.tx.itemList.length > 0">-->
+                                    <!--<b><i class="fa fa-shopping-cart"></i> {{cartItemString}}-->
+                                                <!--<span class="pull-right"-->
+                                                      <!--ng-show="_userInfo.SalesItemListType > 3">-->
+                                                    <!--{{cartAmount}}-->
+                                                <!--</span>-->
+                                    <!--</b>-->
+                                <!--</div>-->
+                            <!--</div>-->
 
-
-
-                    </div>
+                        <!--</div>-->
 
 
+
+                    <!--</div>-->
+
+                    <!-- -->
                     <div class="row">
                         <div class="col-lg-5 col-md-5 col-sm-6 col-xs-12">
                             <div class="row">

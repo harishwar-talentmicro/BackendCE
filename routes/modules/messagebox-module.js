@@ -255,6 +255,135 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
 };
 
 /**
+ * Validates a group number
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @method GET
+ * @service-param token <varchar>
+ * @service-param group_id <int>
+ * @service-param ezeone_id  <int>
+ */
+MessageBox.prototype.validateGroupMember = function(req,res,next){
+
+    var groupId = (parseInt(req.query.group_id) !== NaN && parseInt(req.query.group_id ) > 0) ? parseInt(req.query.group_id) : 0;
+
+    var token = (req.query.token) ? req.query.token : null;
+
+    var ezeoneId = (req.query.ezeone_id) ? alterEzeoneId(req.query.ezeone_id) : null;
+
+    var error  = {};
+    var status = true;
+    var respMsg = {
+        status : false,
+        message : 'Please check the errors below',
+        error : { server : 'Internal Server Error'},
+        data : null
+    }
+
+
+
+    if(!groupId){
+        error['group_id'] = 'Invalid group id';
+        status *= false;
+    }
+
+    if(!ezeoneId){
+        error['ezeone_id'] = 'EZEOne ID is empty';
+        status *= false;
+    }
+
+    if(!status){
+        respMsg.status = false;
+        respMsg.error = error;
+        res.status(400).json(respMsg);
+    }
+    else{
+        try{
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeoneId);
+                        var query = 'CALL pValidateGroupMember('+queryParams+')';
+                        console.log(query);
+                        st.db.query(query,function(err,results){
+                            if(!err){
+                                if(results){
+                                    if(results[0]){
+                                        if(results[0][0]){
+                                            respMsg.data = results[0][0];
+                                            respMsg.status = true;
+                                            respMsg.error = null;
+                                            respMsg.message = 'Yes,Member of the Group';
+                                            res.status(200).json(respMsg);
+                                        }
+                                        else{
+                                            respMsg.status = false;
+                                            respMsg.error = null;
+                                            respMsg.message = 'Not a member of the Group';
+                                            res.status(200).json(respMsg);
+                                        }
+                                    }
+                                    else{
+                                        respMsg.status = false;
+                                        respMsg.error = null;
+                                        respMsg.message = 'Not a member of the Group';
+                                        res.status(200).json(respMsg);
+                                    }
+                                }
+                                else{
+                                    respMsg.status = false;
+                                    respMsg.error = null;
+                                    respMsg.message = 'Not a member of the Group';
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                console.log('Error in messagebox-module stored procedure : validateGroupMember pValidateGroupMember');
+                                console.log(err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                respMsg.status = false;
+                                respMsg.error = {server : 'Internal server error'};
+                                respMsg.message = 'An error occurred';
+                                res.status(500).json(respMsg);
+                            }
+                        });
+                    }
+                    else{
+                        respMsg.status = false;
+                        respMsg.error = {token : 'Invalid token'};
+                        res.status(401).json(respMsg);
+                    }
+                }
+                else{
+                    respMsg.status = false;
+                    respMsg.error = {token : 'Invalid token'};
+                    res.status(401).json(respMsg);
+                }
+            });
+        }
+        catch(ex){
+            console.log('Error in messagebox-module : validateGropuMember');
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.status = false;
+            respMsg.error = {server : 'Internal server error'};
+            respMsg.message = 'An error occurred';
+            res.status(500).json(respMsg);
+        }
+    }
+
+
+
+
+
+
+};
+
+/**
  * @todo FnUpdateUserStatus
  * Method : PUT
  * @param req
