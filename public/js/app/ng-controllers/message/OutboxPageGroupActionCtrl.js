@@ -402,6 +402,16 @@ angular.module('ezeidApp').
                 }
             }
 
+            $scope.validateGroupMember = function(memberEzeoneId)
+            {
+                var ezeone = parseInt(getGroupNameType(memberEzeoneId)) ==  0?"@"+memberEzeoneId:memberEzeoneId;
+                $('#ezeone-id').val(ezeone);
+
+                validateGroupMember(ezeone,$scope.activeGroupId).then(function(data){
+                    console.log(data);
+                });
+            }
+
             /**
              * API call for validating EZEONE ID [called from DOM]
              * @return: 1: valid [test passed],
@@ -969,6 +979,26 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API/////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+            function validateGroupMember(memberEzeoneId,groupId)
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'validate_group_member',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        ezeone_id: memberEzeoneId,
+                        group_id: groupId
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
         }
     ]);

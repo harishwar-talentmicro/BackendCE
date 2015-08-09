@@ -1,6 +1,6 @@
 
 <!-- Compose message block -->
-<div ng-controller="ComposeMessageCtrl as ComposeCtrl">
+<div ng-controller="ComposeMessageCtrl">
     <div class="width-100 p-left-10 p-top-10">
         <div class="compose-message">
             <i class="fa fa-envelope-o"></i> COMPOSE MESSAGE
@@ -8,8 +8,37 @@
         <div class="message-body">
             <div class="input-group p-bottom-4">
                 <div class="input-group-addon">To</div>
-                <input type="text" ng-model="composeMsg.MessageTo" class="form-control" id="to" placeholder="To">
+                <input type="text"
+                       ng-model="composeMsg.MessageTo"
+                       class="form-control"
+                       ng-keypress="($event.charCode==13)?validateEnteredEzeoneOrGroup(composeMsg.MessageTo):return"
+                       id="to"
+                       placeholder="To">
+                <div class="input-group-addon no-padding-and-border">
+                    <div class="btn btn-primary no-radius"
+                            ng-click="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)">
+                        <i class="fa fa-check"></i> Check</div>
+                </div>
             </div>
+            <div class="group-name-suggestion" ng-show="visibilityHtml.groupSuggestion">
+                <!-- group suggestions goes here -->
+                <div class="group-suggestion pointer"
+                     ng-repeat="list in groupSuggestionList track by $index"
+                     ng-click="selectGroupSuggestion($index)">
+                    <span >{{list.GroupName}}</span>
+                </div>
+            </div>
+            <!-- error message goes here -->
+            <div class="invalid-ezeone-msg text-danger" ng-show="visibilityMsg"><i class="fa fa-exclamation-circle"></i> {{errorMsgArr[currentErrorMsg]}} <i class="fa fa-times pointer"></i></div>
+
+            <!-- List of receiver -->
+            <div class="receiver-list p-bottom-10">
+                <span class="receivers">
+                    <button class="btn btn-default btn-xs" disabled><i>@krunalpaid</i></button>
+                    <i class="fa fa-times pointer"></i>
+                </span>
+            </div>
+
             <div class="input-group p-bottom-4">
                 <div class="input-group-addon">From</div>
                 <input type="text" ng-model="composeMsg.MessageFrom" class="form-control" id="from" placeholder="From">
@@ -48,7 +77,8 @@
                 </span>
             </div>
             <div class="send-button text-right p-bottom-4">
-                <button class="btn btn-primary no-radius p-top-4 m_top_4" ng-click="ComposeCtrl.sendMessage();"><i class="fa fa-send"></i> Send</button>
+                <button class="btn btn-primary no-radius p-top-4 m_top_4"
+                        ng-click="sendMessage()"><i class="fa fa-send"></i> Send</button>
             </div>
         </div>
     </div>
