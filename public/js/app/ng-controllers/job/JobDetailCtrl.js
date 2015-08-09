@@ -190,6 +190,7 @@ angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     if(data.status)
                     {
+                        $location.path("/");
                         Notification.success({ message: "Applied Success..", delay : 2000});
                     }
                 })

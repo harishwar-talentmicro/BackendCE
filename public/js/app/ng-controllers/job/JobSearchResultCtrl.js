@@ -137,7 +137,7 @@ angular.module('ezeidApp').
                 $scope.params = $routeParams;
                 cleanExperienceData();
 
-                if(!parseInt($scope.params.searchTerm.length) > 0)
+                if(!parseInt(($scope.params.searchTerm) ? $scope.params.searchTerm.length : 0) > 0)
                 {
                     Notification.error({ message : 'Invalid request', delay : MsgDelay});
                 }

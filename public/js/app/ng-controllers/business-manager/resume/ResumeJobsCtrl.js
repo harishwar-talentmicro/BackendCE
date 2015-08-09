@@ -301,7 +301,7 @@
 
                         if(data.status)
                         {
-                            $scope.jobSearchTerm= "";
+                            $scope.jobSearchTerm = "";
                             $scope.jobFilterStatus = 0;
                             getPostedJob();
                             $scope.showJobListing = true;

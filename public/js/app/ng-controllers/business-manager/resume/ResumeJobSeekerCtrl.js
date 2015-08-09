@@ -53,7 +53,7 @@
                 $scope.countryId = 0;
                 $scope.cityId = 0;
                 $scope.jobSeekerExperienceFrom = 0;
-                $scope.jobSeekerExperienceTo = 0;
+                $scope.jobSeekerExperienceTo = 50;
                 $scope.selectedEducations = [];
                 $scope.selectedSpecializations = [];
                 $scope.selectedInstitute = [];
@@ -562,7 +562,7 @@
                                     document.getElementById("Title").className = "form-control emptyBox";
                                     document.getElementById("Subject").className = "form-control emptyBox";
                                     document.getElementById("Body").className = "form-control emptyBox";
-                                    Notification.success({message: "Mails are submitted for transmitted..", delay: MsgDelay});
+                                    Notification.success({message: "Messages send successfully..", delay: MsgDelay});
 
                                     $scope.jobSeekerResults = "";
                                 }

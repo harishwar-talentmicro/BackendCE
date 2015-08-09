@@ -258,6 +258,14 @@ angular.module('ezeidApp').factory('GoogleMaps',['$q','$timeout','$compile',func
         this.searchBox = new google.maps.places.SearchBox((searchElem));
     };
 
+    GoogleMap.prototype.addAutoComplete = function(elementId,options){
+        var autocompleteElem = document.getElementById(elementId);
+        if(typeof(options) == 'object'){
+            options = {};
+        }
+        this.autoComplete = new google.maps.places.Autocomplete(autocompleteElem,options)
+    };
+
 
     GoogleMap.prototype.listenOnMapControls = function(locationChangeCallback,callback,isMap){
         if(typeof(isMap) == "undefined"){
