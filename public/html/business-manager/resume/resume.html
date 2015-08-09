@@ -731,6 +731,55 @@
                             </div>
                         </div>
 
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Education</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.instituteId">
+                                            <option value="0">--Select Education--</option>
+                                            <option ng-repeat="institute in institutesList track by institute.id" value="{{institute.id}}">{{institute.label}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Specialization</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.instituteId">
+                                            <option value="0">--Select specialization--</option>
+                                            <option ng-repeat="institute in institutesList track by institute.id" value="{{institute.id}}">{{institute.label}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Job (for which candidate is applying)</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.instituteId">
+                                            <option value="0">--Select specialization--</option>
+                                            <option ng-repeat="institute in institutesList track by institute.id" value="{{institute.id}}">{{institute.label}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
                             <div class="row">
