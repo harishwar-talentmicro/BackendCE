@@ -68,7 +68,7 @@ angular.module('ezeidApp').
             function resetVisibilityVar()
             {
                 /* visibility flags for msg */
-                $scope.visibilityMsg = {
+                $scope.visibilityReceiverErrorMsg = {
                     alreadyMemberMsg:false,
                     alreadyRequestedMsg:false
                 };
@@ -140,7 +140,7 @@ angular.module('ezeidApp').
                 {
                     if(membershipStatus == 1)
                     {
-                        $scope.visibilityMsg.alreadyMemberMsg = true;
+                        $scope.visibilityReceiverErrorMsg.alreadyMemberMsg = true;
                     }
                     else if(membershipStatus == 0 && data.isrequester == 0)
                     {
@@ -148,7 +148,7 @@ angular.module('ezeidApp').
                     }
                     else if(membershipStatus == 0 && data.isrequester == 1)
                     {
-                        $scope.visibilityMsg.alreadyRequestedMsg = true;
+                        $scope.visibilityReceiverErrorMsg.alreadyRequestedMsg = true;
                     }
                     $scope.isEzeOneIdValid = true;
                 }
@@ -163,15 +163,15 @@ angular.module('ezeidApp').
              */
             function hideAllMsg()
             {
-                $scope.visibilityMsg.alreadyMemberMsg = false;
-                $scope.visibilityMsg.alreadyRequestedMsg = false;
+                $scope.visibilityReceiverErrorMsg.alreadyMemberMsg = false;
+                $scope.visibilityReceiverErrorMsg.alreadyRequestedMsg = false;
             }
             /**
              * Hide the connect btn
              */
             function hideConnectFormElements()
             {
-                $scope.visibilityMsg.connectBtn = false;
+                $scope.visibilityReceiverErrorMsg.connectBtn = false;
                 $scope.visibilityForm.relation = false;
             }
 

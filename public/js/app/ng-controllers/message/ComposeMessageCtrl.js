@@ -46,14 +46,14 @@ angular.module('ezeidApp').
             $scope.visibilityHtml = {
                 groupSuggestion:false
             };
-            $scope.visibilityMsg = false;
+            $scope.visibilityReceiverErrorMsg = false;
 
             /* Error messages goes here */
             $scope.errorMsgArr = [
                 "Invalid Ezeone",
                 "You are not connected to this user/group",
                 "No result found",
-                "Can't search an empty group or Ezeone Id"
+                "group/ezeone id already exists in receiver's list"
             ];
             $scope.currentErrorMsg = 0;
 
@@ -75,7 +75,7 @@ angular.module('ezeidApp').
                 $scope.currentErrorMsg = 0;
                 $scope.groupSuggestionList = [];
                 $scope.receiverArr = [];
-                $scope.visibilityMsg = false;
+                $scope.visibilityReceiverErrorMsg = false;
                 $scope.visibilityHtml.groupSuggestion = false;
             }
             /**
@@ -121,20 +121,19 @@ angular.module('ezeidApp').
             {
                 /* reset all validation flags before searching */
                 resetKeywordValidation();
-                if(!keyword || !keyword.length > 0)
+                if(!keyword || !keyword.length > 1)
                 {
-                    showErroMsg(3);
                     return;
                 }
                 /* check if the keyword is group name or ezeone id */
                 var keyType = getGroupNameType(keyword);//0:Group,1:Ezeone
                 if(parseInt(keyType) == 0)//get suggestion list
                 {
-                    groupSuggestionList(keyword);
+                    groupSuggestionList(keyword,1);
                 }
                 else if(parseInt(keyType) == 1)//Ezeone just check the validation
                 {
-
+                    groupSuggestionList(keyword,2);
                 }
             }
 
@@ -144,30 +143,61 @@ angular.module('ezeidApp').
             function resetKeywordValidation()
             {
                 $scope.visibilityHtml.groupSuggestion = false;
-                $scope.visibilityMsg = false;
+                $scope.visibilityReceiverErrorMsg = false;
             }
 
             /**
-             * Gives a suggestion list to the enterd group[called from DOM]
+             * Gives a suggestion list to the enterd group
              * and it is connected to the logged in user
+             *
+             * @type:1-group,2-individual
              */
-            function groupSuggestionList(keyword)
+            function groupSuggestionList(keyword,type)
             {
-                getGroupSuggestionApi(keyword).then(function(data){
-                    if(data && data.length > 0)
+                var data = [];
+                $scope.groupSuggestionList = [];
+                if(parseInt(type) == 1)
+                {
+                    data = $scope.groupListData;
+                }
+                else
+                {
+                    data = $scope.individualMember;
+                }
+
+                var count = 0;
+                data.forEach(function(data){
+                    if(data.GroupName.toLowerCase().indexOf(keyword) >= 0)
                     {
-                        /* populate suggestion data */
-                        $scope.groupSuggestionList = data;
-                        /* open up suggestion list */
-                        $scope.visibilityHtml.groupSuggestion = true;
+                        $scope.groupSuggestionList.push(data);
                     }
-                        else{
-                        showErroMsg(2);
-                    }
-                },
-                function(){
-                    showErroMsg(2);
                 });
+
+                if($scope.groupSuggestionList.length > 0)
+                {
+                    /* open up suggestion list */
+                    $scope.visibilityHtml.groupSuggestion = true;
+                }
+                else
+                {
+                    showErroMsg(2);
+                }
+                return;
+                //getGroupSuggestionApi(keyword).then(function(data){
+                //    if(data && data.length > 0)
+                //    {
+                //        /* populate suggestion data */
+                //        $scope.groupSuggestionList = data;
+                //        /* open up suggestion list */
+                //        $scope.visibilityHtml.groupSuggestion = true;
+                //    }
+                //        else{
+                //        showErroMsg(2);
+                //    }
+                //},
+                //function(){
+                //    showErroMsg(2);
+                //});
             }
 
             /**
@@ -176,7 +206,7 @@ angular.module('ezeidApp').
              */
             function showErroMsg(msgId)
             {
-                $scope.visibilityMsg = true;
+                $scope.visibilityReceiverErrorMsg = true;
                 $scope.currentErrorMsg = msgId;
             }
 
@@ -185,16 +215,8 @@ angular.module('ezeidApp').
              */
             function resetVisibilityFlags()
             {
-                $scope.visibilityMsg = false;
+                $scope.visibilityReceiverErrorMsg = false;
                 $scope.groupSuggestionList = [];
-            }
-
-            /**
-             * Validate if the entered ezeone is valid and logged in user is connected
-             */
-            function validateEzeone()
-            {
-
             }
 
             /**
@@ -203,44 +225,57 @@ angular.module('ezeidApp').
              */
             $scope.selectGroupSuggestion = function(index)
             {
-                var groupType = 1;
-                var name = $scope.receiverArr.GroupName;
-                var groupId = $scope.receiverArr.tid;//@todo
-                appendReceiverArr(groupType,name,groupId);
+                $scope.composeMsg.MessageTo = "";
+                $scope.visibilityHtml.groupSuggestion = false;
+
+                var selectedGroupName = $scope.groupSuggestionList[index].GroupName;
+                /* check for duplicate receiver */
+                if($scope.receiverArr.indexOfWhere("GroupName",selectedGroupName) >=0)
+                {
+                    showErroMsg(3);
+                    return;
+                }
+
+                /* append the receiver's list */
+                $scope.receiverArr.push($scope.groupSuggestionList[index]);
+
             }
 
             /**
-             * append the receiver list - post validation
-             * @param groupType:: 0-Ezeone, 1-Group
-             * @param name
-             * @param groupId
+             * check if the receiver is already existing
+             * @param index
              */
-            function appendReceiverArr(groupType,name,groupId)
+            $scope.removeReceiver = function(index)
             {
-
+                $scope.receiverArr.splice(index,1);
             }
 
+            $scope.removeMessage = function()
+            {
+                $scope.visibilityReceiverErrorMsg = false;
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            function getGroupSuggestionApi(keyword)
-            {
-                var defer = $q.defer();
-                $http({
-                    url : GURL + 'suggestion_list',
-                    method : "GET",
-                    params :{
-                        keywordsForSearch:keyword,
-                        token : $rootScope._userInfo.Token
-                    }
-                }).success(function(resp){
-                    defer.resolve(resp.data);
-                }).error(function(err){
-                    $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
-                });
-                return defer.promise;
-            }
+
+            //function getGroupSuggestionApi(keyword)
+            //{
+            //    var defer = $q.defer();
+            //    $http({
+            //        url : GURL + 'suggestion_list',
+            //        method : "GET",
+            //        params :{
+            //            keywordsForSearch:keyword,
+            //            token : $rootScope._userInfo.Token
+            //        }
+            //    }).success(function(resp){
+            //        defer.resolve(resp.data);
+            //    }).error(function(err){
+            //        $scope.$emit('$preLoaderStop');
+            //        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+            //        defer.resolve();
+            //    });
+            //    return defer.promise;
+            //}
 
         }]);
