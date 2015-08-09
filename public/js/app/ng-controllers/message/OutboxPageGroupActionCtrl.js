@@ -255,7 +255,8 @@ angular.module('ezeidApp').
                     params :{
                         group_name:groupName,
                         token : $rootScope._userInfo.Token,
-                        group_type: getGroupNameType(groupName)
+                        group_type: getGroupNameType(groupName),
+                        group_id: getGroupNameType(groupName) == 0?$scope.activeGroupId:null
                     }
                 }).success(function(resp){
 
@@ -401,6 +402,16 @@ angular.module('ezeidApp').
                 }
             }
 
+            $scope.validateGroupMember = function(memberEzeoneId)
+            {
+                var ezeone = parseInt(getGroupNameType(memberEzeoneId)) ==  0?"@"+memberEzeoneId:memberEzeoneId;
+                $('#ezeone-id').val(ezeone);
+
+                validateGroupMember(ezeone,$scope.activeGroupId).then(function(data){
+                    console.log(data);
+                });
+            }
+
             /**
              * API call for validating EZEONE ID [called from DOM]
              * @return: 1: valid [test passed],
@@ -411,6 +422,12 @@ angular.module('ezeidApp').
             {
                 var ezeone = parseInt(getGroupNameType(ezeone)) ==  0?"@"+ezeone:ezeone;
                 $('#ezeone-id').val(ezeone);
+
+                var groupId = null;
+                if($scope.module.join)
+                {
+                    groupId = $scope.activeGroupId;
+                }
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'validate_groupname',
@@ -418,21 +435,23 @@ angular.module('ezeidApp').
                     params :{
                         group_name:ezeone,
                         token : $rootScope._userInfo.Token,
-                        group_type: 1
+                        group_type: 1,
+                        group_id: groupId
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
                     $scope.ezeOneValidationStatus = resp.data[0].status;
                     $scope.ezeOneMembershipStatus = resp.data[0].userstatus;
                     $scope.isLoggedInUserRequeser = resp.data[0].isrequester;
-                    if(resp.data[0].status && resp.data[0].status == -1)
+                    $scope.currentGroupId = resp.data[0].GroupID;
+                    if(resp.data[0].userstatus && resp.data[0].userstatus == -1)
                     {
                         /* Group name is Unique: passed the validity test! */
                         ezeOneValidationAction(1);
                         $scope.activeEzeOneId = resp.data[0].masterid;
                         $scope.activeEzeOneName = resp.data[0].name;
                     }
-                    else if(resp.data[0].status && resp.data[0].status == -2)
+                    else if(resp.data[0].userstatus && resp.data[0].userstatus == -2)
                     {
                         /* EZEONE does not exists */
                         ezeOneValidationAction(2);
@@ -446,7 +465,7 @@ angular.module('ezeidApp').
                         $scope.activeEzeOneId = 0;
                         $scope.activeEzeOneName = "";
                         if($scope.ezeOneMembershipStatus == 1)
-                            Notification.error({ message: "You are already connected to this user", delay: MsgDelay });
+                            Notification.error({ message: "You are already connected to this user/group", delay: MsgDelay });
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
@@ -954,6 +973,32 @@ angular.module('ezeidApp').
                 {
                     $scope.groupMember[index].status = status;
                 }
+            }
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////API/////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            function validateGroupMember(memberEzeoneId,groupId)
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'validate_group_member',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        ezeone_id: memberEzeoneId,
+                        group_id: groupId
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
             }
         }
     ]);
