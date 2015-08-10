@@ -223,6 +223,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var mime_type = req.body.mime_type ? req.body.mime_type : '' ;
         var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
         var targetDate = req.body.target_date ? req.body.target_date : '';
+        var amount = req.body.amount ? req.body.amount : 0;
         var instituteId = req.body.institute_id ? req.body.institute_id : 0;
         var jobId = req.body.job_id ? req.body.job_id : 0;
         var educationId = req.body.education_id ? req.body.education_id : 0;
@@ -284,7 +285,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                             + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName)
                             + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ "," + st.db.escape(proabilities)
                             + "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type)+ "," + st.db.escape(alarmDuration)
-                            + "," + st.db.escape(targetDate)+ ', ' + st.db.escape(instituteId)+ ', ' + st.db.escape(jobId)
+                            + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)+ ', ' + st.db.escape(instituteId)+ ', ' + st.db.escape(jobId)
                             + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType);
                         // st.db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
@@ -806,6 +807,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
         var alarmDuration = (parseInt(req.body.alarm_duration) !== NaN) ? parseInt(req.body.alarm_duration) : 0;
         var probability = (parseInt(req.body.probability) !== NaN && parseInt(req.body.probability) !== 0) ? parseInt(req.body.probability) : 2 ;
         var targetDate = req.body.target_date ? req.body.target_date : null;
+        var amount = req.body.amount ? req.body.amount : 0;
         var instituteId = req.body.institute_id ? req.body.institute_id : 0;
         var jobId = req.body.job_id ? req.body.job_id : 0;
         var educationId = req.body.education_id ? req.body.education_id : 0;
@@ -825,7 +827,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
             var query = st.db.escape(TID) + ', ' + st.db.escape(status) + ',' + st.db.escape(folderRuleID)
                 + ',' + st.db.escape(nextAction) + ',' + st.db.escape(nextActionDateTime)
                 + ', ' + st.db.escape(Token)+ ', ' + st.db.escape(alarmDuration)+ ', ' + st.db.escape(probability)
-                + ', ' + st.db.escape(targetDate)+ ', ' + st.db.escape(instituteId)+ ', ' + st.db.escape(jobId)
+                + ', ' + st.db.escape(targetDate)+ ', ' + st.db.escape(amount)+ ', ' + st.db.escape(instituteId)+ ', ' + st.db.escape(jobId)
                 + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType);
             console.log(query);
             st.db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
