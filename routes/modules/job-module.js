@@ -1234,7 +1234,6 @@ Job.prototype.getAppliedJob = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetJobcountry
  * Method : GET
@@ -1536,7 +1535,6 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnGetListOfJobs
