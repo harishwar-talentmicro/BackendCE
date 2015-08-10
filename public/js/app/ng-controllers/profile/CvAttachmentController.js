@@ -7,15 +7,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var MsgDelay = 2000;
     // Add more skills
     $scope.skillMatrix = [];
-       /* $scope.skillMatrix.push(
-            {
-                "tid":0,
-                "skillname":"",
-                "expertiseLevel":0,
-                "exp":"",
-                "active_status":1
-            }
-        );*/
     $scope.editMode = [];
     $scope.editSkill = {
         "tid":0,
@@ -152,6 +143,13 @@ angular.module('ezeidApp').controller('CVAttachController',[
         {
             errorList.push('Expected Salary is empty');
         }
+        if($scope.instituteTitle)
+        {
+            if(CVAttachCtrl._CVInfo.institute_id == 0)
+            {
+                errorList.push('Select institute from list');
+            }
+        }
 
         if(errorList.length>0){
             for(var i = errorList.length; i>0;i--)
@@ -190,11 +188,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }
 
-        console.log($scope.skillMatrix);
-
         CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions.toString();
         CVAttachCtrl._CVInfo.category_id = $scope.selectedCategories.toString();
 
+        $scope.selectedFunctions = [];
+        $scope.selectedCategories = [];
         CVAttachCtrl._CVInfo.skillMatrix = $scope.skillMatrix;
         CVAttachCtrl._CVInfo.skillsTid = skillsTid.toString();
 
@@ -212,8 +210,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     data: CVAttachCtrl._CVInfo
                  }).success(function (data) {
                     if(data.IsSuccessfull) {
+
                         Notification.success({message: "Saved..", delay: MsgDelay});
                         $scope.skillMatrix = [];
+                        $scope.selectedFunctions = [];
+                        $scope.selectedCategories = [];
                         skillsTid = [];
 
                         $timeout(function()
@@ -270,6 +271,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
     };
 
     function getCVInfo(){
+        $scope.selectedFunctions = [];
+        $scope.selectedCategories = [];
        $http({
             method: 'get',
             url : GURL + 'ewtGetCVInfo',
@@ -283,12 +286,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     CVAttachCtrl._CVInfo = res.data[0];
 
                     $scope.functionsArray = CVAttachCtrl._CVInfo.FunctionID.split(',');
+                    CVAttachCtrl._CVInfo.FunctionID = "";
                     for (var nCount = 0; nCount <$scope.functionsArray.length; nCount++)
                     {
                         $scope.selectedFunctions.push(parseInt($scope.functionsArray[nCount]));
                     }
 
                     $scope.categoryArray = CVAttachCtrl._CVInfo.category_id.split(',');
+                    CVAttachCtrl._CVInfo.category_id = "";
                     for (var nCount = 0; nCount < $scope.categoryArray.length; nCount++)
                     {
                         $scope.selectedCategories.push(parseInt($scope.categoryArray[nCount]));
@@ -304,8 +309,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-                    console.log("SAi9999");
-                    console.log(res);
 
                     for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                     {
@@ -438,7 +441,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
          if(index == 0)
             {
                 var ind = $scope.skillMatrix.indexOfWhere('skillname',$scope.editSkill.skillname);
-                    if(ind > 0){
+                if(ind > 0)
+                {
                     $scope.editSkill = {
                         "tid":0,
                         "skillname":"",
@@ -700,7 +704,37 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
 
        $scope.showInstituteDropDown = false;
-    }
+    };
+
+    // Below function Call on blur of institute
+    $scope.validateInstituteTextBox = function() {
+        console.log("SAi1");
+        console.log(CVAttachCtrl._CVInfo.institute_id);
+        console.log(CVAttachCtrl._CVInfo.institute_title);
+
+       /* if((CVAttachCtrl._CVInfo.institute_id) && (CVAttachCtrl._CVInfo.institute_title))
+        {
+            console.log("SAi2");
+            console.log(CVAttachCtrl._CVInfo.institute_title);
+            console.log($scope.instituteTitle);
+
+            if(CVAttachCtrl._CVInfo.institute_title != $scope.instituteTitle)
+            {
+                console.log("SAi3");
+                console.log($scope.instituteTitle);
+
+                CVAttachCtrl._CVInfo.institute_title = "";
+                CVAttachCtrl._CVInfo.institute_id = 0;
+                $scope.instituteTitle = "";
+            }
+        }
+        else
+        {
+            CVAttachCtrl._CVInfo.institute_title = "";
+            CVAttachCtrl._CVInfo.institute_id = 0;
+            $scope.instituteTitle = "";
+        }*/
+    };
 
     // Get Educations list
     function getEducations()

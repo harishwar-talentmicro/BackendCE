@@ -50,8 +50,8 @@
         '/business-manager/:subview',
         '/profile-manager',
         '/profile-manager/:subview',
-        '/outbox',
-        '/outbox/:action',
+        '/message',
+        '/message/:action',
         '/compose-message',
         '/job',
         '/jobdetail',
@@ -205,11 +205,11 @@
                 templateUrl: 'html/informationDetail.html',
                 controller : 'InformationDetailCtrl'
             })
-            .when('/outbox/:action',{
+            .when('/message/:action',{
                 templateUrl: 'html/message/outbox.html',
                 controller : 'OutboxPageCtrl'
             })
-            .when('/outbox',{
+            .when('/message',{
                 templateUrl: 'html/message/outbox.html',
                 controller : 'OutboxPageCtrl'
             })

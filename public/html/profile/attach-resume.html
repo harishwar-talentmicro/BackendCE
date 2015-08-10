@@ -151,7 +151,6 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
                                         <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "CVAttachCtrl._CVInfo.job_type">
-                                            <option value="0"> Job Type </option>
                                             <option value="1">Full Time</option>
                                             <option value="2">Part Time</option>
                                             <option value="3">Work From Home</option>
@@ -217,8 +216,9 @@
                                               class="form-control"/>-->
                                         <input type="text" placeholder="Institute"
                                                ng-model = "instituteTitle"
-                                               ng-keypress="instituteKeyPress($event.keyCode)"
+                                               ng-keypress = "instituteKeyPress($event.keyCode)"
                                                ng-click = "instituteTextBoxClicked()"
+                                               ng-blur = "validateInstituteTextBox()"
                                                class="form-control"/>
 
                                         <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">

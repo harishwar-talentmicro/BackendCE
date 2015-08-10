@@ -1,6 +1,14 @@
 <div ng-controller="ResumeCtrl" class="row transactions-row setTopMargin">
 
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-xs hidden-sm  transaction-filter-row">
+
+    <div ng-if="jobTid && jobTidLoaded" ng-show="jobTid && jobTidLoaded" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="jumbotron">
+            <h4>Showing Applicants for : <strong>  {{jobTitleString}} </strong>
+            </h4>
+        </div>
+    </div>
+
+    <div ng-if="!jobTid" ng-show="!jobTid" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-xs hidden-sm  transaction-filter-row">
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 bottom-clearfix">
                 <div class="input-group input-group-sm">
@@ -38,7 +46,7 @@
 
     </div>
 
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-xs hidden-sm  transaction-filter-row">
+    <div ng-if="!jobTid" ng-show="!jobTid" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-xs hidden-sm  transaction-filter-row">
         <div class="row bottom-clearfix">
 
 
@@ -144,7 +152,7 @@
 
 
     <!--- Hidden in case of larger screens ----------------->
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-md hidden-lg">
+    <div ng-if="!jobTid" ng-show="!jobTid" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-md hidden-lg">
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 bottom-clearfix">
                 <div class="input-group input-group-sm">
@@ -181,7 +189,7 @@
 
     </div>
 
-    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-md hidden-lg">
+    <div ng-if="!jobTid" ng-show="!jobTid" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 hidden-md hidden-lg">
         <div class="row bottom-clearfix">
 
 
@@ -329,14 +337,13 @@
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="editModes[$index]">
 
                             <label class="tiny">Applied for Job</label>
-                            <div class="form-group form-group-sm">
+                            <div class="form-group form-group-sm ">
                                 <select class="form-control" ng-model="modalBox.tx.jobId">
-                                    <option value="0">New</option>
-                                    <option value="">--Select Job--</option>
-                                    <option ng-repeat="txStatus in txStatusTypes track by txStatus.TID" value="{{txStatus.TID}}">{{txStatus.StatusTitle}}</option>
+                                    <option value="0">--Select Job--</option>
+                                    <option ng-repeat="job in jobsList track by job.id" value="{{job.id}}">{{job.label}}</option>
                                 </select>
                             </div>
-
+                            <!--->
                     </div>
 
 
@@ -350,6 +357,21 @@
                             </select>
                         </div>
                     </div>
+
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-show="editModes[$index]">
+
+                        <label class="tiny">Education</label>
+                        <div class="form-group form-group-sm ">
+                            <select class="form-control" ng-model="modalBox.tx.jobId">
+                                <option value="0">--Select Education--</option>
+                                <option ng-repeat="education in educationsList track by education.id" value="{{education.id}}">{{education.label}}</option>
+                            </select>
+                        </div>
+                        <!--->
+                    </div>
+
+
 
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-hide="editModes[$index]">
                         <small class="text-success" title="{{tx.EducationText}} {{(tx.specialization_text) ? '('+tx.specialization_text+')' : ''}})">
@@ -483,12 +505,40 @@
                         <!--"hours12" : true,-->
                         <!--"minDate" : "-1970/01/01"-->
                         <!--}'></date-time-picker>-->
-                        <date-time-picker input-group-class="input-group-sm" recipient="modalBox.tx.nextActionDateTime" settings='{
+                        <div class="form-group form-group-sm">
+                            <date-time-picker input-group-class="input-group-sm" recipient="modalBox.tx.nextActionDateTime" settings='{
                                                                         "format" : "d M Y H:m",
                                                                         "timepicker" : true,
                                                                         "mask" : false,
                                                                         "hours12" : false
                                                                         }'></date-time-picker>
+                        </div>
+
+                    </div>
+
+                    <br/>
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="tiny">Specialization</label>
+                            <div class="form-group form-group-sm ">
+                                <select class="form-control" ng-model="modalBox.tx.specializationId">
+                                    <option value="0">--Select Specialization--</option>
+                                    <option ng-repeat="specialization in specializationsList track by specialization.id"
+                                            value="{{specialization.id}}">{{specialization.label}}</option>
+                                </select>
+                            </div>
+                    </div>
+
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <label class="tiny">Institute</label>
+                        <div class="form-group form-group-sm ">
+                            <select class="form-control" ng-model="modalBox.tx.instituteId">
+                                <option value="0">--Select Institute--</option>
+                                <option ng-repeat="institute in institutesList track by institute.id"
+                                        value="{{institute.id}}">{{institute.label}}</option>
+                            </select>
+                        </div>
                     </div>
 
                 </div>
@@ -578,10 +628,28 @@
 
                 <div class="row" ng-show="editModes[$index]">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
-                        <label class="tiny">Expected Salary</label>
+                        <label class="tiny"> Salary</label>
                         <div class="form-group form-group-sm">
-                            <input class="form-control"  ng-model="modalBox.tx.expectedSalary" />
+                            <div class="input-group input-group-sm ">
 
+                                <input class="form-control text-right"
+                                       type="text"
+                                       decimals-only
+                                       placeholder="0.00"
+                                       ng-model="modalBox.tx.orderAmount" name="amount" />
+                                            <span class="input-group-btn">
+                                                <div class="btn-group">
+                                                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        {{salaryTypeMappingLong[(modalBox.tx.salaryType-1)]}} <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a ng-click="(modalBox.tx.salaryType = 1)" class="btn-link">per hour</a></li>
+                                                        <li><a ng-click="(modalBox.tx.salaryType = 2)" class="btn-link">per month</a></li>
+                                                        <li><a ng-click="(modalBox.tx.salaryType = 3)" class="btn-link">per year</a></li>
+                                                    </ul>
+                                                </div>
+                                            </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -731,6 +799,89 @@
                             </div>
                         </div>
 
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Education</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.educationId">
+                                            <option value="0">--Select Education--</option>
+                                            <option ng-repeat="education in educationsList track by education.id" value="{{education.id}}">{{education.label}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Specialization</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.specializationId">
+                                            <option value="0">--Select specialization--</option>
+                                            <option ng-repeat="specialization in specializationsList track by specialization.id" value="{{specialization.id}}">{{specialization.label}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <label>Job (for which candidate is applying)</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm ">
+                                        <select class="form-control" ng-model="modalBox.tx.jobId">
+                                            <option value="0">--Select job--</option>
+                                            <option ng-repeat="job in jobsList track by job.id" value="{{job.id}}">{{job.label}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <label>Salary</label>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group form-group-sm">
+                                        <div class="input-group input-group-sm ">
+
+                                            <input class="form-control text-right"
+                                                   type="text"
+                                                   decimals-only
+                                                   placeholder="0.00"
+                                                   ng-model="modalBox.tx.orderAmount" name="amount" />
+                                            <span class="input-group-btn">
+                                                <div class="btn-group">
+                                                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        {{salaryTypeMappingLong[(modalBox.tx.salaryType-1)]}} <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a ng-click="(modalBox.tx.salaryType = 1)" class="btn-link">per hour</a></li>
+                                                        <li><a ng-click="(modalBox.tx.salaryType = 2)" class="btn-link">per month</a></li>
+                                                        <li><a ng-click="(modalBox.tx.salaryType = 3)" class="btn-link">per year</a></li>
+                                                    </ul>
+                                                </div>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
 
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" ng-if="modalBox.editMode" ng-show="modalBox.editMode">
                             <div class="row">
@@ -784,22 +935,6 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                            <div class="row">
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                                    <label>Salary</label>
-                                </div>
-                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <div class="form-group form-group-sm ">
-                                        <input class="form-control text-right"
-                                               type="text"
-                                               decimals-only
-                                               placeholder="0.00"
-                                               ng-model="modalBox.tx.amount" name="amount" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
@@ -835,33 +970,9 @@
                         </div>
 
 
-                        <!--<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">-->
-                        <!--<div class="row">-->
-                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                        <!--<label>Order Amount</label>-->
-                        <!--</div>-->
-                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                        <!--<div class="form-group form-group-sm ">-->
-                        <!--<input type="text" numbers-only class="form-control no-radius" placeholder="Contact Information" name="orderAmount" />-->
-                        <!--</div>-->
-
-                        <!--</div>-->
 
 
-                        <!--</div>-->
-                        <!--</div>-->
-                        <!-- Message will not be there in case of recruitment -->
 
-                        <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">-->
-                            <!--<div class="row">-->
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                    <!--<label> Message</label>-->
-                                <!--</div>-->
-                                <!--<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-                                    <!--<textarea rows="2" class="form-control no-radius" ng-model="modalBox.tx.message" name="message"></textarea>-->
-                                <!--</div>-->
-                            <!--</div>-->
-                        <!--</div>-->
 
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                             <div class="row">

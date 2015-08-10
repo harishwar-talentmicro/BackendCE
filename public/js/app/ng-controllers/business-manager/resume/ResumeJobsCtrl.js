@@ -401,6 +401,7 @@
                             $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].Locname);
                         }
 
+                        $scope.selectedEducations = [];
                         if($scope.jobData[_index].Education)
                         {
                             $scope.EducationArray = $scope.jobData[_index].Education.split(',');
@@ -414,6 +415,7 @@
                              $scope.selectedEducations = [];
                         }
 
+                        $scope.selectedSpecializations = [];
                         if($scope.jobData[_index].Specialization)
                         {
                             $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
@@ -427,6 +429,7 @@
                            $scope.selectedSpecializations = [];
                         }
 
+                        $scope.selectedInstitute = [];
                         if($scope.jobData[_index].Institute)
                         {
                             $scope.InstituteArray = $scope.jobData[_index].Institute.split(',');
@@ -508,6 +511,7 @@
                 $scope.locIndexToEdit = "";
                 if(_locArrayIndex)
                 {
+                    var locIndex = _locArrayIndex - 1;
                     var tempLocationArray = [];
 
                     tempLocationArray = {
@@ -518,26 +522,28 @@
                         "maptype" : 1
                     };
 
-                    $scope.mainLocationArray[_locArrayIndex] = tempLocationArray;
-                    $scope.locationArrayString[_locArrayIndex] = $scope.jobLocation;
+                    $scope.mainLocationArray[locIndex] = tempLocationArray;
+                    $scope.locationArrayString[locIndex] = $scope.jobLocation;
                     $scope.jobLocation = "";
                 }
                 else
                 {
                     return;
                 }
+                $('.pac-input').val("");
             };
 
             // Open popup - list of candidate who applied for job
             $scope.openCandidateListPopup = function(_jobID,_totalapplie)
             {
-                $scope.jobTid = _jobID;
+
                 if(_totalapplie > 0)
                 {
-                    $scope.ResumeInquiriesTab = true;
-                    $scope.JobsTab = false;
-                    $scope.JobSeekerTab = false;
+                    $scope.changeTabToApplicants(_jobID);
                 }
+
+
+
             }
 
             // Get Educations list
@@ -571,7 +577,7 @@
                 {
                     $scope.selectedEducations.push(_educationID);
                 }
-            }
+            };
 
             /**
              * Select - Unselect specialization
@@ -587,7 +593,7 @@
                 {
                     $scope.selectedSpecializations.push(_specializationID);
                 }
-            }
+            };
 
             function getSpecialization()
             {
@@ -636,7 +642,7 @@
                 {
                     $scope.selectedInstitute.push(_instituteID);
                 }
-            }
+            };
 
             $scope.InstituteTextBoxLossFocus = function () {
 
@@ -663,11 +669,17 @@
             $scope.modalVisible = false;
             $scope.modalVisibility = function (_locIndex)
             {
+                console.log("index==>",_locIndex);
                 if(_locIndex)
                 {
-                    $scope.locIndexToEdit = _locIndex;
-                    $scope.latForMap = $scope.mainLocationArray[_locIndex].latitude;
-                    $scope.longForMap = $scope.mainLocationArray[_locIndex].longitude;
+                    var locIndex = _locIndex - 1;
+                  // _locIndex -= _locIndex;
+                    console.log("SAi==>",locIndex);
+                    console.log("SAi loc array==>",$scope.mainLocationArray);
+
+                    $scope.locIndexToEdit = locIndex;
+                    $scope.latForMap = $scope.mainLocationArray[locIndex].latitude;
+                    $scope.longForMap = $scope.mainLocationArray[locIndex].longitude;
                 }
                 $scope.modalVisible = !$scope.modalVisible;
             };
@@ -682,9 +694,20 @@
                     }
                     else {
                        $timeout(function () {
-                            $scope.googleMap.resizeMap();
-                            $scope.googleMap.setMarkersInBounds();
-                        }, 1500);
+
+                           $scope.googleMap1.currentMarkerPosition.latitude = $scope.latForMap;
+                           $scope.googleMap1.currentMarkerPosition.longitude = $scope.longForMap;
+                           $scope.googleMap1.placeCurrentLocationMarker(getNewCoordinates);
+                            $scope.googleMap1.resizeMap();
+                            $scope.googleMap1.setMarkersInBounds();
+
+                           console.log("SAi99");
+
+                           //initializeMap();
+
+
+
+                        }, 4000);
                     }
                 }
             });
@@ -703,11 +726,22 @@
             {
                 $scope.jobLat = lat;
                 $scope.jobLong = lng;
+
+                console.log("sai1");
+                console.log($scope.jobLat);
+                console.log($scope.jobLong);
+
                 $scope.googleMap.getReverseGeolocation(lat,lng).then(function(resp)
                 {
+                    console.log("sai2");
+                    console.log(res);
+
                     if(resp.data)
                     {
+                        console.log("sai3");
+
                         var data = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                        console.log(data);
                         $scope.jobLocation = data.city;
                         $scope.country = data.country;
                         $scope.disabledAddLocation = false;
@@ -725,51 +759,60 @@
 
             /* Callback function for get current location functionality */
             $scope.findCurrentLocation = function(){
-                $scope.googleMap.getCurrentLocation().then(function(){
-                    $scope.googleMap.placeCurrentLocationMarker(null,null,true);
+                $scope.googleMap1.getCurrentLocation().then(function(){
+                    $scope.googleMap1.placeCurrentLocationMarker(null,null,true);
                 },function(){
-                    $scope.googleMap.placeCurrentLocationMarker(null,null,true);
+                    $scope.googleMap1.placeCurrentLocationMarker(null,null,true);
                 });
             };
 
             /* Load the map in the modal box */
             /* Google map integration */
+            $scope.googleMap1 = new GoogleMap();
             var initializeMap = function () {
-                $scope.googleMap.setSettings({
+                console.log("SAi 77");
+                $scope.googleMap1.setSettings({
                     mapElementClass: "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
                     searchElementClass: "form-control pull-left pac-input",
                     currentLocationElementClass: "link-btn pac-loc",
                     controlsContainerClass: "col-lg-6 col-md-6'"
                 });
-                $scope.googleMap.createMap("modal-map-ctrl", $scope, "findCurrentLocation()");
+                $scope.googleMap1.createMap("modal-map-ctrl", $scope, "findCurrentLocation()");
 
-                $scope.googleMap.renderMap();
-                $scope.googleMap.mapIdleListener().then(function () {
-                    $scope.googleMap.pushMapControls();
-                    $scope.googleMap.listenOnMapControls(getNewCoordinates, getNewCoordinates);
+                $scope.googleMap1.renderMap();
+                $scope.googleMap1.mapIdleListener().then(function () {
+                $scope.googleMap1.pushMapControls();
+                $scope.googleMap1.listenOnMapControls(getNewCoordinates, getNewCoordinates);
 
                     /* place the present location marker on map */
                     if(($scope.latForMap) && ($scope.longForMap))
                     {
-                        $scope.googleMap.currentMarkerPosition.latitude = $scope.latForMap;
-                        $scope.googleMap.currentMarkerPosition.longitude = $scope.longForMap;
-                        $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
+                        console.log("sai10");
+                        console.log($scope.latForMap);
+                        console.log($scope.longForMap);
+                        $scope.googleMap1.currentMarkerPosition.latitude = $scope.latForMap;
+                        $scope.googleMap1.currentMarkerPosition.longitude = $scope.longForMap;
+                        $scope.googleMap1.placeCurrentLocationMarker(getNewCoordinates);
+
 
                         /* if this modal box map is opened from search result page: Add marker for additional */
-                        $scope.googleMap.resizeMap();
+                        $scope.googleMap1.resizeMap();
                     }
-                    else{
-                            $scope.googleMap.getCurrentLocation().then(function (e) {
-
-                            $scope.googleMap.placeCurrentLocationMarker(getNewCoordinates);
+                    else
+                    {
+                        console.log("sai11");
+                            $scope.googleMap1.getCurrentLocation().then(function (e) {
+                            $scope.googleMap1.placeCurrentLocationMarker(getNewCoordinates);
 
                             /* if this modal box map is opened from search result page: Add marker for additional */
-                            $scope.googleMap.resizeMap();
-                            $scope.googleMap.setMarkersInBounds();
+                            $scope.googleMap1.resizeMap();
+                            $scope.googleMap1.setMarkersInBounds();
                         }, function () {
 
                         });
                     }
+                    $('.pac-input').val("");
+
                 });
             };
 
@@ -778,12 +821,16 @@
 
                 $scope.jobLat = lat;
                 $scope.jobLong = lng;
+                console.log("sai-5");
+                console.log($scope.jobLat);
+                console.log($scope.jobLong);
 
                 /* get new location string */
-                $scope.googleMap.getReverseGeolocation(lat, lng).then(function (resp) {
+                $scope.googleMap1.getReverseGeolocation(lat, lng).then(function (resp) {
                     if (resp)
                     {
-                        placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                        console.log("sai5");
+                        var data = $scope.googleMap1.parseReverseGeolocationData(resp.data);
 
                         var options = {
                             route : true,
@@ -795,12 +842,22 @@
                             country : false,
                             postalCode : false
                         };
-                        $scope.locationString = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
-                        $scope.location = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
-                        $scope.jobLocation = placeDetail.city;
-                        $scope.country = placeDetail.country;
+                        $scope.locationString = $scope.googleMap1.createAddressFromGeolocation(data,options);
+                        $scope.location = $scope.googleMap1.createAddressFromGeolocation(data,options);
+                        $scope.jobLocation = data.city;
+                        $scope.country = data.country;
+
+                        console.log($scope.locationString);
+                        console.log($scope.location);
+                        console.log($scope.jobLocation);
+                        console.log($scope.country);
+
+                       // $scope.googleMap.clear();
+
+                       // $scope.googleMap = "";
                     }
                 });
+
             };
 
             /*Code for pagging*/
