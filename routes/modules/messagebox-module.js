@@ -1828,7 +1828,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
         validateStatus *= false;
     }
     if(!id){
-        error['ezeone_id'] = 'Invalid id';
+        error['id'] = 'Invalid id';
         validateStatus *= false;
     }
 
@@ -1914,5 +1914,127 @@ MessageBox.prototype.loadMessages = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnViewMessage
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @service-param token <varchar>
+ * @service-param id <int>
+ * @description api code for view messages
+ */
+MessageBox.prototype.viewMessage = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var tid = parseInt(req.query.tid); // tid of message
+
+    var responseMessage = {
+        status: false,
+        error: null,
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!tid){
+        error['tid'] = 'Invalid tid';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =  st.db.escape(tid);
+                        var query = 'CALL pViewMessage(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0){
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Message loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnViewMessage: Message loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Message not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnViewMessage:Message not loaded');
+                                    }
+
+                                }
+                                    else {
+                                        responseMessage.message = 'Message not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnViewMessage:Message not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'Message not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnViewMessage:Message not loaded');
+                                }
+
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnViewMessage: error in getting Messages:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnViewMessage: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnViewMessage:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnViewMessage ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = MessageBox;
