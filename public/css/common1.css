@@ -1991,12 +1991,19 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     width: 79% !important;
 }
 
+/*.jobpost .btn-group-sm>.btn, .btn-sm {
+    padding: 5px 6px;
+    font-size: 12px;
+    line-height: 1.9;
+    border-radius: 3px;
+}*/
 .jobpost .btn-group-sm>.btn, .btn-sm {
-    padding: 5px 10px;
+    padding: 3px 6px;
     font-size: 12px;
     line-height: 1.9;
     border-radius: 3px;
 }
+
 .top-mar-minnus82
 {
     margin-top: -82px;
@@ -2029,4 +2036,14 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     font-family: 'Roboto', sans-serif;
     font-weight: normal;
     color: #11A300;
+}
+.centerAlignImp
+{
+    text-align: center !important;
+}
+.custom-select-dropdown
+{
+    margin-left: 2%;
+    float: left;
+    font-size: 14px;
 }

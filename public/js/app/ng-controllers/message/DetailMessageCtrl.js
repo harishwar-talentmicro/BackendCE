@@ -5,7 +5,7 @@
  * @since 20150717
  */
 angular.module('ezeidApp').
-    controller('ComposeMessageCtrl', [
+    controller('DetailMessageCtrl', [
         '$rootScope',
         '$scope',
         '$http',

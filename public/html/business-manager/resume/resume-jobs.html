@@ -19,14 +19,12 @@
                         </span>
                     </div>
                 </div>
-
-                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-clearfix">
-                    <div class="row">
-                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container"
-                             title="Order By">
+                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-clearfix setLeftRightPaddingZero">
+                    <div class="row setRowLeftRightMarginZero">
+                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container centerAlignImp" title="Order By">
                             <label class="label label-danger">Order By</label>
                         </div>
-                        <div class="col-lg-5 col-md-5 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Order By">
                             <div class="form-group form-group-sm">
                                 <select class="form-control" ng-model="order_by" ng-change="searchJobTerm()">
                                     <option value="2"> Date (Latest)</option>
@@ -34,7 +32,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container" title="Status">
+                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-6 bottom-clearfix tx-filter-container centerAlignImp" title="Status">
                             <label class="label label-danger">Status</label>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 bottom-clearfix" title="Status">
@@ -47,44 +45,26 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 bottom-clearfix">
+                        <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 bottom-clearfix setLeftRightPaddingZero">
                             <button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" data-toggle="tooltip" title="" data-original-title="Add New Job">
-                                <span class="glyphicon glyphicon-plus-sign"></span> Add New
+                                <span class="glyphicon glyphicon-plus-sign"></span> Add New Job
                             </button>
                         </div>
                     </div>
                 </div>
-
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 pull-right">
-                    <!--<div class="btn-group pull-right bottom-clearfix" role="group" aria-label="First group">
-                        <button type="button" ng-click="getPreviousResultPage()" ng-disabled="!paginationPrevious" class="btn btn-info bt-xs no-radius">
-                            <span class="glyphicon glyphicon-chevron-left"></span>
-                            Prev
-                        </button>
-                        &lt;!&ndash; <button type="button" class="btn btn-info bt-xs no-radius active">
-                             {{pageNumber}}
-                         </button>&ndash;&gt;
-                        <button type="button" ng-click="getNextResultPage()" ng-disabled="!paginationNext" class="btn btn-info bt-xs no-radius">
-                            Next
-                            <span class="glyphicon glyphicon-chevron-right"></span>
-                        </button>
-                    </div>-->
-
-                   <!-- <div class="navbar-form navbar-left">-->
-                        <button class="btn"
-                                ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
-                                ng-disabled="!paginationPreviousVisibility"
-                                ng-click="paginationPreviousClick()">
-                            Previous <i class="fa fa-arrow-circle-left"></i>
-                        </button>
-                        <button class="btn btn-primary"
-                                ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
-                                ng-disabled="!paginationNextVisibility"
-                                ng-click="paginationNextClick()">
-                            <i class="fa fa-arrow-circle-right"></i> Next
-                        </button>
-                    <!--</div>-->
-
+                    <button class="btn"
+                            ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
+                            ng-disabled="!paginationPreviousVisibility"
+                            ng-click="paginationPreviousClick()">
+                        Previous <i class="fa fa-arrow-circle-left"></i>
+                    </button>
+                    <button class="btn btn-primary"
+                            ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
+                            ng-disabled="!paginationNextVisibility"
+                            ng-click="paginationNextClick()">
+                        <i class="fa fa-arrow-circle-right"></i> Next
+                    </button>
                 </div>
             </div>
         </div>
@@ -110,7 +90,7 @@
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success pointer">
-                        <b class="ng-binding showPointer" ng-click="openCandidateListPopup(job.tid,job.totalapplied)" data-toggle="tooltip" title="" data-original-title="View Applicant">{{job.totalapplied}} Applicant</b>
+                        <b class="ng-binding showPointer" ng-click="openCandidateListPopup(job.tid,job.totalapplied)" data-toggle="tooltip" title="" data-original-title="View Applicants">{{job.totalapplied}} Applicants</b>
                     </small>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
@@ -169,13 +149,13 @@
                     <label>Skill Keywords</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <input type="text" maxlength="250" ng-model = "skillKeyWords" placeholder="Ex: Sales, Marketing" class="form-control"/>
+                    <input type="text" maxlength="250" ng-model = "skillKeyWords" placeholder="Sales, Marketing" class="form-control"/>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>No. of Vacancies</label>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <input numbers-only type="text" ng-model = "jobVacancies" placeholder="No. of Vacancies" class="form-control"/>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                    <input numbers-only type="text" ng-model = "jobVacancies" placeholder="0" class="form-control text-right"/>
                 </div>
             </div>
             <div class="row topMarginButton">
@@ -185,13 +165,13 @@
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="row">
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                            <input type="text" decimals-only maxlength="5" placeholder="Ex: 1" ng-model = "experienceFrom" class="form-control"/>
+                            <input type="text" decimals-only maxlength="5" placeholder="1" ng-model = "experienceFrom" class="form-control text-right"/>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setTopMarginOneNhalf text-center">
                             to
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                            <input type="text" decimals-only maxlength="5" placeholder="Ex: 3" ng-model = "experienceTo" class="form-control"/>
+                            <input type="text" decimals-only maxlength="5" placeholder="3" ng-model = "experienceTo" class="form-control text-right"/>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setTopMarginOneNhalf">
                             Years
@@ -204,7 +184,7 @@
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="row">
                         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
-                            <input type="text" id="google-map-search-box" placeholder="Ex: Bangalore" ng-model = "jobLocation" class="form-control"/>
+                            <input type="text" id="google-map-search-box" placeholder="Bangalore" ng-model = "jobLocation" class="form-control"/>
                         </div>
                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-right">
                             <button type="button" class="btn btn-primary" ng-disabled="disabledAddLocation" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
@@ -234,14 +214,52 @@
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                         <label>Salary</label>
                     </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                        <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "salaryFrom" class="form-control text-right"/>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 fotterButtonContainer">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero">
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setLeftRightPaddingZero">
+                                <input type="text" decimals-only maxlength="17" placeholder="100000" ng-model = "salaryFrom" class="form-control text-right"/>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer text-center topMargin-three setLeftRightPaddingZero">
+                                <span>to</span>
+                            </div>
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setLeftRightPaddingZero">
+                                <input type="text" decimals-only maxlength="17" placeholder="200000" ng-model = "salaryTo" class="form-control text-right"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 fotterButtonContainer text-center topMargin-three">
+                                Per
+                            </div>
+                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 setLeftRightPaddingZero">
+                                <select class="form-control" name="listType" ng-model="salaryType">
+                                    <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
+                        <label>Job Type</label>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
+                            <option value="0"> -- Select -- </option>
+                            <option value="1">Full Time</option>
+                            <option value="2">Part Time</option>
+                            <option value="3">Work From Home</option>
+                            <option value="4">Internship | Project Work</option>
+                            <option value="5">Consultant</option>
+                            <option value="6">Freelancer</option>
+                        </select>
+                    </div>
+
+                    <!--<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                        <input type="text" decimals-only maxlength="17" placeholder="100000" ng-model = "salaryFrom" class="form-control text-right"/>
                     </div>
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer text-center">
                         to
                     </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                        <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "salaryTo" class="form-control text-right"/>
+                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                        <input type="text" decimals-only maxlength="17" placeholder="200000" ng-model = "salaryTo" class="form-control text-right"/>
                     </div>
                     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer text-center">
                         Per
@@ -250,7 +268,7 @@
                         <select class="form-control" name="listType" ng-model="salaryType">
                             <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
                         </select>
-                    </div>
+                    </div>-->
                 </div>
                 <div class="row setRowLeftRightMarginZero">
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
@@ -260,27 +278,11 @@
             </div>
             <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
-                    <label>Job Type</label>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
-                        <option value="0"> -- Select -- </option>
-                        <option value="1">Full Time</option>
-                        <option value="2">Part Time</option>
-                        <option value="3">Work From Home</option>
-                        <option value="4">Internship | Project Work</option>
-                        <option value="5">Consultant</option>
-                        <option value="6">Freelancer</option>
-                    </select>
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Contact Name</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <input type="text" maxlength="200" placeholder="Contact Name" ng-model = "contactName" class="form-control"/>
                 </div>
-            </div>
-            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Email</label>
                 </div>
@@ -296,14 +298,14 @@
                           ng-if="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1)) ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false">
                     </span>
                 </div>
+            </div>
+            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Phone</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <input type="text" numbers-only maxlength="12" placeholder="Phone" ng-model = "phone" class="form-control"/>
                 </div>
-            </div>
-            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Status</label>
                 </div>
@@ -315,6 +317,8 @@
                         <!--<option value="0,1,2"> All </option>-->
                     </select>
                 </div>
+            </div>
+            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Job Categories</label>
                 </div>
@@ -324,14 +328,12 @@
                         <option ng-repeat="categori in jobCategories track by $index" value="{{categori.CategoryID}}">{{categori.CategoryTitle}}</option>
                     </select>
                 </div>
-            </div>
-            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Last Education</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
                     <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
-                        <span class="normal-view-text"> -- Select -- </span>
+                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span></button>
                     <div class="opt opt-2">
@@ -342,12 +344,14 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Specialization</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
                     <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
-                        <span class="normal-view-text"> -- Select -- </span>
+                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span></button>
                     <div class="opt opt-2">
@@ -358,14 +362,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Restrict Job To Institute</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
                     <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
-                        <span class="normal-view-text"> -- Select -- </span>
+                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span>
                     </button>
@@ -377,25 +379,27 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Aggregate Score</label>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 ">
-                    <input type="text" class="form-control" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="Ex: 87" aria-describedby="sizing-addon1"/>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 ">
+                    <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="87" aria-describedby="sizing-addon1"/>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer">
                     %
                 </div>
             </div>
             <div class="row topMarginButton">
-            <div class="col-lg-3 col-md-3 col-sm-2 col-xs-12">
-                <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
-                <input type="button" ng-click="cancelJobPosting()" class="btn btn-primary" value="Cancel">
+                <div class="col-lg-3 col-md-3 col-sm-2 col-xs-12">
+                    <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">
+                    <input type="button" ng-click="cancelJobPosting()" class="btn btn-primary" value="Cancel">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"></div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"></div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 "></div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"></div>
-            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12"></div>
-            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 "></div>
-        </div>
         </form>
 
         <!--Modal for map-->
