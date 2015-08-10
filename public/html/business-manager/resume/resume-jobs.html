@@ -197,8 +197,8 @@
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
                                 <a class="showPointer">
-                                    <i class="fa fa-map-marker" ng-click="modalVisibility($index)">
-                                        {{mainLocationArray[$index].maptype == 0 ? 'Set Location' : 'Change Location'}}
+                                    <i class="fa fa-map-marker" ng-click="modalVisibility($index + 1)">
+                                      {{mainLocationArray[$index].maptype == 0 ? 'Set Location' : 'Change Location'}}
                                     </i>
                                 </a>
                             </div>
@@ -251,24 +251,6 @@
                             <option value="6">Freelancer</option>
                         </select>
                     </div>
-
-                    <!--<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
-                        <input type="text" decimals-only maxlength="17" placeholder="100000" ng-model = "salaryFrom" class="form-control text-right"/>
-                    </div>
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer text-center">
-                        to
-                    </div>
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
-                        <input type="text" decimals-only maxlength="17" placeholder="200000" ng-model = "salaryTo" class="form-control text-right"/>
-                    </div>
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer text-center">
-                        Per
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                        <select class="form-control" name="listType" ng-model="salaryType">
-                            <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
-                        </select>
-                    </div>-->
                 </div>
                 <div class="row setRowLeftRightMarginZero">
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
@@ -314,7 +296,6 @@
                         <option value="0"> Active </option>
                         <option value="1"> Closed(Hired) </option>
                         <option value="2"> Cancelled </option>
-                        <!--<option value="0,1,2"> All </option>-->
                     </select>
                 </div>
             </div>
@@ -410,7 +391,7 @@
                 </div>
                 <!-- Map ends here -->
                 <div class="col-lg-12 text-right">
-                    <button class="btn btn-primary text-right" ng-click="addJobLocationFrmoMap(locIndexToEdit)">Add</button>
+                    <button class="btn btn-primary text-right" ng-click="addJobLocationFrmoMap(locIndexToEdit + 1)">Add</button>
                     <button class="btn btn-primary text-right" ng-click="modalVisibility()">Cancel</button>
                 </div>
             </div>
