@@ -37,8 +37,8 @@
             'ngAnimate'
         ]);
 
-   //ezeid.value('GURL',"/");
-   ezeid.value('GURL',"http://104.199.128.226:3001/api/");
+   ezeid.value('GURL',"/");
+    //ezeid.value('GURL',"http://104.199.128.226:3001/api/");
 
     ezeid.value('MsgDelay',2000);
 

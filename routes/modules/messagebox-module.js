@@ -865,7 +865,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var targetDate  = req.body.target_date ? req.body.target_date : '';
     var expiryDate  =  req.body.expiry_date ? req.body.expiry_date : '';
     var token = req.body.token;
-    var previousMessageID = req.body.previous_messageID;
+    var previousMessageID = req.body.previous_messageID ? req.body.previous_messageID : 0;
     var toID = req.body.to_id; // comma separated id of toID
     var idType = req.body.id_type; // comma seperated values(0 - Individual Message, 1 - Group Message)
 
@@ -886,15 +886,12 @@ MessageBox.prototype.composeMessage = function(req,res,next){
         error['toID'] = 'Invalid toID';
         validateStatus *= false;
     }
-    if(parseInt(previousMessageID) == NaN){
-        error['previousMessageID'] = 'Invalid previousMessageID';
-        validateStatus *= false;
-    }
 
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
+        console.log(responseMessage);
     }
     else {
         try {
@@ -906,6 +903,10 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                             + ',' + st.db.escape(token) + ',' + st.db.escape(previousMessageID)+ ',' + st.db.escape(toID)
                             + ',' + st.db.escape(idType);
                         var query = 'CALL pComposeMessage(' + queryParams + ')';
+                        console.log(st.db.escape(message)+ ',' + st.db.escape(attachmentFilename)
+                            + ',' + st.db.escape(priority) + ',' + st.db.escape(targetDate) + ',' + st.db.escape(expiryDate)
+                            + ',' + st.db.escape(token) + ',' + st.db.escape(previousMessageID)+ ',' + st.db.escape(toID)
+                            + ',' + st.db.escape(idType));
                         st.db.query(query, function (err, insertResult) {
 
                             if (!err) {
