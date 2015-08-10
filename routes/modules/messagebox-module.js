@@ -375,12 +375,6 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
             res.status(500).json(respMsg);
         }
     }
-
-
-
-
-
-
 };
 
 /**
@@ -881,8 +875,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var expiryDate  =  req.body.expiry_date ? req.body.expiry_date : '';
     var token = req.body.token;
     var previousMessageID = req.body.previous_messageID;
-    var toID = req.body.to_id;
-    var idType = req.body.id_type;
+    var toID = req.body.to_id; // comma separated id of toID
+    var idType = req.body.id_type; // comma seperated values(0 - Individual Message, 1 - Group Message)
 
     var responseMessage = {
         status: false,
@@ -901,7 +895,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
         error['toID'] = 'Invalid toID';
         validateStatus *= false;
     }
-    if(!previousMessageID){
+    if(parseInt(previousMessageID) == NaN){
         error['previousMessageID'] = 'Invalid previousMessageID';
         validateStatus *= false;
     }
@@ -1804,7 +1798,6 @@ MessageBox.prototype.getGroupList = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnLoadMessages
