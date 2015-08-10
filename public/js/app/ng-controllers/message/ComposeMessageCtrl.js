@@ -20,6 +20,7 @@ angular.module('ezeidApp').
         '$location',
         '$routeParams',
         'UtilityService',
+        'FileToBase64',
         function (
             $rootScope,
             $scope,
@@ -34,7 +35,8 @@ angular.module('ezeidApp').
             MsgDelay,
             $location,
             $routeParams,
-            UtilityService
+            UtilityService,
+            FileToBase64
         ) {
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,28 +46,43 @@ angular.module('ezeidApp').
 
             /* visibility */
             $scope.visibilityHtml = {
-                groupSuggestion:false
+                groupSuggestion:false,
+                disabledSendBtn:false
             };
             $scope.visibilityReceiverErrorMsg = false;
+            $scope.visibilityMsgBodyErrorMsg = false;
 
             /* Error messages goes here */
             $scope.errorMsgArr = [
                 "Invalid Ezeone",
                 "You are not connected to this user/group",
                 "No result found",
-                "group/ezeone id already exists in receiver's list"
+                "group/ezeone id already exists in receiver's list",
+                "Please add atleast one receiver",
+                "Message body can't be empty"
+            ];
+
+            /* PRIORITY */
+            $scope.priority = [
+                "High",
+                "Medium",
+                "Low"
             ];
             $scope.currentErrorMsg = 0;
+            $scope.currentMsgBodyErrorMsg = 0;
 
             /* group suggestion list */
             $scope.groupSuggestionList = [];
 
             /* receiver array */
             $scope.receiverArr = [];
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             resetDefault();
+            /* attachments declarations */
+            resetAttachment();
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,9 +90,12 @@ angular.module('ezeidApp').
             function resetDefault()
             {
                 $scope.currentErrorMsg = 0;
+                $scope.currentMsgBodyErrorMsg = 0;
+
                 $scope.groupSuggestionList = [];
                 $scope.receiverArr = [];
                 $scope.visibilityReceiverErrorMsg = false;
+                $scope.visibilityMsgBodyErrorMsg = false;
                 $scope.visibilityHtml.groupSuggestion = false;
             }
             /**
@@ -100,17 +120,96 @@ angular.module('ezeidApp').
             /**
              * Initiate the process to send message
              */
-            $scope.sendMessage = function()
+            $scope.sendMessage = function(replyId)
             {
+                var previousMsgId = 0;
+                /* if reply id is not undefined */
+                if(typeof replyId != undefined)
+                {
+                    previousMsgId = replyId;
+                }
+                /* validate message content */
+                if(!validateMessageContent())
+                {
+                    return;
+                }
+                /* create the smart parameters for sending a message */
+                var data = createCommaSeperatedReceiverId();
 
+
+
+                /* call the API and send message */
+                composeMessageApi(data.toId,data.toIdType,previousMsgId).then(function(){
+                        //Message successfully thrown
+                        Notification.success({ message: "Message sent successfully!", delay: MsgDelay });
+                    },
+                    function(){
+                        //Throw Error Notification
+                        Notification.error({ message: "Error occured! Please try again later.", delay: MsgDelay });
+                    });
             }
 
             /**
-             * Validate weather there is enough data to proceed with the send-message
+             * convert the receiver array in to comma seperated string
+             * @returns {*}
              */
-            function validateMessage()
+            function createCommaSeperatedReceiverId()
             {
+                /* validations */
+                if(!$scope.receiverArr)
+                {
+                    return false;
+                }
 
+                if(!$scope.receiverArr.length > 0)
+                {
+                    return false;
+                }
+                /* convert to comma seperated string */
+                toIdArr = [];
+                toIdTypeArr = [];
+
+
+                $scope.receiverArr.forEach(function(data)
+                {
+                    toIdArr.push(data.GroupID);
+                    toIdTypeArr.push(data.GroupType);
+                });
+
+                return {
+                    "toId":toIdArr.join(","),
+                    "toIdType":toIdTypeArr.join(",")
+                };
+
+            }
+
+
+            /**
+             * validate if all the required parameters available for sending the message
+             * @returns {boolean}
+             */
+            function validateMessageContent()
+            {
+                /* receiver array should not be empty */
+                if(!$scope.receiverArr.length > 0)
+                {
+                    showErroMsg(4);
+                    return false;
+                }
+
+                /* check if the message is not empty */
+                if(typeof $scope.composeMsg.MessageBody == undefined || !$scope.composeMsg.MessageBody)
+                {
+                    showMsgBodyError(5);
+                    return false;
+                }
+
+                if(!$scope.composeMsg.MessageBody.length > 0)
+                {
+                    showMsgBodyError(5);
+                    return false;
+                }
+                return true;
             }
 
             /**
@@ -144,6 +243,7 @@ angular.module('ezeidApp').
             {
                 $scope.visibilityHtml.groupSuggestion = false;
                 $scope.visibilityReceiverErrorMsg = false;
+                $scope.visibilityMsgBodyErrorMsg = false;
             }
 
             /**
@@ -156,6 +256,12 @@ angular.module('ezeidApp').
             {
                 var data = [];
                 $scope.groupSuggestionList = [];
+
+                if(!$scope.groupListData || !$scope.individualMember)
+                {
+                    return;
+                }
+
                 if(parseInt(type) == 1)
                 {
                     data = $scope.groupListData;
@@ -182,22 +288,6 @@ angular.module('ezeidApp').
                 {
                     showErroMsg(2);
                 }
-                return;
-                //getGroupSuggestionApi(keyword).then(function(data){
-                //    if(data && data.length > 0)
-                //    {
-                //        /* populate suggestion data */
-                //        $scope.groupSuggestionList = data;
-                //        /* open up suggestion list */
-                //        $scope.visibilityHtml.groupSuggestion = true;
-                //    }
-                //        else{
-                //        showErroMsg(2);
-                //    }
-                //},
-                //function(){
-                //    showErroMsg(2);
-                //});
             }
 
             /**
@@ -208,6 +298,12 @@ angular.module('ezeidApp').
             {
                 $scope.visibilityReceiverErrorMsg = true;
                 $scope.currentErrorMsg = msgId;
+            }
+
+            function showMsgBodyError(msgId)
+            {
+                $scope.visibilityMsgBodyErrorMsg = true;
+                $scope.currentMsgBodyErrorMsg = msgId;
             }
 
             /**
@@ -242,6 +338,51 @@ angular.module('ezeidApp').
             }
 
             /**
+             * Triggers file attachment selection by generating a click event on the file input (attachment hidden field)
+             */
+            $scope.triggerFileAttachment = function(){
+                $timeout(function(){
+                    $('#tx-attachment').trigger('click');
+                },1000);
+            };
+
+            /**
+             * Function fired when file is selected from the input
+             */
+            $scope.attachDocument = function(){
+                console.log("hello");
+                var elem = $('#tx-attachment');
+                var attachmentFile = angular.element(elem)[0].files;
+                if(parseInt(attachmentFile[0].size/(1024*1024)) > 2){
+                    Notification.error({ title : 'File size exceeds', message : 'Maximum file size allowed is 2 MB', delay : MsgDelay});
+                }
+                else{
+                    $scope.file.attachmentName = attachmentFile[0].name;
+                    $scope.file.attachmentMimeType = attachmentFile[0].type;
+                    $scope.visibilityHtml.disabledSendBtn = true;//Disable send btn
+                    FileToBase64.fileToDataUrl(attachmentFile).then(function(data){
+                        $scope.file.attachment  = data;
+                        $scope.visibilityHtml.disabledSendBtn = false;
+                        console.log(attachmentFile);
+                    });
+                }
+            };
+
+            function resetAttachment()
+            {
+                $scope.file = {
+                    attachmentName:"",
+                    attachmentMimeType:"",
+                    attachment:""
+                };
+            }
+
+            $scope.resetAttachmentData = function()
+            {
+                resetAttachment();
+            }
+
+            /**
              * check if the receiver is already existing
              * @param index
              */
@@ -254,28 +395,56 @@ angular.module('ezeidApp').
             {
                 $scope.visibilityReceiverErrorMsg = false;
             }
+
+            $scope.removeMsgBodyError = function()
+            {
+                $scope.visibilityMsgBodyErrorMsg = false;
+            }
+
+            $scope.removeMsgBodyError = function()
+            {
+                $scope.visibilityMsgBodyErrorMsg = false;
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            //function getGroupSuggestionApi(keyword)
-            //{
-            //    var defer = $q.defer();
-            //    $http({
-            //        url : GURL + 'suggestion_list',
-            //        method : "GET",
-            //        params :{
-            //            keywordsForSearch:keyword,
-            //            token : $rootScope._userInfo.Token
-            //        }
-            //    }).success(function(resp){
-            //        defer.resolve(resp.data);
-            //    }).error(function(err){
-            //        $scope.$emit('$preLoaderStop');
-            //        Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-            //        defer.resolve();
-            //    });
-            //    return defer.promise;
-            //}
+            function composeMessageApi(toId,toIdType,previousMsgId)
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'compose_message',
+                    method : "POST",
+                    data :{
+                        token : $rootScope._userInfo.Token,
+                        message:$scope.composeMsg.MessageBody,
+                        attachment :$scope.file.attachment,
+                        priority:$scope.composeMsg.Priority,
+                        attachment_filename :$scope.file.attachmentName,
+                        target_date :UtilityService._convertTimeToServer($scope.composeMsg.TargetDate,"DD-MMM-YYYY","YYYY-MM-DD"),
+                        expiry_date :UtilityService._convertTimeToServer($scope.composeMsg.ExpiryDate,"DD-MMM-YYYY","YYYY-MM-DD"),
+                        previous_messageID:0,
+                        to_id:toId,
+                        id_type :toIdType//1: individual, 2: group
 
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+                    if(resp.data)
+                    {
+                        defer.resolve(resp.data);
+                    }
+                    else
+                    {
+                        defer.reject();
+                    }
+
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
         }]);

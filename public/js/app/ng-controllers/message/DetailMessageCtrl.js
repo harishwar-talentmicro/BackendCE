@@ -38,11 +38,6 @@ angular.module('ezeidApp').
         ) {
             $scope.composeMsg = {};
 
-            this.sendMessage = function()
-            {
-                console.log($scope.composeMsg);
-            };
-
 
 
         }]);
