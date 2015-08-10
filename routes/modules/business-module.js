@@ -178,43 +178,49 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
     /**
      * @todo FnSaveTransaction
      */
+
     var _this = this;
     try{
+
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var fs = require("fs");
 
         var Token = req.body.Token;
-        var TID = parseInt(req.body.TID);
-        var MessageText =req.body.MessageText;
+        var TID = parseInt(req.body.TID) ?  parseInt(req.body.TID) : 0;
+        var MessageText = (req.body.MessageText) ? req.body.MessageText : '';
         var Status = req.body.Status;
         var TaskDateTime = req.body.TaskDateTime;
-        var Notes = req.body.Notes;
+        var Notes = (req.body.Notes) ? req.body.Notes : '';
         var LocID = req.body.LocID;
-        var Country = req.body.Country;    //country short name
-        var State = req.body.State;         //admin level 1
-        var City = req.body.City;       //ADMIN level 2
-        var Area = req.body.Area;       //admin level 3
+        var Country = (req.body.Country) ? req.body.Country : '';    //country short name
+        var State = (req.body.State) ? req.body.State : '';         //admin level 1
+        var City =  (req.body.City) ? req.body.City : '';       //ADMIN level 2
+        var Area = (req.body.Area) ? req.body.Area : '';       //admin level 3
         var FunctionType = req.body.FunctionType;
-        var Latitude = req.body.Latitude;
-        var Longitude = req.body.Longitude;
-        var EZEID = alterEzeoneId(req.body.EZEID);
+        var Latitude = (req.body.Latitude) ? req.body.Latitude : 0;
+        var Longitude = (req.body.Longitude) ? req.body.Longitude : 0;
+        var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
         var ContactInfo = req.body.ContactInfo;
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
         var ItemsList = req.body.ItemsList;
-        ItemsList = JSON.parse(ItemsList);
+        if(ItemsList){
+            ItemsList = JSON.parse(ItemsList);
+        }
+        else
+        {
+            ItemsList = [];
+        }
         var NextAction = req.body.NextAction;
         var NextActionDateTime = req.body.NextActionDateTime;
         var  TaskDateNew = new Date(TaskDateTime);
         var NextActionDateTimeNew = new Date(NextActionDateTime);
-        var DeliveryAddress = req.body.DeliveryAddress;
-        if(DeliveryAddress == '')
-            DeliveryAddress = '';
+        var DeliveryAddress = (req.body.DeliveryAddress) ? req.body.DeliveryAddress : '';
         var ItemIDList='';
         var ToEZEID = alterEzeoneId(req.body.ToEZEID);
-        var item_list_type = req.body.item_list_type ? req.body.item_list_type : 0;
+        var item_list_type = (req.body.item_list_type) ? req.body.item_list_type : 0;
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
         var attachment = req.body.attachment ? req.body.attachment : null ;
@@ -226,11 +232,11 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var amount = req.body.amount ? req.body.amount : 0;
         var instituteId = req.body.institute_id ? req.body.institute_id : 0;
         var jobId = req.body.job_id ? req.body.job_id : 0;
-        var educationId = req.body.education_id ? req.body.education_id : 0;
+        var educationId = (req.body.education_id) ? req.body.education_id : 0;
         var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
         var salaryType = req.body.salary_type ? req.body.salary_type : 3;
 
-
+        console.log(req.body);
         var messagetype,verified;
 
         if (FunctionType == 0){
@@ -244,10 +250,6 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         else if (FunctionType == 3){
             //Service
             messagetype = 4;
-        }
-        else if (FunctionType == 4){
-            //Cv
-            messagetype = 5;
         }
         var RtnMessage = {
             IsSuccessfull: false,
@@ -269,11 +271,10 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         if(FolderRuleID.toString() == 'NaN')
             FolderRuleID=0;
 
-        if (Token != null && ItemsList != null) {
+        if (Token) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
-
                         var query = st.db.escape(Token) + "," + st.db.escape(FunctionType) + "," + st.db.escape(MessageText)
                             + "," + st.db.escape(Status) + "," + st.db.escape(TaskDateNew) + "," + st.db.escape(Notes)
                             + "," + st.db.escape(LocID) + "," + st.db.escape(Country) + "," + st.db.escape(State)
@@ -488,14 +489,14 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                                 });
                                                             }
                                                         }
-                                                    else {
+                                                        else {
+                                                            console.log('FnSalesMail:error from getting id');
+                                                        }
+                                                    }
+                                                    else
+                                                    {
                                                         console.log('FnSalesMail:error from getting id');
                                                     }
-                                                }
-                                                else
-                                                {
-                                                    console.log('FnSalesMail:error from getting id');
-                                                }
                                                 });
                                             });
                                         }
@@ -770,15 +771,14 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
             if (Token == null) {
                 console.log('FnSaveTranscationItems: Token is empty');
             }
-            else
-                console.log(RtnMessage);
-
             res.statusCode=400;
             res.send(RtnMessage);
         }
     }
     catch (ex) {
         console.log('FnSaveTranscationItems:error ' + ex.description);
+        console.log(ex);
+        console.log(ex.line);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
