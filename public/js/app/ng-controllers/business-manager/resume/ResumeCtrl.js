@@ -1501,10 +1501,10 @@
              */
             var assignEducations = function(){
                 for(var b=0; b < $scope.educationsList.length;b++){
-                    var institute = angular.copy($scope.educationsList[b]);
-                    institute.id = parseInt(institute.TID);
-                    $scope.educationsList[b].id = parseInt(institute.TID);
-                    $scope.educationsList[b].label = institute.EducationTitle;
+                    var edu = angular.copy($scope.educationsList[b]);
+                    edu.id = parseInt(edu.TID);
+                    $scope.educationsList[b].id = parseInt(edu.TID);
+                    $scope.educationsList[b].label = edu.EducationTitle;
                     //$scope.myInstitutes.push({ id : institute.id});
                 }
             };
@@ -1515,10 +1515,10 @@
              */
             var assignSpecializations = function(){
                 for(var b=0; b < $scope.specializationsList.length;b++){
-                    var institute = angular.copy($scope.specializationsList[b]);
-                    institute.id = parseInt(institute.TID);
-                    $scope.specializationsList[b].id = parseInt(institute.TID);
-                    $scope.specializationsList[b].label = institute.Title;
+                    var spz = angular.copy($scope.specializationsList[b]);
+                    spz.id = parseInt(spz.TID);
+                    $scope.specializationsList[b].id = parseInt(spz.TID);
+                    $scope.specializationsList[b].label = spz.Title;
                     //$scope.myInstitutes.push({ id : institute.id});
                 }
             };
@@ -1681,7 +1681,6 @@
                             if(resp.data){
                                 $scope.educationsList = resp.data;
                                 defer.resolve(resp.data);
-
                             }
                             else{
                                 defer.resolve([]);

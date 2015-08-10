@@ -845,9 +845,33 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
                             token : Token,
                             alarm_duration : alarmDuration,
                             probability : probability,
-                            target_date : targetDate
+                            target_date : targetDate,
 
+
+                            amount : (req.body.amount) ?
+                                ((parseFloat(req.body.amount) !== NaN && parseFloat(req.body.amount) > 0)
+                                    ? parseFloat(req.body.amount) : 0.00)  : 0.00,
+                            institute_id :  (req.body.institute_id) ?
+                            ((parseInt(req.body.institute_id) > 0 && parseInt(req.body.institute_id) !== NaN) ?
+                                parseInt(req.body.institute_id) : 0): 0,
+
+                            job_id : (req.body.job_id) ?
+                                ((parseInt(req.body.job_id) > 0 && parseInt(req.body.job_id) !== NaN) ?
+                                    parseInt(req.body.job_id) : 0): 0,
+
+                            education_id : (req.body.education_id) ?
+                                ((parseInt(req.body.education_id) > 0 && parseInt(req.body.education_id) !== NaN) ?
+                                    parseInt(req.body.education_id) : 0): 0,
+
+                            specialization_id : (req.body.specialization_id) ?
+                                ((parseInt(req.body.specialization_id) > 0 && parseInt(req.body.specialization_id) !== NaN) ?
+                                    parseInt(req.body.specialization_id) : 0): 0,
+
+                            salary_type : (req.body.salary_type) ?
+                                ((parseInt(req.body.salary_type) > 0 && parseInt(req.body.salary_type) !== NaN) ?
+                                    parseInt(req.body.salary_type) : 3): 3
                         };
+
                         res.status(200).json(responseMessage);
                         console.log('FnUpdateTransaction: Transaction details update successfully');
                     }
