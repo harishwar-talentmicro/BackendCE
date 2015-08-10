@@ -168,14 +168,8 @@ router.post('/group_members',LocationManager.FnAddGroupMembers);
 router.get('/pending_request',LocationManager.FnGetPendingRequest);
 router.get('/group_list',LocationManager.FnGetGroupList);
 router.get('/load_group_message',LocationManager.FnLoadMessages);
-
-/**
- * Validates Group Member
- * @service-param  token
- * @service-param ezeone_id
- * @service_param group_id
- */
 router.get('/validate_group_member',LocationManager.FnValidateGroupMember);
+router.get('/message_full_view',LocationManager.FnViewMessage);
 
 
 //below service are for EZEIDAP

@@ -1142,6 +1142,7 @@ Job.prototype.getAppliedJob = function(req,res,next){
         status: false,
         error: {},
         message: '',
+        count : 0,
         data: null
     };
 
@@ -1166,13 +1167,15 @@ Job.prototype.getAppliedJob = function(req,res,next){
                         var query = 'CALL pGetAppliedJobs(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Applied job List loaded successfully';
-                                        responseMessage.data = getResult[0];
+                                        responseMessage.count = getResult[0][0].count;
+                                        responseMessage.data = getResult[1];
                                         res.status(200).json(responseMessage);
                                         console.log('FnAppliedJobList: Applied job List loaded successfully');
                                     }
@@ -1335,12 +1338,12 @@ Job.prototype.getjobcity = function(req,res,next){
 */
 Job.prototype.jobSeekersMessage = function(req,res,next){
     var _this = this;
-
+    var fs = require("fs");
     var token = req.body.token;
     var ids = req.body.ids;
     var templateId = req.body.template_id;
     var jobId = req.body.job_id;
-    var id,i=0,tid,jobResult;
+    var id,i=0,tid,jobResult,link;
 
     if(ids){
         id = ids.split(",");
@@ -1430,14 +1433,14 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                     subject: TemplateResult[0].Subject,
                                                     html: TemplateResult[0].Body // html body
                                                 };
-
-                                                //var link = 'http://104.199.128.226:3001/job_id=' + jobid;
-                                                mailOptions.subject = mailOptions.subject.replace("[JobTitle]",jobResult[0][0].jobtitle);
+                                                link = 'http://localhost:3001/jobappliedsuccess?jobid='+jobId;
+                                                console.log(link);
+                                                mailOptions.html = mailOptions.html.replace("[Job Title]",jobResult[0][0].jobtitle);
                                                 mailOptions.html = mailOptions.html.replace("[JobTitle]",jobResult[0][0].jobtitle);
                                                 mailOptions.html = mailOptions.html.replace("[FirstName]", jobResult[0][0].FirstName);
                                                 mailOptions.html = mailOptions.html.replace("[LastName]", jobResult[0][0].LastName);
                                                 mailOptions.html = mailOptions.html.replace("[CompanyName]", jobResult[0][0].CompanyName);
-                                                //mailOptions.html = mailOptions.html.replace("[Link]",'https://www.ezeone.com/' +linkContent);
+                                                mailOptions.html = mailOptions.html.replace("[Link]",link);
 
                                                 var queryParams = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                     + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
@@ -1468,7 +1471,9 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                         mailDetails(i);
                                                     }
                                                 });
+
                                             }
+
                                             else {
                                                 console.log('FnGetJobSeekersMailDetails: Result not loaded');
                                             }
@@ -1488,7 +1493,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                             }
                         };
                         responseMessage.message = 'JobSeeker Message Send Successfully';
-                        responseMessage.data = null;
+                        responseMessage.data = link;
                         res.status(200).json(responseMessage);
                         console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully..');
 
