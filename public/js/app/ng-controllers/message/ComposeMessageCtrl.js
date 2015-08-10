@@ -431,20 +431,22 @@ angular.module('ezeidApp').
                 }).success(function(resp){
 
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                    }
+
                     if(resp.data)
                     {
                         defer.resolve(resp.data);
-                    }
-                    else
-                    {
-                        defer.reject();
                     }
 
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
+
                 return defer.promise;
             }
         }]);

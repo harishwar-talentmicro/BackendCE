@@ -26,11 +26,11 @@
                             <ul class="inbox-nav inbox-divider">
                                 <li class="active index-menu-item compose-mail-menu">
                                     <!--<a ng-click="openComposeMessage()" class="pointer"> <i class="fa fa-pencil-square-o"></i> Compose</a>-->
-                                    <a href="/outbox/compose" class="pointer text-white text-bolder"> <i class="fa fa-pencil-square-o"></i> Compose</a>
+                                    <a href="/message/compose" class="pointer text-white text-bolder"> <i class="fa fa-pencil-square-o"></i> Compose</a>
                                 </li>
                                 <li class="active index-menu-item">
                                     <!--<a ng-click="openInbox()" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>-->
-                                    <a href="/outbox/inbox" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>
+                                    <a href="/message/inbox" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>
                                 </li>
                                 <li class="index-menu-item">
                                     <a href="#"><i class="fa fa-envelope-o"></i> Outbox</a>
@@ -146,6 +146,7 @@
                 </div>
             </div>
         </section>
+
         <!-- details modal of the transaction history item goes here -->
         <modal mtitle="modalBox.title" mclass="modalBox.class" visible="modalVisible">
             <div class="row">

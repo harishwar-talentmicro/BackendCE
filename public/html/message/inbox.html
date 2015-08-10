@@ -133,27 +133,27 @@
                                     <!--12:09AM-->
                                 <!--</td>-->
                             <!--</tr>-->
-                            <tr ng-repeat="msg in dashBoardMsg track by $index">
+                            <tr ng-repeat="msg in dashBoardMsg track by $index" class="pointer" ng-class="msg.status == 1?'active':''">
                                 <td>
                                     <i class="fa fa-arrow-circle-down text-success"></i>
                                 </td>
                                 <td>
                                     <input type="checkbox" />
                                 </td>
-                                <td>
-                                    Vector King
+                                <td title="{{msg.sender}}">
+                                    {{msg.sender | textLength:10}}
                                 </td>
                                 <td>
-                                    Lorem ipsum dolor imit set.
+                                    {{msg.Message | textLength:20}}
                                 </td>
                                 <td>
                                     <span class="glyphicon glyphicon-paperclip"></span>
                                 </td>
                                 <td class="display-in-full-screen display-table">
-                                    15/12/2015 13:10
+                                    {{msg.TargetDate}}
                                 </td>
                                 <td class="display-in-full-screen display-table  ">
-                                    15/12/2014 13:10
+                                    {{msg.ExpiryDate}}
                                 </td>
                                 <td>
                                     12:09AM
