@@ -55,7 +55,7 @@ angular.module('ezeidApp').
             };
 
             /* variables for request for connection */
-
+            $scope.activeEzeOneId = -1;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////Default Functions///////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ angular.module('ezeidApp').
             function resetVisibilityVar()
             {
                 /* visibility flags for msg */
-                $scope.visibilityMsg = {
+                $scope.visibilityReceiverErrorMsg = {
                     alreadyMemberMsg:false,
                     alreadyRequestedMsg:false
                 };
@@ -94,66 +94,84 @@ angular.module('ezeidApp').
             $scope.toggleEzeoneModalVisibility = function()
             {
                 $scope.modalAddEzeoneVisible = !$scope.modalAddEzeoneVisible;
+                return;
             }
 
-            /**
-             * check if the ezeOneValidationStatus have changed its value
-             * & Validate EzeoneId API call response
-             *
-             * @response:
-             * 1:mapping already exists
-             * -1:valid EZEID and no connection exists
-             * -2:Invalid EZEID
-             */
-            $scope.$watch('ezeOneValidationStatus',function(){
+            $scope.validateEzeone = function(keyword)
+            {
                 /* append @ if it is not there */
                 var keyword = $scope.ezeOneModalBox.ezeone;
                 var ezeone = parseInt(getGroupNameType(keyword)) ==  0?"@"+keyword:keyword;
                 $scope.ezeOneModalBox.ezeone = ezeone;
-                var membershipStatus = $scope.ezeOneMembershipStatus;
+                console.log(ezeone.toUpperCase(),$rootScope._userInfo.ezeone_id);
+                if(ezeone.toUpperCase() == $rootScope._userInfo.ezeone_id)
+                {
+                    Notification.error({ message: "You can't connect to yourself, Try again with some other EZEONE ID", delay: MsgDelay });
+                }
+
+                validateEzeone(ezeone).then(function(val){
+                    if(val[0])
+                    {
+                        validateEzeoneResponseActivity(val[0]);
+                        $scope.currentGroupId = val[0].GroupID;
+                        $scope.activeEzeOneId = val[0].masterid;
+                    }
+
+                });
+            }
+
+            /**
+             * Does the activity on the basis of response from validation API
+             */
+            function validateEzeoneResponseActivity(data){
+                var membershipStatus = data.userstatus;
                 /* take suitable action */
                 resetVisibilityVar();
                 hideAllMsg();
                 hideConnectFormElements();
                 hideJoinGroupResponseForm();
-                if(parseInt($scope.ezeOneValidationStatus) == -1)//Valid Ezeid proceed
+                if(parseInt(data.status) == -1)//Valid Ezeid proceed
                 {
                     $scope.visibilityBtn.connectBtn = true;
                     $scope.visibilityForm.relation = true;
                     $scope.isEzeOneIdValid = true;
                 }
-                else if(parseInt($scope.ezeOneValidationStatus) == 1)//mapping already exists
+                else if(parseInt(data.status) == 1)//mapping already exists
                 {
                     if(membershipStatus == 1)
                     {
-                        $scope.visibilityMsg.alreadyMemberMsg = true;
+                        $scope.visibilityReceiverErrorMsg.alreadyMemberMsg = true;
                     }
-                    else if(membershipStatus == 0 && $scope.isLoggedInUserRequeser == 0)
+                    else if(membershipStatus == 0 && data.isrequester == 0)
                     {
                         $scope.visibilityForm.groupJoinRequestForm = true;
                     }
-                    else if(membershipStatus == 0 && $scope.isLoggedInUserRequeser == 1)
+                    else if(membershipStatus == 0 && data.isrequester == 1)
                     {
-                        $scope.visibilityMsg.alreadyRequestedMsg = true;
+                        $scope.visibilityReceiverErrorMsg.alreadyRequestedMsg = true;
                     }
                     $scope.isEzeOneIdValid = true;
                 }
-            });
+                else if(data.status == -2)
+                {
+                    $scope.isEzeOneIdValid = false;
+                }
+            };
 
             /**
              * Hide the already member msg
              */
             function hideAllMsg()
             {
-                $scope.visibilityMsg.alreadyMemberMsg = false;
-                $scope.visibilityMsg.alreadyRequestedMsg = false;
+                $scope.visibilityReceiverErrorMsg.alreadyMemberMsg = false;
+                $scope.visibilityReceiverErrorMsg.alreadyRequestedMsg = false;
             }
             /**
              * Hide the connect btn
              */
             function hideConnectFormElements()
             {
-                $scope.visibilityMsg.connectBtn = false;
+                $scope.visibilityReceiverErrorMsg.connectBtn = false;
                 $scope.visibilityForm.relation = false;
             }
 
@@ -237,6 +255,79 @@ angular.module('ezeidApp').
                 });
                 return defer.promise;
             }
+
+            /**
+             * saves the individual response for connect request
+             * @param ezeoneId
+             * @param status
+             */
+            $scope.individualMemberJoinResponse = function(status,groupId)
+            {
+                var msgType = "rejected";
+                if(parseInt(status) === 1)
+                {
+                    msgType = "accepted";
+                }
+                $scope.modalAddEzeoneVisible = false;
+                joinResponseApi(status,groupId).then(function(){
+                    Notification.success({ message: "You have successfuly "+msgType+" the group join request!", delay: MsgDelay });
+                },function(){
+                    Notification.error({ message: "Error occured! Try again later", delay: MsgDelay });
+                });
+            }
+
+            function joinResponseApi(status,groupId)
+            {
+                var defer = $q.defer();
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url : GURL + 'user_status',
+                    method : "PUT",
+                    data :{
+                        token : $rootScope._userInfo.Token,
+                        group_id : groupId,
+                        master_id : $rootScope._userInfo.TID,
+                        status : status
+                    }
+                }).success(function(resp){
+                    if(resp.status)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        defer.resolve();
+                    }
+                    else
+                    {
+                        defer.reject();
+                    }
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
+
+            function validateEzeone(ezeone)
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'validate_groupname',
+                    method : "GET",
+                    params :{
+                        group_name:ezeone,
+                        token : $rootScope._userInfo.Token,
+                        group_type: 1
+                    }
+                }).success(function(resp) {
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.resolve();
+                });
+                return defer.promise;
+            }
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////

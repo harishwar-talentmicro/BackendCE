@@ -37,9 +37,16 @@
             FileToBase64
         ) {
 
-            $scope._tempSalesItemListType = $rootScope._userInfo.SalesItemListType;
             $scope.txSearchTerm = '';
 
+            $scope.salaryTypeMapping = [
+                'p.h.',
+                'p.m.',
+                'p.a.'
+            ];
+
+            $scope.experienceFrom = 0;
+            $scope.experienceTo = 50;
             /**
              * Probability Values are mapped in this fashion
              * @type {string[]}
@@ -221,7 +228,7 @@
                     taskDateTime : '',
                     folderRule : 0,
                     message : '',
-                    messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                    messageType : (0) ? 0 : 0,
                     latitude : 0,
                     longitude : 0,
                     duration : 0,
@@ -234,7 +241,8 @@
                     attachmentMimeType : "",
                     probability : 2,
                     targetDate : moment().format('YYYY-MM-DD'),
-                    alarmDuration : 0
+                    alarmDuration : 0,
+                    instituteId : 0
                 }
             };
 
@@ -296,16 +304,11 @@
              * alteredMsg = 'this is message text for this recruitment enquiry'
              */
             var alterTransactionMessageToEdit = function(msg){
-                var alteredMsg = '';
-                var str = '   '; //30 characters
-                var indexStr = msg.lastIndexOf(str);
-                if(indexStr !== -1){
-                    alteredMsg = msg.substr(0,indexStr);
-                }
-                else{
-                    alteredMsg = msg;
-                }
-                return alteredMsg;
+
+                return msg;
+                /**
+                 * Return message unaltered in case of recruitment
+                 */
             };
 
             /**
@@ -340,7 +343,7 @@
                     taskDateTime : tx.TaskDateTime,
                     folderRule : (tx.FolderRuleID && tx.FolderRuleID !== 'null') ? tx.FolderRuleID : 0,
                     message : alterTransactionMessageToEdit(tx.Message),
-                    messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                    messageType : (0) ? 0 : 0,
                     latitude : 0,
                     longitude : 0,
                     duration : 0,
@@ -570,20 +573,6 @@
                 }
             };
 
-            ///**
-            // * Finds address using geolocation lat lng
-            // * called on change of location
-            // */
-            //$scope.findAddress = function(){
-            //    $scope.$emit('$preLoaderStart');
-            //    $scope.resolveGeolocationAddress().then(function(){
-            //        $scope.$emit('$preLoaderStop');
-            //    },function(){
-            //        $scope.$emit('$preLoaderStop');
-            //    });
-            //};
-
-
 
             var googleMap = new GoogleMap();
             $timeout(function(){
@@ -712,7 +701,7 @@
                         taskDateTime : '',
                         folderRule : 0,
                         message : '',
-                        messageType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
+                        messageType : (0) ? 0 : 0,
                         latitude : 0,
                         longitude : 0,
                         duration : 0,
@@ -726,7 +715,8 @@
                         attachmentMimeType : "",
                         probability : 2,
                         targetDate : moment().format('YYYY-MM-DD'),
-                        alarmDuration  : 0
+                        alarmDuration  : 0,
+                        instituteId : 0
                     }
                 };
 
@@ -838,38 +828,39 @@
             };
 
             /**
+             * Not required in recruitment module
              * Loads company list for that particular ezeid
              * Company Contact list according to functionType
              */
             var loadCompany = function(){
-                $http({
-                    method : 'GET',
-                    url : GURL + 'company_details',
-                    params : {
-                        Token : $rootScope._userInfo.Token,
-                        functiontype : 4
-                    }
-
-                }).success(function(resp){
-                    if(resp && resp.status && resp.data){
-                        for(var a=0; a < resp.data.length; a++){
-                            var suggestion = {
-                                id : resp.data[a].tid,
-                                duration : resp.data[a].idledays,
-                                user : resp.data[a].updateduser,
-                                name : resp.data[a].company_name,
-                                ezeid : resp.data[a].RequesterEZEID
-                            };
-                            companyList[a] = suggestion;
-                        }
-                    }
-                }).error(function(err,statusCode){
-                    var msg = '';
-                    if(statusCode == 0){
-                        msg = 'Unable to reach server ! Please check your connection';
-                        Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
-                    }
-                });
+                //$http({
+                //    method : 'GET',
+                //    url : GURL + 'company_details',
+                //    params : {
+                //        Token : $rootScope._userInfo.Token,
+                //        functiontype : 4
+                //    }
+                //
+                //}).success(function(resp){
+                //    if(resp && resp.status && resp.data){
+                //        for(var a=0; a < resp.data.length; a++){
+                //            var suggestion = {
+                //                id : resp.data[a].tid,
+                //                duration : resp.data[a].idledays,
+                //                user : resp.data[a].updateduser,
+                //                name : resp.data[a].company_name,
+                //                ezeid : resp.data[a].RequesterEZEID
+                //            };
+                //            companyList[a] = suggestion;
+                //        }
+                //    }
+                //}).error(function(err,statusCode){
+                //    var msg = '';
+                //    if(statusCode == 0){
+                //        msg = 'Unable to reach server ! Please check your connection';
+                //        Notification.error({ title : 'No Connection', message : msg, delay : MsgDelay});
+                //    }
+                //});
             };
 
             /**
@@ -984,6 +975,54 @@
                 });
             };
 
+            /**
+             * Loads candidate picture based on ezeone_id
+             */
+            var loadCandidatePicture = function(_tx){
+                if(!_tx.RequesterEZEID){
+                    return;
+                }
+                $http({
+                    url : GURL + 'ezeone_image',
+                    method : 'GET',
+                    params : {
+                        ezeone_id : _tx.RequesterEZEID,
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    if(resp){
+                        if(resp.status){
+                            if(resp.data){
+                                if(resp.data[0]){
+                                    if(resp.data[0].Picture){
+                                        _tx.applicantImage = resp.data[0].Picture;
+                                    }
+                                    else{
+                                        defer.reject();
+                                    }
+                                }
+                                else{
+                                    defer.reject();
+                                }
+                            }
+                            else{
+                                defer.reject();
+                            }
+                        }
+                        else{
+                            defer.reject();
+                        }
+                    }
+                    else{
+                        defer.reject();
+                    }
+
+                }).error(function(err){
+                    defer.reject();
+                });
+
+            };
+
 
             /**
              * Loads all transactions
@@ -1026,6 +1065,18 @@
                 var institutes = (instituteArr) ? instituteArr.join(',') : '';
 
                 /**
+                 * If user has not selected any institutes to display then by default select all the institutes
+                 * which are assigned to him and assign them to the data model of myFolders also
+                 * to make ui and requested data consistent
+                 */
+                var jobArr = [];
+                for(var i = 0; i < $scope.selectedJobs.length; i++){
+                    jobArr.push($scope.selectedJobs[i].id);
+                }
+                var jobs = (jobArr) ? jobArr.join(',') : '';
+
+
+                /**
                  * If user is subuser and he is not having any rules assigned to him then don't allow him to
                  * make any transaction load request and therefore show no transaction available for him
                  * else let him see the transaction as he can see transaction of default folder also
@@ -1047,7 +1098,14 @@
                             FunctionType : 4,    // For Sales
                             searchkeyword : txSearchKeyword,
                             sort_by : (sortBy) ? sortBy : 0,
-                            folder_rules : folderRules
+                            folder_rules : folderRules,
+                            institute : institutes,
+                            job_id : jobs,
+                            exp_from : (parseFloat($scope.experienceFrom) < 0 || parseFloat($scope.experienceFrom) > 50 || parseFloat($scope.experienceFrom) == NaN) ?
+                                0 : parseFloat($scope.experienceFrom),
+                            exp_to : (parseFloat($scope.experienceTo) < 0 || parseFloat($scope.experienceTo) > 50 || parseFloat($scope.experienceFrom) == NaN) ?
+                                50 : parseFloat($scope.experienceTo),
+                            location_id : ''
                         }
                     }).success(function(resp){
                         if(resp && resp !== 'null'){
@@ -1066,9 +1124,12 @@
                                     resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ?
                                         UtilityService._convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A') :
                                         UtilityService._convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
+                                    resp.Result[a].applicantImage = null;
                                 }
                                 $scope.txList = resp.Result;
-
+                                for(var ax = 0; ax < $scope.txList.length; ax++){
+                                    loadCandidatePicture($scope.txList[ax]);
+                                }
                             }
 
                         }
@@ -1211,7 +1272,6 @@
                         defer.resolve(resp);
                     }
                     else{
-                        $rootScope._userInfo.SalesItemListType = 0;
                         defer.resolve([]);
                     }
                 }).error(function(err){
@@ -1227,7 +1287,7 @@
              */
             $scope.myFolders = [];
             $scope.myInstitutes = [];
-
+            $scope.selectedJobs = [];
 
             /**
              * Folders applicable to the user who logged in
@@ -1239,8 +1299,13 @@
             var allFoldersLoaded = false;
 
             $scope.institutesList = [];
-            var institutesList = [];
             var institutesLoaded = false;
+
+            $scope.jobsList = [];
+            var jobsLoaded = false;
+
+            $scope.locationsList = [];
+            var locationsLoaded = false;
 
 
             var assignUserFolders = function(){
@@ -1257,59 +1322,33 @@
             };
 
 
+            /**
+             * Makes data type conversion to be used by multiselect control
+             */
             var assignInstitutes = function(){
-                for(var b=0; b < institutesList.length;b++){
-                    var _findex = $scope.txFolderRules.indexOfWhere('TID',institutesList[b]);
-                    if(_findex !== -1){
-                        var institute = angular.copy($scope.txFolderRules[_findex]);
+                for(var b=0; b < $scope.institutesList.length;b++){
+                        var institute = angular.copy($scope.institutesList[b]);
                         institute.id = parseInt(institute.TID);
-                        institute.label = institute.InstituteTitle;
-                        $scope.institutesList.push(institute);
-                        $scope.myInstitutes.push({ id : institute.id});
-                    }
+                        $scope.institutesList[b].id = parseInt(institute.TID);
+                        $scope.institutesList[b].label = institute.InstituteTitle;
+                        //$scope.myInstitutes.push({ id : institute.id});
                 }
             };
 
-            //var watchMyFolders = function(){
-            //    console.log('i exec');
-            //    $scope.$watch('myFolders',function(n,v){
-            //        console.log('myFodlers');
-            //        console.log(n);
-            //        if(!n){
-            //
-            //            console.log('myFodlers if');
-            //            ////console.log(n);
-            //            var myFolders = [];
-            //            for(var c=0;c<$scope.userFolders.length;c++){
-            //                 myFolders[c] = { id : parseInt($scope.userFolders[c].TID) };
-            //            }
-            //
-            //            $scope.myFolders = myFolders;
-            //            //$scope.$emit('$preLoaderStart');
-            //            //console.log('In watchMyFolders');
-            //            //console.log($scope.myFolders);
-            //            //$scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
-            //            //    $scope.$emit('$preLoaderStop');
-            //            //},function(){
-            //            //    $scope.$emit('$preLoaderStop');
-            //            //});
-            //        }
-            //        else{
-            //            console.log('myFodlers else');
-            //            console.log(n);
-            //            console.log(v);
-            //            if((n !== v) && (n) ){
-            //                console.log('myFodlers else if');
-            //                $scope.$emit('$preLoaderStart');
-            //                $scope.loadTransaction(1,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
-            //                    $scope.$emit('$preLoaderStop');
-            //                },function(){
-            //                    $scope.$emit('$preLoaderStop');
-            //                });
-            //            }
-            //        }
-            //    });
-            //};
+            /**
+             * Makes data type conversion to be used by multiselect control
+             */
+            var assignJobs = function(){
+                for(var b=0; b < $scope.jobsList.length;b++){
+                    var __job = angular.copy($scope.jobsList[b]);
+                    __job.id = parseInt(__job.tid);
+                    $scope.jobsList[b].id = parseInt(__job.tid);
+                    $scope.jobsList[b].label = __job.jobtitle;
+                    //$scope.selectedJobs.push({ id : _job.id});
+                }
+            };
+
+
             /**
              * Loading user list to fetch rules that are specific to the subuser who logged in
              * (Folder list of logged in user can be fetched by selecting the logged in user from response
@@ -1389,6 +1428,100 @@
 
 
 
+            /**
+             * Loads Institutes for Resume
+             * @return {*|promise}
+             */
+            $scope.loadInstitutes = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'institutes',
+                    method : 'GET',
+                    params : {
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    if(resp){
+                        if(resp.status){
+                           if(resp.data){
+                               $scope.institutesList = resp.data;
+                               defer.resolve(resp.data);
+
+                           }
+                            else{
+                               defer.resolve([]);
+                           }
+                        }
+                        else{
+                            defer.resolve([]);
+                        }
+
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                    institutesLoaded  = true;
+                    if(institutesLoaded){
+                        assignInstitutes();
+                    }
+                }).error(function(err){
+                    defer.reject();
+                    institutesLoaded = true;
+                    if(institutesLoaded){
+                        assignInstitutes();
+                    }
+                });
+                return defer.promise;
+            };
+
+            /**
+             * Loads joblist posted by the logged in user or his master
+             * @return {*|promise}
+             */
+            $scope.loadJobs = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'jobs_list',
+                    method : 'GET',
+                    params : {
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    if(resp){
+                        if(resp.status){
+                            if(resp.data){
+                                $scope.jobsList = resp.data;
+                                defer.resolve(resp.data);
+
+                            }
+                            else{
+                                defer.resolve([]);
+                            }
+                        }
+                        else{
+                            defer.resolve([]);
+                        }
+
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                    jobsLoaded  = true;
+                    if(jobsLoaded){
+                        assignJobs();
+                    }
+                }).error(function(err){
+                    defer.reject();
+                    jobsLoaded = true;
+                    if(jobsLoaded){
+                        assignJobs();
+                    }
+                });
+                return defer.promise;
+            };
+
+
+
             var watchPageNumber = function(){
                 $scope.$watch('pageNumber',function(newVal,oldVal){
                     if(newVal !== oldVal)
@@ -1454,39 +1587,52 @@
 
 
             var init = function(){
-                $scope.loadFolderRules().then(function(){
-                    getSubUserList().then(function(){
-                        $scope.loadTxActionTypes().then(function(){
-                            $scope.loadTxStatusTypes().then(function(){
-                                $scope.loadTransaction(1,-2,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                                    watchPageNumber();
-                                    watchSortBy();
-                                    //watchMyFolders();
-                                    $scope.loadItemList().then(function(){
-                                        $scope.$emit('$preLoaderStop');
+
+                $scope.loadJobs().then(function(){
+                    $scope.loadInstitutes().then(function(){
+                        $scope.loadFolderRules().then(function(){
+                            getSubUserList().then(function(){
+                                $scope.loadTxActionTypes().then(function(){
+                                    $scope.loadTxStatusTypes().then(function(){
+                                        $scope.loadTransaction(1,-2,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                            $scope.$emit('$preLoaderStop');
+                                            watchPageNumber();
+                                            watchSortBy();
+                                            //watchMyFolders();
+
+                                            /**
+                                             * Item loading is not required in case of recruitment module
+                                             */
+
+                                        },function(){
+                                            $scope.$emit('$preLoaderStop');
+                                            Notification.error({message : 'Unable to load applicant list', delay : MsgDelay} );
+                                        });
                                     },function(){
                                         $scope.$emit('$preLoaderStop');
-                                        Notification.error({message : 'Unable to load item list', delay : MsgDelay} );
+                                        Notification.error({message : 'Unable to load applicant status types', delay : MsgDelay} );
                                     });
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load applicant list', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load recruitment next actions list', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
-                                Notification.error({message : 'Unable to load applicant status types', delay : MsgDelay} );
                             });
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load recruitmentnext actions list', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load institutes', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
+                        Notification.error({message : 'Unable to load institutes', delay : MsgDelay} );
                     });
+
                 },function(){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({message : 'Unable to load folder rules', delay : MsgDelay} );
+                    Notification.error({message : 'Unable to load jobs list', delay : MsgDelay} );
                 });
+
 
 
 
@@ -1531,7 +1677,7 @@
                 if(!itemList){
                     return 0.00;
                 }
-                if(parseInt($rootScope._userInfo.SalesItemListType) > 3){
+                if(parseInt(0) > 3){
                     var amount = 0.00;
                     for(var i=0; i<itemList.length; i++){
                         var qty = parseInt(itemList[i].Qty);
@@ -1593,12 +1739,12 @@
                     //NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
                     //    moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    item_list_type : $rootScope._userInfo.SalesItemListType,
+                    item_list_type : 0,
                     DeliveryAddress : (!editMode) ?
                         makeAddress() : $scope.modalBox.tx.DeliveryAddress,
                     companyName : $scope.modalBox.tx.companyName,
                     company_id : $scope.modalBox.tx.companyId,
-                    Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
+                    Amount : (parseInt(0) < 4) ?
                         ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
                         calculateTxAmount($scope.modalBox.tx.itemList),
                     proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) !== 0 ) ? $scope.modalBox.tx.probability : 2 ,
@@ -1706,17 +1852,6 @@
 
 
 
-            $scope.$on(
-                "$destroy",
-                function handleDestroyEvent() {
-                    /**
-                     * If itemListType is > 0, and items are not there then automatically
-                     * listType becomes 0 but to restore the actual list type in $rootScope
-                     * this will reassign the values to _userInfo.SalesItemListType
-                     */
-                    $rootScope._userInfo.SalesItemListType = $scope._tempSalesItemListType;
-                }
-            );
 
 
             /**
@@ -1758,7 +1893,7 @@
                 var qty = 0;
                 for(var ct = 0; ct < $scope.modalBox.tx.itemList.length; ct++){
                     if($scope.modalBox.tx.itemList[ct]['Qty'] &&
-                        (parseInt($rootScope._userInfo.SalesItemListType) == 3 || parseInt($rootScope._userInfo.SalesItemListType) == 4)){
+                        (parseInt(0) == 3 || parseInt(0) == 4)){
                         var ab  = parseInt($scope.modalBox.tx.itemList[ct]['Qty']);
                         if(ab !== NaN){
                             qty += ab;
@@ -1770,7 +1905,7 @@
                     else{
                         qty += 1;
                     }
-                    if($scope.modalBox.tx.itemList[ct]['Amount'] && parseInt($rootScope._userInfo.SalesItemListType) == 4){
+                    if($scope.modalBox.tx.itemList[ct]['Amount'] && parseInt(0) == 4){
                         var am = 0.00;
                         var qt = 1;
                         var rt = parseFloat($scope.modalBox.tx.itemList[ct]['Rate']);
@@ -1879,7 +2014,8 @@
                     if(resp){
                         if(resp.status){
                             if(resp.data[0]){
-                                resp.data[0].attachment = resp.data[0].attachment.split('base64,')[1];
+                                var attachmentArr = resp.data[0].attachment.split('base64,')
+                                resp.data[0].attachment = (attachmentArr.length > 1) ? attachmentArr[1] : attachmentArr[0];
                                 downloadBlob(resp.data[0].attachment, resp.data[0].file_name,resp.data[0].mime_type);
                             }
                         }
@@ -1920,7 +2056,11 @@
                 }
             };
 
-            $scope.multiSelectTransText = {buttonDefaultText: 'Select Folders'};
+            $scope.multiSelectTransText = {buttonDefaultText: 'No folders selected'};
+
+            $scope.multiSelectInstituteText = {buttonDefaultText: 'All Institutes'};
+            $scope.multiSelectJobsText = {buttonDefaultText: 'All Applicants'};
+
 
         }]);
 

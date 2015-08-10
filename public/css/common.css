@@ -1679,10 +1679,10 @@ span.smallCloselink {
 .business-manager .nav > li > a{
     font-size: 16px;
     font-family: 'Roboto',sans-serif;
-    color: #fff;
-    background: #44A9D1;
+    color: #616161;
+    background: #F4F4F4;
     border-radius: 0px;
-    border: 1px solid #2D94BD;
+    border: 1px solid #DDD;
     cursor: pointer;
 }
 
@@ -1729,11 +1729,14 @@ span.smallCloselink {
 
 .business-manager .nav > li > a.active {
     background: #1E5DA5;
+    color: #FFF;
+    border: 1px solid #30258C;
 }
 
 
 .business-manager .nav > li > a:hover, .business-manager .nav > li > a:focus, .business-manager .nav > li > a:active {
     background: #007fff;
+    color: #FFF;
 }
 
 .business-manager .well{
@@ -2870,9 +2873,9 @@ h4.front-business-form.warning-text{
 
 
 .label-tx-attachment,.label-tx-alarm{
-    border : 1px solid #000;
-    color: #FFF;
-    background: #276a76;
+    border: 1px solid #BDBDBD;
+    color: #B608D4;
+    background: #FBFBFB;
 }
 
 .label-tx-alarm{
@@ -2880,6 +2883,13 @@ h4.front-business-form.warning-text{
     color:#000;
 }
 
+.label-tx-attachment:focus,
+.label-tx-attachment:active,
+.label-tx-attachment:hover{
+    border: #EEEEEE;
+    background: #f47302;
+    color:#FFFFFF;
+}
 
 .label-tx-salary-exp{
     background-color: #FFFFFF;
