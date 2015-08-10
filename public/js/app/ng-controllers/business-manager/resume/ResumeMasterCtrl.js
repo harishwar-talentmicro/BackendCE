@@ -54,9 +54,17 @@
              * @type {null}
              */
             $scope.jobTid = null;
+            $scope.changeTabToApplicants = function(jobTid){
+                var jtid = parseInt(jobTid);
+                $scope.jobTid = jobTid;
+                $scope.JobsTab = false;
+                $scope.JobSeekerTab = false;
+                $scope.ResumeInquiriesTab = true;
+            };
 
 
             $scope.defaultApplicantImage = '/images/grey-background.jpg';
+
 
         }
     ]);

@@ -38,11 +38,25 @@
         ) {
 
             $scope.txSearchTerm = '';
+            /**
+             * Variable that tell that when somebody is loading applicants for single job
+             * the applicant list is loaded or not and the promise is resolved or not
+             * (Only in case when person comes from the neighbourhood tab i.e. Jobs)
+             * @type {boolean}
+             */
+            $scope.jobTidLoaded = false;
+            $scope.jobTitleString = '';
 
             $scope.salaryTypeMapping = [
                 'p.h.',
                 'p.m.',
                 'p.a.'
+            ];
+
+            $scope.salaryTypeMappingLong = [
+                'per hour',
+                'per month',
+                'per year'
             ];
 
             $scope.experienceFrom = 0;
@@ -79,7 +93,7 @@
             /**
              * Logged in user cannot use this module as he is not having the required permissions for it
              */
-            var moduleIndex = $scope.modules.indexOfWhere('type','sales');
+            var moduleIndex = $scope.modules.indexOfWhere('type','resume');
             var permission = parseInt($scope.modules[moduleIndex].permission);
             if(permission.isNaN || permission === 0 )
             {
@@ -201,7 +215,7 @@
 
             $scope.showModal = false;
             $scope.modalBox = {
-                title : 'Create New Lead',
+                title : 'Add New Applicant',
                 class : 'business-manager-modal',
                 contactType : 0, // Shows that transaction is made by EZEID (1) or by Contact Name Only (2), zero means have to select
                 editMode : false,
@@ -242,7 +256,12 @@
                     probability : 2,
                     targetDate : moment().format('YYYY-MM-DD'),
                     alarmDuration : 0,
-                    instituteId : 0
+
+                    instituteId : 0,
+                    educationId : 0,
+                    specializationId : 0,
+                    salaryType : 3,
+                    jobId : 0
                 }
             };
 
@@ -321,7 +340,6 @@
             var prepareEditTransaction = function(tx,changeUserDetails){
                 console.log(tx);
                 var editModeTx =  {
-                    orderAmount : (!isNaN(parseFloat(tx.Amount))) ? parseFloat(tx.Amount) : 0.00,
                     trnNo : tx.TrnNo,
                     ezeid : (changeUserDetails) ? '' :  tx.RequesterEZEID,
                     ezeidTid : (tx.EZEID) ? true : 0,
@@ -336,7 +354,7 @@
                     state : '',
                     city : '',
                     area : '',
-                    contactInfo : tx.ContactInfo,
+                    contactInfo : (tx.ContactInfo) ? tx.ContactInfo : tx.Requester,
                     DeliveryAddress : tx.DeliveryAddress,
                     nextAction : (tx.NextActionID && tx.NextActionID !== 'null') ? tx.NextActionID : 0,
                     nextActionDateTime : $filter('dateTimeFilter')(tx.NextActionDate,'DD MMM YYYY hh:mm A','DD MMM YYYY HH:mm'),
@@ -349,16 +367,26 @@
                     duration : 0,
                     durationScale : 0,
                     itemList : [],
-                    companyId : (changeUserDetails) ? 0 : tx.company_id,
-                    companyName : (changeUserDetails) ? '' : tx.company_name,
-                    amount : (parseFloat(tx.Amount) !== NaN) ? parseFloat(tx.Amount,2) : 0.00,
+                    companyId : 0,
+                    companyName :  '',
+                    amount : (parseFloat(tx.salary) !== NaN) ? parseFloat(tx.salary,2) : 0.00,
                     targetDate : (tx.target_date) ? tx.target_date :  moment().format('YYYY-MM-DD'),
                     probability : (parseInt(tx.probability) !== NaN && parseInt(tx.probability) !== 0) ?
                         parseInt(tx.probability) : 2,
                     attachment : "",
                     attachmentName : "",
                     attachmentMimeType : "",
-                    alarmDuration : (parseInt(tx.alarm_duration)) ? parseInt(tx.alarm_duration) : 0
+                    alarmDuration : (parseInt(tx.alarm_duration)) ? parseInt(tx.alarm_duration) : 0,
+
+                    instituteId : tx.institute_id,
+                    educationId : tx.Educationid,
+                    specializationId : tx.specialization_id,
+                    jobId : tx.job_id,
+                    salaryType : tx.salary_type,
+                    salary : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
+                    && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
+                        parseFloat($scope.modalBox.tx.orderAmount) : 0,
+
                 };
                 return editModeTx;
 
@@ -441,7 +469,29 @@
                         Token : $rootScope._userInfo.Token,
                         target_date : $scope.modalBox.tx.targetDate,
                         probability : (parseInt($scope.modalBox.tx.probability)) ? $scope.modalBox.tx.probability : 2,
-                        alarm_duration : (parseInt($scope.modalBox.tx.alarmDuration)) ? parseInt($scope.modalBox.tx.alarmDuration) : 0
+                        alarm_duration : (parseInt($scope.modalBox.tx.alarmDuration)) ? parseInt($scope.modalBox.tx.alarmDuration) : 0,
+
+                        institute_id : (parseInt($scope.modalBox.tx.instituteId) !== NaN
+                        && parseInt($scope.modalBox.tx.instituteId) > 0) ?
+                            parseInt($scope.modalBox.tx.instituteId) : 0,
+
+                        education_id : (parseInt($scope.modalBox.tx.educationId) !== NaN
+                        && parseInt($scope.modalBox.tx.educationId) > 0) ?
+                            parseInt($scope.modalBox.tx.educationId) : 0,
+
+                        specialization_id : (parseInt($scope.modalBox.tx.specializationId) !== NaN
+                        && parseInt($scope.modalBox.tx.specializationId) > 0) ?
+                            parseInt($scope.modalBox.tx.specializationId) : 0,
+
+                        job_id : (parseInt($scope.modalBox.tx.jobId) !== NaN
+                        && parseInt($scope.modalBox.tx.jobId) > 0) ?
+                            parseInt($scope.modalBox.tx.jobId) : 0,
+
+                        salary : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
+                        && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
+                            parseFloat($scope.modalBox.tx.orderAmount) : 0,
+
+                        salary_type : ($scope.modalBox.tx.salaryType) ? $scope.modalBox.tx.salaryType : 3
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -476,7 +526,15 @@
                         $scope.txList[id].NextActionDate = resp.data.nextActionDateTime;
 
                         $scope.txList[id].target_date = resp.data.target_date;
-                        $scope.txList[id].probability = (parseInt(resp.data.probability)) ? parseInt(resp.data.probability) : 2
+                        $scope.txList[id].probability = (parseInt(resp.data.probability)) ? parseInt(resp.data.probability) : 2;
+
+                        $scope.txList[id].institute_id = resp.data.institute_id;
+                        $scope.txList[id].Educationid = resp.data.education_id ;
+                        $scope.txList[id].specialization_id = resp.data.specialization_id ;
+                        $scope.txList[id].job_id = resp.data.job_id;
+
+                        $scope.txList[id].salary = resp.data.amount;
+                        $scope.txList[id].salary_type = resp.data.salary_type;
 
                     }
                     else{
@@ -504,25 +562,33 @@
              */
             var loadTransactionItems = function(txId){
                 var defer = $q.defer();
-                $http({
-                    url : GURL + 'ewtGetTranscationItems',
-                    method : 'GET',
-                    params : {
-                        Token : $rootScope._userInfo.Token,
-                        MessageID : txId
-                    }
-                }).success(function(resp){
-                    if(resp && resp.length > 0 && resp !== 'null'){
-                        $scope.modalBox.tx.itemList = resp;
-                        defer.resolve(resp);
-                    }
-                    else{
-                        defer.resolve([]);
-                    }
-                }).error(function(err){
-                    Notification.error({ message : 'Unable to load items for this enquiry ! Please try again', delay : MsgDelay});
-                    defer.reject();
-                });
+
+                /**
+                 * Recruitment will be having no items therefore not making an HTTP call to load items
+                 * and returning the promise with empty item set
+                 */
+                $timeout(function(){
+                    defer.resolve([]);
+                },250);
+                //$http({
+                //    url : GURL + 'ewtGetTranscationItems',
+                //    method : 'GET',
+                //    params : {
+                //        Token : $rootScope._userInfo.Token,
+                //        MessageID : txId
+                //    }
+                //}).success(function(resp){
+                //    if(resp && resp.length > 0 && resp !== 'null'){
+                //        $scope.modalBox.tx.itemList = resp;
+                //        defer.resolve(resp);
+                //    }
+                //    else{
+                //        defer.resolve([]);
+                //    }
+                //}).error(function(err){
+                //    Notification.error({ message : 'Unable to load items for this enquiry ! Please try again', delay : MsgDelay});
+                //    defer.reject();
+                //});
                 return defer.promise;
             };
 
@@ -534,13 +600,13 @@
 
                 $scope.resetModalBox();
 
-
                 if(e && typeof(index) !== 'undefined' && typeof(index) !== 'null'){
                     /**
                      * Fill the information of Current Transaction
                      */
                     $scope.modalBox.editMode = true;
-                    var editTx = prepareEditTransaction($scope.txList[index]);
+                    var editTx = prepareEditTransaction($scope.txList[index],true);
+
                     if($scope.moduleConf.listType > 0){
                         $scope.$emit('$preLoaderStart');
                         loadTransactionItems(editTx.TID).then(function(resp){
@@ -550,7 +616,7 @@
                             //UI updation is not happening properly because ui is not rendered, and model bind before it
                             //therefore once again updating data after ui rendered
                             $timeout(function(){
-                                $scope.modalBox.title = 'Update Lead';
+                                $scope.modalBox.title = 'Update Applicant';
                                 $scope.modalBox.tx = editTx;
                                 $scope.modalBox.contactType = ($scope.modalBox.tx.ezeid) ? 1 : 2;
                                 $scope.$emit('$preLoaderStop');
@@ -574,43 +640,48 @@
             };
 
 
-            var googleMap = new GoogleMap();
-            $timeout(function(){
-                googleMap.addSearchBox('google-map-search-box');
-                googleMap.listenOnMapControls(null,function(lat,lng){
-                    $scope.modalBox.tx.latitude = lat;
-                    $scope.modalBox.tx.longitude = lat;
-                    googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                        if(resp.data){
-                            var data = googleMap.parseReverseGeolocationData(resp.data);
-                            $scope.modalBox.tx.city = data.city;
-                            $scope.modalBox.tx.state = data.state;
-                            $scope.modalBox.tx.country = data.country;
-                            $scope.modalBox.tx.area = data.area;
-                            $scope.modalBox.tx.pinCode = data.postalCode;
-                            $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
-                                route : true,
-                                sublocality3 : true,
-                                sublocality2 : true,
-                                area : false,
-                                city : false,
-                                state : false,
-                                country : false,
-                                postalCode : false
-                            });
+            /**
+             * This code is commented intentionally because there is no requirement of
+             * address in recruitment module
+             */
 
-                            $scope.modalBox.tx.DeliveryAddress = makeAddress();
-                        }
-                        else{
-                            Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                        }
-
-                    },function(){
-                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                        defer.resolve();
-                    });
-                },false);
-            },3000);
+            //var googleMap = new GoogleMap();
+            //$timeout(function(){
+            //    googleMap.addSearchBox('google-map-search-box');
+            //    googleMap.listenOnMapControls(null,function(lat,lng){
+            //        $scope.modalBox.tx.latitude = lat;
+            //        $scope.modalBox.tx.longitude = lat;
+            //        googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+            //            if(resp.data){
+            //                var data = googleMap.parseReverseGeolocationData(resp.data);
+            //                $scope.modalBox.tx.city = data.city;
+            //                $scope.modalBox.tx.state = data.state;
+            //                $scope.modalBox.tx.country = data.country;
+            //                $scope.modalBox.tx.area = data.area;
+            //                $scope.modalBox.tx.pinCode = data.postalCode;
+            //                $scope.modalBox.tx.address = googleMap.createAddressFromGeolocation(data,{
+            //                    route : true,
+            //                    sublocality3 : true,
+            //                    sublocality2 : true,
+            //                    area : false,
+            //                    city : false,
+            //                    state : false,
+            //                    country : false,
+            //                    postalCode : false
+            //                });
+            //
+            //                $scope.modalBox.tx.DeliveryAddress = makeAddress();
+            //            }
+            //            else{
+            //                Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+            //            }
+            //
+            //        },function(){
+            //            Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+            //            defer.resolve();
+            //        });
+            //    },false);
+            //},3000);
 
 
 
@@ -674,7 +745,7 @@
 
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Create New Lead',
+                    title : 'Add new applicant',
                     class : 'business-manager-modal',
                     contactType : 0,
                     locationList : [],
@@ -716,7 +787,12 @@
                         probability : 2,
                         targetDate : moment().format('YYYY-MM-DD'),
                         alarmDuration  : 0,
-                        instituteId : 0
+
+                        instituteId : 0,
+                        educationId : 0,
+                        specializationId : 0,
+                        salaryType : 3,
+                        jobId : 0
                     }
                 };
 
@@ -979,6 +1055,7 @@
              * Loads candidate picture based on ezeone_id
              */
             var loadCandidatePicture = function(_tx){
+                var defer = $q.defer();
                 if(!_tx.RequesterEZEID){
                     return;
                 }
@@ -996,6 +1073,7 @@
                                 if(resp.data[0]){
                                     if(resp.data[0].Picture){
                                         _tx.applicantImage = resp.data[0].Picture;
+                                        defer.resolve();
                                     }
                                     else{
                                         defer.reject();
@@ -1151,6 +1229,82 @@
 
 
             /**
+             * This function is executed only when the control comes from the neighbour tab i.e. Jobs
+             * when anybody click on applicant number in that tab
+             * @returns {*}
+             */
+            var loadApplicantForOneJob = function(pageNo){
+                var defer = $q.defer();
+
+                    $http({
+                        url : GURL + 'ewtGetTranscation',
+                        method : 'GET',
+                        params : {
+                            Token : $rootScope._userInfo.Token,
+                            Page : (pageNo) ? pageNo : 1,
+                            Status : '',
+                            FunctionType : 4,    // For Sales
+                            searchkeyword : '',
+                            sort_by :  0,
+                            folder_rules : '',
+                            institute : '',
+                            job_id : (parseInt($scope.jobTid) !== NaN && parseInt($scope.jobTid) > 0) ? parseInt($scope.jobTid) : 0 ,
+                            exp_from : 0,
+                            exp_to : 50,
+                            location_id : ''
+                        }
+                    }).success(function(resp){
+                        if(resp && resp !== 'null'){
+                            /**
+                             * Change
+                             * 1. $scope.totalPages
+                             * 2. $scope.pageNumber
+                             * 3. $scope.txList
+                             */
+                            $scope.totalPages = parseInt(resp.TotalPage);
+                            $scope.pageNumber = pageNo;
+                            if(resp.Result && angular.isArray(resp.Result)){
+                                for(var a = 0; a < resp.Result.length; a++){
+                                    $scope.editModes.push(false);
+                                    resp.Result[a].TaskDateTime = UtilityService._convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A');
+                                    resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ?
+                                        UtilityService._convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A') :
+                                        UtilityService._convertTimeToLocal(moment().format('DD MMM YYYY hh:mm:ss A'));
+                                    resp.Result[a].applicantImage = null;
+                                }
+                                $scope.txList = resp.Result;
+                                for(var ax = 0; ax < $scope.txList.length; ax++){
+                                    loadCandidatePicture($scope.txList[ax]);
+                                }
+                            }
+
+                        }
+                        else{
+
+                            $scope.txList = [];
+                            $scope.totalPages = 1;
+                            $scope.pageNumber = 1;
+                        }
+                        $scope.jobTidLoaded = true;
+                        $scope.jobTitleString = ($scope.jobsList[$scope.jobsList.indexOfWhere('id',parseInt($scope.jobTid))].jc) ?
+                            ($scope.jobsList[$scope.jobsList.indexOfWhere('id',parseInt($scope.jobTid))].label) +' (' +
+                            ($scope.jobsList[$scope.jobsList.indexOfWhere('id',parseInt($scope.jobTid))].jc) + ') ':
+                            ($scope.jobsList[$scope.jobsList.indexOfWhere('id',parseInt($scope.jobTid))].label);
+                        defer.resolve(resp);
+                    }).error(function(err){
+                        $scope.totalPages = 1;
+                        $scope.pageNumber = 1;
+                        $scope.jobTidLoaded = true;
+                        $scope.jobTitleString = ($scope.jobsList[$scope.jobsList.indexOfWhere('id',parseInt($scope.jobTid))].jc) ?
+                        ($scope.jobsList[$scope.jobsList.indexOfWhere('id',parseInt($scope.jobTid))].label) +' (' +
+                        ($scope.jobsList[$scope.jobsList.indexOfWhere('id',parseInt($scope.jobTid))].jc) + ') ':
+                            ($scope.jobsList[$scope.jobsList.indexOfWhere('id',parseInt($scope.jobTid))].label);
+                        defer.resolve([]);
+                    });
+                return defer.promise;
+            };
+
+            /**
              * Load Transaction Status types for filtering transaction
              * @returns {*}
              */
@@ -1301,6 +1455,12 @@
             $scope.institutesList = [];
             var institutesLoaded = false;
 
+            $scope.educationsList = [];
+            var educationsLoaded = false;
+
+            $scope.specializationsList = [];
+            var specializationsLoaded = false;
+
             $scope.jobsList = [];
             var jobsLoaded = false;
 
@@ -1335,6 +1495,35 @@
                 }
             };
 
+
+            /**
+             * Makes data type conversion to be used by multiselect control
+             */
+            var assignEducations = function(){
+                for(var b=0; b < $scope.educationsList.length;b++){
+                    var institute = angular.copy($scope.educationsList[b]);
+                    institute.id = parseInt(institute.TID);
+                    $scope.educationsList[b].id = parseInt(institute.TID);
+                    $scope.educationsList[b].label = institute.EducationTitle;
+                    //$scope.myInstitutes.push({ id : institute.id});
+                }
+            };
+
+
+            /**
+             * Makes data type conversion to be used by multiselect control
+             */
+            var assignSpecializations = function(){
+                for(var b=0; b < $scope.specializationsList.length;b++){
+                    var institute = angular.copy($scope.specializationsList[b]);
+                    institute.id = parseInt(institute.TID);
+                    $scope.specializationsList[b].id = parseInt(institute.TID);
+                    $scope.specializationsList[b].label = institute.Title;
+                    //$scope.myInstitutes.push({ id : institute.id});
+                }
+            };
+
+
             /**
              * Makes data type conversion to be used by multiselect control
              */
@@ -1367,7 +1556,7 @@
                     if(resp && resp.length > 0 && resp !== 'null'){
                         var index = resp.indexOfWhere('EZEID',$rootScope._userInfo.ezeid);
                         if(index !== -1){
-                            var userFolders = (resp[index].SalesIDs) ? resp[index].SalesIDs.split(',') : [];
+                            var userFolders = (resp[index].ResumeIDs) ? resp[index].ResumeIDs.split(',') : [];
                             ////console.log(userFolders);
                             for(var b=0;b<userFolders.length;b++){
                                 userFolders[b] = parseInt(userFolders[b]);
@@ -1421,6 +1610,100 @@
                     allFoldersLoaded = true;
                     if(allFoldersLoaded && userFoldersLoaded){
                         assignUserFolders();
+                    }
+                });
+                return defer.promise;
+            };
+
+
+
+            /**
+             * Loads Specializations for Resume
+             * @return {*|promise}
+             */
+            $scope.loadSpecializations = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'specialization',
+                    method : 'GET',
+                    params : {
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    if(resp){
+                        if(resp.status){
+                            if(resp.data){
+                                $scope.specializationsList = resp.data;
+                                defer.resolve(resp.data);
+
+                            }
+                            else{
+                                defer.resolve([]);
+                            }
+                        }
+                        else{
+                            defer.resolve([]);
+                        }
+
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                    specializationsLoaded  = true;
+                    if(specializationsLoaded){
+                        assignSpecializations();
+                    }
+                }).error(function(err){
+                    defer.reject();
+                    specializationsLoaded = true;
+                    if(institutesLoaded){
+                        assignSpecializations();
+                    }
+                });
+                return defer.promise;
+            };
+
+            /**
+             * Loads Educations for Resume
+             * @return {*|promise}
+             */
+            $scope.loadEducations = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'educations',
+                    method : 'GET',
+                    params : {
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+                    if(resp){
+                        if(resp.status){
+                            if(resp.data){
+                                $scope.educationsList = resp.data;
+                                defer.resolve(resp.data);
+
+                            }
+                            else{
+                                defer.resolve([]);
+                            }
+                        }
+                        else{
+                            defer.resolve([]);
+                        }
+
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                    educationsLoaded  = true;
+                    if(educationsLoaded){
+                        assignEducations();
+                    }
+                }).error(function(err){
+                    defer.reject();
+                    educationsLoaded = true;
+                    if(institutesLoaded){
+                        assignEducations();
                     }
                 });
                 return defer.promise;
@@ -1527,11 +1810,27 @@
                     if(newVal !== oldVal)
                     {
                         $scope.$emit('$preLoaderStart');
-                        $scope.loadTransaction(newVal,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                            $scope.$emit('$preLoaderStop');
-                        },function(){
-                            $scope.$emit('$preLoaderStop');
-                        });
+                        if($scope.jobTid){
+
+                        }
+                        else{
+                            if($scope.jobTid){
+                                loadApplicantForOneJob(newVal).then(function(){
+                                    $scope.$emit('$preLoaderStop');
+                                },function(){
+                                    $scope.$emit('$preLoaderStop');
+                                });
+                            }
+                            else{
+                                $scope.loadTransaction(newVal,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                    $scope.$emit('$preLoaderStop');
+                                },function(){
+                                    $scope.$emit('$preLoaderStop');
+                                });
+                            }
+
+                        }
+
                     }
                 });
             };
@@ -1541,11 +1840,17 @@
                     if(newVal !== oldVal)
                     {
                         $scope.$emit('$preLoaderStart');
-                        $scope.loadTransaction($scope.pageNumber,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                            $scope.$emit('$preLoaderStop');
-                        },function(){
-                            $scope.$emit('$preLoaderStop');
-                        });
+                        if($scope.jobTid){
+
+                        }
+                        else{
+                            $scope.loadTransaction($scope.pageNumber,$scope.filterStatus,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                $scope.$emit('$preLoaderStop');
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                            });
+                        }
+
                     }
                 });
             };
@@ -1588,50 +1893,72 @@
 
             var init = function(){
 
-                $scope.loadJobs().then(function(){
-                    $scope.loadInstitutes().then(function(){
-                        $scope.loadFolderRules().then(function(){
-                            getSubUserList().then(function(){
-                                $scope.loadTxActionTypes().then(function(){
-                                    $scope.loadTxStatusTypes().then(function(){
-                                        $scope.loadTransaction(1,-2,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                                            $scope.$emit('$preLoaderStop');
-                                            watchPageNumber();
-                                            watchSortBy();
-                                            //watchMyFolders();
 
-                                            /**
-                                             * Item loading is not required in case of recruitment module
-                                             */
+                $scope.loadSpecializations().then(function(){
+                    $scope.loadEducations().then(function(){
+                        $scope.loadJobs().then(function(){
+                            $scope.loadInstitutes().then(function(){
+                                $scope.loadFolderRules().then(function(){
+                                    getSubUserList().then(function(){
+                                        $scope.loadTxActionTypes().then(function(){
+                                            $scope.loadTxStatusTypes().then(function(){
+                                                if($scope.jobTid){
+                                                    loadApplicantForOneJob(1).then(function(){
+                                                        $scope.$emit('$preLoaderStop');
+                                                    },function(){
+                                                        $scope.$emit('$preLoaderStop');
+                                                    });
+                                                }
+                                                else{
+                                                    $scope.loadTransaction(1,-2,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                                        $scope.$emit('$preLoaderStop');
+                                                        watchPageNumber();
+                                                        watchSortBy();
+                                                        //watchMyFolders();
 
+                                                        /**
+                                                         * Item loading is not required in case of recruitment module
+                                                         */
+
+                                                    },function(){
+                                                        $scope.$emit('$preLoaderStop');
+                                                        Notification.error({message : 'Unable to load applicant list', delay : MsgDelay} );
+                                                    });
+                                                }
+
+                                            },function(){
+                                                $scope.$emit('$preLoaderStop');
+                                                Notification.error({message : 'Unable to load applicant status types', delay : MsgDelay} );
+                                            });
                                         },function(){
                                             $scope.$emit('$preLoaderStop');
-                                            Notification.error({message : 'Unable to load applicant list', delay : MsgDelay} );
+                                            Notification.error({message : 'Unable to load recruitment next actions list', delay : MsgDelay} );
                                         });
                                     },function(){
                                         $scope.$emit('$preLoaderStop');
-                                        Notification.error({message : 'Unable to load applicant status types', delay : MsgDelay} );
                                     });
                                 },function(){
                                     $scope.$emit('$preLoaderStop');
-                                    Notification.error({message : 'Unable to load recruitment next actions list', delay : MsgDelay} );
+                                    Notification.error({message : 'Unable to load institutes', delay : MsgDelay} );
                                 });
                             },function(){
                                 $scope.$emit('$preLoaderStop');
+                                Notification.error({message : 'Unable to load institutes', delay : MsgDelay} );
                             });
+
                         },function(){
                             $scope.$emit('$preLoaderStop');
-                            Notification.error({message : 'Unable to load institutes', delay : MsgDelay} );
+                            Notification.error({message : 'Unable to load jobs list', delay : MsgDelay} );
                         });
                     },function(){
                         $scope.$emit('$preLoaderStop');
-                        Notification.error({message : 'Unable to load institutes', delay : MsgDelay} );
+                        Notification.error({message : 'Unable to load education list', delay : MsgDelay} );
                     });
-
                 },function(){
                     $scope.$emit('$preLoaderStop');
-                    Notification.error({message : 'Unable to load jobs list', delay : MsgDelay} );
+                    Notification.error({message : 'Unable to load specializations', delay : MsgDelay} );
                 });
+
 
 
 
@@ -1738,15 +2065,19 @@
                         ? moment($scope.modalBox.tx.nextActionDateTime,'DD MMM YYYY hh:mm:ss A').format('YYYY-MM-DD HH:mm:ss') : moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss'),
                     //NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
                     //    moment().format('YYYY-MM-DD hh:mm:ss'),
-                    ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
+                    ItemsList: '',
                     item_list_type : 0,
-                    DeliveryAddress : (!editMode) ?
-                        makeAddress() : $scope.modalBox.tx.DeliveryAddress,
-                    companyName : $scope.modalBox.tx.companyName,
-                    company_id : $scope.modalBox.tx.companyId,
-                    Amount : (parseInt(0) < 4) ?
-                        ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
-                        calculateTxAmount($scope.modalBox.tx.itemList),
+                    DeliveryAddress : '',
+                    companyName : '',
+                    company_id : 0,
+                    //Amount : (parseInt(0) < 4) ?
+                    //
+                    //    ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
+                    //    calculateTxAmount($scope.modalBox.tx.itemList),
+                    amount : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
+                    && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
+                        parseFloat($scope.modalBox.tx.orderAmount) : 0,
+
                     proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) !== 0 ) ? $scope.modalBox.tx.probability : 2 ,
                     target_date : ($scope.modalBox.tx.targetDate) ? $scope.modalBox.tx.targetDate :  moment().format('YYYY-MM-DD'),
                     attachment : $scope.modalBox.tx.attachment,
@@ -1763,40 +2094,50 @@
             $scope.saveTransaction = function(){
                 var data = prepareSaveTransaction($scope.modalBox.editMode);
 
-                if(!data.ContactInfo){
-                    Notification.error({ message : 'Please enter contact information for customer',delay : MsgDelay});
-                    return ;
-                }
-
-                if($scope.modalBox.tx.itemList.length <  1 && $scope.modules[moduleIndex].listType > 0){
-                    Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
-                    return ;
-                }
-
-
-                if($scope.modules[moduleIndex].listType > 0){
-                    var separationStr = '     ';
-                    var itemList = [];
-                    try{
-                        itemList = JSON.parse(data.ItemsList);
+                /**
+                 * If user is having EZEID then don't check for contact information, otherwise please validate
+                 * that contact information is filled up or not
+                 */
+                if(!data.EZEID){
+                    if(!data.ContactInfo){
+                        Notification.error({ message : 'Please enter contact information for the applicant',delay : MsgDelay});
+                        return ;
                     }
-                    catch(ex){
-                        //////////console.log(ex);
-                    }
-                    var msg = '';
-                    for(var ct = 0; ct < itemList.length; ct++){
-                        msg += itemList[ct]['ItemName'];
-                        if(itemList[ct]['Qty'] && $scope.modules[moduleIndex].listType > 2){
-                            msg += ' ('+ itemList[ct]['Qty'] + ')';
-                        }
-                        if(itemList[ct]['Amount'] && $scope.modules[moduleIndex].listType > 3){
-                            msg += ' : '+ itemList[ct]['Amount'];
-                        }
-                        msg += ', ';
-                    }
-                    msg = msg.substring(0, msg.length - 2);
-                    data.MessageText += (separationStr + msg);
                 }
+                /**
+                 * These validations are of no use in case of recruitment module
+                 * therefore commented out
+                 */
+
+                //if($scope.modalBox.tx.itemList.length <  1 && $scope.modules[moduleIndex].listType > 0){
+                //    Notification.error({ message : 'Please select items for the enquiry',delay : MsgDelay});
+                //    return ;
+                //}
+                //
+                //
+                //if($scope.modules[moduleIndex].listType > 0){
+                //    var separationStr = '     ';
+                //    var itemList = [];
+                //    try{
+                //        itemList = JSON.parse(data.ItemsList);
+                //    }
+                //    catch(ex){
+                //        //////////console.log(ex);
+                //    }
+                //    var msg = '';
+                //    for(var ct = 0; ct < itemList.length; ct++){
+                //        msg += itemList[ct]['ItemName'];
+                //        if(itemList[ct]['Qty'] && $scope.modules[moduleIndex].listType > 2){
+                //            msg += ' ('+ itemList[ct]['Qty'] + ')';
+                //        }
+                //        if(itemList[ct]['Amount'] && $scope.modules[moduleIndex].listType > 3){
+                //            msg += ' : '+ itemList[ct]['Amount'];
+                //        }
+                //        msg += ', ';
+                //    }
+                //    msg = msg.substring(0, msg.length - 2);
+                //    data.MessageText += (separationStr + msg);
+                //}
 
                 $scope.$emit('$preLoaderStart');
                 $http({
@@ -1821,11 +2162,21 @@
                             $scope.resetModalBox();
                             $scope.toggleAllEditMode();
                             $scope.$emit('$preLoaderStart');
-                            $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
-                                $scope.$emit('$preLoaderStop');
-                            },function(){
-                                $scope.$emit('$preLoaderStop');
-                            });
+                            if($scope.jobTid){
+                                loadApplicantForOneJob(1).then(function(){
+                                    $scope.$emit('$preLoaderStop');
+                                },function(){
+                                    $scope.$emit('$preLoaderStop');
+                                });;
+                            }
+                            else{
+                                $scope.loadTransaction(1,$scope.statusType,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                                    $scope.$emit('$preLoaderStop');
+                                },function(){
+                                    $scope.$emit('$preLoaderStop');
+                                });
+                            }
+
                         }
                         else{
                             Notification.error({ message : 'An error occurred while placing enquiry', delay : MsgDelay});

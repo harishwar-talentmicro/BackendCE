@@ -769,9 +769,9 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
             if (Token == null) {
                 console.log('FnSaveTranscationItems: Token is empty');
             }
-            else
+            else{
                 console.log(RtnMessage);
-
+            }
             res.statusCode=400;
             res.send(RtnMessage);
         }

@@ -531,13 +531,14 @@
             // Open popup - list of candidate who applied for job
             $scope.openCandidateListPopup = function(_jobID,_totalapplie)
             {
-                $scope.jobTid = _jobID;
+
                 if(_totalapplie > 0)
                 {
-                    $scope.ResumeInquiriesTab = true;
-                    $scope.JobsTab = false;
-                    $scope.JobSeekerTab = false;
+                    $scope.changeTabToApplicants(_jobID);
                 }
+
+
+
             }
 
             // Get Educations list
