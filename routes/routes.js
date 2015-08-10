@@ -188,13 +188,8 @@ exports.FnAddGroupMembers = messageBox.addGroupMembers;
 exports.FnGetPendingRequest = messageBox.getPendingRequest;
 exports.FnGetGroupList = messageBox.getGroupList;
 exports.FnLoadMessages = messageBox.loadMessages;
-/**
- * Validates Group Member
- * @service-param  token
- * @service-param ezeone_id
- * @service_param group_id
- */
 exports.FnValidateGroupMember = messageBox.validateGroupMember;
+exports.FnViewMessage = messageBox.viewMessage;
 
 
 var Notification = require('./modules/notification-module.js');
