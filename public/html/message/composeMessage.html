@@ -11,12 +11,12 @@
                 <input type="text"
                        ng-model="composeMsg.MessageTo"
                        class="form-control"
-                       ng-keypress="($event.charCode==13)?validateEnteredEzeoneOrGroup(composeMsg.MessageTo):return"
+                       ng-keypress="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)"
                        id="to"
                        placeholder="To">
-                <div class="input-group-addon no-padding-and-border">
+                <div class="input-group-addon no-padding-and-border hidden">
                     <div class="btn btn-primary no-radius"
-                            ng-click="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)">
+                         ng-click="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)">
                         <i class="fa fa-check"></i> Check</div>
                 </div>
             </div>
@@ -28,18 +28,22 @@
                     <span >{{list.GroupName}}</span>
                 </div>
             </div>
-            <!-- error message goes here -->
-            <div class="invalid-ezeone-msg text-danger" ng-show="visibilityMsg"><i class="fa fa-exclamation-circle"></i> {{errorMsgArr[currentErrorMsg]}} <i class="fa fa-times pointer"></i></div>
+            <!-- error message of receiver field goes here -->
+            <div class="invalid-ezeone-msg text-danger"
+                 ng-show="visibilityReceiverErrorMsg"
+                 ng-click="removeMessage()">
+                <i class="fa fa-exclamation-circle"></i> {{errorMsgArr[currentErrorMsg]}} <i class="fa fa-times pointer"></i>
+            </div>
 
             <!-- List of receiver -->
             <div class="receiver-list p-bottom-10">
-                <span class="receivers">
-                    <button class="btn btn-default btn-xs" disabled><i>@krunalpaid</i></button>
-                    <i class="fa fa-times pointer"></i>
+                <span class="receivers" ng-repeat="grp in receiverArr track by $index">
+                    <button class="btn btn-default btn-xs" disabled><i>{{grp.GroupName}}</i></button>
+                    <i class="fa fa-times pointer" ng-click="removeReceiver($index)"></i>
                 </span>
             </div>
 
-            <div class="input-group p-bottom-4">
+            <div class="input-group p-bottom-4 hidden">
                 <div class="input-group-addon">From</div>
                 <input type="text" ng-model="composeMsg.MessageFrom" class="form-control" id="from" placeholder="From">
             </div>
@@ -47,20 +51,33 @@
             <div class="p-bottom-4">
                 <textarea class="form-control p-bottom-4" ng-model="composeMsg.MessageBody" placeholder="Your message" rows="5"></textarea>
             </div>
+            <!-- error message of textarea field goes here -->
+            <div class="message-body-error text-danger"
+                 ng-show="visibilityMsgBodyErrorMsg"
+                 ng-click="removeMsgBodyError()">
+                <i class="fa fa-exclamation-circle"></i> {{errorMsgArr[currentMsgBodyErrorMsg]}} <i class="fa fa-times pointer"></i>
+            </div>
 
-
-            <button class="btn btn-warning"><i class="fa fa-paperclip"></i> Attachments</button>
-            <label class="label label-info">myFile.pdf &nbsp;<span title="remove attachment" class="label label-danger">X</span></label>
-            <label class="label label-info">myFile1.pdf  &nbsp;<span title="remove attachment" class="label label-danger">X</span></label>
+            <!--<button class="btn btn-default btn-xs"><i class="fa fa-paperclip"></i> Attachments</button>-->
+            <span class="attachment-module">
+                <!-- Attachment btn goes here -->
+                <button class="btn btn-xs btn-warning" ng-click="triggerFileAttachment()"><i class="fa fa-paperclip"></i> Attach Document</button>
+                <input class="hidden" type="file" id="tx-attachment" name="tx_attachment" onchange="angular.element(this).scope().attachDocument()" />
+                &nbsp;
+                <!-- Attachment list -->
+                <span class="attachment-list" ng-show="file.attachmentName.length > 0">
+                    <button class="btn btn-default btn-xs disabled p-left-5">
+                        {{file.attachmentName}}
+                    </button><i class="fa fa-times pointer hidden" ng-click="resetAttachmentData()"></i>
+                </span>
+            </span>
             <hr>
             <!-- Additional Filters -->
             <div class="additional-filter p-bottom-4">
                 <span class="col-lg-4 no-padding">
                 <div class="">Priority</div>
                 <select class="form-control" ng-model="composeMsg.Priority">
-                    <option value="1">High</option>
-                    <option value="2">Medium</option>
-                    <option value="3">Low</option>
+                    <option ng-repeat="pr in priority track by $index" value="{{$index}}">{{priority[$index]}}</option>
                 </select>
                     </span>
 
@@ -76,7 +93,7 @@
                     <date-time-picker recipient="composeMsg.ExpiryDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
                 </span>
             </div>
-            <div class="send-button text-right p-bottom-4">
+            <div class="send-button text-right p-bottom-4" ng-disabled="visibilityHtml.disabledSendBtn">
                 <button class="btn btn-primary no-radius p-top-4 m_top_4"
                         ng-click="sendMessage()"><i class="fa fa-send"></i> Send</button>
             </div>
