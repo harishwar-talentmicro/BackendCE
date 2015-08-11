@@ -1177,7 +1177,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
 
     var messageID  = req.body.message_id;
     var status  = req.body.status;
-    var trash  = req.body.trash;
     var token  = req.body.token;
 
     var responseMessage = {
@@ -1212,8 +1211,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status)
-                            + ',' + st.db.escape(trash)+ ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status)+ ',' + st.db.escape(token);
 
                         var query = 'CALL PchangeMessageActivity(' + queryParams + ')';
                         console.log(query);
@@ -1227,8 +1225,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
                                     responseMessage.data = {
                                         token: token,
                                         messageID: messageID,
-                                        status:status,
-                                        trash: trash
+                                        status:status
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnChangeMessageActivity: Message status changed successfully');

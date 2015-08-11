@@ -45,6 +45,7 @@ exports.FnGetProxmity = userModule.getProxmity;
 exports.FnGetInstitutes = userModule.getInstitutes;
 exports.FnGetEducations = userModule.getEducations;
 exports.FnGetSpecialization = userModule.getSpecialization;
+exports.FnGetVerifiedInstitutes = userModule.getVerifiedInstitutes;
 
 var Audit = require('./modules/audit-module.js');
 var auditModule = new Audit(db,stdLib);
