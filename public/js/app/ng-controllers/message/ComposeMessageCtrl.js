@@ -333,8 +333,13 @@ angular.module('ezeidApp').
                     return;
                 }
 
+                var temp = {
+                    GroupID:$scope.groupSuggestionList[index].GroupID,
+                    GroupType:$scope.groupSuggestionList[index].GroupType,
+                    GroupName:$scope.groupSuggestionList[index].GroupName
+                };
                 /* append the receiver's list */
-                $scope.receiverArr.push($scope.groupSuggestionList[index]);
+                $scope.receiverArr.push(temp);
             }
 
             /**

@@ -29,8 +29,8 @@
     <table class="table hover-effect">
         <thead>
         <th>
-        <td class="text-bolder">
-            <input type="checkbox" /> All
+        <td class="text-bolder pointer" ng-click="selectAllCheckBoxAction()">
+            <i class="fa" ng-class="selectAllCheckBoxChecked?'fa-check-square':'fa-square-o'"></i> All
         </td>
 
         <td class="text-bolder">
@@ -63,8 +63,10 @@
             <td>
                 <i class="fa fa-arrow-circle-down text-success"></i>
             </td>
-            <td>
-                <input type="checkbox" />
+            <td ng-click="$event.stopPropagation()">
+                <i class="fa text-info"
+                   ng-click="checkBoxAction(msg.tid)"
+                   ng-class="selectedMsgIdArray[msg.tid]?'fa-check-square':'fa-square-o'"></i>
             </td>
             <td title="{{msg.sender}}">
                 {{msg.sender | textLength:10}}
