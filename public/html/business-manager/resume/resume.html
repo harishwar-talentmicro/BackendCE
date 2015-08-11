@@ -363,7 +363,7 @@
 
                         <label class="tiny">Education</label>
                         <div class="form-group form-group-sm ">
-                            <select class="form-control" ng-model="modalBox.tx.jobId">
+                            <select class="form-control" ng-model="modalBox.tx.educationId">
                                 <option value="0">--Select Education--</option>
                                 <option ng-repeat="education in educationsList track by education.id" value="{{education.id}}">{{education.label}}</option>
                             </select>
@@ -435,7 +435,7 @@
                             <!--<b> {{tx.salary | formatDecimal:' ':2}} </b> -->
                             <b> {{tx.salary | formatDecimal:' ':2}} </b>
                             {{salaryTypeMapping[(tx.salary_type-1)] }}with
-                            {{(tx.Exp) ? ((tx.Exp == 1 || tx.Exp < 1) ? tx.Exp + ' year' : tx.Exp + ' years' ) : ' no experience'}} exp.
+                            {{(tx.Exp) ? ((tx.Exp == 1 || tx.Exp < 1) ? tx.Exp + ' year' : tx.Exp + ' years' ) : ' no '}} exp.
                         </small>
                     </div>
 
@@ -802,7 +802,7 @@
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                    <label>Education</label>
+                                    <label>Education </label>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="form-group form-group-sm ">

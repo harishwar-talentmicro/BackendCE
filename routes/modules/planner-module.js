@@ -82,7 +82,11 @@ Planner.prototype.getAllTask = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Tasks loaded successfully';
-                                            responseMessage.data = getResult[0][0];
+                                            responseMessage.data = {
+                                                s_time : req.query.s_time,
+                                                e_time : req.query.e_time,
+                                                tasks : getResult[0]
+                                            };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetAllTask: Tasks loaded successfully');
                                         }
@@ -150,5 +154,128 @@ Planner.prototype.getAllTask = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetTrans
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @service-param token <varchar>
+ * @service-param tid <int> tid of transaction id
+ * @description api code for get transaction based on tid
+ */
+Planner.prototype.getTrans = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var tid = parseInt(req.query.tid);
+
+
+    var responseMessage = {
+        status: false,
+        error: null,
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!tid){
+        error['tid'] = 'Invalid tid';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =  st.db.escape(token) + ',' + st.db.escape(tid);
+                        var query = 'CALL (' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0){
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Transaction loaded successfully';
+                                            responseMessage.data =getResult[0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetTrans: Transaction loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Transaction not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetTrans:Transaction not loaded');
+                                        }
+
+                                    }
+                                    else {
+                                        responseMessage.message = 'Transaction not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTrans:Transaction not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'Transaction not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTrans:Transaction not loaded');
+                                }
+
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetTrans: error in getting Transaction:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetTrans: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTrans:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetTrans ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = Planner;
