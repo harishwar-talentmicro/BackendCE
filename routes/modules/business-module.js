@@ -286,7 +286,8 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                             + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName)
                             + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ "," + st.db.escape(proabilities)
                             + "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type)+ "," + st.db.escape(alarmDuration)
-                            + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)+ ', ' + st.db.escape(instituteId)+ ', ' + st.db.escape(jobId)
+                            + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)+ ', ' + st.db.escape(instituteId)+
+                            ', ' + st.db.escape(jobId)
                             + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType);
                         // st.db.escape(NextActionDateTime);
                         console.log('CALL pSaveTrans(' + query + ')');
@@ -1019,7 +1020,8 @@ try{
             if (!err) {
                 if (Result != null) {
 
-                    var query = st.db.escape(MessageID) + ',' + st.db.escape(ItemID) + ',' + st.db.escape(Qty) + ',' + st.db.escape(Rate) + ',' +st.db.escape(Amount) + ',' +st.db.escape(Duration);
+                    var query = st.db.escape(MessageID) + ',' + st.db.escape(ItemID) + ',' + st.db.escape(Qty) +
+                        ',' + st.db.escape(Rate) + ',' +st.db.escape(Amount) + ',' +st.db.escape(Duration);
                     st.db.query('CALL pSaveTranscationItems(' + query + ')', function (err, InsertResult) {
                         if (!err){
                             if (InsertResult.affectedRows > 0) {

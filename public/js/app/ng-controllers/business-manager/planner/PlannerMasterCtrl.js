@@ -21,6 +21,13 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',['$scope','$compile','
         {title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29),url: 'http://google.com/'}
     ];
 
+    /* Render Tooltip */
+    $scope.eventRender = function( event, element, view ) {
+        element.attr({'tooltip': event.title,
+            'tooltip-append-to-body': true});
+        $compile(element)($scope);
+    };
+
     $scope.eventSources = [];
 
 

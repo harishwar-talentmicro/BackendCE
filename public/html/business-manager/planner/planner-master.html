@@ -4,12 +4,23 @@
     <!--</div>-->
     <div class="panel-body">
         <div class="btn-toolbar">
-            <p class="pull-right lead">Planner v1.0</p>
-            <div class="btn-group">
-                <button class="btn btn-success btn-sm" ng-click="changeView('agendaDay', 'ezeoneCalendar')">AgendaDay</button>
-                <button class="btn btn-success btn-sm" ng-click="changeView('agendaWeek', 'ezeoneCalendar')">AgendaWeek</button>
-                <button class="btn btn-success btn-sm" ng-click="changeView('month', 'ezeoneCalendar')">Month</button>
+
+            <div class="btn-group no-radius" data-toggle="buttons">
+                <label class="btn btn-info btn-sm no-radius active" ng-click="changeView('agendaDay', 'ezeoneCalendar')">
+                    <input type="radio" name="options" id="option1" autocomplete="off" checked> &nbsp; Day &nbsp;
+                </label>
+                <label class="btn btn-info btn-sm no-radius" ng-click="changeView('agendaWeek', 'ezeoneCalendar')">
+                    <input type="radio" name="options" id="option2" autocomplete="off"> &nbsp; Week &nbsp;
+                </label>
+                <label class="btn btn-info btn-sm no-radius" ng-click="changeView('month', 'ezeoneCalendar')">
+                    <input type="radio" name="options" id="option3" autocomplete="off"> &nbsp; Month &nbsp;
+                </label>
             </div>
+            <!--<div class="btn-group no-radius">-->
+                <!--<button class="btn btn-info btn-sm no-radius" >Day View</button>-->
+                <!--<button class="btn btn-info btn-sm no-radius" ng-click="changeView('agendaWeek', 'ezeoneCalendar')">Week View</button>-->
+                <!--<button class="btn btn-info btn-sm no-radius" ng-click="changeView('month', 'ezeoneCalendar')">Month View</button>-->
+            <!--</div>-->
         </div>
 
         <div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources" calendar="ezeoneCalendar"></div>
