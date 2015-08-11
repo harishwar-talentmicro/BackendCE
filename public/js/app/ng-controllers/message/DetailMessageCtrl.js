@@ -47,8 +47,17 @@ angular.module('ezeidApp').
                 redirectInboxPage();
             }
 
-            $scope.messageData = [];
+            /* PRIORITY */
+            $scope.priority = [
+                "High",
+                "Medium",
+                "Low"
+            ];
 
+            $scope.messageData = [];
+            $scope.composeMessageTemplate = "";
+            $scope.detailMessagModuleLoaded = true;
+            $scope.responseMsgId = 0;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,12 +74,12 @@ angular.module('ezeidApp').
             {
                 loadFullMessageApi().then(function(data){
                         console.log(data);
-                    $scope.messageData = data;
-                },
-                function()
-                {
-                    redirectInboxPage();
-                });
+                        $scope.messageData = data;
+                    },
+                    function()
+                    {
+                        redirectInboxPage();
+                    });
             }
 
             /**
@@ -78,7 +87,35 @@ angular.module('ezeidApp').
              */
             function redirectInboxPage()
             {
-                //$location.url('/message');
+                $location.url('/message');
+            }
+
+            /**
+             * Load form to reply a group or individual message
+             */
+            $scope.loadReplyMsgForm = function()
+            {
+                setReplyMessageData();
+                $scope.composeMessageTemplate = "html/message/composeMessage.html";
+            }
+
+            function setReplyMessageData()
+            {
+                /* load the reply data in the form */
+                $scope.receiverArr = [];
+                var temp = {
+                    AdminID: 537,
+                    GroupID: 5,
+                    GroupName: "fox1",
+                    GroupType: 0,
+                    MemberID: 537,
+                    Status: 1,
+                    isAdmin: 0,
+                    requester: 1
+                };
+                $scope.receiverArr.push(temp);
+                $scope.responseMsgId = msgId;
+
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
