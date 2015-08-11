@@ -1,1 +1,18 @@
-<div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources"></div> 
+<div class="panel panel-default" ng-controller="PlannerMasterCtrl">
+    <!--<div class="panel-heading">
+    <!--<h3 class="font-roboto business-manager-module-heading">{{(_userInfo.CVModuleTitle) ? _userInfo.CVModuleTitle : 'Resume Application'}}</h3>-->
+    <!--</div>-->
+    <div class="panel-body">
+        <div class="btn-toolbar">
+            <p class="pull-right lead">Planner v1.0</p>
+            <div class="btn-group">
+                <button class="btn btn-success btn-sm" ng-click="changeView('agendaDay', 'ezeoneCalendar')">AgendaDay</button>
+                <button class="btn btn-success btn-sm" ng-click="changeView('agendaWeek', 'ezeoneCalendar')">AgendaWeek</button>
+                <button class="btn btn-success btn-sm" ng-click="changeView('month', 'ezeoneCalendar')">Month</button>
+            </div>
+        </div>
+
+        <div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources" calendar="ezeoneCalendar"></div>
+
+    </div>
+</div>
