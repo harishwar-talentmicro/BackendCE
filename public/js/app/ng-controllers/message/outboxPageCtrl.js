@@ -521,4 +521,12 @@ angular.module('ezeidApp').
                 });
                 return defer.promise;
             }
+
+            /**
+             * redirect to detail page
+             */
+            $scope.redirectPage  = function(msgId)
+            {
+                $location.url('/message/details?msg=' + msgId);
+            }
         }]);

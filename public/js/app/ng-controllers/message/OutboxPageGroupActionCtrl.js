@@ -408,7 +408,31 @@ angular.module('ezeidApp').
                 $('#ezeone-id').val(ezeone);
 
                 validateGroupMember(ezeone,$scope.activeGroupId).then(function(data){
-                    console.log(data);
+
+                    if(data.userstatus && data.userstatus == -1)
+                    {
+                        /* Group name is Unique: passed the validity test! */
+                        ezeOneValidationAction(1);
+                        $scope.activeEzeOneId = data.masterid;
+                        $scope.activeEzeOneName = data.name;
+                    }
+                    else if(data.userstatus && data.userstatus == -2)
+                    {
+                        /* EZEONE does not exists */
+                        ezeOneValidationAction(2);
+                        $scope.activeEzeOneId = 0;
+                        $scope.activeEzeOneName = "";
+                        Notification.error({ message: "EZEONE doesn't exists in the system", delay: MsgDelay });
+                    }
+                    else
+                    {
+                        ezeOneValidationAction(3);
+                        $scope.activeEzeOneId = 0;
+                        $scope.activeEzeOneName = "";
+                        if($scope.ezeOneMembershipStatus == 1)
+                            Notification.error({ message: "You are already connected to this user/group", delay: MsgDelay });
+                    }
+
                 });
             }
 

@@ -43,7 +43,8 @@ angular.module('ezeidApp').
             ////////////////////////////////////INITIALIZATIONS/////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             $scope.composeMsg = [];
-
+            /* title variable */
+            $scope.titleText = "MESSAGE";
             /* visibility */
             $scope.visibilityHtml = {
                 groupSuggestion:false,
@@ -74,19 +75,20 @@ angular.module('ezeidApp').
             /* group suggestion list */
             $scope.groupSuggestionList = [];
 
-            /* receiver array */
-            $scope.receiverArr = [];
-
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            resetDefault();
+            if(!$scope.detailMessagModuleLoaded)
+                resetDefault();
             /* attachments declarations */
             resetAttachment();
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+            /**
+             * Reset all the values to there default settings on page load
+             */
             function resetDefault()
             {
                 $scope.currentErrorMsg = 0;
@@ -97,6 +99,9 @@ angular.module('ezeidApp').
                 $scope.visibilityReceiverErrorMsg = false;
                 $scope.visibilityMsgBodyErrorMsg = false;
                 $scope.visibilityHtml.groupSuggestion = false;
+
+                $scope.responseMsgId = 0;
+                console.log("All compose message data cleared");
             }
             /**
              * Get the group type
@@ -120,14 +125,12 @@ angular.module('ezeidApp').
             /**
              * Initiate the process to send message
              */
-            $scope.sendMessage = function(replyId)
+
+            $scope.sendMessage = function()
             {
-                var previousMsgId = 0;
-                /* if reply id is not undefined */
-                if(typeof replyId != undefined)
-                {
-                    previousMsgId = replyId;
-                }
+
+                var previousMsgId = $scope.responseMsgId;
+                console.log(previousMsgId);
                 /* validate message content */
                 if(!validateMessageContent())
                 {
@@ -135,8 +138,6 @@ angular.module('ezeidApp').
                 }
                 /* create the smart parameters for sending a message */
                 var data = createCommaSeperatedReceiverId();
-
-
 
                 /* call the API and send message */
                 composeMessageApi(data.toId,data.toIdType,previousMsgId).then(function(){
@@ -334,7 +335,6 @@ angular.module('ezeidApp').
 
                 /* append the receiver's list */
                 $scope.receiverArr.push($scope.groupSuggestionList[index]);
-
             }
 
             /**
@@ -409,6 +409,14 @@ angular.module('ezeidApp').
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+            /**
+             * API call for sending a message to a user or group
+             * @param toId
+             * @param toIdType
+             * @param previousMsgId
+             * @returns {*}
+             */
             function composeMessageApi(toId,toIdType,previousMsgId)
             {
                 var defer = $q.defer();
@@ -423,7 +431,7 @@ angular.module('ezeidApp').
                         attachment_filename :$scope.file.attachmentName,
                         target_date :UtilityService._convertTimeToServer($scope.composeMsg.TargetDate,"DD-MMM-YYYY","YYYY-MM-DD"),
                         expiry_date :UtilityService._convertTimeToServer($scope.composeMsg.ExpiryDate,"DD-MMM-YYYY","YYYY-MM-DD"),
-                        previous_messageID:0,
+                        previous_messageID:previousMsgId,
                         to_id:toId,
                         id_type :toIdType//1: individual, 2: group
 
@@ -431,20 +439,22 @@ angular.module('ezeidApp').
                 }).success(function(resp){
 
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                    }
+
                     if(resp.data)
                     {
                         defer.resolve(resp.data);
-                    }
-                    else
-                    {
-                        defer.reject();
                     }
 
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
+
                 return defer.promise;
             }
         }]);

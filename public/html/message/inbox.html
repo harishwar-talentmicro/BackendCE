@@ -26,144 +26,71 @@
     </div>
 </div>
 <div class="message-table">
-                        <table class="table">
-                            <thead>
-                            <th>
-                            <td class="text-bolder">
-                                <input type="checkbox" /> All
-                            </td>
+    <table class="table hover-effect">
+        <thead>
+        <th>
+        <td class="text-bolder">
+            <input type="checkbox" /> All
+        </td>
 
-                            <td class="text-bolder">
-                                Sender
-                            </td>
-                            <td class="text-bolder">
-                                Message
-                            </td>
-                            <td class="text-bolder">
-                            </td>
-                            <td class="display-in-full-screen display-table text-bolder">
-                                Target Date
-                            </td>
-                            <td class="display-in-full-screen display-table text-bolder">
-                                Expiry Date
-                            </td>
-                            <td class="text-bolder">
-                                Time
-                            </td>
-                            </th>
-                            </thead>
-                            <tbody>
-                            <!--<tr>-->
-                                <!--<td>-->
-                                    <!--<i class="fa fa-arrow-circle-up text-danger"></i>-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--<input type="checkbox" />-->
-                                <!--</td>-->
+        <td class="text-bolder">
+            Sender
+        </td>
+        <td class="text-bolder">
+            Message
+        </td>
+        <td class="text-bolder">
+        </td>
+        <td class="display-in-full-screen display-table text-bolder">
+            Target Date
+        </td>
+        <td class="display-in-full-screen display-table text-bolder">
+            Expiry Date
+        </td>
+        <td class="text-bolder">
+            Time
+        </td>
+        </th>
+        </thead>
+        <tbody class="list-hover">
 
-                                <!--<td>-->
+        <!-- Message List -->
+        <tr ng-repeat="msg in dashBoardMsg track by $index"
+            class="pointer"
+            ng-class="msg.status == 1?'active':''"
+            ng-click="redirectPage(msg.tid)">
 
-                                    <!--<a href="/outbox/details" class="pointer"> Vector King</a>-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--Lorem ipsum dolor imit set.-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--<span class="glyphicon glyphicon-paperclip"></span>-->
-                                <!--</td>-->
-                                <!--<td class="display-in-full-screen display-table">-->
-                                    <!--15/12/2015 13:10-->
-                                <!--</td>-->
-                                <!--<td class="display-in-full-screen display-table">-->
-                                    <!--15/12/2014 13:10-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--12:09AM-->
-                                <!--</td>-->
-                            <!--</tr>-->
-                            <!--<tr>-->
-                                <!--<td>-->
-                                    <!--<i class="fa fa-arrow-circle-down text-success"></i>-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--<input type="checkbox" />-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--Vector King-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--Lorem ipsum dolor imit set.-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--<span class="glyphicon glyphicon-paperclip"></span>-->
-                                <!--</td>-->
-                                <!--<td class="display-in-full-screen display-table">-->
-                                    <!--15/12/2015 13:10-->
-                                <!--</td>-->
-                                <!--<td class="display-in-full-screen display-table">-->
-                                    <!--15/12/2014 13:10-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--12:09AM-->
-                                <!--</td>-->
-                            <!--</tr>-->
-                            <!--<tr class="active">-->
-                                <!--<td>-->
-                                    <!--<i class="fa fa-arrow-circle-up text-danger"></i>-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--<input type="checkbox" />-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--Vector King-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--Lorem ipsum dolor imit set.-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--&lt;!&ndash;<span class="glyphicon glyphicon-paperclip"></span>&ndash;&gt;-->
-                                <!--</td>-->
-                                <!--<td class="display-in-full-screen display-table">-->
-                                    <!--15/12/2015 13:10-->
-                                <!--</td>-->
-                                <!--<td class="display-in-full-screen display-table  ">-->
-                                    <!--15/12/2014 13:10-->
-                                <!--</td>-->
-                                <!--<td>-->
-                                    <!--12:09AM-->
-                                <!--</td>-->
-                            <!--</tr>-->
-                            <tr ng-repeat="msg in dashBoardMsg track by $index">
-                                <td>
-                                    <i class="fa fa-arrow-circle-down text-success"></i>
-                                </td>
-                                <td>
-                                    <input type="checkbox" />
-                                </td>
-                                <td>
-                                    Vector King
-                                </td>
-                                <td>
-                                    Lorem ipsum dolor imit set.
-                                </td>
-                                <td>
-                                    <span class="glyphicon glyphicon-paperclip"></span>
-                                </td>
-                                <td class="display-in-full-screen display-table">
-                                    15/12/2015 13:10
-                                </td>
-                                <td class="display-in-full-screen display-table  ">
-                                    15/12/2014 13:10
-                                </td>
-                                <td>
-                                    12:09AM
-                                </td>
-                            </tr>
-                            <tr ng-show="!dashBoardMsg.length > 0">
-                                <td class="text-left" colspan="8">
-                                    <i class="fa fa-envelope text-danger"></i> No new messages
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <td>
+                <i class="fa fa-arrow-circle-down text-success"></i>
+            </td>
+            <td>
+                <input type="checkbox" />
+            </td>
+            <td title="{{msg.sender}}">
+                {{msg.sender | textLength:10}}
+            </td>
+            <td>
+                {{msg.Message | textLength:20}}
+            </td>
+            <td>
+                <span class="glyphicon glyphicon-paperclip"></span>
+            </td>
+            <td class="display-in-full-screen display-table">
+                {{msg.TargetDate}}
+            </td>
+            <td class="display-in-full-screen display-table  ">
+                {{msg.ExpiryDate}}
+            </td>
+            <td>
+                12:09AM
+            </td>
+
+        </tr>
+        <tr ng-show="!dashBoardMsg.length > 0">
+            <td class="text-left" colspan="8">
+                <i class="fa fa-envelope text-danger"></i> No new messages
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

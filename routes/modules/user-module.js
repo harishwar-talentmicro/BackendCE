@@ -2518,7 +2518,7 @@ User.prototype.saveResume = function(req,res,next){
         var specializationID = req.body.specialization_id ? req.body.specialization_id :0;
         var yearOfPassing = req.body.year_of_passing;
         var aggregateScore = req.body.aggregate_score;
-        var institueTitle = req.body.institue_title ? req.body.institue_title : '';
+        var institueTitle = req.body.institute_title ? req.body.institute_title : '';
 
         var expectedSalary = (parseFloat(req.body.exp_salary) !== NaN) ? parseFloat(req.body.exp_salary) : 0.00;
 

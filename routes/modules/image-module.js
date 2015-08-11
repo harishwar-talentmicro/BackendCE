@@ -286,8 +286,8 @@ Image.prototype.imageURL = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var image_url = req.query.image_url;
-        var image_id = req.query.image_id;
+        var image_url = req.query.image_url ? req.query.image_url : 2;   // image_url : 1- getting modules images, 2 - splash images
+        var image_id = req.query.image_id ? req.query.image_id : 0;      //image_id  : 0 - call test serever, 1- call live sever
 
         var responseMessage = {
             status: false,
@@ -311,10 +311,13 @@ Image.prototype.imageURL = function(req,res,next){
             }
 
             else {
-                var image_url1 = 'http://104.199.128.226:3001/images/ezeone_splash_img.jpg';
-
+                var image_url1 = 'http://104.199.128.226:3001/images/splash_theme_1.png';
+                var image_url2 = 'http://104.199.128.226:3001/images/splash_theme_2.png';
+                var image_url3 = 'http://104.199.128.226:3001/images/splash_theme_3.png';
+                var image_url4 = 'http://104.199.128.226:3001/images/splash_theme_4.png';
+                var image_url5 = 'http://104.199.128.226:3001/images/splash_theme_5.png';
                 responseMessage.status = true;
-                responseMessage.data = {splash_url: image_url1};
+                responseMessage.data = {splash_url1: image_url1,splash_url2: image_url2, splash_url3: image_url3,splash_url4: image_url4,splash_url5: image_url5};
                 responseMessage.error = null;
                 responseMessage.message = ' Image URL Send successfully';
                 console.log('FnImageURL:Image URL Send successfully');
@@ -337,10 +340,13 @@ Image.prototype.imageURL = function(req,res,next){
             }
 
             else {
-                var image_url1 = 'http://www.ezeone.com/images/ezeone_splash_img.jpg';
-
+                var image_url1 = 'http://www.ezeone.com/images/splash_theme_1.png';
+                var image_url2 = 'http://www.ezeone.com/images/splash_theme_2.png';
+                var image_url3 = 'http://www.ezeone.com/images/splash_theme_3.png';
+                var image_url4 = 'http://www.ezeone.com/images/splash_theme_4.png';
+                var image_url5 = 'http://www.ezeone.com/images/splash_theme_5.png';
                 responseMessage.status = true;
-                responseMessage.data = {splash_url: image_url1};
+                responseMessage.data = {splash_url1: image_url1,splash_url2: image_url2, splash_url3: image_url3,splash_url4: image_url4,splash_url5: image_url5};
                 responseMessage.error = null;
                 responseMessage.message = ' Image URL Send successfully';
                 console.log('FnImageURL:Image URL Send successfully');
