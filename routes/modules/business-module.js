@@ -807,7 +807,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
         var alarmDuration = (parseInt(req.body.alarm_duration) !== NaN) ? parseInt(req.body.alarm_duration) : 0;
         var probability = (parseInt(req.body.probability) !== NaN && parseInt(req.body.probability) !== 0) ? parseInt(req.body.probability) : 2 ;
         var targetDate = req.body.target_date ? req.body.target_date : null;
-        var amount = req.body.amount ? req.body.amount : 0;
+        var amount = (req.body.amount) ? req.body.amount : 0;
         var instituteId = req.body.institute_id ? req.body.institute_id : 0;
         var jobId = req.body.job_id ? req.body.job_id : 0;
         var educationId = req.body.education_id ? req.body.education_id : 0;
@@ -847,10 +847,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
                             probability : probability,
                             target_date : targetDate,
 
-
-                            amount : (req.body.amount) ?
-                                ((parseFloat(req.body.amount) !== NaN && parseFloat(req.body.amount) > 0)
-                                    ? parseFloat(req.body.amount) : 0.00)  : 0.00,
+                            amount : (req.body.amount) ? ((parseFloat(req.body.amount) !== NaN && parseFloat(req.body.amount) > 0) ? parseFloat(req.body.amount) : 0.00) : 0.00,
                             institute_id :  (req.body.institute_id) ?
                             ((parseInt(req.body.institute_id) > 0 && parseInt(req.body.institute_id) !== NaN) ?
                                 parseInt(req.body.institute_id) : 0): 0,

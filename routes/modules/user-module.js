@@ -749,7 +749,6 @@ User.prototype.login = function(req,res,next){
                                             RtnMessage.TID = loginDetails[0].TID;
                                             RtnMessage.ezeone_id = loginDetails[0].EZEID;
                                             RtnMessage.FirstName = loginDetails[0].FirstName;
-                                            RtnMessage.Password = loginDetails[0].Password;
                                             RtnMessage.CompanyName = loginDetails[0].CompanyName;
                                             RtnMessage.Type = loginDetails[0].IDTypeID;
                                             RtnMessage.Icon = loginDetails[0].Icon;

@@ -369,7 +369,7 @@
                     itemList : [],
                     companyId : 0,
                     companyName :  '',
-                    amount : (parseFloat(tx.salary) !== NaN) ? parseFloat(tx.salary,2) : 0.00,
+                    amount : (parseFloat(tx.salary) !== NaN) ? parseFloat(tx.salary).toFixed(2) : 0.00,
                     targetDate : (tx.target_date) ? tx.target_date :  moment().format('YYYY-MM-DD'),
                     probability : (parseInt(tx.probability) !== NaN && parseInt(tx.probability) !== 0) ?
                         parseInt(tx.probability) : 2,
@@ -377,15 +377,12 @@
                     attachmentName : "",
                     attachmentMimeType : "",
                     alarmDuration : (parseInt(tx.alarm_duration)) ? parseInt(tx.alarm_duration) : 0,
-
                     instituteId : tx.institute_id,
                     educationId : tx.Educationid,
                     specializationId : tx.specialization_id,
                     jobId : tx.job_id,
                     salaryType : tx.salary_type,
-                    salary : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
-                    && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
-                        parseFloat($scope.modalBox.tx.orderAmount) : 0,
+                    orderAmount : (parseFloat(tx.salary) !== NaN) ? parseFloat(tx.salary).toFixed(2) : 0.00
 
                 };
                 return editModeTx;
@@ -487,7 +484,7 @@
                         && parseInt($scope.modalBox.tx.jobId) > 0) ?
                             parseInt($scope.modalBox.tx.jobId) : 0,
 
-                        salary : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
+                        amount : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
                         && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
                             parseFloat($scope.modalBox.tx.orderAmount) : 0,
 
@@ -745,7 +742,7 @@
 
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Add new applicant',
+                    title : 'Add applicant',
                     class : 'business-manager-modal',
                     contactType : 0,
                     locationList : [],

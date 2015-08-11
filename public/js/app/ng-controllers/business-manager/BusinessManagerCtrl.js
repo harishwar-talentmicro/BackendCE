@@ -59,6 +59,12 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
 
         var modules = [
             {
+                title : 'Planner',
+                icon : 'glyphicon glyphicon-list-alt',
+                type : 'planner',
+                permission : 3
+            },
+            {
                 title : ($rootScope._userInfo.SalesModuleTitle) ? $rootScope._userInfo.SalesModuleTitle : 'Sales',
                 permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[0] : 0,
                 listType : ($rootScope._userInfo.SalesItemListType) ? $rootScope._userInfo.SalesItemListType : 0,
@@ -146,6 +152,10 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                 case 'resume' :
                     $scope.activeTemplate = 'html/business-manager/resume/resume-master.html';
                     $scope.activeModule = 'resume';
+                    break;
+                case 'planner':
+                    $scope.activeTemplate = 'html/business-manager/planner/planner-master.html';
+                    $scope.activeModule = 'planner';
                     break;
                 default:
                   if($scope.modules.length < 1){
