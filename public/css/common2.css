@@ -3349,3 +3349,40 @@ sup.tm{
     background-color: #0B848E;
     color: #fff;
 }
+
+.hover-effect .list-hover > tr:hover
+{
+    background-color: rgba(45, 145, 253, 0.85);
+    color: #fff;
+}
+
+.hpw .container .you
+{
+        background-color: rgba(245, 245, 245, 0.69);
+}
+
+.hpw .chat-style-inbox
+{
+    padding: 20px;
+    border: 1px solid #B0AEAE;
+    border-radius: 10px;
+    color: gray;
+    font-size: 1em;
+    font-style: italic;
+    padding-bottom: 10px !important;
+}
+
+.hpw .chat-style-sender-msg
+{
+    color: black;
+    font-style: normal;
+    font-size: 0.8em;
+    font-weight: 600;
+    padding-top: 10px !important;
+}
+
+.hpw .message-detail-text:hover
+{
+    background-color: #108078;
+    color: #fff !important;
+}

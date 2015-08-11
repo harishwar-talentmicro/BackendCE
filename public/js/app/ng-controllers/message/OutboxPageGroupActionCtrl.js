@@ -408,24 +408,15 @@ angular.module('ezeidApp').
                 $('#ezeone-id').val(ezeone);
 
                 validateGroupMember(ezeone,$scope.activeGroupId).then(function(data){
-                    if(data.status == -1)
-                    {
-                        /* enable add btn */
-                    }
-                    else
-                    {
-                        /* disable sadd btn */
-                    }
-
 
                     if(data.userstatus && data.userstatus == -1)
                     {
                         /* Group name is Unique: passed the validity test! */
                         ezeOneValidationAction(1);
-                        $scope.activeEzeOneId = resp.data[0].masterid;
-                        $scope.activeEzeOneName = resp.data[0].name;
+                        $scope.activeEzeOneId = data.masterid;
+                        $scope.activeEzeOneName = data.name;
                     }
-                    else if(resp.data[0].userstatus && resp.data[0].userstatus == -2)
+                    else if(data.userstatus && data.userstatus == -2)
                     {
                         /* EZEONE does not exists */
                         ezeOneValidationAction(2);
