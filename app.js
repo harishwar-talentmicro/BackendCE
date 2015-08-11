@@ -235,6 +235,7 @@ app.get('/message_attachment',LocationManager.FnGetMessageAttachment);
 
 //Planner module
 app.get('/tasks',LocationManager.FnGetAllTask);
+app.get('/ewtGetTransaction',LocationManager.FnGetTrans);
 
 
 //below service are for EZEIDAP

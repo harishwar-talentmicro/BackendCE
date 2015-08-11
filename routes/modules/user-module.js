@@ -3758,7 +3758,6 @@ User.prototype.getInstitutes = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                console.log(result);
                                 responseMsg.status = true;
                                 responseMsg.message = 'Institutes loaded successfully';
                                 responseMsg.error = null;
@@ -3834,7 +3833,6 @@ User.prototype.getEducations = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                console.log(result);
                                 responseMsg.status = true;
                                 responseMsg.message = 'Educations loaded successfully';
                                 responseMsg.error = null;
@@ -3910,7 +3908,6 @@ User.prototype.getSpecialization = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                console.log(result);
                                 responseMsg.status = true;
                                 responseMsg.message = 'Specialization loaded successfully';
                                 responseMsg.error = null;

@@ -202,6 +202,7 @@ exports.FnMSAuthResource = notification.authResource;
 var Planner = require('./modules/planner-module.js');
 var plannerModule = new Planner(db,stdLib);
 exports.FnGetAllTask = plannerModule.getAllTask;
+exports.FnGetTrans = plannerModule.getTrans;
 
 
 //ap parts

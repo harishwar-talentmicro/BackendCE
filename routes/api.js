@@ -175,6 +175,7 @@ router.get('/message_attachment',LocationManager.FnGetMessageAttachment);
 
 //Planner module
 router.get('/tasks',LocationManager.FnGetAllTask);
+router.get('/ewtGetTransaction',LocationManager.FnGetTrans);
 
 
 //below service are for EZEIDAP
