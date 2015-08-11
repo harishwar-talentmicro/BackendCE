@@ -1,4 +1,4 @@
-<section id="detail-message-wapper" ng-controller="DetailMessageCtrl">
+<section id="detail-message-wapper chat hpw" ng-controller="DetailMessageCtrl">
     <div class="message-content-tbl hpw">
         <div class="row setRowLeftRightMarginZero">
             <div class="pagination-btn">
@@ -10,7 +10,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setLeftRightPaddingZero text-right">
                     <span>12:09AM</span>
                     <button class="btn btn-default" title="Download Attachment"><i class="fa fa-paperclip"></i></button>
-                    <button class="btn btn-default" title="Replay"><i class="fa fa-reply"></i></button>
+                    <button class="btn btn-default" title="Reply"><i class="fa fa-reply"></i></button>
                     <button class="btn btn-default" title="Forward"><i class="fa fa-share"></i></button>
                     <button class="btn btn-default" title="Delete"><i class="fa fa-trash-o"></i></button>
                 </div>
@@ -19,8 +19,52 @@
 
         <hr class="style-two">
         <div class="row setRowLeftRightMarginZero">
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 message-detail-text">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+            <!-- individual msgs -->
+            <div class="container p-bottom-10">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 message-detail-text chat-style-inbox">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+                    when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+                    It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+                    and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                    <br>
+                    <div class="col-lg-6 text-left no-padding chat-style-sender-msg">
+                        <i class="fa fa-user"></i> User
+                    </div>
+                    <div class="col-lg-6 text-right no-padding chat-style-sender-msg">
+                        12:00 Am 14' Jan 2015 <i class="fa fa-clock-o"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="container p-bottom-10">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 message-detail-text chat-style-inbox you">
+                    Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                    Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+                    when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                    <br>
+                    <div class="col-lg-6 text-left no-padding chat-style-sender-msg">
+                        <i class="fa fa-star fa-spin text-danger"></i> YOU
+                    </div>
+                    <div class="col-lg-6 text-right no-padding chat-style-sender-msg">
+                        12:00 Am 14' Jan 2015 <i class="fa fa-clock-o"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container p-bottom-10">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 message-detail-text chat-style-inbox">
+                    It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+                    It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+                    and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                    <br>
+                    <div class="col-lg-6 text-left no-padding chat-style-sender-msg">
+                        <i class="fa fa-user"></i> User
+                    </div>
+                    <div class="col-lg-6 text-right no-padding chat-style-sender-msg">
+                        12:00 Am 14' Jan 2015 <i class="fa fa-clock-o"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
