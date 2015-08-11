@@ -64,6 +64,9 @@ angular.module('ezeidApp').
             $scope.pendingRequestCount = 0;
             $scope.pendingRequestData = [];
 
+            /* Mark as read/unread check box */
+            $scope.selectedMsgIdArray = [];
+            $scope.selectAllCheckBoxChecked = false;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////Default Function Calls//////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,6 +313,59 @@ angular.module('ezeidApp').
                 class: 'business-manager-modal'
             };
 
+            /**
+             * Function to MARK/UNMARK the message
+             */
+            $scope.checkBoxAction = function(tid)
+            {
+                $scope.selectAllCheckBoxChecked = false;
+
+                if ($scope.selectedMsgIdArray[tid])
+                    $scope.selectedMsgIdArray[tid] = false;
+                else
+                    $scope.selectedMsgIdArray[tid] = true;
+
+                console.log($scope.selectedMsgIdArray);
+
+            }
+
+            /**
+             * Select all check boxes of message ACTION
+             */
+            $scope.selectAllCheckBoxAction = function()
+            {
+                var totalResLength = $scope.dashBoardMsg.length;
+                var count = 0;
+                $scope.selectedMsgIdArray.forEach(function(data,key){
+                    if($scope.selectedMsgIdArray[key])
+                    {
+                        count++;
+                    }
+                });
+
+                if(parseInt(count) != parseInt(totalResLength))
+                {
+                    /* select All */
+                    selectAllCheckBox();
+                    $scope.selectAllCheckBoxChecked = true;
+                }
+                else
+                {
+                    /* clear all */
+                    $scope.selectedMsgIdArray = [];
+                    $scope.selectAllCheckBoxChecked = false;
+                }
+            }
+
+            /**
+             * parsing through all the checkboxes array and making each of them true
+             */
+            function selectAllCheckBox()
+            {
+                $scope.dashBoardMsg.forEach(function(data){
+                    $scope.selectedMsgIdArray[data.tid] = true;
+                });
+            }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////GET GROUPS & INDIVIDUALS////////////////////////////////////////////////
@@ -387,6 +443,15 @@ angular.module('ezeidApp').
                     $scope.pendingRequestCount = count;
                 });
             }
+
+            /**
+             * redirect to detail page
+             */
+            $scope.redirectPage  = function(msgId)
+            {
+                $location.url('/message/details?msg=' + msgId);
+            }
+
 
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -520,13 +585,5 @@ angular.module('ezeidApp').
                     defer.resolve(resp.data);
                 });
                 return defer.promise;
-            }
-
-            /**
-             * redirect to detail page
-             */
-            $scope.redirectPage  = function(msgId)
-            {
-                $location.url('/message/details?msg=' + msgId);
             }
         }]);

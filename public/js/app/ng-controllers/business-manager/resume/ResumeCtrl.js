@@ -369,7 +369,7 @@
                     itemList : [],
                     companyId : 0,
                     companyName :  '',
-                    amount : (parseFloat(tx.salary) !== NaN) ? parseFloat(tx.salary,2) : 0.00,
+                    amount : (parseFloat(tx.salary) !== NaN) ? parseFloat(tx.salary).toFixed(2) : 0.00,
                     targetDate : (tx.target_date) ? tx.target_date :  moment().format('YYYY-MM-DD'),
                     probability : (parseInt(tx.probability) !== NaN && parseInt(tx.probability) !== 0) ?
                         parseInt(tx.probability) : 2,
@@ -377,15 +377,12 @@
                     attachmentName : "",
                     attachmentMimeType : "",
                     alarmDuration : (parseInt(tx.alarm_duration)) ? parseInt(tx.alarm_duration) : 0,
-
                     instituteId : tx.institute_id,
                     educationId : tx.Educationid,
                     specializationId : tx.specialization_id,
                     jobId : tx.job_id,
                     salaryType : tx.salary_type,
-                    salary : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
-                    && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
-                        parseFloat($scope.modalBox.tx.orderAmount) : 0,
+                    orderAmount : (parseFloat(tx.salary) !== NaN) ? parseFloat(tx.salary).toFixed(2) : 0.00
 
                 };
                 return editModeTx;
@@ -487,7 +484,7 @@
                         && parseInt($scope.modalBox.tx.jobId) > 0) ?
                             parseInt($scope.modalBox.tx.jobId) : 0,
 
-                        salary : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
+                        amount : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
                         && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
                             parseFloat($scope.modalBox.tx.orderAmount) : 0,
 
@@ -745,7 +742,7 @@
 
             $scope.resetModalBox = function(){
                 $scope.modalBox = {
-                    title : 'Add new applicant',
+                    title : 'Add applicant',
                     class : 'business-manager-modal',
                     contactType : 0,
                     locationList : [],
@@ -1501,10 +1498,10 @@
              */
             var assignEducations = function(){
                 for(var b=0; b < $scope.educationsList.length;b++){
-                    var institute = angular.copy($scope.educationsList[b]);
-                    institute.id = parseInt(institute.TID);
-                    $scope.educationsList[b].id = parseInt(institute.TID);
-                    $scope.educationsList[b].label = institute.EducationTitle;
+                    var edu = angular.copy($scope.educationsList[b]);
+                    edu.id = parseInt(edu.TID);
+                    $scope.educationsList[b].id = parseInt(edu.TID);
+                    $scope.educationsList[b].label = edu.EducationTitle;
                     //$scope.myInstitutes.push({ id : institute.id});
                 }
             };
@@ -1515,10 +1512,10 @@
              */
             var assignSpecializations = function(){
                 for(var b=0; b < $scope.specializationsList.length;b++){
-                    var institute = angular.copy($scope.specializationsList[b]);
-                    institute.id = parseInt(institute.TID);
-                    $scope.specializationsList[b].id = parseInt(institute.TID);
-                    $scope.specializationsList[b].label = institute.Title;
+                    var spz = angular.copy($scope.specializationsList[b]);
+                    spz.id = parseInt(spz.TID);
+                    $scope.specializationsList[b].id = parseInt(spz.TID);
+                    $scope.specializationsList[b].label = spz.Title;
                     //$scope.myInstitutes.push({ id : institute.id});
                 }
             };
@@ -1681,7 +1678,6 @@
                             if(resp.data){
                                 $scope.educationsList = resp.data;
                                 defer.resolve(resp.data);
-
                             }
                             else{
                                 defer.resolve([]);

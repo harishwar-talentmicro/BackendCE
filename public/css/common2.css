@@ -2452,6 +2452,11 @@ hr.style-two {
     box-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
 
+.hpw .no-style-link
+{
+    text-decoration: none;
+}
+
 .hpw .no-style-link:hover
 {
     text-decoration: none;
@@ -2812,7 +2817,7 @@ sup.tm{
 {
     padding-top: 10px;
     padding-bottom: 10px;
-    background-color: rgb(133, 134, 195);
+    background-color: rgb(101, 149, 202);
     color: #fff;
     padding-left: 10px;
     font-weight: 800;
@@ -3363,13 +3368,12 @@ sup.tm{
 
 .hpw .chat-style-inbox
 {
-    padding: 20px;
+    padding: 10px;
     border: 1px solid #B0AEAE;
     border-radius: 10px;
     color: gray;
     font-size: 1em;
     font-style: italic;
-    padding-bottom: 10px !important;
 }
 
 .hpw .chat-style-sender-msg
@@ -3385,4 +3389,9 @@ sup.tm{
 {
     background-color: #108078;
     color: #fff !important;
+}
+
+.hpw .chatting-attachment-btn
+{
+    padding-top: 5px !important;
 }

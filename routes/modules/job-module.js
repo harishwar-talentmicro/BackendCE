@@ -171,8 +171,6 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(aggregateScore);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
-                                console.log(insertresult);
-
                                 if (!err) {
                                     if (insertresult) {
                                         responseMessage.status = true;
@@ -660,7 +658,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
             console.log(query);
             st.db.query(query, function (err, getResult) {
-                console.log(getResult);
                 if (!err) {
                     if (getResult) {
                         if (getResult[0].length >0 ) {
@@ -751,7 +748,6 @@ Job.prototype.applyJob = function(req,res,next){
                         var query = st.db.escape(jobId) + ',' + st.db.escape(token);
                         console.log('CALL pApplyjob(' + query + ')');
                         st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
-                            console.log(insertResult);
                             if (!err) {
                                 if (insertResult[0]) {
                                     if (insertResult[0][0]) {
@@ -937,7 +933,6 @@ Job.prototype.getJobDetails = function(req,res,next){
         try {
             console.log('CALL pgetjobDetails(' + st.db.escape(jobId) + ')');
             st.db.query('CALL pgetjobDetails(' + st.db.escape(jobId) + ')', function (err, getResult) {
-                console.log(getResult);
                 if (!err) {
                     if (getResult) {
                         if(getResult[0].length > 0){
@@ -1167,7 +1162,6 @@ Job.prototype.getAppliedJob = function(req,res,next){
                         var query = 'CALL pGetAppliedJobs(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
@@ -1389,7 +1383,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                 var query = 'CALL pGetjobseekersmailDetails(' + queryParams + ')';
                                 console.log(query);
                                 st.db.query(query, function (err, getResult) {
-                                    console.log(getResult);
+
                                     if (!err) {
                                         if (getResult) {
                                             if (getResult[0].length > 0) {
@@ -1425,7 +1419,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                     if (!err) {
                                         if (TemplateResult) {
                                             if (TemplateResult.length > 0) {
-                                                console.log(TemplateResult);
+
                                                 var mailOptions = {
                                                     replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
                                                     to: jobResult[0][0].AdminEmailID,

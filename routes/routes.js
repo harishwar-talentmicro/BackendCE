@@ -190,6 +190,7 @@ exports.FnGetGroupList = messageBox.getGroupList;
 exports.FnLoadMessages = messageBox.loadMessages;
 exports.FnValidateGroupMember = messageBox.validateGroupMember;
 exports.FnViewMessage = messageBox.viewMessage;
+exports.FnGetMessageAttachment = messageBox.getMessageAttachment;
 
 
 var Notification = require('./modules/notification-module.js');
@@ -197,6 +198,11 @@ var notification = new Notification(db,stdLib);
 exports.FnMSAuthUser = notification.authUser;
 exports.FnMSAuthVHost = notification.authVHost;
 exports.FnMSAuthResource = notification.authResource;
+
+var Planner = require('./modules/planner-module.js');
+var plannerModule = new Planner(db,stdLib);
+exports.FnGetAllTask = plannerModule.getAllTask;
+exports.FnGetTrans = plannerModule.getTrans;
 
 
 //ap parts

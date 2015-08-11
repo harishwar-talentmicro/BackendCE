@@ -34,7 +34,8 @@
             'ui-notification',
             'angularjs-dropdown-multiselect',
             'ngTouch',
-            'ngAnimate'
+            'ngAnimate',
+            'ui.calendar'
         ]);
 
    //ezeid.value('GURL',"/");

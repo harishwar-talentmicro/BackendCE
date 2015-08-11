@@ -63,7 +63,7 @@
             };
 
 
-            $scope.defaultApplicantImage = '/images/grey-background.jpg';
+            $scope.defaultApplicantImage = '/images/profile-pic.jpg';
 
 
         }

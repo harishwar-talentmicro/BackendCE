@@ -47,8 +47,17 @@ angular.module('ezeidApp').
                 redirectInboxPage();
             }
 
-            $scope.messageData = [];
+            /* PRIORITY */
+            $scope.priority = [
+                "High",
+                "Medium",
+                "Low"
+            ];
 
+            $scope.messageData = [];
+            $scope.composeMessageTemplate = "";
+            $scope.detailMessagModuleLoaded = true;
+            $scope.responseMsgId = 0;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,13 +73,12 @@ angular.module('ezeidApp').
             function loadFullViewMessage()
             {
                 loadFullMessageApi().then(function(data){
-                        console.log(data);
-                    $scope.messageData = data;
-                },
-                function()
-                {
-                    redirectInboxPage();
-                });
+                        $scope.messageData = data;
+                    },
+                    function()
+                    {
+                        redirectInboxPage();
+                    });
             }
 
             /**
@@ -78,7 +86,43 @@ angular.module('ezeidApp').
              */
             function redirectInboxPage()
             {
-                //$location.url('/message');
+                $location.url('/message');
+            }
+
+            /**
+             * Load form to reply a group or individual message
+             */
+            $scope.loadReplyMsgForm = function()
+            {
+                setReplyMessageData();
+                $scope.composeMessageTemplate = "html/message/composeMessage.html";
+            }
+
+            function setReplyMessageData()
+            {
+                console.log($scope.messageData);
+                /* load the reply data in the form */
+                $scope.receiverArr = [];
+                if(!$scope.messageData || !$scope.messageData.length > 0)
+                {
+                    return false;
+                }
+
+                /* set group name */
+                var groupName = 0;
+                if($scope.messageData[0].grouptype == 1)
+                    groupName = $scope.messageData[0].name;
+                else
+                    groupName = $scope.messageData[0].sender;
+
+                var temp = {
+                    GroupID:$scope.messageData[0].GroupID,
+                    GroupType:$scope.messageData[0].grouptype,
+                    GroupName:groupName
+                };
+                $scope.receiverArr.push(temp);
+                $scope.responseMsgId = msgId;
+
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////

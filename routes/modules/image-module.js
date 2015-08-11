@@ -406,7 +406,7 @@ Image.prototype.getPictureOfEzeid = function(req,res,next){
                         var queryParams = st.db.escape(ezeone_id);
                         var query = 'CALL pgetpictureofEZEID(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
+                          
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
