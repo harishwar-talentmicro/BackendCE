@@ -211,6 +211,7 @@ app.get('/job_city',LocationManager.FnGetjobcity);
 app.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
 app.post('/jobseeker_message',LocationManager.FnJobSeekersMessage);
 app.get('/jobs_list',LocationManager.FnGetListOfJobs);
+app.get('/verify_institute',LocationManager.FnGetVerifiedInstitutes);
 
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);
