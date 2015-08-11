@@ -615,7 +615,7 @@
             function getInstituteList()
             {
                 $http({
-                    url : GURL + 'institutes',
+                    url : GURL + 'verify_institute',
                     method : 'GET',
                     params : {
                         token : $rootScope._userInfo.Token

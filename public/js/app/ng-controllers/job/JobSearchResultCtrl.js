@@ -180,13 +180,13 @@ angular.module('ezeidApp').
              */
             function setSearchResult(isRequestFromFilter)
             {
+
                 var requestFromFilter = false;
                 console.log("FILTER: "+isRequestFromFilter);
                 if(typeof(isRequestFromFilter) !== undefined && parseInt(isRequestFromFilter) == 1)
                 {
                     requestFromFilter = true;
                     console.log("FILTER: "+isRequestFromFilter);
-
                 }
                 else
                 {
@@ -195,78 +195,84 @@ angular.module('ezeidApp').
                     resetFilters();
                 }
 
-                var token = ($rootScope._userInfo.token)?$rootScope._userInfo.token:null;
-                /* make an API request to get the data */
-                var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
-                $http({ method: 'get', url: GURL + 'job_search',
-                    params: {
-                        latitude:$scope.params.lat,
-                        longitude:$scope.params.lng,
-                        proximity:$scope.params.proximity,
-                        jobType:$scope.params.jobType,
-                        exp:experience,
-                        keywords:$scope.params.searchTerm,
-                        token: token,
-                        page_size: $scope.pageSize,
-                        page_count: $scope.pageCount,
-                        order_by: $scope.params.orderBy,
-                        //Exclusively for Advance filters
-                        locations: $scope.params.locations,
-                        category: $scope.params.category,
-                        salary: $scope.params.salary,
-                        restrict: $scope.filterCollege == false ? 0 : 1
-                        //filter:$scope.params.filter?$scope.params.filter:0
-                    }
-                }).success(function (response) {
-
-                    $scope.isProcessing = false;
-
-                    if(response.status)
-                    {
-                        for(var i = 0; i < response.data.result.length; i++)
-                        {
-                            response.data.result[i].LUdate = convertTimeToLocal(response.data.result[i].LUdate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
+                if($rootScope._userInfo.IsAuthenticate)
+                {
+                    /* make an API request to get the data */
+                    var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
+                    $http({ method: 'get', url: GURL + 'job_search',
+                        params: {
+                            latitude:$scope.params.lat,
+                            longitude:$scope.params.lng,
+                            proximity:$scope.params.proximity,
+                            jobType:$scope.params.jobType,
+                            exp:experience,
+                            keywords:$scope.params.searchTerm,
+                            token: $rootScope._userInfo.Token,
+                            page_size: $scope.pageSize,
+                            page_count: $scope.pageCount,
+                            order_by: $scope.params.orderBy,
+                            //Exclusively for Advance filters
+                            locations: $scope.params.locations,
+                            category: $scope.params.category,
+                            salary: $scope.params.salary,
+                            restrict: $scope.filterCollege == false ? 0 : 1
+                            //filter:$scope.params.filter?$scope.params.filter:0
                         }
-                   }
+                    }).success(function (response) {
 
-                    /* YIPPE! Got response */
-                    var isEmpty = !(response.data.result.length > 0);
-                    if(isEmpty)//No Result found
-                    {
-                        console.log("No result found");
-                        /* reset all the data */
-                        resetSearchResultData();
-                        return;
-                    }
-                    /* set the total count of the result */
-                    $scope.totalResult = response.data.total_count;
+                            $scope.isProcessing = false;
 
-                    /* set result data */
-                    setData(response.data.result);
+                            if(response.status)
+                            {
+                                for(var i = 0; i < response.data.result.length; i++)
+                                {
+                                    response.data.result[i].LUdate = convertTimeToLocal(response.data.result[i].LUdate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
+                                }
+                            }
 
-                    /* Reset the pagination buttons */
-                    $scope.paginationVisibility();
+                            /* YIPPE! Got response */
+                            var isEmpty = !(response.data.result.length > 0);
+                            if(isEmpty)//No Result found
+                            {
+                                console.log("No result found");
+                                /* reset all the data */
+                                resetSearchResultData();
+                                return;
+                            }
+                            /* set the total count of the result */
+                            $scope.totalResult = response.data.total_count;
 
-                    if(requestFromFilter)
-                    {
-                        console.log("Filter "+$scope.params.filter);
-                        return;
-                    }
-                    /* Set Advance-filter [Right-side] */
-                    setJobLocationData(response.data.job_location);
-                    setSalaryData(response.data.salary);
-                    setCategoryData(response.data.category);
+                            /* set result data */
+                            setData(response.data.result);
 
-                    /* set all the advance filter */
-                    advanceFilter();
+                            /* Reset the pagination buttons */
+                            $scope.paginationVisibility();
 
-                    $scope.jsTileHoverEffect();
+                            if(requestFromFilter)
+                            {
+                                console.log("Filter "+$scope.params.filter);
+                                return;
+                            }
+                            /* Set Advance-filter [Right-side] */
+                            setJobLocationData(response.data.job_location);
+                            setSalaryData(response.data.salary);
+                            setCategoryData(response.data.category);
 
-                }).error(function(){
-                    $scope.isSearchInProgress = false;
-                    Notification.error({ message : 'An error occurred', delay : MsgDelay});
-                    $scope.$emit('$preLoaderStop');
-                });
+                            /* set all the advance filter */
+                            advanceFilter();
+
+                            $scope.jsTileHoverEffect();
+
+                        }).error(function(){
+                            $scope.isSearchInProgress = false;
+                            Notification.error({ message : 'An error occurred', delay : MsgDelay});
+                            $scope.$emit('$preLoaderStop');
+                        });
+                }
+                else
+                {
+                    $location.url('/');
+                }
             }
 
             /**
@@ -994,7 +1000,7 @@ angular.module('ezeidApp').
                 }
 
                 console.log($scope.paginationPreviousVisibility,$scope.paginationNextVisibility);
-            }
+            };
 
             $scope.googleMap = new GoogleMap();
 
@@ -1108,8 +1114,10 @@ angular.module('ezeidApp').
                 $scope.params.lng = lng;
 
                     /* get new location string */
-                $scope.googleMap.getReverseGeolocation(lat, lng).then(function (resp) {
-                    if (resp) {
+                $scope.googleMap.getReverseGeolocation(lat, lng).then(function (resp)
+                {
+                    if (resp)
+                    {
 
                         placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
 
@@ -1169,6 +1177,37 @@ angular.module('ezeidApp').
             $scope.filterMyCollege = function () {
                 $scope.filterCollege = !$scope.filterCollege;
                 console.log($scope.filterCollege);
+            };
+
+            /**
+             * Apply for job
+             * @param _tid
+             */
+            $scope.applyForJob = function(_tid)
+            {
+                $scope.$emit('$preLoaderStart');
+                $scope.jobData = {
+                    token : $rootScope._userInfo.Token,
+                    job_id : $scope.jobTid
+                }
+                $http({
+                    method: "POST",
+                    url: GURL + 'job_apply',
+                    data :{
+                        token:$rootScope._userInfo.Token,
+                        job_id:_tid
+                    }
+                }).success(function (data) {
+                        $scope.$emit('$preLoaderStop');
+                        if(data.status)
+                        {
+                            initiateSearch();
+                            Notification.success({ message: "Applied Success..", delay : 2000});
+                        }
+                    })
+                .error(function(data, status, headers, config) {
+                    $scope.$emit('$preLoaderStop');
+                });
             };
 
 

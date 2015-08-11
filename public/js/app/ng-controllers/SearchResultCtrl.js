@@ -347,6 +347,40 @@ var res = angular.module('ezeidApp').
                             }
                             else
                             {
+                                /*if(!$rootScope._userInfo.IsAuthenticate)
+                                {
+                                    var defer = $q.defer();
+
+                                    console.log("SAi7");
+                                    console.log($rootScope.loginPromise);
+                                    $rootScope.loginPromise = defer;
+                                    console.log("SAi8");
+                                    console.log($rootScope.loginPromise);
+                                    $timeout(function ()
+                                    {
+                                        angular.element('#SignIn_popup').css({'position':'fixed'});
+                                        angular.element('#SignIn_popup > .window_page').css({'position':'relative'});
+                                        angular.element('#SignIn_popup').slideDown();
+                                    },2000);
+
+                                    defer.promise.then(function(){
+
+                                        console.log("Sai12");
+                                        $scope.showDownloadLink = true;
+                                        $scope.downloadData = data[0];
+                                        var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                        $window.open(downloadUrl, '_blank');
+
+                                    });
+                                }
+                                else
+                                {
+                                    $scope.showDownloadLink = true;
+                                    $scope.downloadData = data[0];
+                                    var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                    $window.open(downloadUrl, '_blank');
+                                }*/
+
                                 $scope.showDownloadLink = true;
                                 $scope.downloadData = data[0];
                                 var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
