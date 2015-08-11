@@ -312,7 +312,7 @@
                                         <input type="text" name="FromEmailID" class="form-control emptyBox"
                                                id="FromEmailID" ng-model="FromEmailID"
                                                ng-class="MailTemplateForm.FromEmailID.$touched && !FromEmailID.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                               placeholder="From email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-readonly="validationMode == 0" required>
+                                               placeholder="From email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-readonly="validationMode == 0" required />
                                         <span ng-show="MailTemplateForm.FromEmailID.$error.email" ng-if="MailTemplateForm.FromEmailID.$error.email == true ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false"></span>
                                     </div>
                                 </div><br/>
@@ -324,7 +324,7 @@
                                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
                                         <input type="text" name="Subject" id="Subject" ng-model="Subject"
                                                class="form-control emptyBox"  ng-class="MailTemplateForm.Subject.$touched && !Subject.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                               placeholder="Subject" maxlength="250" ng-readonly="validationMode == 0" required>
+                                               placeholder="Subject" maxlength="250" ng-readonly="validationMode == 0" required />
                                     </div>
                                 </div><br/>
                                 <div class="row setRowLeftRightMarginZero centerAlign">

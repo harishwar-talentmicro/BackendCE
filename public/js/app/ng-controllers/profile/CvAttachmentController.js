@@ -164,31 +164,25 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     this.saveCVDocInfo=function(){
 
-        //Below code is for institute
-        console.log("SAi2");
-        console.log(CVAttachCtrl._CVInfo.institute_id);
-        console.log(CVAttachCtrl._CVInfo.institute_title);
-
-
+        /**
+         * if user select from list than send id other  wise send text as title
+         */
         if(($scope.instituteText) && ($scope.instituteID))
         {
-            console.log("Sai2222");
-            console.log($scope.instituteText);
-            console.log($scope.instituteTitle);
             if($scope.instituteText != $scope.instituteTitle)
             {
                 CVAttachCtrl._CVInfo.institute_id = 0;
                 CVAttachCtrl._CVInfo.institute_title = $scope.instituteTitle;
-                console.log(CVAttachCtrl._CVInfo.institute_id);
-                console.log(CVAttachCtrl._CVInfo.institute_title);
             }
+        }
+        else
+        {
+            CVAttachCtrl._CVInfo.institute_id = 0;
+            CVAttachCtrl._CVInfo.institute_title = $scope.instituteTitle;
         }
 
         $scope.instituteText = "";
         $scope.instituteID = 0;
-
-
-
 
         CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 1;
         CVAttachCtrl._CVInfo.experience = (CVAttachCtrl._CVInfo.experience) ? CVAttachCtrl._CVInfo.experience : 0;
@@ -248,6 +242,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         {
                             $scope.locationArrayString = [];
                             $scope.mainLocationArray = [];
+                            getInstituteList();
                             getCVInfo();
                             $scope.$emit('$preLoaderStop');
                         },3000);
@@ -336,9 +331,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-                    console.log("sai...");
-                    console.log($scope.instituteList);
-
                     for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                     {
                         if($scope.instituteList[nCount].TID == CVAttachCtrl._CVInfo.institute_id)
@@ -346,8 +338,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             $scope.instituteTitle = $scope.instituteList[nCount].InstituteTitle;
                         }
                     }
-
-                    console.log($scope.instituteTitle);
 
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
@@ -713,7 +703,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
     // Below function Call on click of institute text field
     $scope.instituteTextBoxClicked = function() {
         $scope.showInstituteDropDown = !$scope.showInstituteDropDown;
-       // $scope.showEducationDropDown = false;
     }
 
     $scope.instituteText = "";
@@ -738,38 +727,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
             CVAttachCtrl._CVInfo.institute_id = 0;
         }
 
-        console.log("SAi111");
-        console.log(CVAttachCtrl._CVInfo.institute_id);
-        console.log(CVAttachCtrl._CVInfo.institute_title);
 
        $scope.showInstituteDropDown = false;
-    };
-
-    // Below function Call on blur of institute
-    $scope.validateInstituteTextBox = function()
-    {
-        /*console.log("SAi2");
-        console.log(CVAttachCtrl._CVInfo.institute_id);
-        console.log(CVAttachCtrl._CVInfo.institute_title);
-
-
-        if(($scope.instituteText) && ($scope.instituteID))
-        {
-            console.log("Sai2222");
-            console.log($scope.instituteText);
-            console.log($scope.instituteTitle);
-            if($scope.instituteText != $scope.instituteTitle)
-            {
-                CVAttachCtrl._CVInfo.institute_id = 0;
-                CVAttachCtrl._CVInfo.institute_title = $scope.instituteTitle;
-                console.log(CVAttachCtrl._CVInfo.institute_id);
-                console.log(CVAttachCtrl._CVInfo.institute_title);
-            }
-        }
-
-        $scope.instituteText = "";
-        $scope.instituteID = 0;*/
-
     };
 
     // Get Educations list
