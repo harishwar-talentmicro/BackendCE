@@ -37,7 +37,6 @@ angular.module('ezeidApp').
             UtilityService
         ) {
 
-
             /***********************************************************************************************************
              /***********************************************************************************************************
              /***********************************************************************************************************
@@ -47,7 +46,7 @@ angular.module('ezeidApp').
             $scope.locationData = "NA";
             $scope.isResultEmpty = true;
             $scope.skillArr = [];
-            $scope.salaryType = ["","per Hour","per Month","per Annum"]
+            $scope.salaryType = ["","Per Hour","Per Month","Per Annum"]
 
             $scope.isLoggedIn = $rootScope._userInfo;
 
@@ -95,8 +94,7 @@ angular.module('ezeidApp').
                             $scope.isResultEmpty = false;
                             /* set all the data */
                             $scope.jobData = data;
-                            console.log(data);
-                            /* set the location data */
+                           /* set the location data */
                             setLocation();
                             /* set the skill array */
                             setSkillsArray();
@@ -172,7 +170,10 @@ angular.module('ezeidApp').
                 }
             }
 
-            // Apply for job
+            /**
+             * Apply for job
+             * @param _tid
+             */
             $scope.applyForJob = function(_tid){
                 $scope.$emit('$preLoaderStart');
                 $scope.jobData = {

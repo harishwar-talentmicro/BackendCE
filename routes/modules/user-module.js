@@ -3757,7 +3757,6 @@ User.prototype.getInstitutes = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                console.log(result);
                                 responseMsg.status = true;
                                 responseMsg.message = 'Institutes loaded successfully';
                                 responseMsg.error = null;
@@ -3833,7 +3832,6 @@ User.prototype.getEducations = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                console.log(result);
                                 responseMsg.status = true;
                                 responseMsg.message = 'Educations loaded successfully';
                                 responseMsg.error = null;
@@ -3909,7 +3907,6 @@ User.prototype.getSpecialization = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                console.log(result);
                                 responseMsg.status = true;
                                 responseMsg.message = 'Specialization loaded successfully';
                                 responseMsg.error = null;
@@ -3944,7 +3941,81 @@ User.prototype.getSpecialization = function(req,res,next) {
         }
     }
 };
+/**
+ * @todo FnGetVerifiedInstitutes
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getVerifiedInstitutes = function(req,res,next) {
 
+    var _this = this;
+    var token = req.query.token;
+    var responseMsg = {
+        status: false,
+        data: [],
+        message: 'Unable to load Institutes ! Please try again',
+        error: {}
+    };
+
+    var validateStatus = true, error = {};
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if (!validateStatus) {
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors below';
+        res.status(400).json(responseMsg);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        st.db.query('CALL pGetVerifiedInstitutes()', function (err, result) {
+                            if (err) {
+                                console.log('Error : FnGetVerifiedInstitutes :' + err);
+                                res.status(400).json(responseMsg);
+                            }
+                            else {
+                                console.log(result);
+                                responseMsg.status = true;
+                                responseMsg.message = 'Institutes is valid';
+                                responseMsg.error = null;
+                                responseMsg.data = result[0];
+                                res.status(200).json(responseMsg);
+                            }
+                        });
+                    }
+                    else {
+                        responseMsg.message = 'Invalid token';
+                        responseMsg.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMsg.data = null;
+                        res.status(401).json(responseMsg);
+                        console.log('FnGetVerifiedInstitutes: Invalid token');
+                    }
+                }
+                else {
+                    responseMsg.error = {};
+                    responseMsg.message = 'Error in validating Token';
+                    res.status(500).json(responseMsg);
+                    console.log('FnGetVerifiedInstitutes:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            res.status(500).json(responseMsg);
+            console.log('Error : FnGetVerifiedInstitutes ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 

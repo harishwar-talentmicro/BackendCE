@@ -169,7 +169,6 @@
             .when('/terms',{templateUrl: 'html/terms.html'})
             .when('/help',{templateUrl: 'html/help.html'})
             .when('/legal',{templateUrl: 'html/legal.html'})
-            .when('/blackwhitelist',{templateUrl: 'html/blacklistwhitelist.html'})
             .when('/salesenquiry',{templateUrl: 'html/salesenquiry.html'})
             .when('/bulksalesenquiry',{templateUrl : 'html/bulksalesenquiry.html'})
             .when('/mapView',{templateUrl : 'html/mapPopView.html'})

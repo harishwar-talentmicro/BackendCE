@@ -44,7 +44,6 @@ angular.module('ezeidApp').
             {
                 var defer = $q.defer();
                 $rootScope.loginPromise = defer;
-                console.log("Sai88");
                 $timeout(function ()
                 {
                     angular.element('#SignIn_popup').css({'position':'fixed'});
@@ -55,7 +54,6 @@ angular.module('ezeidApp').
                 defer.promise.then(function(){
                     applayJob($routeParams.jobid);
                 });
-
             }
             else
             {
@@ -91,6 +89,7 @@ angular.module('ezeidApp').
                             }
                             else
                             {
+                                $location.url('/');
                                 $scope.showSuccessMsg = true;
                                 Notification.success({ message: "Applied Success..", delay : 2000});
                             }

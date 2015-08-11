@@ -73,7 +73,6 @@ angular.module('ezeidApp').
             function loadFullViewMessage()
             {
                 loadFullMessageApi().then(function(data){
-                        console.log(data);
                         $scope.messageData = data;
                     },
                     function()
@@ -101,17 +100,25 @@ angular.module('ezeidApp').
 
             function setReplyMessageData()
             {
+                console.log($scope.messageData);
                 /* load the reply data in the form */
                 $scope.receiverArr = [];
+                if(!$scope.messageData || !$scope.messageData.length > 0)
+                {
+                    return false;
+                }
+
+                /* set group name */
+                var groupName = 0;
+                if($scope.messageData[0].grouptype == 1)
+                    groupName = $scope.messageData[0].name;
+                else
+                    groupName = $scope.messageData[0].sender;
+
                 var temp = {
-                    AdminID: 537,
-                    GroupID: 5,
-                    GroupName: "fox1",
-                    GroupType: 0,
-                    MemberID: 537,
-                    Status: 1,
-                    isAdmin: 0,
-                    requester: 1
+                    GroupID:$scope.messageData[0].GroupID,
+                    GroupType:$scope.messageData[0].grouptype,
+                    GroupName:groupName
                 };
                 $scope.receiverArr.push(temp);
                 $scope.responseMsgId = msgId;

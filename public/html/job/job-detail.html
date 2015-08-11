@@ -99,11 +99,11 @@
                         Salary: <span class="text-bolder">{{getRange(jobData.salaryfrom,jobData.salaryto,1)}} {{salaryType[jobData.salarytype]}}</span>
                     </div>
                 </div>
-                <div class="job-main-content text-dark-gray detailed-desc-job">
+                <!--<div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
                         Functional Area: <span class="text-bolder">{{jobData.jobcategory}}</span>
                     </div>
-                </div>
+                </div>-->
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
                         Openings: <span class="text-bolder">{{jobData.openings}}</span>
@@ -116,7 +116,7 @@
                 </div>
             </div>
 
-            <div class="desc-content-body">
+            <div class="desc-content-body p-bottom-4">
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
                         <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
@@ -127,6 +127,19 @@
                     </div>
                 </div>
             </div>
+
+            <div class="desc-content-body">
+                <div class="job-main-content text-dark-gray detailed-desc-job">
+                    <div class="job-desc">
+                        <p class="text-bolder">Contact:</p>
+                        <p>
+                            {{jobData.contactname}}<br/>
+                            {{jobData.emailid}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 

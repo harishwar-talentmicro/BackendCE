@@ -45,6 +45,7 @@ exports.FnGetProxmity = userModule.getProxmity;
 exports.FnGetInstitutes = userModule.getInstitutes;
 exports.FnGetEducations = userModule.getEducations;
 exports.FnGetSpecialization = userModule.getSpecialization;
+exports.FnGetVerifiedInstitutes = userModule.getVerifiedInstitutes;
 
 var Audit = require('./modules/audit-module.js');
 var auditModule = new Audit(db,stdLib);
@@ -202,6 +203,7 @@ exports.FnMSAuthResource = notification.authResource;
 var Planner = require('./modules/planner-module.js');
 var plannerModule = new Planner(db,stdLib);
 exports.FnGetAllTask = plannerModule.getAllTask;
+exports.FnGetTrans = plannerModule.getTrans;
 
 
 //ap parts
