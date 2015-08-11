@@ -337,7 +337,7 @@ var res = angular.module('ezeidApp').
                         if(data[0].Filename)
                         {
                             $scope.isResultNumber = true;
-                            if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
+                            if($rootScope._userInfo.IsAuthenticate)
                             {
                                 $scope.showDownloadLink = true;
                                 $scope.downloadData = data[0];
@@ -347,15 +347,17 @@ var res = angular.module('ezeidApp').
                             }
                             else
                             {
-                                /*if(!$rootScope._userInfo.IsAuthenticate)
+                                if(data[0].IDTypeID == 2){
+                                    $scope.showDownloadLink = true;
+                                    $scope.downloadData = data[0];
+                                    var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                    $window.open(downloadUrl, '_blank');
+                                }
+                                else
                                 {
-                                    var defer = $q.defer();
+                                    var defer11 = $q.defer();
+                                    $rootScope.loginPromise = defer11;
 
-                                    console.log("SAi7");
-                                    console.log($rootScope.loginPromise);
-                                    $rootScope.loginPromise = defer;
-                                    console.log("SAi8");
-                                    console.log($rootScope.loginPromise);
                                     $timeout(function ()
                                     {
                                         angular.element('#SignIn_popup').css({'position':'fixed'});
@@ -363,34 +365,13 @@ var res = angular.module('ezeidApp').
                                         angular.element('#SignIn_popup').slideDown();
                                     },2000);
 
-                                    defer.promise.then(function(){
-
-                                        console.log("Sai12");
+                                    $rootScope.loginPromise.promise.then(function(resp){
                                         $scope.showDownloadLink = true;
                                         $scope.downloadData = data[0];
                                         var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
                                         $window.open(downloadUrl, '_blank');
-
                                     });
                                 }
-                                else
-                                {
-                                    $scope.showDownloadLink = true;
-                                    $scope.downloadData = data[0];
-                                    var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
-                                    $window.open(downloadUrl, '_blank');
-                                }*/
-
-                                $scope.showDownloadLink = true;
-                                $scope.downloadData = data[0];
-                                var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
-                                $window.open(downloadUrl, '_blank');
-                                ////Redirect to Login page
-                                //$('#SignIn_popup').slideDown();
-                                //$rootScope.defer = $q.defer();
-                                //var prom = $rootScope.defer.promise;
-                                //prom.then(function(d){
-                                //});
                             }
                             $scope.searchListData = null;
                             $scope.searchCount = 0;
