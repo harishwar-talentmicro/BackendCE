@@ -47,15 +47,15 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 // Animation complete.
             });})
 
-           // getInstituteList();
+
             getSpecialization();
             getJobCategories();
+            getInstituteList();
             getEducations();
 
             $timeout(function ()
             {
                 getCVInfo();
-                getInstituteList();
                 getAllSkills();
             },3000);
 
@@ -336,6 +336,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
+                    console.log("sai...");
+                    console.log($scope.instituteList);
 
                     for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                     {
@@ -344,6 +346,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             $scope.instituteTitle = $scope.instituteList[nCount].InstituteTitle;
                         }
                     }
+
+                    console.log($scope.instituteTitle);
 
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
