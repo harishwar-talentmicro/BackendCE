@@ -93,9 +93,9 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             $scope.inboxListing = "html/message/inbox.html";
+            $scope.outboxListing = "html/message/outboxMessage.html";
             $scope.composeMessage = "html/message/composeMessage.html";
             $scope.detailMessage = "html/message/detailMessage.html";
-
             $scope.chatMessage = "html/chat/chatMessage.html";
 
             if($routeParams.action)
@@ -109,6 +109,11 @@ angular.module('ezeidApp').
                 {
                     $scope.activeTemplate = $scope.inboxListing;
                     $scope.titleText = "Inbox";
+                }
+                else if ($routeParams.action == 'outbox')
+                {
+                    $scope.activeTemplate = $scope.outboxListing;
+                    $scope.titleText = "Outbox";
                 }
                 else if ($routeParams.action == 'details')
                 {
@@ -138,7 +143,10 @@ angular.module('ezeidApp').
              */
             getGroups();
 
-            /* http request to get all the transaction history */
+            /**
+             *  http request to get all the transaction history from all over the system
+             *  like sales enquiry, reservation etc. not a part of MESSAGING MODULE
+             */
             function getTransactionHistory()
             {
                 var defer = $q.defer();
@@ -544,11 +552,16 @@ angular.module('ezeidApp').
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
 
                 return defer.promise;
@@ -569,11 +582,16 @@ angular.module('ezeidApp').
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
                 return defer.promise;
             }
@@ -597,11 +615,16 @@ angular.module('ezeidApp').
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
                 return defer.promise;
             }
@@ -620,12 +643,20 @@ angular.module('ezeidApp').
                         token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
+
                     $scope.$emit('$preLoaderStop');
+
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
                 return defer.promise;
             }
