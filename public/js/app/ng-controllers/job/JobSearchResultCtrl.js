@@ -118,13 +118,19 @@ angular.module('ezeidApp').
             };
 
             $scope.coordinatesArr = [];
+            var tmp = [];
+            tmp[0] = {
+                        0: 12.937649,
+                        1: 77.655799,
+                        2: "Hirecraft",
+                        3: "/searchDetails?searchType=2&TID=26"
+                    };
 
-            $scope.coordinatesArr = 0: Array[4]
-            0: 12.937649
-            1: 77.655799
-            2: "Hirecraft"
-            3: "/searchDetails?searchType=2&TID=26"
-            length: 4;
+            $scope.coordinatesArr = tmp;
+
+            console.log("saiiiiiiiiii");
+            console.log($scope.coordinatesArr);
+
 
             //easy and default calling of functions
             initiateSearch();
@@ -230,14 +236,15 @@ angular.module('ezeidApp').
                     var category = 0;
                     if($scope.params.category && parseInt($scope.params.category) > 0)
                     {
-                           categor = parseInt($scope.params.category);
+                        category = parseInt($scope.params.category);
                     }
 
 
                     /* make an API request to get the data */
                     var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
                     $http({ method: 'get', url: GURL + 'job_search',
-                        params: {
+                        params:
+                        {
                             latitude:$scope.params.lat,
                             longitude:$scope.params.lng,
                             proximity:$scope.params.proximity,
@@ -247,12 +254,13 @@ angular.module('ezeidApp').
                             token: $rootScope._userInfo.Token,
                             page_size: $scope.pageSize,
                             page_count: $scope.pageCount,
-                            order_by: $scope.params.orderBy,
+                            /*order_by: $scope.params.orderBy,*/
                             //Exclusively for Advance filters
                             locations: $scope.params.locations,
                             category: category,
                             salary: $scope.params.salary,
                             restrict: $scope.filterCollege == false ? 0 : 1
+
                             //filter:$scope.params.filter?$scope.params.filter:0
                         }
                     }).success(function (response) {

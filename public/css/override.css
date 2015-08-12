@@ -13,3 +13,23 @@
 .ezeone-multi-select > .dropdown-multiselect > .dropdown-toggle{
     width: 100%;
 }
+
+.calendar .fc-toolbar h2{
+    font-family: 'Roboto', sans-serif;
+    font-size: 26px;
+    color: #1AA1CA;
+}
+
+.calendar .fc-toolbar .fc-button-group .fc-button {
+    background: #5BC0DE;
+    color: #FFF;
+    box-shadow: none;
+    border: none;
+    margin: 1px;
+}
+
+.calendar .fc-toolbar .fc-button-group .fc-button:hover,
+.calendar .fc-toolbar .fc-button-group .fc-button:active,
+.calendar .fc-toolbar .fc-button-group .fc-button:focus{
+    background: #FF930C;
+}

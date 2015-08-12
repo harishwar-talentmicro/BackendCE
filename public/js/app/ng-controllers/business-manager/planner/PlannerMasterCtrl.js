@@ -21,6 +21,16 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',['$scope','$compile','
         {title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29),url: 'http://google.com/'}
     ];
 
+    /* event source that calls a function on every view switch */
+    $scope.eventsF = function (start, end, timezone, callback) {
+        var s = new Date(start).getTime() / 1000;
+        var e = new Date(end).getTime() / 1000;
+        var m = new Date(start).getMonth();
+        var events = [{title: 'Feed Me ' + m,start: s + (50000),end: s + (100000),allDay: false, className: ['customFeed']}];
+        callback(events);
+    };
+
+
     /* Render Tooltip */
     $scope.eventRender = function( event, element, view ) {
         element.attr({'tooltip': event.title,
@@ -28,7 +38,7 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',['$scope','$compile','
         $compile(element)($scope);
     };
 
-    $scope.eventSources = [];
+    $scope.eventSources = [$scope.eventsList];
 
 
     /* Change View */
