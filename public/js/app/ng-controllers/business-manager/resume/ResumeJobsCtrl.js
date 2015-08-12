@@ -187,6 +187,7 @@
                         }
 
                         $scope.jobData = resp.data.result;
+                        $scope.showJobListing = true;
                     }
 
                 }).error(function(err){
@@ -301,10 +302,10 @@
 
                         if(data.status)
                         {
+                            getPostedJob();
                             $scope.jobSearchTerm = "";
                             $scope.jobFilterStatus = 0;
-                            getPostedJob();
-                            $scope.showJobListing = true;
+                          //  $scope.showJobListing = true;
                         }
                     })
                     .error(function(data, status, headers, config) {
@@ -669,13 +670,9 @@
             $scope.modalVisible = false;
             $scope.modalVisibility = function (_locIndex)
             {
-                console.log("index==>",_locIndex);
                 if(_locIndex)
                 {
                     var locIndex = _locIndex - 1;
-                  // _locIndex -= _locIndex;
-                    console.log("SAi==>",locIndex);
-                    console.log("SAi loc array==>",$scope.mainLocationArray);
 
                     $scope.locIndexToEdit = locIndex;
                     $scope.latForMap = $scope.mainLocationArray[locIndex].latitude;
@@ -701,11 +698,7 @@
                             $scope.googleMap1.resizeMap();
                             $scope.googleMap1.setMarkersInBounds();
 
-                           console.log("SAi99");
-
                            //initializeMap();
-
-
 
                         }, 4000);
                     }
@@ -727,21 +720,12 @@
                 $scope.jobLat = lat;
                 $scope.jobLong = lng;
 
-                console.log("sai1");
-                console.log($scope.jobLat);
-                console.log($scope.jobLong);
-
                 $scope.googleMap.getReverseGeolocation(lat,lng).then(function(resp)
                 {
-                    console.log("sai2");
-                    console.log(res);
-
                     if(resp.data)
                     {
-                        console.log("sai3");
 
                         var data = $scope.googleMap.parseReverseGeolocationData(resp.data);
-                        console.log(data);
                         $scope.jobLocation = data.city;
                         $scope.country = data.country;
                         $scope.disabledAddLocation = false;
@@ -770,7 +754,6 @@
             /* Google map integration */
             $scope.googleMap1 = new GoogleMap();
             var initializeMap = function () {
-                console.log("SAi 77");
                 $scope.googleMap1.setSettings({
                     mapElementClass: "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl-style1",
                     searchElementClass: "form-control pull-left pac-input",
@@ -787,9 +770,6 @@
                     /* place the present location marker on map */
                     if(($scope.latForMap) && ($scope.longForMap))
                     {
-                        console.log("sai10");
-                        console.log($scope.latForMap);
-                        console.log($scope.longForMap);
                         $scope.googleMap1.currentMarkerPosition.latitude = $scope.latForMap;
                         $scope.googleMap1.currentMarkerPosition.longitude = $scope.longForMap;
                         $scope.googleMap1.placeCurrentLocationMarker(getNewCoordinates);
@@ -800,7 +780,6 @@
                     }
                     else
                     {
-                        console.log("sai11");
                             $scope.googleMap1.getCurrentLocation().then(function (e) {
                             $scope.googleMap1.placeCurrentLocationMarker(getNewCoordinates);
 
@@ -821,15 +800,11 @@
 
                 $scope.jobLat = lat;
                 $scope.jobLong = lng;
-                console.log("sai-5");
-                console.log($scope.jobLat);
-                console.log($scope.jobLong);
 
                 /* get new location string */
                 $scope.googleMap1.getReverseGeolocation(lat, lng).then(function (resp) {
                     if (resp)
                     {
-                        console.log("sai5");
                         var data = $scope.googleMap1.parseReverseGeolocationData(resp.data);
 
                         var options = {
@@ -846,15 +821,6 @@
                         $scope.location = $scope.googleMap1.createAddressFromGeolocation(data,options);
                         $scope.jobLocation = data.city;
                         $scope.country = data.country;
-
-                        console.log($scope.locationString);
-                        console.log($scope.location);
-                        console.log($scope.jobLocation);
-                        console.log($scope.country);
-
-                       // $scope.googleMap.clear();
-
-                       // $scope.googleMap = "";
                     }
                 });
 
