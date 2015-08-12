@@ -337,7 +337,7 @@ var res = angular.module('ezeidApp').
                         if(data[0].Filename)
                         {
                             $scope.isResultNumber = true;
-                            if(($rootScope._userInfo.IsAuthenticate == true) && (data[0].IDTypeID == 1))
+                            if($rootScope._userInfo.IsAuthenticate)
                             {
                                 $scope.showDownloadLink = true;
                                 $scope.downloadData = data[0];
@@ -347,16 +347,31 @@ var res = angular.module('ezeidApp').
                             }
                             else
                             {
-                                $scope.showDownloadLink = true;
-                                $scope.downloadData = data[0];
-                                var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
-                                $window.open(downloadUrl, '_blank');
-                                ////Redirect to Login page
-                                //$('#SignIn_popup').slideDown();
-                                //$rootScope.defer = $q.defer();
-                                //var prom = $rootScope.defer.promise;
-                                //prom.then(function(d){
-                                //});
+                                if(data[0].IDTypeID == 2){
+                                    $scope.showDownloadLink = true;
+                                    $scope.downloadData = data[0];
+                                    var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                    $window.open(downloadUrl, '_blank');
+                                }
+                                else
+                                {
+                                    var defer11 = $q.defer();
+                                    $rootScope.loginPromise = defer11;
+
+                                    $timeout(function ()
+                                    {
+                                        angular.element('#SignIn_popup').css({'position':'fixed'});
+                                        angular.element('#SignIn_popup > .window_page').css({'position':'relative'});
+                                        angular.element('#SignIn_popup').slideDown();
+                                    },2000);
+
+                                    $rootScope.loginPromise.promise.then(function(resp){
+                                        $scope.showDownloadLink = true;
+                                        $scope.downloadData = data[0];
+                                        var downloadUrl = "/ewtGetSearchDocuments?Token="+$rootScope._userInfo.Token+"&&Keywords="+_filterValue.searchTerm;
+                                        $window.open(downloadUrl, '_blank');
+                                    });
+                                }
                             }
                             $scope.searchListData = null;
                             $scope.searchCount = 0;

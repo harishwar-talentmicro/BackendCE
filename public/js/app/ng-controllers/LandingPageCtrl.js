@@ -194,8 +194,33 @@ angular.module('ezeidApp').
                 var searchStr;
                 if(parseInt($scope.searchParams.searchType) === 4)//For job search
                 {
-                    searchStr = getJobSearchTermString(modifyValue);
-                    $location.url('/jobsearch?' + searchStr);
+                    if(!$rootScope._userInfo.IsAuthenticate)
+                    {
+                        var defer = $q.defer();
+                        $rootScope.loginPromise = defer;
+                        $timeout(function ()
+                        {
+                            angular.element('#SignIn_popup').css({'position':'fixed'});
+                            angular.element('#SignIn_popup > .window_page').css({'position':'relative'});
+                            angular.element('#SignIn_popup').slideDown();
+                        },2000);
+
+                        defer.promise.then(function()
+                        {
+                            searchStr = getJobSearchTermString(modifyValue);
+                            $location.url('/jobsearch?' + searchStr);
+                        });
+                    }
+                    else
+                    {
+                        searchStr = getJobSearchTermString(modifyValue);
+                        $location.url('/jobsearch?' + searchStr);
+                    }
+
+
+                      //  searchStr = getJobSearchTermString(modifyValue);
+                     //   $location.url('/jobsearch?' + searchStr);
+
                 }
                 else//For all other search
                 {
@@ -698,6 +723,9 @@ angular.module('ezeidApp').
              */
             $scope.changeSeacrhType = function(searchType)
             {
+                console.log("SAi12234");
+                console.log(searchType);
+
                 changeSearchFilterVisibility(searchType);
                 $scope.searchParams.searchType = searchType;
                 if(parseInt(searchType) ===  1)
@@ -708,6 +736,25 @@ angular.module('ezeidApp').
                 else
                 {
                     $('.advance-filter-btn').show();
+                    if(parseInt(searchType) ===  4)
+                    {
+                        if(!$rootScope._userInfo.IsAuthenticate)
+                        {
+                            //var defer = $q.defer();
+                           // $rootScope.loginPromise = defer;
+                            $timeout(function ()
+                            {
+                                angular.element('#SignIn_popup').css({'position':'fixed'});
+                                angular.element('#SignIn_popup > .window_page').css({'position':'relative'});
+                                angular.element('#SignIn_popup').slideDown();
+                            },2000);
+
+                           /* defer.promise.then(function()
+                            {
+                                applyForJobByID(_tid);
+                            });*/
+                        }
+                    }
                 }
             }
 

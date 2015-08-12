@@ -298,7 +298,9 @@
                                 <small class="company-name">{{job.companyname}}</small>
                             </div>
                             <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12 text-right normal-view-buttons">
-                                &nbsp;<!--<img class="height-45-px" alt="Oracle India Pvt. Ltd." src="http://img.naukimg.com/logo_images/v2/16512.gif">-->
+                                <div ng-click="$event.stopPropagation()">
+                                    &nbsp;<button class="btn btn-primary btn-sm" ng-click="applyForJob(job.tid)">APPLY</button>
+                                </div>
                             </div>
                         </div>
                     </div>

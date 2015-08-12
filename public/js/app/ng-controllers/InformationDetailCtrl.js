@@ -63,7 +63,7 @@ angular.module('ezeidApp').
             var RefreshTime = Miliseconds;
             $scope.nextButton = true;
             $scope.previousButton =  true;
-            var AutoRefresh = true;
+            var AutoRefresh = false;
             var x = new Date();
             var today = moment(x.toISOString()).utc().format('DD-MMM-YYYY hh:mm A');
             $scope.activeTemplate = "";
@@ -168,7 +168,46 @@ angular.module('ezeidApp').
                             break;
                     }
                 }
+                else
+                {
+                    getSearchInformation(ezeone).then(function(){
+                        var visibleStr = ($scope.SearchInfo.VisibleModules) ? $scope.SearchInfo.VisibleModules.toString() : null;
+                        var visibleModules = (visibleStr) ? ((visibleStr.length == 5) ? visibleStr : '22222') : '22222';
+                        if($routeParams['sales'] && (visibleModules[0] == 1)){
+                            $timeout(function(){
+                                $scope._salesModalTitle = $scope.SearchInfo.EZEID;
+                                $scope._toggleSalesModal();
+                            },1000);
+                        }
 
+                        else if($routeParams['reservation'] && (visibleModules[1] == 1)){
+                            $timeout(function(){
+                                $scope._reservationModalTitle = $scope.SearchInfo.EZEID;
+                                $scope._toggleReservationModal();
+                            },1000);
+                        }
+
+                        else if($routeParams['homeDelivery'] && (visibleModules[2] == 1)){
+                            $timeout(function(){
+                                $scope._homeDeliveryTitle = $scope.SearchInfo.EZEID;
+                                $scope._toggleHomeDeliveryModal();
+                            },1000);
+                        }
+                        else if($routeParams['service'] && (visibleModules[3] == 1)){
+                            $timeout(function(){
+                                $scope._serviceModalTitle = $scope.SearchInfo.EZEID;
+                                $scope._toggleServiceModal();
+                            },1000);
+                        }
+
+                        else if($routeParams['resume'] && (visibleModules[4] == 1)){
+                            $timeout(function(){
+                                $scope._resumeModalTitle = $scope.SearchInfo.EZEID;
+                                $scope._toggleResumeModal();
+                            },1000);
+                        }
+                    });
+                }
             }
 
             function getSearchKeyword(_searchTerm){
@@ -320,22 +359,26 @@ angular.module('ezeidApp').
             }
 
             //Auto refresh Banner
-            $interval(function()
+            if(AutoRefresh == true)
             {
-                if(AutoRefresh == true && $scope.SearchInfo.Banners != 1)
+                $interval(function()
                 {
-                    currentBanner = currentBanner + 1;
-                    if(currentBanner <= $scope.SearchInfo.Banners)
+                    if(AutoRefresh == true && $scope.SearchInfo.Banners != 1)
                     {
-                        getBanner(currentBanner);
+                        currentBanner = currentBanner + 1;
+                        if(currentBanner <= $scope.SearchInfo.Banners)
+                        {
+                            getBanner(currentBanner);
+                        }
+                        else
+                        {
+                            currentBanner = 1;
+                            getBanner(currentBanner);
+                        }
                     }
-                    else
-                    {
-                        currentBanner = 1;
-                        getBanner(currentBanner);
-                    }
-                }
-            },RefreshTime);
+                },RefreshTime);
+            }
+
 
             //False when navigate to other page
             $scope.$on('$locationChangeStart', function( event ) {
