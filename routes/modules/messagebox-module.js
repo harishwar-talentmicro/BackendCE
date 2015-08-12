@@ -1109,7 +1109,7 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'MessageBox loaded successfully';
-                                        responseMessage.data = getResult[0][0];
+                                        responseMessage.data = getResult[0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnLoadMessageBox: MessageBox loaded successfully');
                                     }

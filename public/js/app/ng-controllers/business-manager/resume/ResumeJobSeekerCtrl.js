@@ -66,6 +66,31 @@
                 $scope.searchListMapFlag = false;//1: List, 2:Flag
             }
 
+            //For fatching location to post job
+           /* var googleMap = new GoogleMap();
+            googleMap.addSearchBox('google-map-search-box');
+            googleMap.listenOnMapControls(null,function(lat,lng){
+                $scope.jobLat = lat;
+                $scope.jobLong = lng;
+                googleMap.getReverseGeolocation(lat,lng).then(function(resp){
+                    if(resp.data){
+                        var data = googleMap.parseReverseGeolocationData(resp.data);
+                        //  CVAttachCtrl._CVInfo.job_location1 = data.city;
+                        $scope.locationName = data.city;
+                        $scope.country= data.country;
+
+                        console.log("sai777");
+                        console.log($scope.locationName);
+                    }
+                    else{
+                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                    }
+                },function(){
+                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
+                    defer.resolve();
+                });
+            },false);*/
+
             $scope.jobSeekerResults = "";
 
             //Pagination settings

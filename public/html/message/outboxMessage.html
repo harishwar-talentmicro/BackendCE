@@ -17,8 +17,14 @@
                         <!--<option ng-repeat="opt in DashBoardOptions track by $index" ng-show="opt.val > 0" value="{{opt.val}}">{{opt.text}}</option>-->
                     <!--</select>-->
 
-                    <button class="btn btn-default"><i class="fa fa-arrow-circle-left"></i></button>
-                    <button class="btn btn-default"><i class="fa fa-arrow-circle-right"></i></button>
+                    <button class="btn"
+                            ng-disabled="!paginationPreviousVisibility"
+                            ng-click="paginationPreviousClick()"
+                            ng-class="paginationPreviousVisibility?'btn-primary':'btn-default'"><i class="fa fa-arrow-circle-left"></i></button>
+                    <button class="btn"
+                            ng-disabled="!paginationNextVisibility"
+                            ng-click="paginationNextClick()"
+                            ng-class="paginationNextVisibility?'btn-primary':'btn-default'"><i class="fa fa-arrow-circle-right"></i></button>
                 </div>
 
             </div>
