@@ -91,9 +91,9 @@ angular.module('ezeidApp').
 
                 if(!$routeParams.id)
                 {
-                    console.log("Alpha1");
                     loadFullMessageApi().then(function(data){
                             $scope.messageData = data;
+                            console.log(data);
                         },
                         function()
                         {
@@ -104,15 +104,17 @@ angular.module('ezeidApp').
                 /* load message specific to group or Ezeone id *///@todo
                 else
                 {
-                    console.log("Alpha2");
                     loadGroupMessageThreadApi().then(function(data){
                             if(!data.length > 0)
                                 return;
+
+                            console.log(data);
                             $scope.messageData = data;
-                    },
-                    function(){
-                        console.log("Invalide Code");
-                    });
+                            console.log($scope.messageData);
+                        },
+                        function(){
+                            console.log("Invalide Code");
+                        });
                 }
             }
 

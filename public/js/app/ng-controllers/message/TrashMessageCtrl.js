@@ -69,7 +69,13 @@ angular.module('ezeidApp').
                 });
             }
 
-
+            /**
+             * redirect to detail page
+             */
+            $scope.redirectPage  = function(msgId)
+            {
+                $location.url('/message/details?msg=' + msgId);
+            }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////PAGINATION CODE/////////////////////////////////////////////////////////////////
