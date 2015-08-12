@@ -44,8 +44,8 @@ Planner.prototype.getAllTask = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var startTime = req.query.s_time;
-    var endTime = req.query.e_time;
+    var startTime = req.query.s_time;    // YYYY-MM-DD HH:mm:ss
+    var endTime = req.query.e_time;      // YYYY-MM-DD HH:mm:ss
 
     var responseMessage = {
         status: false,
@@ -72,9 +72,11 @@ Planner.prototype.getAllTask = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams =  st.db.escape(token) + ',' + st.db.escape(startTime)+ ',' + st.db.escape(endTime);
-                        var query = 'CALL (' + queryParams + ')';
+                        var query = 'CALL pLoadTasks(' + queryParams + ')';
                         console.log(query);
+
                         st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {

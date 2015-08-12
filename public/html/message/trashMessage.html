@@ -1,0 +1,98 @@
+<section id="outbox-message-wrapper" class="hpw" ng-controller="TrashMessageCtrl">
+    <div class="message-content-tbl">
+        <div class="row setRowLeftRightMarginZero">
+            <div class="pagination-btn">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
+                    <!--<select ng-model="filterDropDown" class="filters-dropdown">-->
+                    <!--<option value="0">All</option>-->
+                    <!--<option value="2">Unread</option>-->
+                    <!--<option value="1">Read</option>-->
+                    <!--</select>-->
+                </div>
+                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setLeftRightPaddingZero">
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-right">
+                    <!--<select class="filters-dropdown" ng-model="markId" ng-change="messageActivityInit(markId)">-->
+                    <!--<option selected value="0">Action</option>-->
+                    <!--<option ng-repeat="opt in DashBoardOptions track by $index" ng-show="opt.val > 0" value="{{opt.val}}">{{opt.text}}</option>-->
+                    <!--</select>-->
+
+                    <button class="btn btn-default"><i class="fa fa-arrow-circle-left"></i></button>
+                    <button class="btn btn-default"><i class="fa fa-arrow-circle-right"></i></button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="message-table">
+        <table class="table hover-effect">
+            <thead>
+            <th>
+            <td class="text-bolder pointer" ng-click="selectAllCheckBoxAction()">
+                <!--<i class="fa" ng-class="selectAllCheckBoxChecked?'fa-check-square':'fa-square-o'"></i> All-->
+            </td>
+
+            <td class="text-bolder">
+                Sender
+            </td>
+            <td class="text-bolder">
+                Message
+            </td>
+            <td class="text-bolder">
+            </td>
+            <td class="display-in-full-screen display-table text-bolder">
+                Target Date
+            </td>
+            <td class="display-in-full-screen display-table text-bolder">
+                Expiry Date
+            </td>
+            <td class="text-bolder">
+                Time
+            </td>
+            </th>
+            </thead>
+            <tbody class="list-hover">
+
+            <!-- Message List -->
+            <tr ng-repeat="msg in trashMsg track by $index"
+                class="pointer "
+                ng-click="redirectPage(msg.tid)"
+                ng-show="filterDropDown == msg.status || filterDropDown == 0">
+                <td>
+                    <i class="fa fa-arrow-circle-up text-danger"></i>
+                </td>
+                <td ng-click="$event.stopPropagation()">
+                    <!--<i class="fa text-info"-->
+                    <!--ng-click="checkBoxAction(msg.tid)"-->
+                    <!--ng-class="selectedMsgIdArray[msg.tid]?'fa-check-square':'fa-square-o'"></i>-->
+                </td>
+                <td title="{{msg.sender}}">
+                    {{msg.sender | textLength:10}}
+                </td>
+                <td>
+                    {{msg.Message | textLength:20}}
+                </td>
+                <td>
+                    <span ng-show="msg.isattachment == 1" class="glyphicon glyphicon-paperclip"></span>
+                </td>
+                <td class="display-in-full-screen display-table">
+                    {{msg.TargetDate}}
+                </td>
+                <td class="display-in-full-screen display-table">
+                    {{msg.ExpiryDate}}
+                </td>
+                <td>
+                    12:09AM
+                </td>
+
+            </tr>
+            <tr>
+                <td class="text-left" colspan="8" ng-hide="trashMsg.length > 0">
+                    <i class="fa fa-envelope text-danger"></i> No new messages
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</section>

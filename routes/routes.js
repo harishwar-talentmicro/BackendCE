@@ -196,6 +196,7 @@ exports.FnLoadMessages = messageBox.loadMessages;
 exports.FnValidateGroupMember = messageBox.validateGroupMember;
 exports.FnViewMessage = messageBox.viewMessage;
 exports.FnGetMessageAttachment = messageBox.getMessageAttachment;
+exports.FnGetMessageDetails = messageBox.getMessageDetails;
 
 
 var Notification = require('./modules/notification-module.js');

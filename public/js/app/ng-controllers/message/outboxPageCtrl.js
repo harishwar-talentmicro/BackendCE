@@ -67,6 +67,21 @@ angular.module('ezeidApp').
             /* Mark as read/unread check box */
             $scope.selectedMsgIdArray = [];
             $scope.selectAllCheckBoxChecked = false;
+
+            $scope.DashBoardOptions = [
+                {
+                    val:2,
+                    text:"Mark as Unread"
+                },  {
+                    val:1,
+                    text:"Mark as Read"
+                },  {
+                    val:3,
+                    text:"Move to Trash"
+                }
+            ];
+            $scope.markId = 0;
+            $scope.filterDropDown = 0;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////Default Function Calls//////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,9 +93,10 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             $scope.inboxListing = "html/message/inbox.html";
+            $scope.outboxListing = "html/message/outboxMessage.html";
+            $scope.trashListing = "html/message/trashMessage.html";
             $scope.composeMessage = "html/message/composeMessage.html";
             $scope.detailMessage = "html/message/detailMessage.html";
-
             $scope.chatMessage = "html/chat/chatMessage.html";
 
             if($routeParams.action)
@@ -94,6 +110,16 @@ angular.module('ezeidApp').
                 {
                     $scope.activeTemplate = $scope.inboxListing;
                     $scope.titleText = "Inbox";
+                }
+                else if ($routeParams.action == 'outbox')
+                {
+                    $scope.activeTemplate = $scope.outboxListing;
+                    $scope.titleText = "Outbox";
+                }
+                else if ($routeParams.action == 'trash')
+                {
+                    $scope.activeTemplate = $scope.trashListing;
+                    $scope.titleText = "Trash Messages";
                 }
                 else if ($routeParams.action == 'details')
                 {
@@ -123,7 +149,10 @@ angular.module('ezeidApp').
              */
             getGroups();
 
-            /* http request to get all the transaction history */
+            /**
+             *  http request to get all the transaction history from all over the system
+             *  like sales enquiry, reservation etc. not a part of MESSAGING MODULE
+             */
             function getTransactionHistory()
             {
                 var defer = $q.defer();
@@ -415,7 +444,9 @@ angular.module('ezeidApp').
             function loadDashBoardMessages()
             {
                 loadMessageApi().then(function(data){
-                    $scope.dashBoardMsg = data;
+                    var temp = data;
+                    if(temp)
+                        $scope.dashBoardMsg.push(temp);
                 });
 
             }
@@ -449,10 +480,67 @@ angular.module('ezeidApp').
              */
             $scope.redirectPage  = function(msgId)
             {
-                $location.url('/message/details?msg=' + msgId);
+                messageActivityApi(msgId,1).then(function() {
+                    $location.url('/message/details?msg=' + msgId);
+                });
             }
 
 
+            /**
+             * Message activity init.
+             * @param activityType: 1:Read, 2:Unread, 3:Trash
+             */
+            $scope.messageActivityInit = function(activityType)
+            {
+                /* validation */
+                if(!$scope.selectedMsgIdArray.length > 0)
+                {
+                    return ;
+                }
+                /* get csv msg id for action */
+                var selectedMsgId = convertSelectedMessageToCsv(activityType);
+
+                messageActivityApi(selectedMsgId,activityType).then(function(){
+                        Notification.success({ message: "Your action is saved successfully", delay: MsgDelay });
+                        $scope.selectedMsgIdArray = [];
+                },
+                function(){
+                    Notification.error({ message: "Something went wrong! Try again later", delay: MsgDelay });
+                });
+            }
+
+
+            /**
+             * Convert selected messages id array to csv format
+             * @returns {string}
+             */
+            function convertSelectedMessageToCsv(activityType)
+            {
+                var arr = [];
+                /* traverse */
+                $scope.selectedMsgIdArray.forEach(function(data,key){
+                    if(data)
+                    {
+                        arr.push(key);
+                        changeLiveData(key,activityType);
+                    }
+                });
+                return arr.join(',');
+            }
+
+            /**
+             * Change the live data in DOM after getting response from API call to change status
+             */
+            function changeLiveData(key,status)
+            {
+                var index = $scope.dashBoardMsg.indexOfWhere('tid',key);
+                if(parseInt(status) == 3)//Move to trash || remove the list
+                {
+                    $scope.dashBoardMsg.splice(index,1);
+                    return;
+                }
+                $scope.dashBoardMsg[index].status = status;
+            }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ALL API CALLS///////////////////////////////////////////////////////////
@@ -472,11 +560,16 @@ angular.module('ezeidApp').
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
 
                 return defer.promise;
@@ -493,15 +586,21 @@ angular.module('ezeidApp').
                     method : "GET",
                     params :{
                         token : $rootScope._userInfo.Token,
-                        ezeone_id : $rootScope._userInfo.ezeone_id
+                        ezeone_id : $rootScope._userInfo.ezeone_id,
+                        trash:0
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
                 return defer.promise;
             }
@@ -525,11 +624,16 @@ angular.module('ezeidApp').
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
                 return defer.promise;
             }
@@ -548,12 +652,20 @@ angular.module('ezeidApp').
                         token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
+
                     $scope.$emit('$preLoaderStop');
+
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve();
+                    defer.reject();
                 });
                 return defer.promise;
             }
@@ -561,28 +673,32 @@ angular.module('ezeidApp').
             /**
              * Api to handle all the request to [mark as read,mark as unread,trash]
              * @param messageId: message ID of the messages for which this request is called
-             * @param status:: 1: read, 2: unread
+             * @param status:: 1: read, 2: unread., 3:Trash
              * @param trash: 1:YES, 0: NO
              */
-            function messageActivityApi(messageId,status,trash)
+            function messageActivityApi(messageId,status)
             {
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'message_activity',
-                    method : "POST",
+                    method : "put",
                     data :{
                         token : $rootScope._userInfo.Token,
                         message_id:messageId,
-                        status:status,
-                        trash:trash
+                        status:status
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.resolve(resp.status);
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve(resp.data);
+                    defer.reject();
                 });
                 return defer.promise;
             }

@@ -68,10 +68,9 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown p8">
                             <!-- Select All BTN -->
-                            <button class="btn btn-primary"><i class="fa fa-check-square"></i> Select All</button>
-                            <div class="btn-group hidden">
-                                <button class="btn btn-default"><i class="fa fa-list"></i> List View</button>
-                                <button class="btn btn-default"><i class="fa fa-map-marker"></i> Map View</button>
+                            <div class="btn-group">
+                                <button class="btn btn-default" ng-click="toggleMapView(false)"><i class="fa fa-list"></i> List View</button>
+                                <button class="btn btn-default" ng-click="toggleMapView(true)"><i class="fa fa-map-marker"></i> Map View</button>
                             </div>
                         </li>
                     </ul>
@@ -165,6 +164,13 @@
     <!-- Main body of the search result -->
     <div class="content-bg page-content p-bottom-10">
         <div class="container width-75 ">
+
+
+            <!-- Maps goes here -->
+            <!--<div id="map-ctrl" class="col-lg-12" ng-show="searchListMapFlag"></div>-->
+            <div id="map-ctrl" class="col-lg-12"></div>
+            <!-- Maps ends here -->
+
             <!-- main sorting div goes here -->
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 result-info-div">
                 <div class="sorting-block row">
