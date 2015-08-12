@@ -46,10 +46,10 @@
             function clearSearchFilter()
             {
                 $scope.jobSeekerSkillKeyword = "";
-                $scope.jobSeekerJobType = 0;
+                $scope.jobSeekerJobType = 1 ;
                 $scope.jobSeekerSalaryFrom = 0;
                 $scope.jobSeekerSalaryTo = 0;
-                $scope.jobSeekerSalaryType = 0;
+                $scope.jobSeekerSalaryType = 2;
                 $scope.countryId = 0;
                 $scope.cityId = 0;
                 $scope.jobSeekerExperienceFrom = 0;
@@ -65,6 +65,8 @@
                 $scope.job_id = 0;
                 $scope.searchListMapFlag = false;//1: List, 2:Flag
             }
+
+            $scope.jobSeekerResults = "";
 
             //Pagination settings
             $scope.pageSize = 10;//Results per page
@@ -279,9 +281,6 @@
              */
             $scope.searchJobSeeker = function()
             {
-                console.log("SAi11");
-                var education = $scope.selectedSpecializations.length ? $scope.selectedSpecializations.toString() : "";
-                console.log(education);
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'job_seeker_search',
@@ -295,7 +294,7 @@
                                 experience_from : $scope.jobSeekerExperienceFrom,
                                 experience_to : $scope.jobSeekerExperienceTo,
                                 location_ids : $scope.selectedCitys.toString(),
-                                educations : education,
+                                educations : $scope.selectedSpecializations.toString(),
                                 specialization_id : $scope.selectedSpecializations.toString(),
                                 institute_id : $scope.selectedInstitute.toString(),
                                 score_from : $scope.scoreFrom,
@@ -307,7 +306,6 @@
                     $scope.$emit('$preLoaderStop');
                     if(resp.status)
                     {
-                        console.log(resp);
                         $scope.totalResult = resp.count;
                         $scope.resultThisPage = resp.data.length;
                         $scope.paginationVisibility();
@@ -492,7 +490,8 @@
 
             // Close Create Mail Template Form
             $scope.closeSalesEnquiryForm = function () {
-                $location.path("/");
+                $scope.jobSeekerResults = "";
+                clearSearchFilter();
             };
 
             // Reset job seeker search filter
