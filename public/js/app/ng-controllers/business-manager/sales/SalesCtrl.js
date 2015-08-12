@@ -226,7 +226,7 @@
                   longitude : 0,
                   duration : 0,
                   durationScale : 0,
-                  itemList : [],     // This is transaction item list
+                  itemList : [],     // This is transaction item list,
                   companyName : '',
                   companyId : 0,
                   attachment : "",
@@ -540,6 +540,7 @@
                     var editTx = prepareEditTransaction($scope.txList[index]);
                     if($scope.moduleConf.listType > 0){
                         $scope.$emit('$preLoaderStart');
+                        $scope.modalBox.title = 'Update Lead';
                         loadTransactionItems(editTx.TID).then(function(resp){
                             editTx.itemList = resp;
 
@@ -561,7 +562,16 @@
                         });
                     }
                     else{
+                        $scope.modalBox.title = 'Update Lead';
                         $scope.showModal = !$scope.showModal;
+                        //UI updation is not happening properly because ui is not rendered, and model bind before it
+                        //therefore once again updating data after ui rendered
+                        $timeout(function(){
+                            $scope.modalBox.title = 'Update Lead';
+                            $scope.modalBox.tx = editTx;
+                            $scope.modalBox.contactType = ($scope.modalBox.tx.ezeid) ? 1 : 2;
+                            $scope.$emit('$preLoaderStop');
+                        },1500);
                     }
                 }
                 else{
@@ -1597,7 +1607,8 @@
                     //NextActionDateTime : ($scope.modalBox.tx.nextActionDateTime) ? $scope.modalBox.tx.nextActionDateTime :
                     //    moment().format('YYYY-MM-DD hh:mm:ss'),
                     ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
-                    item_list_type : $rootScope._userInfo.SalesItemListType,
+                    //item_list_type : $rootScope._userInfo.SalesItemListType,
+                    item_list_type : $scope.modalBox.tx.itemListType,
                     DeliveryAddress : (!editMode) ?
                         makeAddress() : $scope.modalBox.tx.DeliveryAddress,
                     companyName : $scope.modalBox.tx.companyName,
@@ -1605,6 +1616,11 @@
                     Amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
                         ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
                         calculateTxAmount($scope.modalBox.tx.itemList),
+
+                    amount : (parseInt($rootScope._userInfo.SalesItemListType) < 4) ?
+                        ((parseFloat($scope.modalBox.tx.amount,2) !== NaN) ? parseFloat($scope.modalBox.tx.amount,2) : 0.00) :
+                        calculateTxAmount($scope.modalBox.tx.itemList),
+
                     proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) !== 0 ) ? $scope.modalBox.tx.probability : 2 ,
                     target_date : ($scope.modalBox.tx.targetDate) ? $scope.modalBox.tx.targetDate :  moment().format('YYYY-MM-DD'),
                     attachment : $scope.modalBox.tx.attachment,
