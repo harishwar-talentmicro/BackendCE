@@ -37,7 +37,7 @@ angular.module('ezeidApp').
             UtilityService
         )
         {
-            if($rootScope._userInfo){
+           if($rootScope._userInfo){
                 if(!$rootScope._userInfo.IsAuthenticate){
                     var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
                         if(newVal){
@@ -52,7 +52,7 @@ angular.module('ezeidApp').
                 }
             }
 
-            //Below line is for Loading img
+            // Below line is for Loading img
             $scope.$emit('$preLoaderStart');
 
             var destroyModalDetailsWatcher = null;
@@ -270,6 +270,7 @@ angular.module('ezeidApp').
                             $scope.AddressForInfoTab = ($scope.SearchInfo.AddressLine1 != "") ? $scope.SearchInfo.AddressLine1 +', ' : "";
                             $scope.AddressForInfoTab += ($scope.SearchInfo.AddressLine2 != "") ? $scope.SearchInfo.AddressLine2 +', ' : "";
                             $scope.AddressForInfoTab += ($scope.SearchInfo.CityTitle != "") ? $scope.SearchInfo.CityTitle +', ' : "";
+                            $scope.AddressForInfoTab += ($scope.SearchInfo.StateTitle != "") ? $scope.SearchInfo.StateTitle +', ' : "";
                             $scope.AddressForInfoTab += ($scope.SearchInfo.CountryTitle != "") ? $scope.SearchInfo.CountryTitle +', ' : "";
                             $scope.AddressForInfoTab += ($scope.SearchInfo.PostalCode != "") ? $scope.SearchInfo.PostalCode : "";
 

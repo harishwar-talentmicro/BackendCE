@@ -63,6 +63,7 @@
                 $scope.selectedTidToMail = [];
                 $scope.mailTemplateTid = 0;
                 $scope.job_id = 0;
+                $scope.searchListMapFlag = false;//1: List, 2:Flag
             }
 
             //Pagination settings
@@ -278,6 +279,9 @@
              */
             $scope.searchJobSeeker = function()
             {
+                console.log("SAi11");
+                var education = $scope.selectedSpecializations.length ? $scope.selectedSpecializations.toString() : "";
+                console.log(education);
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'job_seeker_search',
@@ -291,7 +295,7 @@
                                 experience_from : $scope.jobSeekerExperienceFrom,
                                 experience_to : $scope.jobSeekerExperienceTo,
                                 location_ids : $scope.selectedCitys.toString(),
-                                educations : $scope.selectedEducations.toString(),
+                                educations : education,
                                 specialization_id : $scope.selectedSpecializations.toString(),
                                 institute_id : $scope.selectedInstitute.toString(),
                                 score_from : $scope.scoreFrom,
@@ -303,6 +307,7 @@
                     $scope.$emit('$preLoaderStop');
                     if(resp.status)
                     {
+                        console.log(resp);
                         $scope.totalResult = resp.count;
                         $scope.resultThisPage = resp.data.length;
                         $scope.paginationVisibility();
@@ -588,7 +593,7 @@
                 {
                     $scope.selectedTidToMail.push(_TID);
                 }
-            }
+            };
 
             // Get Job list
             function getJobList()
@@ -636,7 +641,7 @@
                 // $scope.triggerSearch(1);
                 $scope.searchJobSeeker();
                 $scope.paginationVisibility();
-            }
+            };
 
             /**
              * load the previous results
@@ -648,7 +653,7 @@
                 // $scope.triggerSearch(1);
                 $scope.searchJobSeeker();
                 $scope.paginationVisibility();
-            }
+            };
 
             /**
              * Toggle the visibility of the pagination buttons
@@ -682,7 +687,8 @@
                     $scope.paginationNextVisibility = true;
                     $scope.paginationPreviousVisibility = true;
                 }
-            }
+            };
+
 
 
         }]);

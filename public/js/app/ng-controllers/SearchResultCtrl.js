@@ -320,6 +320,9 @@ var res = angular.module('ezeidApp').
                             $scope.checkBoxStatus.push(false);
                         }
                         $scope.coordinatesArr = coordinates;
+
+                        console.log("SAi nath");
+                        console.log($scope.coordinatesArr);
                     }
                     $scope.searchCount = count;
 

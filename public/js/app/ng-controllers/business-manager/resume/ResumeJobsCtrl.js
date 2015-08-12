@@ -623,9 +623,9 @@
                 }).success(function(resp){
                         $scope.instituteList = resp.data;
                     })
-                    .error(function(err){
+                .error(function(err){
 
-                    });
+                });
             }
 
             /**

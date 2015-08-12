@@ -74,17 +74,19 @@ angular.module('ezeidApp').
 
                     if(resp.status)
                     {
-                        $scope.totalResult = resp.data[0].count;
-                        $scope.resultThisPage = resp.data.length;
-
-                        $scope.paginationVisibility();
-
-                        $scope.jobData = resp.data;
-                        for(var nCount = 0; nCount < resp.data.length; nCount++)
+                        if(resp.data.length)
                         {
-                            resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
-                        }
+                            $scope.totalResult = resp.data[0].count;
+                            $scope.resultThisPage = resp.data.length;
 
+                            $scope.paginationVisibility();
+
+                            $scope.jobData = resp.data;
+                            for(var nCount = 0; nCount < resp.data.length; nCount++)
+                            {
+                                resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
+                            }
+                        }
                     }
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');

@@ -117,6 +117,15 @@ angular.module('ezeidApp').
                 salaryRange:[]
             };
 
+            $scope.coordinatesArr = [];
+
+            $scope.coordinatesArr = 0: Array[4]
+            0: 12.937649
+            1: 77.655799
+            2: "Hirecraft"
+            3: "/searchDetails?searchType=2&TID=26"
+            length: 4;
+
             //easy and default calling of functions
             initiateSearch();
 
@@ -197,6 +206,34 @@ angular.module('ezeidApp').
 
                 if($rootScope._userInfo.IsAuthenticate)
                 {
+                    var temp = {
+                        latitude:$scope.params.lat,
+                        longitude:$scope.params.lng,
+                        proximity:$scope.params.proximity,
+                        jobType:$scope.params.jobType,
+                        exp:experience,
+                        keywords:$scope.params.searchTerm,
+                        token: $rootScope._userInfo.Token,
+                        page_size: $scope.pageSize,
+                        page_count: $scope.pageCount,
+                        order_by: $scope.params.orderBy,
+                        //Exclusively for Advance filters
+                        locations: $scope.params.locations,
+                        category: $scope.params.category,
+                        salary: $scope.params.salary,
+                        restrict: $scope.filterCollege == false ? 0 : 1
+                        //filter:$scope.params.filter?$scope.params.filter:0
+                    };
+                    console.log("----------------------------");
+                    console.log(temp);
+
+                    var category = 0;
+                    if($scope.params.category && parseInt($scope.params.category) > 0)
+                    {
+                           categor = parseInt($scope.params.category);
+                    }
+
+
                     /* make an API request to get the data */
                     var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
                     $http({ method: 'get', url: GURL + 'job_search',
@@ -213,7 +250,7 @@ angular.module('ezeidApp').
                             order_by: $scope.params.orderBy,
                             //Exclusively for Advance filters
                             locations: $scope.params.locations,
-                            category: $scope.params.category,
+                            category: category,
                             salary: $scope.params.salary,
                             restrict: $scope.filterCollege == false ? 0 : 1
                             //filter:$scope.params.filter?$scope.params.filter:0
@@ -1209,6 +1246,176 @@ angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                 });
             };
+
+            var isMapInitialized = false;
+
+            /* integrate google map */
+            var googleMap = new GoogleMap();
+
+            /* Callback function for get current location functionality */
+            $scope.findCurrentLocation = function(){
+                googleMap.getCurrentLocation().then(function(){
+                    googleMap.placeCurrentLocationMarker(null,null,true);
+                },function(){
+                    googleMap.placeCurrentLocationMarker(null,null,true);
+                });
+            };
+
+            /* Get the current location string */
+            var promise = googleMap.getCurrentLocation()
+            promise.then(function (resp) {
+                if (resp) {
+
+                    /* push the coordinates on to the API for getting the location string */
+                    if($scope.params.lat != 'undefined' || $scope.params.lng != 'undefined')//If lat-lng is set in URL
+                    {
+                        var coordinates = getSearchedCoordinates($scope.params.lat,$scope.params.lng);
+                    }
+                    else//If lat-lng is not set in URL
+                    {
+                        var coordinates = getSearchedCoordinates(googleMap.currentMarkerPosition.latitude,googleMap.currentMarkerPosition.longitude);
+                    }
+
+
+                    googleMap.getReverseGeolocation(coordinates[0],coordinates[1]).then(function (resp) {
+                        if (resp) {
+                            $rootScope.coordinatesLat = googleMap.currentMarkerPosition.latitude;
+                            $rootScope.coordinatesLng = googleMap.currentMarkerPosition.longitude;
+                            placeDetail = googleMap.parseReverseGeolocationData(resp.data);
+
+                            //$scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
+                            var options = {
+                                route : true,
+                                sublocality3 : true,
+                                sublocality2 : true,
+                                area : true,
+                                city : true,
+                                state : true,
+                                country : false,
+                                postalCode : false
+                            };
+                            $scope.locationString = googleMap.createAddressFromGeolocation(placeDetail,options);
+                            $scope.location = googleMap.createAddressFromGeolocation(placeDetail,options);
+                            /* Setting up default lattitude & longitude of the map */
+                          //  $scope.searchParams.lat = googleMap.currentMarkerPosition.latitude;
+                          //  $scope.searchParams.lng = googleMap.currentMarkerPosition.longitude;
+                        }
+                        if ($routeParams['ezeid']) {
+                            $scope.triggerSearch();
+                        }
+                    }, function () {
+                        if ($routeParams['ezeid']) {
+                            $scope.triggerSearch();
+                        }
+                    });
+                }
+                else {
+                    handleNoGeolocation();
+                    if ($routeParams['ezeid']) {
+                        $scope.triggerSearch();
+                    }
+                }
+            }, function () {
+                if ($routeParams['ezeid']) {
+                    $scope.triggerSearch();
+                }
+                handleNoGeolocation();
+            });
+
+
+            /* Callback function for get current location functionality */
+            $scope.findCurrentLocation = function(){
+                googleMap.getCurrentLocation().then(function(){
+                    googleMap.placeCurrentLocationMarker(null,null,false);
+                },function(){
+                    googleMap.placeCurrentLocationMarker(null,null,false);
+                });
+            };
+            /* Detailed map with all the search result markers */
+            var initializeMap = function(){
+                googleMap.setSettings({
+                    mapElementClass : "col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix class-map-ctrl",
+                    searchElementClass : "form-control pull-left pac-input",
+                    currentLocationElementClass : "link-btn pac-loc",
+                    controlsContainerClass : "col-lg-6 col-md-6'"
+                });
+
+                googleMap.createMap("map-ctrl",$scope,"findCurrentLocation()");
+                googleMap.renderMap();
+
+                googleMap.mapIdleListener().then(function(){
+                    googleMap.pushMapControls();
+                    googleMap.listenOnMapControls();
+                    googleMap.getCurrentLocation().then(function(){
+                        googleMap.placeCurrentLocationMarker();
+                        populateMarkers();
+                        googleMap.setMarkersInBounds();
+                    },function(){
+                        populateMarkers();
+                        googleMap.setMarkersInBounds();
+                    });
+
+                });
+
+                /* populates the map marker for search result */
+                var populateMarkers = function(){
+                    googleMap.resizeMap();
+                    googleMap.setMarkersInBounds();
+                    //googleMap.toggleMapControls();
+
+                    /* place markers on map */
+                    var markerImage = '../../images/business-icon_48.png';
+                    for(var i=0;i < $scope.coordinatesArr.length;i++)
+                    {
+                        if($scope.coordinatesArr[i][0] != 0 || $scope.coordinatesArr[i][0] != 0)
+                        {
+                            var pos = googleMap.createGMapPosition($scope.coordinatesArr[i][0],$scope.coordinatesArr[i][1]);
+                            var marker = googleMap.createMarker(pos,$scope.coordinatesArr[i][2],markerImage,false,null,$scope.coordinatesArr[i][2],$scope.coordinatesArr[i][3]);
+                            googleMap.placeMarker(marker,null,null,true,function(link){
+                                $window.location.href = link;
+                            });
+                        }
+                    }
+
+                    googleMap.setMarkersInBounds();
+                };
+            };
+
+            $scope.toggleMapView = function(flag)
+            {
+                $scope.searchListMapFlag = flag;
+                console.log("Sai7878");
+                console.log($scope.searchListMapFlag);
+
+                if(!isMapInitialized)
+                {
+                    initializeMap();
+                    isMapInitialized = true;
+                }
+                else
+                {
+                    if(flag)
+                    {
+                        $timeout(function(){
+                            googleMap.resizeMap();
+                            googleMap.setMarkersInBounds();
+                        },500);
+                    }
+                }
+            };
+
+            /* get lattitude and longitude based on present lat and lng */
+            function getSearchedCoordinates(lat,lng)
+            {
+                if(typeof($routeParams.lat) != 'undefined' && typeof($routeParams.lng) != 'undefined')
+                {
+                    return [$routeParams.lat,$routeParams.lng];
+                }
+                else
+                {
+                    return [lat,lng];
+                }
+            }
 
 
         }]);
