@@ -3351,7 +3351,7 @@ sup.tm{
 
 .hpw .group-suggestion:hover
 {
-    background-color: #0B848E;
+    background-color: #0B848E !important;
     color: #fff;
 }
 
@@ -3394,4 +3394,9 @@ sup.tm{
 .hpw .chatting-attachment-btn
 {
     padding-top: 5px !important;
+}
+
+.message-table .read
+{
+    background-color: #DFF9F3;;
 }

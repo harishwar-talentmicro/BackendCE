@@ -52,7 +52,7 @@ angular.module('ezeidApp').
             };
             $scope.visibilityReceiverErrorMsg = false;
             $scope.visibilityMsgBodyErrorMsg = false;
-
+            $scope.composeMsg.Priority = 0;
             /* Error messages goes here */
             $scope.errorMsgArr = [
                 "Invalid Ezeone",

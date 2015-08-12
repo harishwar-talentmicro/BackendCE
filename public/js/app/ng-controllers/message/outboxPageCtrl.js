@@ -67,6 +67,21 @@ angular.module('ezeidApp').
             /* Mark as read/unread check box */
             $scope.selectedMsgIdArray = [];
             $scope.selectAllCheckBoxChecked = false;
+
+            $scope.DashBoardOptions = [
+                {
+                    val:2,
+                    text:"Mark as Unread"
+                },  {
+                    val:1,
+                    text:"Mark as Read"
+                },  {
+                    val:3,
+                    text:"Move to Trash"
+                }
+            ];
+            $scope.markId = 0;
+            $scope.filterDropDown = 0;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////Default Function Calls//////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -449,10 +464,61 @@ angular.module('ezeidApp').
              */
             $scope.redirectPage  = function(msgId)
             {
-                $location.url('/message/details?msg=' + msgId);
+                messageActivityApi(msgId,1).then(function() {
+                    $location.url('/message/details?msg=' + msgId);
+                });
             }
 
 
+            /**
+             * Message activity init.
+             * @param activityType: 1:Read, 2:Unread, 3:Trash
+             */
+            $scope.messageActivityInit = function(activityType)
+            {
+                /* validation */
+                if(!$scope.selectedMsgIdArray.length > 0)
+                {
+                    return ;
+                }
+                /* get csv msg id for action */
+                var selectedMsgId = convertSelectedMessageToCsv(activityType);
+
+                messageActivityApi(selectedMsgId,activityType).then(function(){
+                        Notification.success({ message: "Your action is saved successfully", delay: MsgDelay });
+                        $scope.selectedMsgIdArray = [];
+                },
+                function(){
+                    Notification.error({ message: "Something went wrong! Try again later", delay: MsgDelay });
+                });
+            }
+
+            /**
+             * Convert selected messages id array to csv format
+             * @returns {string}
+             */
+            function convertSelectedMessageToCsv(activityType)
+            {
+                var arr = [];
+                /* traverse */
+                $scope.selectedMsgIdArray.forEach(function(data,key){
+                    if(data)
+                    {
+                        arr.push(key);
+                        changeLiveData(key,activityType);
+                    }
+                });
+                return arr.join(',');
+            }
+
+            /**
+             * Change the live data in DOM after getting response from API call to change status
+             */
+            function changeLiveData(key,status)
+            {
+                var index = $scope.dashBoardMsg.indexOfWhere('tid',key);
+                $scope.dashBoardMsg[index].status = status;
+            }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ALL API CALLS///////////////////////////////////////////////////////////
@@ -564,25 +630,29 @@ angular.module('ezeidApp').
              * @param status:: 1: read, 2: unread
              * @param trash: 1:YES, 0: NO
              */
-            function messageActivityApi(messageId,status,trash)
+            function messageActivityApi(messageId,status)
             {
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'message_activity',
-                    method : "POST",
+                    method : "put",
                     data :{
                         token : $rootScope._userInfo.Token,
                         message_id:messageId,
-                        status:status,
-                        trash:trash
+                        status:status
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.resolve(resp.status);
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
-                    defer.resolve(resp.data);
+                    defer.reject();
                 });
                 return defer.promise;
             }
