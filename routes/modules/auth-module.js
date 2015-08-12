@@ -669,7 +669,8 @@ Auth.prototype.login = function(req,res,next){
             PersonalEZEID:'',
             ReservationDisplayFormat:'',
             mobilenumber:'',
-            ISPrimaryLocAdded:''
+            ISPrimaryLocAdded:'',
+            isapplied:''
 
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
@@ -701,7 +702,7 @@ Auth.prototype.login = function(req,res,next){
 
                                         if (TokenResult) {
                                             //res.setHeader('Cookie','Token='+Encrypt);
-                                            // console.log(loginDetails[0]);
+                                            console.log(loginDetails[0]);
                                             res.cookie('Token', TokenResult, { maxAge: 900000, httpOnly: true });
                                             RtnMessage.Token = TokenResult;
                                             RtnMessage.IsAuthenticate = true;
@@ -734,6 +735,7 @@ Auth.prototype.login = function(req,res,next){
                                             RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
                                             RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
                                             RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
+                                            RtnMessage.isjobapplied = loginDetails[0].isappliedforjob;
                                             res.send(RtnMessage);
                                             console.log('FnLogin:tmaster: Login success');
                                         }

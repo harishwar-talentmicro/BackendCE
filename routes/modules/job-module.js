@@ -508,8 +508,8 @@ Job.prototype.getJobLocations = function(req,res,next){
 Job.prototype.searchJobs = function(req,res,next){
     var _this = this;
     try{
-    var latitude = req.query.latitude;
-    var longitude = req.query.longitude;
+    var latitude = req.query.latitude ? req.query.latitude : 0;
+    var longitude = req.query.longitude ? req.query.longitude : 0;
     var proximity = (req.query.proximity) ? req.query.proximity : 0;
     var jobType = req.query.jobType;
     var exp = (req.query.exp) ? req.query.exp : -1;
@@ -535,7 +535,7 @@ Job.prototype.searchJobs = function(req,res,next){
             +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)
             +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue);
 
-                            console.log(query);
+                            console.log('CALL psearchjobs(' + query + ')');
                             st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
                                 if (!err) {
                                     if (getresult) {
