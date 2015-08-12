@@ -94,6 +94,7 @@ angular.module('ezeidApp').
 
             $scope.inboxListing = "html/message/inbox.html";
             $scope.outboxListing = "html/message/outboxMessage.html";
+            $scope.trashListing = "html/message/trashMessage.html";
             $scope.composeMessage = "html/message/composeMessage.html";
             $scope.detailMessage = "html/message/detailMessage.html";
             $scope.chatMessage = "html/chat/chatMessage.html";
@@ -114,6 +115,11 @@ angular.module('ezeidApp').
                 {
                     $scope.activeTemplate = $scope.outboxListing;
                     $scope.titleText = "Outbox";
+                }
+                else if ($routeParams.action == 'trash')
+                {
+                    $scope.activeTemplate = $scope.trashListing;
+                    $scope.titleText = "Trash Messages";
                 }
                 else if ($routeParams.action == 'details')
                 {
@@ -438,7 +444,9 @@ angular.module('ezeidApp').
             function loadDashBoardMessages()
             {
                 loadMessageApi().then(function(data){
-                    $scope.dashBoardMsg = data;
+                    var temp = data;
+                    if(temp)
+                        $scope.dashBoardMsg.push(temp);
                 });
 
             }
@@ -578,7 +586,8 @@ angular.module('ezeidApp').
                     method : "GET",
                     params :{
                         token : $rootScope._userInfo.Token,
-                        ezeone_id : $rootScope._userInfo.ezeone_id
+                        ezeone_id : $rootScope._userInfo.ezeone_id,
+                        trash:0
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
