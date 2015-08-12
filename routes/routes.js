@@ -6,11 +6,15 @@ var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
 exports.FnSendMail = stdLib.sendMail;
 
+var Auth = require('./modules/auth-module.js');
+var authModule = new Auth(db,stdLib);
+exports.FnRegistration = authModule.register;
+exports.FnLogin = authModule.login;
+exports.FnLogout = authModule.logout;
+
 var User = require('./modules/user-module.js');
 var userModule = new User(db,stdLib);
-exports.FnRegistration = userModule.register;
-exports.FnLogin = userModule.login;
-exports.FnLogout = userModule.logout;
+
 exports.FnGetCountry = userModule.getCountry;
 exports.FnGetState = userModule.getState;
 exports.FnGetCity = userModule.getCity;
