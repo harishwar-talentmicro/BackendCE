@@ -493,6 +493,7 @@ angular.module('ezeidApp').
                 });
             }
 
+
             /**
              * Convert selected messages id array to csv format
              * @returns {string}
@@ -517,6 +518,11 @@ angular.module('ezeidApp').
             function changeLiveData(key,status)
             {
                 var index = $scope.dashBoardMsg.indexOfWhere('tid',key);
+                if(parseInt(status) == 3)//Move to trash || remove the list
+                {
+                    $scope.dashBoardMsg.splice(index,1);
+                    return;
+                }
                 $scope.dashBoardMsg[index].status = status;
             }
 
@@ -627,7 +633,7 @@ angular.module('ezeidApp').
             /**
              * Api to handle all the request to [mark as read,mark as unread,trash]
              * @param messageId: message ID of the messages for which this request is called
-             * @param status:: 1: read, 2: unread
+             * @param status:: 1: read, 2: unread., 3:Trash
              * @param trash: 1:YES, 0: NO
              */
             function messageActivityApi(messageId,status)
