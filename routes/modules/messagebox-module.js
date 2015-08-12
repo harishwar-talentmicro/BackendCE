@@ -1067,6 +1067,8 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
     var token = req.query.token;
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
     var trash = (req.query.trash) ? req.query.trash : 0; //if 0 normalmsg ,if u want trash msg send 1....Default is 0..
+    var pageSize = req.query.page_size;
+    var pageCount = req.query.page_count;
 
     var responseMessage = {
         status: false,
@@ -1096,7 +1098,8 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(ezeone_id) + ',' + st.db.escape(trash);
+                        var queryParams = st.db.escape(ezeone_id) + ',' + st.db.escape(trash) + ',' + st.db.escape(pageSize)
+                            + ',' + st.db.escape(pageCount);
                         var query = 'CALL PLoadMessageBox(' + queryParams + ')';
 
                         st.db.query(query, function (err, getResult) {
@@ -1106,7 +1109,7 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'MessageBox loaded successfully';
-                                        responseMessage.data = getResult[0][0];
+                                        responseMessage.data = getResult[0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnLoadMessageBox: MessageBox loaded successfully');
                                     }
@@ -1298,6 +1301,8 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
 
     var token = req.query.token;
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var pageSize = req.query.page_size;
+    var pageCount = req.query.page_count;
 
     var responseMessage = {
         status: false,
@@ -1327,8 +1332,9 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        console.log('CALL pLoadOutBoxMessages(' + st.db.escape(ezeone_id) + ')');
-                        st.db.query('CALL pLoadOutBoxMessages(' + st.db.escape(ezeone_id) + ')', function (err, getResult) {
+                        var queryParams = st.db.escape(ezeone_id) + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount);
+                        var query = 'CALL pLoadOutBoxMessages(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
@@ -1370,7 +1376,7 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
                         };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('FnChangeMessageActivity: Invalid token');
+                        console.log('FnLoadOutBoxMessages: Invalid token');
                     }
                 }
                 else {
@@ -1379,7 +1385,7 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnChangeMessageActivity:Error in processing Token' + err);
+                    console.log('FnLoadOutBoxMessages:Error in processing Token' + err);
                 }
             });
         }
@@ -1820,6 +1826,9 @@ MessageBox.prototype.loadMessages = function(req,res,next){
     var token = req.query.token;
     var id = parseInt(req.query.id); // toId or groupid
     var groupType = parseInt(req.query.group_type);
+    var pageSize = req.query.page_size;
+    var pageCount = req.query.page_count;
+
 
     var responseMessage = {
         status: false,
@@ -1849,7 +1858,8 @@ MessageBox.prototype.loadMessages = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(id) + ',' + st.db.escape(groupType)+ ',' + st.db.escape(token);
+                        var queryParams =  st.db.escape(id) + ',' + st.db.escape(groupType)+ ',' + st.db.escape(token)
+                            + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount);
                         var query = 'CALL pLoadMessagesofGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -2042,6 +2052,7 @@ MessageBox.prototype.viewMessage = function(req,res,next){
         }
     }
 };
+
 /**
  * @todo FnGetMessageAttachment
  * Method : Get
@@ -2165,119 +2176,6 @@ MessageBox.prototype.getMessageAttachment = function(req,res,next){
     }
 };
 
-/**
- * @todo FnGetMessageDetails
- * Method : Get
- * @param req
- * @param res
- * @param next
- * @service-param token <varchar>
- * @service-param tid <int> // tid of tranasction
- * @description api code for get message details
- */
-MessageBox.prototype.getMessageDetails = function(req,res,next){
-    var _this = this;
 
-    var token = req.query.token;
-    var tid = parseInt(req.query.tid); // tid of tranasction
-
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-
-    var validateStatus = true, error = {};
-
-    if(!token){
-        error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
-    if(!tid){
-        error['tid'] = 'Invalid tid';
-        validateStatus *= false;
-    }
-
-    if(!validateStatus){
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-    }
-    else {
-        try {
-            st.validateToken(token, function (err, result) {
-                if (!err) {
-                    if (result) {
-                        var queryParams = st.db.escape(tid);
-                        var query = 'CALL pGetMessagesDetails(' + queryParams + ')';
-                        console.log(query);
-                        st.db.query(query, function (err, getResult) {
-                            if (!err) {
-                                if (getResult) {
-                                    if (getResult[0]) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Message Details loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetMessageDetails: Message Details loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Message Details not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetMessageDetails:Message Details not loaded');
-                                    }
-
-                                }
-                                else {
-                                    responseMessage.message = 'Message Details not loaded';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetMessageDetails:Message Details not loaded');
-                                }
-
-                            }
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnGetMessageDetails: error in getting MessageDetails:' + err);
-                            }
-                        });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {
-                            token: 'invalid token'
-                        };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetMessageDetails: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error = {
-                        server : 'Internal server error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetMessageDetails:Error in processing Token' + err);
-                }
-            });
-        }
-        catch (ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error : FnGetMessageDetails ' + ex.description);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-        }
-    }
-};
 
 module.exports = MessageBox;

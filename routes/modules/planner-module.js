@@ -201,8 +201,8 @@ Planner.prototype.getTrans = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(token) + ',' + st.db.escape(tid);
-                        var query = 'CALL (' + queryParams + ')';
+                        var queryParams = st.db.escape(tid);
+                        var query = 'CALL pGetMessagesDetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -212,7 +212,7 @@ Planner.prototype.getTrans = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Transaction loaded successfully';
-                                            responseMessage.data =getResult[0];
+                                            responseMessage.data = getResult[0][0];
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetTrans: Transaction loaded successfully');
                                         }
