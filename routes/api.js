@@ -173,7 +173,6 @@ router.get('/load_group_message',LocationManager.FnLoadMessages);
 router.get('/validate_group_member',LocationManager.FnValidateGroupMember);
 router.get('/message_full_view',LocationManager.FnViewMessage);
 router.get('/message_attachment',LocationManager.FnGetMessageAttachment);
-router.get('/message_details',LocationManager.FnGetMessageDetails);
 
 //Planner module
 router.get('/tasks',LocationManager.FnGetAllTask);
