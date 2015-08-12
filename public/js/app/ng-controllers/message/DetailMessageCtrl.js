@@ -51,8 +51,8 @@ angular.module('ezeidApp').
             if(typeof $routeParams.type !== undefined)
                 groupType = $routeParams.type;
 
-            /* get the msg Id */
-            if(typeof msgId == undefined || !msgId > 0 || typeof $routeParams.id == undefined)
+            /* Validations */
+            if((typeof msgId == undefined && !parseInt(msgId) > 0 ) || (typeof $routeParams.id == undefined  && !parseInt(msgId) > 0 ))
             {
                 /* redirect to inbox page */
                 redirectInboxPage();
@@ -86,9 +86,12 @@ angular.module('ezeidApp').
              */
             function loadFullViewMessage()
             {
-                /* load normal messages */
-                if(typeof $routeParams.id == undefined)
+                /* load normal messages based on msg ID */
+                console.log($routeParams);
+
+                if(!$routeParams.id)
                 {
+                    console.log("Alpha1");
                     loadFullMessageApi().then(function(data){
                             $scope.messageData = data;
                         },
@@ -98,8 +101,19 @@ angular.module('ezeidApp').
                         });
                     return;
                 }
-                /* load message specific to group or Ezeone id */
-
+                /* load message specific to group or Ezeone id *///@todo
+                else
+                {
+                    console.log("Alpha2");
+                    loadGroupMessageThreadApi().then(function(data){
+                            if(!data.length > 0)
+                                return;
+                            $scope.messageData = data;
+                    },
+                    function(){
+                        console.log("Invalide Code");
+                    });
+                }
             }
 
             /**
@@ -187,13 +201,14 @@ angular.module('ezeidApp').
             function loadGroupMessageThreadApi()
             {
                 var defer = $q.defer();
+                var msgId;
                 $http({
                     url : GURL + 'load_group_message',
                     method : "GET",
                     params :{
                         token : $rootScope._userInfo.Token,
-                        id: msgId,
-                        group_type: groupId,
+                        id: groupId,
+                        group_type: groupType,
                         page_size: $scope.pageSize,
                         page_count: $scope.pageCount
                     }
@@ -201,12 +216,9 @@ angular.module('ezeidApp').
                     if(!resp.status)
                     {
                         defer.reject();
+                        return defer.promise;
                     }
-                    else if(resp.data)
-                    {
-                        defer.resolve(resp.data);
-                    }
-
+                    defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });

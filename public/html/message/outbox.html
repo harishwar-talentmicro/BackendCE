@@ -55,7 +55,7 @@
                                 <!-- groups goes here -->
                                 <div class="group-list grp-hover overflow-y-250">
                                     <li class="index-menu-item group" ng-repeat="grp in groupListData track by $index">
-                                        <a href="#"><i class="fa fa-group"></i> {{grp.GroupName}}</a>
+                                        <a href="#" ng-click="redirectGroupMessage(grp.GroupID,grp.GroupType)"><i class="fa fa-group"></i> {{grp.GroupName}}</a>
                                         <span class="pull-right p-right-10" ng-show="grp.isAdmin == 1">
                                             <button title="edit group" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></button>
                                             <button disabled title="you are admin" class="btn btn-primary btn-xs"><i class="fa fa-shield"></i></button>
@@ -78,7 +78,7 @@
                                 <!-- Individual list goes here -->
                                 <div class="individual-member-list grp-hover overflow-y-250">
                                     <li class="index-menu-item people" ng-hide="loggedInUserEzeone == member.GroupName" ng-repeat="member in individualMember track by $index">
-                                        <a href="#"><i class="fa fa-comments"></i> {{member.GroupName}}</a>
+                                        <a href="#" ng-click="redirectGroupMessage(member.GroupID,member.GroupType)"><i class="fa fa-comments"></i> {{member.GroupName}}</a>
                                     </li>
                                     <li class="index-menu-item people bg-danger text-white" ng-show="!individualMember.length > 0">
                                         <a href="#"><i class="fa fa-comments"></i> No Contacts Available</a>
