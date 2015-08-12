@@ -604,31 +604,17 @@
                     $scope.modalBox.editMode = true;
                     var editTx = prepareEditTransaction($scope.txList[index],true);
 
-                    if($scope.moduleConf.listType > 0){
-                        $scope.$emit('$preLoaderStart');
-                        loadTransactionItems(editTx.TID).then(function(resp){
-                            editTx.itemList = resp;
+                    $scope.modalBox.title = 'Update Applicant';
+                    $scope.showModal = !$scope.showModal;
+                    //UI updation is not happening properly because ui is not rendered, and model bind before it
+                    //therefore once again updating data after ui rendered
+                    $timeout(function(){
+                        $scope.modalBox.title = 'Update Applicant';
+                        $scope.modalBox.tx = editTx;
+                        $scope.modalBox.contactType = ($scope.modalBox.tx.ezeid) ? 1 : 2;
+                        $scope.$emit('$preLoaderStop');
+                    },1500);
 
-                            $scope.showModal = !$scope.showModal;
-                            //UI updation is not happening properly because ui is not rendered, and model bind before it
-                            //therefore once again updating data after ui rendered
-                            $timeout(function(){
-                                $scope.modalBox.title = 'Update Applicant';
-                                $scope.modalBox.tx = editTx;
-                                $scope.modalBox.contactType = ($scope.modalBox.tx.ezeid) ? 1 : 2;
-                                $scope.$emit('$preLoaderStop');
-                            },1500);
-                        },function(){
-                            $scope.showModal = !$scope.showModal;
-                            $timeout(function(){
-                                $scope.modalBox.tx = editTx;
-                                $scope.$emit('$preLoaderStop');
-                            },1500);
-                        });
-                    }
-                    else{
-                        $scope.showModal = !$scope.showModal;
-                    }
                 }
                 else{
                     $scope.modalBox.editMode = false;
