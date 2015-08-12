@@ -992,6 +992,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var find = alterEzeoneId(req.query.Keywords);
     var token = req.query.Token;
+        var tid;
     //console.log(token);
     if (token != null && find != null && token != '' && find != '') {
         st.validateToken(token, function (err, Result) {
@@ -1077,7 +1078,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
                                     var getQuery = 'select masterid from tloginout where Token='+st.db.escape(token);
                                     st.db.query(getQuery, function (err, getResult) {
                                         if(!err){
-                                            var tid = getResult[0].TID;
+                                            tid = getResult[0].TID;
                                             console.log(tid);
                                         }
                                         var query = st.db.escape(tid) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(req.ip) + ',' + st.db.escape(type);
