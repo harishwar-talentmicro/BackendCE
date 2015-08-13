@@ -50,46 +50,34 @@
                     </div>
                 </div>
             </div>
+
+            <div class="desc-content-body p-bottom-4">
+                <div class="job-main-content text-dark-gray detailed-desc-job">
+                    <div class="job-desc">
+                        Job Type: <span class="text-bolder">
+                                        <span ng-show="jobData.jobtype == 0">Full Time</span>
+                                        <span ng-show="jobData.jobtype == 1">Part Time</span>
+                                        <span ng-show="jobData.jobtype == 2">Work from Home</span>
+                                        <span ng-show="jobData.jobtype == 3">Internship</span>
+                                        <span ng-show="jobData.jobtype == 4">Apprenticeship</span>
+                                        <span ng-show="jobData.jobtype == 5">Job Oriented Training</span>
+                                        <span ng-show="jobData.jobtype == 6">Consultant</span>
+                                        <span ng-show="jobData.jobtype == 7">Freelancer</span>
+                                   </span>
+                    </div>
+                </div>
+            </div>
+
             <div class="desc-content-body p-bottom-4">
                 <!-- detailed job description goes here -->
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
                         <p class="text-bolder">Job Description:</p>
-                        <!--<p>We are looking for a PHP developer who has solid understanding of PHP fundamentals,
-                            has proven experience and writes excellent code. We need you to write high standard
-                            code in a timely and scalable manner that improves the code-base of our product.
-                            You will be a part of a creative team that is responsible for all aspects of the ongoing
-                            software development from the initial specification, through to developing, testing and launching.
-                        </p>-->
                         <p>
                             {{jobData.jobdescription}}
                         </p>
                     </div>
                 </div>
-                <!--<div class="job-main-content text-dark-gray detailed-desc-job">
-                    <div class="job-responsibility">
-                        <p class="text-bolder">Responsibilities :</p>
-                        <p>Write clean and well designed code
-                            Produce detailed specifications
-                            Troubleshoot, test and maintain the core product software and databases to ensure strong optimization and functionality
-                            Contribute in all phases of the development lifecycle
-                            Follow industry best practices
-                            Develop and deploy new features to facilitate related procedures and tools if necessary</p>
-                    </div>
-                </div>
-                <div class="job-main-content text-dark-gray detailed-desc-job">
-                    <div class="job-requirements">
-                        <p class="text-bolder">Requirements :</p>
-                        <ul class="list-group">
-                            <li><i class="fa fa-check-circle"></i> Proven software development experience in PHP</li>
-                            <li><i class="fa fa-check-circle"></i> Understanding of open source projects like CodeIgniter</li>
-                            <li><i class="fa fa-check-circle"></i> Demonstrable knowledge of web technologies including HTML, CSS, Javascript, AJAX etc</li>
-                            <li><i class="fa fa-check-circle"></i> Good knowledge of relational databases, version control tools and of developing web services</li>
-                            <li><i class="fa fa-check-circle"></i> Passion for best design and coding practices and a desire to develop new bold ideas</li>
-                            <li><i class="fa fa-check-circle"></i> BS/MS degree in Computer Science, Engineering or a related subject</li>
-                        </ul>
-                    </div>
-                </div>-->
             </div>
 
             <div class="desc-content-body p-bottom-4">
@@ -99,11 +87,6 @@
                         Salary: <span class="text-bolder">{{getRange(jobData.salaryfrom,jobData.salaryto,1)}} {{salaryType[jobData.salarytype]}}</span>
                     </div>
                 </div>
-                <!--<div class="job-main-content text-dark-gray detailed-desc-job">
-                    <div class="job-desc">
-                        Functional Area: <span class="text-bolder">{{jobData.jobcategory}}</span>
-                    </div>
-                </div>-->
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
                         Openings: <span class="text-bolder">{{jobData.openings}}</span>
