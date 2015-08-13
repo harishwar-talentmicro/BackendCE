@@ -57,7 +57,6 @@
             $scope.selectedEducations = [];
             $scope.selectedSpecializations = [];
             $scope.selectedInstitute = [];
-            var placeDetail = [];
             $scope.locIndexToEdit = "";
             $scope.disabledAddLocation = true;
 
