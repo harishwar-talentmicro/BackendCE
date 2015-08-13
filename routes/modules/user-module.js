@@ -2404,10 +2404,8 @@ User.prototype.getResume = function(req,res,next){
                     if (Result) {
                         st.db.query('CALL pgetCVInfo(' + st.db.escape(Token) + ')', function (err, MessagesResult) {
                             if (!err) {
-                                        console.log(MessagesResult);
                                 if (MessagesResult[0]) {
                                     if (MessagesResult[0].length > 0) {
-
                                         responseMessage.status = true;
                                         responseMessage.data = MessagesResult[0];
                                         responseMessage.skillMatrix = MessagesResult[1];
@@ -2538,7 +2536,6 @@ User.prototype.saveResume = function(req,res,next){
         salary = (parseFloat(salary) !== NaN && salary > 0) ? parseFloat(salary) : 0;
         noticePeriod = (parseInt(noticePeriod) !== NaN && parseInt(noticePeriod) > 0) ? parseInt(noticePeriod) : 0;
         experience = (parseInt(experience) !== NaN && parseInt(experience)) ? parseInt(experience) : 0;
-        jobType = (parseInt(jobType) !== NaN && parseInt(jobType) > 0 ) ? parseInt(jobType) : 1;
 
 
         var RtnMessage = {
