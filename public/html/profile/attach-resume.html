@@ -151,12 +151,14 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
                                         <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "CVAttachCtrl._CVInfo.job_type">
-                                            <option value="1">Full Time</option>
-                                            <option value="2">Part Time</option>
-                                            <option value="3">Work From Home</option>
-                                            <option value="4">Internship | Project Work </option>
-                                            <option value="5">Consultant</option>
-                                            <option value="6">Freelancer</option>
+                                            <option value="0">Full Time</option>
+                                            <option value="1">Part Time</option>
+                                            <option value="2">Work from Home</option>
+                                            <option value="3">Internship</option>
+                                            <option value="4">Apprenticeship</option>
+                                            <option value="5">Job Oriented Training</option>
+                                            <option value="6">Consultant</option>
+                                            <option value="7">Freelancer</option>
                                         </select>
                                     </div>
                                 </div>
@@ -236,41 +238,11 @@
                                             <option value = "0" > -- Select -- </option>
                                             <option ng-repeat="education in educationList track by $index" value="{{education.TID}}">{{education.EducationTitle}}</option>
                                         </select>
-                                        <!--<input type="text"
-                                               placeholder="Last Education"
-                                               ng-model = "CVAttachCtrl._CVInfo.education"
-                                               ng-keypress="educationKeyPress($event.keyCode)"
-                                               ng-click = "educationTextBoxClicked()"
-                                               ng-blur="educationTextBoxLossFocus()"
-                                               class="form-control"/>
-
-                                        <div ng-show="showEducationDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
-                                            <div class="checkbox-dropdown" ng-repeat="education in educationList | filter:CVAttachCtrl._CVInfo.education" ng-click="selectEducation(education.TID,education.EducationTitle)">
-                                                {{education.EducationTitle}}
-
-                                                {{education}}
-                                            </div>
-                                        </div>-->
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace ">
                                         <input type="text" class="form-control text-right" numbers-only maxlength="4" ng-model="CVAttachCtrl._CVInfo.year_of_passing" placeholder="Year of Pass" aria-describedby="sizing-addon1"/>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
-                                        <!--<button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
-                                            <span class="normal-view-text">{{specelizationTitle ? specelizationTitle : 'Specialization'}}</span>
-                                            <span class="mobile-view-text"></span>
-                                            <span class="caret"></span>
-                                        </button>
-                                        <div class="opt opt-2">
-                                            <div class="filter-dropdownspecialization width-105 search-option-content setTableFixHeight" style="display: none;">
-                                                <div class="checkbox-dropdown ng-binding ng-scope" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(0,'Specialization')">
-                                                    Specialization
-                                                </div>
-                                                <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID,specialization.Title)">
-                                                    {{specialization.Title}}
-                                                </div>
-                                            </div>
-                                        </div>-->
                                         <select class="form-control" ng-model="CVAttachCtrl._CVInfo.specialization_id">
                                             <option value = "0" > -- Select -- </option>
                                             <option ng-repeat="specialization in specializationList track by $index" value="{{specialization.TID}}">{{specialization.Title}}</option>

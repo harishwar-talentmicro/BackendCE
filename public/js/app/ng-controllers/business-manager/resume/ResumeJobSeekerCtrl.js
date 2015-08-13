@@ -46,7 +46,7 @@
             function clearSearchFilter()
             {
                 $scope.jobSeekerSkillKeyword = "";
-                $scope.jobSeekerJobType = 1 ;
+                $scope.jobSeekerJobType = 0 ;
                 $scope.jobSeekerSalaryFrom = 0;
                 $scope.jobSeekerSalaryTo = 0;
                 $scope.jobSeekerSalaryType = 2;

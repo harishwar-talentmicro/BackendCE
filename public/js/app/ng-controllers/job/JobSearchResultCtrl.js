@@ -987,7 +987,6 @@ angular.module('ezeidApp').
                 else{
                     $scope.paginationNextVisibility = true;
                     $scope.paginationPreviousVisibility = true;
-
                 }
            };
 
@@ -1092,7 +1091,6 @@ angular.module('ezeidApp').
 
                         });
                     }
-
 
                 });
             };
