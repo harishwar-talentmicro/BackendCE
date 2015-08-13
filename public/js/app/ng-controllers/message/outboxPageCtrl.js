@@ -4,6 +4,7 @@
  * @author: Sandeep[EZE ID]
  * @since 20150526
  */
+"use strict"
 angular.module('ezeidApp').
     controller('OutboxPageCtrl', [
         '$rootScope',
@@ -59,6 +60,8 @@ angular.module('ezeidApp').
             $scope.pageSize = 10;
             $scope.pageCount = 0;
             $scope.totalMessage = 0;
+
+            $scope.loggedInMasterId = $rootScope._userInfo.TID;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////GET GROUPS & INDIVIDUALS////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -487,7 +490,7 @@ angular.module('ezeidApp').
              */
             $scope.redirectPage  = function(msgId)
             {
-                messageActivityApi(msgId,1).then(function() {
+                messageActivityApi(msgId,1,1).then(function() {
                     $location.url('/message/details?msg=' + msgId);
                 });
             }
@@ -549,7 +552,20 @@ angular.module('ezeidApp').
                 $scope.dashBoardMsg[index].status = status;
             }
 
-
+            /**
+             * Function for converting UTC time from server to LOCAL timezone
+             */
+            $scope.convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
+                if(!dateFormat){
+                    dateFormat = 'DD-MMM-YYYY hh:mm A';
+                }
+                if(!returnFormat){
+                    returnFormat = dateFormat;
+                }
+                var x = new Date(timeFromServer);
+                var mom1 = moment(x);
+                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
+            };
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////PAGINATION CODE/////////////////////////////////////////////////////////////////
@@ -752,17 +768,20 @@ angular.module('ezeidApp').
              * @param messageId: message ID of the messages for which this request is called
              * @param status:: 1: read, 2: unread., 3:Trash
              * @param trash: 1:YES, 0: NO
+             * @param isOpened: 1:YES, 0: NO
              */
-            function messageActivityApi(messageId,status)
+            function messageActivityApi(messageId,status,isOpened)
             {
                 var defer = $q.defer();
+                var openStatus = isOpened?1:0;
                 $http({
                     url : GURL + 'message_activity',
                     method : "put",
                     data :{
                         token : $rootScope._userInfo.Token,
                         message_id:messageId,
-                        status:status
+                        status:status,
+                        ismessage_open:openStatus
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');

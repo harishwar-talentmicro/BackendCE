@@ -16,7 +16,7 @@
                         <div class="inbox-head-left main-index inbox-head-left-bg">
                             <h3 class="text-white text-center">
 
-                                    <a href="/message" class="text-white no-style-link"><i class="fa fa-envelope"></i> MessageBox</a>
+                                <a href="/message" class="text-white no-style-link"><i class="fa fa-envelope"></i> MessageBox</a>
                                 <label title="New request(s)"
                                        class="label label-warning pointer"
                                        ng-show="pendingRequestCount > 0">{{pendingRequestCount}}</label>
@@ -49,7 +49,7 @@
                                 <span class="pull-right p-right-10">
                                     <button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(1)" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
                                     <button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(2)" class="btn btn-default btn-xs no-radius"><i class="fa fa-thumbs-up"></i> Join</button>
-                                    <!--<button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(3)" class="btn btn-default btn-xs no-radius"><i class="fa fa-edit"></i> Edit</button>-->
+                                    <!--<button class="btn btn-default btn-xs no-radius"><i class="fa fa-edit"></i> Edit</button>-->
                                 </span>
                                 </li>
                                 <!-- groups goes here -->
@@ -57,7 +57,7 @@
                                     <li class="index-menu-item group" ng-repeat="grp in groupListData track by $index">
                                         <a href="#" ng-click="redirectGroupMessage(grp.GroupID,grp.GroupType)"><i class="fa fa-group"></i> {{grp.GroupName}}</a>
                                         <span class="pull-right p-right-10" ng-show="grp.isAdmin == 1">
-                                            <!--<button title="edit group" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></button>-->
+                                            <button ng-click="toggleEditGroupModalVisibility($index,grp.GroupID)" title="edit group" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></button>
                                             <button disabled title="you are admin" class="btn btn-primary btn-xs"><i class="fa fa-shield"></i></button>
                                         </span>
                                     </li>
@@ -206,13 +206,6 @@
             </div>
         </modal>
         <!-- transaction history item modal ends here -->
-        <!-- Footer goes here -->
-
-
-
-
-
-
 
         <!-- Modal Box of Add/Edit Group -->
         <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
@@ -447,7 +440,7 @@
                                ng-keypress="($event.charCode==13)?validateEzeone(ezeOneModalBox.ezeone):return" />
                         <div class="input-group-addon no-padding-and-border">
                             <button class="btn btn-default no-radius"
-                                    ng-click="validateEzeOneId(ezeOneModalBox.ezeone);">
+                                    ng-click="validateEzeone(ezeOneModalBox.ezeone);">
                                 <i class="fa fa-check"></i> Check
                             </button>
                         </div>
@@ -493,7 +486,48 @@
                 </div>
             </div>
         </modal>
-
         <footer-section></footer-section>
     </div>
+
+    <!-- modal for editing admins name -->
+    <modal mtitle="editGroupModalBox.title" mclass="editGroupModalBox.class" visible="editGroupModalVisibility">
+        <div class="container">
+            <!-- edit form -->
+            <div class="col-lg-12 p-bottom-10">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-user"></i> Group Name
+                    </div>
+                    <input type="text" ng-model="editGroupModalBox.groupName" class="form-control ng-pristine ng-valid ng-touched" >
+                    <div class="input-group-addon no-padding-and-border">
+                        <button class="btn btn-default no-radius">
+                            <i class="fa fa-check"></i> Check
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- description goes here -->
+            <div class="col-lg-12 p-bottom-10">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-user"></i> Group Desc.
+                    </div>
+                    <textarea  ng-model="editGroupModalBox.groupDesc" rows="5" class="form-control"></textarea>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <button class="btn btn-default btn-xs" ng-click="editGroupModalBox.isPublicGroup  = !editGroupModalBox.isPublicGroup">
+                    <i class="fa fa-square-o" ng-class="editGroupModalBox.isPublicGroup?'fa-check-square':'fa-square-o'"></i>
+                </button>
+                <b>Make it public</b>
+                <small>(Member requests accepted automatically)</small>
+            </div>
+            <!-- save btn -->
+            <div class="col-lg-12 text-right">
+                <button ng-click="updateGroup()" class="btn btn-primary">Save</button>
+            </div>
+            <br>
+        </div>
+    </modal>
+
 </section>

@@ -4,7 +4,7 @@
         <div class="pagination-btn">
             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setLeftRightPaddingZero">
                 <select ng-model="filterDropDown" class="filters-dropdown">
-                    <option value="0">All</option>
+                    <option value="0">View All</option>
                     <option value="2">Unread</option>
                     <option value="1">Read</option>
                 </select>
@@ -62,7 +62,7 @@
         <!-- Message List -->
         <tr ng-repeat="msg in dashBoardMsg track by $index"
             class="pointer "
-            ng-class="msg.status == 1?'read':''"
+            ng-class="msg.status == 1?'':'read'"
             ng-click="redirectPage(msg.tid)"
                 ng-show="filterDropDown == msg.status || filterDropDown == 0">
             <td>
@@ -77,19 +77,19 @@
                 {{msg.sender | textLength:10}}
             </td>
             <td>
-                {{msg.Message | textLength:20}}
+                {{msg.message | textLength:20}}
             </td>
             <td>
                 <span ng-show="msg.isattachment == 1" class="glyphicon glyphicon-paperclip"></span>
             </td>
             <td class="display-in-full-screen display-table">
-                {{msg.TargetDate}}
+                <span ng-hide="convertTimeToLocal(msg.TargetDate) == 'Invalid date'">{{convertTimeToLocal(msg.TargetDate)}}</span>
             </td>
             <td class="display-in-full-screen display-table  ">
-                {{msg.ExpiryDate}}
+                <span ng-hide="convertTimeToLocal(msg.ExpiryDate) == 'Invalid date'">{{convertTimeToLocal(msg.ExpiryDate)}}</span>
             </td>
             <td>
-                12:09AM
+               {{convertTimeToLocal(msg.createddate)}}
             </td>
 
         </tr>

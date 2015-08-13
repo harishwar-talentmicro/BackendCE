@@ -143,6 +143,7 @@ angular.module('ezeidApp').
                 composeMessageApi(data.toId,data.toIdType,previousMsgId).then(function(){
                         //Message successfully thrown
                         Notification.success({ message: "Message sent successfully!", delay: MsgDelay });
+                        $location.url('/message');
                     },
                     function(){
                         //Throw Error Notification
