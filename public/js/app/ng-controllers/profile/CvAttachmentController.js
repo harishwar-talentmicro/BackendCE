@@ -47,17 +47,21 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 // Animation complete.
             });})
 
+            $scope.spcializationGetResponse = false;
+            $scope.jobCategoriesGetResponse = false;
+            $scope.instituteGetResponse = false;
+            $scope.educationsGetResponse = false;
 
             getSpecialization();
             getJobCategories();
             getInstituteList();
             getEducations();
 
-            $timeout(function ()
+            /*$timeout(function ()
             {
                 getCVInfo();
                 getAllSkills();
-            },3000);
+            },4000);*/
 
         } else {
             $location.path('/');
@@ -238,14 +242,22 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         $scope.selectedCategories = [];
                         skillsTid = [];
 
+                        getInstituteList();
+
                         $timeout(function()
                         {
                             $scope.locationArrayString = [];
                             $scope.mainLocationArray = [];
-                            getInstituteList();
+
                             getCVInfo();
+                            getAllSkills();
                             $scope.$emit('$preLoaderStop');
                         },3000);
+
+                        $scope.spcializationGetResponse = false;
+                        $scope.jobCategoriesGetResponse = false;
+                        $scope.instituteGetResponse = false;
+                        $scope.educationsGetResponse = false;
 
                     }else{
                         Notification.error({message: "Sorry..! not saved", delay: MsgDelay});
@@ -662,6 +674,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }).success(function(resp){
             $scope.jobCategories = resp;
+            $scope.jobCategoriesGetResponse = true;
+            getCVDetails();
           })
         .error(function(err){
 
@@ -679,14 +693,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }).success(function(resp){
             $scope.instituteList = resp.data;
-
-            /*for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
-            {
-                if($scope.instituteList[nCount].TID == CVAttachCtrl._CVInfo.institute_id)
-                {
-                    $scope.instituteTitle = $scope.instituteList[nCount].InstituteTitle;
-                }
-            }*/
+            $scope.instituteGetResponse = true;
+            getCVDetails();
         })
         .error(function(err){
 
@@ -742,6 +750,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
             }
         }).success(function(resp){
                 $scope.educationList = resp.data;
+                $scope.educationsGetResponse = true;
+                getCVDetails();
             })
             .error(function(err){
 
@@ -757,27 +767,30 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
-               $scope.specializationList = resp.data;
+            $scope.specializationList = resp.data;
+            $scope.spcializationGetResponse = true;
+            getCVDetails();
         })
         .error(function(err){
 
         });
     }
 
-
- /*   $scope.specelizationTitle = "";
-    *//**
-     * Select Specialization
-     *//*
-    $scope.selectSpecialization = function(_SpecializationID,title)
+    function getCVDetails()
     {
-        CVAttachCtrl._CVInfo.specialization_id = _SpecializationID;
-        $scope.specelizationTitle = title;
+        console.log("SAi1");
 
-        $( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
-            // Animation complete.
-        });
-    }*/
+        console.log($scope.spcializationGetResponse);
+        console.log($scope.jobCategoriesGetResponse);
+        console.log($scope.instituteGetResponse);
+        console.log($scope.educationsGetResponse);
 
+        if(($scope.spcializationGetResponse) && ($scope.jobCategoriesGetResponse) && ($scope.instituteGetResponse) && ($scope.educationsGetResponse))
+        {
+            console.log("SAi2");
+            getCVInfo();
+            getAllSkills();
+        }
+    }
 
     }]);

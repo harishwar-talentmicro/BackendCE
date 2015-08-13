@@ -108,9 +108,11 @@ angular.module('ezeidApp').
             $scope.getJobType = function()
             {
                 var jobTypeStr = [];
-                for (var i = 0; i < 6; i++) {
-                    if ($scope.activeJobType[i]) {
-                        jobTypeStr.push(i + 1);
+                for (var i = 0; i < 8; i++)
+                {
+                    if ($scope.activeJobType[i])
+                    {
+                        jobTypeStr.push(i);
                     }
                 }
                 return jobTypeStr.join(",");
@@ -129,7 +131,7 @@ angular.module('ezeidApp').
             //$scope.activeSearchType = 2;
             //$scope.activeProximity = 0;//Defaultly ANY proximity is selected
             $scope.activeRating = [true,true,true,true,true];//Checkboxes for star rating
-            $scope.activeJobType = [true,true,true,true,true,true];//Checkboxes for job type
+            $scope.activeJobType = [true,true,true,true,true,true,true,true];//Checkboxes for job type
 
 
             $scope.placeHolderText = placeHolder;
@@ -473,6 +475,7 @@ angular.module('ezeidApp').
                 if (newVal) {
                     /* check for the map initialzation */
                     if (!isMapInitialized) {
+
                         /* initialize map */
                         initializeMap();
                         isMapInitialized = true;
@@ -770,8 +773,7 @@ angular.module('ezeidApp').
                 {
                     $scope.searchParams.promotionsOnly = !$scope.searchParams.promotionsOnly;
                 }
-
-            }
+            };
 
             /**
              * Change the proximity
@@ -779,7 +781,7 @@ angular.module('ezeidApp').
             $scope.changeProximity = function(proximity)
             {
                 $scope.searchParams.proximity = proximity;
-            }
+            };
 
 
             /**
