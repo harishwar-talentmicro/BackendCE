@@ -17,8 +17,14 @@
                     <!--<option ng-repeat="opt in DashBoardOptions track by $index" ng-show="opt.val > 0" value="{{opt.val}}">{{opt.text}}</option>-->
                     <!--</select>-->
 
-                    <button class="btn btn-default"><i class="fa fa-arrow-circle-left"></i></button>
-                    <button class="btn btn-default"><i class="fa fa-arrow-circle-right"></i></button>
+                    <button class="btn"
+                            ng-disabled="!paginationPreviousVisibility"
+                            ng-click="paginationPreviousClick()"
+                            ng-class="paginationPreviousVisibility?'btn-primary':'btn-default'"><i class="fa fa-arrow-circle-left"></i></button>
+                    <button class="btn"
+                            ng-disabled="!paginationNextVisibility"
+                            ng-click="paginationNextClick()"
+                            ng-class="paginationNextVisibility?'btn-primary':'btn-default'"><i class="fa fa-arrow-circle-right"></i></button>
                 </div>
 
             </div>
@@ -55,11 +61,11 @@
 
             <!-- Message List -->
             <tr ng-repeat="msg in trashMsg track by $index"
-                class="pointer "
+                class="pointer"
                 ng-click="redirectPage(msg.tid)"
                 ng-show="filterDropDown == msg.status || filterDropDown == 0">
                 <td>
-                    <i class="fa fa-arrow-circle-up text-danger"></i>
+                    <i class="fa fa-trash text-danger"></i>
                 </td>
                 <td ng-click="$event.stopPropagation()">
                     <!--<i class="fa text-info"-->
@@ -84,7 +90,6 @@
                 <td>
                     12:09AM
                 </td>
-
             </tr>
             <tr>
                 <td class="text-left" colspan="8" ng-hide="trashMsg.length > 0">

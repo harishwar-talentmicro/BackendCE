@@ -415,29 +415,29 @@
                 }
                 var itemsLoaded = true;
                 var locationLoaded = true;
-                if(resolveGeolocation){
-                    locationLoaded = false;
-                    $scope.resolveGeolocationAddress().then(function(){
-                        locationLoaded = true;
-                        if(itemsLoaded && locationLoaded){
-                            $scope.$emit('$preLoaderStop');
-                        }
-                    });
-                }
-                if(loadItems){
-                    itemsLoaded = false;
-                    loadTransactionItems($scope.modalBox.tx.TID).then(function(){
-                        itemsLoaded = true;
-                        if(itemsLoaded && locationLoaded){
-                            $scope.$emit('$preLoaderStop');
-                        }
-                    },function(){
-                        itemsLoaded = true;
-                        if(itemsLoaded && locationLoaded){
-                            $scope.$emit('$preLoaderStop');
-                        }
-                    });
-                }
+                //if(resolveGeolocation){
+                //    locationLoaded = false;
+                //    $scope.resolveGeolocationAddress().then(function(){
+                //        locationLoaded = true;
+                //        if(itemsLoaded && locationLoaded){
+                //            $scope.$emit('$preLoaderStop');
+                //        }
+                //    });
+                //}
+                //if(loadItems){
+                //    itemsLoaded = false;
+                //    loadTransactionItems($scope.modalBox.tx.TID).then(function(){
+                //        itemsLoaded = true;
+                //        if(itemsLoaded && locationLoaded){
+                //            $scope.$emit('$preLoaderStop');
+                //        }
+                //    },function(){
+                //        itemsLoaded = true;
+                //        if(itemsLoaded && locationLoaded){
+                //            $scope.$emit('$preLoaderStop');
+                //        }
+                //    });
+                //}
 
                 /**
                  * If both resolveGeolcation and loadItems are false then stop preloader
@@ -2059,13 +2059,41 @@
                     amount : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
                     && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
                         parseFloat($scope.modalBox.tx.orderAmount) : 0,
+                    Amount : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
+                && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
+                    parseFloat($scope.modalBox.tx.orderAmount) : 0,
+                    salary : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
+                    && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
+                        parseFloat($scope.modalBox.tx.orderAmount) : 0,
 
                     proabilities : (parseInt($scope.modalBox.tx.probability) !== NaN && parseInt($scope.modalBox.tx.probability) !== 0 ) ? $scope.modalBox.tx.probability : 2 ,
                     target_date : ($scope.modalBox.tx.targetDate) ? $scope.modalBox.tx.targetDate :  moment().format('YYYY-MM-DD'),
                     attachment : $scope.modalBox.tx.attachment,
                     attachment_name : $scope.modalBox.tx.attachmentName,
                     mime_type : $scope.modalBox.tx.attachmentMimeType,
-                    alarm_duration : (parseInt($scope.modalBox.tx.alarmDuration)) ? parseInt($scope.modalBox.tx.alarmDuration) : 0
+                    alarm_duration : (parseInt($scope.modalBox.tx.alarmDuration)) ? parseInt($scope.modalBox.tx.alarmDuration) : 0,
+
+                    institute_id : (parseInt($scope.modalBox.tx.instituteId) !== NaN
+                    && parseInt($scope.modalBox.tx.instituteId) > 0) ?
+                        parseInt($scope.modalBox.tx.instituteId) : 0,
+
+                    education_id : (parseInt($scope.modalBox.tx.educationId) !== NaN
+                    && parseInt($scope.modalBox.tx.educationId) > 0) ?
+                        parseInt($scope.modalBox.tx.educationId) : 0,
+
+                    specialization_id : (parseInt($scope.modalBox.tx.specializationId) !== NaN
+                    && parseInt($scope.modalBox.tx.specializationId) > 0) ?
+                        parseInt($scope.modalBox.tx.specializationId) : 0,
+
+                    job_id : (parseInt($scope.modalBox.tx.jobId) !== NaN
+                    && parseInt($scope.modalBox.tx.jobId) > 0) ?
+                        parseInt($scope.modalBox.tx.jobId) : 0,
+
+                    amount : (parseFloat($scope.modalBox.tx.orderAmount) !== NaN
+                    && parseFloat($scope.modalBox.tx.orderAmount) > 0) ?
+                        parseFloat($scope.modalBox.tx.orderAmount) : 0,
+
+                    salary_type : ($scope.modalBox.tx.salaryType) ? $scope.modalBox.tx.salaryType : 3
                 };
                 return preparedTx;
             };

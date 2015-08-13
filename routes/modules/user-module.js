@@ -2404,10 +2404,8 @@ User.prototype.getResume = function(req,res,next){
                     if (Result) {
                         st.db.query('CALL pgetCVInfo(' + st.db.escape(Token) + ')', function (err, MessagesResult) {
                             if (!err) {
-                                        console.log(MessagesResult);
                                 if (MessagesResult[0]) {
                                     if (MessagesResult[0].length > 0) {
-
                                         responseMessage.status = true;
                                         responseMessage.data = MessagesResult[0];
                                         responseMessage.skillMatrix = MessagesResult[1];
@@ -2538,7 +2536,6 @@ User.prototype.saveResume = function(req,res,next){
         salary = (parseFloat(salary) !== NaN && salary > 0) ? parseFloat(salary) : 0;
         noticePeriod = (parseInt(noticePeriod) !== NaN && parseInt(noticePeriod) > 0) ? parseInt(noticePeriod) : 0;
         experience = (parseInt(experience) !== NaN && parseInt(experience)) ? parseInt(experience) : 0;
-        jobType = (parseInt(jobType) !== NaN && parseInt(jobType) > 0 ) ? parseInt(jobType) : 1;
 
 
         var RtnMessage = {
@@ -3716,7 +3713,6 @@ User.prototype.getProxmity = function(req,res,next) {
     }
 };
 
-
 /**
  * @todo FnGetInstitutes
  * Method : GET
@@ -3941,6 +3937,7 @@ User.prototype.getSpecialization = function(req,res,next) {
         }
     }
 };
+
 /**
  * @todo FnGetVerifiedInstitutes
  * Method : GET
@@ -4017,7 +4014,163 @@ User.prototype.getVerifiedInstitutes = function(req,res,next) {
     }
 };
 
+/**
+ * @todo FnSaveUserDetails
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @service-param token     <char(36)>
+ * @service-param first_name <varchar(30)>
+ * @service-param last_name <varchar(30)>
+ * @service-param company_name <varchar(150)>
+ * @service-param job_title <varchar(100)>
+ * @service-param gender <Int>
+ * @service-param dob <DateTime> date of birth
+ * @service-param company_tagline <varchar(100)>
+ * @service-param email_id <varchar(50)>
+ * @description api code for save user details
+ */
+User.prototype.saveUserDetails = function(req,res,next){
 
+    var _this = this;
 
+    var token  = req.body.token;
+    var firstName  = req.body.first_name;
+    var lastName = req.body.last_name;
+    var companyName = req.body.company_name;
+    var jobTitle  = req.body.job_title;
+    var gender  = req.body.gender;
+    var dob  = req.body.dob;
+    var companyTagline  = req.body.company_tagline;
+    var email  = req.body.email;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!firstName){
+        error['firstName'] = 'Invalid firstName';
+        validateStatus *= false;
+    }
+    if(!lastName){
+        error['lastName'] = 'Invalid lastName';
+        validateStatus *= false;
+    }
+    if(!companyName){
+        error['companyName'] = 'Invalid companyName';
+        validateStatus *= false;
+    }
+    if(!jobTitle){
+        error['jobTitle'] = 'Invalid jobTitle';
+        validateStatus *= false;
+    }
+    if(!gender){
+        error['gender'] = 'Invalid gender';
+        validateStatus *= false;
+    }
+    if(!dob){
+        error['dob'] = 'Invalid dob';
+        validateStatus *= false;
+    }
+    if(!email){
+        error['email'] = 'Invalid email';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName)
+                            + ',' + st.db.escape(companyName)+ ','+ st.db.escape(jobTitle) + ',' + st.db.escape(gender)
+                            + ',' + st.db.escape(dob)+ ',' + st.db.escape(companyTagline)+ ',' + st.db.escape(email);
+                        var query = 'CALL psaveuserdetails(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, insertResult) {
+                            if (!err) {
+                                if (insertResult[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'UserDetails save successfully';
+                                    responseMessage.data = {
+                                        token  : req.body.token,
+                                        first_name  : req.body.first_name,
+                                        last_name : req.body.last_name,
+                                        company_name : req.body.company_name,
+                                        job_title  : req.body.job_title,
+                                        gender  : req.body.gender,
+                                        dob  : req.body.dob,
+                                        company_tagline  : req.body.company_tagline,
+                                        email  : req.body.email
+
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveUserDetails: UserDetails save successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'UserDetails is not saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveUserDetails:UserDetails is not saved');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveUserDetails: error in saving UserDetails :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveUserDetails: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveUserDetails:Error in validating Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !'
+            res.status(500).json(responseMessage);
+            console.log('Error : FnSaveUserDetails ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = User;

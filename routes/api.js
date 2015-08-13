@@ -152,6 +152,7 @@ router.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
 router.post('/jobseeker_message',LocationManager.FnJobSeekersMessage);
 router.get('/jobs_list',LocationManager.FnGetListOfJobs);
 router.get('/verify_institute',LocationManager.FnGetVerifiedInstitutes);
+router.post('/user_details',LocationManager.FnSaveUserDetails);
 
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);

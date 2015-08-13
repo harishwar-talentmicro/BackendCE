@@ -55,6 +55,10 @@ angular.module('ezeidApp').
             /* Loading the messages */
             $scope.dashBoardMsg = [];
 
+            /* pagination settings */
+            $scope.pageSize = 10;
+            $scope.pageCount = 0;
+            $scope.totalMessage = 0;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////GET GROUPS & INDIVIDUALS////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +91,7 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             loadDashBoardMessages();
             getPendingRequestUserList();
+            paginationReConfigration();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
@@ -149,7 +154,7 @@ angular.module('ezeidApp').
              */
             getGroups();
 
-            /**
+            /**[hidden at front End]
              *  http request to get all the transaction history from all over the system
              *  like sales enquiry, reservation etc. not a part of MESSAGING MODULE
              */
@@ -444,11 +449,13 @@ angular.module('ezeidApp').
             function loadDashBoardMessages()
             {
                 loadMessageApi().then(function(data){
-                    var temp = data;
-                    if(temp)
-                        $scope.dashBoardMsg.push(temp);
-                });
+                    if(!data.length > 0)
+                        return;
 
+                    $scope.totalMessage = data[0].count;
+                    $scope.dashBoardMsg = data;
+                    paginationReConfigration();
+                });
             }
 
             /**
@@ -542,6 +549,74 @@ angular.module('ezeidApp').
                 $scope.dashBoardMsg[index].status = status;
             }
 
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////PAGINATION CODE/////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            /**
+             * load the next results
+             */
+            $scope.paginationNextClick = function()
+            {
+                $scope.pageCount += $scope.pageSize;
+                /* trigger next results */
+                loadDashBoardMessages();
+                paginationReConfigration();
+            }
+
+            /**
+             * load the previous results
+             */
+            $scope.paginationPreviousClick = function()
+            {
+                $scope.pageCount -= $scope.pageSize;
+                /* trigger previous results */
+                loadDashBoardMessages();
+                paginationReConfigration();
+            }
+
+            /**
+             * Toggle the visibility of the pagination buttons
+             */
+            $scope.paginationNextVisibility = true;
+            $scope.paginationPreviousVisibility = true;
+            function paginationReConfigration()
+            {
+                var totalResult = parseInt($scope.totalMessage);
+                var currentCount = parseInt($scope.pageCount);
+                var resultSize = parseInt($scope.pageSize);
+
+                /* initial state */
+                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if(currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if((currentCount + resultSize) >= totalResult)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = true;
+
+                }
+                else{
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = true;
+
+                }
+            };
+
+            $scope.redirectGroupMessage = function(groupId,groupType)
+            {
+                $location.url('/message/details?id='+ groupId + '&type='+ groupType);
+            }
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ALL API CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -587,6 +662,8 @@ angular.module('ezeidApp').
                     params :{
                         token : $rootScope._userInfo.Token,
                         ezeone_id : $rootScope._userInfo.ezeone_id,
+                        page_size : $scope.pageSize,
+                        page_count : $scope.pageCount,
                         trash:0
                     }
                 }).success(function(resp){
