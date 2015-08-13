@@ -17,7 +17,7 @@ var LocationManager = require('../routes/routes.js');
 router.get('/ms_auth/user',LocationManager.FnMSAuthUser);
 router.get('/ms_auth/vhost',LocationManager.FnMSAuthVHost);
 router.get('/ms_auth/resource',LocationManager.FnMSAuthResource);
-
+router.get('/apns_notify',LocationManager.FnAPNSNotify);
 
 //this part is for passenger
 router.post('/ewLogin', LocationManager.FnLogin);
