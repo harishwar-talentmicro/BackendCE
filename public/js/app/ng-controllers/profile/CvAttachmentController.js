@@ -19,7 +19,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var skillsTid = [];
     $scope.availableTags = [];
 
-    CVAttachCtrl._CVInfo.job_type = 1;
+    CVAttachCtrl._CVInfo.job_type = 0;
     $scope.locationName = "";
     //CVAttachCtrl._CVInfo.job_location1 = "";
     CVAttachCtrl._CVInfo.experience = 0;
@@ -184,7 +184,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         $scope.instituteText = "";
         $scope.instituteID = 0;
 
-        CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 1;
+        CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 0;
         CVAttachCtrl._CVInfo.experience = (CVAttachCtrl._CVInfo.experience) ? CVAttachCtrl._CVInfo.experience : 0;
 
        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {

@@ -723,9 +723,6 @@ angular.module('ezeidApp').
              */
             $scope.changeSeacrhType = function(searchType)
             {
-                console.log("SAi12234");
-                console.log(searchType);
-
                 changeSearchFilterVisibility(searchType);
                 $scope.searchParams.searchType = searchType;
                 if(parseInt(searchType) ===  1)

@@ -170,6 +170,18 @@ Notification.prototype.authResource = function(req,res,next){
 };
 
 /**
+ * Publishing a message to a particular topic
+ * @param groupTitle* (Name of the person or group who sent the message)
+ * @param senderTitle* (Name of the person in group or the individual who sent the message)
+ * @param groupId (To which group you want to send message)
+ * @param message (What message to be sent using notifications)
+ * @param messageType (What kind of message to be sent 0 :Group, 1 : Individual, 2 : Alarm, 3: EZEOne Public Notifications)
+ */
+Notification.prototype.publish = function(senderTitle,groupTitle,groupId,message,messageType){
+    
+};
+
+/**
  * @todo FnGetAlarmMessages
  * Method : Get
  * @param req

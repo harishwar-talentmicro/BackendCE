@@ -815,8 +815,8 @@ Reservation.prototype.getFeedback = function(req,res,next){
     };
 
     var validateStatus = true,error = {};
-    if(!(ezeone_id || transId || resourceId)){
-        error['ezeone_id or transId or resourceId'] = 'Invalid ezeone_id or transId or resourceId parameters';
+    if(!ezeone_id){
+        error['ezeone_id'] = 'Invalid ezeone_id';
         validateStatus *= false;
     }
     if(!moduleType){
@@ -863,8 +863,7 @@ Reservation.prototype.getFeedback = function(req,res,next){
                                     res.status(200).json(responseMessage);
                                 }
                                 else {
-
-                                    responseMessage.error = null;
+                                    responseMessage.error = {};
                                     responseMessage.message = 'Feedback details not loaded';
                                     console.log('FnGetFeedback: Feedback details not loaded');
                                     res.status(200).json(responseMessage);
@@ -920,7 +919,6 @@ Reservation.prototype.saveFeedback = function(req,res,next){
      */
     var _this = this;
 
-    try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
@@ -930,7 +928,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         var module = req.body.module;
         var trans_id = req.body.trans_id ? req.body.trans_id : 0;
         var resourceid = req.body.resourceid ? req.body.resourceid : 0;
-        var toEzeid = alterEzeoneId(req.body.toEzeid) ? alterEzeoneId(req.body.toEzeid) : '';
+        var toEzeid = req.body.toEzeid ? alterEzeoneId(req.body.toEzeid) : '';
         var type = req.body.type;
 
         var responseMessage = {
@@ -941,105 +939,85 @@ Reservation.prototype.saveFeedback = function(req,res,next){
         };
 
 
-        var validateStatus = true;
+        var validateStatus = true, error = {};
 
         if (!ezeid) {
-            responseMessage.error['ezeid'] = 'Invalid ezeid';
+            error['ezeid'] = 'Invalid ezeid';
             validateStatus *= false;
         }
-
         if (!rating) {
-            responseMessage.error['rating'] = 'Invalid rating';
+            error['rating'] = 'Invalid rating';
             validateStatus *= false;
         }
-
         if (!module) {
-            responseMessage.error['module'] = 'Invalid module';
+            error['module'] = 'Invalid module';
             validateStatus *= false;
         }
         if (!type) {
-            responseMessage.error['type'] = 'Invalid type';
+            error['type'] = 'Invalid type';
             validateStatus *= false;
         }
-        if (!validateStatus) {
-            console.log('FnSaveFeedback  error : ' + JSON.stringify(responseMessage.error));
-            responseMessage.message = 'Unable to save feedback ! Please check the errors';
-            res.status(200).json(responseMessage);
-            return;
+        if(!validateStatus){
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
         }
 
-        if (ezeid && rating && module) {
+       else {
+            try {
+                var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments)
+                    + ',' + st.db.escape(module) + ',' + st.db.escape(trans_id) + ',' + st.db.escape(resourceid)
+                    + ',' + st.db.escape(toEzeid) + ',' + st.db.escape(type);
 
-            var query = st.db.escape(ezeid) + ',' + st.db.escape(rating) + ',' + st.db.escape(comments)
-                + ',' + st.db.escape(module) + ',' + st.db.escape(trans_id)+ ',' + st.db.escape(resourceid)
-                + ',' + st.db.escape(toEzeid)  + ',' + st.db.escape(type);
+                console.log('CALL psavefeedback(' + query + ')');
 
-            console.log('CALL psavefeedback(' + query + ')');
+                st.db.query('CALL psavefeedback(' + query + ')', function (err, insertResult) {
+                    console.log(insertResult);
 
-            st.db.query('CALL psavefeedback(' + query + ')', function (err, insertResult) {
-                console.log(insertResult);
+                    if (!err) {
+                        if (insertResult) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Feedback details save successfully';
+                            responseMessage.data = {
+                                ezeid: ezeid,
+                                rating: rating,
+                                comments: comments,
+                                module: module,
+                                trans_id: trans_id,
+                                resourceid: resourceid,
+                                toEzeid: toEzeid
+                            };
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveFeedback: Feedback details save successfully');
 
-                if (!err) {
-                    if (insertResult) {
-                        responseMessage.status = true;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Feedback details save successfully';
-                        responseMessage.data = {
-                            ezeid : ezeid,
-                            rating : rating,
-                            comments : comments,
-                            module : module,
-                            trans_id : trans_id,
-                            resourceid : resourceid,
-                            toEzeid : toEzeid
-                        };
-                        res.status(200).json(responseMessage);
-                        console.log('FnSaveFeedback: Feedback details save successfully');
-
+                        }
+                        else {
+                            responseMessage.message = 'No save Feedback details';
+                            responseMessage.error = {};
+                            res.status(400).json(responseMessage);
+                            console.log('FnSaveFeedback:No save Feedback details');
+                        }
                     }
                     else {
-                        responseMessage.message = 'No save Feedback details';
+                        responseMessage.message = 'An error occured ! Please try again';
                         responseMessage.error = {};
-                        res.status(400).json(responseMessage);
-                        console.log('FnSaveFeedback:No save Feedback details');
+                        res.status(500).json(responseMessage);
+                        console.log('FnSaveFeedback: error in saving Feedback details:' + err);
                     }
-                }
-                else {
-                    responseMessage.message = 'An error occured ! Please try again';
-                    responseMessage.error = {};
-                    res.status(500).json(responseMessage);
-                    console.log('FnSaveFeedback: error in saving Feedback details:' + err);
-                }
-            });
-        }
-        else {
-            if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';
-                responseMessage.error = {Token: 'Invalid ezeid'};
-                console.log('FnSaveFeedback: ezeid is mandatory field');
+                });
             }
-            else if (!rating) {
-                responseMessage.message = 'Invalid rating';
-                responseMessage.error = {rating: 'Invalid rating'};
-                console.log('FnSaveFeedback: rating is mandatory field');
-            }
-            else if (!module) {
-                responseMessage.message = 'Invalid module';
-                responseMessage.error = {module: 'Invalid module'};
-                console.log('FnSaveFeedback: module is mandatory field');
-            }
-            res.status(401).json(responseMessage);
-        }
 
-    }
-
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
-        console.log('FnSaveFeedback:error ' + ex.description);
-        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
-        res.status(400).json(responseMessage);
-    }
+            catch (ex) {
+                responseMessage.error = {};
+                responseMessage.message = 'An error occured !'
+                console.log('FnSaveFeedback:error ' + ex.description);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ....................');
+                res.status(400).json(responseMessage);
+            }
+        }
 };
 
 /**

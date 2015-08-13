@@ -76,7 +76,7 @@ angular.module('ezeidApp').
                     {
                         if(resp.data.length)
                         {
-                            $scope.totalResult = resp.data[0].count;
+                            $scope.totalResult = resp.count;
                             $scope.resultThisPage = resp.data.length;
 
                             $scope.paginationVisibility();
