@@ -435,8 +435,8 @@ angular.module('ezeidApp').
                         attachment :$scope.file.attachment,
                         priority:$scope.composeMsg.Priority,
                         attachment_filename :$scope.file.attachmentName,
-                        target_date :UtilityService._convertTimeToServer($scope.composeMsg.TargetDate,"DD-MMM-YYYY","YYYY-MM-DD"),
-                        expiry_date :UtilityService._convertTimeToServer($scope.composeMsg.ExpiryDate,"DD-MMM-YYYY","YYYY-MM-DD"),
+                        target_date :UtilityService._convertTimeToServer($scope.composeMsg.TargetDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"),
+                        expiry_date :UtilityService._convertTimeToServer($scope.composeMsg.ExpiryDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"),
                         previous_messageID:previousMsgId,
                         to_id:toId,
                         id_type :toIdType//1: individual, 2: group
