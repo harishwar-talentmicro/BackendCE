@@ -15,13 +15,15 @@
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <select class="form-control" ng-model = "jobSeekerJobType">
-                                        <option value="1">Full Time</option>
-                                        <option value="2">Part Time</option>
-                                        <option value="3">Work From Home</option>
-                                        <option value="4">Internship | Project Work</option>
-                                        <option value="5">Consultant</option>
-                                        <option value="6">Freelancer</option>
-                                    </select>
+                                        <option value="0">Full Time</option>
+                                        <option value="1">Part Time</option>
+                                        <option value="2">Work from Home</option>
+                                        <option value="3">Internship</option>
+                                        <option value="4">Apprenticeship</option>
+                                        <option value="5">Job Oriented Training</option>
+                                        <option value="6">Consultant</option>
+                                        <option value="7">Freelancer</option>
+                                      </select>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                     <div class="row">
@@ -239,12 +241,14 @@
                                         {{jobSeeker.Exp}} Yrs
                                     </div>
                                     <div class="col-lg-2">
-                                        <span ng-show="jobSeeker.jobtype == 1">Full Time</span>
-                                        <span ng-show="jobSeeker.jobtype == 2">Part Time</span>
-                                        <span ng-show="jobSeeker.jobtype == 3">Work From Home</span>
-                                        <span ng-show="jobSeeker.jobtype == 4">Internship | Project Work</span>
-                                        <span ng-show="jobSeeker.jobtype == 5">Consultant</span>
-                                        <span ng-show="jobSeeker.jobtype == 6">Freelancer</span>
+                                        <span ng-show="jobSeeker.jobtype == 0">Full Time</span>
+                                        <span ng-show="jobSeeker.jobtype == 1">Part Time</span>
+                                        <span ng-show="jobSeeker.jobtype == 2">Work from Home</span>
+                                        <span ng-show="jobSeeker.jobtype == 3">Internship</span>
+                                        <span ng-show="jobSeeker.jobtype == 4">Apprenticeship</span>
+                                        <span ng-show="jobSeeker.jobtype == 5">Job Oriented Training</span>
+                                        <span ng-show="jobSeeker.jobtype == 6">Consultant</span>
+                                        <span ng-show="jobSeeker.jobtype == 7">Freelancer</span>
                                     </div>
                                     <div class="col-lg-1">
                                         {{jobSeeker.freshness == 0 ? 'Today' : jobSeeker.freshness+' Days'}}
@@ -253,9 +257,7 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-
                 <div ng-show="jobSeekerResults.length">
                     <div class="panel-danger panel-footer text-white">
                         <i class="fa fa-envelope"></i> Compose Mail <label class="label label-primary">{{selectedTidToMail.length}}</label>
@@ -283,7 +285,7 @@
                                             <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('edit')" >Edit</button>
                                         </div>
                                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                            <select class="form-control" name="countrySelect" ng-model="job_id"
+                                            <select class="form-control" name="SelectJob" ng-model="job_id"
                                                     ng-options="job.tid as job.jobtitle for job in jobLists" required>
                                                 <option value = ""> -- Select Job -- </option>
                                             </select>

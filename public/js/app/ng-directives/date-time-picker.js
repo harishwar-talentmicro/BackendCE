@@ -27,7 +27,7 @@ angular.module('ezeidApp').directive('dateTimePicker', function() {
                     dateTimeSettings.onShow = function(){
 
                         this.setOptions({
-                            minTime : (scope.minTime) ? scope.minTime : 0,
+                            minTime : (scope.minTime) ? scope.minTime : '00:00',
                             maxTime : (scope.maxTime) ? scope.maxTime : '23:59'
                         });
                     };

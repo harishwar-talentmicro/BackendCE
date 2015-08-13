@@ -3,9 +3,15 @@
  */
 angular.module('ezeidApp').controller('PlannerMasterCtrl',['$scope','$compile','uiCalendarConfig',function($scope,$compile,uiCalendarConfig) {
 
-    $scope.alertEventOnClick = function(){};
-    $scope.alertOnDrop = function(){};
-    $scope.alertOnResize = function(){};
+    $scope.alertEventOnClick = function(){
+        console.log('Hello event clicked');
+    };
+    $scope.alertOnDrop = function(){
+        console.log('Event dropped');
+    };
+    $scope.alertOnResize = function(){
+        console.log('Event resized');
+    };
 
 
     var date = new Date();
@@ -61,13 +67,14 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',['$scope','$compile','
     $scope.uiConfig = {
         calendar:{
             height: 450,
-            editable: true,
+            editable: false,
             header:{
                 left: '',
                 center: 'title',
                 right: 'prev,next'
             },
             dayClick: $scope.alertEventOnClick,
+            eventClick : $scope.alertEventOnClick,
             eventDrop: $scope.alertOnDrop,
             eventResize: $scope.alertOnResize
         }

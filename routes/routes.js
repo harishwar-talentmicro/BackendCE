@@ -200,11 +200,16 @@ exports.FnGetMessageAttachment = messageBox.getMessageAttachment;
 exports.FnGetMessageDetails = messageBox.getMessageDetails;
 
 
-var Notification = require('./modules/notification-module.js');
+var Notification = require('./modules/notification/notification-master.js');
 var notification = new Notification(db,stdLib);
 exports.FnMSAuthUser = notification.authUser;
 exports.FnMSAuthVHost = notification.authVHost;
 exports.FnMSAuthResource = notification.authResource;
+/**
+ * Test Service
+ */
+exports.FnAPNSNotify = notification.sendAppleNS;
+
 
 var Planner = require('./modules/planner-module.js');
 var plannerModule = new Planner(db,stdLib);

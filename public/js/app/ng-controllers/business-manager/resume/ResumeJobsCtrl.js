@@ -57,7 +57,6 @@
             $scope.selectedEducations = [];
             $scope.selectedSpecializations = [];
             $scope.selectedInstitute = [];
-            var placeDetail = [];
             $scope.locIndexToEdit = "";
             $scope.disabledAddLocation = true;
 
@@ -358,7 +357,7 @@
                     $scope.jobLocation = "";
                     $scope.salaryFrom = "";
                     $scope.salaryTo = "";
-                    $scope.salaryType = 1;
+                    $scope.salaryType = 3;
                     $scope.jobType = 0;
                     $scope.contactName = "";
                     $scope.phone = "";

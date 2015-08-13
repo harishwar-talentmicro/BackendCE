@@ -59,18 +59,18 @@ angular.module('ezeidApp').
              * Initilization of variabes for additional options filter elements
              */
             $scope.params.proximity = 0;//Default any is selected
-            $scope.params.jobType = '1,2,3,4,5,6';//Checkboxes for job type
+            $scope.params.jobType = '0,1,2,3,4,5,6,7';//Checkboxes for job type
             $scope.params.searchTerm = $routeParams.searchTerm;
             $scope.params.orderBy = 1;//1: Asc, 2: Desc
             $scope.params.locations = "";//comma separated ids
             $scope.params.category = "";//comma separated ids
             $scope.params.salary = "";//1-2,5-6
-            $scope.params.filter=0;
+            $scope.params.filter = 0;
 
             $scope.filterCollege = false;
 
             $scope.searchKeyWord = $routeParams.searchTerm;
-            $scope.activeJobType = [false,false,false,false,false,false];//Checkboxes for job type
+            $scope.activeJobType = [false,false,false,false,false,false,false,false];//Checkboxes for job type
             $scope.showProximityFilter = false;
             $scope.jobTypeFilter = false;
             $scope.advanceSearchVisibility = false;
@@ -547,7 +547,7 @@ angular.module('ezeidApp').
                 for(var i = 0; i < jobTypeArr.length; i++)
                 {
                     var val = jobTypeArr[i];
-                    $scope.activeJobType[val - 1] = true;
+                    $scope.activeJobType[val] = true;
                 }
             }
 
@@ -719,7 +719,7 @@ angular.module('ezeidApp').
             $scope.resetAdvanceFilters = function()
             {
                 $scope.params.experience = 0;
-                $scope.activeJobType = [false,false,false,false,false,false];
+                $scope.activeJobType = [false,false,false,false,false,false,false,false];
                 $scope.params.proximity = 0;
             }
 
@@ -768,7 +768,7 @@ angular.module('ezeidApp').
                 {
                     if($scope.activeJobType[i])
                     {
-                        tempStringArr.push(parseInt(i) + 1);
+                        tempStringArr.push(parseInt(i));
                     }
                 }
                 $scope.params.jobType = tempStringArr.join(',');
@@ -987,7 +987,6 @@ angular.module('ezeidApp').
                 else{
                     $scope.paginationNextVisibility = true;
                     $scope.paginationPreviousVisibility = true;
-
                 }
            };
 
@@ -1092,7 +1091,6 @@ angular.module('ezeidApp').
 
                         });
                     }
-
 
                 });
             };

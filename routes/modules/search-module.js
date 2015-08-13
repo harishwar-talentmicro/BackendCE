@@ -74,7 +74,6 @@ Search.prototype.searchKeyword = function(req,res,next){
         var total = req.body.total ? parseInt(req.body.total) : 0;
         var promotionFlag = (req.body.promotion_flag) ? ((parseInt(req.body.promotion_flag) == 1) ? req.body.promotion_flag : 2) : 2;
 
-            console.log(req.body);
 
         if (type == "1") {
 
@@ -93,15 +92,12 @@ Search.prototype.searchKeyword = function(req,res,next){
                             //console.log('findarray: ' + FindArray.length);
                             console.log(req.ip);
 
-
                             var logHistory = {
                                 searchTid : 0,  // who is searching
                                 ezeid : FindArray[0],
                                 ip : req.ip,
                                 type : 0
                             };
-                            console.log('FindArray');
-                            console.log(FindArray);
 
                             if (FindArray.length > 0) {
                                 EZEID = alterEzeoneId(FindArray[0]);
@@ -168,7 +164,6 @@ Search.prototype.searchKeyword = function(req,res,next){
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // st.db.query(searchQuery, function (err, SearchResult) {
-                                console.log(SearchResult);
                                 if (!err) {
                                     if (SearchResult[0]) {
                                         if (SearchResult[0].length > 0) {
@@ -348,7 +343,6 @@ Search.prototype.searchKeyword = function(req,res,next){
                 console.log('CALL pSearchResultNew(' + InsertQuery + ')');
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
-                        console.log(SearchResult);
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
                                 //res.send(SearchResult[0]);
@@ -1075,7 +1069,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
                                     console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
 
 
-                                    var getQuery = 'select masterid from tloginout where Token='+st.db.escape(token);
+                                    var getQuery = 'select masterid as TID from tloginout where Token='+st.db.escape(token);
                                     st.db.query(getQuery, function (err, getResult) {
                                         if(!err){
                                             tid = getResult[0].TID;

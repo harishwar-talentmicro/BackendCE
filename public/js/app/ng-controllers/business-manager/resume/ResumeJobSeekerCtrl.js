@@ -41,12 +41,13 @@
         {
 
             $scope.validationMode = 0;
+            var placeDetail = [];
             clearSearchFilter();
 
             function clearSearchFilter()
             {
                 $scope.jobSeekerSkillKeyword = "";
-                $scope.jobSeekerJobType = 1 ;
+                $scope.jobSeekerJobType = 0 ;
                 $scope.jobSeekerSalaryFrom = 0;
                 $scope.jobSeekerSalaryTo = 0;
                 $scope.jobSeekerSalaryType = 2;
@@ -66,30 +67,7 @@
                 $scope.searchListMapFlag = false;//1: List, 2:Flag
             }
 
-            //For fatching location to post job
-           /* var googleMap = new GoogleMap();
-            googleMap.addSearchBox('google-map-search-box');
-            googleMap.listenOnMapControls(null,function(lat,lng){
-                $scope.jobLat = lat;
-                $scope.jobLong = lng;
-                googleMap.getReverseGeolocation(lat,lng).then(function(resp){
-                    if(resp.data){
-                        var data = googleMap.parseReverseGeolocationData(resp.data);
-                        //  CVAttachCtrl._CVInfo.job_location1 = data.city;
-                        $scope.locationName = data.city;
-                        $scope.country= data.country;
 
-                        console.log("sai777");
-                        console.log($scope.locationName);
-                    }
-                    else{
-                        Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                    }
-                },function(){
-                    Notification.error({message : 'Please enable geolocation settings in your browser',delay : MsgDelay});
-                    defer.resolve();
-                });
-            },false);*/
 
             $scope.jobSeekerResults = "";
 
@@ -166,6 +144,7 @@
                     if(resp.status)
                     {
                         $scope.countryLists = resp.data;
+                        getCurrentCityCountry();
                     }
                 })
                 .error(function(err){
@@ -174,6 +153,7 @@
 
             // Get City list by country title
             $scope.getCityListOfCountry = function (_title) {
+                console.log("SAi444");
                 if(_title != undefined)
                 {
                     $http({
@@ -182,6 +162,19 @@
                             if(data.status)
                             {
                                 $scope.cityList = data.data;
+
+                                $scope.setCurrentCity = placeDetail.city;
+                                if(($scope.setCurrentCity) && ($scope.cityList.length))
+                                {
+                                    for(var nCount = 0; nCount < $scope.cityList.length; nCount++)
+                                    {
+                                        if($scope.cityList[nCount].Locname.toUpperCase() == $scope.setCurrentCity.toUpperCase())
+                                        {
+                                           // $scope.countrySelect = $scope.countryLists[nCount].countryname;
+                                            $scope.selectCity($scope.countryLists[nCount].tid);
+                                        }
+                                    }
+                                }
                             }
                         });
                 }
@@ -267,7 +260,7 @@
                 {
                     $scope.selectedSpecializations.push(_specializationID);
                 }
-            }
+            };
 
             // Get Institute list
             function getInstituteList()
@@ -299,7 +292,7 @@
                 {
                     $scope.selectedInstitute.push(_instituteID);
                 }
-            }
+            };
 
             /**
              * Search job seeker
@@ -712,6 +705,73 @@
                     $scope.paginationPreviousVisibility = true;
                 }
             };
+
+            function getCurrentCityCountry()
+            {
+                var handleNoGeolocation = function () {
+                };
+
+                $scope.googleMap = new GoogleMap();
+
+                var promise = $scope.googleMap.getCurrentLocation()
+                promise.then(function (resp) {
+                    if (resp)
+                    {
+                        /* get the current location coordinates and if it don't exists then update with the present Coordinates */
+                        var coordinates = getSearchedCoordinates($scope.googleMap.currentMarkerPosition.latitude,$scope.googleMap.currentMarkerPosition.longitude);
+
+                        $scope.googleMap.getReverseGeolocation(coordinates[0],coordinates[1]).then(function (resp) {
+                            if(resp)
+                            {
+                                placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
+                                $scope.setCurrentCity = placeDetail.city;
+                                if((placeDetail.city) && (placeDetail.country) && ($scope.countryLists.length))
+                                {
+                                    for(var nCount = 0; nCount < $scope.countryLists.length; nCount++)
+                                    {
+                                        if($scope.countryLists[nCount].countryname.toUpperCase() == placeDetail.country.toUpperCase())
+                                        {
+                                            $scope.countrySelect = $scope.countryLists[nCount].countryname;
+
+                                            //to set default city
+                                            $scope.getCityListOfCountry($scope.countrySelect);
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    else
+                    {
+                        handleNoGeolocation();
+                    }
+                }, function () {
+                    handleNoGeolocation();
+                });
+
+
+                /* Callback function for get current location functionality */
+                $scope.findCurrentLocation = function(){
+                    $scope.googleMap.getCurrentLocation().then(function(){
+                        $scope.googleMap.placeCurrentLocationMarker(null,null,true);
+                    },function(){
+                        $scope.googleMap.placeCurrentLocationMarker(null,null,true);
+                    });
+                };
+
+                /* get lattitude and longitude based on present lat and lng */
+                function getSearchedCoordinates(lat,lng)
+                {
+                    if(typeof($routeParams.lat) != 'undefined' && typeof($routeParams.lng) != 'undefined')
+                    {
+                        return [$routeParams.lat,$routeParams.lng];
+                    }
+                    else
+                    {
+                        return [lat,lng];
+                    }
+                }
+            }
 
 
 

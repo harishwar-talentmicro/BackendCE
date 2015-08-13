@@ -170,6 +170,92 @@ Notification.prototype.authResource = function(req,res,next){
 };
 
 /**
+ * Publishing a message to a particular topic
+ * @param groupTitle* (Name of the person or group who sent the message)
+ * @param senderTitle* (Name of the person in group or the individual who sent the message)
+ * @param groupId* (To which  you want to send message, TID of tmGroups table)
+ * @param message (What message to be sent using notifications)
+ * @param messageType (What kind of message to be sent 0 :Group, 1 : Individual, 2 : Alarm, 3: EZEOne Public Notifications)
+ * @param operationType (Operation type decides what kind of notification it is)
+ * @param iphoneId (If user is having iphone id then pass it also)
+ */
+Notification.prototype.publish = function(senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId){
+    var validationStatus = true;
+    var error = {};
+    if(!senderTitle){
+        senderTitle = "";
+    }
+    if(!groupTitle){
+        groupTitle = "";
+    }
+    if(parseInt(groupId) == NaN || parseInt(groupId) < 1){
+        validationStatus = false;
+        error.groupId = "Error parameter 3  :  \" "+groupId + "\"";
+    }
+    if(!message){
+        validationStatus = false;
+        error.message = "Error parameter 4  :  \""+message + "\"";
+    }
+
+    if(parseInt(messageType) < 0 && parseInt(messageType) > 3){
+        validationStatus = false;
+        error.messageType = "Error parameter 5 : \""+messageType + "\"";
+    }
+
+    if(parseInt(operationType) < 0 && parseInt(operationType) > 2){
+        validationStatus = false;
+        error.operationType = "Error parameter 5 : \""+messageType + "\"";
+    }
+
+};
+
+
+Notification.prototype.sendAppleNS = function(req,res,next){
+    var http = require('http');
+    var apn = require('apn');
+
+    var myPhone =         "51c33c5fef8c134ab86b6cd6b86885e7b452cc9cb865093dbe6c51164d0a1c11";
+
+    var myDevice = new apn.Device(myPhone);
+
+    var FinalMessage = {
+        Message: 'Apple Push Notification Test for EZEOne',
+        Result: 'Pass',
+        StatusCode: '200'
+    };
+
+    var note = new apn.Notification();
+    note.badge = 2;
+    note.sound = "notification-beep.wav";
+    note.alert = { "body" : "Test Message", "action-loc-key" : "Play" ,
+        "launch-image" :
+            "mysplash.png","JsonResult":JSON.stringify(FinalMessage)};
+    note.payload =FinalMessage;
+
+    note.device = myDevice;
+
+    var callback = function(errorNum, notification){
+        console.log('Error is: %s', errorNum);
+        console.log("Note " + notification);
+    };
+    var options = {
+        gateway: 'gateway.sandbox.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+        errorCallback: callback,
+        cert: 'cert.pem',
+        key:  'key.pem',
+        passphrase: 'hire@123',
+        port: 2195,
+        enhanced: true,
+        cacheLength: 100
+    };
+    var apnsConnection = new apn.Connection(options);
+    //apnsConnection.sendNotification(note);
+    apnsConnection.pushNotification(note, myDevice);
+    res.status(200).json({status : true, message : 'Message Sent'});
+};
+
+
+/**
  * @todo FnGetAlarmMessages
  * Method : Get
  * @param req
