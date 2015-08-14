@@ -85,7 +85,6 @@ angular.module('ezeidApp').
                         starStr.push(i + 1);
                     }
                 }
-                console.log(starStr.join(","));
                 return starStr.join(",");
             }
 
@@ -122,9 +121,10 @@ angular.module('ezeidApp').
             $scope.searchType = searchTypeArr;
 
             var placeHolder = [
-                "Type EZEOne ID here",
-                "Type keywords to locate products and services",
-                "Type Job Skill Keywords to locate employers"
+                "Type EZEOne ID to view information",
+                "Type Products/Service names to find Business(s)",
+                "",
+                "Type your Skills to locate nearest Jobs"
             ];
 
             /* basic settings for searching */
@@ -740,23 +740,16 @@ angular.module('ezeidApp').
                     {
                         if(!$rootScope._userInfo.IsAuthenticate)
                         {
-                            //var defer = $q.defer();
-                           // $rootScope.loginPromise = defer;
                             $timeout(function ()
                             {
                                 angular.element('#SignIn_popup').css({'position':'fixed'});
                                 angular.element('#SignIn_popup > .window_page').css({'position':'relative'});
                                 angular.element('#SignIn_popup').slideDown();
                             },2000);
-
-                           /* defer.promise.then(function()
-                            {
-                                applyForJobByID(_tid);
-                            });*/
                         }
                     }
                 }
-            }
+            };
 
             /* change different search option status */
             $scope.changeSearchOptions = function(opt) {
@@ -797,7 +790,6 @@ angular.module('ezeidApp').
              */
             function changeSearchFilterVisibility(searchOption)
             {
-
                 hideAllSearchOptions();
                 switch(searchOption)
                 {

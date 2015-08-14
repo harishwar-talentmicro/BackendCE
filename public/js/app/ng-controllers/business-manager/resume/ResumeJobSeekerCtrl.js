@@ -67,8 +67,6 @@
                 $scope.searchListMapFlag = false;//1: List, 2:Flag
             }
 
-
-
             $scope.jobSeekerResults = "";
 
             //Pagination settings
@@ -153,7 +151,6 @@
 
             // Get City list by country title
             $scope.getCityListOfCountry = function (_title) {
-                console.log("SAi444");
                 if(_title != undefined)
                 {
                     $http({
@@ -162,16 +159,15 @@
                             if(data.status)
                             {
                                 $scope.cityList = data.data;
-
                                 $scope.setCurrentCity = placeDetail.city;
+
                                 if(($scope.setCurrentCity) && ($scope.cityList.length))
                                 {
                                     for(var nCount = 0; nCount < $scope.cityList.length; nCount++)
                                     {
                                         if($scope.cityList[nCount].Locname.toUpperCase() == $scope.setCurrentCity.toUpperCase())
                                         {
-                                           // $scope.countrySelect = $scope.countryLists[nCount].countryname;
-                                            $scope.selectCity($scope.countryLists[nCount].tid);
+                                            $scope.selectCity($scope.cityList[nCount].tid);
                                         }
                                     }
                                 }
