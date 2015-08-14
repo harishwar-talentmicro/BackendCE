@@ -213,6 +213,7 @@ app.post('/jobseeker_message',LocationManager.FnJobSeekersMessage);
 app.get('/jobs_list',LocationManager.FnGetListOfJobs);
 app.get('/verify_institute',LocationManager.FnGetVerifiedInstitutes);
 app.post('/user_details',LocationManager.FnSaveUserDetails);
+app.put('/refresh_job',LocationManager.FnJobRefresh);
 
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);
@@ -234,6 +235,7 @@ app.get('/load_group_message',LocationManager.FnLoadMessages);
 app.get('/validate_group_member',LocationManager.FnValidateGroupMember);
 app.get('/message_full_view',LocationManager.FnViewMessage);
 app.get('/message_attachment',LocationManager.FnGetMessageAttachment);
+app.get('/group_info',LocationManager.FnGetGroupInfo);
 
 //Planner module
 app.get('/tasks',LocationManager.FnGetAllTask);
@@ -310,9 +312,6 @@ app.get('/legal.html',function(req,res,next){
 
 
 
-app.get('/test',function(req,res){
-    res.status(200).json(req.cookies);
-});
 app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });

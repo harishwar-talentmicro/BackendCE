@@ -175,6 +175,7 @@ exports.FnGetJobcountry = jobModule.getJobcountry;
 exports.FnGetjobcity = jobModule.getjobcity;
 exports.FnJobSeekersMessage = jobModule.jobSeekersMessage;
 exports.FnGetListOfJobs = jobModule.getListOfJobs;
+exports.FnJobRefresh = jobModule.jobRefresh;
 
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);
@@ -197,14 +198,19 @@ exports.FnLoadMessages = messageBox.loadMessages;
 exports.FnValidateGroupMember = messageBox.validateGroupMember;
 exports.FnViewMessage = messageBox.viewMessage;
 exports.FnGetMessageAttachment = messageBox.getMessageAttachment;
-exports.FnGetMessageDetails = messageBox.getMessageDetails;
+exports.FnGetGroupInfo = messageBox.getGroupInfo;
 
 
-var Notification = require('./modules/notification-module.js');
+var Notification = require('./modules/notification/notification-master.js');
 var notification = new Notification(db,stdLib);
 exports.FnMSAuthUser = notification.authUser;
 exports.FnMSAuthVHost = notification.authVHost;
 exports.FnMSAuthResource = notification.authResource;
+/**
+ * Test Service
+ */
+exports.FnAPNSNotify = notification.sendAppleNS;
+
 
 var Planner = require('./modules/planner-module.js');
 var plannerModule = new Planner(db,stdLib);

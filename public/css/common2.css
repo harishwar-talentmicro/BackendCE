@@ -3400,3 +3400,16 @@ sup.tm{
 {
     background-color: #DFF9F3;;
 }
+
+.hpw .group-description
+{
+    color: gray;
+    text-shadow: 1px 1px 1px #B1ADAD;
+    text-align: justify;
+}
+
+.hpw .chat-message
+{
+    color: black;
+    text-shadow: 1px 1px 1px #D6D5D5;
+}

@@ -69,6 +69,20 @@ angular.module('ezeidApp').
             $scope.composeMessageTemplate = "";
             $scope.detailMessagModuleLoaded = true;
             $scope.responseMsgId = 0;
+            /* pushing group data */
+            $scope.isGroupLoaded = false;
+            $scope.groupDetailsData = [];
+
+            $scope.groupName = "";//////////////////@todo
+
+            $scope.groupData = {
+                name:"",
+                id:0,
+                desc:"",
+                type:0,//0-group, 1-individual, 2-msgid
+                date:"",
+                isPublic:0
+            }
 
             $scope.pageSize = 10;
             $scope.pageCount = 0;
@@ -77,6 +91,7 @@ angular.module('ezeidApp').
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             loadFullViewMessage();
+            populateGroupInfo();
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,35 +102,42 @@ angular.module('ezeidApp').
             function loadFullViewMessage()
             {
                 /* load normal messages based on msg ID */
-                console.log($routeParams);
-
                 if(!$routeParams.id)
                 {
                     loadFullMessageApi().then(function(data){
                             $scope.messageData = data;
-                            console.log(data);
                         },
                         function()
                         {
                             redirectInboxPage();
                         });
-                    return;
                 }
                 /* load message specific to group or Ezeone id *///@todo
                 else
                 {
                     loadGroupMessageThreadApi().then(function(data){
-                            if(!data.length > 0)
-                                return;
+                            var message = data;
+                            if($routeParams.type && $routeParams.type == 0)
+                            {
+                                message = data.messages;
+                                $scope.isGroupLoaded = true;
+                            }
+                            else
+                            {
+                                $scope.isGroupLoaded = false;
+                            }
 
-                            console.log(data);
-                            $scope.messageData = data;
-                            console.log($scope.messageData);
+                            if(!message.length > 0)
+                                return;
+                            $scope.messageData = message;
                         },
                         function(){
                             console.log("Invalide Code");
                         });
                 }
+
+                /* set the group data */
+
             }
 
             /**
@@ -135,31 +157,89 @@ angular.module('ezeidApp').
                 $scope.composeMessageTemplate = "html/message/composeMessage.html";
             }
 
-            function setReplyMessageData()
+            /**
+             * Get appropriate index from group message array
+             */
+            function getGroupDataIndex()
             {
-                console.log($scope.messageData);
-                /* load the reply data in the form */
-                $scope.receiverArr = [];
-                if(!$scope.messageData || !$scope.messageData.length > 0)
+                if($routeParams.id)
                 {
-                    return false;
+                    console.log("Hi");
+                    var index = $scope.messageData.indexOfWhere('GroupID',$routeParams.id);
+                    return index;
+                }
+            }
+
+            /**
+             * Initiate Download attachment
+             */
+            $scope.initiateDownload = function(tid)
+            {
+                downloadAttachmentApi(tid).then(function(data){
+                        console.log(data);
+                    },
+                    function(){
+                        Notification.error({ message: "Download Failed! Try again later", delay: MsgDelay });
+                    });
+            }
+
+            function populateGroupInfo()
+            {
+                var type = 2;
+                var msgId = 0;
+
+                if($routeParams.msg)
+                    msgId = $routeParams.msg;
+                else if($routeParams.id && $routeParams.type)
+                {
+                    type = $routeParams.type;
+                    msgId = $routeParams.id;
+                }
+                /* set id and type */
+                $scope.groupData.type = type;
+                $scope.groupData.id = msgId;
+
+                getGroupInformation(msgId,type).then(function(data){
+                    setGroupData(data);
+                });
+            }
+
+            function setGroupData(data)
+            {
+                if(!data)
+                    return;
+
+                if($routeParams.msg)
+                {
+                    $scope.groupData.name = data[0].sender;
+                    $scope.groupData.date = data[0].createddate;
+                }
+                else if($routeParams.id && $routeParams.type == 0)
+                {
+                    $scope.groupData.name = data[0].groupname;
+                    $scope.groupData.desc = data[0].aboutgroup;
+                    $scope.groupData.isPublic = data[0].autojoin;
+                    $scope.groupData.date = data[0].createddate;
+
+                }
+                else if($routeParams.id && $routeParams.type == 1)
+                {
+                    $scope.groupData.name = data[0].name;
                 }
 
-                /* set group name */
-                var groupName = 0;
-                if($scope.messageData[0].grouptype == 1)
-                    groupName = $scope.messageData[0].name;
-                else
-                    groupName = $scope.messageData[0].sender;
+            }
 
+            function setReplyMessageData()
+            {
+                $scope.receiverArr = [];
+                /* set the receiver's data */
                 var temp = {
-                    GroupID:$scope.messageData[0].GroupID,
-                    GroupType:$scope.messageData[0].grouptype,
-                    GroupName:groupName
+                    GroupID:$scope.groupData.id,
+                    GroupType:$scope.groupData.type,
+                    GroupName:$scope.groupData.name
                 };
-                $scope.receiverArr.push(temp);
-                $scope.responseMsgId = msgId;
 
+                $scope.receiverArr.push(temp);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
@@ -229,4 +309,71 @@ angular.module('ezeidApp').
                 return defer.promise;
             }
 
+            /**
+             * Api call for download attachment
+             * @param tid : id of the message for which download has to be done
+             * @returns {*}
+             */
+            function downloadAttachmentApi(tid)
+            {
+                var defer = $q.defer();
+                var msgId;
+                $http({
+                    url : GURL + 'message_attachment',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        tid : tid
+                    }
+                }).success(function(resp){
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.reject();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * get the group details of a group or individual
+             * @param tid of group or individual
+             * @param type  - 0 :GroupInfo ID, 1 :Ezeone ID, 2 :Message ID
+             * @returns {*}
+             */
+            function getGroupInformation(tid,type)
+            {
+                console.log(tid,type);
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'group_info',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        group_id : tid,
+                        type : type
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.reject();
+                });
+                return defer.promise;
+            }
         }]);

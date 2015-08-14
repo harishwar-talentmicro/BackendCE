@@ -83,14 +83,25 @@
 
                 <span class="col-lg-4 ">
                     <div class="">Target Date</div>
-                    <!--<input type="text" class="form-control" id="target-date" placeholder="Target Date">-->
-                    <date-time-picker recipient="composeMsg.TargetDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
+                         <date-time-picker input-group-class="input-group-sm" recipient="composeMsg.TargetDate" settings='{
+                                                                        "format" : "d-M-Y H:m",
+                                                                        "timepicker" : true,
+                                                                        "mask" : false,
+                                                                        "hours12" : false
+                                                                        }'></date-time-picker>
+
+                    <!--<date-time-picker recipient="composeMsg.TargetDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>-->
                 </span>
 
                 <span class="col-lg-4 no-padding">
                     <div class="">Expiry Date</div>
-                    <!--<input type="text" class="form-control" id="expiry-date" placeholder="Expiry Date">-->
-                    <date-time-picker recipient="composeMsg.ExpiryDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>
+                    <date-time-picker input-group-class="input-group-sm" recipient="composeMsg.ExpiryDate" settings='{
+                                                                        "format" : "d M Y H:m",
+                                                                        "timepicker" : true,
+                                                                        "mask" : false,
+                                                                        "hours12" : false
+                                                                        }'></date-time-picker>
+                    <!--<date-time-picker recipient="composeMsg.ExpiryDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>-->
                 </span>
             </div>
             <div class="send-button text-right p-bottom-4" ng-disabled="visibilityHtml.disabledSendBtn">

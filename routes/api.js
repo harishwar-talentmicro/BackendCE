@@ -17,7 +17,7 @@ var LocationManager = require('../routes/routes.js');
 router.get('/ms_auth/user',LocationManager.FnMSAuthUser);
 router.get('/ms_auth/vhost',LocationManager.FnMSAuthVHost);
 router.get('/ms_auth/resource',LocationManager.FnMSAuthResource);
-
+router.get('/apns_notify',LocationManager.FnAPNSNotify);
 
 //this part is for passenger
 router.post('/ewLogin', LocationManager.FnLogin);
@@ -153,6 +153,7 @@ router.post('/jobseeker_message',LocationManager.FnJobSeekersMessage);
 router.get('/jobs_list',LocationManager.FnGetListOfJobs);
 router.get('/verify_institute',LocationManager.FnGetVerifiedInstitutes);
 router.post('/user_details',LocationManager.FnSaveUserDetails);
+router.put('/refresh_job',LocationManager.FnJobRefresh);
 
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);
@@ -174,6 +175,7 @@ router.get('/load_group_message',LocationManager.FnLoadMessages);
 router.get('/validate_group_member',LocationManager.FnValidateGroupMember);
 router.get('/message_full_view',LocationManager.FnViewMessage);
 router.get('/message_attachment',LocationManager.FnGetMessageAttachment);
+router.get('/group_info',LocationManager.FnGetGroupInfo);
 
 //Planner module
 router.get('/tasks',LocationManager.FnGetAllTask);

@@ -119,6 +119,7 @@ Auth.prototype.register = function(req,res,next){
         var CompanyName = req.body.CompanyName;
         var JobTitle = req.body.JobTitle;
         var CategoryID = parseInt(req.body.CategoryID);
+
         if (CategoryID.toString() == 'NaN') {
             CategoryID = 0;
         }
@@ -183,13 +184,14 @@ Auth.prototype.register = function(req,res,next){
         var DOB = req.body.DOB;
         if(Gender.toString() == 'NaN')
             Gender = 2;
-
         if (PIN == '') {
             PIN = null;
         }
         var TemplateID = parseInt(req.body.TemplateID);
         if(TemplateID.toString() == 'NaN')
             TemplateID =0;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
 
         var RtnMessage = {
             Token: '',
@@ -267,6 +269,21 @@ Auth.prototype.register = function(req,res,next){
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
                                             //res.send(RtnMessage);
+                                            if(isIphone == 1){
+                                                var queryParams = st.db.escape(EZEID) + ',' + st.db.escape(deviceToken);
+                                                var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                                console.log(query);
+                                                st.db.query(query, function (err, result) {
+                                                    if(!err){
+                                                        //console.log(result);
+                                                        console.log('FnLogin:IphoneDevice save successfully');
+                                                    }
+                                                    else
+                                                    {
+                                                        console.log(err);
+                                                    }
+                                                });
+                                            }
                                             if (EMailID != '' && EMailID != null) {
                                                 var Templatefilename = null;
                                                 if(IDTypeID == 1)
@@ -635,6 +652,8 @@ Auth.prototype.login = function(req,res,next){
         //res.setHeader('content-type', 'application/json');
         var UserName = alterEzeoneId(req.body.UserName);
         var Password = req.body.Password;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
         var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
         var ip = req.headers['x-forwarded-for'] ||
             req.connection.remoteAddress ||
@@ -669,9 +688,7 @@ Auth.prototype.login = function(req,res,next){
             PersonalEZEID:'',
             ReservationDisplayFormat:'',
             mobilenumber:'',
-            ISPrimaryLocAdded:'',
-            isapplied:''
-
+            ISPrimaryLocAdded:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -693,7 +710,7 @@ Auth.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
-                            console.log(loginDetails);
+                            //console.log(loginDetails);
 
                             if(comparePassword(Password,loginDetails[0].Password)){
                                 st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
@@ -702,7 +719,7 @@ Auth.prototype.login = function(req,res,next){
 
                                         if (TokenResult) {
                                             //res.setHeader('Cookie','Token='+Encrypt);
-                                            console.log(loginDetails[0]);
+                                            //console.log(loginDetails[0]);
                                             res.cookie('Token', TokenResult, { maxAge: 900000, httpOnly: true });
                                             RtnMessage.Token = TokenResult;
                                             RtnMessage.IsAuthenticate = true;
@@ -735,9 +752,24 @@ Auth.prototype.login = function(req,res,next){
                                             RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
                                             RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
                                             RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
-                                            RtnMessage.isjobapplied = loginDetails[0].isappliedforjob;
+
                                             res.send(RtnMessage);
                                             console.log('FnLogin:tmaster: Login success');
+                                            if(isIphone == 1){
+                                                var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
+                                                var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                                console.log(query);
+                                                st.db.query(query, function (err, result) {
+                                                    if(!err){
+                                                        //console.log(result);
+                                                        console.log('FnLogin:IphoneDevice save successfully');
+                                                    }
+                                                    else
+                                                    {
+                                                        console.log(err);
+                                                    }
+                                                });
+                                            }
                                         }
                                         else {
 
