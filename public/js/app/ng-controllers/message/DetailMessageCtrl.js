@@ -102,38 +102,16 @@ angular.module('ezeidApp').
             function loadFullViewMessage()
             {
                 /* load normal messages based on msg ID */
-                if(!$routeParams.id)
+                if($routeParams.id)
                 {
-                    loadFullMessageApi().then(function(data){
-                            $scope.messageData = data;
-                        },
-                        function()
-                        {
-                            redirectInboxPage();
-                        });
+                    console.log("ID");
+                    loadGroupMessage();
                 }
                 /* load message specific to group or Ezeone id *///@todo
                 else
                 {
-                    loadGroupMessageThreadApi().then(function(data){
-                            var message = data;
-                            if($routeParams.type && $routeParams.type == 0)
-                            {
-                                message = data.messages;
-                                $scope.isGroupLoaded = true;
-                            }
-                            else
-                            {
-                                $scope.isGroupLoaded = false;
-                            }
-
-                            if(!message.length > 0)
-                                return;
-                            $scope.messageData = message;
-                        },
-                        function(){
-                            console.log("Invalide Code");
-                        });
+                    console.log("msg");
+                    loadFullViewMessageCall();
                 }
 
                 /* set the group data */
@@ -141,10 +119,51 @@ angular.module('ezeidApp').
             }
 
             /**
+             * Load full view of a inbox message
+             */
+            function loadFullViewMessageCall()
+            {
+                loadFullMessageApi().then(function(data){
+                        $scope.messageData = data;
+                    },
+                    function()
+                    {
+                        redirectInboxPage();
+                    });
+            }
+
+            /**
+             * Get the group messages
+             */
+            function loadGroupMessage()
+            {
+                loadGroupMessageThreadApi().then(function(data){
+                        var message = data;
+                        if($routeParams.type && $routeParams.type == 0)
+                        {
+                            message = data.messages;
+                            $scope.isGroupLoaded = true;
+                        }
+                        else
+                        {
+                            $scope.isGroupLoaded = false;
+                        }
+
+                        if(!message.length > 0)
+                            return;
+                        $scope.messageData = message;
+                    },
+                    function(){
+                        redirectInboxPage();
+                    });
+            }
+
+            /**
              * redirect to inbox page
              */
             function redirectInboxPage()
             {
+                Notification.error({ message: "Error Occured! Try again later", delay: MsgDelay });
                 $location.url('/message');
             }
 
@@ -164,7 +183,6 @@ angular.module('ezeidApp').
             {
                 if($routeParams.id)
                 {
-                    console.log("Hi");
                     var index = $scope.messageData.indexOfWhere('GroupID',$routeParams.id);
                     return index;
                 }
@@ -241,6 +259,69 @@ angular.module('ezeidApp').
 
                 $scope.receiverArr.push(temp);
             }
+
+            //////////////////////////////////////PAGINATION////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /**
+             * load the next results
+             */
+            $scope.paginationNextClick = function()
+            {
+                $scope.pageCount += $scope.pageSize;
+                /* trigger next results */
+                loadOutboxMessage();
+                paginationVisibility();
+            }
+
+            /**
+             * load the previous results
+             */
+            $scope.paginationPreviousClick = function()
+            {
+                $scope.pageCount -= $scope.pageSize;
+                /* trigger previous results */
+                loadOutboxMessage();
+                paginationVisibility();
+            }
+
+            /**
+             * Toggle the visibility of the pagination buttons
+             */
+            $scope.paginationNextVisibility = true;
+            $scope.paginationPreviousVisibility = true;
+            function paginationVisibility()
+            {
+                var totalResult = parseInt($scope.totalMessage);
+                var currentCount = parseInt($scope.pageCount);
+                var resultSize = parseInt($scope.pageSize);
+
+                /* initial state */
+                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if(currentCount == 0)
+                {
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = false;
+                }
+                else if((currentCount + resultSize) >= totalResult)
+                {
+                    $scope.paginationNextVisibility = false;
+                    $scope.paginationPreviousVisibility = true;
+
+                }
+                else{
+                    $scope.paginationNextVisibility = true;
+                    $scope.paginationPreviousVisibility = true;
+
+                }
+            };
+
+
+
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,8 +370,8 @@ angular.module('ezeidApp').
                     method : "GET",
                     params :{
                         token : $rootScope._userInfo.Token,
-                        id: groupId,
-                        group_type: groupType,
+                        id: $routeParams.id,
+                        group_type: $routeParams.type,
                         page_size: $scope.pageSize,
                         page_count: $scope.pageCount
                     }

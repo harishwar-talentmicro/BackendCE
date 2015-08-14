@@ -279,7 +279,8 @@ angular.module('ezeidApp').
                     $scope.paginationNext = false;
                     $scope.paginationPrevious = true;
                 }
-                else if(($scope.nextResultId+$scope.resultPerPage) < $scope.totalResult && ($scope.nextResultId+$scope.resultPerPage) > $scope.resultPerPage)
+                else if(($scope.nextResultId+$scope.resultPerPage) < $scope.totalResult &&
+                    ($scope.nextResultId+$scope.resultPerPage) > $scope.resultPerPage)
                 {
                     $scope.paginationNext = true;
                     $scope.paginationPrevious = true;
