@@ -33,6 +33,9 @@
                   GoogleMap,
                   UtilityService) {
 
+            $scope.reportFromDate = '';
+            $scope.reportToDate = '';
 
+            
         }])
 })();

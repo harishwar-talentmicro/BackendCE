@@ -35,7 +35,8 @@
             'angularjs-dropdown-multiselect',
             'ngTouch',
             'ngAnimate',
-            'ui.calendar'
+            'ui.calendar',
+            'textAngular'
         ]);
 
    //ezeid.value('GURL',"/");
@@ -162,6 +163,10 @@
             .when('/',{
                 templateUrl: 'html/landing.html',
                 controller : 'LandingPageCtrl'
+            })
+            .when('/wyswyg',{
+                templateUrl : 'html/wyswyg.html',
+                controller : 'WYSWYGCtrl'
             })
             .when('/messages',{templateUrl: 'html/messages.html'})
             .when('/access-history',{templateUrl: 'html/accesshistory.html'})
