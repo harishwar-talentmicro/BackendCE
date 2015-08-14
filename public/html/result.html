@@ -40,7 +40,8 @@
                                     </button>
                                     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                         <!-- Index subtracted by 1: As searchType's value is [1,2,3] the array's default index is [0,1,2] -->
-                                        <b>{{searchType[params.searchType - 1]}}</b> <span class="caret"></span></button>
+                                        <b>{{searchType[params.searchType - 1]}}</b> <span class="caret"></span>
+                                    </button>
                                         <ul class="dropdown-menu" role="menu">
                                             <li class="btn-link" ng-repeat="search in searchType track by $index">
                                                 <a class="btn-link" ng-click="($event.preventDefault())(params.searchType = $index + 1) (params.searchTerm = '')">{{search}}</a>

@@ -199,6 +199,7 @@ exports.FnValidateGroupMember = messageBox.validateGroupMember;
 exports.FnViewMessage = messageBox.viewMessage;
 exports.FnGetMessageAttachment = messageBox.getMessageAttachment;
 exports.FnGetGroupInfo = messageBox.getGroupInfo;
+exports.FnCountOfUnreadMessage = messageBox.countOfUnreadMessage;
 
 
 var Notification = require('./modules/notification/notification-master.js');

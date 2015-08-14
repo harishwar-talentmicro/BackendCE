@@ -13,7 +13,7 @@
                 <!--IDENTIFY <i class="fa fa-arrow-circle-right"></i> LOCATE <i class="fa fa-arrow-circle-right"></i> INTERACT-->
                 <div class="btn btn-gray" ng-click="changeSeacrhType(1)" ng-class="searchParams.searchType == 1?'selected':''">EZEOne ID</div>
                 <div class="btn btn-gray"  ng-click="changeSeacrhType(2)" ng-class="searchParams.searchType ==2?'selected':''">Keywords</div>
-                <div class="btn btn-gray"  ng-click="changeSeacrhType(3)" ng-class="searchParams.searchType == 3?'selected':''">Employers</div>
+                <!--<div class="btn btn-gray"  ng-click="changeSeacrhType(3)" ng-class="searchParams.searchType == 3?'selected':''">Employers</div>-->
                 <div class="btn btn-gray"  ng-click="changeSeacrhType(4)" ng-class="searchParams.searchType == 4?'selected':''">Jobs</div>
             </div>
             <div class="main-subtitle">Search any product or service in your neighbourhood. <b>It is Easy, Accurate & Verified</b></div>
@@ -136,13 +136,12 @@
                                     <div class="filter-dropdown width-42 search-experience-content" style="display: none;">
                                         <div class="checkbox-dropdown">
                                             <div class="input-group">
-                                                <input type="text" numbers-only maxlength="3" id="experience" placeholder="Your experience in years" class="form-control text-right" />
+                                                <input type="text" numbers-only maxlength="2" id="experience" placeholder="Your experience in years" class="form-control text-right" />
                                                 <span class="input-group-addon">Yrs</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="input-group p-bottom-3">

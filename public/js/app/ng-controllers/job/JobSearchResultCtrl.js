@@ -108,7 +108,6 @@ angular.module('ezeidApp').
                 salary:[]
             };
 
-
             /* selected Filter options */
             $scope.selectedFilter = {
                 locationCode:[],
@@ -535,8 +534,7 @@ angular.module('ezeidApp').
             $scope.clearTempSalaryChecks = function()
             {
                 $scope.tempFilterCheck.salary = [];
-            }
-            //////////////////////////////////////////////////////////////////////////////////////////
+            };
 
             /**
              * Reset job type data
@@ -572,7 +570,7 @@ angular.module('ezeidApp').
                 {
                     return exp2+"-"+exp1+" Years";
                 }
-            }
+            };
 
             /**
              * Set keySkills
@@ -581,7 +579,7 @@ angular.module('ezeidApp').
             $scope.getKeySkillsArray = function(skillString)
             {
                 $scope.activeSkillsArray = skillString.split(",");
-            }
+            };
 
             /**
              * Get the salary range
@@ -604,7 +602,7 @@ angular.module('ezeidApp').
                 {
                     return UtilityService.currencyStyleConverter(salaryTo)+"-"+UtilityService.currencyStyleConverter(salaryFrom)+" INR";
                 }
-            }
+            };
 
             /**
              * Change the proximity value
@@ -612,7 +610,7 @@ angular.module('ezeidApp').
             $scope.changeProximity = function(proximityValue)
             {
                 $scope.params.proximity = proximityValue;
-            }
+            };
 
 
             /**
@@ -622,7 +620,7 @@ angular.module('ezeidApp').
             $scope.changeJobType = function(jobType)
             {
                 $scope.activeJobType[jobType] = !$scope.activeJobType[jobType];
-            }
+            };
 
             /**
              * Toggle the visibility of the proximity[1] and job type[2]
@@ -639,7 +637,7 @@ angular.module('ezeidApp').
                     $scope.jobTypeFilter = !$scope.jobTypeFilter;
                     checkVisibility(2);
                 }
-            }
+            };
 
             /**
              * A simple check to avoid both the filters to get open at the same time
@@ -667,7 +665,7 @@ angular.module('ezeidApp').
                     $scope.showProximityFilter = false;
                     $scope.jobTypeFilter = false;
                 }
-            }
+            };
 
             /**
              * Prefill the advance filter parameter
@@ -711,7 +709,7 @@ angular.module('ezeidApp').
                 {
                     return "No result found ";
                 }
-            }
+            };
 
             /**
              * Reset the advance filter
@@ -721,7 +719,7 @@ angular.module('ezeidApp').
                 $scope.params.experience = 0;
                 $scope.activeJobType = [false,false,false,false,false,false,false,false];
                 $scope.params.proximity = 0;
-            }
+            };
 
             /**
              * initiate search process
@@ -742,7 +740,7 @@ angular.module('ezeidApp').
                     $location.url('/jobsearch?' + searchStr);
                     $scope.triggerSearchOnEnterKey();
                 }
-            }
+            };
 
             /**
              * Get the string to search a normal search term
@@ -784,7 +782,7 @@ angular.module('ezeidApp').
                     /* trigger search */
                     $scope.triggerSearch();
                 }
-            }
+            };
 
             $scope.triggerSearchOnEnterKey();
 
@@ -806,7 +804,7 @@ angular.module('ezeidApp').
                 }
                 $scope.selectedFilter.locationCode.push(code);
                 setFilterLocation();
-            }
+            };
 
             /**
              * set the location string for the search
@@ -834,7 +832,7 @@ angular.module('ezeidApp').
                 $scope.selectedFilter.industryCode.push(code);
                 setFilterIndustry();
                 //console.log("Industry: "+code+" status:"+status);
-            }
+            };
 
             /**
              * set the industry string for the search
@@ -863,7 +861,7 @@ angular.module('ezeidApp').
                 }
                 $scope.selectedFilter.salaryRange.push(code);
                 setFilterSalary();
-            }
+            };
 
             /**
              * set the salary range string for the search
@@ -881,7 +879,7 @@ angular.module('ezeidApp').
                 $scope.params.orderBy = orderId;
                 /* initiate search */
                 $scope.triggerSearch();
-            }
+            };
 
             /**
              * Hover effect && restrict the multiple calls
@@ -909,7 +907,7 @@ angular.module('ezeidApp').
                         $(this).removeAttr('style');
                         //$(this).parent().children('.job-title-icon').removeAttr('style');
                     });
-            }
+            };
 
             function resetRestrictJsTileHoverEffectFlag()
             {
@@ -927,7 +925,7 @@ angular.module('ezeidApp').
             $scope.redirectJobDetailPage = function(tid)
             {
                 $location.url('/jobdetail' + '?jobid='+tid);
-            }
+            };
 
 
             /**************************
@@ -943,7 +941,7 @@ angular.module('ezeidApp').
                 /* trigger next results */
                 $scope.triggerSearch(1);
                 $scope.paginationVisibility();
-            }
+            };
 
             /**
              * load the previous results
@@ -954,7 +952,7 @@ angular.module('ezeidApp').
                 /* trigger previous results */
                 $scope.triggerSearch(1);
                 $scope.paginationVisibility();
-            }
+            };
 
             /**
              * Toggle the visibility of the pagination buttons
@@ -1169,7 +1167,7 @@ angular.module('ezeidApp').
              * Apply for job
              * @param _tid
              */
-            $scope.applyForJob = function(_tid)
+            $scope.applyForJob = function(_tid,_index)
             {
                 $scope.$emit('$preLoaderStart');
                 $scope.jobData = {
@@ -1183,11 +1181,20 @@ angular.module('ezeidApp').
                         token:$rootScope._userInfo.Token,
                         job_id:_tid
                     }
-                }).success(function (data) {
+                }).success(function (data)
+                    {
                         $scope.$emit('$preLoaderStop');
                         if(data.status)
                         {
-                            initiateSearch();
+
+                            console.log($scope.resultData);
+                            console.log(_index);
+
+                            $scope.resultData[_index].hide = 1;
+
+
+
+                          //  initiateSearch();
                             Notification.success({ message: "Applied Success..", delay : 2000});
                         }
                     })

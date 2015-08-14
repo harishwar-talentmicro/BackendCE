@@ -84,11 +84,12 @@ var res = angular.module('ezeidApp').
             $scope.isSearchInProgress = false;
 
             var placeHolder = [
-                "Type EZEID here",
-                "Type keywords to locate products and services",
-                "Type Job Skill Keywords to locate employers"
+                "Type EZEOne ID to view information",
+                "Type Products/Service names to find Business(s)",
+                "",
+                "Type your Skills to locate nearest Jobs"
             ];
-            var searchTypeArr = ["EZEOne ID", "Keywords", "Job Keywords"];
+            var searchTypeArr = ["EZEOne ID", "Keywords"];
 
             $scope.searchType = searchTypeArr;
 
@@ -320,9 +321,6 @@ var res = angular.module('ezeidApp').
                             $scope.checkBoxStatus.push(false);
                         }
                         $scope.coordinatesArr = coordinates;
-
-                        console.log("SAi nath");
-                        console.log($scope.coordinatesArr);
                     }
                     $scope.searchCount = count;
 
@@ -431,14 +429,15 @@ var res = angular.module('ezeidApp').
                 var searchStr = "";
                 $scope.params.rating = $scope.getSearchStars();
                 for(var prop in $scope.params){
-                    console.log(prop.toString()+" --- "+$scope.params[prop]);
-                    if($scope.params.hasOwnProperty(prop)){
-                        if(modifyValue.indexOf(prop) !== -1){
+                   if($scope.params.hasOwnProperty(prop)){
+                        if(modifyValue.indexOf(prop) !== -1)
+                        {
                             var val = ($scope.params[prop] == true) ? 1:0;
                             var attr = prop + '=' + val +'&'
                             searchStr += attr;
                         }
-                        else{
+                        else
+                        {
                             searchStr += (prop + '=' + encodeURIComponent($scope.params[prop])+'&');
                         }
                     }

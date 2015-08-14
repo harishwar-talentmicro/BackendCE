@@ -40,15 +40,17 @@
                             <div class="input-group-btn">
                                 <!-- Change Location btn -->
                                 <button type="button"
+                                        data-toggle="tooltip"
                                         class="btn btn-info"
                                         title="Click to change Search Location"
+                                        data-placement="left"
                                         ng-click="modalVisibility()">
                                     <i class="fa fa-map-marker"></i> <b class="normal-view-buttons">Location</b>
                                 </button>
                             </div>
 
-                            <input id="searchTextField" type="text" placeholder="" ng-model="params.searchTerm" ng-keypress="triggerSearchOnEnterKey($event.keyCode)"
-                                   class="form-control width-search-bar dropdown-toggle" aria-label="..." data-toggle="dropdown">
+                            <input id="searchTextField" type="text" placeholder="Type your Skills to locate nearest Jobs" ng-model="params.searchTerm" ng-keypress="triggerSearchOnEnterKey($event.keyCode)"
+                                   class="form-control width-search-bar dropdown-toggle" aria-label="..." data-toggle="dropdown" />
 
                             <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="margin-left: 32%;" ng-show="(params.searchType == 2) && (KeyWords.length > 0) && (params.searchTerm.length)">-->
 
@@ -61,19 +63,7 @@
                                 <button ng-click="triggerSearch()" type="button" class="btn btn-warning" title="search"><i class="fa fa-search"></i> </button>
                             </div>
                         </div>
-
-
                     </div>
-                    <!-- Toggle buttons for switching betweeen maps and list -->
-                    <!--<ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown p8">
-                            &lt;!&ndash; Select All BTN &ndash;&gt;
-                            <div class="btn-group">
-                                <button class="btn btn-default" ng-click="toggleMapView(false)"><i class="fa fa-list"></i> List View</button>
-                                <button class="btn btn-default" ng-click="toggleMapView(true)"><i class="fa fa-map-marker"></i> Map View</button>
-                            </div>
-                        </li>
-                    </ul>-->
                 </div>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
@@ -149,7 +139,7 @@
                                 <span disabled class="input-group-addon no-padding-and-border">
                                     <button class="btn btn-primary btn-sm form-control">Experience</button>
                                 </span>
-                                <input type="text" class="form-control" ng-model="params.experience" placeholder="Experience" />
+                                <input type="text" numbers-only maxlength="2" class="form-control text-right" ng-model="params.experience" placeholder="Your experience in years" />
                                 <span class="input-group-addon no-padding-and-border">
                                     <button disabled class="btn btn-default btn-sm form-control">Yrs</button>
                                 </span>
@@ -214,6 +204,23 @@
                 </div>
 
                 <!-- Filter by location -->
+                <div class="job-filter-content text-right" ng-show="filter.location.length > 0">
+                    <div class="filter-content-heading container">
+                        <span class="filter-heading">
+                            <button class="btn btn-primary btn-sm" ng-click="triggerSearch(1)" >
+                                Apply Filters  <i class="fa fa-arrow-circle-right"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="job-filter-content" ng-show="filter.location.length > 0">
+                    <div class="location-individual pointer" ng-click="filterMyCollege(filterCollege)">
+                        <i class="fa" ng-class="filterCollege?'fa-check-square':'fa-square-o'"></i> My College Job Only
+                    </div>
+                </div>
+
+
                 <div class="job-filter-content" ng-show="filter.location.length > 0">
                     <!-- filters goes here -->
                     <div class="filter-content-heading container">
@@ -277,13 +284,7 @@
                 <!-- Filter by Institute -->
                 <div class="job-filter-content">
                     <!-- filters goes here -->
-                    <div class="filter-content-heading container">
-                        <span class="filter-heading">
-                            <div class="location-individual pointer" ng-click="filterMyCollege(filterCollege)">
-                                <i class="fa" ng-class="filterCollege?'fa-check-square':'fa-square-o'"></i> My College Only
-                            </div>
-                        </span>
-                    </div>
+
                 </div>
 
                 <!-- Apply filter button goes here -->
@@ -310,7 +311,9 @@
                             </div>
                             <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12 text-right normal-view-buttons">
                                 <div ng-click="$event.stopPropagation()">
-                                    &nbsp;<button class="btn btn-primary btn-sm" ng-click="applyForJob(job.tid)">APPLY</button>
+                                    &nbsp;<span ng-show="_userInfo.Type == 1">
+                                            <button class="btn btn-primary btn-sm" ng-hide="job.hide" ng-click="applyForJob(job.tid,$index)">APPLY</button>
+                                        </span>
                                 </div>
                             </div>
                         </div>
