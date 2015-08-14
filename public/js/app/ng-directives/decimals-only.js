@@ -23,10 +23,18 @@ angular.module('ezeidApp').directive('decimalsOnly', function(){
         link : function(scope,element,attrs,model){
             element.on('keypress',function(e){
 
-                if((e.keyCode < 48 || e.keyCode > 57) && e.keyCode !== 46){
-                    return false;
+                console.log(e);
+                //if((e.which < 48 || e.which > 57) && e.which !== 46){
+                //    return false;
+                //}
+                if((e.which < 48 || e.which > 57) && e.which !== 46){
+                    if(e.which == 0 || e.which == 8){
+                    }
+                    else{
+                        return false;
+                    }
                 }
-                else if(e.keyCode == 46){
+                else if(e.which == 46){
                     var elemval = element.val();
                     if(elemval.split('').indexOf('.') !== -1){
                         return false;
