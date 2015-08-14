@@ -104,13 +104,11 @@ angular.module('ezeidApp').
                 /* load normal messages based on msg ID */
                 if($routeParams.id)
                 {
-                    console.log("ID");
                     loadGroupMessage();
                 }
                 /* load message specific to group or Ezeone id *///@todo
                 else
                 {
-                    console.log("msg");
                     loadFullViewMessageCall();
                 }
 
@@ -138,7 +136,25 @@ angular.module('ezeidApp').
             function loadGroupMessage()
             {
                 loadGroupMessageThreadApi().then(function(data){
+
                         var message = data;
+                        if($routeParams.type == 0)
+                        {
+                           message = data.messages;
+                        }
+
+                        if(!message || !message.length > 0)
+                        {
+                            $scope.totalMessage = 0;
+                            paginationVisibility();
+                            return;
+                        }
+
+                        $scope.totalMessage = message[0].count;
+
+                        /* pagination reconfigration */
+                        paginationVisibility();
+
                         if($routeParams.type && $routeParams.type == 0)
                         {
                             message = data.messages;
@@ -151,11 +167,29 @@ angular.module('ezeidApp').
 
                         if(!message.length > 0)
                             return;
+
+                        message = reverseArray(message);
                         $scope.messageData = message;
                     },
                     function(){
                         redirectInboxPage();
                     });
+            }
+
+            function reverseArray(data)
+            {
+                if(!data || !data.length > 0)
+                    return;
+
+                var arr = [];
+                var len = data.length;
+                for(var i = 0;i < len;i++)
+                {
+                    arr.push(data[len - (i+1)]);
+                }
+
+
+                return arr;
             }
 
             /**
@@ -269,7 +303,7 @@ angular.module('ezeidApp').
             {
                 $scope.pageCount += $scope.pageSize;
                 /* trigger next results */
-                loadOutboxMessage();
+                loadMorePagination();
                 paginationVisibility();
             }
 
@@ -280,7 +314,7 @@ angular.module('ezeidApp').
             {
                 $scope.pageCount -= $scope.pageSize;
                 /* trigger previous results */
-                loadOutboxMessage();
+                //loadOutboxMessage();
                 paginationVisibility();
             }
 
@@ -291,6 +325,7 @@ angular.module('ezeidApp').
             $scope.paginationPreviousVisibility = true;
             function paginationVisibility()
             {
+                console.log("pagination called");
                 var totalResult = parseInt($scope.totalMessage);
                 var currentCount = parseInt($scope.pageCount);
                 var resultSize = parseInt($scope.pageSize);
@@ -315,11 +350,29 @@ angular.module('ezeidApp').
                 else{
                     $scope.paginationNextVisibility = true;
                     $scope.paginationPreviousVisibility = true;
-
                 }
             };
 
+            function loadMorePagination()
+            {
+                if($routeParams.id)
+                {
+                    loadGroupMessageThreadApi().then(function(data){
+                        var message = data;
+                        if($routeParams.type == 0)
+                        {
+                            message = data.messages;
+                        }
+                        if(!message || !message.length > 0)
+                            return;
 
+                        //message = reverseArray(message);
+                        message.forEach(function(data){
+                            $scope.messageData.unshift(data);
+                        });
+                    });
+                }
+            }
 
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
