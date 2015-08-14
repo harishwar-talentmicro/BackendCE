@@ -1865,7 +1865,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                         var query = 'CALL pLoadMessagesofGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
+                            //console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
@@ -2208,6 +2208,7 @@ MessageBox.prototype.getGroupInfo = function(req,res,next){
 
     var token = req.query.token;
     var groupId = parseInt(req.query.group_id); // tid of group
+    var type =req.query.type;     //0=Group info,1=ezeone info,2=messageInfromation
 
     var responseMessage = {
         status: false,
@@ -2237,7 +2238,7 @@ MessageBox.prototype.getGroupInfo = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId);
+                        var queryParams = st.db.escape(groupId)+','+st.db.escape(type);
                         var query = 'CALL pGetGroupInfn(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -2248,7 +2249,7 @@ MessageBox.prototype.getGroupInfo = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'GroupInfromation loaded successfully';
-                                            responseMessage.data = getResult[0][0];
+                                            responseMessage.data = getResult[0];
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetGroupInfo: GroupInfromation loaded successfully');
                                         }
