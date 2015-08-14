@@ -69,6 +69,10 @@ angular.module('ezeidApp').
             $scope.composeMessageTemplate = "";
             $scope.detailMessagModuleLoaded = true;
             $scope.responseMsgId = 0;
+            /* pushing group data */
+            $scope.isGroupLoaded = false;
+            $scope.groupDetailsData = [];
+            $scope.groupName = "";
 
             $scope.pageSize = 10;
             $scope.pageCount = 0;
@@ -87,35 +91,42 @@ angular.module('ezeidApp').
             function loadFullViewMessage()
             {
                 /* load normal messages based on msg ID */
-
                 if(!$routeParams.id)
                 {
                     loadFullMessageApi().then(function(data){
-                            console.log(data);
                             $scope.messageData = data;
                         },
                         function()
                         {
                             redirectInboxPage();
                         });
-                    return;
                 }
                 /* load message specific to group or Ezeone id *///@todo
                 else
                 {
                     loadGroupMessageThreadApi().then(function(data){
-                            console.log(data);
-                            if(!data.length > 0)
-                                return;
+                            var message = data;
+                            if($routeParams.type && $routeParams.type == 0)
+                            {
+                                message = data.messages;
+                                $scope.isGroupLoaded = true;
+                            }
+                            else
+                            {
+                                $scope.isGroupLoaded = false;
+                            }
 
-                            console.log(data);
-                            $scope.messageData = data;
-                            console.log($scope.messageData);
+                            if(!message.length > 0)
+                                return;
+                            $scope.messageData = message;
                         },
                         function(){
                             console.log("Invalide Code");
                         });
                 }
+
+                /* set the group data */
+
             }
 
             /**
@@ -271,7 +282,7 @@ angular.module('ezeidApp').
                         defer.reject();
                         return defer.promise;
                     }
-                    defer.resolve(resp.data.messages);
+                    defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
