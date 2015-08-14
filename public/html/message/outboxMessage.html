@@ -76,7 +76,7 @@
                     {{msg.receiver | textLength:10}}
                 </td>
                 <td>
-                    {{msg.Message | textLength:20}}
+                    {{convertHtmlToText(msg.Message,10)}}
                 </td>
                 <td>
                     <span ng-show="msg.isattachment == 1" class="glyphicon glyphicon-paperclip"></span>

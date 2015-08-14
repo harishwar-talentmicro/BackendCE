@@ -48,8 +48,13 @@
                 <input type="text" ng-model="composeMsg.MessageFrom" class="form-control" id="from" placeholder="From">
             </div>
 
-            <div class="p-bottom-4">
-                <textarea class="form-control p-bottom-4" ng-model="composeMsg.MessageBody" placeholder="Your message" rows="5"></textarea>
+            <div class="p-bottom-4 bg-white">
+                <div text-angular ng-model="composeMsg.MessageBody"
+                     name="demo-editor"
+                     ta-text-editor-class="border-around"
+                     ta-html-editor-class="border-around">
+                </div>
+                <!--<textarea class="form-control p-bottom-4" ng-model="composeMsg.MessageBody" placeholder="Your message" rows="5"></textarea>-->
             </div>
             <!-- error message of textarea field goes here -->
             <div class="message-body-error text-danger"

@@ -573,6 +573,20 @@ angular.module('ezeidApp').
                 return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
             };
 
+            $scope.convertHtmlToText = function(html,length)
+            {
+                return strip(html,length);
+            }
+
+            function strip(html,length)
+            {
+                var tmp = document.createElement("DIV");
+                tmp.innerHTML = html;
+                var text = tmp.textContent || tmp.innerText || "";
+                if(text.length > length)
+                    return text.substr(0,length)+"...";
+                return text.substr(0,length);
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////PAGINATION CODE/////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////

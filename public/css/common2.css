@@ -3387,7 +3387,7 @@ sup.tm{
 
 .hpw .message-detail-text:hover
 {
-    background-color: #108078;
+    background-color: #F0FDFC;
     color: #fff !important;
 }
 
@@ -3412,4 +3412,9 @@ sup.tm{
 {
     color: black;
     text-shadow: 1px 1px 1px #D6D5D5;
+}
+
+.hpw .bg-white
+{
+    background-color: #fff !important;
 }
