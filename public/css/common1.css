@@ -13,6 +13,10 @@
     padding: 0px;
     border: 0px;
 }
+.topMarginButton
+{
+    margin-top: 1%;
+}
 .navbar-brand
 {
     height: 35px;
@@ -714,10 +718,7 @@ body {
 {
     margin-top: 2%;
 }
-.topMarginButton
-{
-    margin-top: 1%;
-}
+
 .setTableFixHeight
 {
     /*height: 300px;*/

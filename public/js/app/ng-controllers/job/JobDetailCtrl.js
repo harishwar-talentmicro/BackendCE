@@ -80,7 +80,8 @@ angular.module('ezeidApp').
                     url : GURL + 'job_details',
                     method : 'GET',
                     params : {
-                        job_id : _jobID
+                        job_id : _jobID,
+                        token : $rootScope._userInfo.Token
                     }
                 }).success(function(resp){
                     $scope.$emit('$preLoaderStop');
@@ -174,12 +175,9 @@ angular.module('ezeidApp').
              * Apply for job
              * @param _tid
              */
+            $scope.showButtons = true;
             $scope.applyForJob = function(_tid){
                 $scope.$emit('$preLoaderStart');
-                $scope.jobData = {
-                    token : $rootScope._userInfo.Token,
-                    job_id : $scope.jobTid
-                }
                 $http({
                     method: "POST",
                     url: GURL + 'job_apply',
@@ -191,13 +189,39 @@ angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     if(data.status)
                     {
-                        $location.path("/");
-                        Notification.success({ message: "Applied Success..", delay : 2000});
+                        if(data.data.Status == 2)
+                        {
+                            $scope.modalVisibleResume = true;
+                        }
+                        else
+                        {
+                            $scope.showButtons = false;
+                            Notification.success({ message: "Applied Success..", delay : 2000});
+                        }
                     }
                 })
                 .error(function(data, status, headers, config) {
                     $scope.$emit('$preLoaderStop');
                 });
             };
+
+            /* modal box for Upload resume */
+            $scope.modalResume = {
+                title: 'Upload Resume',
+                class: 'business-manager-modal'
+            };
+
+            $scope.modalVisibleResume = false;
+            $scope.modalVisibleResumeBox = function () {
+                /* toggle map visibility status */
+                $scope.modalVisibleResume = !$scope.modalVisibleResume;
+            };
+
+            $scope.openResumeTab = function ()
+            {
+                $window.open('/profile-manager/resume', '_blank');
+            };
+
+
 
         }]);

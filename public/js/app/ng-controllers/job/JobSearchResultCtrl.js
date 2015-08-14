@@ -1186,16 +1186,16 @@ angular.module('ezeidApp').
                         $scope.$emit('$preLoaderStop');
                         if(data.status)
                         {
-
-                            console.log($scope.resultData);
-                            console.log(_index);
-
-                            $scope.resultData[_index].hide = 1;
-
-
-
-                          //  initiateSearch();
-                            Notification.success({ message: "Applied Success..", delay : 2000});
+                            if(data.data.Status == -2)
+                            {
+                                $scope.modalVisibleResume = true;
+                            }
+                            else
+                            {
+                                //  initiateSearch();
+                                $scope.resultData[_index].hide = 1;
+                                Notification.success({ message: "Applied Success..", delay : 2000});
+                            }
                         }
                     })
                 .error(function(data, status, headers, config) {
@@ -1215,6 +1215,23 @@ angular.module('ezeidApp').
                     return [lat,lng];
                 }
             }
+
+            /* modal box for Upload resume */
+            $scope.modalResume = {
+                title: 'Upload Resume',
+                class: 'business-manager-modal'
+            };
+
+            $scope.modalVisibleResume = false;
+            $scope.modalVisibleResumeBox = function () {
+                /* toggle map visibility status */
+                $scope.modalVisibleResume = !$scope.modalVisibleResume;
+            };
+
+            $scope.openResumeTab = function ()
+            {
+                $window.open('/profile-manager/resume', '_blank');
+            };
 
 
         }]);

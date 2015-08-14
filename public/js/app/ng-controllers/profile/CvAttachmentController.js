@@ -106,8 +106,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
     };
 
-   $scope.uploadFile = function (files) {
+    $scope.showSelectedText = false;
+    $scope.uploadFile = function (files) {
         $scope.DocumentToUpload = files;
+
+       $scope.showSelectedText = true;
+       console.log($scope.DocumentToUpload.length);
     };
 
     var fileToDataURL = function (file) {
@@ -333,15 +337,19 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         $scope.selectedCategories.push(parseInt($scope.categoryArray[nCount]));
                     }
 
-                    if((res.job_location[0].country) && (res.job_location[0].latitude) && (res.job_location[0].location_title))
+                    if(res.job_location.length)
                     {
-                        for (var nCount = 0; nCount < res.job_location.length; nCount++)
+                        if((res.job_location[0].country) && (res.job_location[0].latitude) && (res.job_location[0].location_title))
                         {
-                            delete res.job_location[nCount].CityID;
-                            $scope.mainLocationArray.push(res.job_location[nCount]);
-                            $scope.locationArrayString.push(res.job_location[nCount].location_title);
+                            for (var nCount = 0; nCount < res.job_location.length; nCount++)
+                            {
+                                delete res.job_location[nCount].CityID;
+                                $scope.mainLocationArray.push(res.job_location[nCount]);
+                                $scope.locationArrayString.push(res.job_location[nCount].location_title);
+                            }
                         }
                     }
+
 
                     for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                     {
@@ -414,10 +422,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     if(res.data[0].CVDocFile == "")
                     {
                         $scope.showLink = false;
+                        $scope.showSelectedText = false;
                     }
                     else
                     {
                         $scope.showLink = true;
+                        $scope.showSelectedText = true;
                     }
                 }
                 else
@@ -435,6 +445,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     $scope.editMode[0] = true;
                     CVAttachCtrl._CVInfo.Status = 1;
                     $scope.showLink = false;
+                    $scope.showSelectedText = false;
                 }
            });
     };

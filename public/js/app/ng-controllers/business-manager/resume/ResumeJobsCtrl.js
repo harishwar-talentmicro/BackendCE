@@ -235,16 +235,36 @@
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
                 }
-                if($scope.phone.length < 1){
-                    err.push('Phone is empty');
+                if(($scope.phone.length < 1) && (!$scope.emailContact))
+                {
+
+                    err.push('Phone or Email Required');
+                    /*if($scope.emailContact)
+                    {
+                        if($scope.isWrongEmailPatternFrom)
+                        {
+                            err.push('Not valid email!');
+                        }
+                    }
+                    else
+                    {
+                        err.push('Phone or Email Required');
+                    }*/
                 }
-                if(!$scope.emailContact){
+               /* if(!$scope.emailContact){
                     err.push('Email is empty');
-                }
-                if($scope.isWrongEmailPatternFrom)
+                }*/
+               /* if($scope.emailContact)
+                {
+                    if($scope.isWrongEmailPatternFrom)
+                    {
+                        err.push('Not valid email!');
+                    }
+                }*/
+                /*if($scope.isWrongEmailPatternFrom)
                 {
                     err.push('Not valid email!');
-                }
+                }*/
                 if($scope.jobCategori == 0){
                     err.push('Please select Job category');
                 }
@@ -319,7 +339,7 @@
             function getJobCategories()
             {
                 $http({
-                    url : GURL + 'ewmGetCategory',
+                    url : GURL + 'ewmGetFunctions',
                     method : 'GET',
                     params : {
                         LangID : 1
