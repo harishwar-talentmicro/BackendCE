@@ -3388,7 +3388,7 @@ sup.tm{
 .hpw .message-detail-text:hover
 {
     background-color: #F0FDFC;
-    color: #fff !important;
+    /*color: #fff !important;*/
 }
 
 .hpw .chatting-attachment-btn
