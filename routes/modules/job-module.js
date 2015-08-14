@@ -1636,6 +1636,106 @@ Job.prototype.getListOfJobs = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnJobRefresh
+ * Method : put
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get job refresh
+ */
+Job.prototype.jobRefresh = function(req,res,next){
+    var _this = this;
+
+    var token = req.body.token;
+    var jobId = req.body.job_id;
+console.log(req.body);
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!jobId){
+        error['jobId'] = 'Invalid job ID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        console.log('CALL pRefreshJob(' + st.db.escape(jobId) + ')');
+                        st.db.query('CALL pRefreshJob(' + st.db.escape(jobId) + ')', function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Jobs refreshed successfully';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnJobRefresh: Jobs refreshed successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Jobs not refreshed';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnJobRefresh:Jobs not refreshed');
+                                    }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnJobRefresh: error in getting JobRefresh :' + err);
+                            }
+                        });
+                    }
+                    else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('FnGetGroupInfo: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server : 'Internal server error'
+                        };
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('FnGetGroupInfo:Error in processing Token' + err);
+                    }
+                });
+            }
+
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnJobRefresh ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = Job;

@@ -1186,6 +1186,7 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
     var messageID  = req.body.message_id;
     var status  = req.body.status;
     var token  = req.body.token;
+    var isMessage = req.body.ismessage_open ? req.body.ismessage_open : 0;
 
     var responseMessage = {
         status: false,
@@ -1219,7 +1220,8 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status)+ ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status)+ ',' + st.db.escape(token)
+                            + ',' + st.db.escape(isMessage);
 
                         var query = 'CALL PchangeMessageActivity(' + queryParams + ')';
                         console.log(query);
@@ -1863,16 +1865,31 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                         var query = 'CALL pLoadMessagesofGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Messages loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnLoadMessages: Messages loaded successfully');
+                                        if (groupType == 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Messages loaded successfully';
+                                            responseMessage.data = {
+                                                group_details: getResult[0],
+                                                messages: getResult[1]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnLoadMessages: Messages loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Messages loaded successfully';
+                                            responseMessage.data = getResult[0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnLoadMessages: Messages loaded successfully');
+                                        }
                                     }
+
                                     else {
                                         responseMessage.message = 'Messages not loaded';
                                         res.status(200).json(responseMessage);
@@ -2176,6 +2193,128 @@ MessageBox.prototype.getMessageAttachment = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetGroupInfo
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @service-param token <varchar>
+ * @service-param group_id <int>
+ * @description api code for get group infromation
+ */
+MessageBox.prototype.getGroupInfo = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var groupId = parseInt(req.query.group_id); // tid of group
+
+    var responseMessage = {
+        status: false,
+        error: null,
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!groupId){
+        error['groupId'] = 'Invalid groupId';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(groupId);
+                        var query = 'CALL pGetGroupInfn(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0){
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'GroupInfromation loaded successfully';
+                                            responseMessage.data = getResult[0][0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetGroupInfo: GroupInfromation loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'GroupInfromation not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetGroupInfo:GroupInfromation not loaded');
+                                        }
+
+                                    }
+                                    else {
+                                        responseMessage.message = 'GroupInfromation not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetGroupInfo:GroupInfromation not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'GroupInfromation not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetGroupInfo:GroupInfromation not loaded');
+                                }
+
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetGroupInfo: error in getting GroupInfromation:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetGroupInfo: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetGroupInfo:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetGroupInfo ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = MessageBox;
