@@ -17,5 +17,5 @@ NotificationMqtt.prototype.publish = function(){
 };
 
 NotificationMqtt.prototype.createQueue = function(){
-    
+
 };

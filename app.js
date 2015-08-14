@@ -310,9 +310,6 @@ app.get('/legal.html',function(req,res,next){
 
 
 
-app.get('/test',function(req,res){
-    res.status(200).json(req.cookies);
-});
 app.get('/:page/:subpage',function(req,res){
     res.sendFile(__dirname + '/public/html/index.html');
 });
