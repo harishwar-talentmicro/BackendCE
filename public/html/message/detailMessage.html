@@ -21,6 +21,19 @@
         </div>
 
         <hr class="style-two">
+
+        <!-- Load more button goes her -->
+        <div class="container no-right-padding p-bottom-20">
+            <div class="col-lg-12 text-right no-right-padding">
+                <button class="btn btn-danger no-radius"
+                        ng-show="paginationNextVisibility"
+                        ng-click="paginationNextClick()">
+                    <i class="fa fa-arrow-circle-up btn-spin"></i> Load More..
+                </button>
+            </div>
+        </div>
+
+        <!-- All messages goes here -->
         <div class="row setRowLeftRightMarginZero">
             <!-- individual msgs -->
             <div class="container p-bottom-10" ng-repeat="msg in messageData track by $index">

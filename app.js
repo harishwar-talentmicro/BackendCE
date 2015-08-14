@@ -236,6 +236,7 @@ app.get('/validate_group_member',LocationManager.FnValidateGroupMember);
 app.get('/message_full_view',LocationManager.FnViewMessage);
 app.get('/message_attachment',LocationManager.FnGetMessageAttachment);
 app.get('/group_info',LocationManager.FnGetGroupInfo);
+app.get('/unread_message_count',LocationManager.FnCountOfUnreadMessage);
 
 //Planner module
 app.get('/tasks',LocationManager.FnGetAllTask);

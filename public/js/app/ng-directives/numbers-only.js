@@ -22,8 +22,12 @@ angular.module('ezeidApp').directive('numbersOnly', function(){
 
         link : function(scope,element,attrs,model){
             element.on('keypress',function(e){
-                if(e.keyCode < 48 || e.keyCode > 57){
-                    return false;
+                if((e.which < 48 || e.which > 57)){
+                    if(e.which == 0 || e.which == 8){
+                    }
+                    else{
+                        return false;
+                    }
                 }
             });
         }

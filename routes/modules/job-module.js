@@ -909,7 +909,7 @@ Job.prototype.appliedJobList = function(req,res,next){
  */
 Job.prototype.getJobDetails = function(req,res,next){
     var _this = this;
-
+    var token = req.query.token;
     var jobId = req.query.job_id;
 
     var responseMessage = {
@@ -933,8 +933,13 @@ Job.prototype.getJobDetails = function(req,res,next){
     }
     else {
         try {
-            console.log('CALL pgetjobDetails(' + st.db.escape(jobId) + ')');
-            st.db.query('CALL pgetjobDetails(' + st.db.escape(jobId) + ')', function (err, getResult) {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =  st.db.escape(jobId) + ',' + st.db.escape(token);
+                        var query = 'CALL pgetjobDetails(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult) {
                         if(getResult[0].length > 0){
@@ -964,6 +969,26 @@ Job.prototype.getJobDetails = function(req,res,next){
                     };
                     res.status(500).json(responseMessage);
                     console.log('FnGetJobDetails: error in getting Job Details :' + err);
+                }
+            });
+        }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnLoadMessages: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnLoadMessages:Error in processing Token' + err);
                 }
             });
         }
