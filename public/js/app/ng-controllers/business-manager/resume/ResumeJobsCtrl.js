@@ -229,9 +229,9 @@
                 if($scope.salaryTo.length < 1){
                     err.push('Salary To is empty');
                 }
-                if($scope.jobType == 0){
+              /*  if($scope.jobType == 0){
                     err.push('Please select Job type');
-                }
+                }*/
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
                 }
@@ -398,7 +398,7 @@
                         {
                             delete $scope.jobData[_index].locationArray[nCount].jobid;
                             $scope.mainLocationArray.push($scope.jobData[_index].locationArray[nCount]);
-                            $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].Locname);
+                            $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].location_title);
                         }
 
                         $scope.selectedEducations = [];
@@ -852,7 +852,7 @@
                // $scope.triggerSearch(1);
                  getPostedJob();
                 $scope.paginationVisibility();
-            }
+            };
 
             /**
              * load the previous results
@@ -864,7 +864,7 @@
                // $scope.triggerSearch(1);
                 getPostedJob();
                 $scope.paginationVisibility();
-            }
+            };
 
             /**
              * Toggle the visibility of the pagination buttons
@@ -898,8 +898,35 @@
                     $scope.paginationNextVisibility = true;
                     $scope.paginationPreviousVisibility = true;
                 }
-            }
+            };
 
+            $scope.refreshJob = function(_jobID)
+            {
+                if(_jobID)
+                {
+                    $scope.$emit('$preLoaderStart');
+                    $http({
+                        url : GURL + 'refresh_job',
+                        method : 'PUT',
+                        data : {
+                            token : $rootScope._userInfo.Token,
+                            job_id : _jobID
+                        }
+                    }).success(function(resp){
+                        $scope.$emit('$preLoaderStop');
+                        if(resp.status)
+                        {
+                            getPostedJob();
+                            $scope.jobSearchTerm = "";
+                            $scope.jobFilterStatus = 0;
+                        }
+                    })
+                    .error(function(err)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                    });
+                }
+            };
 
         }]);
 })();

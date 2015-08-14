@@ -106,7 +106,6 @@ angular.module('ezeidApp').
             $scope.composeMessage = "html/message/composeMessage.html";
             $scope.detailMessage = "html/message/detailMessage.html";
             $scope.chatMessage = "html/chat/chatMessage.html";
-
             if($routeParams.action)
             {
                 if($routeParams.action == 'compose')
@@ -426,7 +425,6 @@ angular.module('ezeidApp').
                             setGroupListData(val);
                         }
                     });
-                    console.log($scope.groupList);
                 });
             }
 

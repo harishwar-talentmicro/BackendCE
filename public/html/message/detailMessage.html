@@ -3,16 +3,19 @@
         <div class="row setRowLeftRightMarginZero">
             <div class="pagination-btn">
                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setLeftRightPaddingZero topMarginButton">
-                    <span class="text-bolder"><i class="fa fa-arrow-circle-down text-primary"></i> FROM: </span>
-                    <button class="btn btn-default btn-xs" disabled>@KRUNALPAID</button>
+                    <!--<span class="text-bolder"><i class="fa fa-arrow-circle-down text-primary"></i> FROM: </span>-->
+                    <!-- Group name -->
+                    <button class="btn btn-danger btn-xs" disabled>{{groupData.name}}</button>
                 </div>
 
-                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setLeftRightPaddingZero text-right">
-                    <span>12:09AM</span>
-                    <button class="btn btn-default" title="Download Attachment"><i class="fa fa-paperclip"></i></button>
-                    <button class="btn btn-default" title="Reply"><i class="fa fa-reply"></i></button>
-                    <button class="btn btn-default" title="Forward"><i class="fa fa-share"></i></button>
-                    <button class="btn btn-default" title="Delete"><i class="fa fa-trash-o"></i></button>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setLeftRightPaddingZero text-right" ng-show="isGroupLoaded">
+                    <i ng-hide="groupData.type == 1" class="text text-dark-gray">{{groupData.date}}</i>
+                </div>
+                <div class="container" ng-show="isGroupLoaded">
+                    <div class="col-lg-12 p-top-10">
+                        <!-- Group description goes here -->
+                        <p ng-show="groupData.type == 0" class="group-description">{{groupData.desc}}</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -36,7 +39,7 @@
                 <div class="col-lg-5 text-right no-padding chat-style-sender-msg">
                     {{convertTimeToLocal(msg.CreatedDate)}} <i class="fa fa-clock-o"></i>
                 </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 message-detail-text chat-style-inbox">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 message-detail-text chat-style-inbox chat-message">
                     {{msg.message}}
                 </div>
                 <!-- Attachments and other btns -->
@@ -58,7 +61,7 @@
             </div>
 
             <!-- No message available warning -->
-            <div class="warning message" ng-show="!messageData.length > 0">
+            <div class="warning message p-bottom-10" ng-show="!messageData.length > 0">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 message-detail-text chat-style-inbox">
                     <span>
                         <i class="fa fa-exclamation-circle"></i> No Previous Message Available.
@@ -74,13 +77,14 @@
                         ng-hide="composeMessageTemplate.length > 0"><i class="fa fa-envelope"></i> Message</button>
 
                 <!--<button class="btn btn-primary"-->
-                        <!--ng-hide="messageData.length > 0"-->
-                        <!--ng-click="loadReplyMsgForm()"-->
-                        <!--ng-hide="composeMessageTemplate.length > 0"><i class="fa fa-envelope"></i> Message</button>-->
+                <!--ng-hide="messageData.length > 0"-->
+                <!--ng-click="loadReplyMsgForm()"-->
+                <!--ng-hide="composeMessageTemplate.length > 0"><i class="fa fa-envelope"></i> Message</button>-->
             </div>
-
-            <!-- compose message HTML goes here -->
-            <div ng-include="composeMessageTemplate"></div>
+            <div class="col-lg-12">
+                <!-- compose message HTML goes here -->
+                <div ng-include="composeMessageTemplate"></div>
+            </div>
         </div>
     </div>
 </section>

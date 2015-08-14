@@ -78,9 +78,9 @@
                         <b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}">{{job.jobcode | textLength:7}}</b>
                     </small>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success">
-                        <b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:50}}</b>
+                        <b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:45}}</b>
                     </small>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
@@ -98,14 +98,12 @@
                         <span class="glyphicon glyphicon-pencil"></span>
                         Edit
                     </button>
-                    <!--<div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                            <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
-                                <span class="glyphicon glyphicon-pencil"></span>
-                                Edit
-                            </button>
-                        </div>
-                    </div>-->
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
+                    <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="refreshJob(job.tid)" data-original-title="Refresh">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        Refresh
+                    </button>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix text-center">
                     <small class="text-success">
@@ -190,6 +188,7 @@
                             <button type="button" class="btn btn-primary" ng-disabled="disabledAddLocation" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
                         </div>
                     </div>
+                    {{locationArrayString}}
                     <div class="row topMargin-three setBorderColor setRowLeftRightMarginZero locationListBox" ng-show="locationArrayString.length">
                         <div class="row setRowLeftRightMarginZero" ng-repeat="location in locationArrayString track by $index">
                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
@@ -370,7 +369,7 @@
                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 ">
                     <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="87" aria-describedby="sizing-addon1"/>
                 </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer">
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 fotterButtonContainer setLeftRightPaddingZero">
                     %
                 </div>
             </div>

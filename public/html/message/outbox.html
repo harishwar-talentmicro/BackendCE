@@ -493,18 +493,27 @@
     <modal mtitle="editGroupModalBox.title" mclass="editGroupModalBox.class" visible="editGroupModalVisibility">
         <div class="container">
             <!-- edit form -->
-            <div class="col-lg-12 p-bottom-10">
+            <div class="col-lg-12 p-bottom-4">
                 <div class="input-group">
                     <div class="input-group-addon">
                         <i class="fa fa-user"></i> Group Name
                     </div>
-                    <input type="text" ng-model="editGroupModalBox.groupName" class="form-control ng-pristine ng-valid ng-touched" >
+                    <input type="text"
+                           ng-model="editGroupModalBox.groupName"
+                           class="form-control ng-pristine ng-valid ng-touched"
+                           ng-keypress="($event.charCode==13)?validateGroup(editGroupModalBox.groupName):return">
                     <div class="input-group-addon no-padding-and-border">
-                        <button class="btn btn-default no-radius">
+                        <button class="btn btn-default no-radius"
+                                ng-click="validateGroup(editGroupModalBox.groupName)">
                             <i class="fa fa-check"></i> Check
                         </button>
                     </div>
                 </div>
+            </div>
+            <!-- group name error goes here -->
+            <div class="col-lg-12 p-bottom-10" ng-show="validateGroupNameError.nameErrorVisibility">
+                <span class="text text-danger">
+                    <i class="fa fa-exclamation-triangle text-danger"></i> {{validateGroupError[validateGroupNameError.status]}}</span>
             </div>
             <!-- description goes here -->
             <div class="col-lg-12 p-bottom-10">
@@ -524,7 +533,10 @@
             </div>
             <!-- save btn -->
             <div class="col-lg-12 text-right">
-                <button ng-click="updateGroup()" class="btn btn-primary">Save</button>
+                <button ng-click="updateGroup()"
+                        class="btn btn-primary"
+                        ng-disabled="validateGroupNameError.status < 3">
+                        Save</button>
             </div>
             <br>
         </div>
