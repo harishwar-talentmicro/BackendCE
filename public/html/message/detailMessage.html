@@ -5,22 +5,16 @@
                 <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setLeftRightPaddingZero topMarginButton">
                     <!--<span class="text-bolder"><i class="fa fa-arrow-circle-down text-primary"></i> FROM: </span>-->
                     <!-- Group name -->
-                    <button class="btn btn-danger btn-xs" disabled>{{groupName}}</button>
+                    <button class="btn btn-danger btn-xs" disabled>{{groupData.name}}</button>
                 </div>
 
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setLeftRightPaddingZero text-right" ng-show="isGroupLoaded">
-                    <i class="text text-dark-gray">Created 2Years ago.</i>
+                    <i ng-hide="groupData.type == 1" class="text text-dark-gray">{{groupData.date}}</i>
                 </div>
                 <div class="container" ng-show="isGroupLoaded">
                     <div class="col-lg-12 p-top-10">
                         <!-- Group description goes here -->
-                        <p class="group-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                            when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-                            It has survived not only five centuries, but also the leap into electronic typesetting,
-                            remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset
-                            sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like
-                            Aldus PageMaker including versions of Lorem Ipsum.</p>
+                        <p ng-show="groupData.type == 0" class="group-description">{{groupData.desc}}</p>
                     </div>
                 </div>
             </div>
