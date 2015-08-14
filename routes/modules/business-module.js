@@ -2219,7 +2219,7 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
                 if (!err) {
                     if (GetResult) {
                         if (GetResult.length > 0) {
-                            console.log(GetResult[0][0].amount);
+
                             for (var i = 0; i < length; i++)
                             {
                                 total_count = total_count + GetResult[0][i].amount;
