@@ -72,7 +72,17 @@ angular.module('ezeidApp').
             /* pushing group data */
             $scope.isGroupLoaded = false;
             $scope.groupDetailsData = [];
-            $scope.groupName = "";
+
+            $scope.groupName = "";//////////////////@todo
+
+            $scope.groupData = {
+                name:"",
+                id:0,
+                desc:"",
+                type:0,//0-group, 1-individual, 2-msgid
+                date:"",
+                isPublic:0
+            }
 
             $scope.pageSize = 10;
             $scope.pageCount = 0;
@@ -81,6 +91,7 @@ angular.module('ezeidApp').
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             loadFullViewMessage();
+            populateGroupInfo();
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,58 +157,6 @@ angular.module('ezeidApp').
                 $scope.composeMessageTemplate = "html/message/composeMessage.html";
             }
 
-            function setReplyMessageData()
-            {
-                console.log($scope.messageData);
-                /* load the reply data in the form */
-                $scope.receiverArr = [];
-                if(!$scope.messageData || !$scope.messageData.length > 0)
-                {
-                    return false;
-                }
-
-                var groupName = "";
-                /**
-                 * Getting the index of that message from all the array of messages to whom the logged In user would R.E.P.L.Y
-                 */
-
-                index = takeLatestGroupIndexFromMsg();
-
-                /* Fetching out the name of the sender */
-                if($scope.messageData[index].grouptype == 1)//1:EZEONE,0:Group
-                    groupName = $scope.messageData[index].name;
-                else
-                    groupName = $scope.messageData[index].sender;
-
-                /* FOR prepoulating receiver list in reply message DOM */
-                var temp = {
-                    GroupID:$scope.messageData[index].GroupID,
-                    GroupType:$scope.messageData[index].grouptype,
-                    GroupName:groupName
-                };
-
-                $scope.receiverArr.push(temp);
-                $scope.responseMsgId = msgId;
-            }
-
-            /**
-             * Traverse the message and get the sender ID
-             * @returns {*|number}
-             */
-            function takeLatestGroupIndexFromMsg()
-            {
-                console.log($scope.messageData);
-                var loggedInId = $rootScope._userInfo.TID;
-                for(var i = 0; i < $scope.messageData.length; i++)
-                {
-                    console.log(parseInt($scope.messageData[i].senderid), loggedInId)
-                    if(parseInt($scope.messageData[i].senderid) !== loggedInId)
-                    {
-                        return i;
-                    }
-                }
-            }
-
             /**
              * Get appropriate index from group message array
              */
@@ -222,6 +181,65 @@ angular.module('ezeidApp').
                     function(){
                         Notification.error({ message: "Download Failed! Try again later", delay: MsgDelay });
                     });
+            }
+
+            function populateGroupInfo()
+            {
+                var type = 2;
+                var msgId = 0;
+
+                if($routeParams.msg)
+                    msgId = $routeParams.msg;
+                else if($routeParams.id && $routeParams.type)
+                {
+                    type = $routeParams.type;
+                    msgId = $routeParams.id;
+                }
+                /* set id and type */
+                $scope.groupData.type = type;
+                $scope.groupData.id = msgId;
+
+                getGroupInformation(msgId,type).then(function(data){
+                    setGroupData(data);
+                });
+            }
+
+            function setGroupData(data)
+            {
+                if(!data)
+                    return;
+
+                if($routeParams.msg)
+                {
+                    $scope.groupData.name = data[0].sender;
+                    $scope.groupData.date = data[0].createddate;
+                }
+                else if($routeParams.id && $routeParams.type == 0)
+                {
+                    $scope.groupData.name = data[0].groupname;
+                    $scope.groupData.desc = data[0].aboutgroup;
+                    $scope.groupData.isPublic = data[0].autojoin;
+                    $scope.groupData.date = data[0].createddate;
+
+                }
+                else if($routeParams.id && $routeParams.type == 1)
+                {
+                    $scope.groupData.name = data[0].name;
+                }
+
+            }
+
+            function setReplyMessageData()
+            {
+                $scope.receiverArr = [];
+                /* set the receiver's data */
+                var temp = {
+                    GroupID:$scope.groupData.id,
+                    GroupType:$scope.groupData.type,
+                    GroupName:$scope.groupData.name
+                };
+
+                $scope.receiverArr.push(temp);
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
@@ -322,4 +340,40 @@ angular.module('ezeidApp').
                 return defer.promise;
             }
 
+            /**
+             * get the group details of a group or individual
+             * @param tid of group or individual
+             * @param type  - 0 :GroupInfo ID, 1 :Ezeone ID, 2 :Message ID
+             * @returns {*}
+             */
+            function getGroupInformation(tid,type)
+            {
+                console.log(tid,type);
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'group_info',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        group_id : tid,
+                        type : type
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.reject();
+                });
+                return defer.promise;
+            }
         }]);
