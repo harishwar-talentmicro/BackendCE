@@ -2895,3 +2895,10 @@ h4.front-business-form.warning-text{
     background-color: #FFFFFF;
     color: #D20505;
 }
+
+.funnel-image-container{
+    height: 300px;
+    width: 100%;
+    background: url('./images/sales-funnel.png');
+    background-repeat: no-repeat;
+}
