@@ -87,13 +87,12 @@ angular.module('ezeidApp').
             function loadFullViewMessage()
             {
                 /* load normal messages based on msg ID */
-                console.log($routeParams);
 
                 if(!$routeParams.id)
                 {
                     loadFullMessageApi().then(function(data){
-                            $scope.messageData = data;
                             console.log(data);
+                            $scope.messageData = data;
                         },
                         function()
                         {
@@ -105,6 +104,7 @@ angular.module('ezeidApp').
                 else
                 {
                     loadGroupMessageThreadApi().then(function(data){
+                            console.log(data);
                             if(!data.length > 0)
                                 return;
 
@@ -145,21 +145,72 @@ angular.module('ezeidApp').
                     return false;
                 }
 
-                /* set group name */
-                var groupName = 0;
-                if($scope.messageData[0].grouptype == 1)
-                    groupName = $scope.messageData[0].name;
-                else
-                    groupName = $scope.messageData[0].sender;
+                var groupName = "";
+                /**
+                 * Getting the index of that message from all the array of messages to whom the logged In user would R.E.P.L.Y
+                 */
 
+                index = takeLatestGroupIndexFromMsg();
+
+                /* Fetching out the name of the sender */
+                if($scope.messageData[index].grouptype == 1)//1:EZEONE,0:Group
+                    groupName = $scope.messageData[index].name;
+                else
+                    groupName = $scope.messageData[index].sender;
+
+                /* FOR prepoulating receiver list in reply message DOM */
                 var temp = {
-                    GroupID:$scope.messageData[0].GroupID,
-                    GroupType:$scope.messageData[0].grouptype,
+                    GroupID:$scope.messageData[index].GroupID,
+                    GroupType:$scope.messageData[index].grouptype,
                     GroupName:groupName
                 };
+
                 $scope.receiverArr.push(temp);
                 $scope.responseMsgId = msgId;
+            }
 
+            /**
+             * Traverse the message and get the sender ID
+             * @returns {*|number}
+             */
+            function takeLatestGroupIndexFromMsg()
+            {
+                console.log($scope.messageData);
+                var loggedInId = $rootScope._userInfo.TID;
+                for(var i = 0; i < $scope.messageData.length; i++)
+                {
+                    console.log(parseInt($scope.messageData[i].senderid), loggedInId)
+                    if(parseInt($scope.messageData[i].senderid) !== loggedInId)
+                    {
+                        return i;
+                    }
+                }
+            }
+
+            /**
+             * Get appropriate index from group message array
+             */
+            function getGroupDataIndex()
+            {
+                if($routeParams.id)
+                {
+                    console.log("Hi");
+                    var index = $scope.messageData.indexOfWhere('GroupID',$routeParams.id);
+                    return index;
+                }
+            }
+
+            /**
+             * Initiate Download attachment
+             */
+            $scope.initiateDownload = function(tid)
+            {
+                downloadAttachmentApi(tid).then(function(data){
+                        console.log(data);
+                    },
+                    function(){
+                        Notification.error({ message: "Download Failed! Try again later", delay: MsgDelay });
+                    });
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
@@ -213,6 +264,37 @@ angular.module('ezeidApp').
                         group_type: groupType,
                         page_size: $scope.pageSize,
                         page_count: $scope.pageCount
+                    }
+                }).success(function(resp){
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+                    defer.resolve(resp.data.messages);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.reject();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Api call for download attachment
+             * @param tid : id of the message for which download has to be done
+             * @returns {*}
+             */
+            function downloadAttachmentApi(tid)
+            {
+                var defer = $q.defer();
+                var msgId;
+                $http({
+                    url : GURL + 'message_attachment',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token,
+                        tid : tid
                     }
                 }).success(function(resp){
                     if(!resp.status)

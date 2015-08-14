@@ -76,19 +76,19 @@
                     {{msg.sender | textLength:10}}
                 </td>
                 <td>
-                    {{msg.Message | textLength:20}}
+                    {{msg.message | textLength:20}}
                 </td>
                 <td>
                     <span ng-show="msg.isattachment == 1" class="glyphicon glyphicon-paperclip"></span>
                 </td>
                 <td class="display-in-full-screen display-table">
-                    {{msg.TargetDate}}
+                    <span ng-hide="convertTimeToLocal(msg.TargetDate) == 'Invalid date'">{{convertTimeToLocal(msg.TargetDate)}}</span>
                 </td>
-                <td class="display-in-full-screen display-table">
-                    {{msg.ExpiryDate}}
+                <td class="display-in-full-screen display-table  ">
+                    <span ng-hide="convertTimeToLocal(msg.ExpiryDate) == 'Invalid date'">{{convertTimeToLocal(msg.ExpiryDate)}}</span>
                 </td>
                 <td>
-                    12:09AM
+                    {{convertTimeToLocal(msg.createddate)}}
                 </td>
             </tr>
             <tr>

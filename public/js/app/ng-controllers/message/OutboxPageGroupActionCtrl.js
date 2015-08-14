@@ -1001,8 +1001,65 @@ angular.module('ezeidApp').
 
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////EDIT ADMIN'S NAME///////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            ////////////////////////////////////INITIALIZATION//////////////////////////////////////////////////////////
+            /* edit group modal goes here */
+            $scope.editGroupModalBox = {
+                title : 'Edit Group',
+                class : 'business-manager-modal',
+                groupName : '',
+                groupDesc : '',
+                isPublicGroup : false
+            };
+            $scope.editGroupModalVisibility = false;
+
+            $scope.currentGroup = {
+                groupId : 0,
+                groupType : 0,
+                groupName : ""
+            };
+
+            ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
+
+            $scope.toggleEditGroupModalVisibility = function(groupIndex,groupTid)
+            {
+                $scope.editGroupModalVisibility = !$scope.editGroupModalVisibility;
+
+                /* if the modal box is opening: populate the name of the group */
+                if($scope.editGroupModalVisibility)
+                {
+                    $scope.currentGroup.groupName = $scope.editGroupModalBox.groupName = $scope.groupListData[groupIndex].GroupName;
+                    $scope.currentGroup.groupId = groupTid;
+                }
+
+                /* take the API Call to get the description and other data *///@todo
+                //Set the group type
+            };
+
+            $scope.updateGroup = function()
+            {
+                updateGroupData().then(function(){
+                        Notification.success({ message: "Group data updated successfully!", delay: MsgDelay });
+                        /* close modal box */
+                        $scope.editGroupModalVisibility = false;
+                },
+                function(){
+                    Notification.error({ message: "Errro occured, Try again later", delay: MsgDelay });
+                });
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API/////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            /**
+             * Validate group member
+             * @param memberEzeoneId
+             * @param groupId
+             * @returns {*}
+             */
             function validateGroupMember(memberEzeoneId,groupId)
             {
                 var defer = $q.defer();
@@ -1021,6 +1078,39 @@ angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
                     defer.resolve();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Update group data
+             * @returns {*}
+             */
+            function updateGroupData()
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'create_group',
+                    method : "POST",
+                    data :{
+                        token : $rootScope._userInfo.Token,
+                        group_name:editGroupModalBox.groupName,
+                        group_type:groupType,
+                        about_group:$scope.editGroupModalBox.groupDesc,
+                        auto_join:$scope.editGroupModalBox.isPublicGroup?1:0,
+                        tid:$scope.currentGroup.groupId
+                    }
+                }).success(function(resp){
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+                    defer.resolve();
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.reject();
                 });
                 return defer.promise;
             }
