@@ -176,6 +176,7 @@ router.get('/validate_group_member',LocationManager.FnValidateGroupMember);
 router.get('/message_full_view',LocationManager.FnViewMessage);
 router.get('/message_attachment',LocationManager.FnGetMessageAttachment);
 router.get('/group_info',LocationManager.FnGetGroupInfo);
+router.get('/unread_message_count',LocationManager.FnCountOfUnreadMessage);
 
 //Planner module
 router.get('/tasks',LocationManager.FnGetAllTask);
