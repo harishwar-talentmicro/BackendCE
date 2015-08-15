@@ -123,18 +123,16 @@ angular.module('ezeidApp').controller('CVAttachController',[
              headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
              .success(function (data, status, headers, config) {
                  // $location.path('/');
-                     console.log(data);
-                     $scope.showLink = true;
+                 if(data.IsSuccessfull)
+                 {
+                    $scope.showLink = true;
+                 }
              })
              .error(function(data, status, headers, config) {
                  Notification.error({message: "An error occurred..", delay: MsgDelay});
              });
          }
 
-
-
-   ///    $scope.showSelectedText = true;
-      // console.log($scope.DocumentToUpload);
     };
 
     var fileToDataURL = function (file) {
@@ -346,18 +344,24 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 {
                     CVAttachCtrl._CVInfo = res.data[0];
 
-                    $scope.functionsArray = CVAttachCtrl._CVInfo.FunctionID.split(',');
-                    CVAttachCtrl._CVInfo.FunctionID = "";
-                    for (var nCount = 0; nCount <$scope.functionsArray.length; nCount++)
+                    if(CVAttachCtrl._CVInfo.FunctionID.length)
                     {
-                        $scope.selectedFunctions.push(parseInt($scope.functionsArray[nCount]));
+                        $scope.functionsArray = CVAttachCtrl._CVInfo.FunctionID.split(',');
+                        CVAttachCtrl._CVInfo.FunctionID = "";
+                        for (var nCount = 0; nCount <$scope.functionsArray.length; nCount++)
+                        {
+                            $scope.selectedFunctions.push(parseInt($scope.functionsArray[nCount]));
+                        }
                     }
 
-                    $scope.categoryArray = CVAttachCtrl._CVInfo.category_id.split(',');
-                    CVAttachCtrl._CVInfo.category_id = "";
-                    for (var nCount = 0; nCount < $scope.categoryArray.length; nCount++)
+                    if(CVAttachCtrl._CVInfo.category_id.length)
                     {
-                        $scope.selectedCategories.push(parseInt($scope.categoryArray[nCount]));
+                        $scope.categoryArray = CVAttachCtrl._CVInfo.category_id.split(',');
+                        CVAttachCtrl._CVInfo.category_id = "";
+                        for (var nCount = 0; nCount < $scope.categoryArray.length; nCount++)
+                        {
+                            $scope.selectedCategories.push(parseInt($scope.categoryArray[nCount]));
+                        }
                     }
 
                     if(res.job_location.length)
@@ -373,12 +377,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-
-                    for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
+                    if($scope.instituteList.length)
                     {
-                        if($scope.instituteList[nCount].TID == CVAttachCtrl._CVInfo.institute_id)
+                        for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                         {
-                            $scope.instituteTitle = $scope.instituteList[nCount].InstituteTitle;
+                            if($scope.instituteList[nCount].TID == CVAttachCtrl._CVInfo.institute_id)
+                            {
+                                $scope.instituteTitle = $scope.instituteList[nCount].InstituteTitle;
+                            }
                         }
                     }
 

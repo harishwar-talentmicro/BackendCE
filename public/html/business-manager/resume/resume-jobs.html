@@ -319,11 +319,11 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
                     <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
-                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
+                        <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedEducations.length}}) -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span></button>
                     <div class="opt opt-2">
-                        <div class="filter-dropdown width-79 search-option-content setTableFixHeight" style="display: none;">
+                        <div class="filter-dropdown width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="education in educationList track by $index" ng-click="selectEducation(education.TID)">
                                 <i class="fa " ng-class="selectedEducations.indexOf(education.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{education.EducationTitle}}
                             </div>
@@ -337,11 +337,11 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
                     <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
-                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
+                        <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedSpecializations.length}}) -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span></button>
                     <div class="opt opt-2">
-                        <div class="filter-dropdownspecialization width-79 search-option-content setTableFixHeight" style="display: none;">
+                        <div class="filter-dropdownspecialization width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
                                 <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
                             </div>
@@ -353,12 +353,12 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
                     <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
-                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
+                        <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedInstitute.length}}) -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span>
                     </button>
                     <div class="opt opt-2">
-                        <div class="filter-dropdownInstitute width-79 search-option-content setTableFixHeight" style="display: none;">
+                        <div class="filter-dropdownInstitute width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
                                 <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
                             </div>

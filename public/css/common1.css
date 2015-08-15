@@ -2012,7 +2012,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .selectImg
 {
     float: right;
-    margin-top: 2%;
+    margin-top: 3%;
 }
 .hpw .filter-dropdownCity {
     position: absolute;
@@ -2047,4 +2047,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     margin-left: 2%;
     float: left;
     font-size: 14px;
+}
+.width89
+{
+    width: 89% !important;
 }
