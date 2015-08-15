@@ -110,8 +110,31 @@ angular.module('ezeidApp').controller('CVAttachController',[
     $scope.uploadFile = function (files) {
         $scope.DocumentToUpload = files;
 
-       $scope.showSelectedText = true;
-       console.log($scope.DocumentToUpload.length);
+         if($scope.DocumentToUpload)
+         {
+             CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
+             var $file = $scope.DocumentToUpload[0];
+             var formData = new FormData();
+             formData.append('file', $file);
+             formData.append('TokenNo', $rootScope._userInfo.Token);
+             formData.append('RefType', 7);
+
+             $http({ method: 'POST', url: '/ewTUploadDoc/', data: formData,
+             headers: { 'Content-Type': undefined }, transformRequest: angular.identity })
+             .success(function (data, status, headers, config) {
+                 // $location.path('/');
+                     console.log(data);
+                     $scope.showLink = true;
+             })
+             .error(function(data, status, headers, config) {
+                 Notification.error({message: "An error occurred..", delay: MsgDelay});
+             });
+         }
+
+
+
+   ///    $scope.showSelectedText = true;
+      // console.log($scope.DocumentToUpload);
     };
 
     var fileToDataURL = function (file) {
@@ -282,7 +305,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     $scope.$emit('$preLoaderStop');
                 });
 
-            if($scope.DocumentToUpload)
+           /* if($scope.DocumentToUpload)
             {
                 CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
                 var $file = $scope.DocumentToUpload[0];
@@ -299,7 +322,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                   .error(function(data, status, headers, config) {
                         Notification.error({message: "An error occurred..", delay: MsgDelay});
                  });
-            }
+            }*/
         }
     };
 
@@ -789,16 +812,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     function getCVDetails()
     {
-        console.log("SAi1");
-
-        console.log($scope.spcializationGetResponse);
-        console.log($scope.jobCategoriesGetResponse);
-        console.log($scope.instituteGetResponse);
-        console.log($scope.educationsGetResponse);
-
         if(($scope.spcializationGetResponse) && ($scope.jobCategoriesGetResponse) && ($scope.instituteGetResponse) && ($scope.educationsGetResponse))
         {
-            console.log("SAi2");
             getCVInfo();
             getAllSkills();
         }

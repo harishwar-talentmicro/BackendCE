@@ -60,16 +60,15 @@
                                         <h5 class="text-primary text-left">CV Upload</h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpaceMiddle">
-                                        {{showSelectedText}}
                                         <span class="btn btn-primary btn-file">
 
-                                            Choose File {{showSelectedText ? '(Selected)' : '(Empty)'}}
-                                               <!--<span ng-show="showLink">
+                                            <!--Choose File {{showSelectedText ? '(Selected)' : '(Empty)'}}-->
+                                               <span ng-show="showLink">
                                                    Choose File (Selected)
                                                </span>
                                                <span ng-hide="showLink">
                                                    Choose File (Empty)
-                                               </span>-->
+                                               </span>
                                                <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
                                          </span>
 
