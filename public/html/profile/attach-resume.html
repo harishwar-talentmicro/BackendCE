@@ -95,6 +95,7 @@
                                         <h5 class="text-primary text-left">CV Status</h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 ">
+
                                         <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
                                         <span> &nbsp; Active(Access is Active)</span>
                                     </div>
@@ -222,7 +223,7 @@
                                                ng-model = "instituteTitle"
                                                ng-keypress = "instituteKeyPress($event.keyCode)"
                                                ng-click = "instituteTextBoxClicked()"
-                                               class="form-control"/>
+                                               class="form-control instittuteClass"/>
 
                                         <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
                                            <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">

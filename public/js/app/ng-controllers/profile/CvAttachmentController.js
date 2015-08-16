@@ -29,23 +29,57 @@ angular.module('ezeidApp').controller('CVAttachController',[
     CVAttachCtrl._CVInfo.current_employeer = "";
     CVAttachCtrl._CVInfo.current_job_title = "";
     CVAttachCtrl._CVInfo.exp_salary = 0;
+    CVAttachCtrl._CVInfo.institute_id = 0;
+    CVAttachCtrl._CVInfo.institute_title = "";
+    CVAttachCtrl._CVInfo.Status = 1;
 
     $scope.selectedFunctions = [];
     $scope.selectedCategories = [];
+
+    /**
+     * Hide all the open dropdown
+     */
+    function hideAllDropdoowns(id)
+    {
+        if(parseInt(id) != 1)
+        {
+            $('.filter-dropdown').hide();
+        }
+        if(parseInt(id) != 2)
+        {
+            $('.filter-dropdownCategory').hide();
+        }
+       /* if(parseInt(id) != 3)
+        {
+            $('.filter-dropdownInstitute').hide();
+        }*/
+    }
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
             $('.dropdown-toggle1').click(function(){$( ".filter-dropdown" ).slideToggle( "slow", function() {
                 // Animation complete.
+                hideAllDropdoowns(1);
             });})
 
             $('.dropdown-toggleCategory').click(function(){$( ".filter-dropdownCategory" ).slideToggle( "slow", function() {
                 // Animation complete.
+                hideAllDropdoowns(2);
             });})
 
-            $('.dropdown-toggleSpecialization').click(function(){$( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
-                // Animation complete.
-            });})
+
+
+           /* $('.dropdown-toggle1').focusout(function() {
+                $('.filter-dropdown').hide();
+            });
+
+            $('.dropdown-toggleCategory').focusout(function() {
+                $('.filter-dropdownCategory').hide();
+            });*/
+
+            /*$('.instittuteClass').focusout(function() {
+                $('.filter-dropdownInstitute').hide();
+            });*/
 
             $scope.spcializationGetResponse = false;
             $scope.jobCategoriesGetResponse = false;
@@ -65,7 +99,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
         } else {
             $location.path('/');
-            CVAttachCtrl._CVInfo.Status = 1;
+           // CVAttachCtrl._CVInfo.Status = 1;
         }
     });
 
@@ -132,7 +166,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                  Notification.error({message: "An error occurred..", delay: MsgDelay});
              });
          }
-
     };
 
     var fileToDataURL = function (file) {
@@ -194,7 +227,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     this.saveCVDocInfo=function(){
 
         /**
-         * if user select from list than send id other  wise send text as title
+         * if user select from list than send id other wise send text as title
          */
         if(($scope.instituteText) && ($scope.instituteID))
         {
@@ -203,11 +236,29 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 CVAttachCtrl._CVInfo.institute_id = 0;
                 CVAttachCtrl._CVInfo.institute_title = $scope.instituteTitle;
             }
+            else
+            {
+                CVAttachCtrl._CVInfo.institute_id = $scope.instituteID;
+                CVAttachCtrl._CVInfo.institute_title = "";
+            }
         }
         else
         {
-            CVAttachCtrl._CVInfo.institute_id = 0;
-            CVAttachCtrl._CVInfo.institute_title = $scope.instituteTitle;
+            console.log("SAi122");
+            console.log($scope.instituteID);
+            console.log($scope.instituteText);
+            if(($scope.instituteTitle) && (parseInt($scope.instituteID) == 0))
+            {
+                CVAttachCtrl._CVInfo.institute_id = 0;
+                CVAttachCtrl._CVInfo.institute_title = $scope.instituteTitle;
+            }
+            else
+            {
+                CVAttachCtrl._CVInfo.institute_id = $scope.instituteID;
+                CVAttachCtrl._CVInfo.institute_title = "";
+            }
+
+
         }
 
         $scope.instituteText = "";
@@ -354,7 +405,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-                    if(CVAttachCtrl._CVInfo.category_id.length)
+                    if(parseInt(CVAttachCtrl._CVInfo.category_id))
                     {
                         $scope.categoryArray = CVAttachCtrl._CVInfo.category_id.split(',');
                         CVAttachCtrl._CVInfo.category_id = "";
@@ -377,13 +428,21 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
+
+                   /* CVAttachCtrl._CVInfo.institute_title = title;
+                    CVAttachCtrl._CVInfo.institute_id = instituteID;
+
+                    $scope.instituteText = title;
+                    $scope.instituteID = instituteID;*/
+
                     if($scope.instituteList.length)
                     {
                         for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                         {
                             if($scope.instituteList[nCount].TID == CVAttachCtrl._CVInfo.institute_id)
                             {
-                                $scope.instituteTitle = $scope.instituteList[nCount].InstituteTitle;
+                                $scope.instituteTitle = ($scope.instituteList[nCount].InstituteTitle) ? $scope.instituteList[nCount].InstituteTitle : "";
+                                $scope.instituteID = $scope.instituteList[nCount].TID;
                             }
                         }
                     }

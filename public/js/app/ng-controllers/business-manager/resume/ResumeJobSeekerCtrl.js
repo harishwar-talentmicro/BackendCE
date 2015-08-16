@@ -130,7 +130,7 @@
                         // Animation complete.
                     });})
 
-                $('.dropdown-toggle1').focusout(function() {
+               /* $('.dropdown-toggle1').focusout(function() {
                     $('.filter-dropdown').hide();
                 });
                 $('.dropdown-toggleSpecialization').focusout(function() {
@@ -141,7 +141,7 @@
                 });
                 $('.dropdown-toggleCity').focusout(function() {
                     $('.filter-dropdownCity').hide();
-                });
+                });*/
             });
 
             // Get Country list

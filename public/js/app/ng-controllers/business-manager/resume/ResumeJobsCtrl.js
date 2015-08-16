@@ -102,18 +102,23 @@
                     // Animation complete.
                 });})
 
-                $('.dropdown-toggle1').focusout(function() {
+                $( ".filter-dropdownspecialization" ).blur(function() {
+                    alert( "Handler for .blur() called." );
+                });
+
+
+               /* $('.dropdown-toggle1').focusout(function() {
                     $('.filter-dropdown').hide();
                 });
 
-                $('.dropdown-toggleSpecialization').focusout(function() {
+                $('.filter-dropdownspecialization').focusout(function() {
                     $('.filter-dropdownspecialization').hide();
                 });
 
                 $('.dropdown-toggleInstitute').focusout(function() {
                     $('.filter-dropdownInstitute').hide();
                 });
-
+*/
 /*
                 $(".filter-dropdownspecialization").focusout(function() {
                     console.log("SAi123");
