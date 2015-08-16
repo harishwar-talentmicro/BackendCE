@@ -1,12 +1,12 @@
 <div ng-controller="SalesReportCtrl" class="row transactions-row setTopMargin">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                 <div class="form-group no-radius">
                     <div class="input-group no-radius">
                         <div class="input-group-addon no-radius">From</div>
                         <date-time-picker input-group-class="input-group-sm  no-radius" recipient="reportFromDate" settings='{
-                                                                        "format" : "d M Y H:m",
+                                                                        "format" : "d-M-Y h:m A",
                                                                         "timepicker" : true,
                                                                         "mask" : false,
                                                                         "hours12" : false
@@ -14,12 +14,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                 <div class="form-group no-radius">
                     <div class="input-group no-radius">
-                        <div class="input-group-addon no-radius">From</div>
+                        <div class="input-group-addon no-radius">To</div>
                         <date-time-picker input-group-class="input-group-sm  no-radius" recipient="reportToDate" settings='{
-                                                                        "format" : "d M Y H:m",
+                                                                        "format" : "d-M-Y h:m A",
                                                                         "timepicker" : true,
                                                                         "mask" : false,
                                                                         "hours12" : false
@@ -27,41 +27,111 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group no-radius">
+                    <div class="input-group no-radius">
+                        <span class="input-group-addon">Users</span>
+                        <div ng-dropdown-multiselect="" class="ezeone-multi-select" options="userList"
+                             translation-texts="multiSelectTransTextUser"
+                             selected-model="selectedUsers" extra-settings="multiSelectDropDownSettings1">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group no-radius">
+                    <div class="input-group no-radius">
+                        <span class="input-group-addon">Stages</span>
+                        <div ng-dropdown-multiselect="" class="ezeone-multi-select" options="statusList"
+                             translation-texts="multiSelectTransTextStatus"
+                             selected-model="selectedStatus" extra-settings="multiSelectDropDownSettings">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group no-radius">
+                    <div class="input-group no-radius">
+                        <span class="input-group-addon">Probabilities</span>
+                        <div ng-dropdown-multiselect="" class="ezeone-multi-select" options="probabilityList"
+                             translation-texts="multiSelectTransTextProbability"
+                             selected-model="selectedProbabilities" extra-settings="multiSelectDropDownSettings">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="form-group no-radius">
+                    <div class="input-group no-radius">
+                        <button class="btn btn-sm btn-info no-radius" ng-click="prepareReport()">&nbsp; Go &nbsp;</button>
+                    </div>
+                </div>
+            </div>
+
+
+
         </div>
 
     </div>
     <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
         <div class="funnel-image-container pull-right">
-            <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <p class="text-black pull-right">New : 75</p>
-                </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <p class="text-black pull-right">Proposal : 29</p>
-                </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <p class="text-black pull-right">Meeting : 18</p>
-                </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <p class="text-black pull-right">Demonstration : 14</p>
-                </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <p class="text-black pull-right">Negotiation : 14</p>
-                </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <p class="text-black pull-right">Agreement : 14</p>
-                </div>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <p class="text-black pull-right">Closed : 11</p>
+            <div class="row top-clearfix-half">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-repeat="elem in reportData.funnel track by $index">
+                    <p class="text-black pull-right">{{elem.stage_title}} : {{elem.count}}</p>
                 </div>
             </div>
 
-
-
-
-
-
-
         </div>
     </div>
+
+    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th class="hidden-xs">Customer</th>
+                    <th class="hidden-xs">Description</th>
+                    <th>Qty</th>
+                    <th>Amount</th>
+                    <th class="hidden-xs">Next Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr  ng-repeat="elem in reportData.transactions track by $index">
+                    <td><small class="text-info">{{elem.user}}</small></td>
+                    <td class="hidden-xs"><small class="text-info">{{elem.customer}}</small></td>
+                    <td class="hidden-xs" title="{{elem.decription}}"><small class="text-info">{{elem.decription | truncate:25:'..'}}</small></td>
+                    <td><small class="text-info">{{elem.qty}}</small></td>
+                    <td><small class="text-info">{{elem.amount}}</small></td>
+                    <td class="hidden-xs">
+                        <small class="text-info">{{(elem.next_action) ? elem.next_action + ' at ' + elem.next_action_date : ''}}</small>
+                        <small class="tiny text-danger" ng-hide="elem.next_action">No next action</small>
+                    </td>
+                </tr>
+                <tr ng-hide="reportData.transactions.length">
+                    <td colspan="6" class="text-center">
+                        <small class="tiny text-warning text-center">No records found</small>
+                    </td>
+                </tr>
+            </tbody>
+            <thead>
+                <tr>
+                    <th>Total</th>
+                    <th class="hidden-xs"></th>
+                    <th class="hidden-xs"></th>
+                    <th>{{reportData.total_amount}}</th>
+                    <th>{{reportData.total_items}}</th>
+                    <th class="hidden-xs"></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
 </div>
