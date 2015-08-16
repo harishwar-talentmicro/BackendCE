@@ -101,6 +101,47 @@
                     $( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
                     // Animation complete.
                 });})
+
+                $( ".filter-dropdownspecialization" ).blur(function() {
+                    alert( "Handler for .blur() called." );
+                });
+
+
+               /* $('.dropdown-toggle1').focusout(function() {
+                    $('.filter-dropdown').hide();
+                });
+
+                $('.filter-dropdownspecialization').focusout(function() {
+                    $('.filter-dropdownspecialization').hide();
+                });
+
+                $('.dropdown-toggleInstitute').focusout(function() {
+                    $('.filter-dropdownInstitute').hide();
+                });
+*/
+/*
+                $(".filter-dropdownspecialization").focusout(function() {
+                    console.log("SAi123");
+                    $('.filter-dropdownspecialization').hide();
+                });
+
+
+                $('body').click(function(evt) {
+                    if($(evt.target).parents('.filter-dropdownspecialization').length==0) {
+                        $('.filter-dropdownspecialization').hide();
+                    }
+                });*/
+
+
+                /*$(document).not(".filter-dropdownspecialization").slideToggle( "slow", function() {
+                    // $('#selecteddiv').hide();
+                    console.log('SAii');
+                });
+
+                $(".filter-dropdownspecialization").focusout(function() {
+                 $('.filter-dropdownspecialization').hide();
+                });*/
+
             });
 
             var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
@@ -235,16 +276,36 @@
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
                 }
-                if($scope.phone.length < 1){
-                    err.push('Phone is empty');
+                if(($scope.phone.length < 1) && (!$scope.emailContact))
+                {
+
+                    err.push('Phone or Email Required');
+                    /*if($scope.emailContact)
+                    {
+                        if($scope.isWrongEmailPatternFrom)
+                        {
+                            err.push('Not valid email!');
+                        }
+                    }
+                    else
+                    {
+                        err.push('Phone or Email Required');
+                    }*/
                 }
-                if(!$scope.emailContact){
+               /* if(!$scope.emailContact){
                     err.push('Email is empty');
-                }
-                if($scope.isWrongEmailPatternFrom)
+                }*/
+               /* if($scope.emailContact)
+                {
+                    if($scope.isWrongEmailPatternFrom)
+                    {
+                        err.push('Not valid email!');
+                    }
+                }*/
+                /*if($scope.isWrongEmailPatternFrom)
                 {
                     err.push('Not valid email!');
-                }
+                }*/
                 if($scope.jobCategori == 0){
                     err.push('Please select Job category');
                 }
@@ -319,7 +380,7 @@
             function getJobCategories()
             {
                 $http({
-                    url : GURL + 'ewmGetCategory',
+                    url : GURL + 'ewmGetFunctions',
                     method : 'GET',
                     params : {
                         LangID : 1
@@ -642,23 +703,6 @@
                 {
                     $scope.selectedInstitute.push(_instituteID);
                 }
-            };
-
-            $scope.InstituteTextBoxLossFocus = function () {
-
-               /* $( ".filter-dropdown" ).slideToggle( "slow", function() {
-                    // Animation complete.
-                });
-                $( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
-                    // Animation complete.
-                });*/
-
-             /*   $( ".filter-dropdown" ).slideToggle( "slow", function() {
-                    // Animation complete.
-                });*/
-
-
-
             };
 
             /**

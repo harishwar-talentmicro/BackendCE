@@ -204,22 +204,24 @@
                 </div>
 
                 <!-- Filter by location -->
-                <div class="job-filter-content text-right" ng-show="filter.location.length > 0">
-                    <div class="filter-content-heading container">
-                        <span class="filter-heading">
-                            <button class="btn btn-primary btn-sm" ng-click="triggerSearch(1)" >
-                                Apply Filters  <i class="fa fa-arrow-circle-right"></i>
-                            </button>
-                        </span>
+                <!-- Apply filter button goes here -->
+                <div class="job-filter-content"  ng-hide="isResultEmpty && !isProcessing">
+                    <div class="p-top-10 apply-filter text-right">
+                        <button class="btn btn-primary btn-sm" ng-click="triggerSearch(1)" >
+                            Apply Filters  <i class="fa fa-arrow-circle-right"></i>
+                        </button>
                     </div>
                 </div>
 
                 <div class="job-filter-content" ng-show="filter.location.length > 0">
-                    <div class="location-individual pointer" ng-click="filterMyCollege(filterCollege)">
-                        <i class="fa" ng-class="filterCollege?'fa-check-square':'fa-square-o'"></i> My College Job Only
+                    <div class="filter-content-heading container">
+                        <span class="filter-heading">
+                            <div class="location-individual pointer" ng-click="filterMyCollege(filterCollege)">
+                                <i class="fa" ng-class="filterCollege?'fa-check-square':'fa-square-o'"></i> My College Job Only
+                            </div>
+                        </span>
                     </div>
                 </div>
-
 
                 <div class="job-filter-content" ng-show="filter.location.length > 0">
                     <!-- filters goes here -->
@@ -279,12 +281,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Filter by Institute -->
-                <div class="job-filter-content">
-                    <!-- filters goes here -->
-
                 </div>
 
                 <!-- Apply filter button goes here -->
@@ -377,6 +373,23 @@
             <!-- Map ends here -->
             <div class="col-lg-12 text-right">
                 <button class="btn btn-info text-right" ng-click="modalVisibility()">OK</button>
+            </div>
+        </div>
+    </modal>
+
+    <!-- Modal Box content for map -->
+    <modal mtitle="modalResume.title" mclass="modal.class" visible="modalVisibleResume">
+        <div class="row">
+            <div class="col-lg-12 text-danger text-center">
+                <div class="row">
+                    Please Upload Resume to apply job
+                </div>
+                <div class="row">
+                    <a class="pointer" ng-click="openResumeTab()">Upload Resume</a>
+                </div>
+            </div>
+            <div class="col-lg-12 text-center marginTopBottom1">
+                <button class="btn btn-info text-right" ng-click="modalVisibleResumeBox()">Cancel</button>
             </div>
         </div>
     </modal>

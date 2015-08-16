@@ -139,7 +139,12 @@
                     <label>Job Description</label>
                 </div>
                 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-                    <textarea rows="5" ng-model = "jobDescription" placeholder="Job Description" class="form-control"></textarea>
+                   <!-- <textarea rows="5" ng-model = "jobDescription" placeholder="Job Description" class="form-control"></textarea>-->
+                    <div text-angular ng-model="jobDescription"
+                         name="demo-editor"
+                         ta-text-editor-class="border-around"
+                         ta-html-editor-class="border-around">
+                    </div>
                 </div>
             </div>
             <div class="row topMarginButton">
@@ -163,13 +168,13 @@
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="row">
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                            <input type="text" decimals-only maxlength="5" placeholder="1" ng-model = "experienceFrom" class="form-control text-right"/>
+                            <input type="text" decimals-only maxlength="4" placeholder="1" ng-model = "experienceFrom" class="form-control text-right"/>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setTopMarginOneNhalf text-center">
                             to
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                            <input type="text" decimals-only maxlength="5" placeholder="3" ng-model = "experienceTo" class="form-control text-right"/>
+                            <input type="text" decimals-only maxlength="4" placeholder="3" ng-model = "experienceTo" class="form-control text-right"/>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setTopMarginOneNhalf">
                             Years
@@ -188,7 +193,6 @@
                             <button type="button" class="btn btn-primary" ng-disabled="disabledAddLocation" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
                         </div>
                     </div>
-                    {{locationArrayString}}
                     <div class="row topMargin-three setBorderColor setRowLeftRightMarginZero locationListBox" ng-show="locationArrayString.length">
                         <div class="row setRowLeftRightMarginZero" ng-repeat="location in locationArrayString track by $index">
                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
@@ -307,7 +311,7 @@
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <select class="form-control" name="listType" ng-model="jobCategori">
                         <option value="0"> -- Select -- </option>
-                        <option ng-repeat="categori in jobCategories track by $index" value="{{categori.CategoryID}}">{{categori.CategoryTitle}}</option>
+                        <option ng-repeat="categori in jobCategories track by $index" value="{{categori.FunctionID}}">{{categori.FunctionName}}</option>
                     </select>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
@@ -315,11 +319,11 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
                     <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
-                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
+                        <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedEducations.length}}) -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span></button>
                     <div class="opt opt-2">
-                        <div class="filter-dropdown width-79 search-option-content setTableFixHeight" style="display: none;">
+                        <div class="filter-dropdown width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="education in educationList track by $index" ng-click="selectEducation(education.TID)">
                                 <i class="fa " ng-class="selectedEducations.indexOf(education.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{education.EducationTitle}}
                             </div>
@@ -333,11 +337,11 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
                     <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
-                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
+                        <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedSpecializations.length}}) -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span></button>
                     <div class="opt opt-2">
-                        <div class="filter-dropdownspecialization width-79 search-option-content setTableFixHeight" style="display: none;">
+                        <div  class="filter-dropdownspecialization width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
                                 <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
                             </div>
@@ -348,13 +352,13 @@
                     <label>Restrict Job To Institute</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
-                    <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
-                        <span class="normal-view-text custom-select-dropdown"> -- Select -- </span>
+                    <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction">
+                        <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedInstitute.length}}) -- </span>
                         <span class="mobile-view-text"></span>
                         <span class="caret selectImg"></span>
                     </button>
                     <div class="opt opt-2">
-                        <div class="filter-dropdownInstitute width-79 search-option-content setTableFixHeight" style="display: none;">
+                        <div class="filter-dropdownInstitute width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
                                 <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
                             </div>

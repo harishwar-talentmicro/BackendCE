@@ -38,7 +38,13 @@
                             <div class="login-signup-btn">
                                 <button ng-show="!isLoggedIn" class="btn btn-primary btn-sm">SIGN IN</button>
                                 <button ng-show="!isLoggedIn" class="btn btn-danger btn-sm">SIGN UP</button>
-                                <button ng-show="isLoggedIn" class="btn btn-primary btn-sm" ng-click="applyForJob(jobData.tid)">APPLY</button>
+                                <span ng-show="isLoggedIn">
+                                    <span ng-show="_userInfo.Type == 1">
+                                        <span ng-show="showButtons">
+                                            <button ng-show="!jobData.isappliedforjob" class="btn btn-primary btn-sm" ng-click="applyForJob(jobData.tid)">APPLY</button>
+                                        </span>
+                                    </span>
+                                </span>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -125,6 +131,23 @@
 
         </div>
     </div>
+
+    <!-- Modal Box content for map -->
+    <modal mtitle="modalResume.title" mclass="modal.class" visible="modalVisibleResume">
+        <div class="row">
+            <div class="col-lg-12 text-danger text-center">
+                <div class="row">
+                    Please Upload Resume to apply job
+                </div>
+                <div class="row">
+                    <a class="pointer" ng-click="openResumeTab()">Upload Resume</a>
+                </div>
+            </div>
+            <div class="col-lg-12 text-center marginTopBottom1">
+                <button class="btn btn-info text-right" ng-click="modalVisibleResumeBox()">Cancel</button>
+            </div>
+        </div>
+    </modal>
 
     <!-- Footer goes here -->
     <footer-section></footer-section>

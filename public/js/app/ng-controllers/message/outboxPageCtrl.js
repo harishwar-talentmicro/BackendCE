@@ -62,6 +62,11 @@ angular.module('ezeidApp').
             $scope.totalMessage = 0;
 
             $scope.loggedInMasterId = $rootScope._userInfo.TID;
+
+            $scope.unreadMsgNotify = {
+                count : 0,
+                visible : true
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////GET GROUPS & INDIVIDUALS////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,6 +100,8 @@ angular.module('ezeidApp').
             loadDashBoardMessages();
             getPendingRequestUserList();
             paginationReConfigration();
+
+            $scope.unreadFun = getUnreadMessageCount();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
@@ -566,6 +573,20 @@ angular.module('ezeidApp').
                 return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
             };
 
+            $scope.convertHtmlToText = function(html,length)
+            {
+                return strip(html,length);
+            }
+
+            function strip(html,length)
+            {
+                var tmp = document.createElement("DIV");
+                tmp.innerHTML = html;
+                var text = tmp.textContent || tmp.innerText || "";
+                if(text.length > length)
+                    return text.substr(0,length)+"...";
+                return text.substr(0,length);
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////PAGINATION CODE/////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -630,8 +651,16 @@ angular.module('ezeidApp').
             $scope.redirectGroupMessage = function(groupId,groupType)
             {
                 $location.url('/message/details?id='+ groupId + '&type='+ groupType);
-            }
+            };
 
+            function getUnreadMessageCount(alpha)
+            {
+                unreadMessagesApi().then(function(data){
+                    if(!data || !data.length > 0)
+                        return;
+                    $scope.unreadMsgNotify.count = data[0].count;
+                });
+            };
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ALL API CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -789,6 +818,38 @@ angular.module('ezeidApp').
                         defer.resolve(resp.status);
                         return defer.promise;
                     }
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.reject();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Get all the unread messages count API call
+             * @returns {*}
+             */
+            function unreadMessagesApi()
+            {
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'unread_message_count',
+                    method : "GET",
+                    params :{
+                        token : $rootScope._userInfo.Token
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');

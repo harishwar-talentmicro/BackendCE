@@ -13,6 +13,10 @@
     padding: 0px;
     border: 0px;
 }
+.topMarginButton
+{
+    margin-top: 1%;
+}
 .navbar-brand
 {
     height: 35px;
@@ -714,10 +718,7 @@ body {
 {
     margin-top: 2%;
 }
-.topMarginButton
-{
-    margin-top: 1%;
-}
+
 .setTableFixHeight
 {
     /*height: 300px;*/
@@ -2011,7 +2012,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .selectImg
 {
     float: right;
-    margin-top: 2%;
+    margin-top: 3%;
 }
 .hpw .filter-dropdownCity {
     position: absolute;
@@ -2046,4 +2047,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
     margin-left: 2%;
     float: left;
     font-size: 14px;
+}
+.width89
+{
+    width: 89% !important;
 }

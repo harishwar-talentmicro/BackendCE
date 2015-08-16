@@ -77,7 +77,8 @@
                 {{msg.sender | textLength:10}}
             </td>
             <td>
-                {{msg.message | textLength:20}}
+                <!--<span ng-bind-html="msg.message"></span>-->
+                {{convertHtmlToText(msg.message,10)}}
             </td>
             <td>
                 <span ng-show="msg.isattachment == 1" class="glyphicon glyphicon-paperclip"></span>
