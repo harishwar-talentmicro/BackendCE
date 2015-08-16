@@ -129,6 +129,19 @@
                     $( ".filter-dropdownCity" ).slideToggle( "slow", function() {
                         // Animation complete.
                     });})
+
+                $('.dropdown-toggle1').focusout(function() {
+                    $('.filter-dropdown').hide();
+                });
+                $('.dropdown-toggleSpecialization').focusout(function() {
+                    $('.filter-dropdownspecialization').hide();
+                });
+                $('.dropdown-toggleInstitute').focusout(function() {
+                    $('.filter-dropdownInstitute').hide();
+                });
+                $('.dropdown-toggleCity').focusout(function() {
+                    $('.filter-dropdownCity').hide();
+                });
             });
 
             // Get Country list

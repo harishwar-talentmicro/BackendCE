@@ -101,6 +101,42 @@
                     $( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
                     // Animation complete.
                 });})
+
+                $('.dropdown-toggle1').focusout(function() {
+                    $('.filter-dropdown').hide();
+                });
+
+                $('.dropdown-toggleSpecialization').focusout(function() {
+                    $('.filter-dropdownspecialization').hide();
+                });
+
+                $('.dropdown-toggleInstitute').focusout(function() {
+                    $('.filter-dropdownInstitute').hide();
+                });
+
+/*
+                $(".filter-dropdownspecialization").focusout(function() {
+                    console.log("SAi123");
+                    $('.filter-dropdownspecialization').hide();
+                });
+
+
+                $('body').click(function(evt) {
+                    if($(evt.target).parents('.filter-dropdownspecialization').length==0) {
+                        $('.filter-dropdownspecialization').hide();
+                    }
+                });*/
+
+
+                /*$(document).not(".filter-dropdownspecialization").slideToggle( "slow", function() {
+                    // $('#selecteddiv').hide();
+                    console.log('SAii');
+                });
+
+                $(".filter-dropdownspecialization").focusout(function() {
+                 $('.filter-dropdownspecialization').hide();
+                });*/
+
             });
 
             var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
@@ -662,23 +698,6 @@
                 {
                     $scope.selectedInstitute.push(_instituteID);
                 }
-            };
-
-            $scope.InstituteTextBoxLossFocus = function () {
-
-               /* $( ".filter-dropdown" ).slideToggle( "slow", function() {
-                    // Animation complete.
-                });
-                $( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
-                    // Animation complete.
-                });*/
-
-             /*   $( ".filter-dropdown" ).slideToggle( "slow", function() {
-                    // Animation complete.
-                });*/
-
-
-
             };
 
             /**
