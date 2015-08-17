@@ -325,10 +325,11 @@
              * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
              */
             $scope.multiSelectDropDownSettings = {
-                smartButtonMaxItems: 2,
+                smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
-                }
+                },
+                dynamicButtonTextSuffix : 'selected'
             };
 
             /**
@@ -336,10 +337,11 @@
              * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
              */
             $scope.multiSelectDropDownSettings1 = {
-                smartButtonMaxItems: 1,
+                smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
-                }
+                },
+                dynamicButtonTextSuffix : 'selected'
             };
 
             $scope.multiSelectTransTextUser = {buttonDefaultText: 'Select Users'};

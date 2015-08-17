@@ -2414,7 +2414,8 @@
                     }
 
                     return itemText;
-                }
+                },
+                dynamicButtonTextSuffix : 'selected'
             };
 
             $scope.multiSelectTransText = {buttonDefaultText: 'No folders selected'};
