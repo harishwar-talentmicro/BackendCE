@@ -50,12 +50,14 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
     var m = date.getMonth();
     var y = date.getFullYear();
     $scope.eventsList =  [
-        {title: 'All Day Event',start: new Date(y, m, 1)},
-        {title: 'Long Event',start: new Date(y, m, d - 5),end: new Date(y, m, d - 2)},
-        {id: 999,title: 'Repeating Event',start: new Date(y, m, d - 3, 16, 0),allDay: false},
-        {id: 999,title: 'Repeating Event',start: new Date(y, m, d + 4, 16, 0),allDay: false},
-        {title: 'Birthday Party',start: new Date(y, m, d + 1, 19, 0),end: new Date(y, m, d + 1, 22, 30),allDay: false},
-        {title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29),url: 'http://google.com/'}
+        {title : 'EZEOne Launch',start : new Date(y,m,d)},
+        {title : 'EZEOne Launch 1',start : new Date(y,m,d,22,30), end : new Date(y,m,d,22,50)}
+        //{title: 'All Day Event',start: new Date(y, m, 1)},
+        //{title: 'Long Event',start: new Date(y, m, d - 5),end: new Date(y, m, d - 2)},
+        //{id: 999,title: 'Repeating Event',start: new Date(y, m, d - 3, 16, 0),allDay: false},
+        //{id: 999,title: 'Repeating Event',start: new Date(y, m, d + 4, 16, 0),allDay: false},
+        //{title: 'Birthday Party',start: new Date(y, m, d + 1, 19, 0),end: new Date(y, m, d + 1, 22, 30),allDay: false},
+        //{title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29),url: 'http://google.com/'}
     ];
 
     /* event source that calls a function on every view switch */
@@ -75,6 +77,7 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
         $compile(element)($scope);
     };
 
+    //$scope.eventSources = [$scope.eventsList];
     $scope.eventSources = [$scope.eventsList];
 
 
@@ -113,12 +116,11 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
                 //console.log(view);
                 //$log.debug("View Changed: ", view.visStart, view.visEnd, view.start, view.end);
 
-                console.log(view.start);
-                console.log(view.end);
                 sTime = view.start.format('YYYY-MM-DD HH:mm:ss');
                 eTime = view.end.format('YYYY-MM-DD HH:mm:ss');
                 $scope.loadNextActionList();
-            }
+            },
+            timeFormat : 'hh:mm A'
         }
     };
 
@@ -139,6 +141,7 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
                 token : $rootScope._userInfo.Token
             }
         }).success(function(resp){
+            $scope.eventsList.splice(0,$scope.eventsList.length);
             if(resp){
                 if(resp.status){
                     if(resp.data){
@@ -149,14 +152,15 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
                                     title : resp.data.tasks[i].ts_t,
                                     start : moment(
                                         UtilityService._convertTimeToLocal(resp.data.tasks[i].ts,
-                                            'DD-MMM-YYYY hh:mm:ss A','YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
+                                            'DD-MMM-YYYY hh:mm:ss A','YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss').toDate(),
                                     end : moment(
                                         UtilityService._convertTimeToLocal(resp.data.tasks[i].ts,
-                                            'DD-MMM-YYYY hh:mm:ss A','YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss').add(15,'m'),
+                                            'DD-MMM-YYYY hh:mm:ss A','YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss').add(15,'m').toDate(),
                                     allDay : false
                                 };
-                                $scope.nextActionList.push(nextAction);
+                                $scope.eventsList.push(nextAction);
                             }
+                            //$scope.renderCalender();
                         }
                     }
                 }
