@@ -2060,3 +2060,9 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     font-size: 21px;
 }
+.sendMsgFrom
+{
+    text-align: right;
+    padding-right: 3%;
+    margin-top: 0.4%;
+}
