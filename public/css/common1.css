@@ -1952,7 +1952,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .arw .location-box-border
 {
-    border: 1px solid #E6DCDC;
+    border: 1px solid #7DBB6A;
 }
 
 .drpFunction {
@@ -2051,4 +2051,12 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .width89
 {
     width: 89% !important;
+}
+.jobDescription
+{
+    border: 1px solid #ddd;
+}
+.fontsize21
+{
+    font-size: 21px;
 }

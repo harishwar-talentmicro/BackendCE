@@ -142,8 +142,8 @@
                    <!-- <textarea rows="5" ng-model = "jobDescription" placeholder="Job Description" class="form-control"></textarea>-->
                     <div text-angular ng-model="jobDescription"
                          name="demo-editor"
-                         ta-text-editor-class="border-around"
-                         ta-html-editor-class="border-around">
+                         ta-text-editor-class="border-around jobDescription"
+                         ta-html-editor-class="border-around jobDescription">
                     </div>
                 </div>
             </div>
@@ -198,14 +198,14 @@
                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
                                 <span data-toggle="tooltip" title="" data-original-title="{{location}}">{{location | textLength:15}}</span>
                             </div>
-                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                 <a class="showPointer">
                                     <i class="fa fa-map-marker" ng-click="modalVisibility($index + 1)">
-                                      {{mainLocationArray[$index].maptype == 0 ? 'Set Location' : 'Change Location'}}
+                                      {{mainLocationArray[$index].maptype == 0 ? 'Set Job Location' : 'Change Job Location'}}
                                     </i>
                                 </a>
                             </div>
-                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setLeftRightPaddingZero">
                                 <span class="showPointer"><img src="/images/Droped_Red_16.png" ng-click="removeLocation($index)" class="width-100-px"></span>
                             </div>
                         </div>
@@ -230,8 +230,7 @@
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero">
-                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 fotterButtonContainer text-center topMargin-three">
-                                Per
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer text-center topMargin-three setLeftRightPaddingZero">
                             </div>
                             <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 setLeftRightPaddingZero">
                                 <select class="form-control" name="listType" ng-model="salaryType">
@@ -274,16 +273,16 @@
                     <label>Email</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <input type="email"
+                    <input type="text"
                            ng-model = "emailContact"
                            name="emailID"
                            maxlength="250"
                            placeholder="Email"
                            class="form-control"/>
 
-                    <span ng-show="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1))"
-                          ng-if="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1)) ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false">
-                    </span>
+                       <!-- <span ng-show="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1))"
+                              ng-if="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1)) ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false">
+                        </span>-->
                 </div>
             </div>
             <div class="row topMarginButton">
@@ -317,7 +316,7 @@
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Last Education</label>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw" id="jobpostEdu">
                     <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
                         <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedEducations.length}}) -- </span>
                         <span class="mobile-view-text"></span>
@@ -335,7 +334,7 @@
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Specialization</label>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw" id="jobpostSpeci">
                     <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
                         <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedSpecializations.length}}) -- </span>
                         <span class="mobile-view-text"></span>
@@ -351,7 +350,7 @@
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Restrict Job To Institute</label>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw" id="jobpostInstit">
                     <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction">
                         <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedInstitute.length}}) -- </span>
                         <span class="mobile-view-text"></span>

@@ -130,6 +130,27 @@
                         // Animation complete.
                     });})
 
+                $('html').click(function() {
+                    $('.filter-dropdown').hide();
+                    $('.filter-dropdownspecialization').hide();
+                    $('.filter-dropdownInstitute').hide();
+                    $('.filter-dropdownCity').hide();
+                })
+
+                $('#jobseekercity').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekerinstitute').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekereducation').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekerspecialization').click(function(e){
+                    e.stopPropagation();
+                });
+
+
                /* $('.dropdown-toggle1').focusout(function() {
                     $('.filter-dropdown').hide();
                 });
