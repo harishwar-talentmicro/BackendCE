@@ -3442,4 +3442,5 @@ sup.tm{
     font-family: normal;
     /*padding: 3px;*/
     box-shadow: 2px 2px 2px #41CAC0;
+    overflow-y: scroll;
 }
