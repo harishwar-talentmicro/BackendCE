@@ -102,8 +102,6 @@ angular.module('ezeidApp').
             getPendingRequestUserList();
             paginationReConfigration();
 
-            $scope.unreadFun = getUnreadMessageCount();
-
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -484,11 +482,8 @@ angular.module('ezeidApp').
                     /* get the pending list count */
                     var count = 0;
                     data.forEach(function(val){
-                        if(parseInt(val.requester) == 2)
-                        {
                             count++;
                             $scope.pendingRequestData.push(val);
-                        }
                     });
                     console.log($scope.pendingRequestData);
                     $scope.pendingRequestCount = count;
@@ -674,14 +669,16 @@ angular.module('ezeidApp').
                 $location.url('/message/details?id='+ groupId + '&type='+ groupType);
             };
 
-            function getUnreadMessageCount(alpha)
+            $scope.getUnreadMessageCount = function(alpha)
             {
                 unreadMessagesApi().then(function(data){
-                    if(!data || !data.length > 0)
+                    if(!data.count)
                         return;
-                    $scope.unreadMsgNotify.count = data[0].count;
+                    $scope.unreadMsgNotify.count = data.count;
                 });
             };
+
+            $scope.getUnreadMessageCount();
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ALL API CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////

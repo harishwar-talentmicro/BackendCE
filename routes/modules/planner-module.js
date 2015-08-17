@@ -76,7 +76,7 @@ Planner.prototype.getAllTask = function(req,res,next){
                         console.log(query);
 
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
+                            //console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {

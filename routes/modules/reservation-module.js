@@ -847,7 +847,7 @@ Reservation.prototype.getFeedback = function(req,res,next){
                     + ',' + st.db.escape(resourceId) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
                 var query = 'CALL pgetfeedbackDetails(' + queryParams + ')';
                 st.db.query(query, function (err, getResult) {
-                    console.log(getResult);
+                    //console.log(getResult);
                     if (!err) {
                         if (getResult) {
                             if (getResult[0]) {

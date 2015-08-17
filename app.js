@@ -99,7 +99,7 @@ app.post('/ewDeleteLocation', LocationManager.FnDeleteLocation);
 app.get('/ewtGetSearchInformationNew', LocationManager.FnGetSearchInformationNew);
 app.get('/ewmGetProxmity', LocationManager.FnGetProxmity);
 app.post('/ewtSendMail', LocationManager.FnSendMail);
-app.get('/ewtGetDoc', LocationManager.FnGetDoc);
+app.get('/ewtGetDocument', LocationManager.FnGetDocument);
 app.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 app.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
 app.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
@@ -237,6 +237,7 @@ app.get('/message_full_view',LocationManager.FnViewMessage);
 app.get('/message_attachment',LocationManager.FnGetMessageAttachment);
 app.get('/group_info',LocationManager.FnGetGroupInfo);
 app.get('/unread_message_count',LocationManager.FnCountOfUnreadMessage);
+app.get('/message_fullview_new',LocationManager.FnViewMessageNew);
 
 //Planner module
 app.get('/tasks',LocationManager.FnGetAllTask);

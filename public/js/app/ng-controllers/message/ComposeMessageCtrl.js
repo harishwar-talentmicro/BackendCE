@@ -356,9 +356,9 @@ angular.module('ezeidApp').
              * Function fired when file is selected from the input
              */
             $scope.attachDocument = function(){
-                console.log("hello");
                 var elem = $('#tx-attachment');
                 var attachmentFile = angular.element(elem)[0].files;
+
                 if(parseInt(attachmentFile[0].size/(1024*1024)) > 2){
                     Notification.error({ title : 'File size exceeds', message : 'Maximum file size allowed is 2 MB', delay : MsgDelay});
                 }
@@ -369,9 +369,9 @@ angular.module('ezeidApp').
                     FileToBase64.fileToDataUrl(attachmentFile).then(function(data){
                         $scope.file.attachment  = data;
                         $scope.visibilityHtml.disabledSendBtn = false;
-                        console.log(attachmentFile);
                     });
                 }
+                console.log(attachmentFile);
             };
 
             function resetAttachment()
@@ -433,6 +433,7 @@ angular.module('ezeidApp').
                         token : $rootScope._userInfo.Token,
                         message:$scope.composeMsg.MessageBody,
                         attachment :$scope.file.attachment,
+                        mime_type:$scope.file.attachmentMimeType,
                         priority:$scope.composeMsg.Priority,
                         attachment_filename :$scope.file.attachmentName,
                         target_date :UtilityService._convertTimeToServer($scope.composeMsg.TargetDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"),

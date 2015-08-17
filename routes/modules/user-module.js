@@ -3037,7 +3037,92 @@ User.prototype.getDoc = function(req,res,next) {
 
     }
 };
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getDocument = function(req,res,next) {
+    /**
+     * @todo FnGetDocument
+     */
+    var _this = this;
+try {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    var Token = req.query.TokenNo;
+    var Type = parseInt(req.query.RefType);
+    if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
+        st.validateToken(Token, function (err, Result) {
+            if (!err) {
+                if (Result != null) {
+                    var query = st.db.escape(Token) + ',' + st.db.escape(Type);
+                    //console.log(query);
+                    st.db.query('CALL  pGetDocsFile(' + query + ')', function (err, DocumentResult) {
+                        if (!err) {
+                            if (DocumentResult[0] != null) {
+                                if (DocumentResult[0].length > 0) {
+                                    DocumentResult = DocumentResult[0];
+                                    var docs = DocumentResult[0];
+                                    // console.log(docs);
+                                    res.setHeader('Content-Type', docs.ContentType);
+                                    res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
+                                    res.setHeader('Cache-Control', 'public, max-age=0');
+                                    res.writeHead('200', { 'Content-Type': docs.ContentType });
+                                    //console.log(docs.Docs);
+                                    res.end(docs.Docs, 'base64');
+                                    console.log('FnGetDocument: Document sent successfully-1');
+                                }
+                                else {
+                                    console.log('FnGetDocument: No document available');
+                                    res.json(null);
+                                }
 
+                            }
+                            else {
+                                console.log('FnGetDocument: No document available');
+                                res.json(null);
+                            }
+                        }
+                        else {
+                            res.statusCode = 500;
+                            res.json(null);
+                            console.log('FnGetDocument: Error in sending documents: ' + err);
+                        }
+                    });
+                }
+                else {
+                    console.log('FnGetDocument: Invalid Token');
+                    res.statusCode = 401;
+                    res.json(null);
+                }
+            }
+            else {
+                console.log('FnGetDocument: Token error: ' + err);
+                res.statusCode = 500;
+                res.json(null);
+            }
+        });
+
+    }
+    else {
+        if (Token == null) {
+            console.log('FnGetDocument: Token is empty');
+        }
+        else if (Type.toString() != 'NaN' || Type.toString() == '0') {
+            console.log('FnGetDocument: Type is empty');
+        }
+        res.statusCode = 400;
+        res.json(null);
+    }
+
+}
+catch (ex) {
+    console.log('FnGetDocument error:' + ex.description);
+    var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+}
+};
 /**
  * Method : POST
  * @param req

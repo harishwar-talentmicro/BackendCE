@@ -102,11 +102,23 @@
                     // Animation complete.
                 });})
 
-                $( ".filter-dropdownspecialization" ).blur(function() {
-                    alert( "Handler for .blur() called." );
+                $('html').click(function() {
+                    $('.filter-dropdown').hide();
+                    $('.filter-dropdownspecialization').hide();
+                    $('.filter-dropdownInstitute').hide();
+                })
+
+                $('#jobpostEdu').click(function(e){
+                    e.stopPropagation();
                 });
 
+                $('#jobpostSpeci').click(function(e){
+                    e.stopPropagation();
+                });
 
+                $('#jobpostInstit').click(function(e){
+                    e.stopPropagation();
+                });
                /* $('.dropdown-toggle1').focusout(function() {
                     $('.filter-dropdown').hide();
                 });
@@ -261,6 +273,11 @@
                 if($scope.experienceTo.length < 1){
                     err.push('Experience To is empty');
                 }
+
+                if($scope.experienceTo < $scope.experienceFrom){
+                    err.push('Experience From is smaller than Experience To');
+                }
+
                 if($scope.mainLocationArray.length == 0){
                     err.push('Location is empty');
                 }
@@ -270,48 +287,44 @@
                 if($scope.salaryTo.length < 1){
                     err.push('Salary To is empty');
                 }
+
+                if($scope.salaryTo < $scope.salaryFrom){
+                    err.push('Salary From is smaller than Salary To');
+                }
               /*  if($scope.jobType == 0){
                     err.push('Please select Job type');
                 }*/
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
                 }
+
                 if(($scope.phone.length < 1) && (!$scope.emailContact))
                 {
-
                     err.push('Phone or Email Required');
-                    /*if($scope.emailContact)
+                }
+                else
+                {
+                    if($scope.emailContact)
                     {
-                        if($scope.isWrongEmailPatternFrom)
+                        var chk_email = new RegExp(/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i);
+
+                        //  var emailval = $('#email').val();
+                        if (!chk_email.test($scope.emailContact))
                         {
                             err.push('Not valid email!');
                         }
                     }
-                    else
-                    {
-                        err.push('Phone or Email Required');
-                    }*/
                 }
-               /* if(!$scope.emailContact){
-                    err.push('Email is empty');
-                }*/
-               /* if($scope.emailContact)
+
+                if($scope.jobCategori == 0)
                 {
-                    if($scope.isWrongEmailPatternFrom)
-                    {
-                        err.push('Not valid email!');
-                    }
-                }*/
-                /*if($scope.isWrongEmailPatternFrom)
-                {
-                    err.push('Not valid email!');
-                }*/
-                if($scope.jobCategori == 0){
                     err.push('Please select Job category');
                 }
 
-                if(err.length > 0){
-                    for(var i = 0; i < err.length; i++){
+                if(err.length > 0)
+                {
+                    for(var i = 0; i < err.length; i++)
+                    {
                         Notification.error({ message : err[i], delay : 2000});
                     }
                     // Notification.error({ message : "Please enter information for Job", delay : 2000});
@@ -366,6 +379,7 @@
                             $scope.jobSearchTerm = "";
                             $scope.jobFilterStatus = 0;
                           //  $scope.showJobListing = true;
+                            Notification.success({message: "Saved..", delay: MsgDelay});
                         }
                     })
                     .error(function(data, status, headers, config) {
@@ -374,7 +388,7 @@
                 }
             };
 
-            $scope.SalaryTypeList = [{ id: 1, label: "Hour" }, { id: 2, label: "Month" }, { id: 3, label: "Annual" }];
+            $scope.SalaryTypeList = [{ id: 1, label: "Per Hour" }, { id: 2, label: "Per Month" }, { id: 3, label: "Per Annum" }];
 
             // Get job Categories
             function getJobCategories()
