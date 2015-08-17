@@ -75,6 +75,7 @@ angular.module('ezeidApp').
             /* pending list init */
             $scope.pendingRequestCount = 0;
             $scope.pendingRequestData = [];
+            $scope.pendingRequestVisbility = false;
 
             /* Mark as read/unread check box */
             $scope.selectedMsgIdArray = [];
@@ -466,6 +467,9 @@ angular.module('ezeidApp').
                     paginationReConfigration();
                 });
             }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ///////////////////////////////////LOAD PENDING REQUEST/////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             /**
              * get all the pending requests for the logged in user
@@ -477,7 +481,6 @@ angular.module('ezeidApp').
                     {
                         return;
                     }
-                    $scope.pendingRequestData = data;
                     /* get the pending list count */
                     var count = 0;
                     data.forEach(function(val){
@@ -487,7 +490,25 @@ angular.module('ezeidApp').
                             $scope.pendingRequestData.push(val);
                         }
                     });
+                    console.log($scope.pendingRequestData);
                     $scope.pendingRequestCount = count;
+                });
+            }
+
+            /**
+             * Change the user status of a pending request
+             */
+            $scope.pendingRequestResponse = function(groupId, masterId, status,index)
+            {
+                updateMemberStatusApi(groupId, masterId, status).then(function(){
+                    console.log("Yes");
+                        $scope.pendingRequestData.splice(index,1);
+                        $scope.pendingRequestVisbility = false;
+                        $scope.pendingRequestCount--;
+
+                },
+                function(){
+                    console.log("No");
                 });
             }
 
@@ -855,6 +876,37 @@ angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
                     defer.reject();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Remove member API call
+             */
+            function updateMemberStatusApi(groupId, masterId, status) {
+                var defer = $q.defer();
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    url: GURL + 'user_status',
+                    method: "PUT",
+                    data: {
+                        token: $rootScope._userInfo.Token,
+                        group_id: groupId,
+                        master_id: masterId,
+                        status: status
+                    }
+                }).success(function (resp) {
+                    if (resp.status) {
+                        $scope.$emit('$preLoaderStop');
+                        defer.resolve();
+                    }
+                    else {
+                        defer.reject();
+                    }
+                }).error(function (err) {
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
+                    defer.resolve();
                 });
                 return defer.promise;
             }
