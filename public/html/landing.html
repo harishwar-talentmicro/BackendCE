@@ -35,11 +35,11 @@
                             <div class="advance-search text-left p-bottom-4 extra-left-padding" style="display: none">
 
 
-                                <button class="btn btn-default btn-sm search-btn-width dropdown-toggle search-proximity opt opt-1">
+                                <button ng-click="" class="btn btn-default btn-sm search-btn-width dropdown-toggle search-proximity opt opt-1">
                                     <span class="normal-view-text">Search Proximity</span>
                                     <span class="mobile-view-text">Proximity</span>
                                     <span class="caret"></span></button>
-                                <span class="drop-down-0 opt opt-1">
+                                <span class="drop-down-0 opt opt-1 option-1">
                                     <div class="filter-dropdown search-proximity-content" style="display: none;">
                                         <!-- check boxes with distance -->
                                         <div class="select-option" ng-class="searchParams.proximity == 1?'selected':''" ng-click="changeProximity(1)">
@@ -72,7 +72,7 @@
                                     <span class="normal-view-text">Search Option</span>
                                     <span class="mobile-view-text">Option</span>
                                     <span class="caret"></span></button>
-                                <div class="drop-down-1 opt opt-2">
+                                <div class="drop-down-1 opt opt-2 option-2">
                                     <div class="filter-dropdown width-90 search-option-content" style="display: none;">
                                         <div class="checkbox-dropdown" ng-click="changeSearchOptions(1)">
                                             <i class="fa " ng-class="searchParams.parkingStatus ?'fa-check-square':'fa-square-o'"></i> Parking Required
@@ -92,7 +92,7 @@
 
 
                                 <button class="btn btn-default btn-sm search-btn-width search-rating opt opt-3 ">Ratings <span class="caret"></span></button>
-                                <div class="drop-down-2 opt opt-3">
+                                <div class="drop-down-2 opt opt-3 option-3">
                                     <div class="filter-dropdown width-42 search-rating-content" style="display: none;">
                                         <div class="checkbox-dropdown" ng-repeat="star in stars track by $index" ng-click="changeActiveRating($index)">
                                             <i class="fa " ng-class="activeRating[$index]?'fa-check-square':'fa-square-o'"></i> <i ng-repeat="str in starArr[$index]" class="fa fa-star text-yellow"></i>

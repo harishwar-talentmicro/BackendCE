@@ -57,8 +57,8 @@
                                         <i class="fa fa-external-link"></i> Groups <span class="label label-warning">{{groupListData.length}}</span>
                                     </a>
                                 <span class="pull-right p-right-10">
-                                    <button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(1)" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
-                                    <button ng-click="modalAddGroupVisible = !modalAddGroupVisible; modalAddGroupVisibility(2)" class="btn btn-default btn-xs no-radius"><i class="fa fa-thumbs-up"></i> Join</button>
+                                    <button ng-click="toggleJoinGroupModal(); modalAddGroupVisibility(1)" class="btn btn-default btn-xs no-radius"><i class="fa fa-plus"></i> New</button>
+                                    <button title="Click to edit or join a group" ng-click="toggleJoinGroupModal(); modalAddGroupVisibility(2)" class="btn btn-default btn-xs no-radius"><i class="fa fa-thumbs-up"></i> Subscriptions</button>
                                     <!--<button class="btn btn-default btn-xs no-radius"><i class="fa fa-edit"></i> Edit</button>-->
                                 </span>
                                 </li>
@@ -218,7 +218,7 @@
         <!-- transaction history item modal ends here -->
 
         <!-- Modal Box of Add/Edit Group -->
-        <modal mtitle="modal.title" mclass="modal.class" visible="modalAddGroupVisible">
+        <modal mtitle="joinGroupModal.title" mclass="joinGroupModal.class" visible="joinGroupModal.visible">
             <section class="group-page row p-5">
 
                 <section id="group-action-form-module" ng-show="groupFormVisible">

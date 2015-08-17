@@ -55,7 +55,7 @@ angular.module('ezeidApp').
             if((typeof msgId == undefined && !parseInt(msgId) > 0 ) || (typeof $routeParams.id == undefined  && !parseInt(msgId) > 0 ))
             {
                 /* redirect to inbox page */
-                redirectInboxPage();
+                //redirectInboxPage();
             }
 
             /* PRIORITY */
@@ -399,6 +399,7 @@ angular.module('ezeidApp').
                     if(!resp.status)
                     {
                         defer.reject();
+                        return defer.promise;
                     }
                     else if(resp.data)
                     {
@@ -484,7 +485,6 @@ angular.module('ezeidApp').
              */
             function getGroupInformation(tid,type)
             {
-                console.log(tid,type);
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'group_info',

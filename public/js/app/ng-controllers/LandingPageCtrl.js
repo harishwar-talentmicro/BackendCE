@@ -867,5 +867,12 @@ angular.module('ezeidApp').
             {
                 $scope.activeJobType[jobType] = !$scope.activeJobType[jobType];
             }
+
+            $scope.hideAll = function()
+            {
+                $('.search-option-content').slideUp();
+                $('.search-proximity-content').slideUp();
+                $('.search-rating-content').slideUp();
+            }
         }]);
 
