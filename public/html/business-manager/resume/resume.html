@@ -318,8 +318,8 @@
                         </small>
                         <br/>
 
-                        <small class="text-default" title="Job Title" ng-show="tx.jobtitle && (!editModes[$index])">
-                            {{tx.jobtitle}}
+                        <small class="text-default" title="Job Title{{(tx.jobtitle) ? ' : '+tx.jobtitle : ''}}" ng-show="tx.jobtitle && (!editModes[$index])">
+                            {{tx.jobtitle | truncate:18:'..'}}
                         </small>
 
                         <small class="text-danger tiny" ng-hide="tx.jobtitle || editModes[$index]">

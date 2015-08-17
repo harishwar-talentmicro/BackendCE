@@ -2407,7 +2407,7 @@
              * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
              */
             $scope.multiSelectDropDownSettings = {
-                smartButtonMaxItems: 3,
+                smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     if (itemText === 'Jhon') {
                         return 'Jhonny!';
@@ -2417,10 +2417,10 @@
                 }
             };
 
-            $scope.multiSelectTransText = {buttonDefaultText: 'No folders selected'};
+            $scope.multiSelectTransText = {buttonDefaultText: 'No folders selected', dynamicButtonTextSuffix : 'selected'};
 
-            $scope.multiSelectInstituteText = {buttonDefaultText: 'All Institutes'};
-            $scope.multiSelectJobsText = {buttonDefaultText: 'All Applicants'};
+            $scope.multiSelectInstituteText = {buttonDefaultText: 'All Institutes',dynamicButtonTextSuffix : 'selected'};
+            $scope.multiSelectJobsText = {buttonDefaultText: 'All Applicants',dynamicButtonTextSuffix : 'selected'};
 
 
         }]);

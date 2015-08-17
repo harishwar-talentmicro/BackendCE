@@ -325,15 +325,26 @@
              * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
              */
             $scope.multiSelectDropDownSettings = {
-                smartButtonMaxItems: 2,
+                smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
                 }
             };
 
-            $scope.multiSelectTransTextUser = {buttonDefaultText: 'Select Users'};
-            $scope.multiSelectTransTextStatus = {buttonDefaultText: 'Select Stages'};
-            $scope.multiSelectTransTextProbability = {buttonDefaultText: 'Select Probabilities'};
+            /**
+             * Settings for Mutli select control (used for folder rules in view)
+             * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
+             */
+            $scope.multiSelectDropDownSettings1 = {
+                smartButtonMaxItems: 0,
+                smartButtonTextConverter: function(itemText, originalItem) {
+                    return itemText;
+                }
+            };
+
+            $scope.multiSelectTransTextUser = {buttonDefaultText: 'Select Users',dynamicButtonTextSuffix : 'selected'};
+            $scope.multiSelectTransTextStatus = {buttonDefaultText: 'Select Stages',dynamicButtonTextSuffix : 'selected'};
+            $scope.multiSelectTransTextProbability = {buttonDefaultText: 'Select Probabilities',dynamicButtonTextSuffix : 'selected'};
 
             init();
 
