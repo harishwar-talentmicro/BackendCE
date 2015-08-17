@@ -302,7 +302,16 @@
                     <div class="job-main-content tile-head job-result">
                         <div class="row">
                             <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
-                                <i class="fa fa-tags text-info job-title-icon"></i> {{job.jobtitle}}<br>
+                                <i class="fa fa-tags text-info job-title-icon"></i> {{job.jobtitle  }} -
+                                <span ng-show="job.jobtype == 0">(Full Time)</span>
+                                <span ng-show="job.jobtype == 1">(Part Time)</span>
+                                <span ng-show="job.jobtype == 2">(Work from Home)</span>
+                                <span ng-show="job.jobtype == 3">(Internship)</span>
+                                <span ng-show="job.jobtype == 4">(Apprenticeship)</span>
+                                <span ng-show="job.jobtype == 5">(Job Oriented Training)</span>
+                                <span ng-show="job.jobtype == 6">(Consultant)</span>
+                                <span ng-show="job.jobtype == 7">(Freelancer)</span>
+                                <br>
                                 <small class="company-name">{{job.companyname}}</small>
                             </div>
                             <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12 text-right normal-view-buttons">
@@ -327,7 +336,7 @@
                         </div>
                         <div class="row">
                             <div class="salary col-lg-7">
-                                <i class="fa fa-rupee"></i> {{getSalaryRange(job.salaryfrom,job.salaryto)}}
+                                Salary: {{getSalaryRange(job.salaryfrom,job.salaryto)}}
                             </div>
                             <div class="posted-on text-right col-lg-5">
                                 <i class="fa fa-clock-o"></i> {{job.LUdate | ageFilter}}
