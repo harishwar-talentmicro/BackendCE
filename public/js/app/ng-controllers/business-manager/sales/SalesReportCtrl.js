@@ -328,8 +328,7 @@
                 smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
-                },
-                dynamicButtonTextSuffix : 'selected'
+                }
             };
 
             /**
@@ -340,13 +339,12 @@
                 smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
-                },
-                dynamicButtonTextSuffix : 'selected'
+                }
             };
 
-            $scope.multiSelectTransTextUser = {buttonDefaultText: 'Select Users'};
-            $scope.multiSelectTransTextStatus = {buttonDefaultText: 'Select Stages'};
-            $scope.multiSelectTransTextProbability = {buttonDefaultText: 'Select Probabilities'};
+            $scope.multiSelectTransTextUser = {buttonDefaultText: 'Select Users',dynamicButtonTextSuffix : 'selected'};
+            $scope.multiSelectTransTextStatus = {buttonDefaultText: 'Select Stages',dynamicButtonTextSuffix : 'selected'};
+            $scope.multiSelectTransTextProbability = {buttonDefaultText: 'Select Probabilities',dynamicButtonTextSuffix : 'selected'};
 
             init();
 

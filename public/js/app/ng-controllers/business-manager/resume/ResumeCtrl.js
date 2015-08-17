@@ -2414,14 +2414,13 @@
                     }
 
                     return itemText;
-                },
-                dynamicButtonTextSuffix : 'selected'
+                }
             };
 
-            $scope.multiSelectTransText = {buttonDefaultText: 'No folders selected'};
+            $scope.multiSelectTransText = {buttonDefaultText: 'No folders selected', dynamicButtonTextSuffix : 'selected'};
 
-            $scope.multiSelectInstituteText = {buttonDefaultText: 'All Institutes'};
-            $scope.multiSelectJobsText = {buttonDefaultText: 'All Applicants'};
+            $scope.multiSelectInstituteText = {buttonDefaultText: 'All Institutes',dynamicButtonTextSuffix : 'selected'};
+            $scope.multiSelectJobsText = {buttonDefaultText: 'All Applicants',dynamicButtonTextSuffix : 'selected'};
 
 
         }]);

@@ -1933,8 +1933,7 @@
                 smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
-                },
-                dynamicButtonTextSuffix : 'selected'
+                }
             };
 
             /**
@@ -1945,11 +1944,10 @@
                 smartButtonMaxItems: 1,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
-                },
-                dynamicButtonTextSuffix : 'selected'
+                }
             };
 
-            $scope.multiSelectTransText = {buttonDefaultText: 'Select Folders'};
+            $scope.multiSelectTransText = {buttonDefaultText: 'Select Folders', dynamicButtonTextSuffix : 'selected'};
 
         }]);
 
