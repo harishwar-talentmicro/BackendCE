@@ -55,8 +55,8 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
     var m = date.getMonth();
     var y = date.getFullYear();
     $scope.eventsList =  [
-        {title : 'EZEOne Launch',start : new Date(y,m,d)},
-        {title : 'EZEOne Launch 1',start : new Date(y,m,d,22,30), end : new Date(y,m,d,22,50)}
+        //{title : 'EZEOne Launch',start : new Date(y,m,d)},
+        //{title : 'EZEOne Launch 1',start : new Date(y,m,d,22,30), end : new Date(y,m,d,22,50)}
         //{title: 'All Day Event',start: new Date(y, m, 1)},
         //{title: 'Long Event',start: new Date(y, m, d - 5),end: new Date(y, m, d - 2)},
         //{id: 999,title: 'Repeating Event',start: new Date(y, m, d - 3, 16, 0),allDay: false},
@@ -206,7 +206,17 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
     };
 
 
-    angular.element('.xdsoft_datetimepicker').css({ 'display':'block'})
+    angular.element('#calendar-block .input-group-addon').addClass('hidden');
+
+    $timeout(function(){
+        $scope.$watch('startDate',function(n,v){
+            if(n !== v){
+                var dateTime = moment(n,'YYYY-MM-DD HH:mm:ss');
+                uiCalendarConfig.calendars['ezeoneCalendar'].fullCalendar('gotoDate',dateTime);
+            }
+        });
+    },3000);
+
 
 
     }]);

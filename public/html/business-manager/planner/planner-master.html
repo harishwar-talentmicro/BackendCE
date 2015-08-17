@@ -26,12 +26,17 @@
 
         <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                <date-time-picker input-group-class="input-group-sm hidden  no-radius" recipient="startDate" settings='{
-                                                                        "format" : "d-M-Y",
-                                                                        "timepicker" : false,
-                                                                        "mask" : false,
-                                                                        "hours12" : false
-                                                                        }'></date-time-picker>
+                <div id="calendar-block">
+                    <date-time-picker recipient="startDate" settings='{
+                                                                    "format" : "Y-m-d H:i:s",
+                                                                    "timepicker" : false,
+                                                                    "mask" : false,
+                                                                    "hours12" : false,
+                                                                    "inline" : true
+                                                                    }'>
+
+                    </date-time-picker>
+                </div>
             </div>
             <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
                 <div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources" calendar="ezeoneCalendar"></div>
