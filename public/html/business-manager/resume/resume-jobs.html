@@ -218,21 +218,21 @@
                         <label>Salary</label>
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 fotterButtonContainer">
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero">
+                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setLeftRightPaddingZero">
                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setLeftRightPaddingZero">
-                                <input type="text" decimals-only maxlength="17" placeholder="100000" ng-model = "salaryFrom" class="form-control text-right"/>
+                                <input type="text" decimals-only maxlength="17" placeholder="2" ng-model = "salaryFrom" class="form-control text-right"/>
                             </div>
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer text-center topMargin-three setLeftRightPaddingZero">
                                 <span>to</span>
                             </div>
                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setLeftRightPaddingZero">
-                                <input type="text" decimals-only maxlength="17" placeholder="200000" ng-model = "salaryTo" class="form-control text-right"/>
+                                <input type="text" decimals-only maxlength="17" placeholder="4" ng-model = "salaryTo" class="form-control text-right"/>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero">
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 setLeftRightPaddingZero">
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer text-center topMargin-three setLeftRightPaddingZero">
                             </div>
-                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 setLeftRightPaddingZero">
+                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 setLeftRightPaddingZero">
                                 <select class="form-control" name="listType" ng-model="salaryType">
                                     <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
                                 </select>

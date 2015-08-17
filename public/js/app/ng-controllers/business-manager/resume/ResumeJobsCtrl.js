@@ -318,7 +318,7 @@
 
                 if($scope.jobCategori == 0)
                 {
-                    err.push('Please select Job category');
+                    err.push('Please select Job Categories');
                 }
 
                 if(err.length > 0)
