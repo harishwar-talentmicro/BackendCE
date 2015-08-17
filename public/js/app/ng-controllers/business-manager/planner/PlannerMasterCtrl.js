@@ -1,7 +1,38 @@
 /**
  * calendarDemoApp - 0.9.0
  */
-angular.module('ezeidApp').controller('PlannerMasterCtrl',['$scope','$compile','uiCalendarConfig',function($scope,$compile,uiCalendarConfig) {
+angular.module('ezeidApp').controller('PlannerMasterCtrl',[
+    '$scope',
+    '$compile',
+    'uiCalendarConfig',
+    '$http',
+    '$timeout',
+    'GURL',
+    '$rootScope',
+    '$q',
+    'Notification',
+    'MsgDelay',
+    '$log',
+    'UtilityService',
+    function($scope,
+             $compile,
+             uiCalendarConfig,
+             $http,
+             $timeout,
+             GURL,
+             $rootScope,
+             $q,
+             Notification,
+             MsgDelay,
+             $log,
+             UtilityService
+    ) {
+
+
+    // Start Time
+    var sTime = moment().format('YYYY-MM-DD HH:mm:ss');
+    // End Time
+    var eTime = moment().format('YYYY-MM-DD HH:mm:ss');
 
     $scope.alertEventOnClick = function(){
         console.log('Hello event clicked');
@@ -29,11 +60,11 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',['$scope','$compile','
 
     /* event source that calls a function on every view switch */
     $scope.eventsF = function (start, end, timezone, callback) {
-        var s = new Date(start).getTime() / 1000;
-        var e = new Date(end).getTime() / 1000;
-        var m = new Date(start).getMonth();
-        var events = [{title: 'Feed Me ' + m,start: s + (50000),end: s + (100000),allDay: false, className: ['customFeed']}];
-        callback(events);
+        //var s = new Date(start).getTime() / 1000;
+        //var e = new Date(end).getTime() / 1000;
+        //var m = new Date(start).getMonth();
+        //var events = [{title: 'Feed Me ' + m,start: s + (50000),end: s + (100000),allDay: false, className: ['customFeed']}];
+        //callback(events);
     };
 
 
@@ -73,11 +104,73 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',['$scope','$compile','
                 center: 'title',
                 right: 'prev,next'
             },
+            defaultView : 'agendaDay',
             dayClick: $scope.alertEventOnClick,
             eventClick : $scope.alertEventOnClick,
             eventDrop: $scope.alertOnDrop,
-            eventResize: $scope.alertOnResize
+            eventResize: $scope.alertOnResize,
+            viewRender : function(view,elem){
+                //console.log(view);
+                //$log.debug("View Changed: ", view.visStart, view.visEnd, view.start, view.end);
+
+                console.log(view.start);
+                console.log(view.end);
+                sTime = view.start.format('YYYY-MM-DD HH:mm:ss');
+                eTime = view.end.format('YYYY-MM-DD HH:mm:ss');
+                $scope.loadNextActionList();
+            }
         }
     };
+
+
+    /**
+     * Next Actions Loaded from server
+     * @type {Array}
+     */
+    $scope.nextActionList = [];
+
+    $scope.loadNextActionList = function(){
+        $http({
+            url : GURL + 'tasks',
+            method : 'GET',
+            params : {
+                s_time : UtilityService._convertTimeToServer(sTime,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss'),
+                e_time : UtilityService._convertTimeToServer(eTime,'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss'),
+                token : $rootScope._userInfo.Token
+            }
+        }).success(function(resp){
+            if(resp){
+                if(resp.status){
+                    if(resp.data){
+                        console.log(resp.data);
+                        if(resp.data.tasks){
+                            for(var i=0; i < resp.data.tasks.length; i++){
+                                var nextAction = {
+                                    title : resp.data.tasks[i].ts_t,
+                                    start : moment(
+                                        UtilityService._convertTimeToLocal(resp.data.tasks[i].ts,
+                                            'DD-MMM-YYYY hh:mm:ss A','YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss'),
+                                    end : moment(
+                                        UtilityService._convertTimeToLocal(resp.data.tasks[i].ts,
+                                            'DD-MMM-YYYY hh:mm:ss A','YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss').add(15,'m'),
+                                    allDay : false
+                                };
+                                $scope.nextActionList.push(nextAction);
+                            }
+                        }
+                    }
+                }
+            }
+        }).error(function(err,statusCode){
+           if(!statusCode){
+               Notification.error({ title : 'Connection Lost', message : 'Please check you internet connection', delay : MsgDelay});
+           }
+           else{
+               Notification.error({ title : 'Error', message : 'An error occurred ! Please try again', delay : MsgDelay});
+           }
+        });
+    };
+
+
 }]);
 
