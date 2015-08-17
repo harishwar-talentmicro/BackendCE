@@ -93,6 +93,7 @@ angular.module('ezeidApp').
             loadFullViewMessage();
             populateGroupInfo();
             $scope.unreadFun;
+            $scope.getUnreadMessageCount();
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ACTION//////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,6 +270,7 @@ angular.module('ezeidApp').
                 }
                 else if($routeParams.id && $routeParams.type == 0)
                 {
+                    $scope.isGroupLoaded = true;
                     $scope.groupData.name = data[0].groupname;
                     $scope.groupData.desc = data[0].aboutgroup;
                     $scope.groupData.isPublic = data[0].autojoin;
@@ -279,7 +281,6 @@ angular.module('ezeidApp').
                 {
                     $scope.groupData.name = data[0].name;
                 }
-
             }
 
             function setReplyMessageData()
