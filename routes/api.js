@@ -40,6 +40,7 @@ router.get('/ewtGetSearchInformationNew', LocationManager.FnGetSearchInformation
 router.get('/ewmGetProxmity', LocationManager.FnGetProxmity);
 router.post('/ewtSendMail', LocationManager.FnSendMail);
 router.get('/ewtGetDoc', LocationManager.FnGetDoc);
+router.get('/ewtGetDocument', LocationManager.FnGetDocument);
 router.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 router.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
 router.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
@@ -177,6 +178,7 @@ router.get('/message_full_view',LocationManager.FnViewMessage);
 router.get('/message_attachment',LocationManager.FnGetMessageAttachment);
 router.get('/group_info',LocationManager.FnGetGroupInfo);
 router.get('/unread_message_count',LocationManager.FnCountOfUnreadMessage);
+router.get('/message_fullview_new',LocationManager.FnViewMessageNew);
 
 //Planner module
 router.get('/tasks',LocationManager.FnGetAllTask);
