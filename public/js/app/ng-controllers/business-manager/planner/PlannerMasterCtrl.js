@@ -29,6 +29,11 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
     ) {
 
 
+    var colorCodes = {
+        sales : '#FF6002',
+        recruitment : '#66B700'
+    };
+
     // Start Time
     var sTime = moment().format('YYYY-MM-DD HH:mm:ss');
     // End Time
@@ -148,15 +153,40 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
                         console.log(resp.data);
                         if(resp.data.tasks){
                             for(var i=0; i < resp.data.tasks.length; i++){
+                                var color = '#000';
+                                switch(resp.data.tasks[i].fn_type){
+                                    case 0 :
+                                        color = colorCodes.sales;
+                                        break;
+                                    case 4 :
+                                        color : colorCodes.recruitment;
+                                        break;
+                                    default :
+                                        color = '#000'
+                                        break;
+                                };
+
+                                var title = resp.data.tasks[i].ts_t;
+
+                                if(resp.data.tasks[i].c_info){
+                                    title += (' '+resp.data.tasks[i].c_info);
+                                    if(resp.data.tasks[i].cn){
+                                        title += (' ('+resp.data.tasks[i].cn+')');
+                                    }
+                                }
+
                                 var nextAction = {
-                                    title : resp.data.tasks[i].ts_t,
+                                    id : resp.data.tasks[i].tid,
+                                    type : resp.data.tasks[i].fn_type,
+                                    title : title,
                                     start : moment(
                                         UtilityService._convertTimeToLocal(resp.data.tasks[i].ts,
                                             'DD-MMM-YYYY hh:mm:ss A','YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss').toDate(),
                                     end : moment(
                                         UtilityService._convertTimeToLocal(resp.data.tasks[i].ts,
                                             'DD-MMM-YYYY hh:mm:ss A','YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss').add(15,'m').toDate(),
-                                    allDay : false
+                                    allDay : false,
+                                    color : color
                                 };
                                 $scope.eventsList.push(nextAction);
                             }
@@ -176,5 +206,8 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
     };
 
 
-}]);
+    angular.element('.xdsoft_datetimepicker').css({ 'display':'block'})
+
+
+    }]);
 

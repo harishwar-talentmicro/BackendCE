@@ -2407,7 +2407,7 @@
              * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
              */
             $scope.multiSelectDropDownSettings = {
-                smartButtonMaxItems: 3,
+                smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     if (itemText === 'Jhon') {
                         return 'Jhonny!';
