@@ -15,12 +15,22 @@
                         <!-- main indexes -->
                         <div class="inbox-head-left main-index inbox-head-left-bg">
                             <h3 class="text-white text-center">
-
                                 <a href="/message" class="text-white no-style-link"><i class="fa fa-envelope"></i> MessageBox</a>
                                 <label title="New request(s)"
                                        class="label label-warning pointer"
+                                       ng-click="pendingRequestVisbility = !pendingRequestVisbility"
                                        ng-show="pendingRequestCount > 0">{{pendingRequestCount}}</label>
                             </h3>
+                            <!-- List of all pending request -->
+                            <div class="pending-request" ng-show="pendingRequestVisbility">
+                                <div class="individual-pending-request" ng-repeat="req in pendingRequestData track by $index">
+                                    {{req.GroupName}}
+                                    <span class="pull-right">
+                                        <button ng-click="pendingRequestResponse(req.GroupID, req.MemberID, 1,$index)" class="btn btn-primary btn-xs"><i class="fa fa-check"></i></button>
+                                        <button ng-click="pendingRequestResponse(req.groupId, req.MemberID, 2,$index)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                         <!-- All the indexes/menu goes here -->
                         <div class="index-menu">

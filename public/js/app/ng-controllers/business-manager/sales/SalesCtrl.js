@@ -1932,10 +1932,17 @@
             $scope.multiSelectDropDownSettings = {
                 smartButtonMaxItems: 3,
                 smartButtonTextConverter: function(itemText, originalItem) {
-                    if (itemText === 'Jhon') {
-                        return 'Jhonny!';
-                    }
+                    return itemText;
+                }
+            };
 
+            /**
+             * Settings for Mutli select control (used for folder rules in view)
+             * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
+             */
+            $scope.multiSelectDropDownSettings1 = {
+                smartButtonMaxItems: 1,
+                smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
                 }
             };

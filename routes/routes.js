@@ -36,6 +36,7 @@ exports.FnSaveCVInfo = userModule.saveResume;
 exports.FnPGetSkills = userModule.getSkills;
 exports.FnGetDocPin = userModule.getDocPin;
 exports.FnGetDoc = userModule.getDoc;
+exports.FnGetDocument = userModule.getDocument;
 exports.FnUpdateDocPin = userModule.updateDocPin;
 exports.FnSaveDoc = userModule.saveDoc;
 exports.FnGetFunctions = userModule.getFunctions;
@@ -200,6 +201,7 @@ exports.FnViewMessage = messageBox.viewMessage;
 exports.FnGetMessageAttachment = messageBox.getMessageAttachment;
 exports.FnGetGroupInfo = messageBox.getGroupInfo;
 exports.FnCountOfUnreadMessage = messageBox.countOfUnreadMessage;
+exports.FnViewMessageNew = messageBox.viewMessageNew;
 
 
 var Notification = require('./modules/notification/notification-master.js');

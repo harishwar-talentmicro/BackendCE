@@ -3418,3 +3418,29 @@ sup.tm{
 {
     background-color: #fff !important;
 }
+
+.hpw .individual-pending-request
+{
+    border-bottom: 1px solid #DCD9D9;cursor: pointer;
+    padding: 6px;
+}
+
+.hpw .individual-pending-request:hover
+{
+    background-color: #6595CA;
+    color: #fff;
+}
+
+.hpw .pending-request
+{
+    z-index: 999;
+    position: absolute;
+    background-color: #fff;
+    width: 90%;
+    max-height: 200px;
+    color:black;
+    font-family: normal;
+    /*padding: 3px;*/
+    box-shadow: 2px 2px 2px #41CAC0;
+    overflow-y: scroll;
+}

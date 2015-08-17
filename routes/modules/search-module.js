@@ -887,7 +887,7 @@ try {
     var Keyword = req.body.Keyword;
     var Latitude = req.body.Latitude;
     var Longitude = req.body.Longitude;
-    var Proximity = req.body.Proximity ? req.body.Proximity : 0;
+    var Proximity = req.body.Proximity ? req.body.Proximity : 1;
     var currentDateTime = req.body.CurrentDate;
 
     if (Token != null && Keyword != null && Latitude != null && Longitude != null) {
