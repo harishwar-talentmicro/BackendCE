@@ -33,3 +33,7 @@
 .calendar .fc-toolbar .fc-button-group .fc-button:focus{
     background: #FF930C;
 }
+
+.fc-event, .fc-event:hover, .ui-widget .fc-event{
+    border-radius: 0px;
+}

@@ -592,15 +592,15 @@ angular.module('ezeidApp').
                 }
                 if(parseInt(salaryFrom) == parseInt(salaryTo))
                 {
-                    return UtilityService.currencyStyleConverter(salaryFrom)+" INR";
+                    return UtilityService.currencyStyleConverter(salaryFrom);
                 }
                 else if(parseInt(salaryFrom) < parseInt(salaryTo))
                 {
-                    return UtilityService.currencyStyleConverter(salaryFrom)+"-"+UtilityService.currencyStyleConverter(salaryTo)+" INR";
+                    return UtilityService.currencyStyleConverter(salaryFrom)+" - "+UtilityService.currencyStyleConverter(salaryTo);
                 }
                 else
                 {
-                    return UtilityService.currencyStyleConverter(salaryTo)+"-"+UtilityService.currencyStyleConverter(salaryFrom)+" INR";
+                    return UtilityService.currencyStyleConverter(salaryTo)+" - "+UtilityService.currencyStyleConverter(salaryFrom);
                 }
             };
 
@@ -1194,7 +1194,7 @@ angular.module('ezeidApp').
                             {
                                 //  initiateSearch();
                                 $scope.resultData[_index].hide = 1;
-                                Notification.success({ message: "Applied Success..", delay : 2000});
+                                Notification.success({ message: "Applied..", delay : 2000});
                             }
                         }
                     })

@@ -70,7 +70,7 @@
             <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                 <div class="form-group no-radius">
                     <div class="input-group no-radius">
-                        <button class="btn btn-sm btn-info no-radius" ng-click="prepareReport()">&nbsp; Go &nbsp;</button>
+                        <button class="btn btn-sm btn-danger no-radius" ng-click="prepareReport()">&nbsp; Go &nbsp;</button>
                     </div>
                 </div>
             </div>
@@ -80,7 +80,7 @@
         </div>
 
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+    <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" ng-show="reportData.funnel.length">
         <div class="funnel-image-container pull-right">
             <div class="row top-clearfix-half">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" ng-repeat="elem in reportData.funnel track by $index">
@@ -121,13 +121,13 @@
                     </td>
                 </tr>
             </tbody>
-            <thead>
+            <thead ng-show="reportData.transactions.length">
                 <tr>
                     <th>Total</th>
                     <th class="hidden-xs"></th>
                     <th class="hidden-xs"></th>
-                    <th>{{reportData.total_amount}}</th>
                     <th>{{reportData.total_items}}</th>
+                    <th>{{reportData.total_amount}}</th>
                     <th class="hidden-xs"></th>
                 </tr>
             </thead>

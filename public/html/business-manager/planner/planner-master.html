@@ -3,27 +3,46 @@
     <!--<h3 class="font-roboto business-manager-module-heading">{{(_userInfo.CVModuleTitle) ? _userInfo.CVModuleTitle : 'Resume Application'}}</h3>-->
     <!--</div>-->
     <div class="panel-body">
-        <div class="btn-toolbar">
 
-            <div class="btn-group no-radius" data-toggle="buttons">
-                <label class="btn btn-info btn-sm no-radius" ng-click="changeView('agendaDay', 'ezeoneCalendar')">
-                    <input type="radio" name="options" id="option1" autocomplete="off"> &nbsp; Day &nbsp;
-                </label>
-                <label class="btn btn-info btn-sm no-radius" ng-click="changeView('agendaWeek', 'ezeoneCalendar')">
-                    <input type="radio" name="options" id="option2" autocomplete="off"> &nbsp; Week &nbsp;
-                </label>
-                <label class="btn btn-info btn-sm no-radius active" ng-click="changeView('month', 'ezeoneCalendar')">
-                    <input type="radio" name="options" id="option3" autocomplete="off" checked> &nbsp; Month &nbsp;
-                </label>
+
+        <div class="row bottom-clearfix">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="btn-toolbar">
+
+                    <div class="btn-group no-radius" data-toggle="buttons">
+                        <label class="btn btn-info btn-sm no-radius active" ng-click="changeView('agendaDay', 'ezeoneCalendar')">
+                            <input type="radio" name="options" id="option1" autocomplete="off"> &nbsp; Day &nbsp;
+                        </label>
+                        <label class="btn btn-info btn-sm no-radius" ng-click="changeView('agendaWeek', 'ezeoneCalendar')">
+                            <input type="radio" name="options" id="option2" autocomplete="off"> &nbsp; Week &nbsp;
+                        </label>
+                        <label class="btn btn-info btn-sm no-radius" ng-click="changeView('month', 'ezeoneCalendar')">
+                            <input type="radio" name="options" id="option3" autocomplete="off" checked> &nbsp; Month &nbsp;
+                        </label>
+                    </div>
+                </div>
             </div>
-            <!--<div class="btn-group no-radius">-->
-                <!--<button class="btn btn-info btn-sm no-radius" >Day View</button>-->
-                <!--<button class="btn btn-info btn-sm no-radius" ng-click="changeView('agendaWeek', 'ezeoneCalendar')">Week View</button>-->
-                <!--<button class="btn btn-info btn-sm no-radius" ng-click="changeView('month', 'ezeoneCalendar')">Month View</button>-->
-            <!--</div>-->
         </div>
 
-        <div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources" calendar="ezeoneCalendar"></div>
+        <div class="row">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                <div id="calendar-block">
+                    <date-time-picker recipient="startDate" settings='{
+                                                                    "format" : "Y-m-d H:i:s",
+                                                                    "timepicker" : false,
+                                                                    "mask" : false,
+                                                                    "hours12" : false,
+                                                                    "inline" : true
+                                                                    }'>
+
+                    </date-time-picker>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                <div ui-calendar="uiConfig.calendar" class="span8 calendar" ng-model="eventSources" calendar="ezeoneCalendar"></div>
+            </div>
+        </div>
+
 
     </div>
 </div>

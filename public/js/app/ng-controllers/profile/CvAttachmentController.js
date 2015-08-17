@@ -45,10 +45,10 @@ angular.module('ezeidApp').controller('CVAttachController',[
         {
             $('.filter-dropdown').hide();
         }
-        if(parseInt(id) != 2)
+       /* if(parseInt(id) != 2)
         {
             $('.filter-dropdownCategory').hide();
-        }
+        }*/
        /* if(parseInt(id) != 3)
         {
             $('.filter-dropdownInstitute').hide();
@@ -62,23 +62,25 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 hideAllDropdoowns(1);
             });})
 
-            $('.dropdown-toggleCategory').click(function(){$( ".filter-dropdownCategory" ).slideToggle( "slow", function() {
+           /* $('.dropdown-toggleCategory').click(function(){$( ".filter-dropdownCategory" ).slideToggle( "slow", function() {
                 // Animation complete.
                 hideAllDropdoowns(2);
             });})
 
-
-
-           /* $('.dropdown-toggle1').focusout(function() {
-                $('.filter-dropdown').hide();
-            });
-
-            $('.dropdown-toggleCategory').focusout(function() {
+            $(".cvcategory").focusout(function() {
                 $('.filter-dropdownCategory').hide();
             });*/
 
-            /*$('.instittuteClass').focusout(function() {
-                $('.filter-dropdownInstitute').hide();
+            $('html').click(function() {
+                $('.filter-dropdown').hide();
+            });
+
+            $('#functionDiv').click(function(e){
+                e.stopPropagation();
+            });
+
+            /*$('#footleft').click(function(e){
+                e.stopPropagation();
             });*/
 
             $scope.spcializationGetResponse = false;
@@ -244,9 +246,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
         else
         {
-            console.log("SAi122");
-            console.log($scope.instituteID);
-            console.log($scope.instituteText);
             if(($scope.instituteTitle) && (parseInt($scope.instituteID) == 0))
             {
                 CVAttachCtrl._CVInfo.institute_id = 0;
@@ -257,8 +256,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 CVAttachCtrl._CVInfo.institute_id = $scope.instituteID;
                 CVAttachCtrl._CVInfo.institute_title = "";
             }
-
-
         }
 
         $scope.instituteText = "";

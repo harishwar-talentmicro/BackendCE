@@ -8,6 +8,7 @@
                 </div>
                 <div class="panel-default panel-body">
                     <!-- search bar to search job keyword by skill keywords -->
+                   <!-- <form name="jobSeekersearchForm" novalidate >-->
                         <div class="container p-bottom-10">
                             <div class="row">
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
@@ -59,7 +60,7 @@
                                         <option value = ""> -- Select Country -- </option>
                                     </select>
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekercity">
                                     <button class="btn btn-default btn-sm dropdown-toggleCity opt opt-2 drpFunction" ng-disabled="!cityList">
                                         <span class="normal-view-text custom-select-dropdown"> -- Select City ({{selectedCitys.length}}) -- </span>
                                         <span class="mobile-view-text"></span>
@@ -95,8 +96,8 @@
                         </div>
                         <div class="container p-bottom-10">
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction" ng-blur="InstituteTextBoxLossFocus()">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekerinstitute">
+                                    <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction">
                                         <span class="normal-view-text custom-select-dropdown"> -- Select Institute ({{selectedInstitute.length}}) -- </span>
                                         <span class="mobile-view-text"></span>
                                         <span class="caret selectImg"></span>
@@ -109,7 +110,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekereducation">
                                     <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
                                         <span class="normal-view-text custom-select-dropdown"> -- Select Education ({{selectedEducations.length}}) -- </span>
                                         <span class="mobile-view-text"></span>
@@ -122,7 +123,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12"  id="jobseekerspecialization">
                                     <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
                                         <span class="normal-view-text custom-select-dropdown"> -- Select Specialization ({{selectedSpecializations.length}}) -- </span>
                                         <span class="mobile-view-text"></span>
@@ -165,6 +166,7 @@
                                 </div>
                             </div>
                         </div>
+                   <!-- </form>-->
                     <hr>
 
                     <div ng-hide="jobSeekerResults.length" class="text-danger text-center">
@@ -176,7 +178,10 @@
                             <div class="col-lg-12">
                             </div>
                             <div class="col-lg-6">
-                                Showing {{pageCount}}-{{pageSize}} of {{totalResult}} results
+
+                                Showing {{pageCount+1}}-{{pageCount+resultThisPage}} of {{totalResult}} results
+                                <!--Showing-->
+                                <!--{{pageCount}}-{{pageSize}} of {{totalResult}} results-->
                             </div>
                             <div class="col-lg-6 text-right">
 
@@ -260,7 +265,7 @@
                 </div>
                 <div ng-show="jobSeekerResults.length">
                     <div class="panel-danger panel-footer text-white">
-                        <i class="fa fa-envelope"></i> Compose Mail <label class="label label-primary">{{selectedTidToMail.length}}</label>
+                        <i class="fa fa-envelope"></i> Compose Message <label class="label label-primary">{{selectedTidToMail.length}}</label>
                     </div>
                     <!--new design of mail template-->
                     <div style="text-align: center">
@@ -281,7 +286,7 @@
                                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
                                             <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('new')" >New</button>
                                         </div>
-                                        <div ng-show="mailTemplateTid" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                        <div ng-show="mailTemplateTid" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment">
                                             <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('edit')" >Edit</button>
                                         </div>
                                         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
@@ -310,7 +315,7 @@
                                                ng-class="MailTemplateForm.FromName.$touched && !FromName.length && validationMode > 0  ? 'mandatoryTextBox' : ''"
                                                class="form-control emptyBox" id="FromName" placeholder="From name" maxlength="100" ng-readonly="validationMode == 0" required>
                                     </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton keyWordText">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer sendMsgFrom">
                                         From
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 searchHeaderAlignment">

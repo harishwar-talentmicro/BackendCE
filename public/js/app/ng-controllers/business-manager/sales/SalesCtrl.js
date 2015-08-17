@@ -1930,7 +1930,7 @@
              * @type {{smartButtonMaxItems: number, smartButtonTextConverter: Function}}
              */
             $scope.multiSelectDropDownSettings = {
-                smartButtonMaxItems: 3,
+                smartButtonMaxItems: 0,
                 smartButtonTextConverter: function(itemText, originalItem) {
                     return itemText;
                 }
@@ -1947,7 +1947,7 @@
                 }
             };
 
-            $scope.multiSelectTransText = {buttonDefaultText: 'Select Folders'};
+            $scope.multiSelectTransText = {buttonDefaultText: 'Select Folders', dynamicButtonTextSuffix : 'selected'};
 
         }]);
 

@@ -118,30 +118,41 @@
                         // Animation complete.
                     });})
 
-                $('.dropdown-toggleInstitute').click(function(){
-                    hideAllDropdoowns(3);
-                    $( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
-                        // Animation complete.
-                    });})
-
                 $('.dropdown-toggleCity').click(function(){
                     hideAllDropdoowns(4);
                     $( ".filter-dropdownCity" ).slideToggle( "slow", function() {
                         // Animation complete.
                     });})
 
-               /* $('.dropdown-toggle1').focusout(function() {
-                    $('.filter-dropdown').hide();
-                });
-                $('.dropdown-toggleSpecialization').focusout(function() {
-                    $('.filter-dropdownspecialization').hide();
-                });
-                $('.dropdown-toggleInstitute').focusout(function() {
-                    $('.filter-dropdownInstitute').hide();
-                });
-                $('.dropdown-toggleCity').focusout(function() {
+                $('.dropdown-toggleInstitute').click(function(){
+                    hideAllDropdoowns(3);
+                    $( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
+                        // Animation complete.
+                    });})
+
+
+
+                $('html').click(function()
+                {
                     $('.filter-dropdownCity').hide();
-                });*/
+                    $('.filter-dropdown').hide();
+                    $('.filter-dropdownspecialization').hide();
+                    $('.filter-dropdownInstitute').hide();
+                })
+
+                $('#jobseekercity').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekerinstitute').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekereducation').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekerspecialization').click(function(e){
+                    e.stopPropagation();
+                });
+
             });
 
             // Get Country list
@@ -321,7 +332,7 @@
                                 experience_from : $scope.jobSeekerExperienceFrom,
                                 experience_to : $scope.jobSeekerExperienceTo,
                                 location_ids : $scope.selectedCitys.toString(),
-                                educations : $scope.selectedSpecializations.toString(),
+                                educations : $scope.selectedEducations.toString(),
                                 specialization_id : $scope.selectedSpecializations.toString(),
                                 institute_id : $scope.selectedInstitute.toString(),
                                 score_from : $scope.scoreFrom,
@@ -333,8 +344,12 @@
                     $scope.$emit('$preLoaderStop');
                     if(resp.status)
                     {
+                        var resultLength = "";
                         $scope.totalResult = resp.count;
-                        $scope.resultThisPage = resp.data.length;
+
+                        resultLength = resp.data.length;
+                        $scope.resultThisPage = parseInt(resultLength);
+
                         $scope.paginationVisibility();
 
                         $scope.jobSeekerResults = resp.data;
@@ -593,7 +608,7 @@
                                     document.getElementById("Title").className = "form-control emptyBox";
                                     document.getElementById("Subject").className = "form-control emptyBox";
                                     document.getElementById("Body").className = "form-control emptyBox";
-                                    Notification.success({message: "Messages send successfully..", delay: MsgDelay});
+                                    Notification.success({message: "Messages sent successfully..", delay: MsgDelay});
 
                                     $scope.jobSeekerResults = "";
                                 }
@@ -781,6 +796,18 @@
                     }
                 }
             }
+
+            /**
+             * Get the range of the results
+             */
+            $scope.getResultRange = function()
+            {
+                if(parseInt($scope.totalResult) > 0 )
+                {
+                    var initialPageId = parseInt($scope.pageCount) + 1;
+                    return (initialPageId)+" - "+(parseInt($scope.pageCount)+$scope.resultThisPage)+" of "+$scope.totalResult;
+                }
+            };
 
 
 
