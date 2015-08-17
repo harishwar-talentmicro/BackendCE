@@ -617,7 +617,7 @@ angular.module('ezeidApp').
             /**
              * Remove member API call
              */
-            function updateMemberStatusApiCall(ezeoneId, status) {
+            function updateMemberStatusApiCall(masterId, status) {
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
@@ -626,7 +626,7 @@ angular.module('ezeidApp').
                     data: {
                         token: $rootScope._userInfo.Token,
                         group_id: $scope.activeGroupId,
-                        master_id: ezeoneId,
+                        master_id: masterId,
                         status: status
                     }
                 }).success(function (resp) {
