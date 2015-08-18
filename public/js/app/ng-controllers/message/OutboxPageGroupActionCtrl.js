@@ -1031,6 +1031,12 @@ angular.module('ezeidApp').
              * Leave group[called from DOM]
              */
             $scope.leaveGroup = function () {
+
+                var cnf = confirm("Are you sure?");
+
+                if(!cnf)
+                    return;
+
                 updateMemberStatusApiCall($rootScope._userInfo.TID, 3).then(function () {
                         $scope.modalAddGroupVisible = false;
                         Notification.success({message: "You successfully left this group", delay: MsgDelay});
@@ -1232,6 +1238,10 @@ angular.module('ezeidApp').
             $scope.deleteGroup = function()
             {
                 var groupId = $scope.activeGroupId;
+                var cnf = confirm("Are you sure?");
+
+                if(!cnf)
+                    return;
 
                 deleteGroupApi(groupId).then(function(){
                         Notification.success({ message: "Group deleted successfully", delay: MsgDelay });

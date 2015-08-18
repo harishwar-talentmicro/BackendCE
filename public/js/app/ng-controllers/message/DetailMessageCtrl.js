@@ -39,7 +39,7 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////INITIALIZATION//////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            var msgId = $routeParams.msg;
+            var msgId = $scope.msgId = $routeParams.msg;
 
             /* set group id */
             var groupId = 0;
@@ -230,9 +230,11 @@ angular.module('ezeidApp').
             $scope.initiateDownload = function(tid)
             {
                 downloadAttachmentApi(tid).then(function(data){
-                        console.log(data);
-                       //push the attachment to the browser
-                        downloadBlob(data.Attachment,data.filename,data.mime_type);
+                        if(!data)
+                            return;
+
+                        data.Attachment = data.Attachment.split('base64,')[1];
+                        downloadBlob(data.Attachment, data.filename, data.mime_type);
                     },
                     function(){
                         Notification.error({ message: "Download Failed! Try again later", delay: MsgDelay });
