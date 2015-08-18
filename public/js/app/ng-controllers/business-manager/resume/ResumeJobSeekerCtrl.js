@@ -106,8 +106,8 @@
             }
 
             $scope.$watch('_userInfo.IsAuthenticate', function () {
-                $('.dropdown-toggle1').click(function(){
-                    hideAllDropdoowns(1);
+               $('.dropdown-toggle1').click(function(){
+                     hideAllDropdoowns(1);
                     $( ".filter-dropdown" ).slideToggle( "slow", function() {
                         // Animation complete.
                     });})
@@ -118,7 +118,7 @@
                         // Animation complete.
                     });})
 
-                $('.dropdown-toggleCity').click(function(){
+                $('.dropdown-toggleCity1').click(function(){
                     hideAllDropdoowns(4);
                     $( ".filter-dropdownCity" ).slideToggle( "slow", function() {
                         // Animation complete.
@@ -814,6 +814,19 @@
                     return (initialPageId)+" - "+(parseInt($scope.pageCount)+$scope.resultThisPage)+" of "+$scope.totalResult;
                 }
             };
+
+            //Called when enter press in text box
+            $scope.searchJobSeekers = function(keyEvent)
+            {
+               if(keyEvent.which === 13)
+                {
+                    if($scope.jobSeekerSkillKeyword)
+                    {
+                       $scope.searchJobSeeker();
+                    }
+                }
+            };
+
 
 
 

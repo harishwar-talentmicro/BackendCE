@@ -8,11 +8,11 @@
                 </div>
                 <div class="panel-default panel-body">
                     <!-- search bar to search job keyword by skill keywords -->
-                   <form name="jobSeekersearchForm" novalidate>
+                  <!-- <form name="jobSeekersearchForm" novalidate>-->
                         <div class="container p-bottom-10">
                             <div class="row">
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <input type="text" class="form-control" placeholder="Skill Keywords" ng-model = "jobSeekerSkillKeyword" />
+                                    <input type="text" name="Skill_Keywords" ng-keypress="searchJobSeekers($event)" class="form-control" placeholder="Skill Keywords" ng-model ="jobSeekerSkillKeyword" />
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                                     <select class="form-control" ng-model = "jobSeekerJobType">
@@ -61,7 +61,7 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekercity">
-                                    <button class="btn btn-default btn-sm dropdown-toggleCity opt opt-2 drpFunction" ng-disabled="!cityList">
+                                    <button class="btn btn-default btn-sm dropdown-toggleCity1 opt opt-2 drpFunction" ng-disabled="!cityList">
                                         <span class="normal-view-text custom-select-dropdown"> -- Select City ({{selectedCitys.length}}) -- </span>
                                         <span class="mobile-view-text"></span>
                                         <span class="caret selectImg"></span></button>
@@ -166,7 +166,7 @@
                                 </div>
                             </div>
                         </div>
-                   <!-- </form>-->
+                   <!--</form>-->
                     <hr>
 
                     <div ng-hide="jobSeekerResults.length" class="text-danger text-center">
