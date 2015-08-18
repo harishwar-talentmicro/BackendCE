@@ -156,18 +156,6 @@
 
             });
 
-            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
-                if(!dateFormat){
-                    dateFormat = 'DD-MMM-YYYY hh:mm A';
-                }
-                if(!returnFormat){
-                    returnFormat = dateFormat;
-                }
-                var x = new Date(timeFromServer);
-                var mom1 = moment(x);
-                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
-            };
-
             $scope.ResumeInquiriesTab = false;
             $scope.JobsTab = true;
             $scope.JobSeekerTab = false;
@@ -222,7 +210,8 @@
 
                         for(var i = 0; i < resp.data.result.length; i++)
                         {
-                            resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
+                            resp.data.result[i].posteddate = UtilityService.convertTimeToLocal(resp.data.result[i].posteddate);
+                            /*resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
                         }
 
                         for(var jobCount = 0; jobCount < resp.data.result.length; jobCount++)

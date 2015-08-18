@@ -50,7 +50,7 @@
                 $scope.jobSeekerJobType = 0 ;
                 $scope.jobSeekerSalaryFrom = 0;
                 $scope.jobSeekerSalaryTo = 0;
-                $scope.jobSeekerSalaryType = 2;
+                $scope.jobSeekerSalaryType = 3;
                 $scope.countryId = 0;
                 $scope.cityId = 0;
                 $scope.jobSeekerExperienceFrom = 0;

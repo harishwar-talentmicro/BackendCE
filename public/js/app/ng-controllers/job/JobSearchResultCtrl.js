@@ -66,8 +66,8 @@ angular.module('ezeidApp').
             $scope.params.category = "";//comma separated ids
             $scope.params.salary = "";//1-2,5-6
             $scope.params.filter = 0;
-
             $scope.filterCollege = false;
+            $scope.showFilterButton = false;
 
             $scope.searchKeyWord = $routeParams.searchTerm;
             $scope.activeJobType = [false,false,false,false,false,false,false,false];//Checkboxes for job type
@@ -147,18 +147,6 @@ angular.module('ezeidApp').
                 setSearchResult();
             }
 
-            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
-                if(!dateFormat){
-                    dateFormat = 'DD-MMM-YYYY hh:mm A';
-                }
-                if(!returnFormat){
-                    returnFormat = dateFormat;
-                }
-                var x = new Date(timeFromServer);
-                var mom1 = moment(x);
-                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
-            };
-
             /**
              * clean the data of experience
              */
@@ -222,14 +210,6 @@ angular.module('ezeidApp').
 
                             $scope.isProcessing = false;
 
-                            if(response.status)
-                            {
-                                for(var i = 0; i < response.data.result.length; i++)
-                                {
-                                    response.data.result[i].LUdate = convertTimeToLocal(response.data.result[i].LUdate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
-                                }
-                            }
-
                             /* YIPPE! Got response */
                             var isEmpty = !(response.data.result.length > 0);
                             if(isEmpty)//No Result found
@@ -238,6 +218,16 @@ angular.module('ezeidApp').
                                 resetSearchResultData();
                                 return;
                             }
+
+                            if(response.status)
+                            {
+                                for(var i = 0; i < response.data.result.length; i++)
+                                {
+                                    /*response.data.result[i].LUdate = convertTimeToLocal(response.data.result[i].LUdate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
+                                    response.data.result[i].LUdate = UtilityService.convertTimeToLocal(response.data.result[i].LUdate);
+                                }
+                            }
+
                             /* set the total count of the result */
                             $scope.totalResult = response.data.total_count;
 
@@ -288,7 +278,10 @@ angular.module('ezeidApp').
              */
             function resetSearchResultData()
             {
-                $scope.params = [];
+               // $scope.params = [];
+
+                $scope.isResultEmpty = true;
+                $scope.resultData = [];
             }
 
             /**
@@ -298,6 +291,7 @@ angular.module('ezeidApp').
             {
                 if(data.length > 0)
                 {
+                    $scope.showFilterButton = true;
                     $scope.isResultEmpty = false;
                     $scope.resultData = data;
                     $scope.resultThisPage = data.length;
@@ -731,6 +725,7 @@ angular.module('ezeidApp').
                     $scope.params.filter = 1;
                     /* Just update the result parameter */
                     setSearchResult(1);
+                    $scope.showFilterButton = true;
                 }
                 else
                 {
@@ -739,6 +734,7 @@ angular.module('ezeidApp').
                     var searchStr = getSearchtermString();
                     $location.url('/jobsearch?' + searchStr);
                     $scope.triggerSearchOnEnterKey();
+                    $scope.showFilterButton = false;
                 }
             };
 
