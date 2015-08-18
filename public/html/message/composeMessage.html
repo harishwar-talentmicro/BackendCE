@@ -20,6 +20,7 @@
                         <i class="fa fa-check"></i> Check</div>
                 </div>
             </div>
+
             <div class="group-name-suggestion" ng-show="visibilityHtml.groupSuggestion">
                 <!-- group suggestions goes here -->
                 <div class="group-suggestion pointer"
@@ -38,7 +39,7 @@
             <!-- List of receiver -->
             <div class="receiver-list p-bottom-10">
                 <span class="receivers" ng-repeat="grp in receiverArr track by $index">
-                    <button class="btn btn-default btn-xs" disabled><i>{{grp.GroupName}}</i></button>
+                    <button class="btn btn-danger btn-xs" disabled><i>{{grp.GroupName}}</i></button>
                     <i class="fa fa-times pointer" ng-click="removeReceiver($index)"></i>
                 </span>
             </div>

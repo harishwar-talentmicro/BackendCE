@@ -231,12 +231,43 @@ angular.module('ezeidApp').
             {
                 downloadAttachmentApi(tid).then(function(data){
                         console.log(data);
+                       //push the attachment to the browser
+                        downloadBlob(data.Attachment,data.filename,data.mime_type);
                     },
                     function(){
                         Notification.error({ message: "Download Failed! Try again later", delay: MsgDelay });
                     });
             }
 
+            /**
+             * Function for downloading blob
+             * @param data
+             * @param mimeType
+             * @param fileName
+             */
+
+            var downloadBlob = function (data, fileName,mimeType) {
+                $timeout(function(){
+                    console.log('a');
+                    var a = document.createElement("a");
+                    document.body.appendChild(a);
+                    a.style = "display: none";
+                    var blob = UtilityService._convertBase64ToBlob(data,mimeType);
+                    if(!blob)
+                        console.log("Error Occured");
+                    console.log(blob);
+                    var url = window.URL.createObjectURL(blob);
+                    a.href = url;
+                    a.download = fileName;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                },1000);
+
+            };
+
+            /**
+             * populate the basic info of group at the begining of the chat
+             */
             function populateGroupInfo()
             {
                 var type = 2;
@@ -387,6 +418,7 @@ angular.module('ezeidApp').
              */
             function loadFullMessageApi()
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'message_full_view',
@@ -396,6 +428,7 @@ angular.module('ezeidApp').
                         tid: msgId
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     if(!resp.status)
                     {
                         defer.reject();
@@ -419,6 +452,7 @@ angular.module('ezeidApp').
              */
             function loadGroupMessageThreadApi()
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 var msgId;
                 $http({
@@ -432,6 +466,7 @@ angular.module('ezeidApp').
                         page_count: $scope.pageCount
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     if(!resp.status)
                     {
                         defer.reject();
@@ -453,6 +488,7 @@ angular.module('ezeidApp').
              */
             function downloadAttachmentApi(tid)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 var msgId;
                 $http({
@@ -463,6 +499,7 @@ angular.module('ezeidApp').
                         tid : tid
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     if(!resp.status)
                     {
                         defer.reject();
@@ -485,6 +522,7 @@ angular.module('ezeidApp').
              */
             function getGroupInformation(tid,type)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'group_info',

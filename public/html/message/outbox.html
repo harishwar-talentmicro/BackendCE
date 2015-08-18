@@ -24,7 +24,7 @@
                             <!-- List of all pending request -->
                             <div class="pending-request" ng-show="pendingRequestVisbility">
                                 <div class="individual-pending-request" ng-repeat="req in pendingRequestData track by $index">
-                                    {{req.GroupName}}
+                                    {{req.GroupName.length > 0?req.GroupName:'NA'}}
                                     <span class="pull-right">
                                         <button ng-click="pendingRequestResponse(req.GroupID, req.MemberID, 1,$index)" class="btn btn-primary btn-xs"><i class="fa fa-check"></i></button>
                                         <button ng-click="pendingRequestResponse(req.groupId, req.MemberID, 2,$index)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
@@ -82,7 +82,7 @@
                                     <a class="text-white text-bolder" href="#"><i class="fa fa-user"></i> My People</a>
                                 <span class="pull-right p-right-10">
                                     <button class="btn btn-default btn-xs no-radius"
-                                            ng-click="toggleEzeoneModalVisibility()"><i class="fa fa-plus-circle"></i> Request</button>
+                                            ng-click="resetEzoeoneRequestForm();toggleEzeoneModalVisibility()"><i class="fa fa-plus-circle"></i> Request</button>
                                 </span>
                                 </li>
                                 <!-- Individual list goes here -->
@@ -254,14 +254,20 @@
                                     {{grp.GroupName}}
                                 </div>
                             </div>
-                        <span class="text text-danger" ng-show="noSuggestionError">
-                            No result found<br>
-                        </span>
-                        <span class="text text-danger" ng-show="emptyGroupNameStringError && !noSuggestionError && !groupName.length > 0">
-                            Can't search an empty string.
-                        </span>
+                            <span class="text text-danger" ng-show="noSuggestionError">
+                                No result found<br>
+                            </span>
+                            <span class="text text-danger" ng-show="emptyGroupNameStringError && !noSuggestionError && !groupName.length > 0">
+                                Can't search an empty string.
+                            </span>
                             <!-- group name error message -->
                             <span class="text-danger" ng-show="groupName.length > 0 && !isGroupNameUnique">Group name entered is empty or not unique</span>
+                        </div>
+
+                        <!-- DELETE group button -->
+                        <div class="col-lg-2" ng-show="groupDeleteBtn">
+                            <button class="btn btn-danger btn-md"
+                                    ng-click="deleteGroup()"><i class="fa fa-thumbs-down"></i> Delete Group</button>
                         </div>
 
                         <!-- JOIN GROUP MODULE: Choose relationship form goes here -->
@@ -546,7 +552,7 @@
                 <button ng-click="updateGroup()"
                         class="btn btn-primary"
                         ng-disabled="validateGroupNameError.status < 3">
-                        Save</button>
+                    Save</button>
             </div>
             <br>
         </div>

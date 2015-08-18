@@ -98,6 +98,7 @@ angular.module('ezeidApp').
             $scope.ezeOneMembershipStatus = -1;
             $scope.isLoggedInUserRequeser = -1;
             $scope.currentGroupId = -1;
+            $scope.groupDeleteBtn = false;
 
 
             /* modal box for loading Add/edit/join Group */
@@ -358,6 +359,7 @@ angular.module('ezeidApp').
                 $scope.isMember = false;
                 $scope.groupJoinResponseBtn = false;
                 $scope.pendingRequestMsg = false;
+                $scope.groupDeleteBtn = false;
             }
 
             /**
@@ -719,6 +721,10 @@ angular.module('ezeidApp').
 
             }
 
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             /**
              * Add member API call
              * @param: 1: group owner, 2: other users
@@ -912,7 +918,8 @@ angular.module('ezeidApp').
                 }
                 /* if ADMIN: load all group member */
                 if ($scope.isAdmin) {
-                    console.log("isAdmin");
+
+                    $scope.groupDeleteBtn = true;
                     /* populate group member data */
                     getGroupMembersApi().then(function (data) {
                         setGroupData(data);
@@ -1221,6 +1228,20 @@ angular.module('ezeidApp').
 
                 return true;
             }
+
+            $scope.deleteGroup = function()
+            {
+                var groupId = $scope.activeGroupId;
+
+                deleteGroupApi(groupId).then(function(){
+                        Notification.success({ message: "Group deleted successfully", delay: MsgDelay });
+                        //Close the modal box
+                        $scope.joinGroupModal.visible = false;
+                },
+                function(){
+                    Notification.error({ message: "Internel error occured! try again later", delay: MsgDelay });
+                });
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API/////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1233,6 +1254,7 @@ angular.module('ezeidApp').
              */
             function validateGroupMember(memberEzeoneId,groupId)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'validate_group_member',
@@ -1260,6 +1282,7 @@ angular.module('ezeidApp').
              */
             function updateGroupData(groupType)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'create_group',
@@ -1295,6 +1318,7 @@ angular.module('ezeidApp').
              */
             function getGroupInformation(tid,type)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'group_info',
@@ -1344,6 +1368,39 @@ angular.module('ezeidApp').
                         group_id: groupId
                     }
                 }).success(function (resp) {
+                    $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+                    defer.resolve(resp.data);
+                }).error(function (err) {
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
+                    defer.reject();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Api call for deleting a group
+             * @param groupId: geroup Id of the group which has to be deleted
+             * @returns {*}
+             */
+            function deleteGroupApi(groupId)
+            {
+                $scope.$emit('$preLoaderStart');
+                var defer = $q.defer();
+                $http({
+                    url: GURL + 'group',
+                    method: "delete",
+                    params: {
+                        token: $rootScope._userInfo.Token,
+                        group_id: groupId
+                    }
+                }).success(function (resp) {
+                    $scope.$emit('$preLoaderStop');
                     if(!resp.status)
                     {
                         defer.reject();
