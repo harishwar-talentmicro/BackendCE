@@ -37,3 +37,7 @@
 .fc-event, .fc-event:hover, .ui-widget .fc-event{
     border-radius: 0px;
 }
+
+.tx-row .bottom-clearfix {
+    margin-bottom: 0px;
+}
