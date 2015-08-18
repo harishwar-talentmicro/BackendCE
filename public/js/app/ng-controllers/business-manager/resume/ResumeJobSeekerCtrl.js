@@ -533,6 +533,12 @@
             // Close Create Mail Template Form
             $scope.closeSalesEnquiryForm = function () {
                 $scope.jobSeekerResults = "";
+
+                $scope.FromName = "";
+                $scope.FromEmailID = "";
+                $scope.Subject = "";
+                $scope.Body = "";
+
                 clearSearchFilter();
             };
 
@@ -608,7 +614,7 @@
                                     document.getElementById("Title").className = "form-control emptyBox";
                                     document.getElementById("Subject").className = "form-control emptyBox";
                                     document.getElementById("Body").className = "form-control emptyBox";
-                                    Notification.success({message: "Messages sent successfully..", delay: MsgDelay});
+                                    Notification.success({message: "Message sent successfully..", delay: MsgDelay});
 
                                     $scope.jobSeekerResults = "";
                                 }
