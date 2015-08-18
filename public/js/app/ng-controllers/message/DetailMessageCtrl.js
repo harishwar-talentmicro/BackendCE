@@ -39,7 +39,7 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////INITIALIZATION//////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            var msgId = $routeParams.msg;
+            var msgId = $scope.msgId = $routeParams.msg;
 
             /* set group id */
             var groupId = 0;
@@ -87,6 +87,19 @@ angular.module('ezeidApp').
             $scope.pageSize = 10;
             $scope.pageCount = 0;
             $scope.totalResult = 0;
+
+            $scope.module = {
+                group:false,
+                ezeone:false
+            };
+
+            $scope.msg = {
+                pageSize:5,
+                pageCount:0,
+                totalResult:0,
+                paginationNextVisibility:false,
+                paginationPreviousVisibility:false
+            };
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +137,16 @@ angular.module('ezeidApp').
             function loadFullViewMessageCall()
             {
                 loadFullMessageApi().then(function(data){
+                        if(!data)
+                            return;
+
+                        $scope.module.ezeone = true;
+
+                        if(data[0].count)
+                            $scope.msg.totalResult = data[0].count;
+                        /* re configure pagination for inbox-message visibility */
+                        msgPaginationVisibility();
+
                         $scope.messageData = data;
                     },
                     function()
@@ -138,6 +161,8 @@ angular.module('ezeidApp').
             function loadGroupMessage()
             {
                 loadGroupMessageThreadApi().then(function(data){
+
+                        $scope.module.group = true;
 
                         var message = data;
                         if($routeParams.type == 0)
@@ -230,13 +255,46 @@ angular.module('ezeidApp').
             $scope.initiateDownload = function(tid)
             {
                 downloadAttachmentApi(tid).then(function(data){
-                        console.log(data);
+                        if(!data)
+                            return;
+                        /* Download Attachment */
+                        data.Attachment = data.Attachment.split('base64,')[1];
+                        downloadBlob(data.Attachment, data.filename, data.mime_type);
                     },
                     function(){
                         Notification.error({ message: "Download Failed! Try again later", delay: MsgDelay });
                     });
             }
 
+            /**
+             * Function for downloading blob
+             * @param data
+             * @param mimeType
+             * @param fileName
+             */
+
+            var downloadBlob = function (data, fileName,mimeType) {
+                $timeout(function(){
+                    console.log('a');
+                    var a = document.createElement("a");
+                    document.body.appendChild(a);
+                    a.style = "display: none";
+                    var blob = UtilityService._convertBase64ToBlob(data,mimeType);
+                    if(!blob)
+                        console.log("Error Occured");
+                    console.log(blob);
+                    var url = window.URL.createObjectURL(blob);
+                    a.href = url;
+                    a.download = fileName;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                },1000);
+
+            };
+
+            /**
+             * populate the basic info of group at the begining of the chat
+             */
             function populateGroupInfo()
             {
                 var type = 2;
@@ -296,7 +354,7 @@ angular.module('ezeidApp').
                 $scope.receiverArr.push(temp);
             }
 
-            //////////////////////////////////////PAGINATION////////////////////////////////////////////////////////////
+            //////////////////////////////////////PAGINATION for groups/////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /**
              * load the next results
@@ -377,6 +435,89 @@ angular.module('ezeidApp').
             }
 
 
+            //////////////////////////////////////PAGINATION for INBOX//////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /**
+             * load the next results
+             */
+            $scope.msgPaginationNextClick = function()
+            {
+                $scope.msg.pageCount += $scope.msg.pageSize;
+                /* trigger next results */
+                msgLoadMorePagination();
+                msgPaginationVisibility();
+            }
+
+            /**
+             * load the previous results
+             */
+            $scope.msgPaginationPreviousClick = function()
+            {
+                $scope.msg.pageCount -= $scope.msg.pageSize;
+                /* trigger previous results */
+                msgPaginationVisibility();
+            }
+
+            /**
+             * Toggle the visibility of the pagination buttons
+             */
+            $scope.msg.paginationNextVisibility = true;
+            $scope.msg.paginationPreviousVisibility = true;
+            function msgPaginationVisibility()
+            {
+                console.log("pagination called");
+                var totalResult = parseInt($scope.msg.totalResult);
+                var currentCount = parseInt($scope.msg.pageCount);
+                var resultSize = parseInt($scope.msg.pageSize);
+
+                /* initial state */
+                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                {
+                    $scope.msg.paginationNextVisibility = false;
+                    $scope.msg.paginationPreviousVisibility = false;
+                }
+                else if(currentCount == 0)
+                {
+                    $scope.msg.paginationNextVisibility = true;
+                    $scope.msg.paginationPreviousVisibility = false;
+                }
+                else if((currentCount + resultSize) >= totalResult)
+                {
+                    $scope.msg.paginationNextVisibility = false;
+                    $scope.msg.paginationPreviousVisibility = true;
+
+                }
+                else{
+                    $scope.msg.paginationNextVisibility = true;
+                    $scope.msg.paginationPreviousVisibility = true;
+                }
+                console.log((currentCount + resultSize) ,totalResult);
+                console.log( $scope.msg.paginationNextVisibility,$scope.msg.paginationPreviousVisibility);
+            };
+
+            function msgLoadMorePagination()
+            {
+                if($routeParams.msg)
+                {
+                    loadFullMessageApi().then(function(data){
+
+                        var message = data;
+                        if($routeParams.type == 0)
+                        {
+                            message = data.messages;
+                        }
+                        if(!message || !message.length > 0)
+                            return;
+
+                        //message = reverseArray(message);
+                        message.forEach(function(data){
+                            $scope.messageData.push(data);
+                        });
+                    });
+                }
+            }
+
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -387,15 +528,19 @@ angular.module('ezeidApp').
              */
             function loadFullMessageApi()
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'message_full_view',
                     method : "GET",
                     params :{
                         token : $rootScope._userInfo.Token,
-                        tid: msgId
+                        tid: msgId,
+                        page_size: $scope.msg.pageSize,
+                        page_count: $scope.msg.pageCount
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     if(!resp.status)
                     {
                         defer.reject();
@@ -419,6 +564,7 @@ angular.module('ezeidApp').
              */
             function loadGroupMessageThreadApi()
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 var msgId;
                 $http({
@@ -432,6 +578,7 @@ angular.module('ezeidApp').
                         page_count: $scope.pageCount
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     if(!resp.status)
                     {
                         defer.reject();
@@ -453,6 +600,7 @@ angular.module('ezeidApp').
              */
             function downloadAttachmentApi(tid)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 var msgId;
                 $http({
@@ -463,6 +611,7 @@ angular.module('ezeidApp').
                         tid : tid
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     if(!resp.status)
                     {
                         defer.reject();
@@ -485,6 +634,7 @@ angular.module('ezeidApp').
              */
             function getGroupInformation(tid,type)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'group_info',

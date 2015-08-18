@@ -50,7 +50,7 @@
                 $scope.jobSeekerJobType = 0 ;
                 $scope.jobSeekerSalaryFrom = 0;
                 $scope.jobSeekerSalaryTo = 0;
-                $scope.jobSeekerSalaryType = 2;
+                $scope.jobSeekerSalaryType = 3;
                 $scope.countryId = 0;
                 $scope.cityId = 0;
                 $scope.jobSeekerExperienceFrom = 0;
@@ -106,8 +106,8 @@
             }
 
             $scope.$watch('_userInfo.IsAuthenticate', function () {
-                $('.dropdown-toggle1').click(function(){
-                    hideAllDropdoowns(1);
+               $('.dropdown-toggle1').click(function(){
+                     hideAllDropdoowns(1);
                     $( ".filter-dropdown" ).slideToggle( "slow", function() {
                         // Animation complete.
                     });})
@@ -118,7 +118,7 @@
                         // Animation complete.
                     });})
 
-                $('.dropdown-toggleCity').click(function(){
+                $('.dropdown-toggleCity1').click(function(){
                     hideAllDropdoowns(4);
                     $( ".filter-dropdownCity" ).slideToggle( "slow", function() {
                         // Animation complete.
@@ -533,6 +533,12 @@
             // Close Create Mail Template Form
             $scope.closeSalesEnquiryForm = function () {
                 $scope.jobSeekerResults = "";
+
+                $scope.FromName = "";
+                $scope.FromEmailID = "";
+                $scope.Subject = "";
+                $scope.Body = "";
+
                 clearSearchFilter();
             };
 
@@ -608,7 +614,7 @@
                                     document.getElementById("Title").className = "form-control emptyBox";
                                     document.getElementById("Subject").className = "form-control emptyBox";
                                     document.getElementById("Body").className = "form-control emptyBox";
-                                    Notification.success({message: "Messages sent successfully..", delay: MsgDelay});
+                                    Notification.success({message: "Message sent successfully..", delay: MsgDelay});
 
                                     $scope.jobSeekerResults = "";
                                 }
@@ -808,6 +814,19 @@
                     return (initialPageId)+" - "+(parseInt($scope.pageCount)+$scope.resultThisPage)+" of "+$scope.totalResult;
                 }
             };
+
+            //Called when enter press in text box
+            $scope.searchJobSeekers = function(keyEvent)
+            {
+               if(keyEvent.which === 13)
+                {
+                    if($scope.jobSeekerSkillKeyword)
+                    {
+                       $scope.searchJobSeeker();
+                    }
+                }
+            };
+
 
 
 

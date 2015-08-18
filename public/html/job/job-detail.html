@@ -31,7 +31,7 @@
                     <span class="experience-title"><i class="fa fa-briefcase"></i> Exp: {{getRange(jobData.expfrom,jobData.expto)}} Yrs</span>
                     <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: {{locationData}}</span>
                     <!-- Salary goes here -->
-                    <p CLASS="p-top-7"><i class="fa fa-rupee"></i> {{getRange(jobData.salaryfrom,jobData.salaryto,1)}}</p>
+                    <p CLASS="p-top-7"><i class="fa fa-money"></i> {{getRange(jobData.salaryfrom,jobData.salaryto,1)}}</p>
                     <!-- Login and signup button -->
                     <div class="row">
                         <div class="col-lg-6">
@@ -90,7 +90,13 @@
                 <!-- detailed job description goes here -->
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
-                        Salary: <span class="text-bolder">{{getRange(jobData.salaryfrom,jobData.salaryto,1)}} {{salaryType[jobData.salarytype]}}</span>
+                      <!--  Salary: <span class="text-bolder">{{getRange(jobData.salaryfrom,jobData.salaryto,1)}} {{salaryType[jobData.salarytype]}}</span>-->
+                      Salary: <span class="text-bolder">
+                                {{getRange(jobData.salaryfrom,jobData.salaryto,1)}}
+                                <span ng-show="jobData.salarytype == 1"> (Per Hour) </span>
+                                <span ng-show="jobData.salarytype == 2"> (Per Month)</span>
+                                <span ng-show="jobData.salarytype == 3"> (Per Annum)</span>
+                    </span>
                     </div>
                 </div>
                 <div class="job-main-content text-dark-gray detailed-desc-job">

@@ -89,6 +89,19 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             /**
+             * reset all the data for EZEONE request form
+             */
+            $scope.resetEzoeoneRequestForm = function()
+            {
+                console.log("Hello MOtoto");
+                $scope.ezeOneModalBox.ezeone = "";
+                resetVisibilityVar();
+                hideAllMsg();
+                hideConnectFormElements();
+                hideJoinGroupResponseForm();
+            }
+
+            /**
              * Toggle visibility of the modal box for joinig request/response
              */
             $scope.toggleEzeoneModalVisibility = function()
@@ -212,6 +225,7 @@ angular.module('ezeidApp').
              */
             $scope.connectToEzeOne = function()
             {
+                $scope.modalAddEzeoneVisible = !$scope.modalAddEzeoneVisible;
                 /* send an API request with the new status */
                 connectionRequestApi().then(function(){
                         Notification.success({ message: "You have successfuly send a request to connect you", delay: MsgDelay });
@@ -264,6 +278,7 @@ angular.module('ezeidApp').
              */
             $scope.individualMemberJoinResponse = function(status,groupId)
             {
+                $scope.modalAddEzeoneVisible = !$scope.modalAddEzeoneVisible;
                 var msgType = "rejected";
                 if(parseInt(status) === 1)
                 {

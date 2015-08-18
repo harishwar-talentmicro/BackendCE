@@ -425,6 +425,7 @@ angular.module('ezeidApp').
              */
             function composeMessageApi(toId,toIdType,previousMsgId)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'compose_message',

@@ -3341,6 +3341,7 @@ sup.tm{
     border: 1px solid #E7D9D9;
     padding: 2px;
     z-index: 999;
+    margin-left: 5%;
 }
 
 .hpw .group-suggestion
@@ -3443,4 +3444,10 @@ sup.tm{
     /*padding: 3px;*/
     box-shadow: 2px 2px 2px #41CAC0;
     overflow-y: scroll;
+}
+
+.hpw .current-msg
+{
+    background-color: #3387C1 !important;
+    color: #fff !important;
 }

@@ -88,7 +88,8 @@ angular.module('ezeidApp').
                     if(resp.status)
                     {
                         var data = resp.data[0];
-                        resp.data[0].LUdate = convertTimeToLocal(data.LUdate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
+                        /*resp.data[0].LUdate = convertTimeToLocal(data.LUdate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
+                        resp.data[0].LUdate = UtilityService.convertTimeToLocal(data.LUdate);
 
                         if(data.companyname)
                         {

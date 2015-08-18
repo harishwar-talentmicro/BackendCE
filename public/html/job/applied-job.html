@@ -16,7 +16,10 @@
                         <hr>
                     </div>
                     <div class="col-lg-6">
-                        <div ng-show="jobData">Showing {{pageCount}}-{{pageSize}} of {{totalResult}} results</div>
+                        <div ng-show="jobData">
+                            <!--Showing {{pageCount}}-{{pageSize}} of {{totalResult}} results-->
+                            Showing {{pageCount+1}}-{{pageCount+resultThisPage}} of {{totalResult}} results
+                        </div>
                     </div>
                     <div ng-show="jobData" class="col-lg-6 text-right">
                         <button class="btn"
