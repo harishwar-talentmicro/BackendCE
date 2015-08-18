@@ -350,11 +350,6 @@ angular.module('ezeidApp').
                 });
             }
 
-            /* modal box for loading Add/edit/join Group */
-            $scope.modal = {
-                title: 'Groups',
-                class: 'business-manager-modal'
-            };
 
             /**
              * Function to MARK/UNMARK the message
