@@ -3445,3 +3445,9 @@ sup.tm{
     box-shadow: 2px 2px 2px #41CAC0;
     overflow-y: scroll;
 }
+
+.hpw .current-msg
+{
+    background-color: #3387C1 !important;
+    color: #fff !important;
+}

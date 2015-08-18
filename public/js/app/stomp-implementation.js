@@ -1,10 +1,10 @@
 // Use SockJS
 Stomp.WebSocketClass = SockJS;
-var token = "93b3b2f1-3c3a-11e5-8e61-42010af056e4";
+var token =  $rootScope._userInfo.Token;
 /*
   var username = "sripad",
   password = "123456",*/
-  var username = "@ind1",
+  var username = $rootScope._userInfo.ezeone,
   password = token,  
     vhost    = "/",
     url      = host,
@@ -30,7 +30,30 @@ var sendMessage = function(){
 function on_connect() {
 	console.log(client);
 	divBox.innerHTML += '<br/> Connected <br/>';
-	client.subscribe("/topic/.indrajeet",on_message);
+	//subscribe to all the groups
+	getGroupApiCall().then(function(data){
+		if(!data)
+			return;
+
+		//subscribe to all the groups of this logged in user
+		data.forEach(function(val){
+			var groupId = val.GroupID;
+			subscribeToTopic(groupId);
+		});
+	},
+	function(){
+		//Error occured
+	});
+
+}
+
+/**
+ * Subscribe to a particular group
+ * @param id
+ */
+function subscribeToTopic(id)
+{
+	client.subscribe("/topic/."+id,on_message);
 	sendMessage();
 }
 
@@ -72,6 +95,36 @@ $('.test-link').click(function(e){
 	else{
 		e.preventDefault();
 	}
-	
 	console.log('Link');
 });
+
+
+/**
+ * Call group ApI calls for getting all the groups of the logged in user
+ */
+function getGroupApiCall()
+{
+	$scope.$emit('$preLoaderStart');
+	var defer = $q.defer();
+	$http({
+		url : GURL + 'group_list',
+		method : "GET",
+		params :{
+			token : $rootScope._userInfo.Token
+		}
+	}).success(function(resp){
+		$scope.$emit('$preLoaderStop');
+		if(!resp.status)
+		{
+			defer.reject();
+			return defer.promise;
+		}
+		defer.resolve(resp.data);
+	}).error(function(err){
+		$scope.$emit('$preLoaderStop');
+		Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+		defer.reject();
+	});
+
+	return defer.promise;
+}
