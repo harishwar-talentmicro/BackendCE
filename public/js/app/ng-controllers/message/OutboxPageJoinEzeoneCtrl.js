@@ -89,6 +89,19 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             /**
+             * reset all the data for EZEONE request form
+             */
+            $scope.resetEzoeoneRequestForm = function()
+            {
+                console.log("Hello MOtoto");
+                $scope.ezeOneModalBox.ezeone = "";
+                resetVisibilityVar();
+                hideAllMsg();
+                hideConnectFormElements();
+                hideJoinGroupResponseForm();
+            }
+
+            /**
              * Toggle visibility of the modal box for joinig request/response
              */
             $scope.toggleEzeoneModalVisibility = function()
@@ -103,7 +116,6 @@ angular.module('ezeidApp').
                 var keyword = $scope.ezeOneModalBox.ezeone;
                 var ezeone = parseInt(getGroupNameType(keyword)) ==  0?"@"+keyword:keyword;
                 $scope.ezeOneModalBox.ezeone = ezeone;
-                console.log(ezeone.toUpperCase(),$rootScope._userInfo.ezeone_id);
                 if(ezeone.toUpperCase() == $rootScope._userInfo.ezeone_id)
                 {
                     Notification.error({ message: "You can't connect to yourself, Try again with some other EZEONE ID", delay: MsgDelay });
@@ -124,13 +136,15 @@ angular.module('ezeidApp').
              * Does the activity on the basis of response from validation API
              */
             function validateEzeoneResponseActivity(data){
-                var membershipStatus = data.userstatus;
+                if(!data)
+                    return;
+                var membershipStatus = parseInt(data.userstatus);
                 /* take suitable action */
                 resetVisibilityVar();
                 hideAllMsg();
                 hideConnectFormElements();
                 hideJoinGroupResponseForm();
-                if(parseInt(data.status) == -1)//Valid Ezeid proceed
+                if(parseInt(data.status) == -1 || membershipStatus > 1)//Valid Ezeid proceed
                 {
                     $scope.visibilityBtn.connectBtn = true;
                     $scope.visibilityForm.relation = true;
@@ -211,6 +225,7 @@ angular.module('ezeidApp').
              */
             $scope.connectToEzeOne = function()
             {
+                $scope.modalAddEzeoneVisible = !$scope.modalAddEzeoneVisible;
                 /* send an API request with the new status */
                 connectionRequestApi().then(function(){
                         Notification.success({ message: "You have successfuly send a request to connect you", delay: MsgDelay });
@@ -263,12 +278,13 @@ angular.module('ezeidApp').
              */
             $scope.individualMemberJoinResponse = function(status,groupId)
             {
+                $scope.modalAddEzeoneVisible = !$scope.modalAddEzeoneVisible;
                 var msgType = "rejected";
                 if(parseInt(status) === 1)
                 {
                     msgType = "accepted";
                 }
-                $scope.modalAddEzeoneVisible = false;
+                $scope.toggleEzeoneModalVisibility();
                 joinResponseApi(status,groupId).then(function(){
                     Notification.success({ message: "You have successfuly "+msgType+" the group join request!", delay: MsgDelay });
                 },function(){
@@ -330,6 +346,11 @@ angular.module('ezeidApp').
                         group_type: 1
                     }
                 }).success(function(resp) {
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');

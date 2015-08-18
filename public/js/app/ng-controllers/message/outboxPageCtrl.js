@@ -350,11 +350,6 @@ angular.module('ezeidApp').
                 });
             }
 
-            /* modal box for loading Add/edit/join Group */
-            $scope.modal = {
-                title: 'Groups',
-                class: 'business-manager-modal'
-            };
 
             /**
              * Function to MARK/UNMARK the message
@@ -688,6 +683,7 @@ angular.module('ezeidApp').
              */
             function getGroupApiCall()
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'group_list',
@@ -717,6 +713,7 @@ angular.module('ezeidApp').
              */
             function loadMessageApi()
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'messagebox',
@@ -752,6 +749,7 @@ angular.module('ezeidApp').
              */
             function loadGroupMsgApi(messageType,groupOrIndividualId)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'load_group_message',
@@ -783,6 +781,7 @@ angular.module('ezeidApp').
              */
             function loadPendingRequestApi()
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'pending_request',
@@ -799,7 +798,6 @@ angular.module('ezeidApp').
                         defer.reject();
                         return defer.promise;
                     }
-
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
@@ -818,6 +816,7 @@ angular.module('ezeidApp').
              */
             function messageActivityApi(messageId,status,isOpened)
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 var openStatus = isOpened?1:0;
                 $http({
@@ -851,6 +850,7 @@ angular.module('ezeidApp').
              */
             function unreadMessagesApi()
             {
+                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
                     url : GURL + 'unread_message_count',
@@ -893,8 +893,8 @@ angular.module('ezeidApp').
                         status: status
                     }
                 }).success(function (resp) {
+                    $scope.$emit('$preLoaderStop');
                     if (resp.status) {
-                        $scope.$emit('$preLoaderStop');
                         defer.resolve();
                     }
                     else {

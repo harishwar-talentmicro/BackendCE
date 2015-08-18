@@ -60,7 +60,7 @@
                     <!-- attachment btn -->
                     <button class="btn btn-default btn-xs"
                             ng-show="msg.attachmentname.length > 0"
-                            ng-click="initiateDownload(msg.senderid)">
+                            ng-click="initiateDownload(msg.tid)">
                         <i class="fa fa-paperclip"></i> Download Attachment
                     </button>
                     <button disabled class="btn btn-default btn-xs"><b class="text-danger">Priority</b>: {{priority[msg.Priority -1]}}  </button>
