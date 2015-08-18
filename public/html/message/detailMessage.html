@@ -23,7 +23,7 @@
         <hr class="style-two">
 
         <!-- Load more button goes her -->
-        <div class="container no-right-padding p-bottom-20">
+        <div class="container no-right-padding p-bottom-20" ng-show="module.group">
             <div class="col-lg-12 text-right no-right-padding">
                 <button class="btn btn-danger no-radius"
                         ng-show="paginationNextVisibility"
@@ -80,6 +80,17 @@
                     <span>
                         <i class="fa fa-exclamation-circle"></i> No Previous Message Available.
                     </span>
+                </div>
+            </div>
+
+            <!-- Load more button goes her -->
+            <div class="container no-right-padding p-bottom-20" ng-show="module.ezeone">
+                <div class="col-lg-12 text-right no-right-padding">
+                    <button class="btn btn-danger no-radius"
+                            ng-show="msg.paginationNextVisibility"
+                            ng-click="msgPaginationNextClick()">
+                        <i class="fa fa-arrow-circle-up btn-spin"></i> Load More..
+                    </button>
                 </div>
             </div>
 
