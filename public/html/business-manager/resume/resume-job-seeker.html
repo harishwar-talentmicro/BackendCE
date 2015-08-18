@@ -339,12 +339,13 @@
                                 </div><br/>
                                 <div class="row setRowLeftRightMarginZero centerAlign">
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                        Body <a class="showPointer" ng-click="profile.openTermsAndConditionForm()" id="termConditions" data-toggle="tooltip" data-placement="top" title="Tags Supported: {FirstName}, {LastName}">  <u>?</u> </a>
+                                        Body <a class="showPointer" ng-click="profile.openTermsAndConditionForm()" id="termConditions" data-toggle="tooltip" data-placement="top" title="Tags Supported: {FirstName}, {LastName}, {CompanyName}, {JobTitle}">  <u>?</u> </a>
                                     </div>
                                     <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
                                         <textarea rows="10" cols="92" name="Body" id="Body" ng-model="Body"
                                                   class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !Body.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                                  placeholder="Type here" ng-readonly="validationMode == 0" required></textarea>
+                                                  placeholder="Type hear"
+                                                  ng-readonly="validationMode == 0" required></textarea>
                                     </div>
                                 </div><br/>
                                 <div class="row setRowLeftRightMarginZero centerAlign" >

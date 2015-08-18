@@ -84,7 +84,8 @@ angular.module('ezeidApp').
                             $scope.jobData = resp.data;
                             for(var nCount = 0; nCount < resp.data.length; nCount++)
                             {
-                                resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');
+                                /*resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
+                                  resp.data[nCount].TaskDateTime = UtilityService.convertTimeToLocal(resp.data[nCount].TaskDateTime);
                             }
                         }
                     }
