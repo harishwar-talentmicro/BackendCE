@@ -259,13 +259,17 @@ angular.module('ezeidApp').
              */
             function checkGroupNameUniqueness(groupName) {
 
+                var defer = $q.defer();
                 var groupType = getGroupNameType(groupName);
                 var groupId = getGroupNameType(groupName) == 0 ? $scope.activeGroupId : null;
 
                 validateGroupNameApi(groupName,groupType,groupId).then(function(data){
 
                         if(!data)
-                            return;
+                        {
+                            defer.reject();
+                            return defer.promise;
+                        }
 
                         if (data[0].status && data[0].status == -1 || data[0].userstatus > 1) {
                             /* Group name is Unique: passed the validity test! */
@@ -280,11 +284,16 @@ angular.module('ezeidApp').
                             emptyGroupNameAction();
                             $scope.saveGroupBtnDisabled = true;
                         }
+
+                        defer.resolve(data);
                     },
                     function(){
                         //Error Occured
                         Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
+                        defer.reject();
                     });
+
+                return defer.promise;
             }
 
             /**
@@ -1128,14 +1137,28 @@ angular.module('ezeidApp').
              */
             $scope.updateGroup = function () {
 
-                updateGroupData(0).then(function () {
+                updateGroupData(0).then(function (data) {
                         Notification.success({message: "Group data updated successfully!", delay: MsgDelay});
                         /* close modal box */
                         $scope.editGroupModalVisibility = false;
+                        /* update live data */
+                        updateLiveGroupName(data.id,data.groupName);
                     },
                     function () {
                         Notification.error({message: "Errro occured, Try again later", delay: MsgDelay});
                     });
+            }
+
+            /**
+             * Update the group's name in the group list
+             * @param groupId: ID of the group which is recently updated
+             * @param groupName: New name of the group
+             */
+            function updateLiveGroupName(groupId,groupName)
+            {
+                var index = $scope.groupListData.indexOfWhere('GroupID',groupId);
+                /* update the name of the group */
+                $scope.groupListData[index].GroupName = groupName;
             }
 
             /**
@@ -1328,12 +1351,13 @@ angular.module('ezeidApp').
                         tid:$scope.currentGroup.groupId
                     }
                 }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
                     if(!resp.status)
                     {
                         defer.reject();
                         return defer.promise;
                     }
-                    defer.resolve();
+                    defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');
                     Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
