@@ -28,44 +28,40 @@ var connOpt = {
 };
 
 var mqtt = null;
-try{
-    mqtt = require('mqtt');
+var mqttClient = null;
+
+function NotificationMqtt(){
     try{
-        var mqttClient = null;
-
-        mqttClient = mqtt.connect(brokerUrl,connOpt);
-    }
-    catch(ex){
-        console.log(ex);
-    }
-}
-catch(ex){
-    mqtt = MqttFalse();
-    console.log(ex);
-}
-
-
-
-
-mqttClient.on('connect',function(){
-    console.log('MQTT Client connected successfully to broker');
-});
-
-mqttClient.on('disconnect',function(){
-    console.log('MQTT Client disconnected from broker ! Trying to connect in 1 second');
-    setTimeout(function(){
+        mqtt = require('mqtt');
         try{
             mqttClient = mqtt.connect(brokerUrl,connOpt);
+
+            mqttClient.on('connect',function(){
+                console.log('MQTT Client connected successfully to broker');
+            });
+
+            mqttClient.on('disconnect',function(){
+                console.log('MQTT Client disconnected from broker ! Trying to connect in 1 second');
+                setTimeout(function(){
+                    try{
+                        mqttClient = mqtt.connect(brokerUrl,connOpt);
+                    }
+                    catch(ex){
+                        console.log(ex);
+                    }
+                },1000);
+
+            });
+
         }
         catch(ex){
             console.log(ex);
         }
-    },1000);
-
-});
-
-
-function NotificationMqtt(){
+    }
+    catch(ex){
+        mqtt = MqttFalse();
+        console.log(ex);
+    }
 
 };
 
@@ -111,6 +107,31 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
 
 
 NotificationMqtt.prototype.createQueue = function(topic){
+
+    var qs = require('querystring');
+    var exec=require('child_process').exec,child;
+
+    var executeCmd = function(cmdStr,callbackFn){
+
+        child = exec(cmdStr, function(err,stdout,stderr){
+            console.log('Error : '+ err);
+            console.log('stdout: '+ stdout);
+            console.log('stderr : '+ stderr);
+            if(callbackFn){
+                callbackFn(stdout);
+            }
+        });
+    };
+
+    var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
+        '"Content-type: application/json" -d "{\"durable\":true,\"autodelete\":false}" '+
+        ' -X PUT  https://ms3.ezeone.com/api/queues/%2F/'+topic;
+
+    console.log(curlCmdString);
+
+    executeCmd(curlCmdString,function(respOutput){
+        console.log(respOutput);
+    });
 
 };
 
