@@ -13,12 +13,13 @@ var bcrypt = require("bcrypt");
 ////
 ////console.log(token);
 var mysql = require('mysql'),
-db_server = "104.199.128.226",//Name of the Server.
+//db_server = "104.199.128.226",//Name of the Server.
 ////db_server = "182.73.205.244",//Name of the Server.
+db_server = "www.ezeone.com",//Name of the Server.
 //    db_server = "localhost",//Name of the Server.
-    db_port = 3306 //Integers please.
-////db_collection = "ezeid"; //Name of DB Collection
-    db_collection = "test_ezeid"; //Name of DB Collection
+db_port = 3306 //Integers please.
+db_collection = "livedb"; //Name of DB Collection
+//    db_collection = "test_ezeid"; //Name of DB Collection
 
 
 
@@ -33,8 +34,8 @@ var getDBContext = function () {
         database: db_collection,
         user: 'root',
         //password: 'ezeid',
-        //password: '#EzEonE_2015tmi',
-        password: 'Test_Ezeid2015#db',
+        password: '#EzEonE_2015tmi',
+        //password: 'Test_Ezeid2015#db',
         multipleStatements: true
     });
     return pool;
@@ -176,89 +177,89 @@ function decrypt(EncryptPassword){
 //};
 //
 //var db = getDBContext();
-//var fs = require('fs');
-//
-//var countQuery = "SELECT COUNT(*) AS total FROM tmaster WHERE 1";
-//var totalCount = 0;
-//
-//var userList = [];
-//var failedList = [];
-//
-//var updateString = "";
-//function passUpdateString(password,ezeid){
-//    var query = "UPDATE tmaster SET password = "+ password + " WHERE ezeid = "+ezeid +";";
-//    updateString+=query;
-//}
-//
-//
-//function decryptAllPasswords(totalCount){
-//    var selectQuery = "SELECT TID as tid,EZEID as ezeid,Password as password FROM tmaster WHERE 1";
-//    db.query(selectQuery,function(err,results){
-//        if(err){
-//            console.log('Error in select Query');
-//        }
-//        else{
-//            if(results){
-//                if(results.length > 0){
-//                    for(var i=0; i<results.length;i++){
-//                        var user = {
-//                            ezeid : null,
-//                            password : null,
-//                            encpassword : null
-//                        };
-//                        //console.log(results[i].password);
-//                        //console.log(decrypt(results[i].password));
-//                        user.ezeid = results[i].ezeid;
-//                        user.encpassword = results[i].password;
-//                        try{
-//                            console.log('user : '+i+' started');
-//                            user.password = (results[i].password) ? decrypt(results[i].password) : null;
-//                            if(user.password){
-//                                passUpdateString( bcrypt.hashSync(user.password, 12),user.ezeid);
-//                            }
-//                            else{
-//                                passUpdateString( user.password,user.ezeid);
-//                            }
-//
-//                            console.log('user : '+i+' finished');
-//
-//                        }
-//                        catch(ex){
-//                            console.log(ex);
-//                            failedList.push(user);
-//                        }
-//
-//                        userList.push(user);
-//                    }
-//
-//                    console.log('UserList : '+userList.length);
-//                    console.log('FailedList : '+failedList.length);
-//
-//                    fs.writeFileSync('./test-user-details.json',JSON.stringify(userList));
-//                    fs.writeFileSync('./test-failed-details.json',JSON.stringify(failedList));
-//                    fs.writeFileSync('./password-update.sql',updateString);
-//                    console.log('All Done');
-//                }
-//            }
-//        }
-//    });
-//
-//};
-//
-//db.query(countQuery,function(err,result){
-//    if(err){
-//       console.log('Error in count query');
-//    }
-//    else{
-//        if(result){
-//            if(result.length > 0){
-//                totalCount = result[0].total;
-//                console.log('Total Count done');
-//                decryptAllPasswords(totalCount);
-//            }
-//        }
-//    }
-//});
+var fs = require('fs');
+
+var countQuery = "SELECT COUNT(*) AS total FROM tmaster WHERE 1";
+var totalCount = 0;
+
+var userList = [];
+var failedList = [];
+
+var updateString = "";
+function passUpdateString(password,ezeid){
+    var query = "UPDATE tmaster SET password = '"+ password + "' WHERE ezeid = '"+ezeid +"';";
+    updateString+=query;
+}
+
+
+function decryptAllPasswords(totalCount){
+    var selectQuery = "SELECT TID as tid,EZEID as ezeid,Password as password FROM tmaster WHERE 1";
+    db.query(selectQuery,function(err,results){
+        if(err){
+            console.log('Error in select Query');
+        }
+        else{
+            if(results){
+                if(results.length > 0){
+                    for(var i=0; i<results.length;i++){
+                        var user = {
+                            ezeid : null,
+                            password : null,
+                            encpassword : null
+                        };
+                        //console.log(results[i].password);
+                        //console.log(decrypt(results[i].password));
+                        user.ezeid = results[i].ezeid;
+                        user.encpassword = results[i].password;
+                        try{
+                            console.log('user : '+i+' started');
+                            user.password = (results[i].password) ? decrypt(results[i].password) : null;
+                            if(user.password){
+                                passUpdateString( bcrypt.hashSync(user.password, 12),user.ezeid);
+                            }
+                            else{
+                                passUpdateString( user.password,user.ezeid);
+                            }
+
+                            console.log('user : '+i+' finished');
+
+                        }
+                        catch(ex){
+                            console.log(ex);
+                            failedList.push(user);
+                        }
+
+                        userList.push(user);
+                    }
+
+                    console.log('UserList : '+userList.length);
+                    console.log('FailedList : '+failedList.length);
+
+                    fs.writeFileSync('./test-user-details.json',JSON.stringify(userList));
+                    fs.writeFileSync('./test-failed-details.json',JSON.stringify(failedList));
+                    fs.writeFileSync('./password-update.sql',updateString);
+                    console.log('All Done');
+                }
+            }
+        }
+    });
+
+};
+
+db.query(countQuery,function(err,result){
+    if(err){
+       console.log('Error in count query');
+    }
+    else{
+        if(result){
+            if(result.length > 0){
+                totalCount = result[0].total;
+                console.log('Total Count done');
+                decryptAllPasswords(totalCount);
+            }
+        }
+    }
+});
 
 //fs.appendFile('message.txt', 'data to append');
 //var bcrypt = require('bcrypt');
@@ -367,12 +368,12 @@ function decrypt(EncryptPassword){
 //        }
 //    }
 //});
-var timeStamp = Date.now();
-var crypto = require('crypto');
-var hash = crypto.createHash('sha1');
-if(!timeStamp){
-    var timeStamp = Date.now().toString();
-}
-hash.update(timeStamp);
-var x =  hash.digest('hex') + crypto.randomBytes(30);
-console.log(x);
+//var timeStamp = Date.now();
+//var crypto = require('crypto');
+//var hash = crypto.createHash('sha1');
+//if(!timeStamp){
+//    var timeStamp = Date.now().toString();
+//}
+//hash.update(timeStamp);
+//var x =  hash.digest('hex') + crypto.randomBytes(30);
+//console.log(x);
