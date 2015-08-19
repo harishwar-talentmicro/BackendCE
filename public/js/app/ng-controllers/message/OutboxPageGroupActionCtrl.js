@@ -999,8 +999,12 @@ angular.module('ezeidApp').
                     updateMemberListLiveData(response, id);
                     userId = id;
                 }
-                /* close the modal in any of the case */
-                $scope.toggleJoinGroupModal();
+
+                if(typeof id == undefined)
+                {
+                    /* close the modal in any of the case */
+                    $scope.toggleJoinGroupModal();
+                }
 
                 /* don't execute further if cancel is clicked */
                 if (parseInt(response) === 3)
