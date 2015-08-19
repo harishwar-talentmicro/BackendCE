@@ -335,12 +335,12 @@
                             </button>
                             <button class="btn btn-info"
                                     ng-show="joinGroupBtnVisible && !isAdmin && !isMember"
-                                    ng-click="requestJoinGroup()">
+                                    ng-click="joinGroupModal.visible = false;requestJoinGroup()">
                                 <i class="fa fa-thumbs-up"></i> Join Group
                             </button>
                             <button class="btn btn-danger"
                                     ng-show="leaveGroupBtnVisible"
-                                    ng-click="leaveGroup()">
+                                    ng-click="joinGroupModal.visible = false;leaveGroup()">
                                 <i class="fa fa-thumbs-down"></i> Leave Group
                             </button>
                             <button class="btn btn-info"  ng-show="editGroupBtnVisible">
@@ -487,15 +487,15 @@
                 <div class="group-join-respnse-module col-lg-10 p-top-7 text-center" ng-show="visibilityForm.groupJoinRequestForm">
                     <div class="input-group-btn">
                         <button class="btn btn-primary"
-                                ng-click="individualMemberJoinResponse(1,currentGroupId)">
+                                ng-click="modalAddEzeoneVisible = false;individualMemberJoinResponse(1,currentGroupId)">
                             <i class="fa fa-check-circle"></i> Accept
                         </button>
                         <button class="btn btn-danger"
-                                ng-click="individualMemberJoinResponse(2,currentGroupId)">
+                                ng-click="modalAddEzeoneVisible = false;individualMemberJoinResponse(2,currentGroupId)">
                             <i class="fa fa-times-circle"></i> Reject
                         </button>
                         <button class="btn btn-warning"
-                                ng-click="individualMemberJoinResponse(3,currentGroupId)">
+                                ng-click="modalAddEzeoneVisible = false;individualMemberJoinResponse(3,currentGroupId)">
                             <i class="fa fa-power-off"></i> Cancel
                         </button>
                     </div>

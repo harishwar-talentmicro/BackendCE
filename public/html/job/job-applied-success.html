@@ -1,4 +1,4 @@
-<div id="wrapper">
+<!--<div id="wrapper">
     <header-section></header-section>
 
     <div class="container idp" style="padding-top:0px; position:relative;">
@@ -11,8 +11,15 @@
                                 Thank you.., You have successfully applied for job
                             </div>
                             <div class="col-lg-12 text-success text-center" ng-hide="showSuccessMsg">
-                                Please Upload Resume to apply job<br/>
-                                <a ng-href="/profile-manager/resume">Upload Resume</a>
+                                <div ng-show="_userInfo.IsAuthenticate">
+                                    <span class="text-danger">Please Upload Resume to apply job</span><br/>
+                                    <a target="_blank" ng-href="/profile-manager/resume">Upload Resume</a><br/>
+                                    <button data-toggle="tooltip" data-placement="right" title="Refresh" type="button" class="btn btn-primary" ng-click="RefreshToApply()" >Refresh</button><br/>
+                                    Click Refresh, Once you uploaded resume.
+                                </div>
+                                <div ng-hide="_userInfo.IsAuthenticate">
+                                    Please Sign In to continue.. <br/>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -21,4 +28,41 @@
         </div>
     </div>
 </div>
+<footer-section></footer-section>-->
+
+<!-- Start of design for finding - Job Seekers -->
+<div id="wrapper">
+    <section id="job-seeker-search" class="jss hpw job-seeker-bg hpw ">
+        <!--<div id="wrapper">-->
+        <header-section></header-section>
+        <!--</div>-->
+        <div class="container width-90 page-content">
+            <div class="panel">
+                <div class="panel-primary panel-heading">
+                    <i class="fa fa-th-list"></i>  Apply for Job
+                </div>
+                <div class="panel-default panel-body">
+                    <div class="container">
+                        <!-- main table goes here -->
+                        <div class="main-table p-top-20 col-lg-12">
+                            <div class="col-lg-12 text-success text-center" ng-show="showSuccessMsg">
+                                Thank you.., You have successfully applied for job
+                            </div>
+                            <div class="col-lg-12 text-success text-center" ng-hide="showSuccessMsg">
+                                <div ng-show="_userInfo.IsAuthenticate">
+                                    <span class="text-danger">Please Upload Resume to apply job</span><br/><br/>
+                                    <a ng-href="/profile-manager/resume?jobid={{job_id}}">Upload Resume</a><br/><br/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- End of design for finding - Job Seekers -->
 <footer-section></footer-section>
+
+

@@ -55,6 +55,8 @@ angular.module('ezeidApp').
                 $scope.modalVisible = !$scope.modalVisible;
             };
 
+            $scope.job_id = 0;
+
             /**
              * Initilization of variabes for additional options filter elements
              */
@@ -1185,6 +1187,7 @@ angular.module('ezeidApp').
                             if(data.data.Status == -2)
                             {
                                 $scope.modalVisibleResume = true;
+                                $scope.job_id = _tid;
                             }
                             else
                             {
@@ -1226,7 +1229,8 @@ angular.module('ezeidApp').
 
             $scope.openResumeTab = function ()
             {
-                $window.open('/profile-manager/resume', '_blank');
+                $scope.modalVisibleResume = false;
+                $window.open('/profile-manager/resume?jobid='+$scope.job_id, '_blank');
             };
 
 

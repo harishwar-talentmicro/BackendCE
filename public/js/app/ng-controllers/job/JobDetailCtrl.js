@@ -50,6 +50,8 @@ angular.module('ezeidApp').
 
             $scope.isLoggedIn = $rootScope._userInfo;
 
+            $scope.job_id = 0;
+
             /***********************************************************************************************************
              /***********************************************************************************************************
              /***********************************************************************************************************
@@ -190,14 +192,15 @@ angular.module('ezeidApp').
                     $scope.$emit('$preLoaderStop');
                     if(data.status)
                     {
-                        if(data.data.Status == 2)
+                        if(data.data.Status == -2)
                         {
                             $scope.modalVisibleResume = true;
+                            $scope.job_id = _tid;
                         }
                         else
                         {
                             $scope.showButtons = false;
-                            Notification.success({ message: "Applied Success..", delay : 2000});
+                            Notification.success({ message: "Applied..", delay : 2000});
                         }
                     }
                 })
@@ -220,7 +223,9 @@ angular.module('ezeidApp').
 
             $scope.openResumeTab = function ()
             {
-                $window.open('/profile-manager/resume', '_blank');
+                $scope.modalVisibleResume = false;
+                $scope.showButtons = false;
+                $window.open('/profile-manager/resume?jobid='+$scope.job_id, '_blank');
             };
 
 

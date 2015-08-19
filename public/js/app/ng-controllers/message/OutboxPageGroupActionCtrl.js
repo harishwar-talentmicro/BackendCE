@@ -280,50 +280,11 @@ angular.module('ezeidApp').
                             emptyGroupNameAction();
                             $scope.saveGroupBtnDisabled = true;
                         }
-                },
-                function(){
-                    //Error Occured
-                    Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
-                });
-
-
-
-
-
-
-                //var defer = $q.defer();
-                //$http({
-                //    url: GURL + 'validate_groupname',
-                //    method: "GET",
-                //    params: {
-                //        group_name: groupName,
-                //        token: $rootScope._userInfo.Token,
-                //        group_type: getGroupNameType(groupName),
-                //        group_id: getGroupNameType(groupName) == 0 ? $scope.activeGroupId : null
-                //    }
-                //}).success(function (resp) {
-                //
-                //    $scope.$emit('$preLoaderStop');
-                //    if (resp.data[0].status && resp.data[0].status == -1 || resp.data[0].userstatus > 1) {
-                //        /* Group name is Unique: passed the validity test! */
-                //        $scope.isGroupNameUnique = true;
-                //        changeCheckBtn(2);
-                //        $scope.groupDescVisible = true;
-                //        $scope.saveGroupBtnDisabled = false;
-                //        $('#group-check-btn').focus();
-                //    }
-                //    else {
-                //        /* already existing group name */
-                //        emptyGroupNameAction();
-                //        $scope.saveGroupBtnDisabled = true;
-                //    }
-                //    defer.resolve(resp.data);
-                //}).error(function (err) {
-                //    $scope.$emit('$preLoaderStop');
-                //    Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
-                //    defer.reject();
-                //});
-                //return defer.promise;
+                    },
+                    function(){
+                        //Error Occured
+                        Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
+                    });
             }
 
             /**
@@ -402,12 +363,13 @@ angular.module('ezeidApp').
                         tid: 0
                     }
                 }).success(function (resp) {
-
                     $scope.$emit('$preLoaderStop');
                     if (resp.data.id && resp.data.id > 0) {
                         $scope.activeGroupId = resp.data.id;
                         $scope.groupNameDisable = true;
                         toggleCreateGroupFormVisibility(1);
+                        /* append group */
+                        appendGroupList(resp.data);
                     }
                 }).error(function (err) {
                     $scope.$emit('$preLoaderStop');
@@ -554,58 +516,6 @@ angular.module('ezeidApp').
                     //Error Occured
                     Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
                 });
-
-
-
-
-
-
-
-
-
-                //$scope.$emit('$preLoaderStart');
-                //$http({
-                //    url: GURL + 'validate_groupname',
-                //    method: "GET",
-                //    params: {
-                //        group_name: ezeone,
-                //        token: $rootScope._userInfo.Token,
-                //        group_type: 1,
-                //        group_id: groupId
-                //    }
-                //}).success(function (resp) {
-                //    $scope.$emit('$preLoaderStop');
-                //    $scope.ezeOneValidationStatus = resp.data[0].status;
-                //    $scope.ezeOneMembershipStatus = resp.data[0].userstatus;
-                //    $scope.isLoggedInUserRequeser = resp.data[0].isrequester;
-                //    $scope.currentGroupId = resp.data[0].GroupID;
-                //    if (resp.data[0].userstatus && resp.data[0].userstatus == -1) {
-                //        /* Group name is Unique: passed the validity test! */
-                //        ezeOneValidationAction(1);
-                //        $scope.activeEzeOneId = resp.data[0].masterid;
-                //        $scope.activeEzeOneName = resp.data[0].name;
-                //    }
-                //    else if (resp.data[0].userstatus && resp.data[0].userstatus == -2) {
-                //        /* EZEONE does not exists */
-                //        ezeOneValidationAction(2);
-                //        $scope.activeEzeOneId = 0;
-                //        $scope.activeEzeOneName = "";
-                //        Notification.error({message: "EZEONE doesn't exists in the system", delay: MsgDelay});
-                //    }
-                //    else {
-                //        ezeOneValidationAction(3);
-                //        $scope.activeEzeOneId = 0;
-                //        $scope.activeEzeOneName = "";
-                //        if ($scope.ezeOneMembershipStatus == 1)
-                //            Notification.error({
-                //                message: "You are already connected to this user/group",
-                //                delay: MsgDelay
-                //            });
-                //    }
-                //}).error(function (err) {
-                //    $scope.$emit('$preLoaderStop');
-                //    Notification.error({message: "Something went wrong! Check your connection", delay: MsgDelay});
-                //});
             }
 
 
@@ -880,9 +790,20 @@ angular.module('ezeidApp').
                 $scope.isAdmin = isAdmin;
                 $scope.isMember = isMember;
                 $scope.isJoinRequestPending = isJoinRequestPending;
-                /* show the remaining form */
-                enteredGroupNameValidAction();
-                $scope.groupNameDisable = true;
+
+                var isRequester = 0;
+                /* get the data if the user is the requester or not */
+                validateGroupMember($rootScope._userInfo.ezeone_id,$scope.activeGroupId).then(function(data){
+                    if(!data)
+                        Notification.error({message: "Error occured, Try again later", delay: MsgDelay});
+
+                    isRequester = data.isrequester;
+                    /* show the remaining form */
+                    enteredGroupNameValidAction(isRequester);
+                },
+                function(){
+                    Notification.error({message: "Error occured, Try again later", delay: MsgDelay});
+                });
             }
 
             /**
@@ -906,7 +827,7 @@ angular.module('ezeidApp').
             /**
              * Decides what will happen when group name is VALID
              */
-            function enteredGroupNameValidAction() {
+            function enteredGroupNameValidAction(isRequester) {
                 /* reset the whole form */
                 resetJoinGroupForm();
 
@@ -932,6 +853,15 @@ angular.module('ezeidApp').
                     return;
                 }
 
+                /* if the logged in user have already made a request */
+                if ($scope.isJoinRequestPending && isRequester) {
+                    Notification.error({message: "You have already requested this group's admin to connect", delay: MsgDelay});
+                    /* reset the form */
+                    $scope.groupName = "";
+                    $('#group-name').val('');
+                    resetJoinGroupForm();
+                    return;
+                }
                 /* if the request is pending */
                 if ($scope.isJoinRequestPending) {
                     console.log("pending");
@@ -1039,6 +969,10 @@ angular.module('ezeidApp').
 
                 updateMemberStatusApiCall($rootScope._userInfo.TID, 3).then(function () {
                         $scope.modalAddGroupVisible = false;
+
+                        /* remove this group from the group list */
+                        spliceGroupList($scope.activeGroupId);
+
                         Notification.success({message: "You successfully left this group", delay: MsgDelay});
                     },
                     function () {
@@ -1065,14 +999,31 @@ angular.module('ezeidApp').
                     updateMemberListLiveData(response, id);
                     userId = id;
                 }
-                console.log($scope.modalAddGroupVisible);
-                /* close the modal in any of the case */
-                $scope.toggleJoinGroupModal();
-                console.log($scope.modalAddGroupVisible);
 
-                /* don't execute furthur if cancel is clicked */
+                if(typeof id == undefined)
+                {
+                    /* close the modal in any of the case */
+                    $scope.toggleJoinGroupModal();
+                }
+
+                /* don't execute further if cancel is clicked */
                 if (parseInt(response) === 3)
                     return;
+
+                /* append the group list if the user have accepted the group join request */
+                if(!id && parseInt(response) == 1)
+                {
+                    var groupId = $scope.activeGroupId;
+                    var index = $scope.pendingRequestData.indexOfWhere('GroupID',groupId);
+                    var data = $scope.pendingRequestData[index];
+                    appendGroupList(data,data.GroupName,data.GroupID);
+                }
+
+                /* removing the pending request notifications */
+                if(!id && parseInt(response) < 3)
+                {
+                    splicePendingRequest($scope.activeGroupId);
+                }
 
                 /* send an API request with the new status */
                 updateMemberStatusApiCall(userId, response).then(function () {
@@ -1239,6 +1190,9 @@ angular.module('ezeidApp').
                 return true;
             }
 
+            /**
+             * Delete a group
+             */
             $scope.deleteGroup = function()
             {
                 var groupId = $scope.activeGroupId;
@@ -1249,14 +1203,77 @@ angular.module('ezeidApp').
 
                 deleteGroupApi(groupId).then(function(){
                         Notification.success({ message: "Group deleted successfully", delay: MsgDelay });
+
+                        //Remove a group from group list
+                        spliceGroupList(groupId);
+
                         //Close the modal box
                         $scope.joinGroupModal.visible = false;
-                },
-                function(){
-                    Notification.error({ message: "Internel error occured! try again later", delay: MsgDelay });
-                });
+                    },
+                    function(){
+                        Notification.error({ message: "Internel error occured! try again later", delay: MsgDelay });
+                    });
             }
 
+            /**
+             * remove a particular group from the group list
+             * @param groupId
+             */
+            function spliceGroupList(groupId)
+            {
+                if(!groupId)
+                    return;
+
+                var index = $scope.groupListData.indexOfWhere('GroupID',groupId);
+                /* remove */
+                $scope.groupListData.splice(index,1);
+            }
+
+            /**
+             * Append in the meain group list
+             * @param data
+             */
+            function appendGroupList(data,groupName,groupId)
+            {
+                if(!data)
+                    return;
+
+                var grpName = data.groupName;
+                var grpId = data.id;
+
+                if(groupName)
+                {
+                    grpName = groupName;
+                    grpId = groupId;
+                }
+
+
+                var temp = {
+                    AdminID: $rootScope._userInfo.ezeone_id,
+                    GroupID: grpId,
+                    GroupName: grpName,
+                    GroupType: 0,
+                    MemberID: $rootScope._userInfo.ezeone_id,
+                    Status: 1,
+                    isAdmin: 1,
+                    requester: 1
+                };
+                console.log(temp);
+                /* push in to the group list */
+                $scope.groupListData.push(temp);
+            }
+
+            function splicePendingRequest(groupId)
+            {
+                if(!groupId)
+                    return;
+
+                var index = $scope.pendingRequestData.indexOfWhere('GroupID',groupId);
+                /* remove */
+                $scope.pendingRequestData.splice(index,1);
+                /* decrease the count */
+                $scope.pendingRequestCount--;
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API/////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
