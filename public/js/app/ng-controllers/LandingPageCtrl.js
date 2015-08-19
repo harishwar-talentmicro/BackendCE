@@ -48,6 +48,8 @@ angular.module('ezeidApp').
              * @type {{searchType: number}}
              */
 
+            resizeTile();
+            
             var placeDetail = [];
             var searchTypeArr = ["EZEOne ID", "Keywords", "Employers", "Jobs"];
 
@@ -873,6 +875,13 @@ angular.module('ezeidApp').
                 $('.search-option-content').slideUp();
                 $('.search-proximity-content').slideUp();
                 $('.search-rating-content').slideUp();
+            }
+
+
+            function resizeTile()
+            {
+                var height = $('.init-tile-5').height();
+                $('.individual-box').height(height);
             }
         }]);
 

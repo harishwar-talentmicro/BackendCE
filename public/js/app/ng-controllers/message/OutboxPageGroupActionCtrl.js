@@ -881,6 +881,8 @@ angular.module('ezeidApp').
                     return;
                 }
 
+
+
                 /* if the request is pending */
                 if ($scope.isJoinRequestPending) {
                     console.log("pending");

@@ -335,7 +335,7 @@
                             </button>
                             <button class="btn btn-info"
                                     ng-show="joinGroupBtnVisible && !isAdmin && !isMember"
-                                    ng-click="requestJoinGroup()">
+                                    ng-click="joinGroupModal.visible = false;requestJoinGroup()">
                                 <i class="fa fa-thumbs-up"></i> Join Group
                             </button>
                             <button class="btn btn-danger"
