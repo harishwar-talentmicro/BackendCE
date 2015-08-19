@@ -119,42 +119,7 @@
                 $('#jobpostInstit').click(function(e){
                     e.stopPropagation();
                 });
-               /* $('.dropdown-toggle1').focusout(function() {
-                    $('.filter-dropdown').hide();
-                });
-
-                $('.filter-dropdownspecialization').focusout(function() {
-                    $('.filter-dropdownspecialization').hide();
-                });
-
-                $('.dropdown-toggleInstitute').focusout(function() {
-                    $('.filter-dropdownInstitute').hide();
-                });
-*/
-/*
-                $(".filter-dropdownspecialization").focusout(function() {
-                    console.log("SAi123");
-                    $('.filter-dropdownspecialization').hide();
-                });
-
-
-                $('body').click(function(evt) {
-                    if($(evt.target).parents('.filter-dropdownspecialization').length==0) {
-                        $('.filter-dropdownspecialization').hide();
-                    }
-                });*/
-
-
-                /*$(document).not(".filter-dropdownspecialization").slideToggle( "slow", function() {
-                    // $('#selecteddiv').hide();
-                    console.log('SAii');
-                });
-
-                $(".filter-dropdownspecialization").focusout(function() {
-                 $('.filter-dropdownspecialization').hide();
-                });*/
-
-            });
+             });
 
             $scope.ResumeInquiriesTab = false;
             $scope.JobsTab = true;
@@ -821,7 +786,6 @@
                         $scope.googleMap1.currentMarkerPosition.latitude = $scope.latForMap;
                         $scope.googleMap1.currentMarkerPosition.longitude = $scope.longForMap;
                         $scope.googleMap1.placeCurrentLocationMarker(getNewCoordinates);
-
 
                         /* if this modal box map is opened from search result page: Add marker for additional */
                         $scope.googleMap1.resizeMap();

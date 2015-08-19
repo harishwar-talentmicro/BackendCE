@@ -238,9 +238,6 @@
                                     <option value="2"> Per Month </option>
                                     <option value="3"> Per Annum </option>
                                 </select>
-                                <!--<select class="form-control" name="listType" ng-model="salaryType">
-                                    <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
-                                </select>-->
                             </div>
                         </div>
                     </div>
@@ -260,13 +257,6 @@
                         </select>
                     </div>
                 </div>
-                <!--<div class="row setRowLeftRightMarginZero">
-                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                    </div>
-                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                        <small class="text-danger">(For India, enter the amount in Rs. Lakhs)</small>
-                    </div>
-                </div>-->
             </div>
             <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
@@ -285,10 +275,6 @@
                            maxlength="250"
                            placeholder="Email"
                            class="form-control"/>
-
-                       <!-- <span ng-show="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1))"
-                              ng-if="((jobPostForm.emailID.$dirty && jobPostForm.emailID.$invalid) || (jobPostForm.emailID.$dirty && jobPostForm.emailID.$modelValue.length < 1)) ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false">
-                        </span>-->
                 </div>
             </div>
             <div class="row topMarginButton">
@@ -302,8 +288,6 @@
                     <label>Status</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <!--<select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">-->
-                    <!--<select class="form-control" ng-model="jobFilterStatus">-->
                     <select class="form-control" ng-model="jobStatus">
                         <option value="0"> Active </option>
                         <option value="1"> Closed(Hired) </option>
