@@ -21,13 +21,20 @@ function alterEzeoneId(ezeoneId){
     }
     return alteredEzeoneId;
 }
+
+var Notification = require('./notification/notification-master.js');
+var notification = null;
+
+
 var st = null;
 function MessageBox(db,stdLib){
 
     if(stdLib){
         st = stdLib;
+        notification = new Notification(db,stdLib);
     }
 };
+
 
 
 /**
@@ -921,6 +928,13 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                         idType : req.body.id_type
                                     };
                                     res.status(200).json(responseMessage);
+
+                                    /**
+                                     * @todo add code for push notification like this
+                                     */
+
+                                    // notification.publish(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId);
+
                                     console.log('FnComposeMessage: Message Composed successfully');
                                 }
                                 else {
@@ -1965,6 +1979,9 @@ MessageBox.prototype.viewMessage = function(req,res,next){
 
     var token = req.query.token;
     var tid = parseInt(req.query.tid); // tid of message
+    var pageSize = req.query.page_size ? req.query.page_size : 100;
+    var pageCount = req.query.page_count ? req.query.page_count : 0;
+
 
     var responseMessage = {
         status: false,
@@ -1994,7 +2011,8 @@ MessageBox.prototype.viewMessage = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(tid);
+                        var queryParams =  st.db.escape(tid) + ',' + st.db.escape(token)+ ',' + st.db.escape(pageSize)
+                            + ',' + st.db.escape(pageCount);
                         var query = 'CALL pViewMessage(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {

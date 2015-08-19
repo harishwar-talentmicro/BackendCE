@@ -266,6 +266,7 @@
             };
 
             $scope.editModes = [];
+            $scope.focusModes = [];
 
 
 
@@ -1181,6 +1182,7 @@
                             if(resp.Result && angular.isArray(resp.Result)){
                                 for(var a = 0; a < resp.Result.length; a++){
                                     $scope.editModes.push(false);
+                                    $scope.focusModes.push(false);
                                     resp.Result[a].TaskDateTime = UtilityService._convertTimeToLocal(resp.Result[a].TaskDateTime,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A');
                                     resp.Result[a].NextActionDate = (resp.Result[a].NextActionDate) ?
                                         UtilityService._convertTimeToLocal(resp.Result[a].NextActionDate,'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A') :
@@ -1188,9 +1190,9 @@
                                     resp.Result[a].applicantImage = null;
                                 }
                                 $scope.txList = resp.Result;
-                                for(var ax = 0; ax < $scope.txList.length; ax++){
-                                    loadCandidatePicture($scope.txList[ax]);
-                                }
+                                //for(var ax = 0; ax < $scope.txList.length; ax++){
+                                //    loadCandidatePicture($scope.txList[ax]);
+                                //}
                             }
 
                         }
@@ -2422,6 +2424,9 @@
             $scope.multiSelectInstituteText = {buttonDefaultText: 'All Institutes',dynamicButtonTextSuffix : 'selected'};
             $scope.multiSelectJobsText = {buttonDefaultText: 'All Applicants',dynamicButtonTextSuffix : 'selected'};
 
+
+
+            $scope.advancedFilters = false;
 
         }]);
 
