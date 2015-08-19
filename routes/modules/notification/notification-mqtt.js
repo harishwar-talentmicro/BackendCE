@@ -7,18 +7,40 @@
  * @author Indra Jeet
  * @since Aug 13, 2015 07:14 PM IST
  */
+
+function MqttFalse(){};
+function MqttFalseClient(){};
+
+MqttFalse.prototype.connect = function(){
+    var mqttFalseClient =  MqttFalseClient();
+    return mqttFalseClient;
+};
+MqttFalse.prototype.publish = function(){};
+MqttFalseClient.prototype.publish = function(topic,payload){};
+
+var crypto = require('crypto');
+
 var brokerUrl = 'mqtt://ms1.ezeone.com:80';
 var connOpt = {
     username : 'indrajeet',
     password : 'indrajeet',
     clientId : 'mqttjs_' + crypto.randomBytes(16).toString('hex')
 };
-var mqtt = require('mqtt');
-var mqttClient = null;
+
+var mqtt = null;
 try{
-     mqttClient = mqtt.connect(brokerUrl,connOpt);
+    mqtt = require('mqtt');
+    try{
+        var mqttClient = null;
+
+        mqttClient = mqtt.connect(brokerUrl,connOpt);
+    }
+    catch(ex){
+        console.log(ex);
+    }
 }
 catch(ex){
+    mqtt = MqttFalse();
     console.log(ex);
 }
 

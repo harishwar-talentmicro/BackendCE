@@ -2902,3 +2902,11 @@ h4.front-business-form.warning-text{
     background: url('./images/sales-funnel.png');
     background-repeat: no-repeat;
 }
+
+.header-notification-count{
+    top: -1em;
+    left: -4px;
+    color: #FFFFFF;
+    padding: 3px;
+    background-color: #ED8D05;
+}

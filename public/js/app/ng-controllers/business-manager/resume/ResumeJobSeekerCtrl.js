@@ -815,7 +815,11 @@
                 }
             };
 
-            //Called when enter press in text box
+            /***
+             *
+             * @param keyEvent
+             * Called when enter press in text box
+             */
             $scope.searchJobSeekers = function(keyEvent)
             {
                if(keyEvent.which === 13)

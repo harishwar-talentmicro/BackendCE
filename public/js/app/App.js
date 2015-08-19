@@ -280,6 +280,8 @@
             var dataProgress = false;
             var htmlProgress = false;
 
+            $rootScope.unreadMessageCount = 2;
+
             $rootScope.navigateHome = function(){
                 $location.path('/');
             };

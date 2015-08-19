@@ -48,7 +48,7 @@
             $scope.experienceTo = "";
             $scope.salaryFrom = "";
             $scope.salaryTo = "";
-            $scope.salaryType = 1;
+            $scope.salaryType = 3;
             $scope.jobType = 0;
             $scope.contactName = "";
             $scope.phone = "";
@@ -364,9 +364,11 @@
 
                         if(data.status)
                         {
-                            getPostedJob();
                             $scope.jobSearchTerm = "";
                             $scope.jobFilterStatus = 0;
+
+                            getPostedJob();
+
                           //  $scope.showJobListing = true;
                             Notification.success({message: "Saved..", delay: MsgDelay});
                         }
@@ -377,7 +379,7 @@
                 }
             };
 
-            $scope.SalaryTypeList = [{ id: 1, label: "Per Hour" }, { id: 2, label: "Per Month" }, { id: 3, label: "Per Annum" }];
+           // $scope.SalaryTypeList = [{ id: 1, label: "Per Hour" }, { id: 2, label: "Per Month" }, { id: 3, label: "Per Annum" }];
 
             // Get job Categories
             function getJobCategories()
