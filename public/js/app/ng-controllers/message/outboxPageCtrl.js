@@ -477,8 +477,8 @@ angular.module('ezeidApp').
                     /* get the pending list count */
                     var count = 0;
                     data.forEach(function(val){
-                            count++;
-                            $scope.pendingRequestData.push(val);
+                        count++;
+                        $scope.pendingRequestData.push(val);
                     });
                     console.log($scope.pendingRequestData);
                     $scope.pendingRequestCount = count;
@@ -490,16 +490,36 @@ angular.module('ezeidApp').
              */
             $scope.pendingRequestResponse = function(groupId, masterId, status,index)
             {
+                console.log("Hello");
+                /* perform appropriate action after user gives response */
+                managePendingRequestNotification(groupId,status,index);
+
                 updateMemberStatusApi(groupId, masterId, status).then(function(){
-                    console.log("Yes");
+
                         $scope.pendingRequestData.splice(index,1);
                         $scope.pendingRequestVisbility = false;
                         $scope.pendingRequestCount--;
+                    },
+                    function(){
+                        Notification.error({ message: "Errror occured! Try again later", delay: MsgDelay });
+                    });
+            }
 
-                },
-                function(){
-                    console.log("No");
-                });
+            /**
+             * Manages the response to the pending requests
+             * @param groupId
+             * @param status
+             * @param index
+             */
+            function managePendingRequestNotification(groupId,status,index)
+            {
+                var groupType = parseInt($scope.pendingRequestData[index].grouptype);
+                /* append in the group list */
+                if(parseInt(status) == 1 && parseInt(groupType) == 0)
+                    appendGroupAndIndividualListOnAcceptJoinRequest(index,0);
+                /* append the individual list */
+                else if(parseInt(status) == 1 && parseInt(groupType) == 1)
+                    appendGroupAndIndividualListOnAcceptJoinRequest(index,1);
             }
 
             /**
@@ -530,10 +550,10 @@ angular.module('ezeidApp').
                 messageActivityApi(selectedMsgId,activityType).then(function(){
                         Notification.success({ message: "Your action is saved successfully", delay: MsgDelay });
                         $scope.selectedMsgIdArray = [];
-                },
-                function(){
-                    Notification.error({ message: "Something went wrong! Try again later", delay: MsgDelay });
-                });
+                    },
+                    function(){
+                        Notification.error({ message: "Something went wrong! Try again later", delay: MsgDelay });
+                    });
             }
 
 
@@ -673,7 +693,36 @@ angular.module('ezeidApp').
                 });
             };
 
+            /* get the count of all the UNREAD messages */
             $scope.getUnreadMessageCount();
+
+
+            /**
+             * Append in the meain group list
+             * @param data
+             * @param type: 0-group,1-individual
+             */
+            function appendGroupAndIndividualListOnAcceptJoinRequest(index,type)
+            {
+                var data = $scope.pendingRequestData[index];
+
+                var temp = {
+                    AdminID: $rootScope._userInfo.ezeone_id,
+                    GroupID: data.GroupID,
+                    GroupName: data.GroupName,
+                    GroupType: data.grouptype,
+                    MemberID: data.MemberID,
+                    Status: 1,
+                    isAdmin: 0,
+                    requester: 1
+                };
+                /* push in to the group list */
+                if(parseInt(type) == 1)
+                    $scope.individualMember.push(temp);
+                else
+                    $scope.groupListData.push(temp);
+
+            }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ALL API CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////

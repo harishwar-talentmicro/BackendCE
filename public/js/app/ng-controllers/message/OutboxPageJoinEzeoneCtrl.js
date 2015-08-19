@@ -284,7 +284,14 @@ angular.module('ezeidApp').
                 {
                     msgType = "accepted";
                 }
-                $scope.toggleEzeoneModalVisibility();
+
+                /* manage the notifications and group list */
+                individualConnectNotification(status,groupId);
+
+                /* Dont proceed for CANCEL status */
+                if(parseInt(status) === 3)
+                    return;
+
                 joinResponseApi(status,groupId).then(function(){
                     Notification.success({ message: "You have successfuly "+msgType+" the group join request!", delay: MsgDelay });
                 },function(){
@@ -292,6 +299,61 @@ angular.module('ezeidApp').
                 });
             }
 
+            /**
+             * handles the ezeone's response for connection
+             * @param status
+             * @param groupId
+             */
+            function individualConnectNotification(status,groupId)
+            {
+                if(status == 1)
+                {
+                    var index = $scope.pendingRequestData.indexOfWhere('GroupID',groupId);
+                    var data = $scope.pendingRequestData[index];
+                    appendIndividualList(data);
+                }
+                /* reduce the pending request notification */
+                splicePendingRequest(groupId);
+            }
+
+            /**
+             * Decrease the pending request count
+             * @param groupId
+             */
+            function splicePendingRequest(groupId)
+            {
+                if(!groupId)
+                    return;
+
+                var index = $scope.pendingRequestData.indexOfWhere('GroupID',groupId);
+                /* remove */
+                $scope.pendingRequestData.splice(index,1);
+                /* decrease the count */
+                $scope.pendingRequestCount--;
+            }
+
+            /**
+             * Append in the meain group list
+             * @param data
+             */
+            function appendIndividualList(data)
+            {
+                if(!data)
+                    return;
+
+                var temp = {
+                    AdminID: $rootScope._userInfo.ezeone_id,
+                    GroupID: data.GroupID,
+                    GroupName: data.GroupName,
+                    GroupType: 0,
+                    MemberID: $rootScope._userInfo.ezeone_id,
+                    Status: 1,
+                    isAdmin: 1,
+                    requester: 1
+                };
+                /* push in to the group list */
+                $scope.individualMember.push(temp);
+            }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
