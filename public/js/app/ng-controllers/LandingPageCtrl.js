@@ -49,7 +49,7 @@ angular.module('ezeidApp').
              */
 
             resizeTile();
-            
+
             var placeDetail = [];
             var searchTypeArr = ["EZEOne ID", "Keywords", "Employers", "Jobs"];
 
