@@ -1466,7 +1466,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                     var queryParams = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                         + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                         + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
-                                                        + ',' + st.db.escape(1)+ ',' + st.db.escape('');
+                                                        + ',' + st.db.escape(1)+ ',' + st.db.escape('')+ ',' + st.db.escape(1);
                                                     var query = 'CALL pComposeMessage(' + queryParams + ')';
                                                     console.log(query);
                                                     st.db.query(query, function (err, result) {
