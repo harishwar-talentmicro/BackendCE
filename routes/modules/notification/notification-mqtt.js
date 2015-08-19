@@ -18,6 +18,8 @@ MqttFalse.prototype.connect = function(){
 MqttFalse.prototype.publish = function(){};
 MqttFalseClient.prototype.publish = function(topic,payload){};
 
+var crypto = require('crypto');
+
 var brokerUrl = 'mqtt://ms1.ezeone.com:80';
 var connOpt = {
     username : 'indrajeet',
