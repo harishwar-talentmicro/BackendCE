@@ -96,7 +96,6 @@ exports.FnGetTransAttachment = businessManager.getTransAttachment;
 exports.FnSalesStatistics = businessManager.salesStatistics;
 
 
-
 var Configuration = require('./modules/configuration-module.js');
 var configurationModule = new Configuration(db,stdLib);
 exports.FnSaveConfig = configurationModule.save;

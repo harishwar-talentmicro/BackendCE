@@ -24,7 +24,8 @@ function Notification(db,stdLib){
  * @param operationType (Operation type decides what kind of notification it is)
  * @param iphoneId (If user is having iphone id then pass it also)
 _ */
-Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId){
+Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,
+                                          messageType,operationType,iphoneId,messageId){
     var validationStatus = true;
     var error = {};
     if(!senderTitle){
@@ -54,7 +55,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
 
 
     if(validationStatus){
-        var notificationMqtt = NotificationMqtt();
+        var notificationMqtt = new NotificationMqtt();
 
         var msgBytes = 1024;
         var messagePayload = {
@@ -64,7 +65,8 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             g_title : groupTitle,
             type : messageType,
             ts : moment("YYYY-MM-DD HH:mm:ss"),
-            op: operationType
+            op: operationType,
+            mid : messageId
         };
 
         notificationMqtt.publish(receiverId,messagePayload);
@@ -74,8 +76,8 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
          * If IPhone ID is there for this user then send notification to his iphone id also
          */
         if(iphoneId){
-            var apnsNotification = AppleNotification();
-            apnsNotification.sendAppleNS(iphoneId,jsonMsg);
+            var apnsNotification = new AppleNotification();
+            apnsNotification.sendAppleNS(iphoneId,messagePayload);
         }
     }
 

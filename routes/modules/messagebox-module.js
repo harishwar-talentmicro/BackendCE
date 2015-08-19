@@ -869,8 +869,10 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var token = req.body.token;
     var previousMessageID = req.body.previous_messageID ? req.body.previous_messageID : 0;
     var toID = req.body.to_id;                              // comma separated id of toID
-    var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Individual Message, 1 - Group Message)
+    var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
+    var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
+    var masterid='',receiverId,senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId;
 
     console.log(req.body);
 
@@ -906,7 +908,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                         var queryParams = st.db.escape(message) + ',' + st.db.escape(attachment) + ',' + st.db.escape(attachmentFilename)
                             + ',' + st.db.escape(priority) + ',' + st.db.escape(targetDate) + ',' + st.db.escape(expiryDate)
                             + ',' + st.db.escape(token) + ',' + st.db.escape(previousMessageID)+ ',' + st.db.escape(toID)
-                            + ',' + st.db.escape(idType)+ ',' + st.db.escape(mimeType);
+                            + ',' + st.db.escape(idType)+ ',' + st.db.escape(mimeType)+ ',' + st.db.escape(isJobseeker);
                         var query = 'CALL pComposeMessage(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
@@ -917,25 +919,56 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'Message Composed successfully';
                                     responseMessage.data = {
-                                        message  : req.body.message,
-                                        attachmentFilename  : req.body.attachment_filename,
-                                        priority  : req.body.priority,
-                                        targetDate  : req.body.target_date,
-                                        expiryDate  : req.body.expiry_date,
-                                        token : req.body.token,
-                                        previousMessageID : req.body.previous_messageID,
-                                        toID : req.body.to_id,
-                                        idType : req.body.id_type
+                                        message: req.body.message,
+                                        attachmentFilename: req.body.attachment_filename,
+                                        priority: req.body.priority,
+                                        targetDate: req.body.target_date,
+                                        expiryDate: req.body.expiry_date,
+                                        token: req.body.token,
+                                        previousMessageID: req.body.previous_messageID,
+                                        toID: req.body.to_id,
+                                        idType: req.body.id_type
                                     };
                                     res.status(200).json(responseMessage);
 
                                     /**
                                      * @todo add code for push notification like this
                                      */
+                                    var query1 = 'SELECT masterid FROM tloginout WHERE token=' + st.db.escape(token);
+                                    st.db.query(query1, function (err, result) {
+                                        console.log('-----------------------------1');
+                                        console.log(result);
 
-                                    // notification.publish(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId);
+                                        if (result[0]) {
+                                            masterid = result[0].masterid;
+                                        }
+                                        else {
+                                            console.log('FnComposeMessage:Error getting from masterid');
+                                        }
+                                        var query2 = 'select * from tmgroups where GroupType=1 and adminid=' + masterid;
+                                        st.db.query(query2, function (err, getResult) {
+                                            console.log('-----------------------------2');
+                                            console.log(getResult);
+                                            if (getResult[0]) {
+                                                receiverId = toID;
+                                                senderTitle = getResult[0].GroupName;
+                                                groupTitle = getResult[0].GroupName;
+                                                groupId = getResult[0].tid;
+                                                messageText = message;
+                                                messageType = idType;
+                                                operationType = '';
+                                                iphoneId = '';
+                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId);
+                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId);
+                                                // notification.publish(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId);
 
-                                    console.log('FnComposeMessage: Message Composed successfully');
+                                                console.log('FnComposeMessage: Message Composed successfully');
+                                            }
+                                            else {
+                                                console.log('FnComposeMessage:Error getting from members');
+                                            }
+                                        });
+                                    });
                                 }
                                 else {
                                     responseMessage.message = 'Message not Composed';
