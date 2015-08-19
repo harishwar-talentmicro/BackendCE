@@ -1,6 +1,6 @@
 angular.module('ezeidApp').controller('CVAttachController',[
-    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q', '$window','$location','GURL','GoogleMaps',
-    function($http, $rootScope, $scope, $timeout, Notification, $filter,$q, $window,$location,GURL,GoogleMap){
+    '$http', '$rootScope', '$scope', '$timeout', 'Notification', '$filter','$q', '$window','$location','GURL','GoogleMaps','$routeParams',
+    function($http, $rootScope, $scope, $timeout, Notification, $filter, $q, $window, $location, GURL, GoogleMap, $routeParams){
 
     var CVAttachCtrl = this;
     CVAttachCtrl._CVInfo = {};
@@ -32,6 +32,13 @@ angular.module('ezeidApp').controller('CVAttachController',[
     CVAttachCtrl._CVInfo.institute_id = 0;
     CVAttachCtrl._CVInfo.institute_title = "";
     CVAttachCtrl._CVInfo.Status = 1;
+
+    // Bellow code id for apply for job
+    $scope.job_id = 0;
+    if($routeParams.jobid)
+    {
+        $scope.job_id = $routeParams.jobid;
+    }
 
     $scope.selectedFunctions = [];
     $scope.selectedCategories = [];
@@ -148,6 +155,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
          if($scope.DocumentToUpload)
          {
+             $scope.$emit('$preLoaderStart');
              CVAttachCtrl._CVInfo.CVDocFile = $scope.DocumentToUpload[0].name;
              var $file = $scope.DocumentToUpload[0];
              var formData = new FormData();
@@ -162,10 +170,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
                  if(data.IsSuccessfull)
                  {
                     $scope.showLink = true;
+                    $scope.$emit('$preLoaderStop');
                  }
              })
              .error(function(data, status, headers, config) {
                  Notification.error({message: "An error occurred..", delay: MsgDelay});
+                 $scope.$emit('$preLoaderStop');
              });
          }
     };
@@ -264,7 +274,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 0;
         CVAttachCtrl._CVInfo.experience = (CVAttachCtrl._CVInfo.experience) ? CVAttachCtrl._CVInfo.experience : 0;
 
-       for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
+        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
        }
 
@@ -321,6 +331,10 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         {
                             $scope.locationArrayString = [];
                             $scope.mainLocationArray = [];
+
+                            $scope.isCvUploded = true;
+
+                            applyJob($scope.job_id);
 
                             getCVInfo();
                             getAllSkills();
@@ -879,6 +893,40 @@ angular.module('ezeidApp').controller('CVAttachController',[
             getCVInfo();
             getAllSkills();
         }
+    }
+
+    $scope.closeCVDocInfo=function()
+    {
+       $location.path('/profile-manager/user');
+    };
+
+
+    // Apply for job
+    function applyJob(_jobId)
+    {
+        if((_jobId) && ($scope.showLink))
+        {
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    method: "POST",
+                    url: GURL + 'job_apply',
+                    data :{
+                        token:$rootScope._userInfo.Token,
+                        job_id:_jobId
+                    }
+                }).success(function (data) {
+                        $scope.$emit('$preLoaderStop');
+
+                        if(data.status)
+                        {
+                            Notification.success({ message: "Applied..", delay : 2000});
+                            $scope.job_id = 0;
+                        }
+                    })
+                    .error(function(data, status, headers, config) {
+                        $scope.$emit('$preLoaderStop');
+                    });
+            }
     }
 
     }]);

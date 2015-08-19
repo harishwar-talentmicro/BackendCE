@@ -52,7 +52,7 @@
                                         <h5 class="text-primary text-left">Key Skills</h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
-                                        <input type="text" ng-class="cvForm.keySkills.$touched && !CVAttachCtrl._CVInfo.KeySkills.length ? 'mandatoryTextBoxCV' : ''" name="keySkills" class="form-control emptyBox" ng-model="CVAttachCtrl._CVInfo.KeySkills" placeholder="Key Skills (Comma Separated)" required/>
+                                        <input type="text" ng-class="cvForm.keySkills.$touched && !CVAttachCtrl._CVInfo.KeySkills.length ? 'mandatoryTextBoxCV' : ''" name="keySkills" class="form-control emptyBox" ng-model="CVAttachCtrl._CVInfo.KeySkills" placeholder="Java, Sales, Marketing" required/>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -276,7 +276,7 @@
                                 </div>
                             </div>
                             <div class="row setRowLeftRightMarginZero" ng-show="true">
-                                <div class="row">
+                                <div class="row setRowLeftRightMarginZero">
                                     <span class="skillText">Skill Map (Choose & Rate your Skills to get a right Job) </span>
                                 </div>
                                 <div class="row">
@@ -344,9 +344,9 @@
                                 <div class="clearfix"></div>
                             </div>
 
-                            <div class="row">
+                            <div class="row setRowLeftRightMarginZero">
                                 <button class="btn btn-primary pull-left" value="Save" ng-click="CVAttachCtrl.saveCVDocInfo()">Save </button>
-                                <input type="button" class="btn btn-primary pull-left" style="margin-left: 5px;" value="Close" onclick="window.location.href='/'"/>
+                                <input type="button" class="btn btn-primary pull-left" style="margin-left: 5px;" value="Close" ng-click="closeCVDocInfo()"/>
                             </div>
                         </div>
                     </div>

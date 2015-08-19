@@ -37,8 +37,7 @@ angular.module('ezeidApp').
             UtilityService
             ) {
 
-
-
+            $scope.job_id = 0;
             $scope.showSuccessMsg = false;
             if(!$rootScope._userInfo.IsAuthenticate)
             {
@@ -66,19 +65,17 @@ angular.module('ezeidApp').
             // Apply for job
             function applayJob(_jobId)
             {
-                $scope.$emit('$preLoaderStart');
-                $scope.jobData = {
-                    token : $rootScope._userInfo.Token,
-                    job_id : $scope.jobTid
-                }
-                $http({
-                    method: "POST",
-                    url: GURL + 'job_apply',
-                    data :{
-                        token:$rootScope._userInfo.Token,
-                        job_id:_jobId
-                    }
-                }).success(function (data) {
+                if($rootScope._userInfo.IsAuthenticate)
+                {
+                    $scope.$emit('$preLoaderStart');
+                    $http({
+                        method: "POST",
+                        url: GURL + 'job_apply',
+                        data :{
+                            token:$rootScope._userInfo.Token,
+                            job_id:_jobId
+                        }
+                    }).success(function (data) {
                         $scope.$emit('$preLoaderStop');
 
                         if(data.status)
@@ -86,22 +83,21 @@ angular.module('ezeidApp').
                             if(data.data.Status == -2)
                             {
                                 $scope.showSuccessMsg = false;
+                                $scope.job_id = _jobId;
                             }
                             else
                             {
-                                $location.url('/');
+                                //  $location.url('/');
                                 $scope.showSuccessMsg = true;
-                                Notification.success({ message: "Applied Success..", delay : 2000});
+                                Notification.success({ message: "Applied..", delay : 2000});
                             }
                         }
-
                     })
                     .error(function(data, status, headers, config) {
                         $scope.$emit('$preLoaderStop');
                     });
+                }
             }
-
-
 
 
         }]);
