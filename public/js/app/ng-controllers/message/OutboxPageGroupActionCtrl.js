@@ -1153,6 +1153,10 @@ angular.module('ezeidApp').
                 //Set the group type
             };
 
+            /**
+             * set the group informations
+             * @returns {boolean}
+             */
             function setGroupInfo()
             {
                 if(!$scope.currentGroup.groupId)
@@ -1252,6 +1256,7 @@ angular.module('ezeidApp').
                     Notification.error({ message: "Internel error occured! try again later", delay: MsgDelay });
                 });
             }
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API/////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
