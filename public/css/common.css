@@ -2910,3 +2910,13 @@ h4.front-business-form.warning-text{
     padding: 3px;
     background-color: #ED8D05;
 }
+
+.header-tx-row{
+    background: #5BC0DE;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.row.tx-row.header-tx-row .text-success {
+    color: #FFF;
+}

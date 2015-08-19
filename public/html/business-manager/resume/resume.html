@@ -83,6 +83,14 @@
                 </div>
             </div>
 
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12" ng-hide="advancedFilters">
+                <div class="form-group form-group-sm">
+                    <button class="btn btn-info btn-sm" ng-click="triggerStatusFilter(1,filterStatus)">
+                        <i class="fa fa-refresh"></i> Reload
+                    </button>
+                </div>
+            </div>
+
 
             <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12  bottom-clearfix" ng-show="advancedFilters">
                 <div class="row">
@@ -240,6 +248,14 @@
                 <div class="form-group form-group-sm">
                     <button class="btn btn-sm btn-success-bright btn-block" ng-click="(advancedFilters = true)">
                         <i class="fa fa-plus-circle"></i> Advanced Filters
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-3 col-xs-12" ng-hide="advancedFilters">
+                <div class="form-group form-group-sm">
+                    <button class="btn btn-info btn-sm" ng-click="triggerStatusFilter(1,filterStatus)">
+                        <i class="fa fa-refresh"></i> Reload
                     </button>
                 </div>
             </div>
@@ -724,6 +740,90 @@
         <!--&lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;end : Single Transaction Entry &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;-->
     <!--</div>-->
     <!-- Previous design with photo, alarm, attachments all showing up at one place - end  -->
+
+    <!-- Header section -->
+    <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 hidden-xs hidden-sm hidden-md">
+        <div class="row tx-row header-tx-row">
+            <!---------- Single Transaction Entry ---------------------->
+            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 bottom-clearfix">
+                <div class="row">
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+
+                        <small class="text-success">
+                            Applicant Name
+                        </small>
+
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 no-padding">
+                        <small class="text-success">Job Title</small>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4 bottom-clearfix no-padding">
+
+                <div class="row">
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-8 col-xs-offset-2 no-padding" title="Stage">
+                        <small class="text-success">Stage</small>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-2 col-md-4 col-sm-12 col-xs-12 bottom-clearfix">
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <small class="text-success">Next Action Date and Time</small>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6 col-sm-12 col-xs-12 bottom-clearfix">
+
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <small class="text-success">Updated By</small>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 bottom-clearfix no-padding">
+                    <small class="text-success">Resume</small>
+                </div>
+
+            </div>
+
+
+
+            <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12">
+
+
+
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12">
+
+
+
+            </div>
+
+        </div>
+
+        <!----------end : Single Transaction Entry ---------------------->
+    </div>
+    <!-- Header section -end -->
 
     <!-- New design clean and single line  -->
     <div ng-show="txList.length" class="col-lg-12 col-md-6 col-sm-6 col-xs-12"  ng-repeat="tx in txList track by tx.TID">
