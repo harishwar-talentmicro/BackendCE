@@ -128,9 +128,15 @@ angular.module('ezeidApp').
 
             $scope.sendMessage = function()
             {
+                /* validate date */
+                if(!validateTargetAndExpiryDate())
+                {
+                    $scope.composeMsg.TargetDate = undefined;
+                    $scope.composeMsg.ExpiryDate = undefined;
+                    return;
+                }
 
                 var previousMsgId = $scope.responseMsgId;
-                console.log(previousMsgId);
                 /* validate message content */
                 if(!validateMessageContent())
                 {
@@ -149,6 +155,43 @@ angular.module('ezeidApp').
                         //Throw Error Notification
                         Notification.error({ message: "Error occured! Please try again later.", delay: MsgDelay });
                     });
+            }
+
+            /**
+             * Validate the target and expiry date
+             */
+            function validateTargetAndExpiryDate()
+            {
+                var targetDate = $scope.composeMsg.TargetDate;
+                var expiryDate = $scope.composeMsg.ExpiryDate;
+                var targetDateTimeStamp = new Date(targetDate).getTime();
+                var expiryDateTimeStamp = new Date(expiryDate).getTime();
+                var currentTimeStamp = new Date().getTime();
+
+                if(targetDate && !expiryDate)
+                {
+                    return true;
+                }
+
+                if(!targetDate && expiryDate)
+                {
+                    Notification.error({ message: "You can't have an Expiry date without a Target date", delay: MsgDelay });
+                    return false;
+                }
+
+                if((parseInt(expiryDateTimeStamp) < parseInt(currentTimeStamp)) ||
+                    (parseInt(currentTimeStamp) < parseInt(currentTimeStamp)))
+                {
+                    Notification.error({ message: "Expiry date or Target date can not be in past", delay: MsgDelay });
+                    return false;
+                }
+
+                if(parseInt(expiryDateTimeStamp) < parseInt(targetDateTimeStamp))
+                {
+                    Notification.error({ message: "Target date can not be bigger than Expiry date", delay: MsgDelay });
+                    return false;
+                }
+                return true;
             }
 
             /**
