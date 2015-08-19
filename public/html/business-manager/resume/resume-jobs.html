@@ -233,9 +233,14 @@
                             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer text-center topMargin-three setLeftRightPaddingZero">
                             </div>
                             <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 setLeftRightPaddingZero">
-                                <select class="form-control" name="listType" ng-model="salaryType">
-                                    <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
+                               <select class="form-control" name="listType" ng-model = "salaryType">
+                                    <option value="1"> Per Hour </option>
+                                    <option value="2"> Per Month </option>
+                                    <option value="3"> Per Annum </option>
                                 </select>
+                                <!--<select class="form-control" name="listType" ng-model="salaryType">
+                                    <option ng-repeat="salaryType in SalaryTypeList track by salaryType.id" value="{{salaryType.id}}">{{salaryType.label}}</option>
+                                </select>-->
                             </div>
                         </div>
                     </div>
@@ -244,7 +249,6 @@
                     </div>
                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                         <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "jobType">
-                            <!--<option value="0"> -- Select -- </option>-->
                             <option value="0">Full Time</option>
                             <option value="1">Part Time</option>
                             <option value="2">Work from Home</option>
@@ -298,7 +302,9 @@
                     <label>Status</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">
+                    <!--<select class="form-control" ng-model="jobFilterStatus" ng-change="searchJobTerm()">-->
+                    <!--<select class="form-control" ng-model="jobFilterStatus">-->
+                    <select class="form-control" ng-model="jobStatus">
                         <option value="0"> Active </option>
                         <option value="1"> Closed(Hired) </option>
                         <option value="2"> Cancelled </option>
