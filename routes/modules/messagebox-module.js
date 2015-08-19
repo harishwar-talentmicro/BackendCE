@@ -1965,6 +1965,9 @@ MessageBox.prototype.viewMessage = function(req,res,next){
 
     var token = req.query.token;
     var tid = parseInt(req.query.tid); // tid of message
+    var pageSize = req.query.page_size ? req.query.page_size : 100;
+    var pageCount = req.query.page_count ? req.query.page_count : 0;
+
 
     var responseMessage = {
         status: false,
@@ -1994,7 +1997,8 @@ MessageBox.prototype.viewMessage = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(tid);
+                        var queryParams =  st.db.escape(tid) + ',' + st.db.escape(token)+ ',' + st.db.escape(pageSize)
+                            + ',' + st.db.escape(pageCount);
                         var query = 'CALL pViewMessage(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
