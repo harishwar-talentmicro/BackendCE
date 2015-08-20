@@ -42,6 +42,7 @@
 
             $scope.validationMode = 0;
             var placeDetail = [];
+            $scope.selectAll = 0;
             clearSearchFilter();
 
             function clearSearchFilter()
@@ -68,6 +69,7 @@
             }
 
             $scope.jobSeekerResults = "";
+
 
             //Pagination settings
             $scope.pageSize = 10;//Results per page
@@ -319,6 +321,7 @@
              */
             $scope.searchJobSeeker = function()
             {
+                $scope.selectAll = 0;
                 $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'job_seeker_search',
@@ -538,7 +541,7 @@
                 $scope.FromEmailID = "";
                 $scope.Subject = "";
                 $scope.Body = "";
-
+                $scope.selectAll = 0;
                 clearSearchFilter();
             };
 
@@ -633,12 +636,39 @@
             {
                 if($scope.selectedTidToMail.indexOf(_TID)!=-1)
                 {
+                    if($scope.selectAll)
+                    {
+                        $scope.selectAll = 0;
+                    }
                     var index = $scope.selectedTidToMail.indexOf(_TID);
                     $scope.selectedTidToMail.splice(index,1);
                 }
                 else
                 {
                     $scope.selectedTidToMail.push(_TID);
+                    if($scope.selectedTidToMail.length == $scope.jobSeekerResults.length)
+                    {
+                        $scope.selectAll = 1;
+                    }
+                }
+            };
+
+            /**
+             * SelectAll - UnselectAll job seeker
+             */
+            $scope.selectAllTidToMail = function(_selectedStatus)
+            {
+                if(_selectedStatus)
+                {
+                    $scope.selectedTidToMail = [];
+                    for(var nCount = 0; nCount < $scope.jobSeekerResults.length; nCount++)
+                    {
+                        $scope.selectedTidToMail.push($scope.jobSeekerResults[nCount].tid);
+                    }
+                }
+                else
+                {
+                    $scope.selectedTidToMail = [];
                 }
             };
 

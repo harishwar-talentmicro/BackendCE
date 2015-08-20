@@ -45,18 +45,6 @@ angular.module('ezeidApp').
 
             getAppliedJob();
 
-            var convertTimeToLocal = function(timeFromServer,dateFormat,returnFormat){
-                if(!dateFormat){
-                    dateFormat = 'DD-MMM-YYYY hh:mm A';
-                }
-                if(!returnFormat){
-                    returnFormat = dateFormat;
-                }
-                var x = new Date(timeFromServer);
-                var mom1 = moment(x);
-                return mom1.add((mom1.utcOffset()),'m').format(returnFormat);
-            };
-
             // Get Applied Job list
             function getAppliedJob()
             {

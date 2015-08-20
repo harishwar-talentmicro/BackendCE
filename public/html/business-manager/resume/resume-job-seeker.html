@@ -199,6 +199,20 @@
                             <div class="main-table p-top-20 col-lg-12 ">
                                 <div class="col-lg-12 table-head">
                                     <div class="col-lg-1">
+
+                                        <div class="row setRowLeftRightMarginZero">
+                                            <div class="col-lg-4 setLeftRightPaddingZero">
+                                                <input type="checkbox"
+                                                       name="all"
+                                                       ng-model="selectAll"
+                                                       ng-checked="selectAll"
+                                                       ng-click="selectAllTidToMail(selectAll)"/>
+                                            </div>
+                                            <div class="col-lg-8 setLeftRightPaddingZero">
+                                                <span> All</span>
+                                            </div>
+                                        </div>
+
                                     </div>
                                     <div class="col-lg-2">
                                         Name
@@ -223,7 +237,8 @@
                                     <div class="col-lg-1">
                                         <input type="checkbox"
                                                name="service"
-                                               ng-click="selectTidToMail(jobSeeker.tid)"/>
+                                               ng-click="selectTidToMail(jobSeeker.tid)"
+                                               ng-checked="selectedTidToMail.indexOf(jobSeeker.tid)!=-1"/>
                                     </div>
                                     <div class="col-lg-2">
                                         <span data-toggle="tooltip" title="" data-original-title="{{jobSeeker.Name}}">{{jobSeeker.Name | textLength:15}}</span>

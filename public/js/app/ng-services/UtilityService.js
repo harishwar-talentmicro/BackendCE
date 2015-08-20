@@ -235,7 +235,17 @@ angular.module('ezeidApp').service('UtilityService',['$q',function($q){
 
             var blob = new Blob([bbByteArray], {type: mimeType});
             return blob;
-        }
+        },
 
+        /**
+         * Convert the sql format [2015-08-18T14:01:36.000Z] to human readable format [14 Aug 2015 04:42:00 PM]
+         *
+         * @param dateFormat
+         */
+        convertSQLDateToHumanDate : function(date)
+        {
+            var date = '2015-08-18T14:01:36.000Z';
+            return  moment(date).format('DD MM YYYY h:mm:ss a');
+        }
     };
 }]);

@@ -124,7 +124,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
             googleMap.getReverseGeolocation(lat,lng).then(function(resp){
                 if(resp.data){
                     var data = googleMap.parseReverseGeolocationData(resp.data);
-                  //  CVAttachCtrl._CVInfo.job_location1 = data.city;
                     $scope.locationName = data.city;
                     $scope.country= data.country;
                 }
@@ -150,7 +149,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
     };
 
     $scope.showSelectedText = false;
-    $scope.uploadFile = function (files) {
+    $scope.uploadFile = function (files)
+    {
         $scope.DocumentToUpload = files;
 
          if($scope.DocumentToUpload)
@@ -881,17 +881,17 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     job_id:_jobId
                 }
             }).success(function (data) {
-                    $scope.$emit('$preLoaderStop');
+                $scope.$emit('$preLoaderStop');
 
-                    if(data.status)
-                    {
-                        Notification.success({ message: "Applied..", delay : 2000});
-                        $scope.job_id = 0;
-                    }
-                })
-                .error(function(data, status, headers, config) {
-                    $scope.$emit('$preLoaderStop');
-                });
+                if(data.status)
+                {
+                    Notification.success({ message: "Applied..", delay : 2000});
+                    $scope.job_id = 0;
+                }
+            })
+            .error(function(data, status, headers, config) {
+                $scope.$emit('$preLoaderStop');
+            });
         }
     }
 
