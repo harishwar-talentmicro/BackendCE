@@ -268,6 +268,16 @@ Auth.prototype.register = function(req,res,next){
                                             CompanyName='';
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
+
+                                            /**
+                                             * Creating queue for the user dynamically on rabbit server
+                                             *
+                                             */
+
+
+                                            st.generateRabbitQueue(RegResult[0].TID);
+
+
                                             //res.send(RtnMessage);
                                             if(isIphone == 1){
                                                 var queryParams = st.db.escape(EZEID) + ',' + st.db.escape(deviceToken);
@@ -318,9 +328,9 @@ Auth.prototype.register = function(req,res,next){
 
                                                     //  console.log(data);
                                                     var mailOptions = {
-                                                        from: 'noreply@ezeid.com',
+                                                        from: 'noreply@ezeone.com',
                                                         to: EMailID,
-                                                        subject: 'Welcome to EZEID',
+                                                        subject: 'Welcome to EZEOneID',
                                                         html: data // html body
                                                     };
                                                     //console.log('Mail Option:' + mailOptions);

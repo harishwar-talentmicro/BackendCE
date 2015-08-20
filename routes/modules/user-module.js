@@ -1480,9 +1480,8 @@ User.prototype.forgetPassword = function(req,res,next){
                     if (ForgetPasswordResult) {
                         if (ForgetPasswordResult.affectedRows > 0) {
                             RtnMessage.IsChanged = true;
-                            var UserQuery = 'Select a.TID, ifnull(a.FirstName,"") as FirstName,ifnull(a.LastName,"") as'+
-                                ' LastName,ifnull(b.EMailID,"") as EMailID from tmaster a,tlocations b where b.SeqNo=0'+
-                                ' and b.EZEID=a.EZEID and a.EZEID=' + st.db.escape(EZEID);
+                            var UserQuery = 'Select TID, ifnull(FirstName,"") as FirstName,ifnull(LastName,"") as'+
+                                ' LastName,ifnull(AdminEMailID,"") as EMailID from tmaster where EZEID=' + st.db.escape(EZEID);
                             //  console.log(UserQuery);
                             st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
