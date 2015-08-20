@@ -381,7 +381,6 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                             message: MessageText,
                                             ezeid : EZEID,
                                             toEzeid :ToEZEID
-
                                         };
                                         st.fnMessageMail(MessageContent, function (err, Result) {
                                             if (!err) {

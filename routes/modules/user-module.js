@@ -142,9 +142,6 @@ User.prototype.register = function(req,res,next){
         //console.log(req._remoteAddress);
         //console.log('---------------------------');
         var OperationType = req.body.OperationType;
-        console.log('--------------------------------------------');
-        console.log(OperationType);
-        console.log('--------------------------------------------');
         var IPAddress = req._remoteAddress;
         var SelectionTypes = parseInt(req.body.SelectionType);
         if(SelectionTypes.toString() == 'NaN'){
@@ -266,7 +263,7 @@ User.prototype.register = function(req,res,next){
                     EncryptPWD = hashPassword(Password);
                 }
                 var DOBDate = null;
-                console.log(EZEID.toUpperCase());
+
                 if (DOB != null && DOB != '') {
                     // datechange = new Date(new Date(TaskDateTime).toUTCString());
                     DOBDate = new Date(DOB);
@@ -310,42 +307,17 @@ User.prototype.register = function(req,res,next){
                                             console.log('FnRegistration:tmaster: Registration success');
                                             //res.send(RtnMessage);
                                             if (EMailID != '' && EMailID != null) {
-                                                var Templatefilename = null;
-                                                if(IDTypeID == 1)
-                                                    Templatefilename="RegTemplate.txt";
-                                                else if(IDTypeID == 2)
-                                                    Templatefilename = "RegBussinessTemplate.txt";
-                                                else
-                                                    Templatefilename = "RegPublicTemplate.txt";
-
                                                 var fs = require('fs');
-                                                fs.readFile(Templatefilename, "utf8", function (err, data) {
+                                                fs.readFile("registration.html", "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);
-                                                    data = data.replace("[EZEID]", EZEID);
-                                                    data = data.replace("[EZEID]", EZEID);  //REG Detials
-                                                    data = data.replace("[EZEID]", EZEID); //L1
-                                                    data = data.replace("[EZEID]", EZEID); //L2
-                                                    data = data.replace("[EZEID]", EZEID); //CV
-                                                    data = data.replace("[EZEID]", EZEID); //ID
-                                                    data = data.replace("[EZEID]", EZEID); //DL
-                                                    data = data.replace("[EZEID]", EZEID); //PP
-                                                    data = data.replace("[CompanyName]",CompanyName);
+                                                    data = data.replace("[EZEOneID]", EZEID);
 
-                                                    if(PIN == null){
-                                                        data = data.replace(".PIN","");
-                                                    }
-                                                    else
-                                                    {
-                                                        data = data.replace("PIN",PIN);
-                                                    }
-
-                                                    //  console.log(data);
                                                     var mailOptions = {
-                                                        from: 'noreply@ezeid.com',
+                                                        from: 'noreply@ezeone.com',
                                                         to: EMailID,
-                                                        subject: 'Welcome to EZEID',
+                                                        subject: 'Welcome to EZEOneID',
                                                         html: data // html body
                                                     };
                                                     //console.log('Mail Option:' + mailOptions);
@@ -1480,25 +1452,25 @@ User.prototype.forgetPassword = function(req,res,next){
                     if (ForgetPasswordResult) {
                         if (ForgetPasswordResult.affectedRows > 0) {
                             RtnMessage.IsChanged = true;
-                            var UserQuery = 'Select TID, ifnull(FirstName,"") as FirstName,ifnull(LastName,"") as'+
-                                ' LastName,ifnull(AdminEMailID,"") as EMailID from tmaster where EZEID=' + st.db.escape(EZEID);
+                            var UserQuery = 'Select TID, ifnull(FirstName,"") as FirstName,ifnull(LastName,"") as LastName,' +
+                                'ifnull(AdminEMailID,"") as EMailID from tmaster where EZEID=' + st.db.escape(EZEID);
                             //  console.log(UserQuery);
                             st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
                                     if(UserResult){
                                         {
 
-                                            //  console.log(UserResult);
+                                            //console.log(UserResult);
                                             UserResult[0].FirstName = (UserResult[0].FirstName) ? UserResult[0].FirstName : 'Anonymous';
                                             UserResult[0].LastName = (UserResult[0].LastName) ? UserResult[0].LastName : ' ';
                                             var fs = require('fs');
-                                            fs.readFile("ForgetPasswordTemplate.txt", "utf8", function (err, data) {
+                                            fs.readFile("password_reset_req.html", "utf8", function (err, data) {
                                                 if (err) throw err;
                                                 var passwordResetLink = req.CONFIG.SCHEME + "://" + req.CONFIG.DOMAIN + "/" +
                                                     req.CONFIG.PASS_RESET_PAGE_LINK + "/" + EZEID + "/" + resetCode
                                                 data = data.replace("[Firstname]", UserResult[0].FirstName);
                                                 data = data.replace("[Lastname]", UserResult[0].LastName);
-                                                data = data.replace("[resetlink]", passwordResetLink);
+                                                data = data.replace("[reset link]", passwordResetLink);
                                                 data = data.replace("[resetlink]", passwordResetLink);
 
                                                 console.log(UserResult);
@@ -1513,7 +1485,7 @@ User.prototype.forgetPassword = function(req,res,next){
                                                 // send mail with defined transport object
                                                 //message Type 7 - Forgot password mails service
                                                 var post = { MessageType: 7, Priority: 1, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
-                                                console.log(post);
+                                                //console.log(post);
                                                 var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                     // Neat!
                                                     if (!err) {
