@@ -1268,6 +1268,11 @@ Configuration.prototype.createSubuser = function(req,res,next){
                                     {
                                         RtnMessage.IsSuccessfull = true;
                                         RtnMessage.TID = Result[0].TID;
+
+                                        if(parseInt(TID) == 0){
+                                            st.generateRabbitQueue(Result[0].TID);
+                                        }
+
                                         res.send(RtnMessage);
                                         console.log('FnCreateSubUser: Sub User details save successfully');}
                                     else

@@ -176,7 +176,7 @@ StdLib.prototype.validateToken = function(Token, CallBack){
 StdLib.prototype.generateRabbitQueue = function(masterId){
   var _this = this;
   try{
-      var groupQuery = "SELECT tid FROM tmgroups WHERE AdminID = ? AND GroupType = ? LIMIT 1";
+      var groupQuery = "SELECT tid FROM tmgroups WHERE AdminID = "+_this.db.escape(masterId)+" AND GroupType = 1 LIMIT 1";
 
       _this.db.query(groupQuery, function (err, result) {
           if (!err) {

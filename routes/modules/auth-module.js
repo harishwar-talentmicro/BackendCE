@@ -275,6 +275,7 @@ Auth.prototype.register = function(req,res,next){
                                              */
 
 
+                                            st.generateRabbitQueue(RegResult[0].TID);
 
 
                                             //res.send(RtnMessage);
