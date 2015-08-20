@@ -101,6 +101,52 @@ StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,callBack){
 
 };
 
+/**
+ * List of groupTids and their respected EZEID(GroupName) from tmGroups table
+ * @param masterIdList [Array]
+ * @param groupMasterCallback [Callback Function]
+ */
+StdLib.prototype.getGroupMasterIdList = function(masterIdList,groupMasterCallback){
+
+    if((typeof(groupMasterCallback)).toString() !== "function"){
+        groupMasterCallback = function(error,res){
+            console.log('No callback passed to getGroupMasterIdList');
+            if(error){
+                console.log('Error in getGroupMasterIdList');
+                console.log(error);
+            }
+            else{
+                console.log(res);
+            }
+        };
+    }
+
+
+    if(masterIdList){
+        if(masterIdList.length){
+            var query = "SELECT tid,GroupName FROM tmgroups WHERE GroupType = 1 AND  AdminID IN ("+
+                st.db.escape(masterIdList.join(',')) + ")";
+
+            st.db.query(query,function(err,results){
+                if(err){
+                    console.log('Error in getGroupMasterIdList');
+                    console.log(err);
+                    groupMasterCallback(err,null);
+                }
+                else{
+                    groupMasterCallback(null,results);
+                }
+            });
+        }
+        else{
+            console.log('No masterIdList passed to getGroupMasterIdList');
+        }
+    }
+    else{
+        console.log('No masterIdList passed to getGroupMasterIdList');
+    }
+};
+
 StdLib.prototype.generateRandomHash = function(timeStamp){
     var crypto = require('crypto');
     var hash = crypto.createHash('sha1');
