@@ -107,7 +107,7 @@ StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,callBack){
  * @param groupMasterCallback [Callback Function]
  */
 StdLib.prototype.getGroupMasterIdList = function(masterIdList,groupMasterCallback){
-
+    var _this = this;
     if((typeof(groupMasterCallback)).toString() !== "function"){
         groupMasterCallback = function(error,res){
             console.log('No callback passed to getGroupMasterIdList');
@@ -125,9 +125,9 @@ StdLib.prototype.getGroupMasterIdList = function(masterIdList,groupMasterCallbac
     if(masterIdList){
         if(masterIdList.length){
             var query = "SELECT tid,GroupName FROM tmgroups WHERE GroupType = 1 AND  AdminID IN ("+
-                st.db.escape(masterIdList.join(',')) + ")";
+                _this.db.escape(masterIdList.join(',')) + ")";
 
-            st.db.query(query,function(err,results){
+            _this.db.query(query,function(err,results){
                 if(err){
                     console.log('Error in getGroupMasterIdList');
                     console.log(err);
@@ -609,8 +609,8 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                              //
                                              //
                                              //        //console.log(mailOptions);
-                                             //        var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(ToEZEID);
-                                             //        st.db.query(queryResult, function (err, result) {
+                                             //        var queryResult = 'select TID from tmaster where EZEID=' + _this.db.escape(ToEZEID);
+                                             //        _this.db.query(queryResult, function (err, result) {
                                              //            console.log(result);
                                              //            var post = {
                                              //                MessageType: messagetype,
@@ -621,7 +621,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                              //                SentbyMasterID: result[0].TID
                                              //            };
                                              //
-                                             //            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                             //            var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                              //                // Neat!
                                              //                if (!err) {
                                              //                    console.log('FnMessageMail: Mail saved Successfully....1');
@@ -654,7 +654,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
 
                                              var mail_query = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
                                              console.log(mail_query);
-                                             st.db.query(mail_query, function (err, get_result) {
+                                             _this.db.query(mail_query, function (err, get_result) {
 
                                              if (get_result) {
                                              var mailOptions = {
@@ -664,8 +664,8 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                              html: data // html body
                                              };
                                              //console.log(mailOptions);
-                                             var queryResult = 'select TID from tmaster where EZEID=' + st.db.escape(ToEZEID);
-                                             st.db.query(queryResult, function (err, result) {
+                                             var queryResult = 'select TID from tmaster where EZEID=' + _this.db.escape(ToEZEID);
+                                             _this.db.query(queryResult, function (err, result) {
 
                                              var post = {
                                              MessageType: messagetype,
@@ -676,7 +676,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                              SentbyMasterID: result[0].TID
                                              };
                                              //console.log(post);
-                                             var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                             var query = _this.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                              // Neat!
                                              if (!err) {
                                              console.log('FnMessageMail: Mail saved Successfully....1');
