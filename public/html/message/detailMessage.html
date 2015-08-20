@@ -40,19 +40,19 @@
                 <div class="container ">
                     <div class="col-lg-9"
                          ng-class="msg.senderid == loggedInMasterId?'pull-right':''">
-                        <div class="col-lg-7 text-left no-padding chat-style-sender-msg">
-                        <span class="sender-name" ng-hide="msg.senderid == loggedInMasterId">
-                            <i class="fa fa-user"></i> {{msg.name}}
-                                <span class="group-sender" ng-show="msg.sender.length > 0 && msg.grouptype == 0">
-                                    ({{msg.sender}})
-                                </span>
-                        </span>
-                        <span class="you" ng-show="msg.senderid == loggedInMasterId">
-                            <i class="fa fa-circle text-danger fa-spin"></i> YOU
-                        </span>
+                        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 text-left no-padding chat-style-sender-msg">
+                            <span class="sender-name" ng-hide="msg.senderid == loggedInMasterId">
+                                <i class="fa fa-user"></i> {{msg.name}}
+                                    <span class="group-sender" ng-show="msg.sender.length > 0 && msg.grouptype == 0">
+                                        ({{msg.sender}})
+                                    </span>
+                            </span>
+                            <span class="you" ng-show="msg.senderid == loggedInMasterId">
+                                <i class="fa fa-circle text-danger fa-spin"></i> YOU
+                            </span>
                         </div>
                         <!-- created time -->
-                        <div class="col-lg-5 text-right no-padding chat-style-sender-msg">
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 text-right no-padding chat-style-sender-msg">
                             {{convertTimeToLocal(msg.CreatedDate)}} <i class="fa fa-clock-o"></i>
                         </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 message-detail-text chat-style-inbox chat-message"
