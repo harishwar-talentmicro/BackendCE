@@ -358,7 +358,9 @@
                 }).success(function(resp){
                     $scope.jobCategories = resp;
                 }).error(function(err){
-
+                    var msg = 'Something went wrong! Please try again';
+                    Notification.error({ message : msg, delay : MsgDelay});
+                    $scope.$emit('$preLoaderStop');
                 });
             }
 
@@ -567,15 +569,11 @@
             // Open popup - list of candidate who applied for job
             $scope.openCandidateListPopup = function(_jobID,_totalapplie)
             {
-
                 if(_totalapplie > 0)
                 {
                     $scope.changeTabToApplicants(_jobID);
                 }
-
-
-
-            }
+            };
 
             // Get Educations list
             function getEducations()
@@ -590,7 +588,9 @@
                         $scope.educationList = resp.data;
                     })
                     .error(function(err){
-
+                        var msg = 'Something went wrong! Please try again';
+                        Notification.error({ message : msg, delay : MsgDelay});
+                        $scope.$emit('$preLoaderStop');
                     });
             }
 
@@ -638,7 +638,9 @@
                         $scope.specializationList = resp.data;
                     })
                     .error(function(err){
-
+                        var msg = 'Something went wrong! Please try again';
+                        Notification.error({ message : msg, delay : MsgDelay});
+                        $scope.$emit('$preLoaderStop');
                     });
             }
 
@@ -655,7 +657,9 @@
                         $scope.instituteList = resp.data;
                     })
                 .error(function(err){
-
+                        var msg = 'Something went wrong! Please try again';
+                        Notification.error({ message : msg, delay : MsgDelay});
+                        $scope.$emit('$preLoaderStop');
                 });
             }
 
@@ -708,8 +712,8 @@
                            $scope.googleMap1.currentMarkerPosition.latitude = $scope.latForMap;
                            $scope.googleMap1.currentMarkerPosition.longitude = $scope.longForMap;
                            $scope.googleMap1.placeCurrentLocationMarker(getNewCoordinates);
-                            $scope.googleMap1.resizeMap();
-                            $scope.googleMap1.setMarkersInBounds();
+                           $scope.googleMap1.resizeMap();
+                           $scope.googleMap1.setMarkersInBounds();
 
                            //initializeMap();
 

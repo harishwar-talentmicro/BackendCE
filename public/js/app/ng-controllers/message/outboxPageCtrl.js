@@ -214,6 +214,11 @@ angular.module('ezeidApp').
                 return UtilityService.checkIfEmpty(val,alternateText);
             }
 
+            $scope.convertDate = function(dateTime)
+            {
+                return UtilityService.convertSQLDateToHumanDate(dateTime);
+            }
+
             /* toggle modal visibility */
             $scope.modalVisible = false;
             $scope.modalVisibility = function () {
