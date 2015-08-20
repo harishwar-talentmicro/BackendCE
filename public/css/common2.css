@@ -128,17 +128,44 @@
 
 }
 
-@media screen and (max-width: 1252px) {
-    .hpw .tile3-dynamic-padding
+.hpw .dynamic-padding-tile-3
+{
+    padding-bottom: 13% !important;
+}
+
+@media screen and (max-width: 2800px) {
+
+    .hpw .dynamic-padding-tile-3
     {
-        padding-bottom: 34px !important;
+        padding-bottom: 13% !important;
+    }
+}
+
+@media screen and (max-width: 1366px) {
+
+    .hpw .dynamic-padding-tile-3
+    {
+        padding-bottom: 5% !important;
+    }
+}
+
+@media screen and (max-width: 1252px) {
+
+    .hpw .dynamic-padding-tile-3
+    {
+        padding-bottom: 13% !important;
     }
 }
 
 @media screen and (max-width: 1312px) {
-    .hpw .tile3-dynamic-padding
+    .hpw .dynamic-padding-tile-3
     {
-        padding-bottom: 30px !important;
+        padding-bottom: 14% !important;
+    }
+
+    .hpw .dynamic-padding-tile-1
+    {
+        padding-bottom: 14% !important;
     }
 }
 @media screen and (max-width: 1320px) {
@@ -202,6 +229,11 @@
 
 @media screen and (max-width: 1200px)
 {
+    .hpw .dynamic-padding-tile-3
+    {
+        padding-bottom: 16% !important;
+    }
+
     .hpw .hidden-1200
     {
         display: none !important;
@@ -277,12 +309,25 @@
 
 
 @media screen and (max-width: 1050px) {
+
+    .hpw .dynamic-padding-tile-3
+    {
+        padding-bottom: 28% !important;
+    }
+
     .hpw .drop-down-3
     {
         margin-top: 5.9% !important;
     }
 }
-@media screen and (max-width: 990px) {
+@media screen and (max-width: 991px) {
+
+    .hpw .dynamic-padding-tile-3
+    {
+        padding-bottom: 0% !important;
+    }
+
+
     .hpw .business-img-text-align
     {
         text-align: center !important;
@@ -300,6 +345,11 @@
 }
 
 @media screen and (max-width: 874px) {
+
+    .hpw .dynamic-padding-tile-4
+    {
+        padding-bottom: 10% !important;
+    }
 
     .hpw .drop-down-3
     {
@@ -1453,6 +1503,7 @@ hr.style-two {
 .hpw .width-190-px
 {
     width: 190px !important;
+    height:190px !important;
 }
 
 .hpw .tile-row
@@ -3452,6 +3503,20 @@ sup.tm{
     color: #fff !important;
 }
 
+.hpw .border-light-gray
+{
+    border: 1px solid #DAD3D3;
+}
+
+.hpw .table-head-gray
+ {
+    background-color: #E6E6E6;
+}
+
+.hpw .chat-my-message
+{
+    background-color: rgba(234, 234, 234, 0.57);
+}
 /*::-webkit-scrollbar {*/
     /*width: 12px;*/
 /*}*/

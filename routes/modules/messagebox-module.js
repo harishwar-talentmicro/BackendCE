@@ -390,6 +390,8 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
     var groupId  = parseInt(req.body.group_id);
     var masterId  = req.body.master_id;
     var status  = parseInt(req.body.status);
+    var deleteStatus = (parseInt(req.body.group_type) !== NaN && parseInt(req.body.group_type) > 0)
+        ? parseInt(req.body.group_type) : 0;
 
     console.log(req.body);
 
@@ -429,7 +431,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(masterId) + ',' + st.db.escape(status);
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(masterId) + ',' + st.db.escape(status) + ','+ st.db.escape(deleteStatus);
 
                         var query = 'CALL pUpdateUserStatus(' + queryParams + ')';
                         console.log(query);
