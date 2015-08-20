@@ -3503,6 +3503,20 @@ sup.tm{
     color: #fff !important;
 }
 
+.hpw .border-light-gray
+{
+    border: 1px solid #DAD3D3;
+}
+
+.hpw .table-head-gray
+ {
+    background-color: #E6E6E6;
+}
+
+.hpw .chat-my-message
+{
+    background-color: rgba(234, 234, 234, 0.57);
+}
 /*::-webkit-scrollbar {*/
     /*width: 12px;*/
 /*}*/

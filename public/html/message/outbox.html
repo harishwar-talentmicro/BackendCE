@@ -24,7 +24,7 @@
                             <!-- List of all pending request -->
                             <div class="pending-request" ng-show="pendingRequestVisbility">
                                 <div class="individual-pending-request" ng-repeat="req in pendingRequestData track by $index">
-                                    {{req.GroupName.length > 0?req.GroupName:'NA'}}
+                                    <span title="{{req.GroupName.length > 0?req.GroupName:'NA'}}">{{req.GroupName.length > 0?req.GroupName:'NA' | textLength:20}}</span>
                                     <span class="pull-right">
                                         <button ng-click="pendingRequestResponse(req.GroupID, req.MemberID, 1,$index)" class="btn btn-primary btn-xs"><i class="fa fa-check"></i></button>
                                         <button ng-click="pendingRequestResponse(req.groupId, req.MemberID, 2,$index)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
@@ -65,7 +65,7 @@
                                 <!-- groups goes here -->
                                 <div class="group-list grp-hover overflow-y-250">
                                     <li class="index-menu-item group" ng-repeat="grp in groupListData track by $index">
-                                        <a href="#" ng-click="redirectGroupMessage(grp.GroupID,grp.GroupType)"><i class="fa fa-group"></i> {{grp.GroupName}}</a>
+                                        <a href="#" title="{{grp.GroupName}}" ng-click="redirectGroupMessage(grp.GroupID,grp.GroupType)"><i class="fa fa-group"></i> {{grp.GroupName | textLength:25}}</a>
                                         <span class="pull-right p-right-10" ng-show="grp.isAdmin == 1">
                                             <button ng-click="toggleEditGroupModalVisibility($index,grp.GroupID)" title="edit group" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></button>
                                             <button disabled title="you are admin" class="btn btn-primary btn-xs"><i class="fa fa-shield"></i></button>
@@ -87,8 +87,16 @@
                                 </li>
                                 <!-- Individual list goes here -->
                                 <div class="individual-member-list grp-hover overflow-y-250">
-                                    <li class="index-menu-item people" ng-hide="loggedInUserEzeone == member.GroupName" ng-repeat="member in individualMember track by $index">
-                                        <a href="#" ng-click="redirectGroupMessage(member.GroupID,member.GroupType)"><i class="fa fa-comments"></i> {{member.GroupName}}</a>
+                                    <li class="index-menu-item people" ng-hide="loggedInUserEzeone == member.GroupName"
+                                        ng-repeat="member in individualMember track by $index">
+                                        <a href="#" title="{{member.GroupName}}" ng-click="redirectGroupMessage(member.GroupID,member.GroupType)"><i class="fa fa-comments"></i> {{member.GroupName | textLength:25}}</a>
+                                         <span class="pull-right p-right-10 ">
+                                            <button class="btn btn-danger btn-xs"
+                                                    title="Remove Contact"
+                                                    ng-click="removeContact(member.GroupID)">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                         </span>
                                     </li>
                                     <li class="index-menu-item people bg-danger text-white" ng-show="!individualMember.length > 0">
                                         <a href="#"><i class="fa fa-comments"></i> No Contacts Available</a>
@@ -190,8 +198,8 @@
 
                     <div class="individual-transaction-items ">
                         <!-- Individual items -->
-                        <table class="table table-striped">
-                            <thead>
+                        <table class="table table-striped border-light-gray">
+                            <thead class="table-head-gray">
                             <tr>
                                 <th width="5%">Id</th>
                                 <th width="40%">Item</th>
