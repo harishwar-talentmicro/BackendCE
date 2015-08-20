@@ -34,24 +34,27 @@ function NotificationMqtt(){
     try{
         mqtt = require('mqtt');
         try{
-            mqttClient = mqtt.connect(brokerUrl,connOpt);
+            if(!mqttClient){
+                mqttClient = mqtt.connect(brokerUrl,connOpt);
 
-            mqttClient.on('connect',function(){
-                console.log('MQTT Client connected successfully to broker');
-            });
+                mqttClient.on('connect',function(){
+                    console.log('MQTT Client connected successfully to broker');
+                });
+            }
 
-            mqttClient.on('disconnect',function(){
-                console.log('MQTT Client disconnected from broker ! Trying to connect in 1 second');
-                setTimeout(function(){
-                    try{
-                        mqttClient = mqtt.connect(brokerUrl,connOpt);
-                    }
-                    catch(ex){
-                        console.log(ex);
-                    }
-                },1000);
 
-            });
+            //mqttClient.on('disconnect',function(){
+            //    console.log('MQTT Client disconnected from broker ! Trying to connect in 1 second');
+            //    setTimeout(function(){
+            //        try{
+            //            mqttClient = mqtt.connect(brokerUrl,connOpt);
+            //        }
+            //        catch(ex){
+            //            console.log(ex);
+            //        }
+            //    },1000);
+            //
+            //});
 
         }
         catch(ex){
@@ -82,7 +85,7 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
     }
     if(validationFlag){
         try{
-            mqttClient.publish(topic,JSON.stringify(messagePayload));
+            mqttClient.publish('/'+topic,JSON.stringify(messagePayload));
         }
         catch(ex){
             console.log(ex);

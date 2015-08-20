@@ -32,6 +32,7 @@ NotificationQueryManager.prototype.isGroupAdminByToken = function(token,groupId,
         var query = "SELECT tid FROM tmgroups WHERE tid = "+ st.db.escape(groupId) + " AND AdminID = " +
             " (SELECT masterid FROM tloginout WHERE token = "+ st.db.escape(token) + " LIMIT 1)";
 
+        console.log(query);
 
         st.db.query(query,function(err,results){
             if(err){
@@ -80,7 +81,7 @@ NotificationQueryManager.prototype.getIndividualGroupId = function(masterId,getI
         var query = "SELECT tid FROM tmgroups WHERE AdminID = " +
             " "+ st.db.escape(masterId) + " LIMIT 1";
 
-
+        console.log(query);
         st.db.query(query,function(err,results){
             if(err){
                 console.log('Error in getIndividualGroupId');
@@ -109,13 +110,13 @@ NotificationQueryManager.prototype.getIndividualGroupId = function(masterId,getI
  * @param getEzeidDetailsCallback (err,result)
  *  err : Error in execution of query , result : boolean (true if isAdmin and false if not an admin)
  */
-NotificationQueryManager.prototype.getEzeidDetails = function(masterId,getEzeidDetailsCallback){
+NotificationQueryManager.prototype.getEzeidDetails = function(masterId,receiverId,getEzeidDetailsCallback){
 
     if((typeof(getEzeidDetailsCallback)).toString() !== "function"){
         getEzeidDetailsCallback = function(error,res){
-            console.log('No callback passed to getEzeidDetailsCallback');
+            console.log('No callback passed to getEzeidDetails');
             if(error){
-                console.log('Error in getEzeidDetailsCallback');
+                console.log('Error in getEzeidDetails');
                 console.log(error);
             }
             else{
@@ -124,23 +125,72 @@ NotificationQueryManager.prototype.getEzeidDetails = function(masterId,getEzeidD
         };
     }
 
-    if(token && groupId){
+    if(masterId){
         var query = "SELECT ezeid FROM tmaster WHERE tid = "+ st.db.escape(masterId) + " LIMIT 1";
 
+        console.log(query);
 
         st.db.query(query,function(err,results){
             if(err){
-                console.log('Error in isGroupAdminByToken');
+                console.log('Error in getEzeidDetails');
                 console.log(err);
                 getEzeidDetailsCallback(err,null);
             }
             else{
                 if(results){
                     if(results[0]){
-                        getEzeidDetailsCallback(null,results[0]);
+                        getEzeidDetailsCallback(null,results[0],receiverId);
                     }
                     else{
-                        getEzeidDetailsCallback(null,null);
+                        getEzeidDetailsCallback(null,null,receiverId);
+                    }
+                }
+            }
+        });
+    }
+
+};
+
+
+/**
+ * Checks if the logged in user is admin of this group or not
+ * @param masterId
+ * @param getEzeidDetailsCallback (err,result)
+ *  err : Error in execution of query , result : boolean (true if isAdmin and false if not an admin)
+ */
+NotificationQueryManager.prototype.getIphoneId = function(masterId,getIphoneIdCallback){
+
+    if((typeof(getIphoneIdCallback)).toString() !== "function"){
+        getIphoneIdCallback = function(error,res){
+            console.log('No callback passed to getIphoneId');
+            if(error){
+                console.log('Error in getIphoneId');
+                console.log(error);
+            }
+            else{
+                console.log(res);
+            }
+        };
+    }
+
+    if(masterId){
+        var query = "SELECT IPhoneDeviceID FROM tmaster WHERE tid = "+ st.db.escape(masterId) + " LIMIT 1";
+
+        console.log(query);
+
+        st.db.query(query,function(err,results){
+            if(err){
+                console.log('Error in getIphoneId');
+                console.log(err);
+                getIphoneIdCallback(err,null);
+            }
+            else{
+                if(results){
+                    if(results[0]){
+                        getIphoneIdCallback(null,results[0]);
+                    }
+                    else{
+                        getIphoneIdCallback(null,null);
                     }
                 }
             }
@@ -151,7 +201,7 @@ NotificationQueryManager.prototype.getEzeidDetails = function(masterId,getEzeidD
 
 
 
-NotificationQueryManager.getGroupInfo = function(groupId,groupType,getGroupInfoCallback){
+NotificationQueryManager.prototype.getGroupInfo = function(groupId,groupType,getGroupInfoCallback){
     if((typeof(getGroupInfoCallback)).toString() !== "function"){
         getGroupInfoCallback = function(error,res){
             console.log('No callback passed to getGroupInfo');
@@ -166,7 +216,7 @@ NotificationQueryManager.getGroupInfo = function(groupId,groupType,getGroupInfoC
     }
 
 
-    var queryParams = st.db.escape(groupId)+','+st.db.escape(type);
+    var queryParams = st.db.escape(groupId)+','+st.db.escape(groupType);
     var query = 'CALL pGetGroupInfn(' + queryParams + ')';
 
     st.db.query(query, function (err, getResult) {

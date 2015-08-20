@@ -34,9 +34,7 @@ function MessageBox(db,stdLib){
     if(stdLib){
         st = stdLib;
         notification = new Notification(db,stdLib);
-
-
-        notificationQmManager = NotificationQueryManager(db,stdLib);
+        notificationQmManager = new NotificationQueryManager(db,stdLib);
     }
 };
 
@@ -469,10 +467,11 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                      * then admin is logged in and he is doing status change for some other user
                                      */
 
-                                    notificationQmManager.isAdmin(token,groupId,function(err,isAdmin){
+                                    notificationQmManager.isGroupAdminByToken(token,groupId,function(err,isAdmin){
                                         if(!err){
+                                            console.log('yes going into isGroupAdminByToken');
                                             var isAdmin = isAdmin;
-                                            switch(status){
+                                            switch(parseInt(status)){
                                                 case 0:
 
                                                     // Pending
@@ -484,27 +483,34 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                      */
                                                     if(isAdmin && (!parseInt(deleteStatus))){
 
+                                                        console.log('yes going into isAdmin');
                                                         notificationQmManager.getGroupInfo(groupId,deleteStatus,function(err,groupInfoRes){
                                                             if(!err){
+
+                                                                console.log('yes going into getGroupInfo');
                                                                 if(groupInfoRes){
-                                                                    st.getGroupMasterIdList([masterId],function(err,groupListRes){
+                                                                    st.getGroupMasterIdList([masterId],function(err,groupListRes1){
+                                                                        console.log('yes going into getGroupMasterIdList');
                                                                         if(!err){
-                                                                            if(groupListRes){
-                                                                                for(var ct = 0; ct < groupListRes.length; ct++){
-                                                                                    notificationQmManager.getEzeidDetailsCallback(masterId,function(err,ezeidResults){
+                                                                            if(groupListRes1){
+                                                                                console.log(groupListRes1);
+                                                                                for(var cx = 0; cx < groupListRes1.length; cx++){
+                                                                                    console.log(groupListRes1[cx]);
+                                                                                    console.log(groupListRes1[cx].tid);
+                                                                                    notificationQmManager.getEzeidDetails(masterId,groupListRes1[cx].tid,function(err,ezeidResults,receiverId){
                                                                                         if(!err){
                                                                                             if(ezeidResults){
-                                                                                                console.log(groupListRes[ct].tid,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
+                                                                                                console.log(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
                                                                                                     1, 0, null, 0);
-                                                                                                notification.publish(groupListRes[ct].tid,sendTitle , groupInfoRes.groupname, groupId, "Request to join",
+                                                                                                notification.publish(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
                                                                                                     1, 0, null, 0);
                                                                                             }
 
                                                                                         }
 
                                                                                     });
-
                                                                                 }
+
                                                                             }
                                                                         }
                                                                     });

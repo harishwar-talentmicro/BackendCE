@@ -1,6 +1,9 @@
 var moment = require('moment');
 var AppleNotification = require('./notification-apns.js');
 var NotificationMqtt = require('./notification-mqtt.js');
+var notificationMqtt = new NotificationMqtt();
+var apnsNotification = new AppleNotification();
+
 var st = null;
 
 function Notification(db,stdLib){
@@ -55,7 +58,6 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
 
 
     if(validationStatus){
-        var notificationMqtt = new NotificationMqtt();
 
         var msgBytes = 1024;
         var messagePayload = {
@@ -64,7 +66,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             s_title : senderTitle,
             g_title : groupTitle,
             type : messageType,
-            ts : moment("YYYY-MM-DD HH:mm:ss"),
+            ts : moment().format("YYYY-MM-DD HH:mm:ss"),
             op: operationType,
             mid : messageId
         };
@@ -76,7 +78,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
          * If IPhone ID is there for this user then send notification to his iphone id also
          */
         if(iphoneId){
-            var apnsNotification = new AppleNotification();
+
             apnsNotification.sendAppleNS(iphoneId,messagePayload);
         }
     }
