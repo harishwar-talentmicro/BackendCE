@@ -828,7 +828,7 @@ angular.module('ezeidApp').
                 /* API call for requesting to join group */
                 addMemberAndGroupMembershipRequestApiCall(2).then(function () {
                         $scope.modalAddGroupVisible = false;
-                        Notification.success({message: "You successfully joined this group", delay: MsgDelay});
+                        Notification.success({message: "You've successfully joined this group", delay: MsgDelay});
                     },
                     function () {
                         Notification.error({message: "Failed to join this group, Try again later", delay: MsgDelay});
@@ -985,7 +985,7 @@ angular.module('ezeidApp').
                         /* remove this group from the group list */
                         spliceGroupList($scope.activeGroupId);
 
-                        Notification.success({message: "You successfully left this group", delay: MsgDelay});
+                        Notification.success({message: "You've successfully left this group", delay: MsgDelay});
                     },
                     function () {
                         Notification.error({message: "Failed to leave the group, Try again later", delay: MsgDelay});
@@ -1041,7 +1041,7 @@ angular.module('ezeidApp').
                 /* send an API request with the new status */
                 updateMemberStatusApiCall(userId, response, type).then(function () {
                         Notification.success({
-                            message: "You have successfuly " + msgType + " the group join request!",
+                            message: "You have " + msgType + " the Group Join request!",
                             delay: MsgDelay
                         });
                     },

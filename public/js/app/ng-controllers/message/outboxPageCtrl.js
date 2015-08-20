@@ -19,6 +19,7 @@ angular.module('ezeidApp').
         '$interval',
         'MsgDelay',
         '$location',
+        '$route',
         '$routeParams',
         'UtilityService',
         function (
@@ -34,6 +35,7 @@ angular.module('ezeidApp').
             $interval,
             MsgDelay,
             $location,
+            $route,
             $routeParams,
             UtilityService
         ) {
@@ -553,7 +555,7 @@ angular.module('ezeidApp').
                 var selectedMsgId = convertSelectedMessageToCsv(activityType);
 
                 messageActivityApi(selectedMsgId,activityType).then(function(){
-                        Notification.success({ message: "Your action is saved successfully", delay: MsgDelay });
+                        Notification.success({ message: "Your activity is saved", delay: MsgDelay });
                         $scope.selectedMsgIdArray = [];
                     },
                     function(){
@@ -727,6 +729,23 @@ angular.module('ezeidApp').
                 else
                     $scope.groupListData.push(temp);
 
+            }
+
+            /**
+             * Decides weather to reload or redirect between on the conditions
+             */
+            $scope.redirectOrRefresh = function()
+            {
+                var pathName = window.location.pathname;
+                var pathArr = pathName.split('/');
+                /* if no data redirect to inbox pages */
+                if(!pathArr)
+                    $location.url('/message');
+                /* user is in one of the sub paths redirect it to INBOX page */
+                if(pathArr.length > 2)
+                    $location.url('/message');
+                else//Reload the page [user is in message box page only]
+                    $route.reload();
             }
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////ALL API CALLS///////////////////////////////////////////////////////////

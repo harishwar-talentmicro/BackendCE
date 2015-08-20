@@ -1094,7 +1094,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                         console.log(resultList);
                                                                     receiverId = resultList[0].tid;
                                                                     senderTitle = resultList[0].GroupName;
-                                                                    groupTitle = resultList[0].GroupName;
+                                                                    groupTitle = result[0].GroupName;
                                                                     groupId = toID;
                                                                     messageText = message;
                                                                     messageType = idType;
@@ -2095,6 +2095,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Messages loaded successfully';
+                                            responseMessage.count = getResult[0][0].count;
                                             responseMessage.data = getResult[0];
                                             res.status(200).json(responseMessage);
                                             console.log('FnLoadMessages: Messages loaded successfully');

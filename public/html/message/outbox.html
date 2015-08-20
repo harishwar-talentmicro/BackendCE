@@ -16,8 +16,9 @@
                     <div class="col-lg-3 no-padding">
                         <!-- main indexes -->
                         <div class="inbox-head-left main-index inbox-head-left-bg">
-                            <h3 class="text-white text-center">
-                                <a href="/message" class="text-white no-style-link"><i class="fa fa-envelope"></i> MessageBox</a>
+                            <h3 class="text-white text-center pointer">
+                                <!--<a href="/message" class="text-white no-style-link"><i class="fa fa-envelope"></i> MessageBox</a>-->
+                                <a ng-click="redirectOrRefresh()" class="text-white no-style-link"><i class="fa fa-envelope"></i> MessageBox</a>
                                 <label title="New request(s)"
                                        class="label label-warning pointer"
                                        ng-click="pendingRequestVisbility = !pendingRequestVisbility"
