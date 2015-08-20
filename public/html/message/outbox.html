@@ -1,5 +1,7 @@
 <!-- Outbox module goes here -->
-<section id="outbox-wrapper" class="hpw ow"  ng-controller="OutboxPageGroupActionCtrl">
+<section id="outbox-wrapper" class="hpw ow css_version"  ng-controller="OutboxPageGroupActionCtrl">
+
+
     <div ng-controller="OutboxPageJoinEzeoneCtrl">
         <!-- Header menu goes here -->
         <header-section></header-section>
@@ -63,12 +65,16 @@
                                 </span>
                                 </li>
                                 <!-- groups goes here -->
-                                <div class="group-list grp-hover overflow-y-250">
-                                    <li class="index-menu-item group" ng-repeat="grp in groupListData track by $index">
-                                        <a href="#" title="{{grp.GroupName}}" ng-click="redirectGroupMessage(grp.GroupID,grp.GroupType)"><i class="fa fa-group"></i> {{grp.GroupName | textLength:25}}</a>
-                                        <span class="pull-right p-right-10" ng-show="grp.isAdmin == 1">
+                                <div class="group-list grp-hover overflow-y-250 css_version">
+                                    <li class="index-menu-item group"
+                                        ng-repeat="grp in groupListData track by $index"
+                                        ng-click="redirectGroupMessage(grp.GroupID,grp.GroupType)">
+                                        <a href="#" title="{{grp.GroupName}}" >
+                                            <i class="fa fa-group"></i>
+                                            <i class="fa fa-shield text-warning" title="You are admin" ng-show="grp.isAdmin == 1"></i> {{grp.GroupName | textLength:25}}
+                                        </a>
+                                        <span class="pull-right p-right-10 on-hover-active" ng-show="grp.isAdmin == 1">
                                             <button ng-click="toggleEditGroupModalVisibility($index,grp.GroupID)" title="edit group" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></button>
-                                            <button disabled title="you are admin" class="btn btn-primary btn-xs"><i class="fa fa-shield"></i></button>
                                         </span>
                                     </li>
                                     <li class="index-menu-item group" ng-show="!groupListData.length > 0">
@@ -86,7 +92,7 @@
                                 </span>
                                 </li>
                                 <!-- Individual list goes here -->
-                                <div class="individual-member-list grp-hover overflow-y-250">
+                                <div class="individual-member-list grp-hover overflow-y-250 css_version">
                                     <li class="index-menu-item people" ng-hide="loggedInUserEzeone == member.GroupName"
                                         ng-repeat="member in individualMember track by $index">
                                         <a href="#" title="{{member.GroupName}}" ng-click="redirectGroupMessage(member.GroupID,member.GroupType)"><i class="fa fa-comments"></i> {{member.GroupName | textLength:25}}</a>
@@ -565,5 +571,4 @@
             <br>
         </div>
     </modal>
-
 </section>
