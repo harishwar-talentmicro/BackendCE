@@ -680,7 +680,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                     var mailOptions = {
                                                         from: 'noreply@ezeone.com',
                                                         to: MessageContentResult[0][0].ToMailID,
-                                                        subject: 'CV Request',
+                                                        subject: 'Resume Request',
                                                         html: data // html body
                                                     };
                                                     console.log('mailOption...................1');
@@ -696,16 +696,16 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                         // Neat!
                                                         if (!err) {
                                                             console.log('FnMessageMail: Mail saved Successfully....5');
-                                                            nextMessage();
+                                                            CallBack(null, RtnMessage);
 
                                                         }
                                                         else {
                                                             console.log('FnMessageMail: Mail not Saved Successfully');
-
+                                                            CallBack(null, null);
                                                         }
                                                     });
                                                 });
-                                            var nextMessage = function () {
+/*                                            var nextMessage = function () {
                                              fs.readFile("cv_sender.html", "utf8", function (err, data1) {
                                              if (err) throw err;
                                              data1 = data1.replace("[IsVerified]", 'Not Verified');
@@ -753,7 +753,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                              }
                                              });
                                              });
-                                             };
+                                             };*/
 
                                         }
                                     }

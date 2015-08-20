@@ -80,10 +80,13 @@ angular.module('ezeidApp').controller('HistoryController',[
 
     function LoadHistory(_pageValue){
 
-        $http({ method: 'get', url: GURL + 'ewtGetAccessHistory?TokenNo=' + $rootScope._userInfo.Token + '&Page='+_pageValue }).success(function (data) {
-
-            if (data != 'null') {
-                //////console.log(data);
+        $http({
+            method: 'get',
+            url: GURL + 'ewtGetAccessHistory?TokenNo=' + $rootScope._userInfo.Token + '&Page='+_pageValue
+        }).success(function (data)
+        {
+            if ((data != 'null') && (data))
+            {
                 for (var i = 0; i < data.length; i++) {
                     data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
                     msgSen.msgs.push(data[i]);
