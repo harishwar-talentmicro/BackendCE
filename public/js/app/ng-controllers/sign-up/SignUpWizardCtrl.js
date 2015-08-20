@@ -126,7 +126,7 @@ angular.module('ezeidApp').
              * Date of Birth for Individual
              * @type {string}
              */
-            $scope.dateOfBirth = '';
+            $scope.dateOfBirth = moment().add(18,'y').format("YYYY-MM-DD");
 
 
             /**
@@ -207,7 +207,7 @@ angular.module('ezeidApp').
                     $scope.showBusinnessSelectionType = true;
                 }
                 else{
-                    $scope.selectionString = (parseInt($scope.userType) == 1) ? 'You are signing up as an individual'
+                    $scope.selectionString = (parseInt($scope.userType) == 1) ? 'You are signing up as an Individual'
                         : 'You are signing up as a public place';
                     $scope.isEzeidCheckBlockVisible = true;
                 }
@@ -215,7 +215,7 @@ angular.module('ezeidApp').
             };
 
             $scope.selectPlanSelectionType = function(planSelectionType){
-                $scope.selectionString = (parseInt(planSelectionType) == 2) ? 'You are signing up as a business (paid listing)'
+                $scope.selectionString = (parseInt(planSelectionType) == 2) ? 'You are signing up as a Business (Paid listing)'
                     : 'You are signing up as a business (free listing)';
                 $scope.showBusinnessSelectionType = false;
                 $scope.planSelectionType = planSelectionType;
@@ -632,7 +632,7 @@ angular.module('ezeidApp').
                     });
                 };
 
-                createActionTypes();
+                //createActionTypes();
 
                 var statusCount = 0;
                 var createPrimaryStatusTypes = function(masterId){
@@ -901,7 +901,7 @@ angular.module('ezeidApp').
                         });
                     };
 
-                    createStatus(masterId);
+                    //createStatus(masterId);
                 };
 
 
@@ -914,7 +914,7 @@ angular.module('ezeidApp').
                 }).success(function(resp) {
                     if (resp.length > 0 && resp !== 'null') {
                         var masterId = resp[0].MasterID;
-                        createPrimaryStatusTypes(masterId);
+                        //createPrimaryStatusTypes(masterId);
                     }
                     else{
                         statusCompleteFlag = true;
