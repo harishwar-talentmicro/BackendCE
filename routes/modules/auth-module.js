@@ -28,6 +28,11 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var NotificationMqtt = require('./notification/notification-mqtt.js');
+var notificationMqtt = new NotificationMqtt();
+var NotificationQueryManager = require('./notification/notification-query.js');
+var notificationQmManager = null;
+
 
 var bcrypt = null;
 
@@ -80,6 +85,7 @@ var st = null;
 function Auth(db,stdLib){
     if(stdLib){
         st = stdLib;
+        notificationQmManager = new NotificationQueryManager(db,st);
     }
 }
 
@@ -270,10 +276,13 @@ Auth.prototype.register = function(req,res,next){
                                              * Creating queue for the user dynamically on rabbit server
                                              *
                                              */
-
-
-                                            st.generateRabbitQueue(RegResult[0].TID);
-
+                                            notificationQmManager.getIndividualGroupId(RegResult[0].TID,function(err1,getIndividualGroupIdRes){
+                                                if(!err1){
+                                                    if(getIndividualGroupIdRes){
+                                                        notificationMqtt.createQueue(getIndividualGroupIdRes.tid);
+                                                    }
+                                                }
+                                            });
 
                                             //res.send(RtnMessage);
                                             if(isIphone == 1){

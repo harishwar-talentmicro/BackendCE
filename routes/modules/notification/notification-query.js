@@ -1,5 +1,9 @@
-function NotificationQueryManager(db,stdLib){
+var st = null;
 
+function NotificationQueryManager(db,stdLib){
+    if(stdLib){
+        st = stdLib;
+    }
 };
 
 /**
@@ -42,6 +46,54 @@ NotificationQueryManager.prototype.isGroupAdminByToken = function(token,groupId,
                     }
                     else{
                         isGroupAdminCallback(null,false);
+                    }
+                }
+            }
+        });
+    }
+
+};
+
+/**
+ * Checks if the logged in user is admin of this group or not
+ * @param token
+ * @param groupId
+ * @param isGroupAdminCallback (err,result)
+ *  err : Error in execution of query , result : boolean (true if isAdmin and false if not an admin)
+ */
+NotificationQueryManager.prototype.getIndividualGroupId = function(masterId,getIndividualGroupIdCallback){
+
+    if((typeof(getIndividualGroupIdCallback)).toString() !== "function"){
+        getIndividualGroupIdCallback = function(error,res){
+            console.log('No callback passed to getIndividualGroupIdCallback');
+            if(error){
+                console.log('Error in getIndividualGroupIdCallback');
+                console.log(error);
+            }
+            else{
+                console.log(res);
+            }
+        };
+    }
+
+    if(masterId){
+        var query = "SELECT tid FROM tmgroups WHERE AdminID = " +
+            " "+ st.db.escape(masterId) + " LIMIT 1";
+
+
+        st.db.query(query,function(err,results){
+            if(err){
+                console.log('Error in getIndividualGroupId');
+                console.log(err);
+                getIndividualGroupIdCallback(err,null);
+            }
+            else{
+                if(results){
+                    if(results[0]){
+                        getIndividualGroupIdCallback(null,results[0]);
+                    }
+                    else{
+                        getIndividualGroupIdCallback(null,null);
                     }
                 }
             }

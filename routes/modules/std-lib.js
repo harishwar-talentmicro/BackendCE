@@ -127,6 +127,8 @@ StdLib.prototype.getGroupMasterIdList = function(masterIdList,groupMasterCallbac
             var query = "SELECT tid,GroupName FROM tmgroups WHERE GroupType = 1 AND  AdminID IN ("+
                 _this.db.escape(masterIdList.join(',')) + ")";
 
+            console.log(query);
+
             _this.db.query(query,function(err,results){
                 if(err){
                     console.log('Error in getGroupMasterIdList');

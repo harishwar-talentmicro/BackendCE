@@ -23,7 +23,9 @@ function alterEzeoneId(ezeoneId){
 }
 
 var Notification = require('./notification/notification-master.js');
+var NotificationQueryManager = require('./notification/notification-query.js');
 var notification = null;
+var notificationQmManager = null;
 
 
 var st = null;
@@ -32,6 +34,9 @@ function MessageBox(db,stdLib){
     if(stdLib){
         st = stdLib;
         notification = new Notification(db,stdLib);
+
+
+        notificationQmManager = NotificationQueryManager(db,stdLib);
     }
 };
 
@@ -389,6 +394,9 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
     var token  = req.body.token;
     var groupId  = parseInt(req.body.group_id);
     var masterId  = req.body.master_id;
+
+    // Status 0 : Pending, 1: Accepted, 2 : Rejected, 3 : Leaved, 4 : Removed
+
     var status  = parseInt(req.body.status);
     var deleteStatus = (parseInt(req.body.group_type) !== NaN && parseInt(req.body.group_type) > 0)
         ? parseInt(req.body.group_type) : 0;
@@ -438,7 +446,6 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                         st.db.query(query, function (err, updateResult) {
                             if (!err) {
                                 if (updateResult) {
-
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'User status updated successfully';
@@ -449,6 +456,95 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                         status: req.body.status
 
                                     };
+
+                                    var notificationParams = {
+                                        receiverId: "", senderTitle: "", groupTitle: "",
+                                        groupId: "", messageText: "",
+                                        messageType: "", operationType: "", iphoneId: "",
+                                        messageId : ""
+                                    };
+
+                                    /**
+                                     * Fetch group_admin and token master_id if both are same
+                                     * then admin is logged in and he is doing status change for some other user
+                                     */
+
+                                    notificationQmManager.isAdmin(token,groupId,function(err,isAdmin){
+                                        if(!err){
+                                            var isAdmin = isAdmin;
+                                            switch(status){
+                                                case 0:
+
+                                                    // Pending
+                                                    // Notification has to be sent to req.master_id (if admin has requested him to join)
+                                                    // Notification has to be sent to req.group_id admin (if someone has requested admin to join his group)
+
+                                                    /**
+                                                     * If he is an admin of a group and group_type is Group
+                                                     */
+                                                    if(isAdmin && (!parseInt(deleteStatus))){
+
+                                                        notificationQmManager.getGroupInfo(groupId,deleteStatus,function(err,groupInfoRes){
+                                                            if(!err){
+                                                                if(groupInfoRes){
+                                                                    st.getGroupMasterIdList([masterId],function(err,groupListRes){
+                                                                        if(!err){
+                                                                            if(groupListRes){
+                                                                                for(var ct = 0; ct < groupListRes.length; ct++){
+                                                                                    notificationQmManager.getEzeidDetailsCallback(masterId,function(err,ezeidResults){
+                                                                                        if(!err){
+                                                                                            if(ezeidResults){
+                                                                                                console.log(groupListRes[ct].tid,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
+                                                                                                    1, 0, null, 0);
+                                                                                                notification.publish(groupListRes[ct].tid,sendTitle , groupInfoRes.groupname, groupId, "Request to join",
+                                                                                                    1, 0, null, 0);
+                                                                                            }
+
+                                                                                        }
+
+                                                                                    });
+
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                            }
+
+                                                        });
+
+
+                                                    }
+
+                                                    break;
+                                                case 1 :
+                                                    //Accepted
+                                                    // Notification has to be sent to req.group_id admin(owner of group)
+                                                    break;
+                                                case 2 :
+                                                    // Rejected
+                                                    // No notification
+                                                    break;
+                                                case 3 :
+                                                    // Leaved
+                                                    // Notification has to be sent to req.group_id All Members of group
+                                                    break;
+                                                case 4 :
+                                                    // Removed
+                                                    // Notification has to be sent to req.group_id all members of the group + req.master_id (to user who is removed)
+                                                    break;
+
+                                            }
+
+
+
+                                        }
+
+                                    });
+
+
+
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserStatus: User status updated successfully');
                                 }
