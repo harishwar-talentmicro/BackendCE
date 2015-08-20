@@ -100,9 +100,6 @@ Auth.prototype.register = function(req,res,next){
         //console.log(req._remoteAddress);
         //console.log('---------------------------');
         var OperationType = req.body.OperationType;
-        console.log('--------------------------------------------');
-        console.log(OperationType);
-        console.log('--------------------------------------------');
         var IPAddress = req._remoteAddress;
         var SelectionTypes = parseInt(req.body.SelectionType);
         if(SelectionTypes.toString() == 'NaN'){
@@ -226,7 +223,7 @@ Auth.prototype.register = function(req,res,next){
                     EncryptPWD = hashPassword(Password);
                 }
                 var DOBDate = null;
-                console.log(EZEID.toUpperCase());
+
                 if (DOB != null && DOB != '') {
                     // datechange = new Date(new Date(TaskDateTime).toUTCString());
                     DOBDate = new Date(DOB);
@@ -247,8 +244,8 @@ Auth.prototype.register = function(req,res,next){
 
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
-                        console.log('InsertResult: ');
-                        console.log( InsertResult);
+                        //console.log('InsertResult: ');
+                        //console.log( InsertResult);
                         if (InsertResult != null) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
@@ -268,6 +265,16 @@ Auth.prototype.register = function(req,res,next){
                                             CompanyName='';
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
+
+                                            /**
+                                             * Creating queue for the user dynamically on rabbit server
+                                             *
+                                             */
+
+
+                                            st.generateRabbitQueue(RegResult[0].TID);
+
+
                                             //res.send(RtnMessage);
                                             if(isIphone == 1){
                                                 var queryParams = st.db.escape(EZEID) + ',' + st.db.escape(deviceToken);
@@ -285,42 +292,16 @@ Auth.prototype.register = function(req,res,next){
                                                 });
                                             }
                                             if (EMailID != '' && EMailID != null) {
-                                                var Templatefilename = null;
-                                                if(IDTypeID == 1)
-                                                    Templatefilename="RegTemplate.txt";
-                                                else if(IDTypeID == 2)
-                                                    Templatefilename = "RegBussinessTemplate.txt";
-                                                else
-                                                    Templatefilename = "RegPublicTemplate.txt";
-
                                                 var fs = require('fs');
-                                                fs.readFile(Templatefilename, "utf8", function (err, data) {
+                                                fs.readFile("registration.html", "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);
-                                                    data = data.replace("[EZEID]", EZEID);
-                                                    data = data.replace("[EZEID]", EZEID);  //REG Detials
-                                                    data = data.replace("[EZEID]", EZEID); //L1
-                                                    data = data.replace("[EZEID]", EZEID); //L2
-                                                    data = data.replace("[EZEID]", EZEID); //CV
-                                                    data = data.replace("[EZEID]", EZEID); //ID
-                                                    data = data.replace("[EZEID]", EZEID); //DL
-                                                    data = data.replace("[EZEID]", EZEID); //PP
-                                                    data = data.replace("[CompanyName]",CompanyName);
-
-                                                    if(PIN == null){
-                                                        data = data.replace(".PIN","");
-                                                    }
-                                                    else
-                                                    {
-                                                        data = data.replace("PIN",PIN);
-                                                    }
-
-                                                    //  console.log(data);
+                                                    data = data.replace("[EZEOneID]", EZEID);
                                                     var mailOptions = {
-                                                        from: 'noreply@ezeid.com',
+                                                        from: 'noreply@ezeone.com',
                                                         to: EMailID,
-                                                        subject: 'Welcome to EZEID',
+                                                        subject: 'Welcome to EZEOneID',
                                                         html: data // html body
                                                     };
                                                     //console.log('Mail Option:' + mailOptions);
@@ -374,28 +355,28 @@ Auth.prototype.register = function(req,res,next){
                                     {
                                         console.log(RtnMessage);
                                         res.send(RtnMessage);
-                                        console.log('FnRegistration:tmaster: Registration Failed');
+                                        console.log('FnRegistration:tmaster: Registration Failed..1');
                                     }
 
                                 }
                                 else {
                                     console.log(RtnMessage);
                                     res.send(RtnMessage);
-                                    console.log('FnRegistration:tmaster: Registration Failed');
+                                    console.log('FnRegistration:tmaster: Registration Failed..2');
                                 }
                             }
 
                             else {
                                 console.log(RtnMessage);
                                 res.send(RtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed');
+                                console.log('FnRegistration:tmaster: Registration Failed..3');
                             }
 
                         }
                         else {
                             console.log(RtnMessage);
                             res.send(RtnMessage);
-                            console.log('FnRegistration:tmaster: Registration Failed');
+                            console.log('FnRegistration:tmaster: Registration Failed..4');
                         }
                     }
                     else {
@@ -489,28 +470,12 @@ Auth.prototype.register = function(req,res,next){
                                             //res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
                                                 var fs = require('fs');
-                                                fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
+                                                fs.readFile("registration.html", "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);
-                                                    data = data.replace("[EZEID]", EZEID);
-                                                    data = data.replace("[EZEID]", EZEID);  //REG Detials
-                                                    data = data.replace("[EZEID]", EZEID); //L1
-                                                    data = data.replace("[EZEID]", EZEID); //L2
-                                                    data = data.replace("[EZEID]", EZEID); //CV
-                                                    data = data.replace("[EZEID]", EZEID); //ID
-                                                    data = data.replace("[EZEID]", EZEID); //DL
-                                                    data = data.replace("[EZEID]", EZEID); //PP
+                                                    data = data.replace("[EZEOneID]", EZEID);
 
-                                                    if(PIN == null){
-                                                        data = data.replace(".PIN","");
-                                                    }
-                                                    else
-                                                    {
-                                                        data = data.replace("PIN",PIN);
-                                                    }
-
-                                                    //  console.log(data);
                                                     var mailOptions = {
                                                         from: 'noreply@ezeid.com',
                                                         to: EMailID,

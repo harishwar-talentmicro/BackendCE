@@ -470,6 +470,8 @@ angular.module('ezeidApp').
             {
                 $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
+                var targetDate = $scope.composeMsg.TargetDate;
+                var expiryDate = $scope.composeMsg.ExpiryDate;
                 $http({
                     url : GURL + 'compose_message',
                     method : "POST",
@@ -480,8 +482,8 @@ angular.module('ezeidApp').
                         mime_type:$scope.file.attachmentMimeType,
                         priority:$scope.composeMsg.Priority,
                         attachment_filename :$scope.file.attachmentName,
-                        target_date :UtilityService._convertTimeToServer($scope.composeMsg.TargetDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"),
-                        expiry_date :UtilityService._convertTimeToServer($scope.composeMsg.ExpiryDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"),
+                        target_date :targetDate?UtilityService._convertTimeToServer(targetDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"):'',
+                        expiry_date :expiryDate?UtilityService._convertTimeToServer(expiryDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"):'',
                         previous_messageID:previousMsgId,
                         to_id:toId,
                         id_type :toIdType//1: individual, 2: group

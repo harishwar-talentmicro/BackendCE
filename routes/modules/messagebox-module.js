@@ -874,7 +874,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
-    var masterid='',receiverId,senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId;
+    var masterid='',receiverId,toid,senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
 
     console.log(req.body);
 
@@ -947,29 +947,66 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                         else {
                                             console.log('FnComposeMessage:Error getting from masterid');
                                         }
-                                        var query2 = 'select * from tmgroups where GroupType=1 and adminid=' + masterid;
-                                        st.db.query(query2, function (err, getResult) {
-                                            console.log('-----------------------------2');
-                                            console.log(getResult);
-                                            if (getResult[0]) {
-                                                receiverId = toID;
-                                                senderTitle = getResult[0].GroupName;
-                                                groupTitle = getResult[0].GroupName;
-                                                groupId = getResult[0].tid;
-                                                messageText = message;
-                                                messageType = idType;
-                                                operationType = '';
-                                                iphoneId = '';
-                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId);
-                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId);
-                                                // notification.publish(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId);
+                                        if (idType == 1) {
+                                            var query2 = 'select * from tmgroups where GroupType=1 and adminid=' + masterid;
+                                            st.db.query(query2, function (err, getResult) {
+                                                console.log('-----------------------------');
+                                                console.log(getResult);
+                                                if (getResult) {
+                                                    if (getResult[0]) {
+                                                        receiverId = toID;
+                                                        senderTitle = getResult[0].GroupName;
+                                                        groupTitle = getResult[0].GroupName;
+                                                        groupId = getResult[0].tid;
+                                                        messageText = message;
+                                                        messageType = idType;
+                                                        operationType = 0;
+                                                        iphoneId = '';
+                                                        messageId = previousMessageID;
+                                                        console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                    }
+                                                    else {
+                                                        console.log('FnComposeMessage:Error getting from members');
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnComposeMessage:Error getting from members');
+                                                }
+                                            });
+                                        }
+                                        else {
+                                         var query3 = 'select * from tmgroupusers where GroupID=' +toID;
+                                         st.db.query(query3, function (err, get_result) {
+                                         console.log('-----------------------------');
+                                         console.log(get_result);
+                                         if (get_result[0]) {
+                                         var length = get_result[0].length;
+                                         for (var i = 0; i < length; i++) {
+                                         id = get_result[i].MemberID;
+                                         }
+                                         }
+                                         else {
+                                         console.log('FnComposeMessage:Invalid length');
+                                         }
 
-                                                console.log('FnComposeMessage: Message Composed successfully');
-                                            }
-                                            else {
-                                                console.log('FnComposeMessage:Error getting from members');
-                                            }
-                                        });
+                                         receiverId = toid;
+                                         senderTitle = getResult[0].GroupName;
+                                         groupTitle = getResult[0].GroupName;
+                                         groupId = getResult[0].GroupID;
+                                         messageText = message;
+                                         messageType = idType;
+                                         operationType = 0;
+                                         iphoneId = '';
+                                         messageId = previousMessageID;
+                                         console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                         notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                         // notification.publish(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId);
+
+                                         console.log('FnComposeMessage: Message Composed successfully');
+                                         
+                                         });
+                                         }
                                     });
                                 }
                                 else {
@@ -1888,6 +1925,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
         status: false,
         error: {},
         message: '',
+        count:'',
         data: null
     };
 
@@ -1917,10 +1955,10 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                         var query = 'CALL pLoadMessagesofGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
-                            //console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
+
                                         if (groupType == 0) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
@@ -1929,6 +1967,13 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                                 group_details: getResult[0],
                                                 messages: getResult[1]
                                             };
+                                            if(getResult[1].length > 0) {
+                                                responseMessage.count = getResult[1][0].count;
+                                            }
+                                            else
+                                            {
+                                                responseMessage.count=0;
+                                            }
                                             res.status(200).json(responseMessage);
                                             console.log('FnLoadMessages: Messages loaded successfully');
                                         }
