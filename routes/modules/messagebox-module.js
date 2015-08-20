@@ -874,7 +874,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
-    var masterid='',receiverId,toid,senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
+    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
 
     console.log(req.body);
 
@@ -984,10 +984,15 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                             if (get_result[0]) {
                                                                 console.log(get_result.length);
                                                                 for (var i = 0; i < get_result.length; i++) {
-                                                                    toid = get_result[i].MemberID;
-                                                                    receiverId = toid;
-                                                                    senderTitle = result[0].GroupName;
-                                                                    groupTitle = result[0].GroupName;
+                                                                    var id = get_result[i].MemberID;
+                                                                    toid.push(id);
+                                                                }
+                                                                console.log(toid);
+                                                                    st.getGroupMasterIdList(toid, function (err, resultList){
+                                                                        console.log(resultList);
+                                                                    receiverId = resultList[0].tid;
+                                                                    senderTitle = resultList[0].GroupName;
+                                                                    groupTitle = resultList[0].GroupName;
                                                                     groupId = toID;
                                                                     messageText = message;
                                                                     messageType = idType;
@@ -997,7 +1002,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                     console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
                                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
                                                                     // notification.publish(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId);
-                                                                }
+                                                                });
                                                                 console.log('FnComposeMessage: Message Composed successfully');
                                                             }
                                                             else {
