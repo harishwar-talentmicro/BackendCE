@@ -898,6 +898,9 @@ try {
     var Longitude = req.body.Longitude;
     var Proximity = req.body.Proximity ? req.body.Proximity : 1;
     var currentDateTime = req.body.CurrentDate ? req.body.CurrentDate : '';
+    var currentDateTime = req.body.CurrentDate;
+    var trackerFlag = (parseInt(req.body.Flag) !== NaN && parseInt(req.body.Flag) > 0) ? parseInt(req.body.Flag) : 0;
+
 
     if (Token != null && Keyword != null && Latitude != null && Longitude != null && currentDateTime) {
         st.validateToken(Token, function (err, Result) {
@@ -905,7 +908,7 @@ try {
                 if (Result != null) {
                     var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' +
                         st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+
-                        ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime);
+                        ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag);
                     console.log('CALL pTrackerSearch(' + query + ')');
                     st.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
                         console.log(GetResult);
