@@ -268,6 +268,15 @@ Auth.prototype.register = function(req,res,next){
                                             CompanyName='';
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
+
+                                            /**
+                                             * Creating queue for the user dynamically on rabbit server
+                                             *
+                                             */
+
+
+
+
                                             //res.send(RtnMessage);
                                             if(isIphone == 1){
                                                 var queryParams = st.db.escape(EZEID) + ',' + st.db.escape(deviceToken);

@@ -106,6 +106,10 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
 };
 
 
+/**
+ * Create a message queue for each EZEID when they signup or subuser is created
+ * @param topic
+ */
 NotificationMqtt.prototype.createQueue = function(topic){
 
     var qs = require('querystring');
@@ -124,8 +128,8 @@ NotificationMqtt.prototype.createQueue = function(topic){
     };
 
     var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
-        '"Content-type: application/json" -d "{\"durable\":true,\"autodelete\":false}" '+
-        ' -X PUT  https://ms3.ezeone.com/api/queues/%2F/'+topic;
+        '"Content-type: application/json" -d \'{"durable":true,"autodelete":false}\' '+
+        ' -X PUT  https://ms3.ezeone.com/api/queues/%2F/'+topic.toString();
 
     console.log(curlCmdString);
 

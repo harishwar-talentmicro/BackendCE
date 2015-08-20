@@ -7,6 +7,11 @@ var FinalMessage = {
 };
 var FinalMsgJson = JSON.parse(JSON.stringify(FinalMessage));
 
+
+var NotificationMqtt = require('./notification/notification-mqtt.js');
+
+var notificationMqtt = new NotificationMqtt();
+
 function error(err, req, res, next) {
     // log it
     console.error(err.stack);
@@ -165,6 +170,54 @@ StdLib.prototype.validateToken = function(Token, CallBack){
         console.log('OTP FnValidateToken error:' + ex.description);
 
         return 'error'
+    }
+};
+
+StdLib.prototype.generateRabbitQueue = function(masterId){
+  var _this = this;
+  try{
+      var groupQuery = "SELECT tid FROM tmgroups WHERE AdminID = ? AND GroupType = ? LIMIT 1";
+
+      _this.db.query(groupQuery, function (err, result) {
+          if (!err) {
+              if(result){
+                  if (result.length > 0) {
+                      if(result[0]){
+                          if(result[0].tid){
+                              console.log('generateRabbitQueue started :'+ groupQuery);
+                              notificationMqtt.createQueue(groupId);
+                          }
+                          else {
+                              console.log('generateRabbitQueue:'+ groupQuery);
+                          }
+                      }
+                      else {
+                          console.log('generateRabbitQueue:'+ groupQuery);
+                      }
+
+                  }
+                  else {
+                      console.log('generateRabbitQueue:'+ groupQuery);
+                  }
+              }
+              else{
+                  console.log('generateRabbitQueue: '+ groupQuery);
+              }
+
+          }
+          else {
+              console.log('generateRabbitQueue:  '+ groupQuery);
+              console.log(err);
+
+          }
+      });
+
+
+
+  }
+    catch(ex){
+        console.log(ex);
+        console.log('Error in generateRabbitQueue');
     }
 };
 
