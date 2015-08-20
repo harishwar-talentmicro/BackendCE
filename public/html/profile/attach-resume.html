@@ -224,11 +224,12 @@
                                         <h5 class="text-primary text-left">Institute</h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
-                                        <input type="text" placeholder="Institute"
+                                        <input type = "text"
+                                               placeholder = "Full and Correct College Name"
                                                ng-model = "instituteTitle"
                                                ng-keypress = "instituteKeyPress($event.keyCode)"
                                                ng-click = "instituteTextBoxClicked()"
-                                               class="form-control instittuteClass"/>
+                                               class = "form-control instittuteClass"/>
 
                                         <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
                                            <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
@@ -243,7 +244,7 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
                                         <select class="form-control" ng-model="CVAttachCtrl._CVInfo.education_id">
-                                            <option value = "0" > -- Select -- </option>
+                                            <option value = "0"> -- Select -- </option>
                                             <option ng-repeat="education in educationList track by $index" value="{{education.TID}}">{{education.EducationTitle}}</option>
                                         </select>
                                     </div>
@@ -257,7 +258,7 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
                                         <select class="form-control" ng-model="CVAttachCtrl._CVInfo.specialization_id">
-                                            <option value = "0" > -- Select Specialization -- </option>
+                                            <option value = "0"> -- Select Specialization -- </option>
                                             <option ng-repeat="specialization in specializationList track by $index" value="{{specialization.TID}}">{{specialization.Title}}</option>
                                         </select>
                                     </div>
