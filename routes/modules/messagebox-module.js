@@ -872,7 +872,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
-    var masterid='',receiverId,senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId;
+    var masterid='',receiverId,senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
 
     console.log(req.body);
 
@@ -950,16 +950,23 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             console.log('-----------------------------2');
                                             console.log(getResult);
                                             if (getResult[0]) {
+                                                //var query3 = 'select * from tmgroupusers where MemberID=' +toID;
+                                                //st.db.query(query3, function (err, get_result) {
+                                                //    console.log('-----------------------------3');
+                                                //    console.log(get_result);
+                                                //    if(get_result[0]){
+
                                                 receiverId = toID;
                                                 senderTitle = getResult[0].GroupName;
                                                 groupTitle = getResult[0].GroupName;
-                                                groupId = getResult[0].tid;
+                                                groupId = get_result[0].GroupID;
                                                 messageText = message;
                                                 messageType = idType;
                                                 operationType = '';
                                                 iphoneId = '';
-                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId);
-                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId);
+                                                messageId = '';
+                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,messageId);
+                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,messageId);
                                                 // notification.publish(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId);
 
                                                 console.log('FnComposeMessage: Message Composed successfully');
