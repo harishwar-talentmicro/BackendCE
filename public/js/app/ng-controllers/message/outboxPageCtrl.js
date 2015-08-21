@@ -1006,10 +1006,10 @@ angular.module('ezeidApp').
 
 
             var on_connect = function (){
-                client.subscribe("/topic/.148",function(m){
+                /*client.subscribe("/topic/.148",function(m){
                     console.log('Message received');
                     console.log(m);
-                });
+                });*/
             };
             var on_connection_error = function (){};
 
