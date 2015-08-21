@@ -355,9 +355,9 @@
      * @ezeid Configuring Route access based on authentication
      */
     ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout',
-        'UNAUTHORIZED_ROUTES','OPEN_ROUTES','$queryLsToken', '$notify','MURL','Notification','CONSTATUS',
+        'UNAUTHORIZED_ROUTES','OPEN_ROUTES','$queryLsToken', '$notify','MURL','Notification','CONSTATUS','MsgDelay',
         function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout,
-                 UNAUTHORIZED_ROUTES,OPEN_ROUTES,$queryLsToken,$notify,MURL,Notification,CONSTATUS){
+                 UNAUTHORIZED_ROUTES,OPEN_ROUTES,$queryLsToken,$notify,MURL,Notification,CONSTATUS,MsgDelay){
 
             var dataProgress = false;
             var htmlProgress = false;
@@ -433,9 +433,23 @@
                                 }, function(m){
                                     // On message arrival Time if you want to do anything after message arrival
                                     // m.body is JSON object stringified, parse this json and you will get exact format written in
+
                                     // message structure document
-                                    console.log("------");
-                                    console.log(m.body);
+                                    var res = m.body;
+                                    var arr = $.parseJSON(res);
+
+                                    var message = "You've got a notification! Check Message Box";
+                                    var title = "MesageBox";
+                                    if(arr.message)
+                                    {
+                                        message = arr.message;
+                                        title = arr.g_title;
+                                    }
+
+                                    //get Notifications
+                                    Notification.success({ title : title, message : message, delay : MsgDelay});
+                                    //Increase the notification
+                                    $rootScope.unreadMessageCount++;
 
                                 }, MURL);
                             },2000);

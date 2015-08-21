@@ -4,28 +4,51 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
     return {
         restrict: 'EA',
         templateUrl: 'directives/Header.html',
-        controller: ['$http', '$rootScope','$location','$window','GURL','CONSTATUS','$notify','MURL','$timeout',
-            function ($http, $rootScope,$location,$window,GURL,CONSTATUS,$notify,MURL,$timeout) {
-            var MsgDelay = 2000;
-            var SignCtrl = this;
-            this.LInfo = {};
-            this.AccsHis = [];
-            SignCtrl.RegInfo = {};
+        controller: [
+            '$http',
+            '$rootScope',
+            '$location',
+            '$window',
+            'GURL',
+            'CONSTATUS',
+            '$notify',
+            'MURL',
+            '$timeout',
+            '$scope',
+            '$route',
+            function (
+                $http,
+                $rootScope,
+                $location,
+                $window,
+                GURL,
+                CONSTATUS,
+                $notify,
+                MURL,
+                $timeout,
+                $scope,
+                $route
+            ) {
+                var MsgDelay = 2000;
+                var SignCtrl = this;
+                this.LInfo = {};
+                this.AccsHis = [];
+                SignCtrl.RegInfo = {};
 
-            //login
-            this.LoginUser = function (loginFormData, form) {
-                var Logdata = {
-                    UserName : '',
-                    Password : ''
-                };
-                Logdata.UserName = (loginFormData.UserName) ?
-                    ((loginFormData.UserName[0] == '@') ? loginFormData.UserName : '@'+loginFormData.UserName) : '';
-                Logdata.Password = loginFormData.Password;
-                if (!SignCtrl.Captcha) {
-                    $http({
-                        method: 'post', url: GURL + 'ewLogin', data: Logdata
-                    }).success(function (data,status,x) {
-                        $rootScope._userInfo = data;
+                //login
+                this.LoginUser = function (loginFormData, form) {
+                    var Logdata = {
+                        UserName : '',
+                        Password : ''
+                    };
+                    Logdata.UserName = (loginFormData.UserName) ?
+                        ((loginFormData.UserName[0] == '@') ? loginFormData.UserName : '@'+loginFormData.UserName) : '';
+                    Logdata.Password = loginFormData.Password;
+                    if (!SignCtrl.Captcha) {
+                        $http({
+                            method: 'post', url: GURL + 'ewLogin', data: Logdata
+                        }).success(function (data,status,x) {
+                            $rootScope._userInfo = data;
                             if ($rootScope._userInfo.IsAuthenticate == true) {
                                 // Notification.success({ message: "Sign In Success", delay: MsgDelay });
 
@@ -52,8 +75,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                                                     // On message arrival Time if you want to do anything after message arrival
                                                     // m.body is JSON object stringified, parse this json and you will get exact format written in
                                                     // message structure document
-                                                    console.log("------");
-                                                    console.log(m.body);
+
 
                                                 }, MURL);
                                             },2000);
@@ -66,7 +88,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                                 $('#SignIn_popup').slideUp();
 
                                 $window.history.forward();
-                               // $location.path('/');
+                                // $location.path('/');
                                 if (form) {
                                     form.$setPristine();
                                     form.$setUntouched();
@@ -104,141 +126,142 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                             $rootScope._userInfo.ezeid = Logdata.UserName.toUpperCase();
 
 
-                        if (typeof (Storage) !== "undefined") {
-                            var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
-                            localStorage.setItem("_token", encrypted);
-                        } else {
-                            alert('Sorry..! Browser is not supported');
-                            window.location.href = "/";
+                            if (typeof (Storage) !== "undefined") {
+                                var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), "EZEID");
+                                localStorage.setItem("_token", encrypted);
+                            } else {
+                                alert('Sorry..! Browser is not supported');
+                                window.location.href = "/";
+                            }
+                        });
+                    }
+                    else {
+                        SignCtrl.FMessage = 'You are a Robot...!!';
+                    }
+                };
+                this.reset = function (form) {
+                    if (form) {
+                        form.$setPristine();
+                        form.$setUntouched();
+                    }
+                    this.LInfo = {};
+                    SignCtrl.FMessage = '';
+                    $('#SignIn_popup').slideUp();
+                };
+
+                //forgot password
+                this.openForgotPasswordForm=function(){
+                    SignCtrl.EzeId="";
+                    $("#SignIn_popup").slideUp();
+                    $('#forgot-password').css({'position':'fixed'});
+                    $('#forgot-password > div').css({'position':'relative'});
+                    $('#forgot-password').slideDown();
+                    $(".wd_forgot").focus();
+                };
+                this.forgotPassword=function(){
+                    $http({
+                        method: 'post', url: GURL + 'ewtForgetPassword', data: {EZEID:SignCtrl.EzeId}
+                    }).success(function (data) {
+                        if(data.IsChanged){
+                            $('#SignIn_popup').slideUp();
+                            $('#forgot-password').slideUp();
+
+                            Notification.success({ message: "Password sent to your registered email", delay: MsgDelay });
+                            SignCtrl.EzeId="";
+                            SignCtrl.ForgotMessage = "";
+                        }else{
+                            SignCtrl.ForgotMessage = "Error please Try again";
+                            SignCtrl.EzeId="";
                         }
                     });
-                }
-                else {
-                    SignCtrl.FMessage = 'You are a Robot...!!';
-                }
-            };
-            this.reset = function (form) {
-                if (form) {
-                    form.$setPristine();
-                    form.$setUntouched();
-                }
-                this.LInfo = {};
-                SignCtrl.FMessage = '';
-                $('#SignIn_popup').slideUp();
-            };
+                };
+                this.closeForgotPasswordForm=function(){
+                    SignCtrl.ForgotMessage = "";
+                    $('#SignIn_popup').slideUp();
+                    $('#forgot-password').slideUp();
+                };
 
-            //forgot password
-            this.openForgotPasswordForm=function(){
-                SignCtrl.EzeId="";
-                $("#SignIn_popup").slideUp();
-                $('#forgot-password').css({'position':'fixed'});
-                $('#forgot-password > div').css({'position':'relative'});
-                $('#forgot-password').slideDown();
-                $(".wd_forgot").focus();
-            };
-            this.forgotPassword=function(){
-                $http({
-                    method: 'post', url: GURL + 'ewtForgetPassword', data: {EZEID:SignCtrl.EzeId}
-                }).success(function (data) {
-                    if(data.IsChanged){
-                        $('#SignIn_popup').slideUp();
-                        $('#forgot-password').slideUp();
+                // open registration page
+                //forgot password
+                this.openRegistrationForm=function(){
+                    $('#SignIn_popup').slideUp();
+                    $location.path('/signup');
+                };
 
-                       Notification.success({ message: "Password sent to your registered email", delay: MsgDelay });
-                        SignCtrl.EzeId="";
-                        SignCtrl.ForgotMessage = "";
-                    }else{
-                        SignCtrl.ForgotMessage = "Error please Try again";
-                        SignCtrl.EzeId="";
-                    }
-                });
-            };
-            this.closeForgotPasswordForm=function(){
-                SignCtrl.ForgotMessage = "";
-                $('#SignIn_popup').slideUp();
-                $('#forgot-password').slideUp();
-            };
+                //Change password
+                this.changePassword = function () {
+                    if( !SignCtrl.OldPassword=="" && !SignCtrl.NewPassword=="" && !SignCtrl.ReEnterPassword=="")
+                    {
+                        $http({
+                            method: 'post', url: GURL + 'ewtChangePassword', data: {Token:$rootScope._userInfo.Token,OldPassword:SignCtrl.OldPassword,NewPassword:SignCtrl.NewPassword}
+                        }).success(function (data) {
+                            if(data.IsChanged){
 
-            // open registration page
-            //forgot password
-            this.openRegistrationForm=function(){
-                $('#SignIn_popup').slideUp();
-                $location.path('/signup');
-            };
-
-            //Change password
-            this.changePassword = function () {
-                if( !SignCtrl.OldPassword=="" && !SignCtrl.NewPassword=="" && !SignCtrl.ReEnterPassword=="")
-                {
-                   $http({
-                        method: 'post', url: GURL + 'ewtChangePassword', data: {Token:$rootScope._userInfo.Token,OldPassword:SignCtrl.OldPassword,NewPassword:SignCtrl.NewPassword}
-                    }).success(function (data) {
-                          if(data.IsChanged){
-
-                              $('#ChangePassword_popup').slideUp();
-                              SignCtrl.OldPassword="";
-                              SignCtrl.NewPassword="";
-                              SignCtrl.ReEnterPassword="";
-                              $location.path('/');
-                             /* document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                              document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                              document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                              */
-                          }
-                          else{
-                              SignCtrl.OldPassword="";
-                              SignCtrl.NewPassword="";
-                              SignCtrl.ReEnterPassword="";
-                              document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                              document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                              document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                              SignCtrl.ErrorMessage="Password mismatch...";
-                          }
+                                $('#ChangePassword_popup').slideUp();
+                                SignCtrl.OldPassword="";
+                                SignCtrl.NewPassword="";
+                                SignCtrl.ReEnterPassword="";
+                                $location.path('/');
+                                /* document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                                 document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                                 document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                                 */
+                            }
+                            else{
+                                SignCtrl.OldPassword="";
+                                SignCtrl.NewPassword="";
+                                SignCtrl.ReEnterPassword="";
+                                document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                                document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                                document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                                SignCtrl.ErrorMessage="Password mismatch...";
+                            }
                         });
-                }
-                else
-                {
+                    }
+                    else
+                    {
+                        SignCtrl.OldPassword="";
+                        SignCtrl.NewPassword="";
+                        SignCtrl.ReEnterPassword="";
+
+                    }
+                };
+
+                this.closeChangePasswordForm=function(){
+                    $('#ChangePassword_popup').slideUp();
+                };
+
+                this.Logout = function () {
+                    $http({ method: 'get', url: GURL + 'ewLogout?Token=' + $rootScope._userInfo.Token }).success(function (data) {
+                        localStorage.removeItem("_token");
+                        $rootScope._userInfo = data;
+                        $rootScope.IsIdAvailable = false;
+                        CONSTATUS = false;
+                        $window.localStorage.removeItem("searchResult");
+                        document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+                        $location.path('/');
+                        //  Notification.success({ message: "Sign Out Success", delay: MsgDelay });
+                    });
+                };
+
+                this.openChangePasswordForm=function(){
                     SignCtrl.OldPassword="";
                     SignCtrl.NewPassword="";
                     SignCtrl.ReEnterPassword="";
+                    document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                    document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                    document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
+                    $('#ChangePassword_popup').slideDown();
 
-                }
-            };
-            this.closeChangePasswordForm=function(){
-                  $('#ChangePassword_popup').slideUp();
-            };
+                };
 
-            this.Logout = function () {
-                $http({ method: 'get', url: GURL + 'ewLogout?Token=' + $rootScope._userInfo.Token }).success(function (data) {
-                    localStorage.removeItem("_token");
-                    $rootScope._userInfo = data;
-                    $rootScope.IsIdAvailable = false;
-                    CONSTATUS = false;
-                    $window.localStorage.removeItem("searchResult");
-                    document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-                    $location.path('/');
-                  //  Notification.success({ message: "Sign Out Success", delay: MsgDelay });
-                });
-            };
+                //Open Quick SignUp Form
+                this.openQuickSignUpForm=function(){
+                    $('#SignIn_popup').slideUp();
+                    $('#signup_popup').slideDown();
+                };
 
-            this.openChangePasswordForm=function(){
-                SignCtrl.OldPassword="";
-                SignCtrl.NewPassword="";
-                SignCtrl.ReEnterPassword="";
-                document.getElementById("OldPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                document.getElementById("NewPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                document.getElementById("ReEnterPassword").className = "form-control wd_oldPass changePass_inpMar emptyBox change_PadLeft";
-                $('#ChangePassword_popup').slideDown();
-
-            };
-
-            //Open Quick SignUp Form
-            this.openQuickSignUpForm=function(){
-                $('#SignIn_popup').slideUp();
-                $('#signup_popup').slideDown();
-             };
-
-            // Sign Up Controller
+                // Sign Up Controller
                 this.AddUser = function (form) {
                     $http({ method: 'post', url: GURL + 'ewSaveQucikEZEData', data: SignCtrl.RegInfo }).success(function (data) {
                         $rootScope._userInfo = data;
@@ -277,7 +300,46 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                         form.$setUntouched();
                     }
                 };
-        }],
+
+                /**
+                 * Decides weather to reload or redirect between on the conditions
+                 */
+                $scope.redirectToMessageBox = function()
+                {
+                    var pathName = window.location.pathname;
+                    var pathArr = pathName.split('/');
+                    $rootScope.unreadMessageCount = 0;
+
+                    /* If user at HOME PAGE */
+                    if(!checkIfArrayEmpty(pathArr))
+                        $location.url('/message');
+                    /* if no data redirect to inbox pages */
+                    if(!pathArr)
+                        $location.url('/message');
+                    /* user is in one of the sub paths redirect it to INBOX page */
+                    if(pathArr.length > 2)
+                        $location.url('/message');
+                    else//Reload the page [user is in message box page only]
+                        $route.reload();
+                }
+
+                function checkIfArrayEmpty(data)
+                {
+                    if(!data)
+                        return false;
+
+                    if(!data.length > 0)
+                        return false;
+
+                    var status = false;
+                    for(var i = 0; i < data.length; i++)
+                    {
+                        if(data[i].length > 0)
+                            status = true;
+                    }
+                    return status;
+                }
+            }],
         controllerAs: 'SignInCtrl',
         link: function () {
 
@@ -304,8 +366,6 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                 $("#UserName").focus();
             });
             /******************end :  New code ************************/
-
-
 
             $('.closelink').click(function () {
                 $('#ChangePassword_popup').slideUp();
