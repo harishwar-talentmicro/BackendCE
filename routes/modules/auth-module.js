@@ -488,7 +488,7 @@ Auth.prototype.register = function(req,res,next){
                                                     var mailOptions = {
                                                         from: 'noreply@ezeid.com',
                                                         to: EMailID,
-                                                        subject: 'Welcome to EZEID',
+                                                        subject: 'Welcome to EZEOneID',
                                                         html: data // html body
                                                     };
                                                     //console.log('Mail Option:' + mailOptions);

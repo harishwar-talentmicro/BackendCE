@@ -517,14 +517,15 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                     data = data.replace("[EZEID1]", getResult[0].EZEID);
                                     data = data.replace("[Message]", MessageContent.message);
 
-                                    var mail_query = 'Select EZEID,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID=' + getResult[0].TID;
+                                    var mail_query = 'Select EZEID,SalesMailID from tmaster where TID=' + getResult[0].TID;
                                     console.log(mail_query);
+
                                     _this.db.query(mail_query, function (err, get_result) {
 
                                         if (get_result) {
                                             if (get_result[0]) {
-                                                if(get_result[0].EMailID){
-                                                    salesEmail = get_result[0].EMailID;
+                                                if(get_result[0].SalesMailID){
+                                                    salesEmail = get_result[0].SalesMailID;
                                                 }
                                                 else
                                                 {
@@ -541,7 +542,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                 _this.db.query(queryResult, function (err, result) {
 
                                                     var post = {
-                                                        MessageType: messagetype,
+                                                        MessageType: 1,
                                                         Priority: 3,
                                                         ToMailID: mailOptions.to,
                                                         Subject: mailOptions.subject,
