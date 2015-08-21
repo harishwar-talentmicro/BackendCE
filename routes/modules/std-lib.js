@@ -128,8 +128,13 @@ StdLib.prototype.getGroupMasterIdList = function(masterIdList,groupMasterCallbac
              * @todo IPHONE ID has to be fetched
              * @type {string}
              */
+            for(var ctx = 0; ctx  < masterIdList.length; ctx++){
+                masterIdList[ctx] = _this.db.escape(masterIdList[ctx]);
+                masterIdList[ctx] = parseInt(masterIdList[ctx]);
+            }
+
             var query = "SELECT tid,GroupName FROM tmgroups WHERE GroupType = 1 AND  AdminID IN ("+
-                _this.db.escape(masterIdList.join(',')) + ")";
+                (masterIdList.join(',')) + ")";
 
             console.log(query);
 

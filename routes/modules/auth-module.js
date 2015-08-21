@@ -726,6 +726,7 @@ Auth.prototype.login = function(req,res,next){
                                             RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
                                             RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
                                             RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
+                                            RtnMessage.group_id = loginDetails[0].group_id;
 
                                             res.send(RtnMessage);
                                             console.log('FnLogin:tmaster: Login success');
