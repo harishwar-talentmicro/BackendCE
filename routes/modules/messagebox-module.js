@@ -483,7 +483,6 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                         console.log('yes going into isAdmin');
                                                         notificationQmManager.getGroupInfo(groupId,deleteStatus,function(err,groupInfoRes){
                                                             if(!err){
-
                                                                 console.log('yes going into getGroupInfo');
                                                                 if(groupInfoRes){
                                                                     st.getGroupMasterIdList([masterId],function(err,groupListRes1){
@@ -500,7 +499,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                                                                 console.log(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
                                                                                                     1, 0, null, 0);
                                                                                                 notification.publish(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
-                                                                                                    1, 0, "51c33c5fef8c134ab86b6cd6b86885e7b452cc9cb865093dbe6c51164d0a1c11", 0);
+                                                                                                    1, 0, ezeidResults.iphoneId, 0);
                                                                                             }
 
                                                                                         }
@@ -518,6 +517,42 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                         });
 
 
+                                                    }
+                                                    else{
+                                                        notificationQmManager.getGroupInfo(groupId,deleteStatus,function(err,groupInfoRes){
+                                                            if(!err){
+                                                                console.log('yes going into getGroupInfo');
+                                                                if(groupInfoRes){
+                                                                    st.getGroupMasterIdList([masterId],function(err,groupListRes1){
+                                                                        console.log('yes going into getGroupMasterIdList');
+                                                                        if(!err){
+                                                                            if(groupListRes1){
+                                                                                console.log(groupListRes1);
+                                                                                for(var cx = 0; cx < groupListRes1.length; cx++){
+                                                                                    console.log(groupListRes1[cx]);
+                                                                                    console.log(groupListRes1[cx].tid);
+                                                                                    notificationQmManager.getEzeidDetails(masterId,groupListRes1[cx].tid,function(err,ezeidResults,receiverId){
+                                                                                        if(!err){
+                                                                                            if(ezeidResults){
+                                                                                                console.log(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
+                                                                                                    1, 0, null, 0);
+                                                                                                notification.publish(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
+                                                                                                    1, 0, ezeidResults.iphoneId, 0);
+                                                                                            }
+
+                                                                                        }
+
+                                                                                    });
+                                                                                }
+
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                            }
+
+                                                        });
                                                     }
 
                                                     break;

@@ -126,7 +126,7 @@ NotificationQueryManager.prototype.getEzeidDetails = function(masterId,receiverI
     }
 
     if(masterId){
-        var query = "SELECT ezeid FROM tmaster WHERE tid = "+ st.db.escape(masterId) + " LIMIT 1";
+        var query = "SELECT ezeid,IPhoneDeviceID AS iphoneId FROM tmaster WHERE tid = "+ st.db.escape(masterId) + " LIMIT 1";
 
         console.log(query);
 

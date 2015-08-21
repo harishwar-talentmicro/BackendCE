@@ -124,6 +124,10 @@ StdLib.prototype.getGroupMasterIdList = function(masterIdList,groupMasterCallbac
 
     if(masterIdList){
         if(masterIdList.length){
+            /**
+             * @todo IPHONE ID has to be fetched
+             * @type {string}
+             */
             var query = "SELECT tid,GroupName FROM tmgroups WHERE GroupType = 1 AND  AdminID IN ("+
                 _this.db.escape(masterIdList.join(',')) + ")";
 
