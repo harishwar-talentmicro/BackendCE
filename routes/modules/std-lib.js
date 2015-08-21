@@ -517,10 +517,9 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                     data = data.replace("[EZEID1]", getResult[0].EZEID);
                                     data = data.replace("[Message]", MessageContent.message);
 
-                                    var mail_query = 'Select EZEID,SalesMailID from tmaster where TID=' + getResult[0].TID;
-                                    console.log(mail_query);
-
+                                    var mail_query = 'Select EZEID,SalesMailID from tmaster where EZEID=' +MessageContent.ezeid;
                                     _this.db.query(mail_query, function (err, get_result) {
+                                        console.log(get_result);
 
                                         if (get_result) {
                                             if (get_result[0]) {
