@@ -385,8 +385,6 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
  * @description api code for Update User status
  */
 MessageBox.prototype.updateUserStatus = function(req,res,next){
-    console.log('hai...........');
-    console.log(req.body);
     var _this = this;
 
     var token  = req.body.token;
@@ -399,7 +397,6 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
     var deleteStatus = (parseInt(req.body.group_type) !== NaN && parseInt(req.body.group_type) > 0)
         ? parseInt(req.body.group_type) : 0;
 
-    console.log(req.body);
 
     var responseMessage = {
         status: false,
@@ -1073,6 +1070,26 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                     /**
                                      * @todo add code for push notification like this
                                      */
+                                    //var notificationParams = {
+                                    //    receiverId: "", senderTitle: "", groupTitle: "",
+                                    //    groupId: "", messageText: "",
+                                    //    messageType: "", operationType: "", iphoneId: "",
+                                    //    messageId : ""
+                                    //};
+                                    //
+                                    //notificationQmManager.isGroupAdminByToken(token,toID,function(err,isAdmin) {
+                                    //    if (!err) {
+                                    //        console.log('FnComposeMessage: yes going into isGroupAdminByToken');
+                                    //        var isAdmin = isAdmin;
+                                    //        console.log('isAdmin............................');
+                                    //        console.log(isAdmin);
+                                    //        if(isAdmin){
+                                    //
+                                    //            console.log('yes going into isAdmin');
+                                    //            notificationQmManager.getGroupInfo(toID,,function(err,groupInfoRes){
+                                    //                if(!err){
+                                    //
+                                    //                }
                                     var query1 = 'SELECT masterid FROM tloginout WHERE token=' + st.db.escape(token);
                                     st.db.query(query1, function (err, result) {
                                         if (result[0]) {
@@ -2104,6 +2121,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                         var query = 'CALL pLoadMessagesofGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
@@ -2130,7 +2148,12 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Messages loaded successfully';
-                                            responseMessage.count = getResult[0][0].count;
+                                            if(getResult[0][0]) {
+                                                responseMessage.count = getResult[0][0].count;
+                                            }
+                                            else{
+                                                responseMessage.count=0;
+                                            }
                                             responseMessage.data = getResult[0];
                                             res.status(200).json(responseMessage);
                                             console.log('FnLoadMessages: Messages loaded successfully');
