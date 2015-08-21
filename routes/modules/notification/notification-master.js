@@ -1,8 +1,8 @@
 var moment = require('moment');
 var AppleNotification = require('./notification-apns.js');
 var NotificationMqtt = require('./notification-mqtt.js');
-var notificationMqtt = new NotificationMqtt();
-var apnsNotification = new AppleNotification();
+var _notificationMqtt = new NotificationMqtt();
+var _apnsNotification = new AppleNotification();
 
 var st = null;
 
@@ -64,7 +64,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
         var msgBytes = 1024;
         var messagePayload = {
             gid : groupId,
-            message : notificationMqtt.limitMessage(message,msgBytes),
+            message : _notificationMqtt.limitMessage(message,msgBytes),
             s_title : senderTitle,
             g_title : groupTitle,
             type : messageType,
@@ -74,7 +74,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
         };
 
         console.log('Actual receiver Id : '+receiverId);
-        notificationMqtt.publish(receiverId,messagePayload);
+        _notificationMqtt.publish(receiverId,messagePayload);
 
 
         /**
@@ -82,7 +82,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
          */
         if(iphoneId){
 
-            apnsNotification.sendAppleNS(iphoneId,messagePayload);
+            _apnsNotification.sendAppleNS(iphoneId,messagePayload);
         }
     }
 
