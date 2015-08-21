@@ -186,7 +186,7 @@
 
                         <!-- Signin Link -->
                         <li ng-show="$root._userInfo.IsAuthenticate">
-                            <a href="/message" class="border-right-1 btn-link" ng-click="($root.unreadMessageCount  = 0)" title="Messages">
+                            <a ng-click="redirectToMessageBox()" class="border-right-1 btn-link" ng-click="($root.unreadMessageCount  = 0)" title="Messages">
                                 <i class="fa fa-bell"></i>
                                 <sup ng-show="$root.unreadMessageCount" class="header-notification-count">{{$root.unreadMessageCount}}</sup>
                             </a>
