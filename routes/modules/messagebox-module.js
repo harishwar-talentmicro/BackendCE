@@ -503,7 +503,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                                                                 console.log(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
                                                                                                     1, 0, null, 0);
                                                                                                 notification.publish(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
-                                                                                                    1, 0, null, 0);
+                                                                                                    1, 0, "51c33c5fef8c134ab86b6cd6b86885e7b452cc9cb865093dbe6c51164d0a1c11", 0);
                                                                                             }
 
                                                                                         }
