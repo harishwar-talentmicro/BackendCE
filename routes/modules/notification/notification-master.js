@@ -29,6 +29,8 @@ function Notification(db,stdLib){
 _ */
 Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,
                                           messageType,operationType,iphoneId,messageId){
+
+    console.log('It is coming to publish block of Notification');
     var validationStatus = true;
     var error = {};
     if(!senderTitle){
@@ -61,7 +63,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
 
         var msgBytes = 1024;
         var messagePayload = {
-            gid : 12,
+            gid : groupId,
             message : notificationMqtt.limitMessage(message,msgBytes),
             s_title : senderTitle,
             g_title : groupTitle,
@@ -71,6 +73,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             mid : messageId
         };
 
+        console.log('Actual receiver Id : '+receiverId);
         notificationMqtt.publish(receiverId,messagePayload);
 
 

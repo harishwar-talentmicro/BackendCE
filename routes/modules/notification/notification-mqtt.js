@@ -43,18 +43,18 @@ function NotificationMqtt(){
             }
 
 
-            //mqttClient.on('disconnect',function(){
-            //    console.log('MQTT Client disconnected from broker ! Trying to connect in 1 second');
-            //    setTimeout(function(){
-            //        try{
-            //            mqttClient = mqtt.connect(brokerUrl,connOpt);
-            //        }
-            //        catch(ex){
-            //            console.log(ex);
-            //        }
-            //    },1000);
-            //
-            //});
+            mqttClient.on('disconnect',function(){
+                console.log('MQTT Client disconnected from broker ! Trying to connect in 1 second');
+                setTimeout(function(){
+                    try{
+                        mqttClient = mqtt.connect(brokerUrl,connOpt);
+                    }
+                    catch(ex){
+                        console.log(ex);
+                    }
+                },1000);
+
+            });
 
         }
         catch(ex){
@@ -85,7 +85,10 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
     }
     if(validationFlag){
         try{
-            mqttClient.publish('/'+topic,JSON.stringify(messagePayload));
+            mqttClient.publish('/'+topic,JSON.stringify(messagePayload),function(){
+                console.log('Message published : '+ topic);
+            });
+            console.log('You are publishing to topic:'+'/'+topic);
         }
         catch(ex){
             console.log(ex);
@@ -105,7 +108,38 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
     /**
      * @todo Limit message length to respected bytes
      */
-    return message;
+    function convertHtmlToText(htmlString){
+        var regStr = "<([^>]*)>";
+
+        var regExp = new RegExp(regStr,'g');
+        return htmlString.replace(regExp, "");
+    }
+    
+    
+    function cutMessage(msgStr){
+        /**
+         * to get size of message and fix it at 1024 byte;
+         */
+
+
+
+        var bufsize = Buffer.byteLength(msgStr);
+        console.log('original message buffer size : '+bufsize);
+        console.log(typeof(bufsize));
+        if (bufsize > 1024){
+            var buf = new buffer(1024);
+            buf.write(msgStr);
+            var stringMessage = buf.toString('utf8');
+            var stringbufsize = Buffer.byteLength(stringMessage);
+            msgStr = stringMessage;
+        }
+
+        return msgStr;
+    };
+    
+    var withoutHtml =  cutMessage(convertHtmlToText(message));
+    return withoutHtml;
+
 };
 
 
