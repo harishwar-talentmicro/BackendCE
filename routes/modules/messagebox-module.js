@@ -2069,6 +2069,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                         var query = 'CALL pLoadMessagesofGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
@@ -2095,7 +2096,12 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Messages loaded successfully';
-                                            responseMessage.count = getResult[0][0].count;
+                                            if(getResult[0][0]) {
+                                                responseMessage.count = getResult[0][0].count;
+                                            }
+                                            else{
+                                                responseMessage.count=0;
+                                            }
                                             responseMessage.data = getResult[0];
                                             res.status(200).json(responseMessage);
                                             console.log('FnLoadMessages: Messages loaded successfully');
