@@ -39,8 +39,9 @@
             'textAngular'
         ]);
 
-   //ezeid.value('GURL',"/");
+    //ezeid.value('GURL',"/");
     ezeid.value('GURL',"http://104.199.128.226:3001/api/");
+    ezeid.value('MURL',"https://ms2.ezeone.com/stomp");
 
     ezeid.value('MsgDelay',2000);
 
@@ -89,26 +90,26 @@
 
 
     ezeid.value('$queryLsToken',(function(){
-       if(typeof(localStorage) !== "undefined"){
-           try {
-               var encrypted = localStorage.getItem("_token");
-               if (encrypted) {
-                   var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                   var jsonString = {};
-                   try {
-                       jsonString = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
-                   }
-                   catch (ex) {
-                   }
-                   return jsonString;
-               }
-               else {
-                   return {};
-               }
-           }
-           catch(ex){
-               return {};
-           }
+        if(typeof(localStorage) !== "undefined"){
+            try {
+                var encrypted = localStorage.getItem("_token");
+                if (encrypted) {
+                    var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
+                    var jsonString = {};
+                    try {
+                        jsonString = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+                    }
+                    catch (ex) {
+                    }
+                    return jsonString;
+                }
+                else {
+                    return {};
+                }
+            }
+            catch(ex){
+                return {};
+            }
         }
         else{
             alert('You are using and outdated browser! Please upgrade to newer browser');
@@ -116,6 +117,85 @@
         }
     })());
 
+    /*Mxg*/
+    ezeid.value('$notify',(function(){
+        /**
+         *
+         * @param userName
+         * @param token
+         * @param groupId
+         * @param icallBack: connection ccallback - called post connection
+         * @param dcallBack: On disconnection
+         * @param mcallBack: on message arrival
+         * @param url
+         */
+        var x = function(userName, token, groupId, icallBack, dcallBack, mcallBack, url){
+            /********************** WebStomp Code (MQTT) *********************************/
+            if((typeof(icallBack)).toString() !== "function"){
+                icallBack = function(){
+                    console.log('No callback passed to icallBack');
+                };
+            }
+
+            if((typeof(dcallBack)).toString() !== "function"){
+                dcallBack = function(){
+                    console.log('No callback passed to dcallBack');
+                };
+            }
+            if((typeof(mcallBack)).toString() !== "function"){
+                mcallBack = function(m){
+                    console.log('No callback passed to mcallBack');
+                    console.log(m);
+                };
+            }
+
+            var username = userName,
+                password = token,
+                vhost    = "/",
+                url      = url,
+                queue    = "topic"; // To translate mqtt topics to
+            // stomp we change slashes
+            // to dots
+
+
+            // Use SockJS
+            Stomp.WebSocketClass = SockJS;
+            var ws = new SockJS(url);
+            var client = Stomp.over(ws);
+            client.heartbeat.outgoing = 0;
+            client.heartbeat.incoming = 0;
+
+            console.log('I executed');
+
+
+            var on_connect = function (){
+                client.subscribe("/"+queue+"/."+groupId,function(m){
+                    mcallBack(m);
+                });
+                icallBack();
+            };
+
+            var on_connection_error = function (){
+
+                dcallBack();//reconnection try @todo
+            };
+
+            // Connect
+            client.connect(
+                username,
+                password,
+                on_connect,
+                on_connection_error,
+                vhost
+            );
+            /********************** WebStomp Code (MQTT) end *********************************/
+
+        };
+        return x;
+    })());
+
+
+    ezeid.value('CONSTATUS',false);
 
     /**
      * HTTP Interceptor for detecting token expiry
@@ -267,19 +347,20 @@
                 controller : 'InformationDetailCtrl'
             })
             .otherwise({redirectTo : '/'});
-    $locationProvider.html5Mode(true);
-    $httpProvider.interceptors.push("ezeidInterceptor");
+        $locationProvider.html5Mode(true);
+        $httpProvider.interceptors.push("ezeidInterceptor");
     }]);
 
     /***
      * @ezeid Configuring Route access based on authentication
      */
-    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout','UNAUTHORIZED_ROUTES','OPEN_ROUTES','$queryLsToken',
-        function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout,UNAUTHORIZED_ROUTES,OPEN_ROUTES,$queryLsToken){
+    ezeid.run(['$location','$rootScope','CLOSED_ROUTES','$routeParams','$timeout',
+        'UNAUTHORIZED_ROUTES','OPEN_ROUTES','$queryLsToken', '$notify','MURL','Notification','CONSTATUS',
+        function($location,$rootScope,CLOSED_ROUTES,$routeParams,$timeout,
+                 UNAUTHORIZED_ROUTES,OPEN_ROUTES,$queryLsToken,$notify,MURL,Notification,CONSTATUS){
 
             var dataProgress = false;
             var htmlProgress = false;
-
             $rootScope.unreadMessageCount = 0;
 
             $rootScope.navigateHome = function(){
@@ -328,96 +409,137 @@
 
             });
 
-        /**
-         * Checking login while navigating to different pages
-         */
 
-        $rootScope.$on('$routeChangeStart',function(event,next,current){
-            if($('#progress-overlay').hasClass('hidden')){
-                $('#progress-overlay').removeClass('hidden');
-            }
+            var stompInit = function(){
+                /**
+                 * Fetching userInfo From local storage here if userInfo is not found in $rootScope
+                 */
+                if($rootScope._userInfo){
+                    if($rootScope._userInfo.group_id){
+                        if(!CONSTATUS){
+                            var notificationFn = $notify;
+
+                            $timeout(function(){
+
+                                notificationFn($rootScope._userInfo.ezeid, $rootScope._userInfo.Token, $rootScope._userInfo.group_id, function(){
+                                    // On Connection Time if you want to display anything after connection
+                                    CONSTATUS = true;
+                                }, function(){
+                                    // On disconnection Time if you want to do anything after diconnection
+                                    //Try to reconnect
+                                    console.log("Connection Failed! Trying to reconnect..");
+                                    //Reconnection attempt goes here
+
+                                }, function(m){
+                                    // On message arrival Time if you want to do anything after message arrival
+                                    // m.body is JSON object stringified, parse this json and you will get exact format written in
+                                    // message structure document
+                                    console.log("------");
+                                    console.log(m.body);
+
+                                }, MURL);
+                            },2000);
+                        }
+
+                    }
+                }
+            };
+
+            stompInit();
+
             /**
-             * Fetching userInfo From local storage here if userInfo is not found in $rootScope
-             */
-            if(!$rootScope._userInfo){
-                $rootScope._userInfo = $queryLsToken;
-            }
-
-            if(!$rootScope._userInfo.IsAuthenticate){
-                $rootScope._userInfo = {};
-            }
-
-            var requestedRoute = '';
-
-            try{
-                requestedRoute = next.$$route.originalPath
-            }
-            catch(ex){
-                /**
-                 * In case if user has opened up the site index he will not be having any requestedRoute
-                 * then in that case let him navigate
-                 */
-                return;
-            }
-
-            /**
-             * Checking requestedRoute presence in our configured route lists
+             * Checking login while navigating to different pages
              */
 
-            if(OPEN_ROUTES.indexOf(requestedRoute) !== -1){
+            $rootScope.$on('$routeChangeStart',function(event,next,current){
+                if($('#progress-overlay').hasClass('hidden')){
+                    $('#progress-overlay').removeClass('hidden');
+                }
                 /**
-                 * If route is Open then let him navigate it
+                 * Fetching userInfo From local storage here if userInfo is not found in $rootScope
                  */
-                return;
-            }
+                if(!$rootScope._userInfo){
+                    $rootScope._userInfo = $queryLsToken;
+                }
 
-            else if(CLOSED_ROUTES.indexOf(requestedRoute) !== -1){
-                /**
-                 * If user is authenticated let him navigate
-                 */
-                if($rootScope._userInfo.IsAuthenticate){
+
+                stompInit();
+
+                if(!$rootScope._userInfo.IsAuthenticate){
+                    $rootScope._userInfo = {};
+                }
+
+                var requestedRoute = '';
+
+                try{
+                    requestedRoute = next.$$route.originalPath
+                }
+                catch(ex){
+                    /**
+                     * In case if user has opened up the site index he will not be having any requestedRoute
+                     * then in that case let him navigate
+                     */
                     return;
                 }
-                /**
-                 * If user is not logged in then redirect him to home page
-                 */
-                else{
-                    $rootScope._userInfo = undefined;
-                    $location.path('/');
-                }
-            }
 
-            else if(UNAUTHORIZED_ROUTES.indexOf(requestedRoute) !== -1){
                 /**
-                 * If user is authenticated don't let him navigate to this route
+                 * Checking requestedRoute presence in our configured route lists
                  */
-                if($rootScope._userInfo.IsAuthenticate){
-                    $location.path('/');
+
+                if(OPEN_ROUTES.indexOf(requestedRoute) !== -1){
+                    /**
+                     * If route is Open then let him navigate it
+                     */
+                    return;
+                }
+
+                else if(CLOSED_ROUTES.indexOf(requestedRoute) !== -1){
+                    /**
+                     * If user is authenticated let him navigate
+                     */
+                    if($rootScope._userInfo.IsAuthenticate){
+                        return;
+                    }
+                    /**
+                     * If user is not logged in then redirect him to home page
+                     */
+                    else{
+                        $rootScope._userInfo = undefined;
+                        $location.path('/');
+                    }
+                }
+
+                else if(UNAUTHORIZED_ROUTES.indexOf(requestedRoute) !== -1){
+                    /**
+                     * If user is authenticated don't let him navigate to this route
+                     */
+                    if($rootScope._userInfo.IsAuthenticate){
+                        $location.path('/');
+                    }
+                    /**
+                     * If user is not logged in then only let him navigate to this page
+                     */
+                    else{
+                        return;
+                    }
                 }
                 /**
-                 * If user is not logged in then only let him navigate to this page
+                 * The route which is not added anywhere is considered as publicly open route
+                 * and let him navigate to it without checking whether he is logged in or not
                  */
                 else{
                     return;
                 }
-            }
-            /**
-             * The route which is not added anywhere is considered as publicly open route
-             * and let him navigate to it without checking whether he is logged in or not
-             */
-            else{
-                return;
-            }
 
-        });
+            });
 
-        $rootScope.$on('$routeChangeSuccess',function(){
-            if($('#progress-overlay').hasClass('hidden')){
-                $('#progress-overlay').removeClass('hidden');
-            }
-        });
+            $rootScope.$on('$routeChangeSuccess',function(){
+                if($('#progress-overlay').hasClass('hidden')){
+                    $('#progress-overlay').removeClass('hidden');
+                }
+            });
 
 
-    }]);
+        }]);
     /************************************** Run Configuration ends here ****************************/
 })();

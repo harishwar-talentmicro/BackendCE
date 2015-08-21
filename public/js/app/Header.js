@@ -4,8 +4,8 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
     return {
         restrict: 'EA',
         templateUrl: 'directives/Header.html',
-        controller: ['$http', '$rootScope','$location','$window','GURL',
-            function ($http, $rootScope,$location,$window,GURL) {
+        controller: ['$http', '$rootScope','$location','$window','GURL','CONSTATUS','$notify','MURL','$timeout',
+            function ($http, $rootScope,$location,$window,GURL,CONSTATUS,$notify,MURL,$timeout) {
             var MsgDelay = 2000;
             var SignCtrl = this;
             this.LInfo = {};
@@ -26,9 +26,42 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                         method: 'post', url: GURL + 'ewLogin', data: Logdata
                     }).success(function (data,status,x) {
                         $rootScope._userInfo = data;
-
                             if ($rootScope._userInfo.IsAuthenticate == true) {
                                 // Notification.success({ message: "Sign In Success", delay: MsgDelay });
+
+                                /**
+                                 * Fetching userInfo From local storage here if userInfo is not found in $rootScope
+                                 */
+                                if($rootScope._userInfo){
+                                    if($rootScope._userInfo.group_id){
+                                        if(!CONSTATUS){
+                                            var notificationFn = $notify;
+
+                                            $timeout(function(){
+
+                                                notificationFn($rootScope._userInfo.ezeid, $rootScope._userInfo.Token, $rootScope._userInfo.group_id, function(){
+                                                    // On Connection Time if you want to display anything after connection
+                                                    CONSTATUS = true;
+                                                }, function(){
+                                                    // On disconnection Time if you want to do anything after diconnection
+                                                    //Try to reconnect
+                                                    console.log("Connection Failed! Trying to reconnect..");
+                                                    //Reconnection attempt goes here
+
+                                                }, function(m){
+                                                    // On message arrival Time if you want to do anything after message arrival
+                                                    // m.body is JSON object stringified, parse this json and you will get exact format written in
+                                                    // message structure document
+                                                    console.log("------");
+                                                    console.log(m.body);
+
+                                                }, MURL);
+                                            },2000);
+                                        }
+
+                                    }
+                                }
+
 
                                 $('#SignIn_popup').slideUp();
 
@@ -180,6 +213,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                     localStorage.removeItem("_token");
                     $rootScope._userInfo = data;
                     $rootScope.IsIdAvailable = false;
+                    CONSTATUS = false;
                     $window.localStorage.removeItem("searchResult");
                     document.cookie = "login=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
                     $location.path('/');

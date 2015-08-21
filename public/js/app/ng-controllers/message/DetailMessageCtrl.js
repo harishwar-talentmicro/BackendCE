@@ -20,6 +20,7 @@ angular.module('ezeidApp').
         '$location',
         '$routeParams',
         'UtilityService',
+        '$anchorScroll',
         function (
             $rootScope,
             $scope,
@@ -34,12 +35,17 @@ angular.module('ezeidApp').
             MsgDelay,
             $location,
             $routeParams,
-            UtilityService
+            UtilityService,
+            $anchorScroll
         ) {
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////INITIALIZATION//////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             var msgId = $scope.msgId = $routeParams.msg;
+
+            $scope.isThreadRedirectionBtnVisible = false;
+            if(msgId)
+                $scope.isThreadRedirectionBtnVisible = true;
 
             /* set group id */
             var groupId = 0;
@@ -434,7 +440,32 @@ angular.module('ezeidApp').
                 }
             }
 
+            /**
+             * Responsible for redirecting to message-thread page
+             */
+            $scope.redirectToMessageThread = function()
+            {
+                if(!$scope.messageData || !$scope.messageData.length > 0)
+                    return;
 
+                var receiverId = $rootScope._userInfo.TID;
+
+
+                var index = $scope.messageData.indexOfWhere('receiverid',receiverId);
+
+                if(index == -1)
+                    return;
+
+                /* get group Id and group type */
+                var groupId = $scope.messageData[index].GroupID;
+                var groupType = $scope.messageData[index].grouptype;
+                console.log(groupId,groupType);
+                if(!groupId || !groupType)
+                    return;
+
+                /* final redirection */
+                $location.url('/message/details?id='+groupId+'&type='+groupType);
+            }
             //////////////////////////////////////PAGINATION for INBOX//////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             /**
@@ -517,6 +548,12 @@ angular.module('ezeidApp').
                 }
             }
 
+            $scope.anchorScroll = function()
+            {
+                $location.hash('compose-message');
+                $('#compose-message').click();
+                $anchorScroll();
+            }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
