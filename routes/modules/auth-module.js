@@ -201,7 +201,9 @@ Auth.prototype.register = function(req,res,next){
             IsAuthenticate: false,
             FirstName: '',
             Type: 0,
-            Icon: ''
+            Icon: '',
+            tid:'',
+            group_id:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         console.log(OperationType);
@@ -251,7 +253,7 @@ Auth.prototype.register = function(req,res,next){
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         //console.log('InsertResult: ');
-                        //console.log( InsertResult);
+                        console.log( InsertResult);
                         if (InsertResult != null) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
@@ -267,6 +269,8 @@ Auth.prototype.register = function(req,res,next){
                                         RtnMessage.Token = TokenNo;
                                         RtnMessage.Type = IDTypeID;
                                         RtnMessage.Icon = Icon;
+                                        RtnMessage.tid = InsertResult[0][0].TID;
+                                        RtnMessage.group_id = InsertResult[0][0].group_id;
                                         if (CompanyName == null)
                                             CompanyName='';
                                         if (Operation == 'I') {
