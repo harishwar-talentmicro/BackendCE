@@ -999,7 +999,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var message  = req.body.message;
     var attachment  = req.body.attachment ? req.body.attachment : '';
     var attachmentFilename  = req.body.attachment_filename ? req.body.attachment_filename : '';
-    var priority  = req.body.priority ? req.body.priority : 1;
+    var priority  = (parseInt(req.body.priority) !== NaN) ? req.body.priority : 1;
     var targetDate  = (req.body.target_date) ? (req.body.target_date) : '';
     var expiryDate  =  (req.body.expiry_date) ? (req.body.expiry_date) : '';
     var token = req.body.token;

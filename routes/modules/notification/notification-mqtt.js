@@ -85,7 +85,7 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
     }
     if(validationFlag){
         try{
-            mqttClient.publish('/'+topic,JSON.stringify(messagePayload),function(){
+            mqttClient.publish('/'+topic,JSON.stringify(messagePayload),{qos : 1},function(){
                 console.log('Message published : '+ topic);
             });
             console.log('You are publishing to topic:'+'/'+topic);
