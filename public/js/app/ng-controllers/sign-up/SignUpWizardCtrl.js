@@ -602,6 +602,7 @@ angular.module('ezeidApp').
                                     if(!sResp.userName){
                                         sResp.userName = $scope.ezeid;
                                     }
+                                    console.log(sResp);
                                     var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEID");
 
                                     localStorage.setItem("_token", encrypted);
@@ -618,14 +619,19 @@ angular.module('ezeidApp').
                                             $scope.$emit('$preLoaderStop');
                                             $rootScope._userInfo = sResp;
                                             $rootScope._userInfo.userName = sResp.userName;
+                                            $rootScope._userInfo.ezeid = $scope.ezeid;
                                             Notification.success({ message : 'Your EZEOne - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
                                             $location.path('/profile-manager/user');
+
+                                            console.log($rootScope._userInfo);
                                         });
                                     }
                                     else{
                                         $scope.$emit('$preLoaderStop');
                                         $rootScope._userInfo = sResp;
+                                        console.log($rootScope._userInfo);
                                         $rootScope._userInfo.userName = sResp.userName;
+                                        $rootScope._userInfo.ezeid = $scope.ezeid;
                                         Notification.success({ message : 'Your EZEOne - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
                                         $location.path('/profile-manager/user');
                                     }

@@ -787,6 +787,7 @@ angular.module('ezeidApp').
              */
             function loadMessageApi()
             {
+                console.log($rootScope._userInfo);
                 $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
                 $http({
@@ -794,7 +795,7 @@ angular.module('ezeidApp').
                     method : "GET",
                     params :{
                         token : $rootScope._userInfo.Token,
-                        ezeone_id : $rootScope._userInfo.ezeone_id,
+                        ezeone_id : $rootScope._userInfo.ezeid,
                         page_size : $scope.pageSize,
                         page_count : $scope.pageCount,
                         trash:0
