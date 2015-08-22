@@ -320,7 +320,7 @@
             })
 
             .when('/reset_password/:ezeone/:reset_code',{
-                templateUrl : 'html/reset_password.html',
+                templateUrl : 'html/sign-up/reset-password.html',
                 controller : 'ResetPasswordCtrl'
             })
             .when('/:ezeone/sales',{
