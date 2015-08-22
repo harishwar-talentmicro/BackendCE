@@ -312,6 +312,9 @@ app.get('/legal.html',function(req,res,next){
     res.sendFile(__dirname + '/public/html/legal.html');
 });
 
+app.get('/:page/:subpage/:xsubpage',function(req,res){
+    res.sendFile(__dirname + '/public/html/index.html');
+});
 
 
 app.get('/:page/:subpage',function(req,res){
