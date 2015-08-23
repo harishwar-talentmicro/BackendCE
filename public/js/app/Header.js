@@ -166,7 +166,7 @@ HeaderApp.directive('headerSection',['Notification','$window' ,function (Notific
                             $('#SignIn_popup').slideUp();
                             $('#forgot-password').slideUp();
 
-                            Notification.success({ message: "Password sent to your registered email", delay: MsgDelay });
+                            Notification.success({ message: "Password reset instructions are sent to your registered email address", delay: MsgDelay });
                             SignCtrl.EzeId="";
                             SignCtrl.ForgotMessage = "";
                         }else{

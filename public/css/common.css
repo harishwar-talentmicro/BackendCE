@@ -2733,6 +2733,14 @@ h4.front-business-form.warning-text{
     color:#FFF;
 }
 
+.btn-success-bright:hover,
+.btn-success-bright:active,
+.btn-success-bright:focus{
+    color:#FFF;
+    background-color: #7aba38;
+    border: 1px solid #1ABA00;
+}
+
 .btn-wide{
     min-width: 30%;
 }
@@ -2919,4 +2927,17 @@ h4.front-business-form.warning-text{
 
 .row.tx-row.header-tx-row .text-success {
     color: #FFF;
+}
+
+.reset-pwd-heading{
+    color:#FFF;
+}
+
+.reset-pwd-panel{
+    border-color: #008B8B;
+}
+
+.reset-pwd-panel > .panel-heading{
+    background-color: #008B8B;
+    border-color: #008B8B;
 }
