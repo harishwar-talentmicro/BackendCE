@@ -582,6 +582,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
                                     delay : MsgDelay
                                 });
                                 $scope.locationsToggleIndex[locIndex].editMode = false;
+                                $scope.locationsToggleIndex[locIndex].savedOnServer = true;
                                 /**
                                  * Resetting edit mode data
                                  */

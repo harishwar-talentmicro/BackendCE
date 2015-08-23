@@ -161,6 +161,9 @@ angular.module('ezeidApp').controller('ProfileManagerCtrl',[
                 case 'about-company':
                     $scope.activeTemplate = 'html/profile/about-company.html';
                     break;
+                case 'new':
+                    $scope.activeTemplate = 'html/profile/profile-master.html';
+                    break;
                 default:
                     $location.path('/profile-manager/user');
                     break;
