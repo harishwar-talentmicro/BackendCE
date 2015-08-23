@@ -33,7 +33,7 @@ app.use(multer({ dest: './uploads/'}));
 app.all('*',function(req,res,next){
     console.log();
     req.CONFIG = CONFIG;
-    console.log(req.CONFIG);
+    //console.log(req.CONFIG);
     //// Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', '*');
 

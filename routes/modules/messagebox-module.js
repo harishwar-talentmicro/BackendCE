@@ -464,122 +464,122 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                      * then admin is logged in and he is doing status change for some other user
                                      */
 
-                                    notificationQmManager.isGroupAdminByToken(token,groupId,function(err,isAdmin){
-                                        if(!err){
-                                            console.log('yes going into isGroupAdminByToken');
-                                            var isAdmin = isAdmin;
-                                            switch(parseInt(status)){
-                                                case 0:
-
-                                                    // Pending
-                                                    // Notification has to be sent to req.master_id (if admin has requested him to join)
-                                                    // Notification has to be sent to req.group_id admin (if someone has requested admin to join his group)
-
-                                                    /**
-                                                     * If he is an admin of a group and group_type is Group
-                                                     */
-                                                    if(isAdmin && (!parseInt(deleteStatus))){
-
-                                                        console.log('yes going into isAdmin');
-                                                        notificationQmManager.getGroupInfo(groupId,deleteStatus,function(err,groupInfoRes){
-                                                            if(!err){
-                                                                console.log('yes going into getGroupInfo');
-                                                                if(groupInfoRes){
-                                                                    st.getGroupMasterIdList([masterId],function(err,groupListRes1){
-                                                                        console.log('yes going into getGroupMasterIdList');
-                                                                        if(!err){
-                                                                            if(groupListRes1){
-                                                                                console.log(groupListRes1);
-                                                                                for(var cx = 0; cx < groupListRes1.length; cx++){
-                                                                                    console.log(groupListRes1[cx]);
-                                                                                    console.log(groupListRes1[cx].tid);
-                                                                                    notificationQmManager.getEzeidDetails(masterId,groupListRes1[cx].tid,function(err,ezeidResults,receiverId){
-                                                                                        if(!err){
-                                                                                            if(ezeidResults){
-                                                                                                console.log(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
-                                                                                                    1, 0, null, 0);
-                                                                                                notification.publish(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
-                                                                                                    1, 0, ezeidResults.iphoneId, 0);
-                                                                                            }
-
-                                                                                        }
-
-                                                                                    });
-                                                                                }
-
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                }
-
-                                                            }
-
-                                                        });
-
-
-                                                    }
-                                                    else{
-                                                        notificationQmManager.getGroupInfo(groupId,deleteStatus,function(err,groupInfoRes){
-                                                            if(!err){
-                                                                console.log('yes going into getGroupInfo');
-                                                                if(groupInfoRes){
-                                                                    st.getGroupMasterIdList([masterId],function(err,groupListRes1){
-                                                                        console.log('yes going into getGroupMasterIdList');
-                                                                        if(!err){
-                                                                            if(groupListRes1){
-                                                                                console.log(groupListRes1);
-                                                                                for(var cx = 0; cx < groupListRes1.length; cx++){
-                                                                                    console.log(groupListRes1[cx]);
-                                                                                    console.log(groupListRes1[cx].tid);
-                                                                                    notificationQmManager.getEzeidDetails(masterId,groupListRes1[cx].tid,function(err,ezeidResults,receiverId){
-                                                                                        if(!err){
-                                                                                            if(ezeidResults){
-                                                                                                console.log(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
-                                                                                                    1, 0, null, 0);
-                                                                                                notification.publish(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
-                                                                                                    1, 0, ezeidResults.iphoneId, 0);
-                                                                                            }
-
-                                                                                        }
-
-                                                                                    });
-                                                                                }
-
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                }
-
-                                                            }
-
-                                                        });
-                                                    }
-
-                                                    break;
-                                                case 1 :
-                                                    //Accepted
-                                                    // Notification has to be sent to req.group_id admin(owner of group)
-                                                    break;
-                                                case 2 :
-                                                    // Rejected
-                                                    // No notification
-                                                    break;
-                                                case 3 :
-                                                    // Leaved
-                                                    // Notification has to be sent to req.group_id All Members of group
-                                                    break;
-                                                case 4 :
-                                                    // Removed
-                                                    // Notification has to be sent to req.group_id all members of the group + req.master_id (to user who is removed)
-                                                    break;
-
-                                            }
-
-
-
-                                        }
-
-                                    });
+                                    //notificationQmManager.isGroupAdminByToken(token,groupId,function(err,isAdmin){
+                                    //    if(!err){
+                                    //        console.log('yes going into isGroupAdminByToken');
+                                    //        var isAdmin = isAdmin;
+                                    //        switch(parseInt(status)){
+                                    //            case 0:
+                                    //
+                                    //                // Pending
+                                    //                // Notification has to be sent to req.master_id (if admin has requested him to join)
+                                    //                // Notification has to be sent to req.group_id admin (if someone has requested admin to join his group)
+                                    //
+                                    //                /**
+                                    //                 * If he is an admin of a group and group_type is Group
+                                    //                 */
+                                    //                if(isAdmin && (!parseInt(deleteStatus))){
+                                    //
+                                    //                    console.log('yes going into isAdmin');
+                                    //                    notificationQmManager.getGroupInfo(groupId,deleteStatus,function(err,groupInfoRes){
+                                    //                        if(!err){
+                                    //                            console.log('yes going into getGroupInfo');
+                                    //                            if(groupInfoRes){
+                                    //                                st.getGroupMasterIdList([masterId],function(err,groupListRes1){
+                                    //                                    console.log('yes going into getGroupMasterIdList');
+                                    //                                    if(!err){
+                                    //                                        if(groupListRes1){
+                                    //                                            console.log(groupListRes1);
+                                    //                                            for(var cx = 0; cx < groupListRes1.length; cx++){
+                                    //                                                console.log(groupListRes1[cx]);
+                                    //                                                console.log(groupListRes1[cx].tid);
+                                    //                                                notificationQmManager.getEzeidDetails(masterId,groupListRes1[cx].tid,function(err,ezeidResults,receiverId){
+                                    //                                                    if(!err){
+                                    //                                                        if(ezeidResults){
+                                    //                                                            console.log(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
+                                    //                                                                1, 0, null, 0);
+                                    //                                                            notification.publish(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
+                                    //                                                                1, 0, ezeidResults.iphoneId, 0);
+                                    //                                                        }
+                                    //
+                                    //                                                    }
+                                    //
+                                    //                                                });
+                                    //                                            }
+                                    //
+                                    //                                        }
+                                    //                                    }
+                                    //                                });
+                                    //                            }
+                                    //
+                                    //                        }
+                                    //
+                                    //                    });
+                                    //
+                                    //
+                                    //                }
+                                    //                else{
+                                    //                    notificationQmManager.getGroupInfo(groupId,deleteStatus,function(err,groupInfoRes){
+                                    //                        if(!err){
+                                    //                            console.log('yes going into getGroupInfo');
+                                    //                            if(groupInfoRes){
+                                    //                                st.getGroupMasterIdList([masterId],function(err,groupListRes1){
+                                    //                                    console.log('yes going into getGroupMasterIdList');
+                                    //                                    if(!err){
+                                    //                                        if(groupListRes1){
+                                    //                                            console.log(groupListRes1);
+                                    //                                            for(var cx = 0; cx < groupListRes1.length; cx++){
+                                    //                                                console.log(groupListRes1[cx]);
+                                    //                                                console.log(groupListRes1[cx].tid);
+                                    //                                                notificationQmManager.getEzeidDetails(masterId,groupListRes1[cx].tid,function(err,ezeidResults,receiverId){
+                                    //                                                    if(!err){
+                                    //                                                        if(ezeidResults){
+                                    //                                                            console.log(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
+                                    //                                                                1, 0, null, 0);
+                                    //                                                            notification.publish(receiverId,ezeidResults.ezeid , groupInfoRes.groupname, groupId, "Request to join",
+                                    //                                                                1, 0, ezeidResults.iphoneId, 0);
+                                    //                                                        }
+                                    //
+                                    //                                                    }
+                                    //
+                                    //                                                });
+                                    //                                            }
+                                    //
+                                    //                                        }
+                                    //                                    }
+                                    //                                });
+                                    //                            }
+                                    //
+                                    //                        }
+                                    //
+                                    //                    });
+                                    //                }
+                                    //
+                                    //                break;
+                                    //            case 1 :
+                                    //                //Accepted
+                                    //                // Notification has to be sent to req.group_id admin(owner of group)
+                                    //                break;
+                                    //            case 2 :
+                                    //                // Rejected
+                                    //                // No notification
+                                    //                break;
+                                    //            case 3 :
+                                    //                // Leaved
+                                    //                // Notification has to be sent to req.group_id All Members of group
+                                    //                break;
+                                    //            case 4 :
+                                    //                // Removed
+                                    //                // Notification has to be sent to req.group_id all members of the group + req.master_id (to user who is removed)
+                                    //                break;
+                                    //
+                                    //        }
+                                    //
+                                    //
+                                    //
+                                    //    }
+                                    //
+                                    //});
 
 
 
