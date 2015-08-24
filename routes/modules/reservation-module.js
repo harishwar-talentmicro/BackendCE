@@ -979,7 +979,7 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                         if (insertResult.affectedRows > 0) {
                             responseMessage.status = true;
                             responseMessage.error = null;
-                            responseMessage.message = 'Feedback details save successfully';
+                            responseMessage.message = 'Feedback details saved successfully';
                             responseMessage.data = {
                                 ezeid: ezeid,
                                 rating: rating,
@@ -991,14 +991,14 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                                 type: type
                             };
                             res.status(200).json(responseMessage);
-                            console.log('FnSaveFeedback: Feedback details save successfully');
+                            console.log('FnSaveFeedback: Feedback details saved successfully');
 
                         }
                         else {
-                            responseMessage.message = 'No save Feedback details';
+                            responseMessage.message = 'Feedback details not saved';
                             responseMessage.error = {};
                             res.status(200).json(responseMessage);
-                            console.log('FnSaveFeedback:No save Feedback details');
+                            console.log('FnSaveFeedback:Feedback details not saved');
                         }
                     }
                     else {
