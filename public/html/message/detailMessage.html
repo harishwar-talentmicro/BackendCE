@@ -73,7 +73,7 @@
                                     ng-click="initiateDownload(msg.tid)">
                                 <i class="fa fa-paperclip"></i> Download Attachment
                             </button>
-                            <button disabled class="btn btn-default btn-xs"><b class="text-danger">Priority</b>: {{priority[msg.Priority -1]}}  </button>
+                            <button disabled class="btn btn-default btn-xs"><b class="text-danger">Priority</b>: {{priority[msg.Priority]}}  </button>
                             <button ng-hide="convertTimeToLocal(msg.TargetDate) == 'Invalid date'" disabled class="btn btn-default btn-xs">
                                 <b class="text-danger">Target</b>:  {{convertTimeToLocal(msg.TargetDate)}}
                             </button>

@@ -18,7 +18,8 @@ var mysql = require('mysql'),
 db_server = "www.ezeone.com",//Name of the Server.
 //    db_server = "localhost",//Name of the Server.
 db_port = 3306 //Integers please.
-db_collection = "livedb"; //Name of DB Collection
+//db_collection = "livedb"; //Name of DB Collection
+db_collection = "test"; //Name of DB Collection
 //    db_collection = "test_ezeid"; //Name of DB Collection
 
 
@@ -187,7 +188,7 @@ var failedList = [];
 
 var updateString = "";
 function passUpdateString(password,ezeid){
-    var query = "UPDATE tmaster SET password = '"+ password + "' WHERE ezeid = '"+ezeid +"';";
+    var query = 'UPDATE tmaster SET password = "'+ password + '" WHERE ezeid = "'+ezeid +'";';
     updateString+=query;
 }
 
@@ -235,9 +236,9 @@ function decryptAllPasswords(totalCount){
                     console.log('UserList : '+userList.length);
                     console.log('FailedList : '+failedList.length);
 
-                    fs.writeFileSync('./test-user-details.json',JSON.stringify(userList));
-                    fs.writeFileSync('./test-failed-details.json',JSON.stringify(failedList));
-                    fs.writeFileSync('./password-update.sql',updateString);
+                    fs.writeFileSync('./test-user-details-new.json',JSON.stringify(userList));
+                    fs.writeFileSync('./test-failed-details-new.json',JSON.stringify(failedList));
+                    fs.writeFileSync('./password-update-new.sql',updateString);
                     console.log('All Done');
                 }
             }
