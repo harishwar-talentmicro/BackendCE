@@ -198,7 +198,23 @@ angular.module('ezeidApp').
                 }
             };
 
+            /**
+             *  Arrow key controls
+             * @param keyId: ID of the pressed key
+             */
+            function arrowKeyControl(key)
+            {
+                console.log(key);
+            }
 
+            $scope.groupSubscriptionKeyPressEvent = function(keyId)
+            {
+                console.log("Hello  "+keyId);
+                if(parseInt(keyId) == 13)
+                    $scope.groupSearchAction();
+                else if(parseInt(keyId) == 38 || parseInt(keyId) == 40)
+                    arrowKeyControl(keyId);
+            }
             /**
              * Validate the group's relation to the logged in user [called from DOM]
              */

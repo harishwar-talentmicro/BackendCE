@@ -67,6 +67,7 @@
                 ng-show="filterDropDown == msg.status || filterDropDown == 0">
             <td>
                 <i class="fa fa-arrow-circle-down text-success"></i>
+                <i class="fa text-warning" ng-class="msg.grouptype == 0?'fa-users':'fa-user'"></i>
             </td>
             <td ng-click="$event.stopPropagation()">
                 <i class="fa text-info"
