@@ -498,7 +498,6 @@ angular.module('ezeidApp').
              */
             $scope.pendingRequestResponse = function(groupId, masterId, status,index)
             {
-                console.log("Hello");
                 /* perform appropriate action after user gives response */
                 managePendingRequestNotification(groupId,status,index);
 
@@ -787,9 +786,17 @@ angular.module('ezeidApp').
              */
             function loadMessageApi()
             {
-                console.log($rootScope._userInfo);
-                $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
+
+                /* check if the ezeone id is VALID or not */
+                if(!$rootScope._userInfo.ezeid)
+                {
+                    Notification.error({ message: "Error occured! Please log Out and re-login again.", delay: MsgDelay });
+                    defer.reject();
+                    return defer.promise;
+                }
+
+                $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'messagebox',
                     method : "GET",

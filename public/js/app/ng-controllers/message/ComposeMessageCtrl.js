@@ -144,6 +144,9 @@ angular.module('ezeidApp').
                 }
                 /* create the smart parameters for sending a message */
                 var data = createCommaSeperatedReceiverId();
+                //console.log($scope.receiverArr);
+                //console.log(data.toId,data.toIdType,previousMsgId);
+                //return;
 
                 /* call the API and send message */
                 composeMessageApi(data.toId,data.toIdType,previousMsgId).then(function(){
@@ -484,7 +487,7 @@ angular.module('ezeidApp').
                         attachment_filename :$scope.file.attachmentName,
                         target_date :targetDate?UtilityService._convertTimeToServer(targetDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"):'',
                         expiry_date :expiryDate?UtilityService._convertTimeToServer(expiryDate,"DD-MMM-YYYY H:m","YYYY-MM-DD H:m"):'',
-                        previous_messageID:previousMsgId,
+                        previous_messageID:0,//Reply message LOGIC reply!
                         to_id:toId,
                         id_type :toIdType//1: individual, 2: group
 

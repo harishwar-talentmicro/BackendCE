@@ -345,6 +345,10 @@ angular.module('ezeidApp').
                 {
                     $scope.groupData.name = data[0].name;
                 }
+                /* set the GROUP ID for which the message has to be sent as REPLY */
+                $scope.groupData.id = data[0].groupid;
+                /* set message type */
+                $scope.groupData.type = data[0].idtype;
             }
 
             function setReplyMessageData()
@@ -449,18 +453,18 @@ angular.module('ezeidApp').
                     return;
 
                 var receiverId = $rootScope._userInfo.TID;
-
-
+                //console.log("------");
+                //console.log($scope.messageData);
+                //console.log(receiverId);
                 var index = $scope.messageData.indexOfWhere('receiverid',receiverId);
-
+                console.log(index);
                 if(index == -1)
                     return;
 
                 /* get group Id and group type */
-                var groupId = $scope.messageData[index].GroupID;
+                var groupId = $scope.messageData[index].redirectionid;
                 var groupType = $scope.messageData[index].grouptype;
-                console.log(groupId,groupType);
-                if(!groupId || !groupType)
+                if(!groupId || parseInt(groupType) == NaN)
                     return;
 
                 /* final redirection */
