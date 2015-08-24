@@ -1078,20 +1078,25 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             if (groupDetails) {
                                                 if (groupDetails[0]) {
                                                     if (groupDetails[1]) {
-                                                        console.log('----------------------------');
-                                                        console.log(groupDetails);
-                                                        receiverId = groupDetails[1][0].tid;
-                                                        senderTitle = groupDetails[0][0].groupname;
-                                                        groupTitle = groupDetails[0][0].groupname;
-                                                        groupId = groupDetails[0][0].tid;
-                                                        messageText = message;
-                                                        messageType = 1;
-                                                        operationType = 0;
-                                                        iphoneId = null;
-                                                        messageId = previousMessageID;
-                                                        console.log('senderid:'+groupId+'     receiverid:'+receiverId);
-                                                        console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
-                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                        if (groupDetails[1].length > 0) {
+                                                            console.log('----------------------------');
+                                                            console.log(groupDetails);
+                                                            receiverId = groupDetails[1][0].tid;
+                                                            senderTitle = groupDetails[0][0].groupname;
+                                                            groupTitle = groupDetails[0][0].groupname;
+                                                            groupId = groupDetails[0][0].tid;
+                                                            messageText = message;
+                                                            messageType = 1;
+                                                            operationType = 0;
+                                                            iphoneId = null;
+                                                            messageId = previousMessageID;
+                                                            console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                        }
+                                                        else {
+                                                            console.log('FnComposeMessage:Error getting from groupdetails');
+                                                        }
                                                     }
                                                     else {
                                                         console.log('FnComposeMessage:Error getting from groupdetails');
@@ -1119,20 +1124,25 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                         if (groupDetails[0]) {
                                                             if (groupDetails[1]) {
                                                                 if (groupDetails[1]) {
-                                                                    for (var i = 0; i < groupDetails[1].length; i++) {
-                                                                        console.log('----------------------------');
-                                                                        console.log(groupDetails);
-                                                                        receiverId = groupDetails[1][i].tid;
-                                                                        senderTitle = groupDetails[0][0].groupname;
-                                                                        groupTitle = results[0].GroupName;
-                                                                        groupId = results[0].tid;
-                                                                        messageText = message;
-                                                                        messageType = 1;
-                                                                        operationType = 0;
-                                                                        iphoneId = null;
-                                                                        messageId = previousMessageID;
-                                                                        console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
-                                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                                    if (groupDetails[1].length > 0) {
+                                                                        for (var i = 0; i < groupDetails[1].length; i++) {
+                                                                            console.log('----------------------------');
+                                                                            console.log(groupDetails);
+                                                                            receiverId = groupDetails[1][i].tid;
+                                                                            senderTitle = groupDetails[0][0].groupname;
+                                                                            groupTitle = results[0].GroupName;
+                                                                            groupId = results[0].tid;
+                                                                            messageText = message;
+                                                                            messageType = 1;
+                                                                            operationType = 0;
+                                                                            iphoneId = null;
+                                                                            messageId = previousMessageID;
+                                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnComposeMessage:Error getting from groupDetails');
                                                                     }
                                                                 }
                                                                 else {
