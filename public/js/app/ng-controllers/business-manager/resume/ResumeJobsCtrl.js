@@ -217,7 +217,10 @@
                 if($scope.skillKeyWords.length < 1){
                     err.push('Skill Keywords is empty');
                 }
-                if($scope.jobVacancies.length < 1)
+
+                /*if(($scope.jobVacancies.length == 1) && (parseInt($scope.jobVacancies == 0)))*/
+                /*if((parseInt($scope.jobVacancies) == 0) && ($scope.jobVacancies.length == 0))*/
+                if(($scope.jobVacancies == "") || ($scope.jobVacancies.length == 0) || (parseInt($scope.jobVacancies) == 0))
                 {
                     err.push('Job Vacancies is empty');
                 }
@@ -228,10 +231,9 @@
                     err.push('Experience To is empty');
                 }
 
-                if($scope.experienceTo < $scope.experienceFrom){
+                if(parseInt($scope.experienceTo) < parseInt($scope.experienceFrom)){
                     err.push('Experience From is smaller than Experience To');
                 }
-
                 if($scope.mainLocationArray.length == 0){
                     err.push('Location is empty');
                 }
@@ -241,8 +243,7 @@
                 if($scope.salaryTo.length < 1){
                     err.push('Salary To is empty');
                 }
-
-                if($scope.salaryTo < $scope.salaryFrom){
+                if(parseInt($scope.salaryTo) < parseInt($scope.salaryFrom)){
                     err.push('Salary From is smaller than Salary To');
                 }
               /*  if($scope.jobType == 0){
@@ -886,8 +887,8 @@
             /**
              * Toggle the visibility of the pagination buttons
              */
-            $scope.paginationPreviousVisibility = false;
-            $scope.paginationNextVisibility = false;
+            $scope.paginationPreviousVisibility = true;
+            $scope.paginationNextVisibility = true;
 
             $scope.paginationVisibility = function()
             {
@@ -896,7 +897,7 @@
                 var resultSize = parseInt($scope.pageSize);
 
                 /* initial state */
-                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                if((totalResult <= (currentCount+resultSize)) && currentCount == 0)
                 {
                     $scope.paginationNextVisibility = false;
                     $scope.paginationPreviousVisibility = false;

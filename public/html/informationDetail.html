@@ -202,15 +202,19 @@
                                                             <div ng-click="toggleReviewModalVisibility()" class="small pointer">0 Reviews </div>
                                                             <hr class="style-three">
                                                         </div>
-
-
                                                     </div>
 
                                                     <div class="row setRowLeftRightMarginZero p-top-10 mobile-font">
-                                                        {{SearchInfo.MobileNumber != '' ?  SearchInfo.ISDMobileNumber +'-'+ SearchInfo.MobileNumber + ' ' : ''}}{{SearchInfo.PhoneNumber != '' ? '| ' + SearchInfo.ISDPhoneNumber +'-'+ SearchInfo.PhoneNumber : ''}}
+                                                        {{SearchInfo.MobileNumber != '' ? SearchInfo.ISDMobileNumber +'-'+ SearchInfo.MobileNumber + ' ' : ''}}{{SearchInfo.PhoneNumber != '' ? '| ' + SearchInfo.ISDPhoneNumber +'-'+ SearchInfo.PhoneNumber : ''}}
                                                     </div>
+
                                                     <div class="row setRowLeftRightMarginZero">
-                                                        <a href="mailto:{{SearchInfo.EMailID}}" target="_blank">{{SearchInfo.EMailID +' '}}</a>  <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
+                                                        <div ng-class="SearchInfo.Website.length ? 'col-lg-6 col-md-6 col-sm-6 col-xs-12 setPaddingLeftRight0' : 'col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0' ">
+                                                            <canvas width="340" height="30"></canvas>
+                                                        </div>
+                                                        <div ng-class="SearchInfo.Website.length ? 'col-lg-6 col-md-6 col-sm-6 col-xs-12 setPaddingLeftRight0 text-left topMarginButton' : 'col-lg-0 col-md-0 col-sm-0 col-xs-0'">
+                                                            <span ng-show="SearchInfo.Website"> | <a target="_blank" href="http://{{SearchInfo.Website}}">{{' '+SearchInfo.Website}}</a> </span>
+                                                        </div>
                                                     </div>
 
                                                     <div class="row setRowLeftRightMarginZero address-font">

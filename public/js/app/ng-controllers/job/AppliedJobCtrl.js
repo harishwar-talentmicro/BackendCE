@@ -36,7 +36,6 @@ angular.module('ezeidApp').
             $routeParams,
             UtilityService
         ) {
-
             //Pagination settings
             $scope.pageSize = 10;//Results per page
             $scope.pageCount = 0;//Everything starts with a 0 - 10,20,30 etc.
@@ -126,8 +125,8 @@ angular.module('ezeidApp').
             /**
              * Toggle the visibility of the pagination buttons
              */
-            $scope.paginationPreviousVisibility = false;
-            $scope.paginationNextVisibility = false;
+            $scope.paginationPreviousVisibility = true;
+            $scope.paginationNextVisibility = true;
 
             $scope.paginationVisibility = function()
             {
@@ -135,8 +134,10 @@ angular.module('ezeidApp').
                 var currentCount = parseInt($scope.pageCount);
                 var resultSize = parseInt($scope.pageSize);
 
+                //console.log(totalResult,currentCount,resultSize);
+
                 /* initial state */
-                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                if((totalResult <= (currentCount+resultSize)) && currentCount == 0)
                 {
                     $scope.paginationNextVisibility = false;
                     $scope.paginationPreviousVisibility = false;

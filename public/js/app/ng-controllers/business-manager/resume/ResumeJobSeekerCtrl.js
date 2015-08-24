@@ -735,8 +735,8 @@
             /**
              * Toggle the visibility of the pagination buttons
              */
-            $scope.paginationPreviousVisibility = false;
-            $scope.paginationNextVisibility = false;
+            $scope.paginationPreviousVisibility = true;
+            $scope.paginationNextVisibility = true;
 
             $scope.paginationVisibility = function()
             {
@@ -745,7 +745,7 @@
                 var resultSize = parseInt($scope.pageSize);
 
                 /* initial state */
-                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                if((totalResult <= (currentCount+resultSize)) && currentCount == 0)
                 {
                     $scope.paginationNextVisibility = false;
                     $scope.paginationPreviousVisibility = false;

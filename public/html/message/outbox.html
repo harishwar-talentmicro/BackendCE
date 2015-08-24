@@ -249,7 +249,7 @@
                                        id="group-name"
                                        ng-disabled="groupNameDisable"
                                        ng-click="invalidateGroupId()"
-                                       ng-keypress="($event.charCode==13)?groupSearchAction():return">
+                                       ng-keypress="($event.charCode==13)?groupSubscriptionKeyPressEvent($event.charCode):return">
                                 <div class="input-group-addon no-padding-and-border">
                                     <button class="btn no-radius"
                                             title="search group"

@@ -253,6 +253,26 @@ angular.module('ezeidApp').
                         $rootScope.$broadcast('$preLoaderStop');
                         $timeout(function () {
                             $scope.SearchInfo = data[0];
+
+                           /* var ctx = document.querySelector('canvas').getContext('2d');
+                            ctx.font = "18px SANS SERIF";
+                            ctx.strokeStyle = '#337ab7';
+                            ctx.strokeText($scope.SearchInfo.EMailID, 25, 25);*/
+
+
+                            var ctx = document.querySelector('canvas').getContext('2d');
+                            ctx.font = "18px SANS SERIF";
+                            ctx.lineWidth = 1;
+                            ctx.fillStyle = '#337ab7';
+                            ctx.strokeStyle = '#337ab7';
+                            /*var x = 300 / ($scope.SearchInfo.Website == '' ? 8 : 4);*/
+                            var x = 340 / 4;
+                            var y = 30 / 2;
+
+                         //   ctx.fillText($scope.SearchInfo.EMailID, x, 25);
+                            ctx.strokeText($scope.SearchInfo.EMailID, x, 25);
+
+
                             getPictureOfSearchedTerm(_ezeone);
 
                             if($scope.SearchInfo.IDTypeID == 2)
