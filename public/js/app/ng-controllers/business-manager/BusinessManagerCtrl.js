@@ -72,30 +72,30 @@ angular.module('ezeidApp').controller('BusinessManagerCtrl',[
                 icon : 'glyphicon glyphicon-stats',
                 type : 'sales'
             },
-            {
-                title : ($rootScope._userInfo.AppointmentModuleTitle) ? $rootScope._userInfo.AppointmentModuleTitle :'Reservation',
-                permission :  ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[1] : 0,
-                listType : ($rootScope._userInfo.ReservationItemListType) ? $rootScope._userInfo.ReservationItemListType : 0,
-                message : ($rootScope._userInfo.ReservationFormMsg) ? $rootScope._userInfo.ReservationFormMsg : '',
-                icon : 'glyphicon glyphicon-calendar',
-                type : 'reservation'
-            },
-            {
-                title : ($rootScope._userInfo.HomeDeliveryModuleTitle) ? $rootScope._userInfo.HomeDeliveryModuleTitle : 'Home Delivery',
-                permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[2] : 0,
-                listType : ($rootScope._userInfo.HomeDeliveryItemListType) ? $rootScope._userInfo.HomeDeliveryItemListType : 0,
-                message : ($rootScope._userInfo.HomeDeliveryFormMsg) ? $rootScope._userInfo.HomeDeliveryFormMsg : '',
-                icon : 'glyphicon glyphicon-cutlery',
-                type : 'home-delivery'
-            },
-            {
-                title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Help Desk',
-                permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[3] : 0,
-                listType : 0,
-                message : ($rootScope._userInfo.ServiceFormMsg) ? $rootScope._userInfo.ServiceFormMsg : '',
-                icon : 'glyphicon glyphicon-dashboard',
-                type : 'service'
-            },
+            //{
+            //    title : ($rootScope._userInfo.AppointmentModuleTitle) ? $rootScope._userInfo.AppointmentModuleTitle :'Reservation',
+            //    permission :  ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[1] : 0,
+            //    listType : ($rootScope._userInfo.ReservationItemListType) ? $rootScope._userInfo.ReservationItemListType : 0,
+            //    message : ($rootScope._userInfo.ReservationFormMsg) ? $rootScope._userInfo.ReservationFormMsg : '',
+            //    icon : 'glyphicon glyphicon-calendar',
+            //    type : 'reservation'
+            //},
+            //{
+            //    title : ($rootScope._userInfo.HomeDeliveryModuleTitle) ? $rootScope._userInfo.HomeDeliveryModuleTitle : 'Home Delivery',
+            //    permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[2] : 0,
+            //    listType : ($rootScope._userInfo.HomeDeliveryItemListType) ? $rootScope._userInfo.HomeDeliveryItemListType : 0,
+            //    message : ($rootScope._userInfo.HomeDeliveryFormMsg) ? $rootScope._userInfo.HomeDeliveryFormMsg : '',
+            //    icon : 'glyphicon glyphicon-cutlery',
+            //    type : 'home-delivery'
+            //},
+            //{
+            //    title : ($rootScope._userInfo.ServiceModuleTitle) ? $rootScope._userInfo.ServiceModuleTitle : 'Help Desk',
+            //    permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[3] : 0,
+            //    listType : 0,
+            //    message : ($rootScope._userInfo.ServiceFormMsg) ? $rootScope._userInfo.ServiceFormMsg : '',
+            //    icon : 'glyphicon glyphicon-dashboard',
+            //    type : 'service'
+            //},
             {
                 title : 'Recruitment',
                 permission : ($rootScope._userInfo.UserModuleRights) ? $rootScope._userInfo.UserModuleRights[4] : 0,
