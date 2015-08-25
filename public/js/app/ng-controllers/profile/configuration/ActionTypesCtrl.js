@@ -241,9 +241,12 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
                         // ////////////console.log($scope.txActionTypes);
                     }
 
-                    $scope.count += 1;
-                    if($scope.count < 5){
-                        $scope.loadItems();
+                    $scope.functionTypeCount += 1;
+                    if($scope.functionTypeCount < 5){
+                        $scope.loadTxActionTypes();
+                    }
+                    else{
+                        $scope.functionTypeCount = 0;
                     }
                 }
             }).error(function(err){

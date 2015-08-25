@@ -136,6 +136,8 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
 
     $scope.statusValueLimit = 10;
 
+    $scope.count = 0;
+
     $scope.$watch('modalBox.txStatus.progress',function(n,v){
        if(parseInt(n) == NaN || parseInt(n) < 0 || parseInt(n)> 100){
             $scope.modalBox.txStatus.progress = 0;
@@ -302,6 +304,15 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
                             $scope.txStatuses[functionTypes[fType]].push(txStatus);
                         }
                         // ////////////console.log($scope.txStatuses);
+                    }
+
+                    $scope.functionTypeCount+=1;
+                    if($scope.functionTypeCount < 5){
+                        $scope.loadTxStatusTypes();
+                    }
+                    else
+                    {
+                        $scope.functionTypeCount = 0;
                     }
                 }
             }).error(function(err,statusCode){

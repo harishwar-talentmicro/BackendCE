@@ -22,7 +22,8 @@
             replace:true,
             templateUrl: '../../../html/review-form.html',
             scope:{//here we define all the parameters used in this template
-                ngTransType:'@',//1:Reservation, 2:Outbox, 3:Sales, 4:Home-Delivery
+                ngTransType:'@',//1-ezeid, 2-transactionid, 3-Reservation id
+                ngModule:'@',//1:Reservation, 2:Outbox, 3:Sales, 4:Home-Delivery, 5:Just Ezeone
                 ngTransId:'=',
                 ngResourceId:'=',
                 ngToEzeid :'=',
@@ -89,7 +90,8 @@
                             ezeid:$rootScope._userInfo.ezeid,
                             rating:$scope.starCount,
                             comments:review,
-                            trans_type:$scope.ngTransType,
+                            type:$scope.ngTransType,
+                            module:$scope.ngModule,
                             trans_id:$scope.ngTransId,
                             resourceid:$scope.ngResourceId,
                             toEzeid :$scope.ngToEzeid

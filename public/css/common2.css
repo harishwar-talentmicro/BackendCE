@@ -3593,6 +3593,26 @@ sup.tm{
 
 }
 
+
+.hpw .review-header
+{
+    padding: 9px;
+    background-color: #2D70F7;
+    color: #fff;
+}
+
+.hpw .review-body
+{
+    padding: 9px;
+    background-color: #ECEFEC;
+}
+
+.hpw .single-comment
+{
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+}
 /*::-webkit-scrollbar {*/
 /*width: 12px;*/
 /*}*/
