@@ -56,19 +56,36 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
 
     function getWorkingHours()
     {
-        $http({ method: 'get', url: GURL + 'ewtWorkingHours',
+        /*$http({ method: 'get', url: GURL + 'ewtWorkingHours',*/
+        $http({ method: 'get', url: GURL + 'get_workinghours_list',
             params : {
                 Token : $rootScope._userInfo.Token
             }
         }).success(function (data) {
-           if (data != 'null')
+                if(data.status)
+                {
+                    if (data.data.length)
+                    {
+                        $scope.result = data.data;
+                    }
+                    else
+                    {
+                        $scope.result = [];
+                    }
+                }
+                else
+                {
+                    $scope.result = [];
+                }
+
+           /*if (data != 'null')
             {
                $scope.result = data;
             }
             else
             {
                $scope.result = [];
-            }
+            }*/
         });
     }
 
@@ -158,8 +175,8 @@ angular.module('ezeidApp').controller('WorkingHourCtrl',['$scope','$rootScope','
 
         $scope.saveInfo.SA1 = ($scope.mInfo.SA1) ? selectedTimeToUtc($scope.mInfo.SA1) : selectedTimeToUtc('08:00');
         $scope.saveInfo.SA2 = ($scope.mInfo.SA2) ? selectedTimeToUtc($scope.mInfo.SA2) : selectedTimeToUtc('13:00');
-        $scope.saveInfo.SA4 = ($scope.mInfo.SA4) ? selectedTimeToUtc($scope.mInfo.SA4) : selectedTimeToUtc('13:00');
-        $scope.saveInfo.SA3 = ($scope.mInfo.SA3) ? selectedTimeToUtc($scope.mInfo.SA3) : selectedTimeToUtc('21:00');
+        $scope.saveInfo.SA3 = ($scope.mInfo.SA4) ? selectedTimeToUtc($scope.mInfo.SA4) : selectedTimeToUtc('13:00');
+        $scope.saveInfo.SA4 = ($scope.mInfo.SA3) ? selectedTimeToUtc($scope.mInfo.SA3) : selectedTimeToUtc('21:00');
 
         $scope.saveInfo.SU1 = ($scope.mInfo.SU1) ? selectedTimeToUtc($scope.mInfo.SU1) : selectedTimeToUtc('08:00');
         $scope.saveInfo.SU2 = ($scope.mInfo.SU2) ? selectedTimeToUtc($scope.mInfo.SU2) : selectedTimeToUtc('13:00');

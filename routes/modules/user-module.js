@@ -4229,4 +4229,106 @@ User.prototype.saveUserDetails = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetUserDetailsNew
+ * @method GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @request-param token* <string>
+ */
+User.prototype.getUserDetailsNew = function(req,res,next){
+    var token = req.query.token;
+
+    var respMsg = {
+        status : false,
+        message : 'An error occurred ! Please try again',
+        data : null,
+        error : {
+            token : 'Invalid token'
+        }
+    };
+
+    if(!token){
+        res.status(401).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+            token : 'Invalid token'
+        }});
+    }
+    else{
+        try{
+            st.validateToken(token,function(err,tokenRes){
+                if(!err){
+                    if(tokenRes){
+                        var queryString = 'CALL pgetuserdetails('+st.db.escape(token) + ')';
+                        st.db.query(queryString,function(err,results){
+                            if(!err){
+                                if(results){
+                                    if(results[0]){
+                                        if(results[0][0]){
+                                            respMsg.status = true;
+                                            respMsg.error = null;
+                                            respMsg.message = 'User details loaded successfully';
+                                            results[0][0].Password = undefined;
+                                            respMsg.data = results[0][0];
+                                            res.status(200).json(respMsg);
+                                        }
+                                        else{
+                                            respMsg.status = false;
+                                            respMsg.error = null;
+                                            respMsg.message = 'No such user is available';
+                                            respMsg.data = results;
+                                            res.status(200).json(respMsg);
+                                        }
+                                    }
+                                    else{
+                                        respMsg.status = false;
+                                        respMsg.error = null;
+                                        respMsg.message = 'No such user is available';
+                                        respMsg.data = results;
+                                        res.status(200).json(respMsg);
+                                    }
+
+                                }
+                                else{
+                                    respMsg.status = false;
+                                    respMsg.error = null;
+                                    respMsg.message = 'No such user is available';
+                                    respMsg.data = results;
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                console.log('getUserDetailsNew : error');
+                                console.log(err);
+                                res.status(200).json(respMsg);
+                            }
+                        });
+                    }
+                    else{
+                        res.status(401).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                            token : 'Invalid token'
+                        }});
+                    }
+                }
+                else{
+                    console.log('getUserDetailsNew : error');
+                    console.log(err);
+                    res.status(500).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                        token : 'Invalid token'
+                    }});
+                }
+            });
+        }
+        catch(ex){
+            console.log('Exception - getUserDetailsNew ');
+            console.log(ex);
+            res.status(500).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                token : 'Invalid token'
+            }});
+        }
+
+    }
+};
+
 module.exports = User;
