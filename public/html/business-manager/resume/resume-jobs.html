@@ -46,7 +46,8 @@
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 bottom-clearfix setLeftRightPaddingZero">
-                            <button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" data-toggle="tooltip" title="" data-original-title="Add New Job">
+                            <!--<button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" data-toggle="tooltip" title="" data-original-title="Add New Job">-->
+                            <button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" title="Add New Job">
                                 <span class="glyphicon glyphicon-plus-sign"></span> Add New Job
                             </button>
                         </div>
@@ -73,14 +74,19 @@
         <!--List of Job Start hear-->
         <div class="col-lg-12 col-md-6 col-sm-6 col-xs-12 setLeftRightPaddingZero" ng-repeat="job in jobData track by $index">
             <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
-                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
+                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success">
-                        <b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}">{{job.jobcode | textLength:7}}</b>
+                        <!--<b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}"> <span title="{{job.jobcode.length > 15 ? job.jobcode : ''}}"></span>JobCode:{{ job.jobcode | textLength:15}}</b>-->
+                        <b class="ng-binding" >
+                            <span title="{{job.jobcode.length >= 12 ? job.jobcode : ''}}">JobCode:{{' '+job.jobcode | textLength:12}}
+                            </span>
+                        </b>
                     </small>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success">
-                        <b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:45}}</b>
+                        <!--<b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:25}}</b>-->
+                        <b class="ng-binding"  title="{{job.jobtitle.length >= 40 ? job.jobtitle : ''}}" >{{job.jobtitle | textLength:40}}</b>
                     </small>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
@@ -90,22 +96,25 @@
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success pointer">
-                        <b class="ng-binding showPointer" ng-click="openCandidateListPopup(job.tid,job.totalapplied)" data-toggle="tooltip" title="" data-original-title="View Applicants">{{job.totalapplied}} Applicants</b>
+                        <!--<b class="ng-binding showPointer" ng-click="openCandidateListPopup(job.tid,job.totalapplied)" data-toggle="tooltip" title="" data-original-title="View Applicants">{{job.totalapplied}} Applicants</b>-->
+                        <b class="ng-binding showPointer" ng-click="openCandidateListPopup(job.tid,job.totalapplied)" title="View Applicants">{{job.totalapplied}} Applicants</b>
                     </small>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                    <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">
+                    <!--<button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">-->
+                    <button class="btn btn-xs btn-block btn-warning no-radius" title="Edit Details" ng-click="openJobPostForm($index)">
                         <span class="glyphicon glyphicon-pencil"></span>
                         Edit
                     </button>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                    <button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="refreshJob(job.tid)" data-original-title="Refresh">
+                    <!--<button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="refreshJob(job.tid)" data-original-title="Refresh">-->
+                    <button class="btn btn-xs btn-block btn-warning no-radius" title="Refresh" ng-click="refreshJob(job.tid)">
                         <span class="glyphicon glyphicon-refresh"></span>
                         Refresh
                     </button>
                 </div>
-                <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix text-center">
+                <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12 bottom-clearfix text-center">
                     <small class="text-success">
                         <b class="ng-binding" ng-show="job.status == 0">Active</b>
                         <b class="ng-binding" ng-show="job.status == 1">Closed(Hired)</b>
@@ -386,7 +395,7 @@
                 </div>
                 <!-- Map ends here -->
                 <div class="col-lg-12 text-right">
-                    <button class="btn btn-primary text-right" ng-click="addJobLocationFrmoMap(locIndexToEdit + 1)">Add</button>
+                    <button class="btn btn-primary text-right" ng-disabled="disabledAddLocationOnMapPopup" ng-click="addJobLocationFrmoMap(locIndexToEdit + 1)">Add</button>
                     <button class="btn btn-primary text-right" ng-click="modalVisibility()">Cancel</button>
                 </div>
             </div>

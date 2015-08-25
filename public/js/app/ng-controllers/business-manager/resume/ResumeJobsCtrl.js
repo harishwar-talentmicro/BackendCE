@@ -59,6 +59,7 @@
             $scope.selectedInstitute = [];
             $scope.locIndexToEdit = "";
             $scope.disabledAddLocation = true;
+            $scope.disabledAddLocationOnMapPopup = true;
 
             //Pagination settings
             $scope.pageSize = 10;//Results per page
@@ -485,7 +486,8 @@
             };
 
             // Cancel job posting form
-            $scope.cancelJobPosting = function(){
+            $scope.cancelJobPosting = function()
+            {
                 $scope.showJobListing = true;
             };
 
@@ -519,6 +521,7 @@
                     return;
                 }
                 var tempLocationArray = [];
+
                 if(typeof($scope.jobLat) == undefined || typeof($scope.country) == undefined ||  !$scope.jobLocation.length > 0)
                 {
                     return;
@@ -541,6 +544,7 @@
              */
             $scope.addJobLocationFrmoMap = function(_locArrayIndex)
             {
+                $scope.disabledAddLocationOnMapPopup = true;
                 $scope.modalVisible = false;
                 $scope.locIndexToEdit = "";
                 if(_locArrayIndex)
@@ -834,13 +838,22 @@
                             country : false,
                             postalCode : false
                         };
+
                         $scope.locationString = $scope.googleMap1.createAddressFromGeolocation(data,options);
                         $scope.location = $scope.googleMap1.createAddressFromGeolocation(data,options);
                         $scope.jobLocation = data.city;
                         $scope.country = data.country;
+
+                        if($scope.jobLocation)
+                        {
+                            $scope.disabledAddLocationOnMapPopup = false;
+                        }
+                        else
+                        {
+                            $scope.disabledAddLocationOnMapPopup = true;
+                        }
                     }
                 });
-
             };
 
             /*Code for pagging*/

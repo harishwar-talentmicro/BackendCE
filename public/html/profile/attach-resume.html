@@ -219,11 +219,11 @@
                                         <input type="text" decimals-only maxlength="17" name="exp_salary" class="form-control text-right emptyBox" ng-model="CVAttachCtrl._CVInfo.exp_salary" placeholder="Expected Salary"/>
                                     </div>
 
-
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
                                         <h5 class="text-primary text-left">Institute</h5>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
+
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw" id="instituteDiv">
                                         <input type = "text"
                                                placeholder = "Full and Correct College Name"
                                                ng-model = "instituteTitle"
@@ -256,11 +256,26 @@
                                                placeholder="Passed Year"
                                                aria-describedby="sizing-addon1"/>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
-                                        <select class="form-control" ng-model="CVAttachCtrl._CVInfo.specialization_id">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw" id="specializationDiv">
+                                        <!--<select class="form-control" ng-model="CVAttachCtrl._CVInfo.specialization_id">
                                             <option value = "0"> -- Select Specialization -- </option>
-                                            <option ng-repeat="specialization in specializationList track by $index" value="{{specialization.TID}}">{{specialization.Title}}</option>
-                                        </select>
+                                            <option ng-repeat="specialization in specializationList track by $index" value="{{specialization.TID}}">{{specialization.specialization}}</option>
+                                        </select>-->
+
+                                        <input type = "text"
+                                               placeholder = "Type Specialization"
+                                               ng-model = "specilizationTitle"
+                                               ng-keypress = "specializationKeyPress($event.keyCode)"
+                                               ng-click = "specializationTextBoxClicked()"
+                                               class = "form-control instittuteClass"/>
+
+                                        <div ng-hide="showSpecializationDropDown" class="filter-dropdownSpecialization width-105 search-option-content setTableFixHeight">
+                                            <div class="checkbox-dropdown" ng-repeat="specialization in specializationList | filter:specilizationTitle" ng-click="selectSpecilization(specialization.TID,specialization.Title)">
+                                                {{specialization.Title}}
+                                            </div>
+                                        </div>
+
+
                                     </div>
                                 </div>
                                 <div class="row">
@@ -273,7 +288,6 @@
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace setLeftRightPaddingZero">
                                         <label class="imgTopMargin">%</label>
                                     </div>
-
                                 </div>
                             </div>
                             <div class="row setRowLeftRightMarginZero" ng-show="true">

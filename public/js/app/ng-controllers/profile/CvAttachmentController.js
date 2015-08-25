@@ -33,6 +33,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
     CVAttachCtrl._CVInfo.institute_title = "";
     CVAttachCtrl._CVInfo.Status = 1;
 
+    $scope.showSpecializationDropDown = true;
+
     // Bellow code id for apply for job
     $scope.job_id = 0;
     if($routeParams.jobid)
@@ -52,14 +54,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
         {
             $('.filter-dropdown').hide();
         }
-       /* if(parseInt(id) != 2)
-        {
-            $('.filter-dropdownCategory').hide();
-        }*/
-       /* if(parseInt(id) != 3)
+        if(parseInt(id) != 2)
         {
             $('.filter-dropdownInstitute').hide();
-        }*/
+        }
+        if(parseInt(id) != 3)
+        {
+            $('.filter-dropdownSpecialization').hide();
+        }
     }
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
@@ -69,15 +71,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 hideAllDropdoowns(1);
             });})
 
-           /* $('.dropdown-toggleCategory').click(function(){$( ".filter-dropdownCategory" ).slideToggle( "slow", function() {
-                // Animation complete.
-                hideAllDropdoowns(2);
-            });})
-
-            $(".cvcategory").focusout(function() {
-                $('.filter-dropdownCategory').hide();
-            });*/
-
             $('html').click(function() {
                 $('.filter-dropdown').hide();
             });
@@ -86,9 +79,23 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 e.stopPropagation();
             });
 
-            /*$('#footleft').click(function(e){
+            $('html').click(function() {
+                $('.filter-dropdownInstitute').hide();
+            });
+
+            $('#instituteDiv').click(function(e){
                 e.stopPropagation();
-            });*/
+            });
+
+            $('html').click(function() {
+                $('.filter-dropdownSpecialization').hide();
+            });
+
+            $('#specializationDiv').click(function(e){
+                e.stopPropagation();
+            });
+
+
 
             $scope.spcializationGetResponse = false;
             $scope.jobCategoriesGetResponse = false;
@@ -232,7 +239,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     this.saveCVDocInfo=function(){
 
         /**
-         * if user select from list than send id other wise send text as title
+         * if user select institute from list than send id other wise send text as title
          */
         if(($scope.instituteText) && ($scope.instituteID))
         {
@@ -258,6 +265,24 @@ angular.module('ezeidApp').controller('CVAttachController',[
             {
                 CVAttachCtrl._CVInfo.institute_id = $scope.instituteID;
                 CVAttachCtrl._CVInfo.institute_title = "";
+            }
+        }
+
+
+        /**
+         * if user select specialization from list than send id other wise send text as title
+         */
+        if(($scope.specilizationTitle) && (CVAttachCtrl._CVInfo.specialization_id))
+        {
+            if($scope.specilizationTitle != $scope.specilizationText)
+            {
+                CVAttachCtrl._CVInfo.specialization_id = 0;
+                $scope.specilizationTitle = "";
+                $scope.specilizationText = "";
+            }
+            else
+            {
+                $scope.specilizationText = "";
             }
         }
 
@@ -421,6 +446,17 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             {
                                 $scope.instituteTitle = ($scope.instituteList[nCount].InstituteTitle) ? $scope.instituteList[nCount].InstituteTitle : "";
                                 $scope.instituteID = $scope.instituteList[nCount].TID;
+                            }
+                        }
+                    }
+
+                    if($scope.specializationList.length)
+                    {
+                        for (var nCount = 0; nCount < $scope.specializationList.length; nCount++)
+                        {
+                            if($scope.specializationList[nCount].TID == CVAttachCtrl._CVInfo.specialization_id)
+                            {
+                                $scope.specilizationTitle = $scope.specializationList[nCount].Title;
                             }
                         }
                     }
@@ -783,11 +819,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
     $scope.showInstituteDropDown = false;
     // Below function Call on key press of institute text field
     $scope.instituteKeyPress = function(keyEvent) {
+        $('.filter-dropdownInstitute').show();
         $scope.showInstituteDropDown = true;
+        hideAllDropdoowns(2);
     }
     // Below function Call on click of institute text field
     $scope.instituteTextBoxClicked = function() {
         $scope.showInstituteDropDown = !$scope.showInstituteDropDown;
+        hideAllDropdoowns(2);
     }
 
     $scope.instituteText = "";
@@ -815,6 +854,29 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
        $scope.showInstituteDropDown = false;
     };
+
+    $scope.showSpecializationDropDown = true;
+    // Below function Call on key press of specialization text field
+    $scope.specializationKeyPress = function(keyEvent) {
+        $scope.showSpecializationDropDown = false;
+        $('.filter-dropdownSpecialization').show();
+        hideAllDropdoowns(3);
+    }
+    // Below function Call on click of institute text field
+    $scope.specializationTextBoxClicked = function() {
+        $scope.showSpecializationDropDown = !$scope.showSpecializationDropDown;
+        hideAllDropdoowns(3);
+    }
+
+    $scope.specilizationText = "";
+    // Below function Call on selection of institute
+    $scope.selectSpecilization = function(specilizationID,title) {
+        CVAttachCtrl._CVInfo.specialization_id = specilizationID;
+        $scope.specilizationTitle = title;
+        $scope.specilizationText = title;
+        $scope.showSpecializationDropDown = true;
+    };
+
 
     // Get Educations list
     function getEducations()

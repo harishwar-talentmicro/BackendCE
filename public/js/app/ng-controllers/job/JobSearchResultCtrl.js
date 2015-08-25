@@ -187,6 +187,7 @@ angular.module('ezeidApp').
 
                     /* make an API request to get the data */
                     var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
+                    $scope.$emit('$preLoaderStart');
                     $http({ method: 'get', url: GURL + 'job_search',
                         params:
                         {
@@ -209,7 +210,7 @@ angular.module('ezeidApp').
                             //filter:$scope.params.filter?$scope.params.filter:0
                         }
                     }).success(function (response) {
-
+                            $scope.$emit('$preLoaderStop');
                             $scope.isProcessing = false;
 
                             /* YIPPE! Got response */
