@@ -53,6 +53,11 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
             }
         };
 
+        $scope.countryList = [];
+        $scope.stateList = [];
+        $scope.cityList = [];
+        $scope.workingHourList = [];
+        $scope.newUserDetails = null;
 
         /**
          * Loading countries
@@ -90,8 +95,13 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
                     CountryID : countryId
                 }
             }).success(function(resp){
-                if(resp && resp.length > 0 && resp !== 'null'){
-                    defer.resolve(resp);
+                if(resp && resp !== 'null'){
+                    if(resp.length){
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
                 }
                 else{
                     defer.resolve([]);
@@ -120,8 +130,13 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
                 }
             }).success(function(resp){
                 promiseResolved = true;
-                if(resp && resp.length > 0 && resp !== 'null'){
-                    defer.resolve(resp);
+                if(resp && resp !== 'null'){
+                    if(resp.length){
+                        defer.resolve(resp);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
                 }
                 else{
                     defer.resolve([]);
@@ -140,7 +155,6 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
 
         $scope.loadWorkingHourTemplates =  function(){
             var defer = $q.defer();
-
             $http({
                 method : "GET",
                 url : GURL + "ewtWorkingHours",
@@ -150,11 +164,7 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
             }).success(function(resp){
                 if(resp && resp !== 'null'){
                     if(resp.length > 0){
-                        $scope.workingHoursTemplateMap = resp;
-                        for(var i in resp){
-                            $scope.workingHoursTemplates[resp[i].TID] = resp[i].TemplateName;
-                        }
-                        defer.resolve(resp);
+                        $scope.workingHourList = resp;
                     }
                 }
                 else{
@@ -166,6 +176,62 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
             return defer.promise;
         };
 
+        /**
+         * Calling new API for loading user details
+         * i.e. user_details_new
+         */
+        $scope.loadNewUserDetails = function(){
+            var defer = $q.defer();
+            $http({
+                method : "GET",
+                url : GURL + "user_details_new",
+                params : {
+                    token : $rootScope._userInfo.Token
+                }
+            }).success(function(resp){
+                if(resp && resp !== 'null'){
+                    if(resp.status){
+                        $scope.newUserDetails = resp.data;
+                        for(var x=0; x < resp.data.locationcount; x++){
+                            $scope.locCount.push({ id : x});
+                        }
+                        console.log($scope.locCount);
+                    }
+                    else{
+                        defer.resolve([]);
+                    }
+                }
+                else{
+                    defer.resolve([]);
+                }
+            }).error(function(err){
+                defer.resolve([]);
+            });
+            return defer.promise;
+        };
+
+
+        $scope.loadUserDetails().then(function(userDetails){
+            $scope.loadCountries().then(function(){
+                $scope.loadStates($scope.countryList[0].CountryID).then(function(){
+                    $scope.loadCities($scope.stateList[0].StateID).then(function(){
+                        $scope.loadWorkingHourTemplates().then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    },function(){
+                        $scope.$emit('$preLoaderStop');
+                    });
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                });
+            },function(){
+                $scope.$emit('$preLoaderStop')
+            })
+        },function(){
+            $scope.$emit('$preLoaderStop');
+        });
 
 
     }]);

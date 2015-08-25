@@ -701,8 +701,60 @@ angular.module('ezeidApp').
             };
 
             /* basic setting for loading review-form */
-            $scope.ngTransId = '';
-            $scope.ngResourceId = '';
+            $scope.ngTransId = 0;
+            $scope.ngResourceId = 0;
             $scope.ngToEzeId = $routeParams.ezeone;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////GET FEEDBACK////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /**
+             * Get all the feedbacks
+             */
+            $scope.getFeedbacks = function()
+            {
+                getReviewApiCall().then(function(data){
+                    console.log(data);
+                });
+            }
+            $scope.getFeedbacks();
+
+            /**
+             * Getting reviews API calls
+             */
+            function getReviewApiCall()
+            {
+                $scope.$emit('$preLoaderStart');
+                var defer = $q.defer();
+                $http({
+                    url : GURL + 'feedback',
+                    method : "GET",
+                    params :{
+                        ezeone_id : $rootScope._userInfo.ezeid,
+                        module_type : 5,
+                        trans_id : 1,
+                        resource_id : 0,
+                        page_size : 0,
+                        page_count : 0
+                    }
+                }).success(function(resp){
+
+                    $scope.$emit('$preLoaderStop');
+
+                    if(!resp.status)
+                    {
+                        defer.reject();
+                        return defer.promise;
+                    }
+
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.reject();
+                });
+                return defer.promise;
+            }
         }
+
     ]);
