@@ -21,32 +21,39 @@ angular.module('ezeidApp').controller('HolidayCalenderCtrl',['$scope','$rootScop
                 LocID : 0
             }
         }).success(function (data) {
-                if (data != 'null')
-                {
-                   $scope.showNoDataFound = false;
-                   $scope.result = data;
-                }
-                else
-                {
-                   $scope.result = [];
-                   $scope.showNoDataFound = true;
-                }
-            });
+
+            if ((data) && (data != 'null'))
+            {
+               $scope.showNoDataFound = false;
+               $scope.result = data;
+            }
+            else
+            {
+               $scope.result = [];
+               $scope.showNoDataFound = true;
+            }
+        });
     };
 
     //To get All working hours template
     function getTemplateList()
     {
-        $http({ method: 'get', url: GURL + 'ewtWorkingHours',
+        /*$http({ method: 'get', url: GURL + 'ewtWorkingHours',*/
+        $http({ method: 'get', url: GURL + 'get_workinghours_list',
             params : {
                 Token : $rootScope._userInfo.Token
             }
         }).success(function (data)
             {
-                if(data != 'null')
+                if(data.status)
+                {
+
+                    $scope.TemplateData = data.data;
+                }
+                /*if(data != 'null')
                 {
                     $scope.TemplateData = data;
-                }
+                }*/
             });
     }
 
