@@ -41,7 +41,7 @@
                                                         <i class="fa fa-suitcase"></i>
                                                         Sales
                                                     </a>
-                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius"
+                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius hidden"
                                                        ng-href="{{SearchInfo.ReservationURL}}"
                                                        target="_blank"
                                                        ng-show="SearchInfo.EZEIDVerifiedID == '2' && shoReserVation == 1"
@@ -50,7 +50,7 @@
                                                         <i class="fa fa-clock-o"></i>
                                                         Reservation
                                                     </a>
-                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius"
+                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius hidden"
                                                        ng-href="{{SearchInfo.HomeDeliveryURL}}"
                                                        target="_blank"
                                                        ng-show="SearchInfo.EZEIDVerifiedID == '2' && showHomeDelivery == 1"
@@ -60,7 +60,7 @@
                                                         Home Delivery
                                                     </a>
 
-                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius"
+                                                    <a class="btn btn-warning info-btn msgBtnColor no-radius hidden"
                                                        ng-href="{{SearchInfo.ServiceURL}}"
                                                        target="_blank"
                                                        ng-show="SearchInfo.EZEIDVerifiedID == '2' && showServiceRequest == 1"
@@ -1130,100 +1130,45 @@
                         </div>
                     </div>
 
-                    <!-- Main page ends here -->
-                    <div class="review-section-wrapper p-top-20 hidden">
+                    <!-- REVIEWS GOES HERE -->
+                    <div class="review-section-wrapper p-top-20 ">
                         <!-- Review header -->
                         <div class="review-section-header review-header">
-                            <i class="fa fa-comments"></i> Reviews
+                            <i class="fa fa-comments"></i> <b>Reviews</b>
+                            <!-- righth side of the reviw tab -->
+                            <small class="pull-right">
+                                <span> {{totalReview}} Reviews | </span>
+                                <button class="btn btn-default btn-xs disabled">{{avgRating}} <i class="fa fa-star text-default"></i></button>
+                            </small>
                         </div>
                         <!-- Review body -->
-                        <div class="review-body">
-                            <!-- Individual comments goes here -->
+                        <div class="review-body" ng-show="reviewArr.length > 0">
                             <div class="container">
-                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10">
+                                <!-- Individual comments goes here -->
+                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10" ng-repeat="rev in reviewArr track by $index">
                                     <div class="single-comment container">
                                         <div class="comment-author col-lg-12 p-bottom-4">
-                                            <button class="btn btn-xs btn-primary" disabled>@KRUNALPAID</button>
+                                            <button class="btn btn-xs btn-primary" disabled>{{rev.ezeid}}</button>
                                                         <span class="pull-right">
-                                                            <i class="fa fa-star text-warning"></i>
-                                                            <i class="fa fa-star text-warning"></i>
-                                                            <i class="fa fa-star text-warning"></i>
+                                                            <i class="fa fa-star"
+                                                               ng-repeat="n in [1,2,3,4,5] track by $index"
+                                                                    ng-class="$index < rev.rating?'text-warning':'text-gray'"></i>
                                                         </span>
                                         </div>
                                         <div class="comment-author col-lg-12">
-                                            <i>Heya just wanted to give you a brief heads up and let you know a few
-                                                of the images aren’t loading properly. I’m not sure why but I think
-                                                its a linking issue. I’ve tried it in two different internet browsers and both show the same outcome.</i>
+                                            <i>{{rev.comments}}</i>
                                         </div>
                                         <div class="comment-author col-lg-12">
-                                                        <span class="text-right">
-                                                            <p class="text text-dark-gray">2 Days ago.</p>
+                                                        <span class="pull-right">
+                                                            <i ng-show="rev.createddate" class="text text-dark-gray">{{convertTimeToLocal(rev.createddate) | ageFilter}}..</i>
                                                         </span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10">
-                                    <div class="single-comment container">
-                                        <div class="comment-author col-lg-12 p-bottom-4">
-                                            <button class="btn btn-xs btn-primary" disabled>@KRUNALPAY</button>
-                                                        <span class="pull-right">
-                                                            <i class="fa fa-star text-warning"></i>
-                                                            <i class="fa fa-star text-warning"></i>
-                                                        </span>
-                                        </div>
-                                        <div class="comment-author col-lg-12">
-                                            <i>Heya just wanted to give you a brief heads up and let you know a few
-                                                of the images aren’t loading properly. I’m not sure why but I think
-                                                its a linking issue. I’ve tried it in two different internet browsers and both show the same outcome.</i>
-                                        </div>
-                                        <div class="comment-author col-lg-12">
-                                                        <span class="text-right">
-                                                            <p class="text text-dark-gray">2 Days ago.</p>
-                                                        </span>
-                                        </div>
-                                    </div>
-                                </div><div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10">
-                                <div class="single-comment container">
-                                    <div class="comment-author col-lg-12 p-bottom-4">
-                                        <button class="btn btn-xs btn-primary" disabled>@KRUNAL</button>
-                                                        <span class="pull-right">
-                                                            <i class="fa fa-star text-warning"></i>
-                                                            <i class="fa fa-star text-warning"></i>
-                                                            <i class="fa fa-star text-warning"></i>
-                                                        </span>
-                                    </div>
-                                    <div class="comment-author col-lg-12">
-                                        <i>Heya just wanted to give you a brief heads up and let you know a few
-                                            of the images aren’t loading properly. I’m not sure why but I think
-                                            its a linking issue. I’ve tried it in two different internet browsers and both show the same outcome.</i>
-                                    </div>
-                                    <div class="comment-author col-lg-12">
-                                                        <span class="text-right">
-                                                            <p class="text text-dark-gray">2 Days ago.</p>
-                                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-top-10">
-                                    <div class="single-comment container">
-                                        <div class="comment-author col-lg-12 p-bottom-4">
-                                            <button class="btn btn-xs btn-primary" disabled>@SANDY5</button>
-                                                        <span class="pull-right">
-                                                            <i class="fa fa-star text-warning"></i>
-                                                            <i class="fa fa-star text-warning"></i>
-                                                        </span>
-                                        </div>
-                                        <div class="comment-author col-lg-12">
-                                            <i>Heya just wanted to give you a brief heads up and let you know a few
-                                                of the images aren’t loading properly. I’m not sure why but I think
-                                                its a linking issue. I’ve tried it in two different internet browsers and both show the same outcome.</i>
-                                        </div>
-                                        <div class="comment-author col-lg-12">
-                                                        <span class="text-right">
-                                                            <p class="text text-dark-gray">2 Days ago.</p>
-                                                        </span>
-                                        </div>
-                                    </div>
+                                <div class="col-lg-12 text-right p-top-10">
+                                    <button class="btn btn-default btn-xs"
+                                            ng-show="review.paginationNextVisibility"
+                                            ng-click="reviewPaginationNextClick()">Load more..</button>
                                 </div>
                             </div>
                         </div>
