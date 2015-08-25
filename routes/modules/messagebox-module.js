@@ -956,9 +956,10 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                                             operationType = 0;
                                                             iphoneId = null;
                                                             messageId = 0;
+                                                            masterid = '';
                                                             console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
-                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId,masterid);
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId,masterid);
 
                                                         }
                                                         else {
@@ -1046,7 +1047,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var token = req.body.token;
     var previousMessageID = req.body.previous_messageID ? req.body.previous_messageID : 0;
     var toID = req.body.to_id;                              // comma separated id of toID
-    var idType = req.body.id_type ? parseInt(req.body.id_type) : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
+    var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
     var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
@@ -1112,6 +1113,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                      * @todo add code for push notification like this
                                      */
                                     if (idType == 1) {
+                                        console.log(idType);
                                         var queryParams = st.db.escape(token) + ',' + st.db.escape(1) + ',' + st.db.escape(toID);
                                         var mailQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
                                         console.log(mailQuery);
@@ -1120,7 +1122,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                 if (groupDetails[0]) {
                                                     if (groupDetails[1]) {
                                                         if (groupDetails[1].length > 0) {
-                                                            console.log('----------------------------');
+                                                            console.log('Coming here----------------------------');
                                                             console.log(groupDetails);
                                                             receiverId = groupDetails[1][0].tid;
                                                             senderTitle = groupDetails[0][0].groupname;
@@ -1131,9 +1133,10 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                             operationType = 0;
                                                             iphoneId = null;
                                                             messageId = previousMessageID;
+                                                            masterid = groupDetails[0][0].AdminID;
                                                             console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
-                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId,masterid);
                                                         }
                                                         else {
                                                             console.log('FnComposeMessage:Error getting from groupdetails');
@@ -1178,8 +1181,9 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                             operationType = 0;
                                                                             iphoneId = null;
                                                                             messageId = previousMessageID;
-                                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
-                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId);
+                                                                            masterid = '';
+                                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId,masterid);
+                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId,masterid);
                                                                         }
                                                                     }
                                                                     else {

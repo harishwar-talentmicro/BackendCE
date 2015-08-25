@@ -26,9 +26,10 @@ function Notification(db,stdLib){
  * @param messageType (What kind of message to be sent 0 :Group, 1 : Individual, 2 : Alarm, 3: EZEOne Public Notifications)
  * @param operationType (Operation type decides what kind of notification it is)
  * @param iphoneId (If user is having iphone id then pass it also)
+ * @param masterId (masterId of adminid or pass empty)
 _ */
 Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,
-                                          messageType,operationType,iphoneId,messageId){
+                                          messageType,operationType,iphoneId,messageId,masterId){
 
     console.log('It is coming to publish block of Notification');
     var validationStatus = true;
@@ -57,6 +58,9 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
         validationStatus = false;
         error.operationType = "Error parameter 5 : \""+messageType + "\"";
     }
+    if(!masterId){
+        masterId = "";
+    }
 
 
     if(validationStatus){
@@ -70,7 +74,8 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             type : messageType,
             ts : moment().format("YYYY-MM-DD HH:mm:ss"),
             op: operationType,
-            mid : messageId
+            mid : messageId,
+            masterid : masterId
         };
 
         console.log('Actual receiver Id : '+receiverId);
