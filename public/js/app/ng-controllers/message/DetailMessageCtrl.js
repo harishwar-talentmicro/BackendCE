@@ -401,7 +401,7 @@ angular.module('ezeidApp').
                 var resultSize = parseInt($scope.pageSize);
 
                 /* initial state */
-                if((totalResult < (currentCount+resultSize)) && currentCount == 0)
+                if((totalResult <= (currentCount+resultSize)) && currentCount == 0)
                 {
                     $scope.paginationNextVisibility = false;
                     $scope.paginationPreviousVisibility = false;

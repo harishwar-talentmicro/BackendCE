@@ -29,7 +29,7 @@
                 ngToEzeid :'=',
                 toggleReviewModalVisibility : '&'
             },
-            controller : function($rootScope,$scope,$http,GURL,MsgDelay,Notification){
+            controller : function($rootScope,$scope,$http,GURL,MsgDelay,Notification,$route){
                 $scope.starArray = [];
                 deactivateStars();
                 $scope.starCount = 1;
@@ -104,6 +104,7 @@
                             $scope.toggleReviewModalVisibility();
                             Notification.success({ message: "Thank you for giving your valuable feedback", delay: MsgDelay });
                             $scope.$emit('$preLoaderStop');
+                            $route.reload();
                         }
                         else
                         {
