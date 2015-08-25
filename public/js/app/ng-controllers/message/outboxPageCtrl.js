@@ -486,11 +486,30 @@ angular.module('ezeidApp').
                     var count = 0;
                     data.forEach(function(val){
                         count++;
+
+                        if(val.grouptype==0 && val.requester==2)
+                            val = updategroupName(val);
+
                         $scope.pendingRequestData.push(val);
                     });
-                    console.log($scope.pendingRequestData);
                     $scope.pendingRequestCount = count;
                 });
+            }
+
+            /**
+             * Update the group name in case the pending request is from the user to group admin
+             * @param data
+             */
+            function updategroupName(data)
+            {
+                if(!data || !data.GroupName || !data.membername)
+                    return;
+
+                var groupName = data.GroupName;
+                var memberName = data.membername;
+
+                data.GroupName = memberName+" for "+groupName;
+                return data;
             }
 
             /**
