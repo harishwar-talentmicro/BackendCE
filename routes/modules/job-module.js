@@ -46,8 +46,8 @@ Job.prototype.create = function(req,res,next){
     var ezeone_id = alterEzeoneId(req.body.ezeone_id);
     var job_code = req.body.job_code;
     var job_title = req.body.job_title;
-    var exp_from = req.body.exp_from;
-    var exp_to = req.body.exp_to;
+    var exp_from = req.body.exp_from ? req.body.exp_from : 0;
+    var exp_to = req.body.exp_to ? req.body.exp_to : 0;
     var job_description = req.body.job_description;
     var salaryFrom = req.body.salaryFrom;
     var salaryTo = req.body.salaryTo;
@@ -98,10 +98,6 @@ Job.prototype.create = function(req,res,next){
     }
     if(!job_title){
         error['job_title'] = 'Invalid job_title';
-        validateStatus *= false;
-    }
-    if(!exp_from && !exp_to){
-        error['Experience'] = 'Invalid ExperienceFrom or Experience To ';
         validateStatus *= false;
     }
     if(!job_description){

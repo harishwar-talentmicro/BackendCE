@@ -37,6 +37,17 @@ angular.module('ezeidApp').
             UtilityService
         )
         {
+
+
+            $scope.review = {
+                pageSize:6,
+                pageCount:0,
+                totalResult:0,
+                paginationNextVisibility:false,
+                paginationPreviousVisibility:false
+            };
+
+
            if($rootScope._userInfo){
                 if(!$rootScope._userInfo.IsAuthenticate){
                     var unregister = $rootScope.$watch('_userInfo',function(newVal,oldVal){
@@ -713,16 +724,127 @@ angular.module('ezeidApp').
              */
             $scope.getFeedbacks = function()
             {
-                getReviewApiCall().then(function(data){
-                    console.log(data);
+                var ezeoneId = $routeParams.ezeone;
+                /* if ezeone not found */
+                if(!ezeoneId)
+                    $route.reload();
+
+                /* API call to get the reviews */
+                getReviewApiCall(ezeoneId).then(function(data){
+                    setReviewData(data);
+                    reviewPaginationVisibility();
                 });
             }
             $scope.getFeedbacks();
 
+
+            $scope.avgRating = 0;
+            $scope.totalReview = 0;
+            $scope.reviewArr = [];
+
+
+            /**
+             * set all the reviews data
+             * @param data: data from the reviews API
+             */
+            function setReviewData(data)
+            {
+                /* set the basic data of all the reviews */
+                if(data.count[0])
+                {
+                    $scope.avgRating = data.count[0].averagerating;
+                    $scope.review.totalResult = $scope.totalReview = data.count[0].count;
+                }
+                /* set the individual reviews */
+                if(data.result && data.result.length > 0)
+                {
+                     data.result.forEach(function(data)
+                     {
+                         $scope.reviewArr.push(data);
+                     });
+                }
+            }
+
+            /**
+             * convert server time to local time
+             * @param dateTime
+             * @returns {*}
+             */
+            $scope.convertTimeToLocal = function(dateTime)
+            {
+                return UtilityService.convertTimeToLocal(dateTime)
+            }
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////PAGINATION for REVIEWS////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            /**
+             * load the next results
+             */
+            $scope.reviewPaginationNextClick = function()
+            {
+                $scope.review.pageCount += $scope.review.pageSize;
+                /* trigger next results */
+                $scope.getFeedbacks();
+                reviewPaginationVisibility();
+            }
+
+            /**
+             * load the previous results[nOT uSED]
+             */
+            $scope.reviewPaginationPreviousClick = function()
+            {
+                $scope.review.pageCount -= $scope.review.pageSize;
+                /* trigger previous results */
+                reviewPaginationVisibility();
+            }
+
+            /**
+             * Toggle the visibility of the pagination buttons
+             */
+            $scope.review.paginationNextVisibility = true;
+            $scope.review.paginationPreviousVisibility = true;
+            function reviewPaginationVisibility()
+            {
+                var totalResult = parseInt($scope.review.totalResult);
+                var currentCount = parseInt($scope.review.pageCount);
+                var resultSize = parseInt($scope.review.pageSize);
+
+                /* initial state */
+                if((totalResult <= (currentCount+resultSize)) && currentCount == 0)
+                {
+                    $scope.review.paginationNextVisibility = false;
+                    $scope.review.paginationPreviousVisibility = false;
+                }
+                else if(currentCount == 0)
+                {
+                    $scope.review.paginationNextVisibility = true;
+                    $scope.review.paginationPreviousVisibility = false;
+                }
+                else if((currentCount + resultSize) >= totalResult)
+                {
+                    $scope.review.paginationNextVisibility = false;
+                    $scope.review.paginationPreviousVisibility = true;
+
+                }
+                else{
+                    $scope.review.paginationNextVisibility = true;
+                    $scope.review.paginationPreviousVisibility = true;
+                }
+                console.log((currentCount + resultSize) ,totalResult);
+                console.log( $scope.review.paginationNextVisibility,$scope.review.paginationPreviousVisibility);
+            };
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////////API CALLS/////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             /**
              * Getting reviews API calls
              */
-            function getReviewApiCall()
+            function getReviewApiCall(ezeoneId)
             {
                 $scope.$emit('$preLoaderStart');
                 var defer = $q.defer();
@@ -730,12 +852,12 @@ angular.module('ezeidApp').
                     url : GURL + 'feedback',
                     method : "GET",
                     params :{
-                        ezeone_id : $rootScope._userInfo.ezeid,
+                        ezeone_id : ezeoneId,
                         module_type : 5,
-                        trans_id : 1,
+                        trans_id : 0,
                         resource_id : 0,
-                        page_size : 0,
-                        page_count : 0
+                        page_size : $scope.review.pageSize,
+                        page_count : $scope.review.pageCount
                     }
                 }).success(function(resp){
 
