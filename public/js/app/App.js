@@ -162,6 +162,7 @@
             Stomp.WebSocketClass = SockJS;
             var ws = new SockJS(url);
             var client = Stomp.over(ws);
+            client.debug = null;
             client.heartbeat.outgoing = 0;
             client.heartbeat.incoming = 0;
 

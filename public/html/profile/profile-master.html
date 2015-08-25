@@ -2,22 +2,33 @@
     <div class="col-sm-12 col-xs-12 hidden-lg hidden-md hidden-sm navbar-collapse">
         <ul class="nav nav-pills nav-justified nav-configuration">
             <li role="presentation" ng-class="{'active':pageUserDetails === activeSubTemplate}">
-                <a ng-click="changeActive(pageModuleSettings)" class="btn-link"><span class="glyphicon glyphicon-wrench"></span> Profile Details</a>
+                <a ng-click="changeActive(0,false)" class="btn-link">
+                    <i class="fa fa-circle-o" ng-hide="(pageUserDetails === activeSubTemplate)"></i>
+                    <i class="fa fa-circle" ng-show="(pageUserDetails === activeSubTemplate)"></i>
+                    Profile Details</a>
             </li>
-            <li role="presentation" ng-class="{'active':pageLocationDetails === activeSubTemplate}">
-                <a ng-click="changeActive(pageSubuser)" class="btn-link"><span class="glyphicon glyphicon-user"></span> L0 (Primary Location)</a>
+            <li ng-repeat="loc in locCount track by $index" role="presentation" ng-class="{'active': ((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))}">
+                <a ng-click="changeActive($index,true)" class="btn-link">
+                    <i class="fa fa-circle-o" ng-hide="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
+                    <i class="fa fa-circle" ng-show="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
+                    L{{$index}} </a>
             </li>
-
         </ul>
     </div>
     <!------ Only on Desktop ------------------------------------>
     <div class="col-lg-3 col-md-3 hidden-xs">
         <ul class="nav nav-pills nav-stacked nav-configuration">
             <li role="presentation" ng-class="{'active':pageUserDetails === activeSubTemplate}">
-                <a ng-click="changeActive(false,null)" class="btn-link"><span class="glyphicon glyphicon-wrench"></span> Profile Details</a>
+                <a ng-click="changeActive(0,false)" class="btn-link">
+                    <i class="fa fa-circle-o" ng-hide="(pageUserDetails === activeSubTemplate)"></i>
+                    <i class="fa fa-circle" ng-show="(pageUserDetails === activeSubTemplate)"></i>
+                    Profile Details</a>
             </li>
             <li ng-repeat="loc in locCount track by $index" role="presentation" ng-class="{'active': ((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))}">
-                <a ng-click="changeActive(true,$index)" class="btn-link"><span class="glyphicon glyphicon-user"></span>  L{{$index}} (Primary Location) </a>
+                <a ng-click="changeActive($index,true)" class="btn-link">
+                    <i class="fa fa-circle-o" ng-hide="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
+                    <i class="fa fa-circle" ng-show="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
+                    L{{$index}} </a>
             </li>
             <!-- end  - Uncomment this code to turn on reservation settings -->
         </ul>
@@ -30,7 +41,7 @@
 
 <div class="panel panel-success">
     <div class="panel-heading">
-        Profile Details
+        {{(pageUserDetails === activeSubTemplate) ? 'Step 1 : Profile Details' : 'Step '+(activeLoc +2)  + ': Location Details'}}
     </div>
     <div class="panel-body" ng-controller="ProfileMasterCtrl">
         <!------- Page Content go inside ------------------>
