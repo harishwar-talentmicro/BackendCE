@@ -1119,7 +1119,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
-    var c=0,toIds,to_Ids,masterid,receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type;
+    var c=0,toIds,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type;
 
     console.log(req.body);
 
@@ -1192,31 +1192,54 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                     /**
                                      * @todo add code for push notification like this
                                      */
-                                        for (var c=0; c < id.length;c++) {
+
+                                        for (var c = 0; c < id.length; c++) {
+                                            console.log('....................'+c);
                                             id_type = parseInt(id[c]);
+                                            gid = parseInt(toIds[c]);
                                             var queryParams = st.db.escape(token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(parseInt(toIds[c]));
-                                            var mailQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
-                                            console.log(mailQuery);
-                                            st.db.query(mailQuery, function (err, groupDetails) {
+                                            var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
+                                            console.log(messageQuery);
+                                            st.db.query(messageQuery, function (err, groupDetails) {
                                                 if (groupDetails) {
                                                     if (groupDetails[0]) {
                                                         if (groupDetails[1]) {
                                                             if (groupDetails[1].length > 0) {
-                                                                for (var i = 0; i < groupDetails[1].length; i++) {
-                                                                    receiverId = groupDetails[1][i].tid;
-                                                                    senderTitle = groupDetails[0][0].groupname;
-                                                                    groupTitle = groupDetails[0][0].groupname;
-                                                                    groupId = groupDetails[0][0].tid;
-                                                                    messageText = message;
-                                                                    messageType = id_type;
-                                                                    operationType = 0;
-                                                                    iphoneId = null;
-                                                                    messageId = previousMessageID;
-                                                                    masterid = groupDetails[0][0].AdminID;
-                                                                    console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                }
+                                                                console.log('....................1');
+                                                                console.log(groupDetails);
+                                                                var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type);
+                                                                var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
+                                                                console.log(messageQuery1);
+                                                                st.db.query(messageQuery1, function (err, groupDetails1) {
+                                                                    if (groupDetails1) {
+                                                                        console.log('....................2');
+                                                                        console.log(groupDetails1);
+                                                                        for (var i = 0; i < groupDetails[1].length; i++) {
+                                                                            receiverId = groupDetails[1][i].tid;
+                                                                            senderTitle = groupDetails[0][0].groupname;
+                                                                            groupTitle = groupDetails1[0][0].groupname ? groupDetails1[0][0].groupname : groupDetails1[0][0].name;
+                                                                            if(id_type == 0) {
+                                                                                groupId = groupDetails1[0][0].groupid;
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                groupId = groupDetails[0][0].tid;
+                                                                            }
+                                                                            messageText = message;
+                                                                            messageType = id_type;
+                                                                            operationType = 0;
+                                                                            iphoneId = null;
+                                                                            messageId = previousMessageID;
+                                                                            masterid = groupDetails[0][0].AdminID;
+                                                                            console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnComposeMessage:Error getting from groupname');
+                                                                    }
+                                                                });
                                                             }
                                                             else {
                                                                 console.log('FnComposeMessage:Error getting from groupdetails');

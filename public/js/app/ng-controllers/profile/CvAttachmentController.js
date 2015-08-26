@@ -33,6 +33,10 @@ angular.module('ezeidApp').controller('CVAttachController',[
     CVAttachCtrl._CVInfo.institute_title = "";
     CVAttachCtrl._CVInfo.Status = 1;
 
+    $scope.instituteText = "";
+    $scope.instituteID = 0;
+    $scope.specilizationText = "";
+
     $scope.showSpecializationDropDown = true;
 
     // Bellow code id for apply for job
@@ -241,7 +245,35 @@ angular.module('ezeidApp').controller('CVAttachController',[
         /**
          * if user select institute from list than send id other wise send text as title
          */
-        if(($scope.instituteText) && ($scope.instituteID))
+
+        if($scope.instituteTitle)
+        {
+            if($scope.instituteTitle == $scope.instituteText)
+            {
+                CVAttachCtrl._CVInfo.institute_id = $scope.instituteID;
+                CVAttachCtrl._CVInfo.institute_title = "";
+                $scope.instituteText = "";
+            }
+            else
+            {
+                CVAttachCtrl._CVInfo.institute_id = 0;
+                $scope.instituteID = 0;
+                $scope.instituteText = "";
+                CVAttachCtrl._CVInfo.institute_title = $scope.instituteTitle;
+            }
+        }
+        else
+        {
+            CVAttachCtrl._CVInfo.institute_id = 0;
+            CVAttachCtrl._CVInfo.institute_title = "";
+            $scope.instituteText = "";
+            $scope.instituteID = 0;
+        }
+
+        $scope.instituteText = "";
+        $scope.instituteID = 0;
+
+       /* if(($scope.instituteText) && ($scope.instituteID))
         {
             if($scope.instituteText != $scope.instituteTitle)
             {
@@ -266,13 +298,13 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 CVAttachCtrl._CVInfo.institute_id = $scope.instituteID;
                 CVAttachCtrl._CVInfo.institute_title = "";
             }
-        }
-
+        }*/
 
         /**
          * if user select specialization from list than send id other wise send text as title
          */
-        if(($scope.specilizationTitle) && (CVAttachCtrl._CVInfo.specialization_id))
+
+        if($scope.specilizationTitle)
         {
             if($scope.specilizationTitle != $scope.specilizationText)
             {
@@ -280,21 +312,37 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 $scope.specilizationTitle = "";
                 $scope.specilizationText = "";
             }
-            else
-            {
-                $scope.specilizationText = "";
-            }
+        }
+        else
+        {
+            CVAttachCtrl._CVInfo.specialization_id = 0;
+            $scope.specilizationTitle = "";
+            $scope.specilizationText = "";
         }
 
-        $scope.instituteText = "";
-        $scope.instituteID = 0;
+
+       /* if(($scope.specilizationTitle) && (CVAttachCtrl._CVInfo.specialization_id))
+        {
+           if($scope.specilizationTitle != $scope.specilizationText)
+            {
+                CVAttachCtrl._CVInfo.specialization_id = 0;
+                $scope.specilizationTitle = "";
+                $scope.specilizationText = "";
+            }
+            else
+            {
+               $scope.specilizationText = "";
+            }
+        }*/
+
 
         CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 0;
         CVAttachCtrl._CVInfo.experience = (CVAttachCtrl._CVInfo.experience) ? CVAttachCtrl._CVInfo.experience : 0;
 
-        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++) {
+        for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++)
+        {
            $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
-       }
+        }
 
         if($scope.skillMatrix[0])
         {
@@ -445,6 +493,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             if($scope.instituteList[nCount].TID == CVAttachCtrl._CVInfo.institute_id)
                             {
                                 $scope.instituteTitle = ($scope.instituteList[nCount].InstituteTitle) ? $scope.instituteList[nCount].InstituteTitle : "";
+                                $scope.instituteText = ($scope.instituteList[nCount].InstituteTitle) ? $scope.instituteList[nCount].InstituteTitle : "";
                                 $scope.instituteID = $scope.instituteList[nCount].TID;
                             }
                         }
@@ -457,6 +506,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             if($scope.specializationList[nCount].TID == CVAttachCtrl._CVInfo.specialization_id)
                             {
                                 $scope.specilizationTitle = $scope.specializationList[nCount].Title;
+                                $scope.specilizationText = $scope.specializationList[nCount].Title;
                             }
                         }
                     }
@@ -829,8 +879,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
         hideAllDropdoowns(2);
     }
 
-    $scope.instituteText = "";
-    $scope.instituteID = 0;
+    /*$scope.instituteText = "";
+    $scope.instituteID = 0;*/
     // Below function Call on selection of institute
     $scope.selectInstitute = function(instituteID,title) {
 
@@ -850,8 +900,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
             CVAttachCtrl._CVInfo.institute_title = title;
             CVAttachCtrl._CVInfo.institute_id = 0;
         }
-
-
        $scope.showInstituteDropDown = false;
     };
 
@@ -868,7 +916,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
         hideAllDropdoowns(3);
     }
 
-    $scope.specilizationText = "";
+   // $scope.specilizationText = "";
     // Below function Call on selection of institute
     $scope.selectSpecilization = function(specilizationID,title) {
         CVAttachCtrl._CVInfo.specialization_id = specilizationID;
