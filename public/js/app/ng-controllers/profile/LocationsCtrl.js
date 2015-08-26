@@ -124,6 +124,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         /**
          * Show and hide map using location index
          * @param index
+         * @param editFlag
          */
         $scope.toggleMapControls = function(index,editFlag){
             mapList['map'+index].toggleMapControls().then(function(){

@@ -14,6 +14,13 @@
         </div>
     </div>
 
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID === 3">
+        <label>Public Place</label>
+        <div class="form-group form-group-sm">
+            <input type="text" class="form-control" ng-model="newUserDetails.CompanyName" placeholder="Public Place" />
+        </div>
+    </div>
+
 
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID == 2">
         <label>Company Tagline</label>
@@ -21,6 +28,14 @@
             <input type="text" class="form-control" ng-model="newUserDetails.AboutCompany" placeholder="About Company" maxlength="100" />
         </div>
     </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID == 3">
+        <label>Description</label>
+        <div class="form-group form-group-sm">
+            <input type="text" class="form-control" ng-model="newUserDetails.AboutCompany" placeholder="Public Place Description" maxlength="100" />
+        </div>
+    </div>
+
 
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <label>Admin Email</label>

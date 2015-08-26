@@ -188,7 +188,6 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
             $scope.loadUserDetails().then(function(userDetails){
                 $scope.loadCountries().then(function(){
                     $scope.loadStates($scope.countryList[0].CountryID).then(function(){
-                        console.log($scope.stateList);
                         $scope.loadCities($scope.stateList[0].StateID).then(function(){
                             $scope.loadWorkingHourTemplates().then(function(){
                                 if(typeof(callBack) == "function"){
