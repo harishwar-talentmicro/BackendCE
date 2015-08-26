@@ -320,7 +320,7 @@
                                                                                ng-model="editSkill.skillname" placeholder="Type skill here"/>
                                                                     </div>
                                                                 </td>
-                                                                <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
+                                                                <td class="panelPd5px" ng-hide="(!editMode[$index]) && ($index == 0)">
                                                                     <span ng-hide="editMode[$index]">{{expertiseLevels[skillMatrix[$index].expertiseLevel]}}</span>
                                                                     <select class="form-control" name="expertiesLevel" ng-model="editSkill.expertiseLevel"
                                                                             ng-show="editMode[$index]">
