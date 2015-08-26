@@ -2,56 +2,90 @@
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <label>EZEOne</label>
         <div class="form-group form-group-sm">
-            <input type="text" class="form-control" disabled />
+            <input type="text" class="form-control" ng-model="newUserDetails.EZEID" disabled />
         </div>
     </div>
 
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-        <label>PIN</label>
-        <div class="form-group form-group-sm">
-            <input type="text" class="form-control" placeholder="PIN" />
-        </div>
-    </div>
 
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID === 2">
         <label>Company Name</label>
         <div class="form-group form-group-sm">
-            <input type="text" class="form-control" placeholder="Company Name" />
+            <input type="text" class="form-control" ng-model="newUserDetails.CompanyName" placeholder="Company Name" />
+        </div>
+    </div>
+
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID == 2">
+        <label>Company Tagline</label>
+        <div class="form-group form-group-sm">
+            <input type="text" class="form-control" ng-model="newUserDetails.AboutCompany" placeholder="About Company" maxlength="100" />
         </div>
     </div>
 
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
         <label>Admin Email</label>
         <div class="form-group form-group-sm">
-            <input type="email" class="form-control" placeholder="Email" />
+            <input type="email" class="form-control" ng-model="newUserDetails.AdminEmailID" placeholder="Email" maxlength="50" />
         </div>
     </div>
 
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-        <label>Contact Person : First Name</label>
+        <label>{{(newUserDetails.IDTypeID === 1) ? '' : 'Contact Person :'}} First Name</label>
         <div class="form-group form-group-sm">
-            <input type="text" class="form-control" placeholder="First Name" />
+            <input type="text" class="form-control" ng-model="newUserDetails.FirstName" placeholder="First Name" maxlength="50" />
         </div>
     </div>
 
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-        <label>Contact Person : Last Name</label>
+        <label>{{(newUserDetails.IDTypeID === 1) ? '' : 'Contact Person :'}} Last Name</label>
         <div class="form-group form-group-sm">
-            <input type="text" class="form-control" placeholder="Last Name" />
+            <input type="text" class="form-control" ng-model="newUserDetails.LastName" placeholder="Last Name" maxlength="50" />
         </div>
     </div>
 
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-        <label>Tagline</label>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID == 1">
+        <label>Gender</label>
         <div class="form-group form-group-sm">
-            <input type="email" class="form-control" placeholder="About Company" />
+            <select class="form-control" ng-model="newUserDetails.Gender">
+                <option value="2">Unspecified Gender</option>
+                <option value="0">Male</option>
+                <option value="1">Female</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID == 1">
+        <label>{{(newUserDetails.IDTypeID === 1) ? '' : 'Contact Person :'}} Date of Birth</label>
+        <div class="form-group form-group-sm">
+            <date-time-picker placeholder="Date of Birth" recipient="newUserDetails.DOB" settings='{
+                                                                    "format" : "d-M-Y",
+                                                                    "timepicker" : false,
+                                                                    "mask" : false,
+                                                                    "hours12" : false,
+                                                                    "maxDate" : "+1970/01/01"
+                                                                    }'></date-time-picker>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID === 1">
+        <label>Company Name</label>
+        <div class="form-group form-group-sm">
+            <input type="text" class="form-control" ng-model="newUserDetails.CompanyName" placeholder="Company Name" maxlength="100" />
+        </div>
+    </div>
+
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-if="newUserDetails.IDTypeID == 1">
+        <label>Job Title</label>
+        <div class="form-group form-group-sm">
+            <input type="text" class="form-control" ng-model="newUserDetails.JobTitle" placeholder="Job Title" maxlength="50" />
         </div>
     </div>
 
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                <button class="btn btn-sm btn-primary no-radius btn-block text-center">
+                <button class="btn btn-sm btn-primary no-radius btn-block text-center" ng-click="saveNewUserDetails()">
                     <i class="fa fa-arrow-circle-right"></i> Next
                 </button>
             </div>

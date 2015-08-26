@@ -5,13 +5,13 @@
                 <a ng-click="changeActive(0,false)" class="btn-link">
                     <i class="fa fa-circle-o" ng-hide="(pageUserDetails === activeSubTemplate)"></i>
                     <i class="fa fa-circle" ng-show="(pageUserDetails === activeSubTemplate)"></i>
-                    Profile Details</a>
+                    Profile </a>
             </li>
             <li ng-repeat="loc in locCount track by $index" role="presentation" ng-class="{'active': ((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))}">
                 <a ng-click="changeActive($index,true)" class="btn-link">
                     <i class="fa fa-circle-o" ng-hide="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
                     <i class="fa fa-circle" ng-show="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
-                    L{{$index}} </a>
+                    L{{$index}} {{($index == 0) ? '(Primary)' : ''}} </a>
             </li>
         </ul>
     </div>
@@ -22,13 +22,13 @@
                 <a ng-click="changeActive(0,false)" class="btn-link">
                     <i class="fa fa-circle-o" ng-hide="(pageUserDetails === activeSubTemplate)"></i>
                     <i class="fa fa-circle" ng-show="(pageUserDetails === activeSubTemplate)"></i>
-                    Profile Details</a>
+                    Profile </a>
             </li>
             <li ng-repeat="loc in locCount track by $index" role="presentation" ng-class="{'active': ((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))}">
                 <a ng-click="changeActive($index,true)" class="btn-link">
                     <i class="fa fa-circle-o" ng-hide="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
                     <i class="fa fa-circle" ng-show="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
-                    L{{$index}} </a>
+                    L{{$index}} {{($index == 0) ? '(Primary)' : ''}} </a>
             </li>
             <!-- end  - Uncomment this code to turn on reservation settings -->
         </ul>
@@ -39,11 +39,31 @@
 
 
 
-<div class="panel panel-success">
-    <div class="panel-heading">
-        {{(pageUserDetails === activeSubTemplate) ? 'Step 1 : Profile Details' : 'Step '+(activeLoc +2)  + ': Location Details'}}
-    </div>
-    <div class="panel-body" ng-controller="ProfileMasterCtrl">
+<div class="panel panel-success"  ng-controller="ProfileMasterCtrl">
+    <!--<div class="panel-heading">-->
+        <!--&lt;!&ndash;{{(pageUserDetails === activeSubTemplate) ? 'Step 1 : Profile Details' : 'Step '+(activeLoc +2)  + ': Location Details'}}&ndash;&gt;-->
+
+       <!-- -->
+
+    <!--</div>-->
+    <div class="panel-body">
+
+        <ul class="nav nav-pills nav-wizard">
+            <li ng-class="((pageUserDetails === activeSubTemplate) ? 'active' : '')">
+                <a>
+                    <small class="tiny">Step 1 : Profile</small>
+                    </a>
+                <div class="nav-arrow"></div>
+            </li>
+            <li ng-class="((pageUserDetails === activeSubTemplate) ? '' : 'active')">
+
+                <a>
+                    <small class="tiny">Step 2 : Primary Location</small>
+                    </a>
+                <div class="nav-arrow"></div>
+            </li>
+        </ul>
+
         <!------- Page Content go inside ------------------>
         <div class="row">
             <div ng-include="'/tpl/profile/navigation.html'">
