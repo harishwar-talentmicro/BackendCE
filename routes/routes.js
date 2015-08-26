@@ -75,6 +75,7 @@ exports.FnDeleteLocation = locationModule.deleteLocation;
 exports.FnGetLocationListForEZEID = locationModule.getAllForEzeid;
 exports.FnGetLocationList = locationModule.getLoactionList;
 exports.FnGetLocationPicture = locationModule.getLocationPicture;
+exports.FnLocationDetails = locationModule.getLocationDetails;
 
 var BusinessManager = require('./modules/business-module.js');
 var businessManager = new BusinessManager(db,stdLib);

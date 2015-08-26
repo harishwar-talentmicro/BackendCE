@@ -4126,18 +4126,18 @@ User.prototype.saveUserDetails = function(req,res,next){
         error['companyName'] = 'Invalid companyName';
         validateStatus *= false;
     }
-    if(!jobTitle){
-        error['jobTitle'] = 'Invalid jobTitle';
-        validateStatus *= false;
-    }
-    if(!gender){
-        error['gender'] = 'Invalid gender';
-        validateStatus *= false;
-    }
-    if(!dob){
-        error['dob'] = 'Invalid dob';
-        validateStatus *= false;
-    }
+    //if(!jobTitle){
+    //    error['jobTitle'] = 'Invalid jobTitle';
+    //    validateStatus *= false;
+    //}
+    //if(!gender){
+    //    error['gender'] = 'Invalid gender';
+    //    validateStatus *= false;
+    //}
+    //if(!dob){
+    //    error['dob'] = 'Invalid dob';
+    //    validateStatus *= false;
+    //}
     if(!email){
         error['email'] = 'Invalid email';
         validateStatus *= false;
@@ -4153,14 +4153,16 @@ User.prototype.saveUserDetails = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName)
+                        var queryParams =  st.db.escape(firstName) + ',' + st.db.escape(lastName)
                             + ',' + st.db.escape(companyName)+ ','+ st.db.escape(jobTitle) + ',' + st.db.escape(gender)
-                            + ',' + st.db.escape(dob)+ ',' + st.db.escape(companyTagline)+ ',' + st.db.escape(email);
+                            + ',' + st.db.escape(dob + ' 00:00') + ',' + st.db.escape(companyTagline)+ ',' + st.db.escape(email)
+                            + ',' + st.db.escape(token);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
                             if (!err) {
-                                if (insertResult[0]) {
+                                console.log(insertResult);
+                                if (insertResult.affectedRows) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'UserDetails save successfully';
