@@ -789,38 +789,80 @@
 
             var init = function(){
                 $scope.$emit('$preLoaderStart');
-                $scope.getUserDetails().then(function(){
-                    masterUserLoaded = true;
-                    checkLoaded();
-                },function(noInternet){
-                    masterUserLoaded = false;
-                    if(!noInternet){
-                        Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                if($rootScope._userInfo){
+                    if($rootScope._userInfo.IsAuthenticate){
+                        $scope.getUserDetails().then(function(){
+                            masterUserLoaded = true;
+                            checkLoaded();
+                        },function(noInternet){
+                            masterUserLoaded = false;
+                            if(!noInternet){
+                                Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                            }
+                            checkLoaded();
+                            $location.url('/'+$routeParams.ezeone);
+
+                        });
+
+                        $scope.getModuleItemList().then(function(){
+                            masterUserItemsLoaded = true;
+                            checkLoaded();
+                        },function(){
+                            masterUserItemsLoaded = true;
+                            Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                            checkLoaded();
+                        });
+
+
+
+                        $scope.getLoggedInUserDetails().then(function(){
+                            loggedInUserLoaded = true;
+                            checkLoaded();
+                        },function(){
+                            loggedInUserLoaded = true;
+                            Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                            checkLoaded();
+                        });
+
                     }
-                    checkLoaded();
-                    $location.url('/'+$routeParams.ezeone);
+                    else{
+                        var loginDefer = $q.defer();
+                        $rootScope.loginPromise = loginDefer;
+                        loginPromise.then(function(){
+                            $scope.getUserDetails().then(function(){
+                                masterUserLoaded = true;
+                                checkLoaded();
+                            },function(noInternet){
+                                masterUserLoaded = false;
+                                if(!noInternet){
+                                    Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                                }
+                                checkLoaded();
+                                $location.url('/'+$routeParams.ezeone);
 
-                });
+                            });
 
-                $scope.getModuleItemList().then(function(){
-                    masterUserItemsLoaded = true;
-                    checkLoaded();
-                },function(){
-                    masterUserItemsLoaded = true;
-                    Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
-                    checkLoaded();
-                });
+                            $scope.getModuleItemList().then(function(){
+                                masterUserItemsLoaded = true;
+                                checkLoaded();
+                            },function(){
+                                masterUserItemsLoaded = true;
+                                Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                                checkLoaded();
+                            });
 
-
-
-                $scope.getLoggedInUserDetails().then(function(){
-                    loggedInUserLoaded = true;
-                    checkLoaded();
-                },function(){
-                    loggedInUserLoaded = true;
-                    Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
-                    checkLoaded();
-                });
+                            $scope.getLoggedInUserDetails().then(function(){
+                                loggedInUserLoaded = true;
+                                checkLoaded();
+                            },function(){
+                                loggedInUserLoaded = true;
+                                Notification.error({ message : 'An error occurred ! Please try again', delay : MsgDelay});
+                                checkLoaded();
+                            });
+                        })
+                        Notification.error({ title : 'Login Required',message : 'Please login to continue',delay : MsgDelay});
+                    }
+                }
 
             };
 

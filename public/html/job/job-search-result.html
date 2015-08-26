@@ -309,19 +309,24 @@
                     <div class="job-main-content tile-head job-result">
                         <div class="row">
                             <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
-                                <i class="fa fa-tags text-info job-title-icon"></i> {{job.jobtitle  }} -
-                                <span ng-show="job.jobtype == 0">(Full Time)</span>
-                                <span ng-show="job.jobtype == 1">(Part Time)</span>
-                                <span ng-show="job.jobtype == 2">(Work from Home)</span>
-                                <span ng-show="job.jobtype == 3">(Internship)</span>
-                                <span ng-show="job.jobtype == 4">(Apprenticeship)</span>
-                                <span ng-show="job.jobtype == 5">(Job Oriented Training)</span>
-                                <span ng-show="job.jobtype == 6">(Consultant)</span>
-                                <span ng-show="job.jobtype == 7">(Freelancer)</span>
-                                <br>
-                                <small class="company-name">{{job.companyname}}</small>
+                                <i class="fa fa-tags text-info job-title-icon"></i>
+                                <span title="{{job.jobtitle.length >= 42 ? job.jobtitle : ''}}">{{job.jobtitle | textLength:42}}</span>
+                                <br/>
+                                <small class="company-name" title="{{job.companyname.length >= 42 ? job.companyname : ''}}">{{job.companyname}}</small>
                             </div>
-                            <div class="col-lg-5 col-md-7 col-sm-12 col-xs-12 text-right normal-view-buttons">
+
+                            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 text-left setLeftRightPaddingZero">
+                                <span class="text-left" ng-show="job.jobtype == 0">(Full Time)</span>
+                                <span class="text-left" ng-show="job.jobtype == 1">(Part Time)</span>
+                                <span class="text-left" ng-show="job.jobtype == 2">(Work from Home)</span>
+                                <span class="text-left" ng-show="job.jobtype == 3">(Internship)</span>
+                                <span class="text-left" ng-show="job.jobtype == 4">(Apprenticeship)</span>
+                                <span class="text-left" ng-show="job.jobtype == 5">(Job Oriented Training)</span>
+                                <span class="text-left" ng-show="job.jobtype == 6">(Consultant)</span>
+                                <span class="text-left" ng-show="job.jobtype == 7">(Freelancer)</span>
+                            </div>
+
+                            <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 text-right normal-view-buttons">
                                 <div ng-click="$event.stopPropagation()">
                                     &nbsp;<span ng-show="_userInfo.Type == 1">
                                             <button class="btn btn-primary btn-sm" ng-hide="job.hide" ng-click="applyForJob(job.tid,$index)">APPLY</button>

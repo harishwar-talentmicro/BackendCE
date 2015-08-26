@@ -45,10 +45,12 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
 
         $scope.changeActive = function(locationIndex,isLocationFlag){
             if(isLocationFlag){
-                $scope.activeSubTemplate = $scope.pageLocationDetails;
                 $scope.activeLoc = locationIndex;
+                $scope.activeSubTemplate = $scope.pageLocationDetails;
+
             }
             else{
+                $scope.locCount = [];
                 $scope.activeSubTemplate = $scope.pageUserDetails;
             }
         };
@@ -57,7 +59,6 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
         $scope.stateList = [];
         $scope.cityList = [];
         $scope.workingHourList = [];
-        $scope.newUserDetails = null;
 
         /**
          * Loading countries
@@ -73,7 +74,6 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
             }).success(function(resp){
                 if(resp && resp.length > 0 && resp !== 'null'){
                     $scope.countryList = resp;
-
                     defer.resolve(true);
                 }
                 else{
@@ -86,6 +86,7 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
         };
 
         $scope.loadStates = function(countryId){
+            console.log('CountryID :'+countryId);
             var defer = $q.defer();
             $http({
                 url : GURL + 'ewmGetState',
@@ -97,6 +98,7 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
             }).success(function(resp){
                 if(resp && resp !== 'null'){
                     if(resp.length){
+                        $scope.stateList = resp;
                         defer.resolve(resp);
                     }
                     else{
@@ -165,37 +167,7 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
                 if(resp && resp !== 'null'){
                     if(resp.length > 0){
                         $scope.workingHourList = resp;
-                    }
-                }
-                else{
-                    defer.resolve([]);
-                }
-            }).error(function(err){
-                defer.resolve([]);
-            });
-            return defer.promise;
-        };
-
-        /**
-         * Calling new API for loading user details
-         * i.e. user_details_new
-         */
-        $scope.loadNewUserDetails = function(){
-            var defer = $q.defer();
-            $http({
-                method : "GET",
-                url : GURL + "user_details_new",
-                params : {
-                    token : $rootScope._userInfo.Token
-                }
-            }).success(function(resp){
-                if(resp && resp !== 'null'){
-                    if(resp.status){
-                        $scope.newUserDetails = resp.data;
-                        for(var x=0; x < resp.data.locationcount; x++){
-                            $scope.locCount.push({ id : x});
-                        }
-                        console.log($scope.locCount);
+                        defer.resolve(resp);
                     }
                     else{
                         defer.resolve([]);
@@ -211,12 +183,20 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
         };
 
 
-        $scope.loadUserDetails().then(function(userDetails){
-            $scope.loadCountries().then(function(){
-                $scope.loadStates($scope.countryList[0].CountryID).then(function(){
-                    $scope.loadCities($scope.stateList[0].StateID).then(function(){
-                        $scope.loadWorkingHourTemplates().then(function(){
-                            $scope.$emit('$preLoaderStop');
+        $scope.masterInit = function(callBack){
+
+            $scope.loadUserDetails().then(function(userDetails){
+                $scope.loadCountries().then(function(){
+                    $scope.loadStates($scope.countryList[0].CountryID).then(function(){
+                        console.log($scope.stateList);
+                        $scope.loadCities($scope.stateList[0].StateID).then(function(){
+                            $scope.loadWorkingHourTemplates().then(function(){
+                                if(typeof(callBack) == "function"){
+                                    callBack();
+                                }
+                            },function(){
+                                $scope.$emit('$preLoaderStop');
+                            });
                         },function(){
                             $scope.$emit('$preLoaderStop');
                         });
@@ -224,14 +204,15 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
                         $scope.$emit('$preLoaderStop');
                     });
                 },function(){
-                    $scope.$emit('$preLoaderStop');
-                });
+                    $scope.$emit('$preLoaderStop')
+                })
             },function(){
-                $scope.$emit('$preLoaderStop')
-            })
-        },function(){
-            $scope.$emit('$preLoaderStop');
-        });
+                $scope.$emit('$preLoaderStop');
+            });
+
+
+        };
+
 
 
     }]);

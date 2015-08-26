@@ -512,6 +512,101 @@ Location.prototype.getLoactionList = function(req,res,next){
     }
 };
 
+
+/**
+ * Get location details of a specific location
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @method GET
+ * @service-param token <string>
+ * @service-param seq_no <int> (Location Sequence Number)
+ */
+
+Location.prototype.getLocationDetails = function(req,res,next){
+    var token = (req.query.token) ? req.query.token : null;
+    var locationSequence = (parseInt(req.query.seq_no) !== NaN && parseInt(req.query.seq_no) >= 0) ?
+        parseInt(req.query.seq_no) : 0;
+
+    var validationFlag = true;
+    var error = {};
+    var respMsg = {
+        status : false,
+        error : null,
+        message : 'Please check the errors',
+        data : null
+    };
+
+    if(!validationFlag){
+        respMsg.error = error;
+        res.status(400).json(respMsg);
+        return;
+    }
+    else{
+
+        try{
+            var queryParams = st.db.escape(token) +','+st.db.escape(locationSequence);
+            console.log(queryParams);
+            st.db.query('CALL pGetLocationDetails('+queryParams+')',function(err,result){
+                if(err){
+
+                    console.log('FnGetLocationDetails error:' + err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                    respMsg.status = false;
+                    respMsg.message = 'Internal Server error';
+                    respMsg.error = {
+                        server : 'Server Error'
+                    };
+                    respMsg.data = null;
+                    res.status(500).json(respMsg);
+                }
+                else{
+                    if(result){
+                        if(result[0]){
+                            if(result[0][0]){
+                                respMsg.status = true;
+                                respMsg.message = 'Location loaded successfully';
+                                respMsg.error = null;
+                                respMsg.data = result[0][0];
+                            }
+                            else{
+                                respMsg.message = 'Location details not found';
+                                respMsg.error = null;
+                                respMsg.data = null;
+                            }
+                        }
+                        else{
+                            respMsg.message = 'Location details not found';
+                            respMsg.error = null;
+                            respMsg.data = null;
+                        }
+
+                        res.status(200).json(respMsg);
+                    }
+                }
+            });
+        }
+        catch(ex){
+            console.log('FnGetLocationDetails error:' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+            respMsg.status = false;
+            respMsg.message = 'Internal Server error';
+            respMsg.error = {
+                server : 'Server Error'
+            };
+            respMsg.data = null;
+            res.status(500).json(respMsg);
+
+
+        }
+    }
+};
+
 /**
  * Get the Picture based on location for an ezeid
  * @param req
