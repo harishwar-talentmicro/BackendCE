@@ -546,13 +546,12 @@ Location.prototype.getLocationDetails = function(req,res,next){
     else{
 
         try{
-            var queryParams = st.db.escape(token) +','
-                st.db.escape(locationSequence);
+            var queryParams = st.db.escape(token) +','+st.db.escape(locationSequence);
             console.log(queryParams);
             st.db.query('CALL pGetLocationDetails('+queryParams+')',function(err,result){
                 if(err){
 
-                    console.log('FnGetLocationDetails error:' + ex.description);
+                    console.log('FnGetLocationDetails error:' + err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -566,10 +565,26 @@ Location.prototype.getLocationDetails = function(req,res,next){
                 }
                 else{
                     if(result){
-                        respMsg.status = true;
-                        respMsg.message = 'Location loaded successfully';
-                        respMsg.error = null;
-                        respMsg.data = result[0][0];
+                        if(result[0]){
+                            if(result[0][0]){
+                                respMsg.status = true;
+                                respMsg.message = 'Location loaded successfully';
+                                respMsg.error = null;
+                                respMsg.data = result[0][0];
+                            }
+                            else{
+                                respMsg.message = 'Location details not found';
+                                respMsg.error = null;
+                                respMsg.data = null;
+                            }
+                        }
+                        else{
+                            respMsg.message = 'Location details not found';
+                            respMsg.error = null;
+                            respMsg.data = null;
+                        }
+
+                        res.status(200).json(respMsg);
                     }
                 }
             });
