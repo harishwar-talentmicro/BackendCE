@@ -1,1 +1,179 @@
-<div ng-controller="ProfileLocationCtrl"></div>
+<div class="row" ng-controller="ProfileLocationCtrl">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div id="map-location" class="row locations-map-container bottom-clearfix">
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Address Line 1</label>
+        <div class="form-group form-group-sm">
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.AddressLine1"
+                   name="editLocationDetails.AddressLine1"
+                   class="form-control"
+                   placeholder="Address Line 1" />
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Address Line 2</label>
+        <div class="form-group form-group-sm">
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.AddressLine2"
+                   name="editLocationDetails.AddressLine2"
+                   class="form-control"
+                   placeholder="Address Line 2" />
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Country</label>
+        <div class="form-group form-group-sm">
+            <select class="form-control" ng-model="editLocationDetails.CountryID"
+                    ng-change="loadEditStateList()"
+                    name="editLocationDetails.CountryID">
+                <option ng-repeat="country in countryList track by country.CountryID" value="{{country.CountryID}}">{{country.CountryName}}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>State/Province</label>
+        <div class="form-group form-group-sm">
+            <select class="form-control" ng-model="editLocationDetails.StateID" name="editLocationDetails.StateID">
+                <option ng-repeat="state in stateList track by state.StateID" value="{{state.StateID}}">{{state.StateName}}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>City</label>
+        <div class="form-group form-group-sm">
+            <input type="text"
+                   maxlength="45"
+                   ng-model="editLocationDetails.CityTitle"
+                   name="editLocationDetails.CityTitle"
+                   class="form-control"
+                   placeholder="City" />
+
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Postal/Zip Code</label>
+        <div class="form-group form-group-sm">
+            <input type="text"
+                   maxlength="15"
+                   ng-model="editLocationDetails.PostalCode"
+                   name="editLocationDetails.PostalCode"
+                   class="form-control"
+                   placeholder="Postal Code" />
+
+
+        </div>
+    </div>
+
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Phone Number</label>
+        <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{editLocationDetails.ISDPhoneNumber}}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="country in countryISDList"><a ng-click="setISDPhoneNumber(country.value)">{{country.value}} ({{country.abbr}})</a></li>
+
+                    </ul>
+                </div>
+                <input type="text"
+                       maxlength="12"
+                       numbers-only
+                       ng-model="editLocationDetails.PhoneNumber"
+                       name="editLocationDetails.PhoneNumber"
+                       class="form-control"
+                       placeholder="Phone"/>
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Mobile Number</label>
+        <div class="form-group form-group-sm">
+            <div class="input-group input-group-sm">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{editLocationDetails.ISDMobileNumber}} <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="country in countryISDList"><a ng-click="setISDMobileNumber(country.value)">{{country.value}} ({{country.abbr}})</a></li>
+
+                    </ul>
+                </div>
+                <input type="text"
+                       maxlength="12"
+                       numbers-only
+                       ng-model="editLocationDetails.MobileNumber"
+                       name="editLocationDetails.MobileNumber"
+                       class="form-control"
+                       placeholder="Mobile"/>
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Website</label>
+        <div class="form-group form-group-sm">
+            <input type="text"
+                   maxlength="50"
+                   ng-model="editLocationDetails.Website"
+                   name="editLocationDetails.Website"
+                   class="form-control"
+                   placeholder="http://www.example.com"/>
+
+
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Parking</label>
+        <div class="form-group form-group-sm">
+            <select class="form-control" ng-model="editLocationDetails.ParkingStatus" name="editLocationDetails.ParkingStatus">
+                <option ng-repeat="parking in parkingStatusMap track by parking" value="{{$index}}">{{((parking) ? parking : '--Select Parking--')}}</option>
+            </select>
+
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+        <label>Working Hour Template</label>
+        <div class="form-group form-group-sm">
+            <div class="form-group form-group-sm">
+                <select class="form-control" ng-model="editLocationDetails.TemplateID" name="editLocationDetails.TemplateID">
+                    <option ng-repeat="w in  workingHourList track by w.TID" value="{{w.TID}}">{{w.TemplateName}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <button class="btn btn-sm btn-primary no-radius btn-block text-center" ng-click="saveLocation()">
+                    <i class="fa fa-arrow-circle-right"></i> Save
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>

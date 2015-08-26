@@ -614,14 +614,14 @@ angular.module('ezeidApp').
                                             $rootScope._userInfo = sResp;
                                             $rootScope._userInfo.userName = sResp.userName;
                                             Notification.success({ message : 'Your EZEOne - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
-                                            $location.path('/profile-manager/user');
+                                            $location.path('/profile-manager/new');
                                         },function(){
                                             $scope.$emit('$preLoaderStop');
                                             $rootScope._userInfo = sResp;
                                             $rootScope._userInfo.userName = sResp.userName;
                                             $rootScope._userInfo.ezeid = $scope.ezeid;
                                             Notification.success({ message : 'Your EZEOne - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
-                                            $location.path('/profile-manager/user');
+                                            $location.path('/profile-manager/new');
 
                                             console.log($rootScope._userInfo);
                                         });
@@ -633,7 +633,7 @@ angular.module('ezeidApp').
                                         $rootScope._userInfo.userName = sResp.userName;
                                         $rootScope._userInfo.ezeid = $scope.ezeid;
                                         Notification.success({ message : 'Your EZEOne - '+$scope.ezeid + ' have been generated successfully ! Please fill up you details to proceed', delay : MsgDelay});
-                                        $location.path('/profile-manager/user');
+                                        $location.path('/profile-manager/new');
                                     }
 
                                 } else {

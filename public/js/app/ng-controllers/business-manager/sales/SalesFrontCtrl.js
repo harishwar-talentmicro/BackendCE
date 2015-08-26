@@ -15,6 +15,7 @@
         '$routeParams',
         '$route',
         'GoogleMaps',
+        'UtilityService',
         function ($rootScope,
                   $scope,
                   $http,
@@ -29,7 +30,9 @@
                   $location,
                   $routeParams,
                   $route,
-                  GoogleMap) {
+                  GoogleMap,
+                UtilityService
+        ) {
 
             $scope.ezeone = $routeParams['ezeone'];
             $scope.isEnquiryPosted = false;
@@ -587,7 +590,7 @@
                     Token : $rootScope._userInfo.Token,
                     MessageText : $scope.modalBox.tx.message,
                     Status : 0,
-                    TaskDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
+                    TaskDateTime : UtilityService._convertTimeToServer(moment().format('DD MMM YYYY hh:mm:ss A'),'DD MMM YYYY hh:mm:ss A','DD MMM YYYY hh:mm:ss A'),
                     Notes : $scope.modalBox.tx.notes,
                     LocID : ($scope.modalBox.tx.locId) ? $scope.modalBox.tx.locId : 0,
                     Country : $scope.modalBox.tx.country,
@@ -598,13 +601,13 @@
                     Latitude : $scope.modalBox.tx.latitude,
                     Longitude : $scope.modalBox.tx.longitude,
                     EZEID : $rootScope._userInfo.ezeid,
-                    ContactInfo : $rootScope._userInfo.FirstName + ' '+ $rootScope._userInfo.LastName + ', '+ $scope.masterUser.MobileNumber,
+                    ContactInfo : $rootScope._userInfo.FirstName + ' '+ (($rootScope._userInfo.LastName) ? $rootScope._userInfo.LastName : '' ) + ', '+ ($scope.masterUser.MobileNumber) ? $scope.masterUser.MobileNumber : '',
                     FolderRuleID : 0,
                     Duration : 0,
                     DurationScales : 0,
                     NextAction : 0,
-                    NextActionDateTime : moment().format('DD MMM YYYY hh:mm:ss'),
-                    ItemsList: JSON.stringify($scope.modalBox.tx.itemList),
+                    NextActionDateTime  : UtilityService._convertTimeToServer(moment().format('YYYY-MM-DD HH:mm:ss'),'YYYY-MM-DD HH:mm:ss','YYYY-MM-DD HH:mm:ss'),
+                    ItemsList: ($scope.modalBox.tx.itemList) ? JSON.stringify($scope.modalBox.tx.itemList) : JSON.stringify([]),
                     DeliveryAddress : makeAddress(),
                     companyName : $scope.loggedInUser.CompanyName,
                     company_id : 0

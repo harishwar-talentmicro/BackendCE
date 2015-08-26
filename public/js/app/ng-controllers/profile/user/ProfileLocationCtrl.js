@@ -13,6 +13,8 @@ angular.module('ezeidApp').controller('ProfileLocationCtrl',[
     'MsgDelay',
     '$location',
     '$routeParams',
+    'GoogleMaps',
+    'CountryISDList',
     function (
         $rootScope,
         $scope,
@@ -27,10 +29,257 @@ angular.module('ezeidApp').controller('ProfileLocationCtrl',[
         ScaleAndCropImage,
         MsgDelay,
         $location,
-        $routeParams
+        $routeParams,
+        GoogleMap,
+        CountryISDList
     ) {
 
+        $scope.countryISDList = CountryISDList;
+
+
+        $scope.setISDPhoneNumber = function(number){
+            $scope.editLocationDetails.ISDPhoneNumber = number;
+        };
+
+        $scope.setISDMobileNumber = function(number){
+            $scope.editLocationDetails.ISDMobileNumber = number;
+        };
+        /**
+         * Maps parking Status with its string equivalent
+         * @type {Array}
+         */
+        $scope.parkingStatusMap = [
+            '',
+            'Public Parking',
+            'Valet Parking',
+            'No Parking'
+        ];
+
+        var loadFlags = {
+            map : false,
+            location : false
+        };
+
+        /**
+         * Checking load flags and executing the callback on all load flags true
+         * @param cb
+         */
+        var checkLoadFlags = function(cb){
+            var statusFlag = true;
+            if(loadFlags){
+                for(var prop in loadFlags){
+                    if(loadFlags.hasOwnProperty(prop)){
+                        statusFlag *= loadFlags[prop];
+                    }
+                }
+                if(statusFlag){
+                    if(typeof(cb)== "function"){
+                        cb();
+                    }
+                }
+            }
+        };
+
         $scope.locDetails = {};
+        var googleMap = new GoogleMap();
+        googleMap.createMap('map-location',$scope,"findCurrentLocation()");
+
+        googleMap.renderMap();
+        googleMap.mapIdleListener().then(function(){
+            googleMap.pushMapControls($scope.setEditCurrentLocation);
+            googleMap.listenOnMapControls($scope.setEditCurrentLocation,$scope.setEditCurrentLocation);
+            googleMap.resizeMap();
+
+            loadFlags.map = true;
+
+            checkLoadFlags($scope.placeLocationMarkers);
+
+            //var marker = googleMap.createMarker(pos,title,null,false,null);
+            //googleMap.placeMarker(marker);
+
+        });
+
+        $scope.findCurrentLocation = function(){
+            googleMap.getCurrentLocation().then(function(){
+                $scope.editLocationDetails.Latitude = googleMap.currentMarkerPosition.latitude;
+                $scope.editLocationDetails.Longitude = googleMap.currentMarkerPosition.longitude;
+                googleMap.clearAllMarkers();
+                var pos = googleMap.createGMapPosition(
+                    $scope.editLocationDetails.Latitude,
+                    $scope.editLocationDetails.Longitude
+                );
+                var marker = googleMap.createMarker(pos,'Location 1',null,true,$scope.setEditCurrentLocation);
+                googleMap.placeMarker(marker);
+
+
+            },function(){
+                googleMap.clearAllMarkers();
+                var pos = googleMap.createGMapPosition(
+                    $scope.editLocationDetails.Latitude,
+                    $scope.editLocationDetails.Longitude
+                );
+                var marker = googleMap.createMarker(pos,'Location 1',null,true,$scope.setEditCurrentLocation);
+                googleMap.placeMarker(marker);
+
+
+                /**
+                 * Reverse Geolocation API call to get city, state, country and PIN code
+                 */
+                googleMap.getReverseGeolocation(lat,lng).then(function(results){
+                    var geolocationAddress = googleMap.parseReverseGeolocationData(results.data);
+                    var countryIndex = $scope.countryList.indexOfWhere('CountryName',geolocationAddress.country);
+                    /**
+                     * If country is changed then load new list of state for the new country
+                     */
+
+                    $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
+                    $scope.editLocationDetails.ISDMobileNumber = $scope.countryList[countryIndex].ISDCode;
+                    $scope.editLocationDetails.ISDPhoneNumber = $scope.countryList[countryIndex].ISDCode;
+
+                    /**
+                     * If country is changed then only load states
+                     */
+                    if($scope.countryList[countryIndex].CountryID !== $scope.editLocationDetails.CountryID){
+                        $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
+
+                        $scope.loadStates($scope.countryList[countryIndex].CountryID).then(function(stateList){
+                            if(stateList.length > 0){
+                                $scope.stateList = stateList;
+                            }
+                            var stateIndex = $scope.stateList.indexOfWhere('StateName',geolocationAddress.state);
+                            var xIndex = stateList.indexOfWhere('StateName',geolocationAddress.state);
+                            if(stateIndex === -1){
+                                stateIndex = 0;
+                            }
+
+                            $timeout(function(){
+                                $scope.editLocationDetails.StateID = $scope.stateList[stateIndex].StateID;
+                            },1000);
+                            $scope.editLocationDetails.CityTitle = geolocationAddress.city;
+                            $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
+
+                        });
+                    }
+                    else{
+                        $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
+
+                        var stateIndex = $scope.stateList.indexOfWhere('StateName',geolocationAddress.state);
+                        if(stateIndex === -1){
+                            stateIndex = 0;
+                        }
+
+                        $timeout(function(){
+                            $scope.editLocationDetails.StateID = $scope.stateList[stateIndex].StateID;
+                        },500);
+                        $scope.editLocationDetails.StateTitle = $scope.stateList[stateIndex].StateName;
+                        $scope.editLocationDetails.CityTitle = geolocationAddress.city;
+                        $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
+                        $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
+                    }
+                });
+            });
+        };
+
+        $scope.setEditCurrentLocation = function(lat,lng){
+            $scope.editLocationDetails.Latitude = lat;
+            $scope.editLocationDetails.Longitude = lng;
+            googleMap.clearAllMarkers();
+            var pos = googleMap.createGMapPosition(
+                $scope.editLocationDetails.Latitude,
+                $scope.editLocationDetails.Longitude
+            );
+            var marker = googleMap.createMarker(pos,'Location 1',null,true,$scope.setEditCurrentLocation);
+            googleMap.placeMarker(marker);
+
+
+            /**
+             * Reverse Geolocation API call to get city, state, country and PIN code
+             */
+            googleMap.getReverseGeolocation(lat,lng).then(function(results){
+                var geolocationAddress = googleMap.parseReverseGeolocationData(results.data);
+                var countryIndex = $scope.countryList.indexOfWhere('CountryName',geolocationAddress.country);
+                /**
+                 * If country is changed then load new list of state for the new country
+                 */
+
+                $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
+                $scope.editLocationDetails.ISDMobileNumber = $scope.countryList[countryIndex].ISDCode;
+                $scope.editLocationDetails.ISDPhoneNumber = $scope.countryList[countryIndex].ISDCode;
+
+                /**
+                 * If country is changed then only load states
+                 */
+                if($scope.countryList[countryIndex].CountryID !== $scope.editLocationDetails.CountryID){
+                    $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
+
+                    $scope.loadStates($scope.countryList[countryIndex].CountryID).then(function(stateList){
+                        if(stateList.length > 0){
+                            $scope.stateList = stateList;
+
+                        }
+                        var stateIndex = $scope.stateList.indexOfWhere('StateName',geolocationAddress.state);
+                        var xIndex = stateList.indexOfWhere('StateName',geolocationAddress.state);
+                        if(stateIndex === -1){
+                            stateIndex = 0;
+                        }
+
+                        $timeout(function(){
+                            $scope.editLocationDetails.StateID = $scope.stateList[stateIndex].StateID;
+                        },500);
+                        $scope.editLocationDetails.CityTitle = geolocationAddress.city;
+                        $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
+
+                    });
+                }
+                else{
+                    $scope.editLocationDetails.CountryID = $scope.countryList[countryIndex].CountryID;
+
+                    var stateIndex = $scope.stateList.indexOfWhere('StateName',geolocationAddress.state);
+                    if(stateIndex === -1){
+                        stateIndex = 0;
+                    }
+
+                    $timeout(function(){
+                        $scope.editLocationDetails.StateID = $scope.stateList[stateIndex].StateID;
+                    },500);
+                    $scope.editLocationDetails.StateTitle = $scope.stateList[stateIndex].StateName;
+                    $scope.editLocationDetails.CityTitle = geolocationAddress.city;
+                    $scope.editLocationDetails.PostalCode = geolocationAddress.postalCode;
+                    $scope.editLocationDetails.CountryName = $scope.countryList[countryIndex].CountryName;
+                }
+            });
+            
+        };
+
+
+        /**
+         * Callback which is executed after map and location details are loaded properly
+         */
+        $scope.placeLocationMarkers = function(){
+            if($scope.editLocationDetails.Latitude == 0 && $scope.editLocationDetails.Latitude == 0){
+                googleMap.getCurrentLocation().then(function(){
+                    $scope.editLocationDetails.Latitude = googleMap.currentMarkerPosition.latitude;
+                    $scope.editLocationDetails.Longitude = googleMap.currentMarkerPosition.longitude;
+
+                    var pos = googleMap.createGMapPosition(
+                        $scope.editLocationDetails.Latitude,
+                        $scope.editLocationDetails.Longitude
+                    );
+                    var marker = googleMap.createMarker(pos,'Location 1',null,true,$scope.setEditCurrentLocation);
+                    googleMap.placeMarker(marker);
+                });
+            }
+            else{
+                var pos = googleMap.createGMapPosition(
+                    $scope.editLocationDetails.Latitude,
+                    $scope.editLocationDetails.Longitude
+                );
+                var marker = googleMap.createMarker(pos,'Location 1',null,true,$scope.setEditCurrentLocation);
+                googleMap.placeMarker(marker);
+            }
+
+        };
+        
         /**
          * Calling new API for loading user details
          * i.e. user_details_new
@@ -46,20 +295,122 @@ angular.module('ezeidApp').controller('ProfileLocationCtrl',[
                 }
             }).success(function(resp) {
                 if (resp && resp !== 'null') {
+                    if(resp.status){
+                        $scope.editLocationDetails = $scope.prepareEditLocation(resp.data);
+                        var stateId = resp.data.StateID;
+                        var templateId = (resp.data.HcalID) ? resp.data.HcalID : 0;
+                        $timeout(function(){
+                            $scope.editLocationDetails.TemplateID = templateId.toString();
+                        },2000);
+                        $scope.loadStates($scope.editLocationDetails.CountryID).then(function(){
+
+                            console.log(stateId);
+                            console.log($scope.editLocationDetails);
+                            console.log('Loading states');
+                            $scope.editLocationDetails.StateID = 0;
+                            $timeout(function(){
+                                console.log($scope.editLocationDetails);
+                                console.log('Timeout Executed');
+                                $scope.editLocationDetails.StateID =  stateId;
+                                console.log($scope.editLocationDetails);
+                            },500);
+                        });
+                        loadFlags.location = true;
+                        checkLoadFlags($scope.placeLocationMarkers);
+                    }
+                    else{
+                        Notification.error({title : 'Unable to load location details',delay : MsgDelay});
+                    }
                     console.log(resp);
                     defer.resolve(resp);
-
                 }
                 else{
-                    defer.resolve(null);
+                    Notification.error({title : 'Unable to load location details',delay : MsgDelay});
                 }
             }).error(function(err){
-                defer.resolve(null);
+                Notification.error({title : 'Unable to load location details',delay : MsgDelay});
             });
             return defer.promise;
         };
 
+        $scope.prepareEditLocation = function(data){
+            data.TID = data.tid;
+            data.TemplateID = 0;
+            return data;
+        };
 
+        $scope.loadEditStateList = function(){
+            checkLoadFlags(function(){
+                $scope.loadStates($scope.editLocationDetails.CountryID).then(function(stateList){
+                    if(stateList && stateList.length > 0 && stateList !== 'null'){
+                        $scope.stateList = stateList;
+                        $timeout(function(){
+                            $scope.editLocationDetails.StateID = stateList[0].StateID;
+                        },500);
+                    }
+                    else{
+                        Notification.error({
+                            message : 'Unable to load list of states/provinces',
+                            delay : MsgDelay
+                        });
+                    }
+                }, function(){
+                    Notification.error({
+                        message : 'Unable to load list of states/provinces',
+                        delay : MsgDelay
+                    });
+                });
+            });
+        };
+
+        $scope.saveLocation = function(seqNo){
+            var data  = {
+                Token : $rootScope._userInfo.Token,
+                TID : ($scope.editLocationDetails.TID) ? $scope.editLocationDetails.TID : 0,
+                LocTitle : $scope.editLocationDetails.LocTitle,
+                Latitude : ($scope.editLocationDetails.Latitude) ? $scope.editLocationDetails.Latitude : 12.9667,
+                Longitude : ($scope.editLocationDetails.Longitude) ? $scope.editLocationDetails.Longitude : 77.5667,
+                Altitude : 0,
+                AddressLine1 : $scope.editLocationDetails.AddressLine1,
+                AddressLine2 : $scope.editLocationDetails.AddressLine2,
+                CityTitle : $scope.editLocationDetails.CityTitle,
+                StateID : $scope.editLocationDetails.StateID,
+                CountryID : $scope.editLocationDetails.CountryID,
+                PostalCode : $scope.editLocationDetails.PostalCode,
+                PIN : '',
+                PhoneNumber : $scope.editLocationDetails.PhoneNumber,
+                MobileNumber : $scope.editLocationDetails.MobileNumber,
+                Picture : $scope.editLocationDetails.Picture,
+                PictureFileName : ($scope.editLocationDetails.PictureFileName) ? $scope.editLocationDetails.PictureFileName : 'default.jpg' ,
+                Website : $scope.editLocationDetails.Website,
+                ISDPhoneNumber : $scope.editLocationDetails.ISDPhoneNumber,
+                ISDMobileNumber : $scope.editLocationDetails.ISDMobileNumber,
+                ParkingStatus : $scope.editLocationDetails.ParkingStatus,
+                TemplateID : ($scope.editLocationDetails.TemplateID) ? $scope.editLocationDetails.TemplateID : 0
+            };
+
+            $scope.$emit('$preLoaderStart');
+            $http({
+                url : GURL + 'ewmAddLocation',
+                method : 'POST',
+                data : data
+            }).success(function(resp) {
+                $scope.$emit('$preLoaderStop');
+                if (resp && resp.length > 0) {
+                    Notification.success({title : 'Success', message : 'Your location details are saved successfully',delay : MsgDelay});
+                }
+            }).error(function(err,statusCode){
+                $scope.$emit('$preLoaderStop');
+                var msg = { title : 'Error', message : "An error occurred ! Please try again", delay : MsgDelay};
+                if(!statusCode){
+                    msg = { title : 'Connection Lost', message : "Unable to reach the server ! Please check your connection", delay : MsgDelay};
+                }
+                Notification.error(msg);
+            });
+        };
+
+
+        $scope.$emit('$preLoaderStart');
         $scope.masterInit(function(){
             $scope.loadLocationDetails().then(function(){
                 $scope.$emit('$preLoaderStop');
@@ -67,5 +418,9 @@ angular.module('ezeidApp').controller('ProfileLocationCtrl',[
                 $scope.$emit('$preLoaderStop');
             });
         });
+
+        $timeout(function(){
+            $scope.$emit('$preLoaderStop');
+        },7000);
     }
 ]);

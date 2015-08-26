@@ -113,6 +113,7 @@ angular.module('ezeidApp').controller('ProfileUserCtrl',[
 
         };
 
+        $scope.$emit('$preLoaderStart');
         $scope.masterInit(function(){
             $scope.loadNewUserDetails().then(function(){
                 $scope.$emit('$preLoaderStop');
@@ -120,5 +121,9 @@ angular.module('ezeidApp').controller('ProfileUserCtrl',[
                 $scope.$emit('$preLoaderStop');
             });
         });
+
+        $timeout(function(){
+            $scope.$emit('$preLoaderStop');
+        },7000);
     }
 ]);
