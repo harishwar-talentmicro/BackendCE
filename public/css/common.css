@@ -3051,3 +3051,18 @@ h4.front-business-form.warning-text{
 .nav-pills.nav-wizard > li.active a {
     background-color: #3cca35;
 }
+
+/*.ezeone-bootstrap-ui-modal  .modal-dialog  .modal-content:before,*/
+/*.ezeone-bootstrap-ui-modal > .modal-dialog > .modal-content:after{*/
+    /*clear: both;*/
+/*}*/
+
+/*.ezeone-bootstrap-ui-modal > div > div:before,*/
+/*.ezeone-bootstrap-ui-modal > div > div:after {*/
+    /*clear: both;*/
+/*}*/
+
+.ezeone-bootstrap-ui-modal >   .modal-dialog >  .modal-content{
+    min-height: 150px;
+    height: 150px;
+}

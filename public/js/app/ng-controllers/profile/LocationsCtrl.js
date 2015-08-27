@@ -19,6 +19,7 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
     '$location',
     '$compile',
     'GoogleMaps',
+    '$modal',
     function (
         $rootScope,
         $scope,
@@ -34,7 +35,8 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         ScaleAndCropImage,
         $location,
         $compile,
-        GoogleMaps
+        GoogleMaps,
+        $modal
         ) {
 
 
@@ -676,52 +678,95 @@ angular.module('ezeidApp').controller('LocationsCtrl',[
         };
 
 
+        $scope.actuallyDeleteLocation = function(locIndex){
+
+        };
+
         /**
          * Deletes a secondary Location
          * @param locIndex
          */
         $scope.deleteSecondaryLocation = function(locIndex){
-            if(locIndex < 1){
-                return 0;
-            }
 
-            if(!$scope.locationsToggleIndex[locIndex].savedOnServer){
-                $scope.locationsToggleIndex[locIndex].removeProgress = true;
-                $timeout(function(){
-                    delete mapList['map'+locIndex];
-                    $scope.locationsToggleIndex.splice(locIndex,1);
-                    $scope.secondaryLocations.splice(locIndex - 1,1);
-                },2000);
-            }
-
-            else{
-                $scope.locationsToggleIndex[locIndex].removeProgress = true;
-                $http({
-                    url : GURL + 'ewDeleteLocation',
-                    method : 'POST',
-                    data : {
-                        Token : $rootScope._userInfo.Token,
-                        TID : $scope.secondaryLocations[locIndex-1].TID
-                    }
-                }).success(function(resp){
-                    if(resp && resp !== 'null' && resp.hasOwnProperty('IsDeleted')){
-                        if(resp.IsDeleted){
-                            delete mapList['map'+locIndex];
-                            $scope.locationsToggleIndex.splice(locIndex,1);
-                            $scope.secondaryLocations.splice(locIndex - 1,1);
-                            Notification.success({ message : 'Location removed successfully', delay : MsgDelay});
+            $scope.items = [];
+            var animationsEnabled = true;
+                var size = 'sm';
+                if(!size){
+                    size = 'lg';
+                }
+                var modalInstance = $modal.open({
+                    animation: animationsEnabled,
+                    templateUrl: 'html/profile/user/location-modal-confirm.html',
+                    controller: 'LocationDeleteConfirmCtrl',
+                    size: size,
+                    resolve: {
+                        items: function () {
+                            $('.modal-content').addClass('clearfix');
+                            return $scope.items;
                         }
-                        else{
-                            Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
-                        }
-                    }
-                    else{
-                        Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
-                    }
-                }).error(function(err){
-                        Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
+                    },
+                    windowClass : 'ezeone-bootstrap-ui-modal'
                 });
-            }
+
+                modalInstance.result.then(function (confirmation) {
+                    console.log('Confirmation');
+                    if(confirmation){
+                        /**
+                         * When user confirms to delete the location
+                         */
+
+                        if(locIndex < 1){
+                            return 0;
+                        }
+
+                        if(!$scope.locationsToggleIndex[locIndex].savedOnServer){
+                            $scope.locationsToggleIndex[locIndex].removeProgress = true;
+                            $timeout(function(){
+                                delete mapList['map'+locIndex];
+                                $scope.locationsToggleIndex.splice(locIndex,1);
+                                $scope.secondaryLocations.splice(locIndex - 1,1);
+                            },2000);
+                        }
+
+                        else{
+                            $scope.locationsToggleIndex[locIndex].removeProgress = true;
+                            $http({
+                                url : GURL + 'ewDeleteLocation',
+                                method : 'POST',
+                                data : {
+                                    Token : $rootScope._userInfo.Token,
+                                    TID : $scope.secondaryLocations[locIndex-1].TID
+                                }
+                            }).success(function(resp){
+                                if(resp && resp !== 'null' && resp.hasOwnProperty('IsDeleted')){
+                                    if(resp.IsDeleted){
+                                        delete mapList['map'+locIndex];
+                                        $scope.locationsToggleIndex.splice(locIndex,1);
+                                        $scope.secondaryLocations.splice(locIndex - 1,1);
+                                        Notification.success({ message : 'Location removed successfully', delay : MsgDelay});
+                                    }
+                                    else{
+                                        Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
+                                    }
+                                }
+                                else{
+                                    Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
+                                }
+                            }).error(function(err){
+                                Notification.error({ message : 'Error occured while removing location! Try again', delay : MsgDelay});
+                            });
+                        }
+                    }
+
+                }, function () {
+                    /**
+                     * When modal is dimissed
+                     */
+                });
+
+
+
+
         };
 
         /**
