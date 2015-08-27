@@ -396,6 +396,9 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
     var status  = parseInt(req.body.status);
     var deleteStatus = (parseInt(req.body.group_type) !== NaN && parseInt(req.body.group_type) > 0)
         ? parseInt(req.body.group_type) : 0;
+
+    var requester = req.body.requester ? parseInt(req.body.requester) : 2 ;
+
     var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupID,messageText,messageType,operationType,iphoneId,messageId;
 
 
@@ -566,86 +569,81 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                 //                break;
                                                 case 1 :
                                                     console.log('Accepted');
-                                                    //Notification has to be sent to req.group_id admin(owner of group)
-                                                    var getQuery = 'select GroupName,AdminID from tmgroups where tid=' + groupId;
-                                                    st.db.query(getQuery, function (err, resultDetails) {
-                                                        if (resultDetails) {
-                                                            if (resultDetails[0]) {
-                                                                console.log(resultDetails);
-                                                                var getQuery1 = 'select tid from tmgroups where GroupType=1 and AdminID=' + resultDetails[0].AdminID;
-                                                                console.log(getQuery1);
-                                                                st.db.query(getQuery1, function (err, resultDetails1) {
-                                                                    if (resultDetails1) {
-                                                                        if (resultDetails1[0]) {
-                                                                            console.log(resultDetails1);
-                                                                            var getQuery2 = 'select EZEID from tmaster where tid=' + masterId;
-                                                                            console.log(getQuery2);
-                                                                            st.db.query(getQuery2, function (err, memberDetails) {
-                                                                                if (!err) {
-                                                                                    if (memberDetails) {
-                                                                                        console.log(memberDetails);
-                                                                                        receiverId = resultDetails1[0].tid;
-                                                                                        senderTitle = memberDetails[0].EZEID;
-                                                                                        groupTitle = resultDetails[0].GroupName;
-                                                                                        groupID = groupId;
-                                                                                        messageText = 'has accepted your request ';
-                                                                                        messageType = 3;
-                                                                                        operationType = 0;
-                                                                                        iphoneId = null;
-                                                                                        messageId = 0;
-                                                                                        masterid = '';
-                                                                                        console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                                                        console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                    }
-                                                                                    else {
-                                                                                        console.log('FnUpdateUserStatus:Error getting from groupInfoRes');
-                                                                                    }
+                                                    var query2 = 'select tid,GroupType,GroupName,AdminID from tmgroups where tid=' + groupId;
+                                                    st.db.query(query2, function (err, getDetails) {
+                                                        if (getDetails) {
+                                                            if (getDetails[0]) {
+                                                                var getQuery2 = 'select EZEID from tmaster where tid=' + masterId;
+                                                                st.db.query(getQuery2, function (err, memberDetails) {
+                                                                    if (memberDetails) {
+                                                                        if (memberDetails[0]) {
+                                                                            if (getDetails[0].GroupType == 1) {
+                                                                                console.log('------------GroupType 1----------------');
+                                                                                receiverId = getDetails[0].tid;
+                                                                                senderTitle = memberDetails[0].EZEID;
+                                                                                groupTitle = getDetails[0].GroupName;
+                                                                                groupID = groupId;
+                                                                                messageText = 'has accepted your request ';
+                                                                                messageType = 3;
+                                                                                operationType = 0;
+                                                                                iphoneId = null;
+                                                                                messageId = 0;
+                                                                                masterid = '';
+                                                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                            }
+                                                                            else {
+                                                                                console.log('------------GroupType 0----------------');
+                                                                                if (requester == 1) {
+                                                                                    var query3 = 'select tid, GroupName from tmgroups where grouptype=1 and adminid =' + getDetails[0].AdminID;
                                                                                 }
                                                                                 else {
-                                                                                    console.log('FnUpdateUserStatus:Error getting from groupInfoRes');
+                                                                                    var query3 = 'select tid, GroupName from tmgroups where grouptype=1 and adminid =' + masterId;
                                                                                 }
-                                                                            });
+                                                                                st.db.query(query3, function (err, groupDetails) {
+                                                                                    if (groupDetails) {
+                                                                                        if (groupDetails[0]) {
+                                                                                            receiverId = groupDetails[0].tid;
+                                                                                            senderTitle = getDetails[0].GroupName;
+                                                                                            groupTitle = getDetails[0].GroupName;
+                                                                                            groupID = groupId;
+                                                                                            messageText = 'has accepted your request ';
+                                                                                            messageType = 3;
+                                                                                            operationType = 0;
+                                                                                            iphoneId = null;
+                                                                                            messageId = 0;
+                                                                                            masterid = '';
+                                                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                        }
+                                                                                        else {
+                                                                                            console.log('FnUpdateUserStatus:Error getting from groupDetails');
+                                                                                        }
+                                                                                    }
+                                                                                    else {
+                                                                                        console.log('FnUpdateUserStatus:Error getting from groupDetails');
+                                                                                    }
+                                                                                });
+                                                                            }
                                                                         }
                                                                         else {
-                                                                            console.log('FnUpdateUserStatus:Error getting from memberDetails');
+                                                                            console.log('FnUpdateUserStatus:Error getting from menberDetails');
                                                                         }
                                                                     }
                                                                     else {
-                                                                        console.log('FnUpdateUserStatus:Error getting from memberDetails');
+                                                                        console.log('FnUpdateUserStatus:Error getting from menberDetails');
                                                                     }
                                                                 });
                                                             }
                                                             else {
-                                                                console.log('FnUpdateUserStatus:Error getting from memberDetails');
+                                                                console.log('FnUpdateUserStatus:Error getting from groupInfoRes');
                                                             }
                                                         }
                                                         else {
-                                                            console.log('FnUpdateUserStatus:Error getting from memberDetails');
+                                                            console.log('FnUpdateUserStatus:Error getting from groupInfoRes');
                                                         }
                                                     });
-                                                                    break;
-s
-                                                //            case 2 :
-                                                //                // Rejected
-                                                //                // No notification
-                                                //                break;
-                                                //            case 3 :
-                                                //                // Leaved
-                                                //                // Notification has to be sent to req.group_id All Members of group
-                                                //                break;
-                                                //            case 4 :
-                                                //                // Removed
-                                                //                // Notification has to be sent to req.group_id all members of the group + req.master_id (to user who is removed)
-                                                //                break;
-                                                //
-                                                //        }
-                                                //
-                                                //
-                                                //
-                                                //    }
-                                                //
-                                                //});
+                                                    break;
                                             }
                                         }
                                         else {
@@ -1204,44 +1202,48 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             st.db.query(messageQuery, function (err, groupDetails) {
                                                 if (groupDetails) {
                                                     if (groupDetails[0]) {
-                                                        if (groupDetails[1]) {
-                                                            if (groupDetails[1].length > 0) {
-                                                                console.log('....................1');
-                                                                console.log(groupDetails);
-                                                                var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type);
-                                                                var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
-                                                                console.log(messageQuery1);
-                                                                st.db.query(messageQuery1, function (err, groupDetails1) {
-                                                                    if (groupDetails1) {
-                                                                        console.log('....................2');
-                                                                        console.log(groupDetails1);
-                                                                        for (var i = 0; i < groupDetails[1].length; i++) {
-                                                                            receiverId = groupDetails[1][i].tid;
-                                                                            senderTitle = groupDetails[0][0].groupname;
-                                                                            if(id_type == 0) {
-                                                                                groupId = groupDetails1[0][0].groupid;
-                                                                                groupTitle = groupDetails1[0][0].groupname;
+                                                        if (groupDetails[0].length > 0) {
+                                                            if (groupDetails[1]) {
+                                                                if (groupDetails[1].length > 0) {
+                                                                    console.log('....................1');
+                                                                    console.log(groupDetails);
+                                                                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type);
+                                                                    var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
+                                                                    console.log(messageQuery1);
+                                                                    st.db.query(messageQuery1, function (err, groupDetails1) {
+                                                                        if (groupDetails1) {
+                                                                            console.log('....................2');
+                                                                            console.log(groupDetails1);
+                                                                            for (var i = 0; i < groupDetails[1].length; i++) {
+                                                                                receiverId = groupDetails[1][i].tid;
+                                                                                senderTitle = groupDetails[0][0].groupname;
+                                                                                if (id_type == 0) {
+                                                                                    groupId = groupDetails1[0][0].groupid;
+                                                                                    groupTitle = groupDetails1[0][0].groupname;
+                                                                                }
+                                                                                else {
+                                                                                    groupId = groupDetails[0][0].tid;
+                                                                                    groupTitle = groupDetails[0][0].groupname;
+                                                                                }
+                                                                                messageText = message;
+                                                                                messageType = id_type;
+                                                                                operationType = 0;
+                                                                                iphoneId = null;
+                                                                                messageId = previousMessageID;
+                                                                                masterid = groupDetails[0][0].AdminID;
+                                                                                console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                             }
-                                                                            else
-                                                                            {
-                                                                                groupId = groupDetails[0][0].tid;
-                                                                                groupTitle = groupDetails[0][0].groupname;
-                                                                            }
-                                                                            messageText = message;
-                                                                            messageType = id_type;
-                                                                            operationType = 0;
-                                                                            iphoneId = null;
-                                                                            messageId = previousMessageID;
-                                                                            masterid = groupDetails[0][0].AdminID;
-                                                                            console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                         }
-                                                                    }
-                                                                    else {
-                                                                        console.log('FnComposeMessage:Error getting from groupname');
-                                                                    }
-                                                                });
+                                                                        else {
+                                                                            console.log('FnComposeMessage:Error getting from groupname');
+                                                                        }
+                                                                    });
+                                                                }
+                                                                else {
+                                                                    console.log('FnComposeMessage:Error getting from groupdetails');
+                                                                }
                                                             }
                                                             else {
                                                                 console.log('FnComposeMessage:Error getting from groupdetails');
