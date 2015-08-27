@@ -1,99 +1,88 @@
 ﻿<div id="wrapper" ng-controller="HistoryController as historyCtrl">
-    <header-section></header-section>
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="container" style="padding-top:0px; position:relative;">
-        <!-- Example row of columns -->
-        <div class="row">
-            <div class="col-sm-10" style="margin: auto; float: none;">
-                <div class="panel panel-default" style="min-height: 367px;">
-                    <div class="panel-body">
-                        <h1 class="text-center font-open-sans-light">Access History</h1>
-                        <p class="text-center">
-                            <small class="text-center text-success">(List of persons who had viewed your EZEOne)</small>
-                        </p>
-                        <div class="clearfix"></div>
-
-                       <div ng-show="historyCtrl.msgs.length" class="hpw">
-                            <div class="col-lg-12 table-head">
-                                <div class="col-lg-2">
-                                    EZEOne ID
-                                </div>
-                                <div class="col-lg-4">
-                                    Name
-                                </div>
-                                <div class="col-lg-3">
-                                    City
-                                </div>
-                                <div class="col-lg-3">
-                                    Date
-                                </div>
-                            </div>
-                            <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}" ng-repeat="_item in historyCtrl.msgs track by $index">
-                                <div class="col-lg-2">
-                                   <a title="{{_item.EZEID}}" class="showPointer" ng-click="(_item.EZEID) ? redirectFullPage(_item.EZEID) : ''">
-                                         {{_item.EZEID | textLength:16}}
-                                   </a>
-                                    <small class="tiny text-danger" ng-hide="_item.EZEID">Unknown</small>
-                                </div>
-                                <div class="col-lg-4">
-                                    <span title="{{_item.Name}}">{{_item.Name | textLength:45}}</span>
-                                    <small class="tiny text-primary" ng-hide="_item.Name"> - </small>
-                                </div>
-                                <div class="col-lg-3">
-                                    <!--<span data-toggle="tooltip" title="" data-original-title="{{job.companyname}}">{{job.companyname | textLength:35}}</span>-->
-                                    <span title="{{_item.City}}">{{_item.City | textLength:30}}</span>
-                                    <small class="tiny text-primary" ng-hide="_item.City"> - </small>
-                                </div>
-                                <div class="col-lg-3">
-                                    {{_item.AccessDate}}
-                                </div>
+    <section id="job-seeker-search" class="jss hpw job-seeker-bg hpw ">
+        <header-section></header-section>
+        <div class="container width-90 page-content">
+            <div class="panel">
+                <div class="panel-primary panel-heading">
+                    <i class="fa fa-th-list"></i>  Access History (List of persons who had viewed your EZEOne)
+                </div>
+                <div class="panel-default panel-body">
+                    <!-- search bar to search job keyword by skill keywords -->
+                    <div class="container">
+                        <div class="col-lg-12">
+                            <hr>
+                        </div>
+                        <div class="col-lg-6">
+                            <div ng-show="historyCtrl.msgs.length">
+                                Showing {{pageCount+1}}-{{pageCount+resultThisPage}} of {{totalResult}} results
                             </div>
                         </div>
-                       <div ng-hide="historyCtrl.msgs.length" class="text-danger text-center">
-                            <b> No History found..! </b>
+                        <div ng-show="historyCtrl.msgs.length" class="col-lg-6 text-right">
+                            <button class="btn"
+                                    ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
+                                    ng-disabled="!paginationPreviousVisibility"
+                                    ng-click="paginationPreviousClick()">
+                                Previous <i class="fa fa-arrow-circle-left"></i>
+                            </button>
+                            <button class="btn btn-primary"
+                                    ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
+                                    ng-disabled="!paginationNextVisibility"
+                                    ng-click="paginationNextClick()">
+                                <i class="fa fa-arrow-circle-right"></i> Next
+                            </button>
                         </div>
+                    </div>
+                    <div class="container">
+                        <!-- main table goes here -->
+                        <div class="main-table p-top-20 col-lg-12">
 
+                            <div ng-show="historyCtrl.msgs.length" class="hpw">
+                                <div class="col-lg-12 table-head">
+                                    <div class="col-lg-2">
+                                        EZEOne ID
+                                    </div>
+                                    <div class="col-lg-4">
+                                        Name
+                                    </div>
+                                    <div class="col-lg-3">
+                                        City
+                                    </div>
+                                    <div class="col-lg-3">
+                                        Date
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}" ng-repeat="_item in historyCtrl.msgs track by $index">
+                                    <div class="col-lg-2">
+                                        <a title="{{_item.EZEID}}" class="showPointer" ng-click="(_item.EZEID) ? redirectFullPage(_item.EZEID) : ''">
+                                            {{_item.EZEID | textLength:16}}
+                                        </a>
+                                        <small class="tiny text-danger" ng-hide="_item.EZEID">Unknown</small>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <span title="{{_item.Name}}">{{_item.Name | textLength:45}}</span>
+                                        <small class="tiny text-primary" ng-hide="_item.Name"> - </small>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <!--<span data-toggle="tooltip" title="" data-original-title="{{job.companyname}}">{{job.companyname | textLength:35}}</span>-->
+                                        <span title="{{_item.City}}">{{_item.City | textLength:30}}</span>
+                                        <small class="tiny text-primary" ng-hide="_item.City"> - </small>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        {{_item.AccessDate}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-hide="historyCtrl.msgs.length" class="text-danger text-center">
+                                <b> No History found..! </b>
+                            </div>
 
-
-<!--
-                        <div class="panel-group panelTextSize no_select" id="accordion">
-                            <table class="table table-striped" st-table="rowCollection" class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th>EZEOne ID</th>
-                                    <th>Name</th>
-                                    <th>City</th>
-                                    <th>Date</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                &lt;!&ndash;<tr ng-repeat="_item in msgCtrl.msgs | filter: {Status: msgCtrl.status,MessageTypeTitle:msgCtrl.type}">&ndash;&gt;
-                                    <tr ng-repeat="_item in historyCtrl.msgs" class="">
-                                        <td class="panelPd5px">
-                                            <a class="showPointer" ng-click="(_item.EZEID) ? redirectFullPage(_item.EZEID) : ''">{{_item.EZEID}}</a>
-                                            <small class="tiny text-danger" ng-hide="_item.EZEID">Unknown</small>
-                                        </td>
-                                        <td class="panelPd5px">
-                                            {{_item.Name}}
-                                            <small class="tiny text-primary" ng-hide="_item.Name"> - </small>
-                                        </td>
-                                        <td class="panelPd5px">
-                                            {{_item.City}}
-                                            <small class="tiny text-primary" ng-hide="_item.City"> - </small>
-                                        </td>
-                                        <td class="panelPd5px">{{_item.AccessDate}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>-->
-                        <div class="clearfix"></div>
-                        <div ng-show="historyCtrl.showMoreButton">
-                            <button class="btn btn-primary pull-right" ng-click="historyCtrl.getMoreHistory()" type="button">More</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>
+
+<!-- End of design for finding - Job Seekers -->
 <footer-section></footer-section>

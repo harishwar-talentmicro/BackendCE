@@ -36,7 +36,8 @@
             'ngTouch',
             'ngAnimate',
             'ui.calendar',
-            'textAngular'
+            'textAngular',
+            'talent-multi-select'
         ]);
 
     //ezeid.value('GURL',"/");
