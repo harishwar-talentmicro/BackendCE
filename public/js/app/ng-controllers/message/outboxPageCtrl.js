@@ -515,12 +515,12 @@ angular.module('ezeidApp').
             /**
              * Change the user status of a pending request
              */
-            $scope.pendingRequestResponse = function(groupId, masterId, status,index)
+            $scope.pendingRequestResponse = function(groupId, masterId, status,index, requester)
             {
                 /* perform appropriate action after user gives response */
                 managePendingRequestNotification(groupId,status,index);
 
-                updateMemberStatusApi(groupId, masterId, status).then(function(){
+                updateMemberStatusApi(groupId, masterId, status, requester).then(function(){
 
                         $scope.pendingRequestData.splice(index,1);
                         $scope.pendingRequestVisbility = false;
@@ -981,7 +981,7 @@ angular.module('ezeidApp').
             /**
              * Remove member API call
              */
-            function updateMemberStatusApi(groupId, masterId, status) {
+            function updateMemberStatusApi(groupId, masterId, status, requester) {
                 var defer = $q.defer();
                 $scope.$emit('$preLoaderStart');
                 $http({
@@ -991,7 +991,8 @@ angular.module('ezeidApp').
                         token: $rootScope._userInfo.Token,
                         group_id: groupId,
                         master_id: masterId,
-                        status: status
+                        status: status,
+                        requester: requester
                     }
                 }).success(function (resp) {
                     $scope.$emit('$preLoaderStop');

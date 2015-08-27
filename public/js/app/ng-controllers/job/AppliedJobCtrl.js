@@ -108,7 +108,7 @@ angular.module('ezeidApp').
                 // $scope.triggerSearch(1);
                 getAppliedJob();
                 $scope.paginationVisibility();
-            }
+            };
 
             /**
              * load the previous results
@@ -120,7 +120,7 @@ angular.module('ezeidApp').
                 // $scope.triggerSearch(1);
                 getAppliedJob();
                 $scope.paginationVisibility();
-            }
+            };
 
             /**
              * Toggle the visibility of the pagination buttons
@@ -157,6 +157,6 @@ angular.module('ezeidApp').
                     $scope.paginationNextVisibility = true;
                     $scope.paginationPreviousVisibility = true;
                 }
-            }
+            };
 
         }]);

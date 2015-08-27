@@ -11,20 +11,36 @@ angular.module('ezeidApp').controller('HistoryController',[
     msgSen.msgs = [];
     var showPaging = "N";
 
-    if ($rootScope._userInfo) {
+    //Pagination settings
+    $scope.pageSize = 10;//Results per page
+    $scope.pageCount = 0;//Everything starts with a 0 - 10,20,30 etc.
+    $scope.totalResult = 0;//Total results
+    $scope.resultThisPage = 0;//Total results you got this page
 
+    if ($rootScope._userInfo) {
     }
     else {
-        if (typeof (Storage) !== "undefined") {
-            var encrypted = localStorage.getItem("_token");
-            if (encrypted) {
-                var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
-                var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
-                if (Jsonstring) {
-                    $rootScope._userInfo = JSON.parse(Jsonstring);
+            if (typeof (Storage) !== "undefined") {
+                var encrypted = localStorage.getItem("_token");
+                if (encrypted) {
+                    var decrypted = CryptoJS.AES.decrypt(encrypted, "EZEID");
+                    var Jsonstring = decrypted.toString(CryptoJS.enc.Utf8);
+                    if (Jsonstring) {
+                        $rootScope._userInfo = JSON.parse(Jsonstring);
+                    }
+                }
+                else {
+                    $rootScope._userInfo = {
+                        IsAuthenticate: false,
+                        Token: '',
+                        FirstName: '',
+                        Type:'',
+                        Icon:''
+                    };
                 }
             }
             else {
+                // Sorry! No Web Storage support..
                 $rootScope._userInfo = {
                     IsAuthenticate: false,
                     Token: '',
@@ -32,19 +48,9 @@ angular.module('ezeidApp').controller('HistoryController',[
                     Type:'',
                     Icon:''
                 };
+                alert('Sorry..! Browser does not support');
+                window.location.href = "/";
             }
-        } else {
-            // Sorry! No Web Storage support..
-            $rootScope._userInfo = {
-                IsAuthenticate: false,
-                Token: '',
-                FirstName: '',
-                Type:'',
-                Icon:''
-            };
-            alert('Sorry..! Browser does not support');
-            window.location.href = "/";
-        }
     }
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
@@ -87,7 +93,12 @@ angular.module('ezeidApp').controller('HistoryController',[
         {
             if ((data != 'null') && (data))
             {
-                for (var i = 0; i < data.length; i++) {
+                $scope.totalResult = data.count;
+                $scope.resultThisPage = data.length;
+                $scope.paginationVisibility();
+
+                for (var i = 0; i < data.length; i++)
+                {
                     data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
                     msgSen.msgs.push(data[i]);
                     showPaging = data[0]['NextPage'];
@@ -118,8 +129,86 @@ angular.module('ezeidApp').controller('HistoryController',[
     /* redirect to full details page */
     $scope.redirectFullPage = function(ezeoneId)
     {
-        //////console.log(tid);
         /* redirect to full detail page */
         $location.url('/'+ezeoneId);
-    }
+    };
+
+        /*Code for pagging*/
+        /**
+         * Incerement the page count of the pagination after every pagination: NEXT
+         */
+        function incrementPageCount()
+        {
+            $scope.pageCount += $scope.pageSize;
+        }
+
+        /**
+         * Decrement the page count of the pagination after every pagination: PREVIOUS
+         */
+        function decrementPageCount()
+        {
+            $scope.pageCount -= $scope.pageSize;
+        }
+
+        /**
+         * load the next results
+         */
+        $scope.paginationNextClick = function()
+        {
+            $scope.pageCount += $scope.pageSize;
+            /* trigger next results */
+            // $scope.triggerSearch(1);
+            LoadHistory();
+            $scope.paginationVisibility();
+        };
+
+        /**
+         * load the previous results
+         */
+        $scope.paginationPreviousClick = function()
+        {
+            $scope.pageCount -= $scope.pageSize;
+            /* trigger previous results */
+            // $scope.triggerSearch(1);
+            LoadHistory();
+            $scope.paginationVisibility();
+        };
+
+        /**
+         * Toggle the visibility of the pagination buttons
+         */
+        $scope.paginationPreviousVisibility = true;
+        $scope.paginationNextVisibility = true;
+
+        $scope.paginationVisibility = function()
+        {
+            var totalResult = parseInt($scope.totalResult);
+            var currentCount = parseInt($scope.pageCount);
+            var resultSize = parseInt($scope.pageSize);
+
+            /* initial state */
+            if((totalResult <= (currentCount+resultSize)) && currentCount == 0)
+            {
+                $scope.paginationNextVisibility = false;
+                $scope.paginationPreviousVisibility = false;
+            }
+            else if(currentCount == 0)
+            {
+                $scope.paginationNextVisibility = true;
+                $scope.paginationPreviousVisibility = false;
+            }
+            else if((currentCount + resultSize) >= totalResult)
+            {
+                $scope.paginationNextVisibility = false;
+                $scope.paginationPreviousVisibility = true;
+            }
+            else
+            {
+                $scope.paginationNextVisibility = true;
+                $scope.paginationPreviousVisibility = true;
+            }
+        };
+
+
+
 }]);
