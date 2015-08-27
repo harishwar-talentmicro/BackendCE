@@ -571,12 +571,13 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                     st.db.query(getQuery, function (err, resultDetails) {
                                                         if (resultDetails) {
                                                             if (resultDetails[0]) {
-
+                                                                console.log(resultDetails);
                                                                 var getQuery1 = 'select tid from tmgroups where GroupType=1 and AdminID=' + resultDetails[0].AdminID;
                                                                 console.log(getQuery1);
                                                                 st.db.query(getQuery1, function (err, resultDetails1) {
                                                                     if (resultDetails1) {
                                                                         if (resultDetails1[0]) {
+                                                                            console.log(resultDetails1);
                                                                             var getQuery2 = 'select EZEID from tmaster where tid=' + masterId;
                                                                             console.log(getQuery2);
                                                                             st.db.query(getQuery2, function (err, memberDetails) {
@@ -1217,13 +1218,14 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                         for (var i = 0; i < groupDetails[1].length; i++) {
                                                                             receiverId = groupDetails[1][i].tid;
                                                                             senderTitle = groupDetails[0][0].groupname;
-                                                                            groupTitle = groupDetails1[0][0].groupname ? groupDetails1[0][0].groupname : groupDetails1[0][0].name;
                                                                             if(id_type == 0) {
                                                                                 groupId = groupDetails1[0][0].groupid;
+                                                                                groupTitle = groupDetails1[0][0].groupname;
                                                                             }
                                                                             else
                                                                             {
                                                                                 groupId = groupDetails[0][0].tid;
+                                                                                groupTitle = groupDetails[0][0].groupname;
                                                                             }
                                                                             messageText = message;
                                                                             messageType = id_type;

@@ -48,54 +48,82 @@ Audit.prototype.getAccessHistory = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.TokenNo;
-        var Page = parseInt(req.query.Page);
+        //var Page = parseInt(req.query.Page);
+        var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
+        var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;
 
-        if (Token != null && Page.toString() != 'NaN' && Page.toString() != '0') {
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            count:0,
+            data: []
+        };
+
+        if (Token) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        var ToPage = 25 * Page;
-                        var FromPage = ToPage - 24;
-
-                        if (FromPage <= 1) {
-                            FromPage = 0;
-                        }
-
-                        st.db.query('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(FromPage) + ',' + st.db.escape(ToPage) + ')', function (err, AccessHistoryResult) {
+                        //var ToPage = 25 * Page;
+                        //var FromPage = ToPage - 24;
+                        //
+                        //if (FromPage <= 1) {
+                        //    FromPage = 0;
+                        //}
+                        console.log('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ')');
+                        st.db.query('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ')', function (err, AccessHistoryResult) {
                             if (!err) {
-                                //    console.log(AccessHistoryResult);
+                                   console.log(AccessHistoryResult);
                                 if (AccessHistoryResult[0]) {
                                     if (AccessHistoryResult[0].length > 0) {
-                                        res.send(AccessHistoryResult[0]);
-                                        console.log('FnGetAccessHistory: History sent successfully');
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'AccessHistory List loaded successfully';
+                                        responseMessage.count = AccessHistoryResult[0][0].count;
+                                        responseMessage.data = AccessHistoryResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAccessHistory: AccessHistory List loaded successfully');
                                     }
                                     else {
-                                        console.log('FnGetAccessHistory: History not available');
-                                        res.json(null);
+                                        responseMessage.message = 'AccessHistory List not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAccessHistory:AccessHistory List not loaded');
                                     }
 
                                 }
                                 else {
-                                    console.log('FnGetAccessHistory: No History available');
-                                    res.json(null);
+                                    responseMessage.message = 'AccessHistory List not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetAccessHistory:AccessHistory List not loaded');
                                 }
                             }
                             else {
-                                res.json(null);
-                                console.log('FnGetAccessHistory: Error in sending documents: ' + err);
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetAccessHistory: error in getting AccessHistory:' + err);
                             }
                         });
                     }
                     else {
-                        res.statusCode = 401;
-                        console.log('FnGetAccessHistory: Invalid Token');
-                        res.json(null);
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetAccessHistory: Invalid token');
                     }
                 }
                 else {
-                    res.statusCode = 500;
-                    console.log('FnGetAccessHistory: Token error: ' + err);
-                    res.json(null);
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetAccessHistory:Error in processing Token' + err);
                 }
             });
 
@@ -103,10 +131,13 @@ Audit.prototype.getAccessHistory = function(req,res,next){
         else {
             if (Token == null) {
                 console.log('FnGetAccessHistory: Token is empty');
+                responseMessage.error = {
+                    token : 'Token is empty'
+                };
+                responseMessage.message = 'Please check the errors';
+                res.status(400).json(responseMessage);
             }
-            else if (Page.toString() != 'NaN') {
-                console.log('FnGetAccessHistory: Type is empty');
-            }
+
             res.statusCode = 400;
             res.json(null);
         }
