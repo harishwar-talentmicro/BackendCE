@@ -1676,7 +1676,7 @@ Job.prototype.jobRefresh = function(req,res,next){
 
     var token = req.body.token;
     var jobId = req.body.job_id;
-console.log(req.body);
+
     var responseMessage = {
         status: false,
         error: {},
@@ -1737,7 +1737,7 @@ console.log(req.body);
                             };
                             responseMessage.data = null;
                             res.status(401).json(responseMessage);
-                            console.log('FnGetGroupInfo: Invalid token');
+                            console.log('FnJobRefresh: Invalid token');
                         }
                     }
                     else {
@@ -1746,7 +1746,7 @@ console.log(req.body);
                         };
                         responseMessage.message = 'Error in validating Token';
                         res.status(500).json(responseMessage);
-                        console.log('FnGetGroupInfo:Error in processing Token' + err);
+                        console.log('FnJobRefresh:Error in processing Token' + err);
                     }
                 });
             }
@@ -1763,6 +1763,219 @@ console.log(req.body);
         }
     }
 };
+
+/**
+ * @todo FnJobsMatch
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get job match
+ */
+Job.prototype.jobsMatch = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        console.log('CALL pShowMatchingJobsofCV(' + st.db.escape(token) + ')');
+                        st.db.query('CALL pShowMatchingJobsofCV(' + st.db.escape(token) + ')', function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.data = getResult[0][0];
+                                        responseMessage.message = 'Jobs Matched successfully';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnJobsMatch: Jobs Matched successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Jobs not Matched';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnJobsMatch:Jobs not Matched');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Jobs not Matched';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnJobsMatch:Jobs not Matched');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnJobsMatch: error in getting JobsMatch :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnJobsMatch: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnJobsMatch:Error in processing Token' + err);
+                }
+            });
+        }
+
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnJobsMatch ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnJobsMyInstitute
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get job MyInstitute
+ */
+Job.prototype.jobsMyInstitute = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var latitude = req.query.latitude;
+    var longitude = req.query.longitude;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude);
+                        var query = 'CALL pShowMyInstituteJob(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.data = getResult[0];
+                                        responseMessage.message = 'Jobs Loaded successfully';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnJobsMyInstitute: Jobs Loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Jobs not Loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnJobsMyInstitute:Jobs not Loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Jobs not Loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnJobsMyInstitute:Jobs not Loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnJobsMyInstitute: error in getting JobsMatch :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnJobsMyInstitute: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnJobsMyInstitute:Error in processing Token' + err);
+                }
+            });
+        }
+
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnJobsMatch ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 
 module.exports = Job;
