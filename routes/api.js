@@ -157,6 +157,9 @@ router.post('/user_details',LocationManager.FnSaveUserDetails);
 router.put('/refresh_job',LocationManager.FnJobRefresh);
 router.get('/user_details_new',LocationManager.FnGetUserDetailsNew);
 router.get('/location_details',LocationManager.FnLocationDetails);
+router.get('/job_match',LocationManager.FnJobsMatch);
+router.get('/job_myinstitute',LocationManager.FnJobsMyInstitute);
+
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);
 router.get('/validate_groupname',LocationManager.FnValidateGroupName);
