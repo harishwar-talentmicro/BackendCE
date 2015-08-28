@@ -161,6 +161,7 @@ router.get('/job_match',LocationManager.FnJobsMatch);
 router.get('/job_myinstitute',LocationManager.FnJobsMyInstitute);
 router.get('/notify_student',LocationManager.FnNotifyRelevantStudent);
 router.get('/cv_details',LocationManager.FnViewNotifiedCVDetails);
+router.get('/profile_image',LocationManager.FnProfileImageURL);
 
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);

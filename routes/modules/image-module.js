@@ -270,7 +270,7 @@ Image.prototype.cropImage = function(req,res,next){
 
 
 /**
- * Method : POST
+ * Method : GET
  * @param req
  * @param res
  * @param next
@@ -326,11 +326,11 @@ Image.prototype.imageURL = function(req,res,next){
         }
         else{
             if(image_url == 1) {
-                var image_url1 = 'http://www.ezeone.com/images/sales_enquiry.jpg';
-                var image_url2 = 'http://www.ezeone.com/images/home_delivery.jpg';
-                var image_url3 = 'http://www.ezeone.com/images/reservations.jpg';
-                var image_url4 = 'http://www.ezeone.com/images/help_desk.jpg';
-                var image_url5 = 'http://www.ezeone.com/images/human_resources.jpg';
+                var image_url1 = 'https://www.ezeone.com/images/sales_enquiry.jpg';
+                var image_url2 = 'https://www.ezeone.com/images/home_delivery.jpg';
+                var image_url3 = 'https://www.ezeone.com/images/reservations.jpg';
+                var image_url4 = 'https://www.ezeone.com/images/help_desk.jpg';
+                var image_url5 = 'https://www.ezeone.com/images/human_resources.jpg';
                 responseMessage.status = true;
                 responseMessage.data = {pager_url1: image_url1,pager_url2: image_url2, pager_url3: image_url3,pager_url4: image_url4,pager_url5: image_url5};
                 responseMessage.error = null;
@@ -340,11 +340,11 @@ Image.prototype.imageURL = function(req,res,next){
             }
 
             else {
-                var image_url1 = 'http://www.ezeone.com/images/splash_theme_1.png';
-                var image_url2 = 'http://www.ezeone.com/images/splash_theme_2.png';
-                var image_url3 = 'http://www.ezeone.com/images/splash_theme_3.png';
-                var image_url4 = 'http://www.ezeone.com/images/splash_theme_4.png';
-                var image_url5 = 'http://www.ezeone.com/images/splash_theme_5.png';
+                var image_url1 = 'https://www.ezeone.com/images/splash_theme_1.png';
+                var image_url2 = 'https://www.ezeone.com/images/splash_theme_2.png';
+                var image_url3 = 'https://www.ezeone.com/images/splash_theme_3.png';
+                var image_url4 = 'https://www.ezeone.com/images/splash_theme_4.png';
+                var image_url5 = 'https://www.ezeone.com/images/splash_theme_5.png';
                 responseMessage.status = true;
                 responseMessage.data = {splash_url1: image_url1,splash_url2: image_url2, splash_url3: image_url3,splash_url4: image_url4,splash_url5: image_url5};
                 responseMessage.error = null;
@@ -363,6 +363,62 @@ Image.prototype.imageURL = function(req,res,next){
         res.status(400).json(responseMessage);
     }
 };
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Image.prototype.profileImageURL = function(req,res,next){
+    /**
+     * @todo FnProfileImageURL
+     */
+    var _this = this;
+
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+
+        var serverId = req.query.server_id ? req.query.server_id : 0;      //image_id  : 0 - call test serever, 1- call live sever
+
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
+        if (serverId == 0 ){
+                var image_url1 = 'http://104.199.128.226:3001/images/EZEOne_profile.png';
+                responseMessage.status = true;
+                responseMessage.data = {EZEOne_profile: image_url1};
+                responseMessage.error = null;
+                responseMessage.message = ' Image URL Send successfully';
+                console.log('FnImageURL:Image URL Send successfully');
+                res.status(200).json(responseMessage);
+            }
+        else {
+                var image_url1 = 'https://www.ezeone.com/images/EZEOne_profile.png';
+                responseMessage.status = true;
+                responseMessage.data = {EZEOne_profile: image_url1};
+                responseMessage.error = null;
+                responseMessage.message = ' Image URL Send successfully';
+                console.log('FnImageURL:Image URL Send successfully');
+                res.status(200).json(responseMessage);
+            }
+
+    }
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnImageURL:error ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(responseMessage);
+    }
+};
+
 
 /**
  * @todo FnGetPictureOfEzeid
