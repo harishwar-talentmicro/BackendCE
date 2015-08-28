@@ -22,6 +22,7 @@
             'MsgDelay',
             '$location',
             '$routeParams',
+            '$controller',
             function (
                 $rootScope,
                 $scope,
@@ -36,7 +37,8 @@
                 ScaleAndCropImage,
                 MsgDelay,
                 $location,
-                $routeParams
+                $routeParams,
+                $controller
             )
             {
 
@@ -57,7 +59,7 @@
                  * Password and re enter password field models
                  * @type {string}
                  */
-                $scope.password = "";
+                $scope.rPassword = "";
                 $scope.rePassword = "";
 
                 $scope.viewPassword = false;
@@ -71,9 +73,9 @@
                 $scope.invalidLink = true;
                 $scope.checkLink = function(ezeoneId,resetCode){
                     $http({
-                        url : GURL + '',
-                        method : 'POST',
-                        data : {
+                        url : GURL + 'pass_reset_code',
+                        method : 'GET',
+                        params : {
                             ezeone_id : ezeoneId,
                             reset_code : resetCode
                         }
@@ -86,9 +88,9 @@
                         if(resp){
                             if(resp.status){
                                 if(resp.data){
-                                    if(resp.data.valid){
+                                    if(resp.data.tid){
                                         $scope.invalidLink = false;
-                                        $scope.verifyCode = resp.data.verify_code;
+                                        $scope.verifyCode = resp.data.reset_otp;
                                     }
                                 }
                             }
@@ -114,33 +116,32 @@
                 };
 
                 $scope.resetForm = function(){
-                    $scope.password = "";
+                    $scope.rPassword = "";
                     $scope.rePassword = "";
                 };
 
-                $scope.resetPassword = function(){
+                $scope.resetPassword = function(rPassword){
                     var defer = $q.defer();
 
                     $http({
-                        url : '',
+                        url : 'verify_secret_code',
                         method : 'POST',
                         data : {
-                            password : $scope.password,
-                            repassword : $scope.resPassword,
+                            new_password : rPassword,
                             ezeone_id : $routeParams.ezeone,
-                            verify_code : $scope.verifyCode
+                            secret_code : $scope.verifyCode
                         }
                     }).success(function(resp){
                         if(resp){
                             if(resp.status){
-                                Notification.success({ title : 'Password reset successful',
-                                    message : 'Please login to continue',delay : MsgDelay});
+                                Notification.success({ title : 'Password reset process is completed successfully',
+                                    message : 'Please login with your new password to continue',delay : MsgDelay});
 
                                 $location.path('/');
 
                             }
                             else{
-                                Notification.error({ title : 'Your session expired',
+                                Notification.error({ title : 'Your session has expired',
                                     message : 'Please try again to reset your password!',delay : MsgDelay});
                                 $location.path('/');
                             }
@@ -171,18 +172,13 @@
 
 
                 if($routeParams['ezeone'] && $routeParams['reset_code']){
-                    //$scope.checkLink($routeParams.ezeone,$routeParams.reset_code);
+                    $scope.checkLink($routeParams.ezeone,$routeParams.reset_code);
 
                 }
                 else{
                     $scope.$emit('$preLoaderStop');
                     $location.path('/');
                 }
-                $scope.$emit('$preLoaderStop');
-
-
-
-
 
 
 

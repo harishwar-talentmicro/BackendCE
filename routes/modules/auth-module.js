@@ -887,4 +887,248 @@ Auth.prototype.logout = function(req,res,next){
     }
 };
 
+/**
+ * Verify Password reset code (expiry 24 hrs) and generates a new secret code which expires in 5 minutes
+ * @method GET
+ *
+ * @service-param ezeone_id <string>
+ * @service-param reset_code <string>
+ */
+
+Auth.prototype.verifyResetCode = function(req,res,next){
+    var ezeoneId = alterEzeoneId(req.query.ezeone_id);
+    var resetCode = req.query.reset_code;
+
+    var ip = req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress ||
+        req.socket.remoteAddress ||
+        req.connection.socket.remoteAddress;
+
+    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+
+    var statusFlag = true;
+    var error  = {};
+    var respMsg = {
+        status : false,
+        message : 'Invalid password reset link',
+        data : null,
+        error : null
+    }
+
+    if(!ezeoneId){
+        statusFlag *= false;
+        error['ezeone_id'] = 'Invalid EZEOne ID';
+    }
+
+    if(!resetCode){
+        statusFlag *= false;
+        error['reset_code'] = 'Invalid Reset Code';
+    }
+
+    if(statusFlag){
+        try{
+            var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode);
+            var query = 'CALL pverifyresetcode('+queryParams+')';
+
+
+            console.log(query);
+
+            st.db.query(query, function (err, verifyRes) {
+                if(err){
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    console.log('audit-module -> verifyResetCode : Error in PROCEDURE pverifyresetcode');
+                    console.log(err);
+                    console.log('audit-module -> verifyResetCode : params - 1. ezeone_id : '+
+                        req.query.ezeone_id + ' 2. reset_code : '+ req.query.reset_code + ' IP Address : '+ ip + ' UserAgent : '+ userAgent );
+                    respMsg.error = { server : 'Internal Server Error'};
+                    respMsg.message = "Internal Server Error";
+                    respMsg.data = null;
+                    respMsg.status = false;
+                    res.status(500).json(respMsg);
+                }
+
+                else{
+                    console.log(verifyRes);
+
+                    if(verifyRes){
+                        if(verifyRes[0]){
+                            if(verifyRes[0][0]){
+                                if(verifyRes[0][0].tid){
+                                    respMsg.status = true;
+                                    respMsg.data = {
+                                        tid : verifyRes[0][0].tid,
+                                        reset_otp : verifyRes[0][0].secreate_code
+                                    };
+                                    respMsg.message = 'Reset code is valid ! Proceed to reset password';
+                                    respMsg.error = null;
+                                    res.status(200).json(respMsg);
+                                }
+                                else{
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                res.status(200).json(respMsg);
+                            }
+                        }
+                        else{
+                            res.status(200).json(respMsg);
+                        }
+                    }
+                    else{
+                        respMsg.status = true;
+                        respMsg.error = null;
+                        respMsg.message = "Successfully verified reset code";
+                        respMsg.data = {
+                            valid : true,
+                            result : verifyRes
+                        };
+                        res.status(200).json(respMsg);
+                    }
+                }
+
+            });
+        }
+        catch(ex){
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            console.log('audit-module -> verifyResetCode : Exception');
+            console.log(ex);
+            console.log('audit-module -> verifyResetCode : params - 1. ezeone_id : '+
+                req.query.ezeone_id + ' 2. reset_code : '+ req.query.reset_code + ' IP Address : '+ ip + ' UserAgent : '+ userAgent );
+            respMsg.error = { server : 'Internal Server Error'};
+            respMsg.message = "Internal Server Error";
+            respMsg.data = null;
+            respMsg.status = false;
+            res.status(500).json(respMsg);
+        }
+    }
+    else{
+        console.log('audit-module -> verifyResetCode : Unable to verify password reset link');
+        console.log('audit-module -> verifyResetCode : params - 1. ezeone_id : '+
+            req.query.ezeone_id + ' 2. reset_code : '+ req.query.reset_code + ' IP Address : '+ ip + ' UserAgent : '+ userAgent );
+        res.status(200).json(respMsg);
+    }
+
+};
+
+
+Auth.prototype.verifySecretCode = function(req,res,next) {
+
+    var status = true;
+    var error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!req.body.secret_code) {
+        error['secret_code'] = 'secret_code is invalid';
+        status *= false;
+    }
+
+    if (!req.body.ezeone_id) {
+        error['ezeone_id'] = 'EZEOne ID is invalid';
+        status *= false;
+    }
+    if (!req.body.new_password) {
+        error['new_password'] = 'new_password is invalid';
+        status *= false;
+    }
+
+    if (status) {
+        try {
+            req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
+            var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.body.new_password);
+            var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
+
+            console.log(verifyQuery);
+
+            st.db.query(verifyQuery, function (err, verifyRes) {
+                if (err) {
+                    console.log('Error in verifyQuery : FnVerifySecretCode ');
+                    console.log(err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    respMsg.error = {server: 'Internal Server Error'};
+                    respMsg.message = 'An error occurred ! Please try again';
+                    res.status(400).json(respMsg);
+                }
+                else {
+
+                    //if (verifyRes) {
+                    //    if (verifyRes[0]) {
+                    //        if (verifyRes[0].length > 0) {
+                    //            respMsg.message = verifyRes[0][0].Error;
+                    //            res.status(200).json(respMsg);
+                    //        }
+                    //        else {
+                    //            if (verifyRes[0][0]) {
+                    //                respMsg.status = true;
+                    //                //respMsg.data = {
+                    //                //    secret_code: req.body.secret_code,
+                    //                //    ezeone_id: req.body.ezeone_id,
+                    //                //    new_password: req.body.new_password
+                    //                //};
+                    //                respMsg.message = 'secret code is saved successfully';
+                    //                respMsg.error = null;
+                    //                res.status(200).json(respMsg);
+                    //            }
+                    //        }
+                    //    }
+                    //    else {
+                    //        res.status(200).json(respMsg);
+                    //    }
+                    //}
+                    //else {
+                    //    res.status(200).json(respMsg);
+                    //}
+
+                    if(verifyRes){
+                        if(verifyRes.affectedRows){
+                            respMsg.status = true;
+                            respMsg.error = null;
+                            respMsg.data = null;
+                            respMsg.message = "Password reset process is completed successfully";
+                            res.status(200).json(respMsg);
+                        }
+                        else{
+                            respMsg.status = false;
+                            respMsg.error = { secret_code : 'Session Expired ! Please try again'};
+                            respMsg.data = null;
+                            respMsg.message = "Session Expired ! Please try again";
+                            res.status(200).json(respMsg);
+                        }
+                    }
+                    else{
+                        respMsg.status = false;
+                        respMsg.error = { secret_code : 'Session Expired ! Please try again'};
+                        respMsg.data = null;
+                        respMsg.message = "Session Expired ! Please try again";
+                        res.status(200).json(respMsg);
+                    }
+                }
+            });
+        }
+        catch (ex) {
+            console.log('Error : FnVerifySecretCode ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = {server: 'Internal Server Error'};
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Please check all the errors';
+        res.status(400).json(respMsg);
+    }
+};
+
 module.exports = Auth;

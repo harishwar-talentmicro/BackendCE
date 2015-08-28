@@ -214,6 +214,12 @@ app.get('/jobs_list',LocationManager.FnGetListOfJobs);
 app.get('/verify_institute',LocationManager.FnGetVerifiedInstitutes);
 app.post('/user_details',LocationManager.FnSaveUserDetails);
 app.put('/refresh_job',LocationManager.FnJobRefresh);
+app.get('/user_details_new',LocationManager.FnGetUserDetailsNew);
+app.get('/location_details',LocationManager.FnLocationDetails);
+app.get('/job_match',LocationManager.FnJobsMatch);
+app.get('/job_myinstitute',LocationManager.FnJobsMyInstitute);
+app.get('/notify_student',LocationManager.FnNotifyRelevantStudent);
+app.get('/cv_details',LocationManager.FnViewNotifiedCVDetails);
 
 //MessageBox module methods
 app.post('/create_group',LocationManager.FnCreateMessageGroup);

@@ -11,6 +11,8 @@ var authModule = new Auth(db,stdLib);
 exports.FnRegistration = authModule.register;
 exports.FnLogin = authModule.login;
 exports.FnLogout = authModule.logout;
+exports.FnVerifyResetPasswordLink = authModule.verifyResetCode;
+exports.FnVerifySecretCode = authModule.verifySecretCode;
 
 var User = require('./modules/user-module.js');
 var userModule = new User(db,stdLib);
@@ -22,8 +24,7 @@ exports.FnGetUserDetails = userModule.getUserDetails;
 exports.FnCheckEzeid = userModule.checkEzeid;
 exports.FnChangePassword = userModule.changePassword;
 exports.FnForgetPassword = userModule.forgetPassword;
-exports.FnVerifyResetPasswordLink = userModule.verifyResetPasswordLink;
-exports.FnVerifySecretCode = userModule.verifySecretCode;
+
 exports.FnDecryptPassword = userModule.decryptPassword;
 exports.FnGetCompanyProfile = userModule.getCompanyProfile;
 exports.FnSaveCompanyProfile = userModule.saveCompanyProfile;
@@ -146,6 +147,7 @@ var imageModule = new Image(db,stdLib);
 exports.FnCropImage = imageModule.cropImage;
 exports.FnImageURL = imageModule.imageURL;
 exports.FnGetPictureOfEzeid = imageModule.getPictureOfEzeid;
+exports.FnProfileImageURL = imageModule.profileImageURL;
 
 var Reservation = require('./modules/reservation-module.js');
 var reservationModule = new Reservation(db,stdLib);
@@ -178,6 +180,10 @@ exports.FnGetjobcity = jobModule.getjobcity;
 exports.FnJobSeekersMessage = jobModule.jobSeekersMessage;
 exports.FnGetListOfJobs = jobModule.getListOfJobs;
 exports.FnJobRefresh = jobModule.jobRefresh;
+exports.FnJobsMatch = jobModule.jobsMatch;
+exports.FnJobsMyInstitute = jobModule.jobsMyInstitute;
+exports.FnNotifyRelevantStudent = jobModule.notifyRelevantStudent;
+exports.FnViewNotifiedCVDetails = jobModule.viewNotifiedCVDetails;
 
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);

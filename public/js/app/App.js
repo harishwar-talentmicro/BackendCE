@@ -37,11 +37,13 @@
             'ngAnimate',
             'ui.calendar',
             'textAngular',
-            'talent-multi-select'
+            'talent-multi-select',
+            'ui.bootstrap'
         ]);
 
     //ezeid.value('GURL',"/");
     ezeid.value('GURL',"http://104.199.128.226:3001/api/");
+    ezeid.value('GURL',angular.appSettings.SERVICE_URL);
     ezeid.value('MURL',"https://ms2.ezeone.com/stomp");
 
     ezeid.value('MsgDelay',2000);

@@ -44,7 +44,7 @@ router.get('/ewtGetDocument', LocationManager.FnGetDocument);
 router.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
 router.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
 router.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
-router.post('/pass_reset_code',LocationManager.FnVerifyResetPasswordLink);
+router.get('/pass_reset_code',LocationManager.FnVerifyResetPasswordLink);
 router.post('/verify_secret_code',LocationManager.FnVerifySecretCode);
 router.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
 router.post('/ewtChangePassword', LocationManager.FnChangePassword);
@@ -157,6 +157,12 @@ router.post('/user_details',LocationManager.FnSaveUserDetails);
 router.put('/refresh_job',LocationManager.FnJobRefresh);
 router.get('/user_details_new',LocationManager.FnGetUserDetailsNew);
 router.get('/location_details',LocationManager.FnLocationDetails);
+router.get('/job_match',LocationManager.FnJobsMatch);
+router.get('/job_myinstitute',LocationManager.FnJobsMyInstitute);
+router.get('/notify_student',LocationManager.FnNotifyRelevantStudent);
+router.get('/cv_details',LocationManager.FnViewNotifiedCVDetails);
+router.get('/profile_image',LocationManager.FnProfileImageURL);
+
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);
 router.get('/validate_groupname',LocationManager.FnValidateGroupName);
