@@ -180,6 +180,8 @@ exports.FnGetListOfJobs = jobModule.getListOfJobs;
 exports.FnJobRefresh = jobModule.jobRefresh;
 exports.FnJobsMatch = jobModule.jobsMatch;
 exports.FnJobsMyInstitute = jobModule.jobsMyInstitute;
+exports.FnNotifyRelevantStudent = jobModule.notifyRelevantStudent;
+exports.FnViewNotifiedCVDetails = jobModule.viewNotifiedCVDetails;
 
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);
