@@ -242,7 +242,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
         /**
          * if user select institute from list than send id other wise send text as title
          */
-
         if($scope.instituteTitle)
         {
             if($scope.instituteTitle == $scope.instituteText)
@@ -427,13 +426,20 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             }
                         }
                     }
+                    $scope.modernBrowsers = CVAttachCtrl.Functions;
+
+                    for (var nCountAll = 0; nCountAll < $scope.educationList.length; nCountAll++)
+                    {
+                        if($scope.educationList[nCountAll].TID == CVAttachCtrl._CVInfo.education_id)
+                        {
+                            $scope.educationList[nCountAll].ticked = true;
+                        }
+                    }
 
                     /**
                      *  Below line is for assign functions to functions dropdown
                      *  @type {*}
                      */
-                    $scope.modernBrowsers = CVAttachCtrl.Functions;
-
                     if(parseInt(CVAttachCtrl._CVInfo.category_id))
                     {
                         $scope.categoryArray = CVAttachCtrl._CVInfo.category_id.split(',');
@@ -1005,100 +1011,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
 
         /*------------------------ multi selection ----------------*/
-        // This will be our input model
-        $scope.dynamicData = [];
-
-        // Just a function to switch the model
-        $scope.switchSource = function( data ) {
-            $scope.dynamicData = angular.copy( $scope[ data ]);
-        };
-
-        // Modern browsers
-       /* $scope.modernBrowsers = [
-            {
-                icon: '<img src="https://cdn1.iconfinder.com/data/icons/fatcow/32/opera.png" />',
-                name: 'Opera',
-                maker: 'Opera Software',
-                ticked: true
-            },
-            {
-                icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32/internet_explorer.png" />',
-                name: 'Internet Explorer',
-                maker: 'Microsoft',
-                ticked: false
-            },
-            {
-                icon: '<img  src="https://cdn1.iconfinder.com/data/icons/humano2/32x32/apps/firefox-icon.png" />',
-                name: 'Firefox',
-                maker: 'Mozilla Foundation',
-                ticked: true,
-                selectedText : "selected "
-            },
-            {
-                icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32x32/safari_browser.png" />',
-                name: 'Safari',
-                maker: 'Apple',
-                ticked: false
-            },
-            {
-                icon: '<img  src="https://cdn1.iconfinder.com/data/icons/google_jfk_icons_by_carlosjj/32/chrome.png" />',
-                name: 'Chrome',
-                maker: 'Google',
-                ticked: true
-            },
-            {
-                icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32/internet_explorer.png" />',
-                name: 'Krunal',
-                maker: 'patel',
-                ticked: false
-            },
-            {
-                icon: '<img  src="https://cdn1.iconfinder.com/data/icons/humano2/32x32/apps/firefox-icon.png" />',
-                name: 'Firefox',
-                maker: 'Mozilla Foundation',
-                ticked: true,
-                selectedText : "selected "
-            },
-            {
-                icon: '<img  src="https://cdn1.iconfinder.com/data/icons/fatcow/32x32/safari_browser.png" />',
-                name: 'Safari',
-                maker: 'Apple',
-                ticked: false
-            },
-            {
-                icon: '<img  src="https://cdn1.iconfinder.com/data/icons/google_jfk_icons_by_carlosjj/32/chrome.png" />',
-                name: 'Chrome',
-                maker: 'Google',
-                ticked: true
-            }
-        ];*/
-
-        // Old browsers
-        $scope.oldBrowsers = [{"FunctionID":1,"FunctionName":"Accounts/Finance/Costing/Audit"},{"FunctionID":2,"FunctionName":"Admin/Front Office/Office Maintenance"},{"FunctionID":3,"FunctionName":"Agriculture /Veternary/Horticulture"},{"FunctionID":4,"FunctionName":"Airlines/Aerospace"},{"FunctionID":5,"FunctionName":"Automobile"},{"FunctionID":6,"FunctionName":"Banking/Financial Services/Insurance"},{"FunctionID":7,"FunctionName":"Beauty/SPA"},{"FunctionID":8,"FunctionName":"Biotechnology"},{"FunctionID":9,"FunctionName":"Chef/Cook/Waiter"},{"FunctionID":10,"FunctionName":"Education"},{"FunctionID":11,"FunctionName":"Electronics/Embedded/VLSI"},{"FunctionID":12,"FunctionName":"Engineering"},{"FunctionID":13,"FunctionName":"Entertainment/Casino/VIP Escort"},{"FunctionID":14,"FunctionName":"Healthcare/Doctor/Nurse"},{"FunctionID":15,"FunctionName":"Hospitality/Hotels/Restaurants"},{"FunctionID":16,"FunctionName":"Housekeeping/Security"},{"FunctionID":17,"FunctionName":"HR(Internal)"},{"FunctionID":18,"FunctionName":"IT Software/Hardware"},{"FunctionID":19,"FunctionName":"Maintenance Services"},{"FunctionID":20,"FunctionName":"Management/Professional Services"},{"FunctionID":21,"FunctionName":"Manufacturing & Production"},{"FunctionID":22,"FunctionName":"Marine/Shipping"},{"FunctionID":23,"FunctionName":"Marketing, PR & Events"},{"FunctionID":24,"FunctionName":"Media/Market Research"},{"FunctionID":25,"FunctionName":"Oil & Gas"},{"FunctionID":26,"FunctionName":"Pharmaceutical"},{"FunctionID":27,"FunctionName":"R & D / Space Sciences"},{"FunctionID":28,"FunctionName":"Retail"},{"FunctionID":29,"FunctionName":"Road Transportation/Logistics/Warehousing"},{"FunctionID":30,"FunctionName":"Sales/BD"},{"FunctionID":31,"FunctionName":"Spiritual/Astrology/Vaastu/feng shui"},{"FunctionID":32,"FunctionName":"Staffing/Executive Search/RPO/Placement"},{"FunctionID":33,"FunctionName":"Telecom/ISP"},{"FunctionID":34,"FunctionName":"Travel/Entertainment"},{"FunctionID":35,"FunctionName":"Other"}];
-
-        /*  $scope.oldBrowsers = [
-              {
-                  icon: '<img  src="http://www.ucdmc.ucdavis.edu/apps/error/nojavascript/images/netscape_icon.jpg" />',
-                  name: 'Netscape Navigator',
-                  maker: 'Netscape Corporation',
-                  ticked: true
-              },
-              {
-                  icon: '<img  src="http://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Amaya_logo_65x50.png/48px-Amaya_logo_65x50.png" />',
-                  name: 'Amaya',
-                  maker: 'Inria & W3C',
-                  ticked: true
-              },
-              {
-                  icon: '<img  src="http://upload.wikimedia.org/wikipedia/commons/8/8c/WorldWideWeb_Icon.png" />',
-                  name: 'WorldWideWeb Nexus',
-                  maker: 'Tim Berners-Lee',
-                  ticked: false
-              }
-          ];*/
-
-        // Initially we'll use the modern browsers
-        $scope.switchSource( 'modernBrowsers' );
 
         $scope.fOpen = function() {
            // console.log( 'On-open' );
@@ -1166,6 +1078,52 @@ angular.module('ezeidApp').controller('CVAttachController',[
             selectNone : "Deselect All",
             nothingSelected  : "Select Function"
         };
+
+        /*------------------------ multi selection ----------------*/
+
+        $scope.educationOpen = function() {
+            // console.log( 'On-open' );
+        };
+
+        $scope.educationClose = function() {
+            //console.log( 'On-close' );
+        };
+
+        $scope.educationClick = function( data )
+        {
+            CVAttachCtrl._CVInfo.education_id = data.TID;
+        };
+
+
+
+        $scope.educationReset = function() {
+            /*$scope.selectedFunctions = [];
+
+            for (var nCount = 0; nCount < $scope.functionsArray.length; nCount++)
+            {
+                $scope.selectedFunctions.push(parseInt($scope.functionsArray[nCount]));
+            }*/
+        };
+
+        $scope.educationClear = function() {
+            // console.log( 'On-clear' );
+        };
+
+        $scope.educationSearchChange = function( data ) {
+            /*console.log( 'On-search-change' );
+             console.log( 'On-search-change - keyword: ' + data.keyword );
+             console.log( 'On-search-change - result: ' );
+             console.log( data.result );*/
+        };
+
+        $scope.eductionTags = {
+            selectAll : "Select All",
+            reset : "Reset",
+            search : "Search Last Education",
+            selectNone : "Deselect All",
+            nothingSelected  : "Select Last Education"
+        };
+
 
 
         /*$scope.$watch('outputBrowsers',function(n,o){
