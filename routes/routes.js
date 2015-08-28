@@ -147,6 +147,7 @@ var imageModule = new Image(db,stdLib);
 exports.FnCropImage = imageModule.cropImage;
 exports.FnImageURL = imageModule.imageURL;
 exports.FnGetPictureOfEzeid = imageModule.getPictureOfEzeid;
+exports.FnProfileImageURL = imageModule.profileImageURL;
 
 var Reservation = require('./modules/reservation-module.js');
 var reservationModule = new Reservation(db,stdLib);

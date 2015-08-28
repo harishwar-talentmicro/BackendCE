@@ -32,7 +32,7 @@ function utcToLocal(utc) {
 
 
 var rule = new schedule.RecurrenceRule();
-rule.minute = new schedule.Range(0, 59, 1);
+rule.minute = new schedule.Range(0, 1, 1);
 
 var MessageScheduler = schedule.scheduleJob(rule, function () {
     try {

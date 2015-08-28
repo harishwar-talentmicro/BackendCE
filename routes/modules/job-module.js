@@ -72,6 +72,7 @@ Job.prototype.create = function(req,res,next){
     var resultvalue = '';
     var skillMatrix1 = req.body.skillMatrix;
     skillMatrix1= JSON.parse(JSON.stringify(skillMatrix1));
+    var skillIds = req.body.skill_ids ? req.body.skill_ids : '';
 
     var responseMessage = {
         status: false,
@@ -167,7 +168,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
                                 + ',' + st.db.escape(categoryID)+ ',' + st.db.escape(educationID)+ ',' + st.db.escape(specializationID)
-                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(aggregateScore);
+                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(aggregateScore)+ ',' + st.db.escape(skillIds);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
                                     if (!err) {
