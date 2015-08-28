@@ -2529,11 +2529,10 @@ User.prototype.saveResume = function(req,res,next){
 
                         var saveResumeDetails = function(){
                             location_id = location_id.substr(0,location_id.length - 1);
-                            var queryParams = st.db.escape(FunctionID) + ',' + st.db.escape(KeySkills) + ',' +
-                                st.db.escape(Status) + ',' + st.db.escape(Pin) + ',' + st.db.escape(Token) + ',' + st.db.escape(ids)+ ','+
-                                st.db.escape(salary) + ',' + st.db.escape(noticePeriod) + ',' + st.db.escape(experience) + ','+
-                                st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle) + ',' + st.db.escape(jobType) + ','+
-                                st.db.escape(location_id) + ',' + st.db.escape(categoryID) + ',' + st.db.escape(instituteID)
+                            var queryParams = st.db.escape(FunctionID) + ',' + st.db.escape(Status) + ',' + st.db.escape(Pin)
+                                + ',' + st.db.escape(Token) + ',' + st.db.escape(ids)+ ','+ st.db.escape(salary) + ',' + st.db.escape(noticePeriod)
+                                + ',' + st.db.escape(experience) + ','+ st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle)
+                                + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID) + ',' + st.db.escape(instituteID)
                                 + ',' + st.db.escape(educationID) + ',' + st.db.escape(specializationID) + ',' + st.db.escape(yearOfPassing)
                                 + ','+ st.db.escape(aggregateScore)+ ','+ st.db.escape(institueTitle) +',' + st.db.escape(expectedSalary);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
@@ -2758,7 +2757,7 @@ function FnSaveSkills(skill, CallBack) {
             };
             RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
 
-            st.db.query('Select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, SkillResult) {
+            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname), function (err, SkillResult) {
                 if ((!err)) {
                     if (SkillResult[0]) {
                         console.log(SkillResult);

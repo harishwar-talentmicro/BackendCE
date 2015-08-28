@@ -468,7 +468,7 @@ Search.prototype.searchInformation = function(req,res,next){
             st.db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
                 // st.db.query(searchQuery, function (err, SearchResult) {
                 if (!err) {
-                    // console.log(UserInfoResult);
+                    console.log(UserInfoResult);
                     if (UserInfoResult[0].length > 0) {
                         res.send(UserInfoResult[0]);
                         console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
