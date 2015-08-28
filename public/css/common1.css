@@ -1638,7 +1638,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .cvBottomSpace
 {
-    margin-bottom: 25px;
+    /*margin-bottom: 25px;*/
+    margin-bottom: 10px;
 }
 .cvBottomSpaceMiddle
 {
@@ -1948,7 +1949,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .arw .label-form
 {
     display: initial;
-    padding: 1px 2px 1px 2px;
+   /* padding: 1px 2px 1px 2px;*/
+    padding: 2px 5px 0px 5px;
 }
 .arw .location-box-border
 {
@@ -2080,4 +2082,22 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .padding-left4
 {
     padding-left: 4%;
+}
+.setHeight35
+{
+    height: 35px;
+}
+.fontsize19
+{
+    font-size: 19px;
+}
+.addLocLables
+{
+    border: 1px solid #A59090;
+    background-color: #F7F3F3;
+    color: #000;
+}
+.textRed
+{
+    color: #FC1C00;
 }

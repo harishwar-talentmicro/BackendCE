@@ -32,13 +32,13 @@
                         <div class="row">
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 profile-details" ng-hide="profileEditMode">
 
-                            <div class="row">
+                               <!-- <div class="row">
                                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
                                     <h5 class="text-primary text-left">Function</h5>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw">
 
-                                    <div    talent-multi-select=""
+                                   &lt;!&ndash; <div    talent-multi-select=""
                                             input-model="modernBrowsers"
                                             output-model="outputBrowsers"
                                             button-label="icon name"
@@ -55,37 +55,134 @@
                                             on-search-change="fSearchChange( data )"
                                             translation="localLang"
                                             custom-button-class="btn-block"
-                                            max-labels="0">
-                                    </div>
+                                            max-labels="0"
+                                            max-height="250px">
+                                    </div>&ndash;&gt;
 
                                 </div>
                             </div>
-                            <hr/>
+                                <hr/>-->
 
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                <div class="row cvBottomSpace ">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 label">
                                         <h5 class="text-primary text-left">Function</h5>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw" id="functionDiv">
-                                         <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction emptyBox">
-                                            <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedFunctions.length}}) -- </span>
-                                            <span class="mobile-view-text"></span>
-                                            <span class="caret selectImg"></span></button>
-                                        <div class="opt opt-2">
-                                            <div class="filter-dropdown width-105 search-option-content setTableFixHeight" style="display: none;">
-                                                <div class="checkbox-dropdown" ng-repeat="function in CVAttachCtrl.Functions track by $index" ng-click="selectFunction(function.FunctionID)">
-                                                   <i class="fa " ng-class="selectedFunctions.indexOf(function.FunctionID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{function.FunctionName}}
-                                                </div>
-                                            </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                        <div  talent-multi-select=""
+                                                input-model="modernBrowsers"
+                                                output-model="outputBrowsers"
+                                                button-label="icon name"
+                                                default-button-label="Select Function "
+                                                item-label="icon FunctionName maker"
+                                                tick-property="ticked"
+                                                on-open="fOpen()"
+                                                on-close="fClose()"
+                                                on-item-click="fClick( data )"
+                                                on-select-all="fSelectAll()"
+                                                on-select-none="fSelectNone()"
+                                                on-reset="fReset()"
+                                                on-clear="fClear()"
+                                                on-search-change="fSearchChange( data )"
+                                                translation="functionTags"
+                                                custom-button-class="btn-block"
+                                                max-labels="0"
+                                                max-height="250px">
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Key Skills</h5>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
-                                        <input type="text" ng-class="cvForm.keySkills.$touched && !CVAttachCtrl._CVInfo.KeySkills.length ? 'mandatoryTextBoxCV' : ''" name="keySkills" class="form-control emptyBox" ng-model="CVAttachCtrl._CVInfo.KeySkills" placeholder="Java, Sales, Marketing" required/>
                                     </div>
                                 </div>
+                                <div class="row cvBottomSpace">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 label">
+                                       <h5 class="text-primary text-left">CV Status</h5>
+                                    </div>
+                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                                        <div class="row setRowLeftRightMarginZero location-box-border ">
+                                            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 innerMsgButtonContainer">
+                                                <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
+                                                <div class="innerMsgButtonContainer"> &nbsp; Active(Access is Active)</div>
+                                            </div>
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 innerMsgButtonContainer">
+                                                <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="NotVisible" class="check-box pull-left" value="2" style="margin-top: 0px;"/>
+                                                <div class="innerMsgButtonContainer"> &nbsp; Inactive(Access Denied/Not Looking for Change)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row cvBottomSpace">
+                                   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 label">
+                                       <h5 class="text-primary text-left">Preferred Location</h5>
+                                   </div>
+                                   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                                       <div class="input-group">
+                                           <input type="text" id="google-map-search-box" placeholder="Type City" ng-model = "locationName" class="form-control"/>
+                                            <span class="input-group-addon noPaddingNoBorder">
+                                                <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
+                                            </span>
+                                       </div>
+                                   </div>
+                                   <!--<div class="row cvBottomSpace" ng-show="locationArrayString.length">-->
+                                   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 location-box-border" ng-show="locationArrayString.length" style="width: 48%;">
+                                       <div style="padding-right: 15px;">
+                                             <span class="fontsize19" ng-repeat="location in locationArrayString track by $index">
+                                                <label  class="label label-default label-form addLocLables" style="font-weight:normal;">{{location}} <i ng-click="removeLocation($index)" class="fa fa-times textRed"></i></label>&nbsp;
+                                            </span>
+                                       </div>
+                                   </div>
+                                   <!--</div>-->
+                               </div>
+                                <div class="row cvBottomSpace">
+                                   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                       <h5 class="text-primary text-left">Experience</h5>
+                                   </div>
+                                   <div class="col-lg-3 col-md-3 col-sm-3 col-xs-8 cvBottomSpace">
+                                       <div class="row setRowLeftRightMarginZero">
+
+                                           <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setLeftRightPaddingZero">
+                                               <div class="input-group">
+                                                   <input type="text" class="form-control text-right" decimals-only maxlength="4" ng-model="CVAttachCtrl._CVInfo.experience" placeholder="Experience" aria-describedby="sizing-addon1"/>
+                                                   <span class="input-group-addon" id="sizing-addon2">Years</span>
+                                               </div>
+                                           </div>
+                                       </div>
+
+
+                                   </div>
+                                   <div class="col-lg-1 col-md-1 col-sm-1 col-xs-8">
+                                   </div>
+
+                                   <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
+                                       <h5 class="text-primary text-left">Institute</h5>
+                                   </div>
+                                   <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
+                                       <div    talent-multi-select=""
+                                               input-model="modernBrowsers"
+                                               output-model="outputBrowsers"
+                                               button-label="icon name"
+                                               default-button-label="Select Institute "
+                                               item-label="icon FunctionName maker"
+                                               tick-property="ticked"
+                                               on-open="fOpen()"
+                                               on-close="fClose()"
+                                               on-item-click="fClick( data )"
+                                               on-select-all="fSelectAll()"
+                                               on-select-none="fSelectNone()"
+                                               on-reset="fReset()"
+                                               on-clear="fClear()"
+                                               on-search-change="fSearchChange( data )"
+                                               translation="functionTags"
+                                               custom-button-class="btn-block"
+                                               max-labels="0"
+                                               max-height="250px"
+                                               selection-mode="single">
+                                       </div>
+                                   </div>
+                               </div>
+
+
+
                                 <div class="row">
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpaceMiddle label">
                                         <h5 class="text-primary text-left">CV Upload</h5>
@@ -121,20 +218,6 @@
                                         <input ng-show="CVAttachCtrl.EnablePin" maxlength="3" onkeypress="return isNumberKey(event);" type="text" style="width: 22%;" class="form-control" ng-model="CVAttachCtrl._CVInfo.Pin" placeholder="Pin"/>
                                     </div>
                             </div>
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
-                                        <h5 class="text-primary text-left">CV Status</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 ">
-
-                                        <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="Visible" class="check-box pull-left" value="1" style="margin-top: 0px;"/>
-                                        <span> &nbsp; Active(Access is Active)</span>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-8 " style="padding-left: 0px;">
-                                        <input type="radio" name="CVStatus" ng-model="CVAttachCtrl._CVInfo.Status" id="NotVisible" class="check-box pull-left" value="2" style="margin-top: 0px;"/>
-                                        <span> &nbsp; Inactive(Access Denied/Not Looking for Change)</span>
-                                    </div>
-                                </div>
                                 <div class="row">
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
                                         <h5 class="text-primary text-left">Present Salary</h5>
@@ -201,48 +284,8 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Preferred Location</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
-                                        <div class="input-group">
-                                            <input type="text" id="google-map-search-box" placeholder="Type City" ng-model = "locationName" class="form-control"/>
-                                            <span class="input-group-addon noPaddingNoBorder">
-                                                <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <!--<div class="row cvBottomSpace" ng-show="locationArrayString.length">-->
-                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 location-box-border cvBottomSpace" ng-show="locationArrayString.length" style="width: 48%;">
-                                            <div style="padding-right: 15px;">
-                                                 <span class="fontsize21" ng-repeat="location in locationArrayString track by $index">
-                                                    <label  class="label label-default label-form" style="font-weight:normal;">{{location}} <i ng-click="removeLocation($index)" class="fa fa-times text-warning"></i></label>&nbsp;
-                                                </span>
-                                            </div>
-                                        </div>
-                                    <!--</div>-->
-                                </div>
 
                                 <div class="row">
-                                    <!--<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Job Categories</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw cvcategory" id="footleft">
-                                        <button class="btn btn-default btn-sm dropdown-toggleCategory opt opt-2 drpFunction">
-                                            <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedCategories.length}}) -- </span>
-                                            <span class="mobile-view-text"></span>
-                                            <span class="caret selectImg"></span>
-                                        </button>
-                                        <div class="opt opt-2">
-                                            <div class="filter-dropdownCategory width-105 search-option-content setTableFixHeight" style="display: none;">
-                                                <div class="checkbox-dropdown" ng-repeat="category in jobCategories track by $index" ng-click="selectJobCategories(category.CategoryID)">
-                                                    <i class="fa " ng-class="selectedCategories.indexOf(category.CategoryID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{category.CategoryTitle}}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>-->
-
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
                                         <h5 class="text-primary text-left">Expected Salary</h5>
                                     </div>
