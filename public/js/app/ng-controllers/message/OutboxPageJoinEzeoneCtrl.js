@@ -119,6 +119,7 @@ angular.module('ezeidApp').
                 if(ezeone.toUpperCase() == $rootScope._userInfo.ezeone_id)
                 {
                     Notification.error({ message: "You can't connect to yourself, Try again with some other EZEONE ID", delay: MsgDelay });
+                    $scope.toggleEzeoneModalVisibility();
                 }
 
                 validateEzeone(ezeone).then(function(val){
