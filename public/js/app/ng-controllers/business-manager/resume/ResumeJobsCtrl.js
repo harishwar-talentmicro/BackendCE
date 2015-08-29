@@ -67,6 +67,22 @@
             $scope.totalResult = 0;//Total results
             $scope.resultThisPage = 0;//Total results you got this page
 
+            //Skill Map declaration
+            $scope.skillMatrix = [];
+            $scope.editMode = [];
+            var skillsTid = [];
+            $scope.availableTags = [];
+            $scope.editSkill = {
+                "tid":0,
+                "skillname":"",
+                "expertiseLevel":0,
+                "exp_from":0.00,
+                "exp_to":0.00,
+                "active_status":true
+            };
+
+
+
             /**
              * Hide all the open dropdown
              */
@@ -215,12 +231,13 @@
                 if($scope.jobDescription.length < 1){
                     err.push('Job Description is empty');
                 }
+
+                /*
                 if($scope.skillKeyWords.length < 1){
                     err.push('Skill Keywords is empty');
                 }
+                */
 
-                /*if(($scope.jobVacancies.length == 1) && (parseInt($scope.jobVacancies == 0)))*/
-                /*if((parseInt($scope.jobVacancies) == 0) && ($scope.jobVacancies.length == 0))*/
                 if(($scope.jobVacancies == "") || ($scope.jobVacancies.length == 0) || (parseInt($scope.jobVacancies) == 0))
                 {
                     err.push('Job Vacancies is empty');
@@ -247,7 +264,7 @@
                 if(parseInt($scope.salaryTo) < parseInt($scope.salaryFrom)){
                     err.push('Salary From is smaller than Salary To');
                 }
-              /*  if($scope.jobType == 0){
+                /*  if($scope.jobType == 0){
                     err.push('Please select Job type');
                 }*/
                 if($scope.contactName.length < 1){
@@ -263,8 +280,6 @@
                     if($scope.emailContact)
                     {
                         var chk_email = new RegExp(/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i);
-
-                        //  var emailval = $('#email').val();
                         if (!chk_email.test($scope.emailContact))
                         {
                             err.push('Not valid email!');
@@ -274,7 +289,7 @@
 
                 if($scope.jobCategori == 0)
                 {
-                    err.push('Please select Job Categories');
+                    err.push('Please select Job Function');
                 }
 
                 if(err.length > 0)
@@ -283,7 +298,6 @@
                     {
                         Notification.error({ message : err[i], delay : 2000});
                     }
-                    // Notification.error({ message : "Please enter information for Job", delay : 2000});
                     return false;
                 }
                 return true;
@@ -291,6 +305,34 @@
 
             // save job to system
             $scope.postJob = function(){
+
+                for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++)
+                {
+                    $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
+                }
+
+                if($scope.skillMatrix[0])
+                {
+                    if((!$scope.skillMatrix[0].skillname) && (!$scope.skillMatrix[0].exp))
+                    {
+                        var index = 0;
+                        if (index > -1)
+                        {
+                            $scope.skillMatrix.splice(index, 1);
+                            skillsTid.splice(index,1);
+                        }
+                        if($scope.skillMatrix.length == 0)
+                        {
+                            $scope.skillMatrix = [];
+                            skillsTid = [];
+                        }
+                    }
+                }
+
+                console.log("sai123 ");
+                console.log($scope.skillMatrix);
+
+
                 if(validateItem())
                 {
                     $scope.$emit('$preLoaderStart');
@@ -319,7 +361,9 @@
                         education_id : $scope.selectedEducations.toString(),
                         specialization_id : $scope.selectedSpecializations.toString(),
                         institute_id : $scope.selectedInstitute.toString(),
-                        aggregate_score : $scope.aggregate_score
+                        aggregate_score : $scope.aggregate_score,
+                        skillMatrix : $scope.skillMatrix,
+                        skill_ids : skillsTid.toString()
                     }
 
                     $http({
@@ -373,6 +417,7 @@
                 getEducations();
                 getSpecialization();
                 getInstituteList();
+                getAllSkills();
 
                 $scope.showJobListing = false;
                 $scope.locationArrayString = [];
@@ -380,6 +425,19 @@
 
                 if(_index == 'add')
                 {
+                    $scope.skillMatrix = [];
+                    $scope.skillMatrix.push(
+                        {
+                            "tid":0,
+                            "skillname":"",
+                            "expertiseLevel":0,
+                            "exp_from":"",
+                            "exp_to":"",
+                            "active_status":1
+                        }
+                    );
+                    $scope.editMode[0] = true;
+
                     $scope.$emit('$preLoaderStop');
                     $scope.jobTid = 0;
                     $scope.jobTitle = "";
@@ -958,6 +1016,236 @@
                     });
                 }
             };
+
+            /**   Skill map functions Start */
+
+            $scope.complete=function(_index){
+                $( "#tags"+_index ).autocomplete({
+                    source: $scope.availableTags
+                });
+
+                $("#tags"+_index ).on("autocompleteselect", function( event, ui ) {
+                    $scope.editSkill.skillname = ui.item.value;
+                });
+            };
+
+            $scope.expertiseLevels = [
+                'Beginner',
+                'Independent',
+                'Expert',
+                'Master'
+            ];
+
+            $scope.deleteSkilFromMartix=function(_index, _tid)
+            {
+                if (_index > -1) {
+
+                    $scope.editMode.splice(_index,1);
+
+                    $scope.skillMatrix.splice(_index, 1);
+                    skillsTid.splice(_index,1);
+                }
+                if($scope.skillMatrix.length == 0)
+                {
+                    $scope.skillMatrix = [];
+                    skillsTid = [];
+                    $scope.editMode = [];
+                }
+            };
+
+            $scope.checkExp = function(index)
+            {
+                /*if(parseFloat($scope.skillMatrix[index].exp) == NaN)
+                {
+                    $scope.skillMatrix[index].exp = 0.00;
+                }
+                $scope.skillMatrix[index].exp = (parseFloat($scope.skillMatrix[index].exp)).toFixed(2);*/
+
+                if((parseFloat($scope.skillMatrix[index].exp_from) == NaN) && (parseFloat($scope.skillMatrix[index].exp_to) == NaN))
+                {
+                    $scope.skillMatrix[index].exp_from = 0.00;
+                    $scope.skillMatrix[index].exp_to = 0.00;
+                }
+                $scope.skillMatrix[index].exp_from = (parseFloat($scope.skillMatrix[index].exp_from)).toFixed(2);
+                $scope.skillMatrix[index].exp_to = (parseFloat($scope.skillMatrix[index].exp_to)).toFixed(2);
+            };
+
+            $scope.saveSkillFn = function(index){
+                if(index == 0)
+                {
+                    var ind = $scope.skillMatrix.indexOfWhere('skillname',$scope.editSkill.skillname);
+                    if(ind > 0)
+                    {
+                        $scope.editSkill = {
+                            "tid":0,
+                            "skillname":"",
+                            "expertiseLevel":0,
+                            "exp_from":0.00,
+                            "exp_to":0.00,
+                            "active_status":true
+                        };
+                        return;
+                    }
+
+                    var newSkill = angular.copy($scope.editSkill);
+                    $scope.editMode.push(false);
+
+                    /*if(newSkill.skillname && newSkill.exp)*/
+
+                    console.log(newSkill);
+
+                    if(newSkill.skillname)
+                    {
+                        $scope.skillMatrix.push(newSkill);
+                    }
+
+                    $scope.editSkill = {
+                        "tid":0,
+                        "skillname":"",
+                        "expertiseLevel":0,
+                        "exp_from":0.00,
+                        "exp_to":0.00,
+                        "active_status":true
+                    };
+                }
+                else{
+                    $scope.skillMatrix[index] = angular.copy($scope.editSkill);
+                    $scope.editMode[index] = false;
+                    $scope.editMode[0] = true;
+                    $scope.editSkill = {
+                        "tid":0,
+                        "skillname":"",
+                        "expertiseLevel":0,
+                        "exp_from":0.00,
+                        "exp_to":0.00,
+                        "active_status":true
+                    };
+                }
+
+                $scope.skillMatrix[0] = {
+                    "tid":0,
+                    "skillname":"",
+                    "expertiseLevel":0,
+                    "exp_from":0.00,
+                    "exp_to":0.00,
+                    "active_status":true
+                };
+            };
+
+            var editSkill = {
+                "tid":0,
+                "skillname":"",
+                "expertiseLevel":0,
+                "exp_from":"1",
+                "exp_to":"2",
+                "active_status":1
+            };
+
+            $scope.editSkillFn = function(index){
+                $scope.editSkill = angular.copy($scope.skillMatrix[index]);
+                for(var ct=0; ct < $scope.skillMatrix.length; ct++){
+                    if($scope.editMode[ct] && ct !== index){
+                        $scope.editMode[ct] = false;
+                    }
+                    else if(ct == index){
+                        $scope.editMode[ct] = true;
+                    }
+                }
+            };
+
+            $scope.$watch('editSkill.exp_from',function(n,v){
+                if(parseFloat(n) == NaN){
+                    $scope.editSkill.exp_from = 0.0;
+                }
+                if(n && (n !== v)){
+                    $scope.editSkill.exp_from = (parseFloat($scope.editSkill.exp_from) !== NaN &&
+                        parseFloat($scope.editSkill.exp_from) >= 0 && parseFloat($scope.editSkill.exp_from) < 51) ? (parseFloat($scope.editSkill.exp_from)).toFixed(1) : 0.0;
+                }
+            });
+
+            $scope.$watch('editSkill.exp_to',function(n,v){
+                if(parseFloat(n) == NaN){
+                    $scope.editSkill.exp_to = 0.0;
+                }
+                if(n && (n !== v)){
+                    $scope.editSkill.exp_to = (parseFloat($scope.editSkill.exp_to) !== NaN &&
+                        parseFloat($scope.editSkill.exp_to) >= 0 && parseFloat($scope.editSkill.exp_to) < 51) ? (parseFloat($scope.editSkill.exp_to)).toFixed(1) : 0.0;
+                }
+            });
+
+            function getAllSkills(){
+                $scope.$emit('$preLoaderStart');
+                $http({
+                    method: 'get',
+                    url : GURL + 'skill_list'
+
+                }).success(function (res)
+                    {
+                        $scope.$emit('$preLoaderStop');
+                        if(res.status)
+                        {
+                            for (var nCount = 0; nCount < res.data.length; nCount++)
+                            {
+                                $scope.availableTags.push(res.data[nCount].SkillTitle);
+                            }
+                        }
+                    }).error(function(err){
+                        $scope.$emit('$preLoaderStop');
+                    });
+            };
+            /**   Skill map functions End */
+
+            /** Multiselct Combo **/
+            $scope.fOpen = function() {
+                // console.log( 'On-open' );
+            };
+
+            $scope.fClose = function() {
+                //console.log( 'On-close' );
+            };
+
+            $scope.fClick = function( data )
+            {
+                if($scope.selectedFunctions.indexOf(data.FunctionID)!=-1)
+                {
+                    var index = $scope.selectedFunctions.indexOf(data.FunctionID);
+                    $scope.selectedFunctions.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedFunctions.push(data.FunctionID);
+                }
+            };
+
+            $scope.fSelectAll = function()
+            {};
+
+            $scope.fSelectNone = function()
+            {};
+
+            $scope.fReset = function()
+            {};
+
+            $scope.fClear = function() {
+                // console.log( 'On-clear' );
+            };
+
+            $scope.fSearchChange = function( data ) {
+                /*console.log( 'On-search-change' );
+                 console.log( 'On-search-change - keyword: ' + data.keyword );
+                 console.log( 'On-search-change - result: ' );
+                 console.log( data.result );*/
+            };
+
+            $scope.functionTags = {
+                selectAll : "Select All",
+                reset : "Reset",
+                search : "Search Function",
+                selectNone : "Deselect All",
+                nothingSelected  : "Expertise Level"
+            };
+
+
 
         }]);
 })();
