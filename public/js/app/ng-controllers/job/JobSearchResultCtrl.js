@@ -351,22 +351,15 @@ angular.module('ezeidApp').
                 /* calculate the salary range */
                 var min = minSal;
                 var max = maxSal;
-                var rangeBreakPoints = 5;
-                var diff = (max - min)/rangeBreakPoints;
+                var diff = (max - min)/5;
 
-                for(var i = 0; i < rangeBreakPoints; i++)
+                for(var i = 0; i < 5; i++)
                 {
-                    var tempDiff = diff;
-                    if(i > 0)
-                    {
-                        tempDiff -= 1;
-                        min += 1;
-                    }
-
                     tempArr = {
                         minSal:min,
-                        maxSal:(min = parseInt(min) + tempDiff)
+                        maxSal:maxSal
                     };
+                    min+=diff;
                     $scope.filter.salaryArr.push(tempArr);
                 }
             }

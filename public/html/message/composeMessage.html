@@ -79,15 +79,16 @@
             </span>
             <hr>
             <!-- Additional Filters -->
-            <div class="additional-filter p-bottom-4">
-                <span class="col-lg-4 no-padding">
+            <div class="additional-filter p-bottom-4 container">
+
+                <span class="col-lg-3 no-padding">
                 <div class="">Priority</div>
                 <select class="form-control" ng-model="composeMsg.Priority">
                     <option ng-repeat="pr in priority track by $index" value="{{$index}}">{{priority[$index]}}</option>
                 </select>
-                    </span>
+                </span>
 
-                <span class="col-lg-4 ">
+                <span class="col-lg-3 ">
                     <div class="">Target Date</div>
                          <date-time-picker input-group-class="input-group-sm" recipient="composeMsg.TargetDate" settings='{
                                                                         "format" : "d M Y H:m",
@@ -99,7 +100,7 @@
                     <!--<date-time-picker recipient="composeMsg.TargetDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>-->
                 </span>
 
-                <span class="col-lg-4 no-padding">
+                <span class="col-lg-3 no-padding">
                     <div class="">Expiry Date</div>
                     <date-time-picker input-group-class="input-group-sm" recipient="composeMsg.ExpiryDate" settings='{
                                                                         "format" : "d M Y H:m",
@@ -109,10 +110,11 @@
                                                                         }'></date-time-picker>
                     <!--<date-time-picker recipient="composeMsg.ExpiryDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>-->
                 </span>
-            </div>
-            <div class="send-button text-right p-bottom-4" ng-disabled="visibilityHtml.disabledSendBtn">
-                <button class="btn btn-primary no-radius p-top-4 m_top_4"
+
+                <span class="col-lg-3 send-button text-right" ng-disabled="visibilityHtml.disabledSendBtn">
+                     <button class="btn btn-primary no-radius"
                         ng-click="sendMessage()"><i class="fa fa-send"></i> Send</button>
+                </span>
             </div>
         </div>
     </div>
