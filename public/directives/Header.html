@@ -184,6 +184,10 @@
                 <form class="" role="form">
                     <ul class="nav navbar-nav navbar-right">
 
+                        <li ng-show="($root._userInfo.IsAuthenticate) && (!$root._userInfo.isinstitute_admin)">
+                            <a title="Show my institute job" href="/show-my-institute-jobs" class="btn-link header-link"><i class="fa fa-arrow-circle-up"></i> Show Jobs</a>
+                        </li>
+
                         <!-- Signin Link -->
                         <li ng-show="$root._userInfo.IsAuthenticate">
                             <a ng-click="redirectToMessageBox()" class="border-right-1 btn-link" ng-click="($root.unreadMessageCount  = 0)" title="Messages">

@@ -1,385 +1,97 @@
-<div class="row setRowLeftRightMarginZero post-job topMarginButton" ng-controller="ResumeJobSeekerCtrl">
-    <!-- Start of design for finding - Job Seekers -->
-    <section id="job-seeker-search" class="jss hpw job-seeker-bg">
-        <div class="container width-100 setRowLeftRightMarginZero setLeftRightPaddingZero">
-            <div class="panel">
-                <div class="panel-primary panel-heading">
-                    <i class="fa fa-search"></i>  Find Job Seekers
-                </div>
-                <div class="panel-default panel-body">
-                    <!-- search bar to search job keyword by skill keywords -->
-                        <div class="container p-bottom-10">
-                            <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <input type="text" name="Skill_Keywords" ng-keypress="searchJobSeekers($event)" class="form-control" placeholder="Skill Keywords" ng-model ="jobSeekerSkillKeyword" />
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <select class="form-control" ng-model = "jobSeekerJobType">
-                                        <option value="0">Full Time</option>
-                                        <option value="1">Part Time</option>
-                                        <option value="2">Work from Home</option>
-                                        <option value="3">Internship</option>
-                                        <option value="4">Apprenticeship</option>
-                                        <option value="5">Job Oriented Training</option>
-                                        <option value="6">Consultant</option>
-                                        <option value="7">Freelancer</option>
-                                      </select>
-                                </div>
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-left topMarginButton">
-                                            Salary
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" decimals-only maxlength="17" placeholder="Ex: 100000" ng-model = "jobSeekerSalaryFrom" class="form-control text-right"/>
-                                        </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 text-center topMarginButton">
-                                            to
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" decimals-only maxlength="17" placeholder="Ex: 200000" ng-model = "jobSeekerSalaryTo" class="form-control text-right"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                                    <select class="form-control" ng-model = "jobSeekerSalaryType">
-                                        <option value="1"> Per Hour </option>
-                                        <option value="2"> Per Month</option>
-                                        <option value="3"> Per Annum</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="container p-bottom-10">
-                            <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <select class="form-control" name="countrySelect" ng-model="countrySelect"
-                                            ng-change="getCityListOfCountry(countrySelect)"
-                                            ng-options="country.countryname as country.countryname for country in countryLists" required>
-                                        <option value = ""> -- Select Country -- </option>
-                                    </select>
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekercity">
-                                    <button class="btn btn-default btn-sm dropdown-toggleCity1 opt opt-2 drpFunction" ng-disabled="!cityList">
-                                        <span class="normal-view-text custom-select-dropdown"> -- Select City ({{selectedCitys.length}}) -- </span>
-                                        <span class="mobile-view-text"></span>
-                                        <span class="caret selectImg"></span></button>
-                                    <div class="opt opt-2">
-                                        <div class="filter-dropdownCity width89 search-option-content setTableFixHeight" style="display: none;">
-                                            <div class="checkbox-dropdown" ng-repeat="city in cityList track by $index" ng-click="selectCity(city.tid)">
-                                                <i class="fa " ng-class="selectedCitys.indexOf(city.tid)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{city.Locname}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                    <div class="row">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center topMarginButton">
-                                            Experience
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" decimals-only maxlength="5" placeholder="1" ng-model = "jobSeekerExperienceFrom" class="form-control text-right"/>
-                                        </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 text-center topMarginButton">
-                                            to
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" decimals-only maxlength="5" placeholder="3" ng-model = "jobSeekerExperienceTo" class="form-control text-right"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
-                                    Years
-                                </div>
-                            </div>
-                        </div>
-                        <div class="container p-bottom-10">
-                            <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekerinstitute">
-                                    <button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction">
-                                        <span class="normal-view-text custom-select-dropdown"> -- Select Institute ({{selectedInstitute.length}}) -- </span>
-                                        <span class="mobile-view-text"></span>
-                                        <span class="caret selectImg"></span>
-                                    </button>
-                                    <div class="opt opt-2">
-                                        <div class="filter-dropdownInstitute width89 search-option-content setTableFixHeight" style="display: none;">
-                                            <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
-                                                <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekereducation">
-                                    <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
-                                        <span class="normal-view-text custom-select-dropdown"> -- Select Education ({{selectedEducations.length}}) -- </span>
-                                        <span class="mobile-view-text"></span>
-                                        <span class="caret selectImg"></span></button>
-                                    <div class="opt opt-2">
-                                        <div class="filter-dropdown width89 search-option-content setTableFixHeight" style="display: none;">
-                                            <div class="checkbox-dropdown" ng-repeat="education in educationList track by $index" ng-click="selectEducation(education.TID)">
-                                                <i class="fa " ng-class="selectedEducations.indexOf(education.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{education.EducationTitle}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12"  id="jobseekerspecialization">
-                                    <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
-                                        <span class="normal-view-text custom-select-dropdown"> -- Select Specialization ({{selectedSpecializations.length}}) -- </span>
-                                        <span class="mobile-view-text"></span>
-                                        <span class="caret selectImg"></span></button>
-                                    <div class="opt opt-2">
-                                        <div class="filter-dropdownspecialization width89 search-option-content setTableFixHeight" style="display: none;">
-                                            <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
-                                                <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+<div id="wrapper" ng-controller="bulksalesController as bulksalesController">
+    <header-section></header-section>
+    <div class="container-fluid">
 
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                    <div class="row setRowLeftRightMarginZero">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 setLeftRightPaddingZero setTopMargin">
-                                            Score
-                                        </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center setLeftRightPaddingZero">
-                                            <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="scoreFrom" placeholder="75" aria-describedby="sizing-addon1">
-                                        </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 text-center topMargin-three">
-                                            to
-                                        </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 text-center setLeftRightPaddingZero">
-                                            <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="scoreTo" placeholder="95" aria-describedby="sizing-addon1">
-                                        </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 text-center topMargin-three setLeftRightPaddingZero">
-                                            %
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="container p-bottom-10">
-                            <div class="row">
-                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                                    <button class="btn btn-primary btn-dark-orange" ng-click="searchJobSeeker()"><i class="fa fa-search"></i> Search</button>
-                                    <button class="btn btn-primary btn-dark-orange" ng-click="resetJobSeekerSearch()"><i class="fa fa-eraser"></i> Clear</button>
-                                </div>
-                            </div>
-                        </div>
-                    <hr>
+        <div class="row">
+           <div class="col-sm-10" style="margin: auto; float: none;">
+               <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>Notify Applicant</h4>
+                    </div><br/>
+                   <div class="templateBoxContainer">
+                       <span>Matching Applicants </span> <span class="showPointer"><a >{{applicantCount}}</a></span>
+                       <hr/>
+                   </div><br/>
+                    <div class="panel-body setPanelPadding">
 
-                    <div ng-hide="jobSeekerResults.length" class="text-danger text-center">
-                        No Search Result Found !!
-                    </div>
-
-                    <div ng-show="jobSeekerResults.length">
-                        <div class="container">
-                            <div class="col-lg-12">
-                            </div>
-                            <div class="col-lg-6">
-                                Showing {{pageCount+1}}-{{pageCount+resultThisPage}} of {{totalResult}} results
-                            </div>
-                            <div class="col-lg-6 text-right">
-
-                                <button class="btn"
-                                        ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
-                                        ng-disabled="!paginationPreviousVisibility"
-                                        ng-click="paginationPreviousClick()">
-                                    Previous <i class="fa fa-arrow-circle-left"></i>
-                                </button>
-                                <button class="btn btn-primary"
-                                        ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
-                                        ng-disabled="!paginationNextVisibility"
-                                        ng-click="paginationNextClick()">
-                                    <i class="fa fa-arrow-circle-right"></i> Next
-                                </button>
-                            </div>
-                        </div>
-                        <div class="container">
-                            <!-- main table goes here -->
-                            <div class="main-table p-top-20 col-lg-12 ">
-                                <div class="col-lg-12 table-head">
-                                    <div class="col-lg-1">
-
-                                        <div class="row setRowLeftRightMarginZero">
-                                            <div class="col-lg-4 setLeftRightPaddingZero">
-                                                <input type="checkbox"
-                                                       name="all"
-                                                       ng-model="selectAll"
-                                                       ng-checked="selectAll"
-                                                       ng-click="selectAllTidToMail(selectAll)"/>
+                        <div style="text-align: center">
+                            <div class="well well-lg templateBoxContainer">
+                                <form name="MailTemplateForm" novalidate >
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Template
+                                        </div>
+                                        <div ng-hide="showCreateMailTemplate">
+                                            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 searchHeaderAlignment ">
+                                                <select class="form-control" name="TitleSeelect" ng-model="bulksalesController._info.TID"
+                                                        ng-change="bulksalesController.getTemplateDetails(bulksalesController._info.TID)"
+                                                        ng-options="template.TID as template.Title for template in bulksalesController.templates" required>
+                                                    <option value = ""> -- Select Template -- </option>
+                                                </select>
                                             </div>
-                                            <div class="col-lg-8 setLeftRightPaddingZero">
-                                                <span> All</span>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                                <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm('new')" >New</button>
+                                            </div>
+                                            <div ng-show="bulksalesController._info.TID" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                                <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="bulksalesController.addNewTemplateForm('edit')" >Edit</button>
                                             </div>
                                         </div>
 
+                                        <div ng-show="showCreateMailTemplate">
+                                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                                <input type="text" name="Title" id="Title" ng-model="bulksalesController._info.Title"
+                                                       class="form-control emptyBox"  ng-class="MailTemplateForm.Title.$touched && !bulksalesController._info.Title.length ? 'mandatoryTextBox' : ''"
+                                                       placeholder="Template title" maxlength="100" required>
+                                            </div>
+                                        </div>
+                                    </div><br/>
+
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Body
+                                        </div>
+                                        <!--<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 searchHeaderAlignment">-->
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 searchHeaderAlignment">
+                                            <textarea rows="10" cols="92" name="Body" id="Body" ng-model="bulksalesController._info.Body"
+                                                      class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !bulksalesController._info.Body.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
+                                                      placeholder="Type here" ng-readonly="validationMode == 0" required></textarea>
+                                        </div>
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign" >
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 searchHeaderAlignment TemplateTextContainer">
+
+                                        </div>
+                                        <div ng-hide="showCreateMailTemplate">
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="submit" class="btn btn-primary" ng-click="bulksalesController.SendEnquiryMail()"
+                                                        ng-disabled="!bulksalesController._info.TID" >Send</button>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="button" class="btn btn-primary" ng-click="bulksalesController.closeSalesEnquiryForm()" >Close</button>
+                                            </div>
+                                        </div>
+
+                                        <div ng-show="showCreateMailTemplate">
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="submit" class="btn btn-primary" ng-click="bulksalesController.saveMailTemplate()"
+                                                        ng-disabled="!bulksalesController._info.Title || !bulksalesController._info.FromName || !bulksalesController._info.FromEmailID
+                                                                            || !bulksalesController._info.Subject || !bulksalesController._info.Body">Save</button>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="button" class="btn btn-primary" ng-click="bulksalesController.closeCreateMailTemplateForm()" >Cancel</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-lg-2">
-                                        Name
-                                    </div>
-                                    <div class="col-lg-2">
-                                        Location
-                                    </div>
-                                    <div class="col-lg-3">
-                                        Skills
-                                    </div>
-                                    <div class="col-lg-1">
-                                        Experience
-                                    </div>
-                                    <div class="col-lg-2">
-                                        Preferred Job Type
-                                    </div>
-                                    <div class="col-lg-1">
-                                        Freshness
-                                    </div>
-                                </div>
-                                <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}"  ng-repeat="jobSeeker in jobSeekerResults track by $index">
-                                    <div class="col-lg-1">
-                                        <input type="checkbox"
-                                               name="service"
-                                               ng-click="selectTidToMail(jobSeeker.tid)"
-                                               ng-checked="selectedTidToMail.indexOf(jobSeeker.tid)!=-1"/>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{jobSeeker.Name}}">{{jobSeeker.Name | textLength:15}}</span>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{jobSeeker.location}}">{{jobSeeker.location | textLength:15}}</span>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{jobSeeker.Skills}}">{{jobSeeker.Skills | textLength:20}}</span>
-                                    </div>
-                                    <div class="col-lg-1">
-                                        {{jobSeeker.Exp}} Yrs
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <span ng-show="jobSeeker.jobtype == 0">Full Time</span>
-                                        <span ng-show="jobSeeker.jobtype == 1">Part Time</span>
-                                        <span ng-show="jobSeeker.jobtype == 2">Work from Home</span>
-                                        <span ng-show="jobSeeker.jobtype == 3">Internship</span>
-                                        <span ng-show="jobSeeker.jobtype == 4">Apprenticeship</span>
-                                        <span ng-show="jobSeeker.jobtype == 5">Job Oriented Training</span>
-                                        <span ng-show="jobSeeker.jobtype == 6">Consultant</span>
-                                        <span ng-show="jobSeeker.jobtype == 7">Freelancer</span>
-                                    </div>
-                                    <div class="col-lg-1">
-                                        {{jobSeeker.freshness == 0 ? 'Today' : jobSeeker.freshness+' Days'}}
-                                    </div>
-                                </div>
+                                </form>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div ng-show="jobSeekerResults.length">
-                    <div class="panel-danger panel-footer text-white">
-                        <i class="fa fa-envelope"></i> Compose Message <label class="label label-primary">{{selectedTidToMail.length}}</label>
-                    </div>
-                    <!--new design of mail template-->
-                    <div style="text-align: center">
-                        <div class="well-lg templateBoxContainer">
-                            <form name="MailTemplateForm" novalidate >
-                                <div class="row setRowLeftRightMarginZero centerAlign">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                        Template
-                                    </div>
-                                    <div ng-hide="showCreateMailTemplate">
-                                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 searchHeaderAlignment ">
-                                            <select class="form-control" name="TitleSeelect" ng-model="mailTemplateTid"
-                                                    ng-change="getTemplateDetails(mailTemplateTid)"
-                                                    ng-options="template.TID as template.Title for template in templates" required>
-                                                <option value = ""> -- Select Template -- </option>
-                                            </select>
-                                        </div>
-                                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
-                                            <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('new')" >New</button>
-                                        </div>
-                                        <div ng-show="mailTemplateTid" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment">
-                                            <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('edit')" >Edit</button>
-                                        </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
-                                            <select class="form-control" name="SelectJob" ng-model="job_id"
-                                                    ng-options="job.tid as job.jobtitle for job in jobLists" required>
-                                                <option value = ""> -- Select Job -- </option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div ng-show="showCreateMailTemplate">
-                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
-                                            <input type="text" name="Title" id="Title" ng-model="Title"
-                                                   class="form-control emptyBox" ng-class="MailTemplateForm.Title.$touched && !Title.length ? 'mandatoryTextBox' : ''"
-                                                   placeholder="Template title" maxlength="100" required>
-                                        </div>
-                                    </div>
-
-                                </div><br/>
-                                <div class="row setRowLeftRightMarginZero centerAlign">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                        Name
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 searchHeaderAlignment">
-                                        <input type="text" name="FromName" ng-model="FromName"
-                                               ng-class="MailTemplateForm.FromName.$touched && !FromName.length && validationMode > 0  ? 'mandatoryTextBox' : ''"
-                                               class="form-control emptyBox" id="FromName" placeholder="From name" maxlength="100" ng-readonly="validationMode == 0" required>
-                                    </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer sendMsgFrom">
-                                        From
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 searchHeaderAlignment">
-                                        <input type="text" name="FromEmailID" class="form-control emptyBox"
-                                               id="FromEmailID" ng-model="FromEmailID"
-                                               ng-class="MailTemplateForm.FromEmailID.$touched && !FromEmailID.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                               placeholder="From email" maxlength="100"  ng-pattern="/^[a-z]+[a-z0-9._]+@[a-z]+\.[a-z.]{2,5}$/" ng-readonly="validationMode == 0" required />
-                                        <span ng-show="MailTemplateForm.FromEmailID.$error.email" ng-if="MailTemplateForm.FromEmailID.$error.email == true ? isWrongEmailPatternFrom = true : isWrongEmailPatternFrom = false"></span>
-                                    </div>
-                                </div><br/>
-
-                                <div class="row setRowLeftRightMarginZero centerAlign">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                        Subject
-                                    </div>
-                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
-                                        <input type="text" name="Subject" id="Subject" ng-model="Subject"
-                                               class="form-control emptyBox"  ng-class="MailTemplateForm.Subject.$touched && !Subject.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                               placeholder="Subject" maxlength="250" ng-readonly="validationMode == 0" required />
-                                    </div>
-                                </div><br/>
-                                <div class="row setRowLeftRightMarginZero centerAlign">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
-                                        Body <a class="showPointer" ng-click="profile.openTermsAndConditionForm()" id="termConditions" data-toggle="tooltip" data-placement="top" title="Tags Supported: {FirstName}, {LastName}, {CompanyName}, {JobTitle}">  <u>?</u> </a>
-                                    </div>
-                                    <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
-                                        <textarea rows="10" cols="92" name="Body" id="Body" ng-model="Body"
-                                                  class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !Body.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
-                                                  placeholder="Type here"
-                                                  ng-readonly="validationMode == 0" required></textarea>
-                                    </div>
-                                </div><br/>
-                                <div class="row setRowLeftRightMarginZero centerAlign" >
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer">
-                                    </div>
-                                    <div ng-hide="showCreateMailTemplate">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                            <button type="submit" class="btn btn-primary" ng-click="SendJobSeekerMail()"
-                                                    ng-disabled="!mailTemplateTid || !job_id" >Send</button>
-                                            <button type="button" class="btn btn-primary" ng-click="closeSalesEnquiryForm()" >Close</button>
-                                        </div>
-                                    </div>
-
-                                    <div ng-show="showCreateMailTemplate">
-                                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 searchHeaderAlignment" style="text-align: left;">
-                                            <button type="submit" class="btn btn-primary" ng-click="saveMailTemplate()"
-                                                    ng-disabled="!Title || !FromName || !FromEmailID || !Subject || !Body">Save</button>
-                                            <button type="button" class="btn btn-primary" ng-click="closeCreateMailTemplateForm()" >Cancel</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
-    <!-- End of design for finding - Job Seekers -->
+    </div>
 </div>
+
+</div>
+
+<footer-section></footer-section>

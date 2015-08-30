@@ -1206,15 +1206,36 @@
 
             $scope.fClick = function( data )
             {
-                if($scope.selectedFunctions.indexOf(data.FunctionID)!=-1)
+                console.log(data);
+
+
+               /* $scope.editSkill = {
+                    "tid":0,
+                    "skillname":"",
+                    "expertiseLevel":0,
+                    "exp_from":0.00,
+                    "exp_to":0.00,
+                    "active_status":true
+                };
+                */
+
+                if(data.value)
                 {
-                    var index = $scope.selectedFunctions.indexOf(data.FunctionID);
-                    $scope.selectedFunctions.splice(index,1);
+                    console.log("sai1");
+                    console.log($scope.editSkill);
+                   // var index = $scope.editSkill.expertiseLevel.indexOf(data.value);
+                  //  $scope.$scope.editSkill.expertiseLevel.splice(index,1);
+
+                    //delete $scope.editSkill.expertiseLevel.data.value;
+
                 }
                 else
                 {
-                    $scope.selectedFunctions.push(data.FunctionID);
+                    console.log("sai2");
+                   // $scope.editSkill.expertiseLevel.push(data.value);
                 }
+
+                console.log($scope.editSkill);
             };
 
             $scope.fSelectAll = function()
@@ -1244,6 +1265,13 @@
                 selectNone : "Deselect All",
                 nothingSelected  : "Expertise Level"
             };
+
+            $scope.modernBrowsers = [
+                {name: "Beginner",value:"0", ticked: true },
+                {name: "Independent",value:"1", ticked: false},
+                {name: "Expert",value:"2",ticked: false},
+                {name: "Master",value:"3",ticked: false}
+            ];
 
 
 
