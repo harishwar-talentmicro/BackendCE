@@ -1,4 +1,3 @@
-
 (function() {
 
     angular.module('ezeidApp').controller('NotifyApplicantCtrl', [
@@ -36,40 +35,26 @@
                   UtilityService)
         {
 
-            var notifyApplicant = this;
+            $scope.showCreateMailTemplate = false;
+            $scope.validationMode = 0;
+            $scope.mailTemplateTid = 0;
 
             clearSearchFilter();
 
             function clearSearchFilter()
             {
-                $scope.jobSeekerSkillKeyword = "";
-                $scope.jobSeekerJobType = 0 ;
-                $scope.jobSeekerSalaryFrom = 0;
-                $scope.jobSeekerSalaryTo = 0;
-                $scope.jobSeekerSalaryType = 3;
-                $scope.countryId = 0;
-                $scope.cityId = 0;
-                $scope.jobSeekerExperienceFrom = 0;
-                $scope.jobSeekerExperienceTo = 50;
-                $scope.selectedEducations = [];
-                $scope.selectedSpecializations = [];
-                $scope.selectedInstitute = [];
-                $scope.selectedCitys = [];
-                $scope.scoreFrom = "";
-                $scope.scoreTo = "";
-                $scope.selectedTidToMail = [];
                 $scope.mailTemplateTid = 0;
                 $scope.job_id = 0;
-                $scope.searchListMapFlag = false;//1: List, 2:Flag
             }
 
+            $scope.job_id = $routeParams.jobid
             getApplicant();
             getTemplateList();
 
             // Get Country list
             function getApplicant()
             {
-                if($routeParams.jobid)
+                if($scope.job_id)
                 {
                     $scope.$emit('$preLoaderStart');
                     $http({
@@ -78,7 +63,7 @@
                         params :
                         {
                             token : $rootScope._userInfo.Token,
-                            job_id : $routeParams.jobid
+                            job_id : $scope.job_id
                         }
                     }).success(function(resp){
                         $scope.$emit('$preLoaderStop');
@@ -107,25 +92,21 @@
                     url: GURL + 'ewtTemplateList',
                     params : {
                         Token : $rootScope._userInfo.Token,
-                        template_type : 1 //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer , 3 = notify applicant
+                        template_type : 3 //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer , 3= for applicant notification
                     }
                 }).success(function (data) {
-                        console.log(data);
+
                         if(data !== "null")
                         {
                             if($rootScope._userInfo.Token == false) {
                                 var _obj = { TID: 0, Title: '--Select Template--' };
                                 data.splice(0, 0, _obj);
-                                $scope.templatesList.TID = _obj.TID;
+                                $scope.mailTemplateTid = _obj.TID;
                             }
-                            $scope.templatesList = data;
+                            $scope.templates = data;
                         }
                     });
             }
-
-
-
-
 
             // Create new mail template
             $scope.addNewTemplateForm = function (_NewEdit) {
@@ -134,6 +115,7 @@
                     $scope.validationMode = 1;
                     $scope.Title = "";
                     $scope.Body = "";
+                    $scope.TID = "";
                     $scope.showCreateMailTemplate = true;
                 }
                 else
@@ -144,11 +126,14 @@
             };
 
             // Close Create Mail Template Form
-                $scope.closeCreateMailTemplateForm = function () {
+            $scope.closeCreateMailTemplateForm = function ()
+            {
                 $scope.showCreateMailTemplate = false;
                 $scope.validationMode = 0;
                 $scope.Title = "";
                 $scope.Body = "";
+                $scope.TID = "";
+                $scope.mailTemplateTid = 0;
             };
 
             // Validation function for creating mail template
@@ -161,14 +146,13 @@
                 {
                     errorList.push('Template title is Required');
                 }
-
                 if(!$scope.Body)
                 {
                     errorList.push('Body is Required');
                 }
-
-                if(errorList.length>0){
-                    for(var i = errorList.length; i>0;i--)
+                if(errorList.length > 0)
+                {
+                    for(var i = errorList.length; i > 0;i--)
                     {
                         Notification.error({ message: errorList[i-1], delay: MsgDelay });
                     }
@@ -184,23 +168,24 @@
 
                 if(isValidate())
                 {
+                    $scope.$emit('$preLoaderStart');
                     $http({ method: 'post',
                         url: GURL + 'ewtTemplateDetails',
-                        data :{
-                                Token : $rootScope._userInfo.Token,
-                                Title : $scope.Title,
-                                Body : $scope.Body,
-                                template_type  : 3 //(TemplateType=1 for bulkmailer , 2=jobseekers bulkmailer , 3 = notify applicant), tid <int> [while creating time tid is 0]
-                             }
+                        data :
+                        {
+                            Token : $rootScope._userInfo.Token,
+                            Title : $scope.Title,
+                            Body : $scope.Body,
+                            template_type : 3,
+                            tid :  $scope.mailTemplateTid
+                        }
                     }).success(function (data)
                         {
-                            if (data != 'null') {
-                                //salesEnquiry._info = {};
+                            $scope.$emit('$preLoaderStop');
 
-                                $scope.FromName = "";
-                                $scope.FromEmailID = "";
+                            if (data.IsSuccessfull)
+                            {
                                 $scope.Title = "";
-                                $scope.Subject = "";
                                 $scope.Body = "";
                                 $scope.mailTemplateTid = "";
 
@@ -209,107 +194,122 @@
                                 $scope.showCreateMailTemplate = false;
                                 $scope.validationMode = 0;
                             }
-                            else {
-                                // Notification.error({ message: 'Invalid key or not found…', delay: MsgDelay });
-
-                            }
+                        }).error(function(){
+                            Notification.error({ message : 'An error occurred', delay : MsgDelay});
+                            $scope.$emit('$preLoaderStop');
                         });
                 }
             };
 
-
             // get template details
-            $scope.getTemplateDetails = function (Tid) {
-
+            $scope.getTemplateDetails = function (Tid)
+            {
                 if(Tid != undefined)
                 {
                     $http({
                         method: 'get',
-                        url: GURL + 'ewtTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid}).success(function (data) {
+                        url: GURL + 'ewtTemplateDetails?Token=' + $rootScope._userInfo.Token + '&TID='+Tid}).success(function (data)
+                        {
                             if(data !== "null")
                             {
-                                $scope.FromName = data[0].FromName;
-                                $scope.FromEmailID = data[0].FromEmailID;
                                 $scope.Title = data[0].Title;
-                                $scope.Subject = data[0].Subject;
                                 $scope.Body = data[0].Body;
                                 $scope.mailTemplateTid = data[0].TID;
                             }
                         });
                 }
-            };
-
-            // Close Create Mail Template Form
-            $scope.closeSalesEnquiryForm = function () {
-                $scope.jobSeekerResults = "";
-
-                $scope.FromName = "";
-                $scope.FromEmailID = "";
-                $scope.Subject = "";
-                $scope.Body = "";
-                $scope.selectAll = 0;
-                clearSearchFilter();
-            };
-
-
-
-            // send sales enquiry mail
-            $scope.SendJobSeekerMail = function () {
-
-                if($scope.selectedTidToMail.length > 10)
-                {
-                    $scope.$emit('$preLoaderStop');
-                    Notification.error({ message: 'Maximum Limit: 10 Job Seeker…', delay: MsgDelay });
-                }
                 else
                 {
-                    if(validateItem())
-                    {
-                        $scope.$emit('$preLoaderStart');
-
-                        $http({
-                            method: 'post',
-                            url: GURL + 'jobseeker_message',
-                            data:
-                            {
-                                token : $rootScope._userInfo.Token,
-                                ids : $scope.selectedTidToMail.toString(),
-                                template_id : $scope.mailTemplateTid,
-                                job_id : $scope.job_id
-                            }
-                        }).success(function (data)
-                            {
-                                $scope.$emit('$preLoaderStop');
-                                if(data.status)
-                                {
-                                    $scope.FromName = "";
-                                    $scope.FromEmailID = "";
-                                    $scope.Subject = "";
-                                    $scope.Body = "";
-
-                                    clearSearchFilter();
-
-                                    $scope.showCreateMailTemplate = false;
-                                    document.getElementById("FromName").className = "form-control emptyBox";
-                                    document.getElementById("FromEmailID").className = "form-control emptyBox";
-                                    document.getElementById("Title").className = "form-control emptyBox";
-                                    document.getElementById("Subject").className = "form-control emptyBox";
-                                    document.getElementById("Body").className = "form-control emptyBox";
-                                    Notification.success({message: "Message sent successfully..", delay: MsgDelay});
-
-                                    $scope.jobSeekerResults = "";
-                                }
-                            }).error(function(err){
-                                $scope.$emit('$preLoaderStop');
-                            });
-                        $scope.$emit('$preLoaderStop');
-                    }
+                    $scope.Title = "";
+                    $scope.Body = "";
+                    $scope.mailTemplateTid = "";
                 }
             };
 
+            // Validation function
+            function validateItem(){
+                var err = [];
+                if($scope.mailTemplateTid == 0)
+                {
+                    err.push('Select Mail Template');
+                }
 
+                if(!$scope.applicantCount)
+                {
+                    err.push('No applicant found');
+                }
 
+                if(err.length > 0)
+                {
+                    for(var i = 0; i < err.length; i++)
+                    {
+                        Notification.error({ message : err[i], delay : 2000});
+                    }
+                    return false;
+                }
+                return true;
+            };
 
+            // send job notification
+            $scope.SendNotification = function ()
+            {
+                if(validateItem())
+                {
+                    $scope.$emit('$preLoaderStart');
+
+                    $http({
+                        method: 'post',
+                        url: GURL + 'job_notification',
+                        data:
+                        {
+                            token : $rootScope._userInfo.Token,
+                            ezeid : $rootScope._userInfo.ezeid,
+                            ids : $scope.applicantIDs,
+                            template_id : $scope.mailTemplateTid,
+                            job_id : $scope.job_id
+                        }
+                    }).success(function (data)
+                        {
+                            $scope.$emit('$preLoaderStop');
+                            if(data.status)
+                            {
+                                $scope.Body = "";
+                                clearSearchFilter();
+
+                                $scope.showCreateMailTemplate = false;
+                                document.getElementById("Title").className = "form-control emptyBox";
+                                document.getElementById("Body").className = "form-control emptyBox";
+                                Notification.success({message: "Notification sent successfully..", delay: MsgDelay});
+                            }
+                        }).error(function(err)
+                        {
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    $scope.$emit('$preLoaderStop');
+                }
+            };
+
+            // Close Notify applicant Form
+            $scope.closeNotifyForm = function ()
+            {
+                clearSearchFilter();
+                $scope.Title = "";
+                $scope.Body = "";
+                $scope.TID = "";
+                $scope.mailTemplateTid = 0;
+                $location.url('/');
+            };
+
+            /**
+             * Redirect to applicant listing page
+             */
+            $scope.redirectApplicantPage = function(tid)
+            {
+                if($scope.applicantCount)
+                {
+                    $location.url('/applicantlisting' + '?jobid='+tid);
+                }
+            };
 
         }]);
 })();

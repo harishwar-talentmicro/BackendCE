@@ -64,6 +64,7 @@
         '/appliedjob',
         '/show-my-institute-jobs',
         '/notify-applicant',
+        '/applicantslisting',
         '/access-history',
         '/:ezeond/sales',
         '/:ezeone/home_delivery',
@@ -316,6 +317,11 @@
             {
                 templateUrl: 'html/job/notify-applicant.html',
                 controller : 'NotifyApplicantCtrl'
+            })
+            .when('/applicantlisting',
+            {
+                templateUrl: 'html/job/applicant-list.html',
+                controller : 'ApplicantListing'
             })
             .when('/jobappliedsuccess',{
                 templateUrl: 'html/job/job-applied-success.html',

@@ -1,0 +1,83 @@
+<!-- Start of design for finding - Job Seekers -->
+<div id="wrapper">
+    <section id="job-seeker-search" class="jss hpw job-seeker-bg hpw ">
+        <header-section></header-section>
+        <div class="container width-90 page-content">
+            <div class="panel">
+                <div class="panel-primary panel-heading">
+                    <i class="fa fa-th-list"></i>  Applicant List
+                </div>
+                <div class="panel-default panel-body">
+                    <!-- search bar to search job keyword by skill keywords -->
+
+                    <div class="container">
+                        <div class="col-lg-12">
+                            <hr>
+                        </div>
+                        <div class="col-lg-6">
+                            <div ng-show="jobData">
+                                Showing {{pageCount+1}}-{{pageCount+resultThisPage}} of {{totalResult}} results
+                            </div>
+                        </div>
+                        <div ng-show="jobData" class="col-lg-6 text-right">
+                            <button class="btn"
+                                    ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
+                                    ng-disabled="!paginationPreviousVisibility"
+                                    ng-click="paginationPreviousClick()">
+                                Previous <i class="fa fa-arrow-circle-left"></i>
+                            </button>
+                            <button class="btn btn-primary"
+                                    ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
+                                    ng-disabled="!paginationNextVisibility"
+                                    ng-click="paginationNextClick()">
+                                <i class="fa fa-arrow-circle-right"></i> Next
+                            </button>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <!-- main table goes here -->
+                        <div class="main-table p-top-20 col-lg-12">
+                            <div ng-show="jobData" class="hpw">
+                                <div class="col-lg-12 table-head">
+                                    <div class="col-lg-2">
+                                        Job Code
+                                    </div>
+                                    <div class="col-lg-4">
+                                        Title
+                                    </div>
+                                    <div class="col-lg-4">
+                                        Company Name
+                                    </div>
+                                    <div class="col-lg-2">
+                                        Date
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}" ng-repeat="job in jobData track by $index">
+                                    <div class="col-lg-2">
+                                        <span data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}">{{job.jobcode | textLength:16}}</span>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <span data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:35}}</span>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <span data-toggle="tooltip" title="" data-original-title="{{job.companyname}}">{{job.companyname | textLength:35}}</span>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        {{job.TaskDateTime | ageFilter}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-hide="jobData" class="text-danger text-center">
+                                <b> You have not applied for any job ! </b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- End of design for finding - Job Seekers -->
+<footer-section></footer-section>
+
