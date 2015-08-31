@@ -2478,7 +2478,7 @@ Job.prototype.jobNotification = function(req,res,next) {
     var ids = req.body.ids;    // tid of student ids
     var templateId = req.body.template_id;
     var jobId = req.body.job_id;
-    var id, i, gid, jobResult, link;
+    var id, i, types='',idType,gid, jobResult, link;
     var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
 
     console.log(req.body);
@@ -2488,6 +2488,14 @@ Job.prototype.jobNotification = function(req,res,next) {
         console.log(id.length);
         console.log(id);
     }
+    if(id.length) {
+        for (var i = 0; i < id.length; i++) {
+            types += 1 + ',';
+        }
+    }
+    types = types.slice(0,-1);
+    console.log(types);
+
 
     var responseMessage = {
         status: false,
@@ -2531,115 +2539,111 @@ Job.prototype.jobNotification = function(req,res,next) {
                             if (!err) {
                                 if (templateResult) {
                                     if (templateResult.length > 0) {
-                                        console.log(templateResult[0].Body);
+                                        if (templateResult[0]) {
+                                            console.log(templateResult[0].Body);
 
-                                        var mailOptions = {
-                                            html: templateResult[0].Body // html body
-                                        };
+                                            var mailOptions = {
+                                                html: templateResult[0].Body // html body
+                                            };
 
 
-                                        var queryParams1 = st.db.escape(ezeid) + ',' + st.db.escape(ids);
-                                        var query1 = 'CALL pSendMsgRequestbyPO(' + queryParams1 + ')';
-                                        console.log(query1);
-                                        st.db.query(query1, function (err, getResult) {
-                                            if (!err) {
-                                                if (getResult) {
-                                                    console.log(getResult);
-                                                    for (var i = 0; i < id.length; i++) {
-                                                        gid = id[i];
-                                                        var query2 = 'select tid,GroupName from tmgroups where GroupType=1 and AdminID=' + gid;
-                                                        console.log(query2);
-                                                        st.db.query(query2, function (err, userDetails) {
-                                                            console.log(userDetails);
-                                                            if (userDetails) {
-                                                                if (userDetails[0]) {
-                                                                    receiverId = userDetails[0].tid;
-                                                                    senderTitle = ezeid;
-                                                                    groupTitle = ezeid;
-                                                                    groupId = gid;
-                                                                    messageText = mailOptions.html;
-                                                                    messageType = 3;
-                                                                    operationType = 0;
-                                                                    iphoneId = null;
-                                                                    messageId = 0;
-                                                                    masterid = '';
-                                                                    console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                            var queryParams1 = st.db.escape(ezeid) + ',' + st.db.escape(ids);
+                                            var query1 = 'CALL pSendMsgRequestbyPO(' + queryParams1 + ')';
+                                            console.log(query1);
+                                            st.db.query(query1, function (err, getResult) {
+                                                if (!err) {
+                                                    if (getResult) {
+                                                        console.log(getResult);
 
-                                                                    var queryParams3 = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                        + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(gid)
-                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
-                                                                    var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
-                                                                    console.log(query3);
-                                                                    st.db.query(query3, function (err, result) {
-                                                                        if (!err) {
-                                                                            if (result) {
+                                                        var queryParams3 = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                            + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(ids)
+                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
+                                                        var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
+                                                        console.log(query3);
+                                                        st.db.query(query3, function (err, result) {
+                                                            if (!err) {
+                                                                if (result) {
+                                                                    responseMessage.status = true;
+                                                                    responseMessage.error = null;
+                                                                    responseMessage.message = 'Notification send successfully';
+                                                                    responseMessage.data = {
+                                                                        token: req.body.token,
+                                                                        ezeid: req.body.ezeid,
+                                                                        ids: req.body.ids, // tid of student ids
+                                                                        templateId: req.body.template_id,
+                                                                        jobId: req.body.job_id,
+                                                                        message: mailOptions.html
+                                                                    };
 
-                                                                                console.log('FnjobNotification:Message Composed successfully');
-                                                                            }
-                                                                            else {
-                                                                                console.log('FnComposeMessage:Error getting from composeMessage');
+                                                                    res.status(200).json(responseMessage);
+                                                                    console.log('FnjobNotification:Message Composed successfully');
 
-                                                                            }
-                                                                        }
-                                                                        else {
-                                                                            console.log('FnComposeMessage:Error getting from groupname');
-
-                                                                        }
-                                                                    });
                                                                 }
                                                                 else {
-                                                                    console.log('FnjobNotification:Error getting from UserDaetils');
+                                                                    responseMessage.message = 'Notification not send';
+                                                                    res.status(200).json(responseMessage);
+                                                                    console.log('FnComposeMessage:Error getting from composeMessage');
 
                                                                 }
                                                             }
                                                             else {
-                                                                console.log('FnjobNotification:Error getting from UserDaetils');
+                                                                responseMessage.error = {
+                                                                    server: 'Internal Server Error'
+                                                                };
+                                                                responseMessage.message = 'An error occurred !';
+                                                                res.status(500).json(responseMessage);
+                                                                console.log('FnComposeMessage:Error getting from composeMessage');
 
                                                             }
                                                         });
                                                     }
+                                                    else {
+                                                        responseMessage.message = 'Notification not send';
+                                                        res.status(200).json(responseMessage);
+                                                        console.log('FnjobNotification:Error getting from UserDaetils');
+
+                                                    }
                                                 }
                                                 else {
-                                                    console.log('FnjobNotification:Error getting from SendMessage');
+                                                    responseMessage.error = {
+                                                        server: 'Internal Server Error'
+                                                    };
+                                                    responseMessage.message = 'An error occurred !';
+                                                    res.status(500).json(responseMessage);
+                                                    console.log('FnjobNotification:Error getting from UserDaetils');
 
                                                 }
-                                            }
-                                            else {
-                                                console.log('FnjobNotification:Error getting from SendMessage');
+                                            });
+                                        }
+                                        else {
+                                            responseMessage.message = 'Notification not send';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnjobNotification:Error getting from templateResult');
 
-                                            }
-                                        });
-                                        //sending response..
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Notification send successfully';
-                                        responseMessage.data = {
-                                            token : req.body.token,
-                                            ezeid :req.body.ezeid,
-                                            ids : req.body.ids, // tid of student ids
-                                            templateId : req.body.template_id,
-                                            jobId : req.body.job_id,
-                                            message: mailOptions.html
-                                        };
-
-                                        res.status(200).json(responseMessage);
+                                        }
                                     }
                                     else {
-                                        console.log('FnjobNotification:Error getting from templateDetails');
+                                        responseMessage.message = 'Notification not send';
                                         res.status(200).json(responseMessage);
+                                        console.log('FnjobNotification:Error getting from templateResult');
+
                                     }
                                 }
                                 else {
-                                    console.log('FnjobNotification:Error getting from templateDetails');
+                                    responseMessage.message = 'Notification not send';
                                     res.status(200).json(responseMessage);
+                                    console.log('FnjobNotification:Error getting from templateResult');
+
                                 }
                             }
                             else {
-                                console.log('FnjobNotification:Error getting from templateDetails');
-                                res.status(200).json(responseMessage);
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('FnjobNotification:Error getting from templateResult');
                             }
                         });
                     }
@@ -2675,20 +2679,6 @@ Job.prototype.jobNotification = function(req,res,next) {
         }
     }
 };
-
-
-
-                                    //
-                                    //        var queryParams = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                    //        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                    //        + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
-                                    //        + ',' + st.db.escape(1)+ ',' + st.db.escape('')+ ',' + st.db.escape(1);
-                                    //    var query = 'CALL pComposeMessage(' + queryParams + ')';
-                                    //    console.log(query);
-                                    //    st.db.query(query, function (err, result) {
-                                    //        if (!err) {
-                                    //            if (result) {
-
 
 
 module.exports = Job;
