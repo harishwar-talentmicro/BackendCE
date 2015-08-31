@@ -644,7 +644,6 @@ Auth.prototype.login = function(req,res,next){
             ezeone_id:'',
             FirstName: '',
             Type: 0,
-            Icon: '',
             Verified: 0,
             SalesModuleTitle: '',
             AppointmentModuleTitle: '',
@@ -706,7 +705,6 @@ Auth.prototype.login = function(req,res,next){
                                             RtnMessage.FirstName = loginDetails[0].FirstName;
                                             RtnMessage.CompanyName = loginDetails[0].CompanyName;
                                             RtnMessage.Type = loginDetails[0].IDTypeID;
-                                            RtnMessage.Icon = loginDetails[0].Icon;
                                             RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
                                             RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
                                             RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
