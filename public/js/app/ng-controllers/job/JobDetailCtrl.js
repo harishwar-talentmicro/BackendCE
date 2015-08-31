@@ -1,7 +1,7 @@
 /**
  * Controller to manage all the functionaloties in OUTBOX
  *
- * @author: Krunal[EZE ONE]
+ * @author: Krunal[EZEOne]
  * @since 20150718
  */
 angular.module('ezeidApp').
@@ -228,6 +228,12 @@ angular.module('ezeidApp').
                 $window.open('/profile-manager/resume?jobid='+$scope.job_id, '_blank');
             };
 
-
+            /**
+             * Redirect to notify-applicant page
+             */
+            $scope.redirectNotifyPage = function(tid)
+            {
+                $location.url('/notify-applicant' + '?jobid='+tid);
+            };
 
         }]);

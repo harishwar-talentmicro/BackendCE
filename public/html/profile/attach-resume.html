@@ -55,6 +55,25 @@
                                                 custom-button-class="btn-block"
                                                 max-labels="0"
                                                 max-height="250px">
+                                        </div><div  talent-multi-select=""
+                                                input-model="modernBrowsers"
+                                                output-model="outputBrowsers"
+                                                button-label="icon name"
+                                                default-button-label="Select Function "
+                                                item-label="icon FunctionName maker"
+                                                tick-property="ticked"
+                                                on-open="fOpen()"
+                                                on-close="fClose()"
+                                                on-item-click="fClick( data )"
+                                                on-select-all="fSelectAll()"
+                                                on-select-none="fSelectNone()"
+                                                on-reset="fReset()"
+                                                on-clear="fClear()"
+                                                on-search-change="fSearchChange( data )"
+                                                translation="functionTags"
+                                                custom-button-class="btn-block"
+                                                max-labels="0"
+                                                max-height="250px">
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
@@ -91,15 +110,13 @@
                                             </span>
                                        </div>
                                    </div>
-                                   <!--<div class="row cvBottomSpace" ng-show="locationArrayString.length">-->
-                                   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 location-box-border" ng-show="locationArrayString.length" style="width: 48%;">
+                                   <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 location-box-border setVScrolToLocationBox" ng-show="locationArrayString.length">
                                        <div style="padding-right: 15px;">
                                              <span class="fontsize19" ng-repeat="location in locationArrayString track by $index">
                                                 <label  class="label label-default label-form addLocLables" style="font-weight:normal;">{{location}} <i ng-click="removeLocation($index)" class="fa fa-times textRed"></i></label>&nbsp;
                                             </span>
                                        </div>
                                    </div>
-                                   <!--</div>-->
                                </div>
                                 <div class="row cvBottomSpace">
                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
@@ -109,7 +126,7 @@
                                        <div class="row setRowLeftRightMarginZero">
                                            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 setLeftRightPaddingZero">
                                                <div class="input-group">
-                                                   <input type="text" class="form-control text-right" decimals-only maxlength="4" ng-model="CVAttachCtrl._CVInfo.experience" placeholder="Experience" aria-describedby="sizing-addon1"/>
+                                                   <input type="text" class="form-control text-right" decimals-only maxlength="4" ng-model="CVAttachCtrl._CVInfo.experience" placeholder="" aria-describedby="sizing-addon1"/>
                                                    <span class="input-group-addon" id="sizing-addon2">Years</span>
                                                </div>
                                            </div>
@@ -139,13 +156,13 @@
                                     </div>
                                </div>
                                 <div class="row cvBottomSpace">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 label">
                                         <h5 class="text-primary text-left">Last Education</h5>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                         <div  talent-multi-select=""
                                               input-model="educationList"
-                                              output-model="outputBrowsers"
+                                              output-model="outputEducation"
                                               button-label="icon name"
                                               default-button-label="Select Last Education "
                                               item-label="EducationTitle "
@@ -160,14 +177,33 @@
                                               custom-button-class="btn-block"
                                               max-labels="0"
                                               max-height="250px"
-                                              selection-mode="single">
+                                              selection-mode="single"
+                                              helper-elements="filter">
                                         </div>
-                                        <!--<select class="form-control" ng-model="CVAttachCtrl._CVInfo.education_id">
-                                            <option value = "0"> -- Select -- </option>
-                                            <option ng-repeat="education in educationList track by $index" value="{{education.TID}}">{{education.EducationTitle}}</option>
-                                        </select>-->
                                     </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace setLeftRightPaddingZero">
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 setPaddingLeft0">
+                                        <div  talent-multi-select=""
+                                              input-model="specializationList"
+                                              output-model="outputSpecialization"
+                                              button-label="icon name"
+                                              default-button-label="Select Specialization "
+                                              item-label="Title"
+                                              tick-property="ticked"
+                                              on-open="specializationOpen()"
+                                              on-close="specializationClose()"
+                                              on-item-click="specializationClick( data )"
+                                              on-reset="specializationReset()"
+                                              on-clear="specializationClear()"
+                                              on-search-change="specializationSearchChange( data )"
+                                              translation="specializationTags"
+                                              custom-button-class="btn-block"
+                                              max-labels="0"
+                                              max-height="250px"
+                                              selection-mode="single"
+                                              helper-elements="filter">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setPaddingLeft0">
                                         <input type="text"
                                                class="form-control text-right"
                                                numbers-only maxlength="4"
@@ -175,32 +211,92 @@
                                                placeholder="Passed Year"
                                                aria-describedby="sizing-addon1"/>
                                     </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw" id="specializationDiv">
-                                        <!--<select class="form-control" ng-model="CVAttachCtrl._CVInfo.specialization_id">
-                                            <option value = "0"> -- Select Specialization -- </option>
-                                            <option ng-repeat="specialization in specializationList track by $index" value="{{specialization.TID}}">{{specialization.specialization}}</option>
-                                        </select>-->
-
-                                        <input type = "text"
-                                               placeholder = "Type Specialization"
-                                               ng-model = "specilizationTitle"
-                                               ng-keypress = "specializationKeyPress($event.keyCode)"
-                                               ng-click = "specializationTextBoxClicked()"
-                                               class = "form-control instittuteClass"/>
-
-                                        <div ng-hide="showSpecializationDropDown" class="filter-dropdownSpecialization width-105 search-option-content setTableFixHeight">
-                                            <div class="checkbox-dropdown" ng-repeat="specialization in specializationList | filter:specilizationTitle" ng-click="selectSpecilization(specialization.TID,specialization.Title)">
-                                                {{specialization.Title}}
+                                </div>
+                                <div class="row cvBottomSpace">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 label">
+                                        <h5 class="text-primary text-left">Aggregate Score</h5>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <div class="row setRowLeftRightMarginZero">
+                                            <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 setLeftRightPaddingZero">
+                                                <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.aggregate_score" placeholder="87" aria-describedby="sizing-addon1"/>
+                                            </div>
+                                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 imgTopMargin">
+                                                <div>%</div>
                                             </div>
                                         </div>
-
-
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
+                                        <h5 class="text-primary text-left">Job Type</h5>
+                                    </div>
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8">
+                                        <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "CVAttachCtrl._CVInfo.job_type">
+                                            <option value="0">Full Time</option>
+                                            <option value="1">Part Time</option>
+                                            <option value="2">Work from Home</option>
+                                            <option value="3">Internship</option>
+                                            <option value="4">Apprenticeship</option>
+                                            <option value="5">Job Oriented Training</option>
+                                            <option value="6">Consultant</option>
+                                            <option value="7">Freelancer</option>
+                                        </select>
                                     </div>
                                 </div>
+                                <div class="row cvBottomSpace">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
+                                            <h5 class="text-primary text-left">Current Employer</h5>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8">
+                                            <input type="text" ng-model="CVAttachCtrl._CVInfo.current_employeer" placeholder="Current Employer" class="form-control"/>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
+                                            <h5 class="text-primary text-left">Current Job Title</h5>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8">
+                                            <input type="text" placeholder="Current Job Title" ng-model = "CVAttachCtrl._CVInfo.current_job_title" class="form-control"/>
+                                        </div>
+                                    </div>
+                                <div class="row cvBottomSpace">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
+                                            <h5 class="text-primary text-left">Present Salary</h5>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8 ">
+                                            <input type="text"
+                                                   decimals-only maxlength="17"
+                                                   name="salary"
+                                                   class="form-control text-right"
+                                                   ng-model="CVAttachCtrl._CVInfo.salary"
+                                                   placeholder=""/>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                                        </div>
 
-
-
-                                <div class="row">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
+                                            <h5 class="text-primary text-left">Notice Period</h5>
+                                        </div>
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                                            <div class="input-group">
+                                                <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.notice_period" placeholder="" aria-describedby="sizing-addon1"/>
+                                                <span class="input-group-addon" id="sizing-addon1">Days</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <div class="row cvBottomSpace">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 label">
+                                        <h5 class="text-primary text-left">Expected Salary</h5>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-8">
+                                        <input type="text"
+                                               decimals-only maxlength="17"
+                                               name="exp_salary"
+                                               class="form-control text-right emptyBox"
+                                               ng-model="CVAttachCtrl._CVInfo.exp_salary"
+                                               placeholder=""/>
+                                    </div>
+                                </div>
+                                <div class="row cvBottomSpace">
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpaceMiddle label">
                                         <h5 class="text-primary text-left">CV Upload</h5>
                                     </div>
@@ -233,151 +329,6 @@
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 cvBottomSpaceMiddle">
                                         <input ng-show="CVAttachCtrl.EnablePin" maxlength="3" onkeypress="return isNumberKey(event);" type="text" style="width: 22%;" class="form-control" ng-model="CVAttachCtrl._CVInfo.Pin" placeholder="Pin"/>
-                                    </div>
-                            </div>
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Present Salary</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
-                                        <input type="text"
-                                               decimals-only maxlength="17"
-                                               name="salary"
-                                               class="form-control text-right"
-                                               ng-model="CVAttachCtrl._CVInfo.salary"
-                                               placeholder="Present Salary"/>
-                                    </div>
-
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Notice Period</h5>
-                                    </div>
-                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-8 cvBottomSpace">
-                                       <div class="input-group">
-                                            <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.notice_period" placeholder="Notice Period" aria-describedby="sizing-addon1"/>
-                                            <span class="input-group-addon" id="sizing-addon1">Days</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Experience</h5>
-                                    </div>
-                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-8 cvBottomSpace">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.experience" placeholder="Experience" aria-describedby="sizing-addon1"/>
-                                            <span class="input-group-addon" id="sizing-addon2">Years</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-8">
-                                    </div>
-
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Current Employer</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
-                                        <input type="text" ng-model="CVAttachCtrl._CVInfo.current_employeer" placeholder="Current Employer" class="form-control"/>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Current Job Title</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
-                                        <input type="text" placeholder="Current Job Title" ng-model = "CVAttachCtrl._CVInfo.current_job_title" class="form-control"/>
-                                    </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Job Type</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
-                                        <select class="form-control ng-pristine ng-valid ng-touched" ng-model = "CVAttachCtrl._CVInfo.job_type">
-                                            <option value="0">Full Time</option>
-                                            <option value="1">Part Time</option>
-                                            <option value="2">Work from Home</option>
-                                            <option value="3">Internship</option>
-                                            <option value="4">Apprenticeship</option>
-                                            <option value="5">Job Oriented Training</option>
-                                            <option value="6">Consultant</option>
-                                            <option value="7">Freelancer</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Expected Salary</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8 cvBottomSpace">
-                                        <input type="text" decimals-only maxlength="17" name="exp_salary" class="form-control text-right emptyBox" ng-model="CVAttachCtrl._CVInfo.exp_salary" placeholder="Expected Salary"/>
-                                    </div>
-
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Institute</h5>
-                                    </div>
-
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw" id="instituteDiv">
-                                        <input type = "text"
-                                               placeholder = "Full and Correct College Name"
-                                               ng-model = "instituteTitle"
-                                               ng-keypress = "instituteKeyPress($event.keyCode)"
-                                               ng-click = "instituteTextBoxClicked()"
-                                               class = "form-control instittuteClass"/>
-
-                                        <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
-                                           <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
-                                                {{institute.InstituteTitle}}
-                                           </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Last Education</h5>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace">
-                                        <select class="form-control" ng-model="CVAttachCtrl._CVInfo.education_id">
-                                            <option value = "0"> -- Select -- </option>
-                                            <option ng-repeat="education in educationList track by $index" value="{{education.TID}}">{{education.EducationTitle}}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace setLeftRightPaddingZero">
-                                        <input type="text"
-                                               class="form-control text-right"
-                                               numbers-only maxlength="4"
-                                               ng-model="CVAttachCtrl._CVInfo.year_of_passing"
-                                               placeholder="Passed Year"
-                                               aria-describedby="sizing-addon1"/>
-                                    </div>
-                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 cvBottomSpace hpw" id="specializationDiv">
-                                        <!--<select class="form-control" ng-model="CVAttachCtrl._CVInfo.specialization_id">
-                                            <option value = "0"> -- Select Specialization -- </option>
-                                            <option ng-repeat="specialization in specializationList track by $index" value="{{specialization.TID}}">{{specialization.specialization}}</option>
-                                        </select>-->
-
-                                        <input type = "text"
-                                               placeholder = "Type Specialization"
-                                               ng-model = "specilizationTitle"
-                                               ng-keypress = "specializationKeyPress($event.keyCode)"
-                                               ng-click = "specializationTextBoxClicked()"
-                                               class = "form-control instittuteClass"/>
-
-                                        <div ng-hide="showSpecializationDropDown" class="filter-dropdownSpecialization width-105 search-option-content setTableFixHeight">
-                                            <div class="checkbox-dropdown" ng-repeat="specialization in specializationList | filter:specilizationTitle" ng-click="selectSpecilization(specialization.TID,specialization.Title)">
-                                                {{specialization.Title}}
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
-                                        <h5 class="text-primary text-left">Aggregate Score</h5>
-                                    </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace">
-                                        <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="CVAttachCtrl._CVInfo.aggregate_score" placeholder="87" aria-describedby="sizing-addon1"/>
-                                    </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace setLeftRightPaddingZero">
-                                        <label class="imgTopMargin">%</label>
                                     </div>
                                 </div>
                             </div>
@@ -433,7 +384,7 @@
                                                                     <input class="newCvActveSkills" ng-show="editMode[$index]" type="checkbox"  ng-checked="editSkill.active_status" ng-model="editSkill.active_status"/>
                                                                 </td>
                                                                 <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
-                                                                    <button class="btn btn-success btn-xs" ng-show="editMode[$index]" ng-click="saveSkillFn($index)">Save</button>
+                                                                    <button class="btn btn-success btn-xs" ng-show="editMode[$index]" ng-click="saveSkillFn($index)">Add</button>
                                                                     <button class="btn btn-warning btn-xs" ng-hide="editMode[$index]" ng-click="editSkillFn($index)">Edit</button>
                                                                     <button class="btn btn-primary btn-xs panelTextSize" ng-disabled="$index == 0" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</button>
                                                                 </td>

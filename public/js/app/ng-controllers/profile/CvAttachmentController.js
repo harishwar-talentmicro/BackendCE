@@ -203,6 +203,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
     function isValidate()
     {
        var notificationMessage = "";
+        console.log("SAi88");
+        console.log(CVAttachCtrl._CVInfo);
+
         var errorList  = [];
         if(CVAttachCtrl._CVInfo.Pin)
         {
@@ -226,13 +229,20 @@ angular.module('ezeidApp').controller('CVAttachController',[
             errorList.push('Expected Salary is empty');
         }
 
+        if(!CVAttachCtrl._CVInfo.skillMatrix.length)
+        {
+            errorList.push('Skill Map is empty');
+        }
+
+
+
         if(errorList.length > 0)
         {
             for(var i = errorList.length; i > 0;i--)
             {
                 Notification.error({ message: errorList[i-1], delay: MsgDelay });
             }
-         };
+        };
         //Return false if errorList is greater than zero
         return (errorList.length>0) ? false : true;
     }
@@ -266,28 +276,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
             $scope.instituteID = 0;
         }
 
-        $scope.instituteText = "";
-        $scope.instituteID = 0;
-
-        /**
-         * if user select specialization from list than send id other wise send text as title
-         */
-        if($scope.specilizationTitle)
-        {
-            if($scope.specilizationTitle != $scope.specilizationText)
-            {
-                CVAttachCtrl._CVInfo.specialization_id = 0;
-                $scope.specilizationTitle = "";
-                $scope.specilizationText = "";
-            }
-        }
-        else
-        {
-            CVAttachCtrl._CVInfo.specialization_id = 0;
-            $scope.specilizationTitle = "";
-            $scope.specilizationText = "";
-        }
-
         CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 0;
         CVAttachCtrl._CVInfo.experience = (CVAttachCtrl._CVInfo.experience) ? CVAttachCtrl._CVInfo.experience : 0;
 
@@ -317,14 +305,19 @@ angular.module('ezeidApp').controller('CVAttachController',[
         CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions.toString();
         CVAttachCtrl._CVInfo.category_id = $scope.selectedCategories.toString();
 
-        $scope.selectedFunctions = [];
-        $scope.selectedCategories = [];
+
         CVAttachCtrl._CVInfo.skillMatrix = $scope.skillMatrix;
         CVAttachCtrl._CVInfo.skillsTid = skillsTid.toString();
 
-        if(isValidate())
+        if(isValidate() )
         {
             $scope.$emit('$preLoaderStart');
+            $scope.instituteText = "";
+            $scope.instituteID = 0;
+
+            $scope.selectedFunctions = [];
+            $scope.selectedCategories = [];
+
 
             CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
             CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
@@ -382,6 +375,22 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 .error(function(data, status, headers, config) {
                     $scope.$emit('$preLoaderStop');
                 });
+        }
+        else
+        {
+
+            if(!CVAttachCtrl._CVInfo.skillMatrix.length)
+            {
+                $scope.skillMatrix.push(
+                    {
+                        "tid":0,
+                        "skillname":"",
+                        "expertiseLevel":0,
+                        "exp":"",
+                        "active_status":1
+                    }
+                );
+            }
         }
     };
 
@@ -482,11 +491,13 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         {
                             if($scope.specializationList[nCount].TID == CVAttachCtrl._CVInfo.specialization_id)
                             {
-                                $scope.specilizationTitle = $scope.specializationList[nCount].Title;
-                                $scope.specilizationText = $scope.specializationList[nCount].Title;
+                                $scope.specializationList[nCount].ticked = true;
                             }
                         }
                     }
+
+
+                  //  $scope.specializationList
 
                     if((res.skillMatrix.length == 0) || (res.skillMatrix == null) || (res.skillMatrix == 'null'))
                     {
@@ -870,6 +881,10 @@ angular.module('ezeidApp').controller('CVAttachController',[
         $scope.instituteText = title;
         $scope.instituteID = instituteID;
 
+        console.log("SAi1");
+        console.log(CVAttachCtrl._CVInfo.institute_id);
+        console.log(CVAttachCtrl._CVInfo.institute_title);
+
         $scope.instituteTitle = title;
         if(CVAttachCtrl._CVInfo.institute_id != 0)
         {
@@ -880,7 +895,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
             CVAttachCtrl._CVInfo.institute_title = title;
             CVAttachCtrl._CVInfo.institute_id = 0;
         }
-       $scope.showInstituteDropDown = false;
+
+        console.log("SAi2");
+        console.log(CVAttachCtrl._CVInfo.institute_id);
+        console.log(CVAttachCtrl._CVInfo.institute_title);
+
+        $scope.showInstituteDropDown = false;
     };
 
     $scope.showSpecializationDropDown = true;
@@ -934,17 +954,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
             params : {
                 token : $rootScope._userInfo.Token
             }
-        }).success(function(resp){
-//            $scope.specializationList = resp.data;
-
-
-                for(var i=0; i<5000;i++){
-                    $scope.specializationList.push({TID : (i+1), Title : "College "+i });
-                }
+        }).success(function(resp)
+        {
+            $scope.specializationList = resp.data;
             $scope.spcializationGetResponse = true;
             getCVDetails();
         })
-        .error(function(err){
+        .error(function(err)
+        {
 
         });
     }
@@ -1002,14 +1019,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     };
 
-        $scope.example9model = [];
-        $scope.example9data = [];
-        $scope.example9settings = {enableSearch: true};
-
-        for(var i=0; i<5000;i++){
-            $scope.example9data.push({id : (i+1), label : "College "+i });
-        }
-
         /*------------------------ multi selection ----------------*/
 
         $scope.fOpen = function() {
@@ -1051,13 +1060,14 @@ angular.module('ezeidApp').controller('CVAttachController',[
             $scope.selectedFunctions = [];
         };
 
-        $scope.fReset = function() {
+        $scope.fReset = function()
+        {
             $scope.selectedFunctions = [];
 
-            for (var nCount = 0; nCount < $scope.functionsArray.length; nCount++)
+            /*for (var nCount = 0; nCount < $scope.functionsArray.length; nCount++)
             {
                 $scope.selectedFunctions.push(parseInt($scope.functionsArray[nCount]));
-            }
+            }*/
         };
 
         $scope.fClear = function() {
@@ -1079,14 +1089,11 @@ angular.module('ezeidApp').controller('CVAttachController',[
             nothingSelected  : "Select Function"
         };
 
-        /*------------------------ multi selection ----------------*/
-
+        /*------------------------ multi selection education ----------------*/
         $scope.educationOpen = function() {
-            // console.log( 'On-open' );
         };
 
         $scope.educationClose = function() {
-            //console.log( 'On-close' );
         };
 
         $scope.educationClick = function( data )
@@ -1094,26 +1101,13 @@ angular.module('ezeidApp').controller('CVAttachController',[
             CVAttachCtrl._CVInfo.education_id = data.TID;
         };
 
-
-
         $scope.educationReset = function() {
-            /*$scope.selectedFunctions = [];
-
-            for (var nCount = 0; nCount < $scope.functionsArray.length; nCount++)
-            {
-                $scope.selectedFunctions.push(parseInt($scope.functionsArray[nCount]));
-            }*/
         };
 
         $scope.educationClear = function() {
-            // console.log( 'On-clear' );
         };
 
         $scope.educationSearchChange = function( data ) {
-            /*console.log( 'On-search-change' );
-             console.log( 'On-search-change - keyword: ' + data.keyword );
-             console.log( 'On-search-change - result: ' );
-             console.log( data.result );*/
         };
 
         $scope.eductionTags = {
@@ -1123,8 +1117,39 @@ angular.module('ezeidApp').controller('CVAttachController',[
             selectNone : "Deselect All",
             nothingSelected  : "Select Last Education"
         };
+        $scope.outputEducation = [];
 
 
+        /*------------------------ multi selection specialization ----------------*/
+        $scope.specializationOpen = function() {
+        };
+
+        $scope.specializationClose = function() {
+        };
+
+        $scope.specializationClick = function( data )
+        {
+            CVAttachCtrl._CVInfo.specialization_id = data.TID;
+            //CVAttachCtrl._CVInfo.education_id = data.TID;
+        };
+
+        $scope.specializationReset = function() {
+        };
+
+        $scope.specializationClear = function() {
+        };
+
+        $scope.specializationSearchChange = function( data ) {
+        };
+
+        $scope.specializationTags = {
+            selectAll : "Select All",
+            reset : "Reset",
+            search : "Search Specialization",
+            selectNone : "Deselect All",
+            nothingSelected  : "Select Specialization"
+        };
+        $scope.outputSpecialization = [];
 
         /*$scope.$watch('outputBrowsers',function(n,o){
             console.log(n);

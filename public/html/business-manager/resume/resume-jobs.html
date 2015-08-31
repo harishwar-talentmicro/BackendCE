@@ -1,6 +1,5 @@
 <!-- Main job post starts here -->
 <div class="row setRowLeftRightMarginZero post-job" ng-controller="ResumeJobsCtrl">
-
     <div ng-show="showJobListing">
         <!-- Top filter start -->
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero topMarginButton">
@@ -157,38 +156,35 @@
             </div>
             <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
-                    <label>Skill Keywords</label>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <input type="text" maxlength="250" ng-model = "skillKeyWords" placeholder="Sales, Marketing" class="form-control"/>
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>No. of Vacancies</label>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
                     <input numbers-only type="text" ng-model = "jobVacancies" placeholder="0" class="form-control text-right"/>
                 </div>
-            </div>
-            <div class="row topMarginButton">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 fotterButtonContainer">
+                </div>
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Experience</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="row">
-                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
                             <input type="text" decimals-only maxlength="4" placeholder="1" ng-model = "experienceFrom" class="form-control text-right"/>
                         </div>
-                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setTopMarginOneNhalf text-center">
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setTopMarginOneNhalf text-center">
                             to
                         </div>
-                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                            <input type="text" decimals-only maxlength="4" placeholder="3" ng-model = "experienceTo" class="form-control text-right"/>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                           <input type="text" decimals-only maxlength="4" placeholder="3" ng-model = "experienceTo" class="form-control text-right"/>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 setTopMarginOneNhalf">
                             Years
                         </div>
                     </div>
                 </div>
+
+            </div>
+            <div class="row topMarginButton">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Location</label>
                 </div>
@@ -201,7 +197,7 @@
                             <button type="button" class="btn btn-primary" ng-disabled="disabledAddLocation" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
                         </div>
                     </div>
-                    <div class="row topMargin-three setBorderColor setRowLeftRightMarginZero locationListBox" ng-show="locationArrayString.length">
+                    <!--<div class="row topMargin-three setBorderColor setRowLeftRightMarginZero locationListBox" ng-show="locationArrayString.length">
                         <div class="row setRowLeftRightMarginZero" ng-repeat="location in locationArrayString track by $index">
                             <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
                                 <span data-toggle="tooltip" title="" data-original-title="{{location}}">{{location | textLength:15}}</span>
@@ -210,6 +206,26 @@
                                 <a class="showPointer">
                                     <i class="fa fa-map-marker" ng-click="modalVisibility($index + 1)">
                                       {{mainLocationArray[$index].maptype == 0 ? 'Set Job Location' : 'Change Job Location'}}
+                                    </i>
+                                </a>
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setLeftRightPaddingZero">
+                                <span class="showPointer"><img src="/images/Droped_Red_16.png" ng-click="removeLocation($index)" class="width-100-px"></span>
+                            </div>
+                        </div>
+                    </div>-->
+                </div>
+
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="row setBorderColor setRowLeftRightMarginZero locationListBox" ng-show="locationArrayString.length">
+                        <div class="row setRowLeftRightMarginZero" ng-repeat="location in locationArrayString track by $index">
+                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
+                                <span data-toggle="tooltip" title="" data-original-title="{{location}}">{{location | textLength:15}}</span>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                                <a class="showPointer">
+                                    <i class="fa fa-map-marker" ng-click="modalVisibility($index + 1)">
+                                        {{mainLocationArray[$index].maptype == 0 ? 'Set Job Location' : 'Change Job Location'}}
                                     </i>
                                 </a>
                             </div>
@@ -289,8 +305,10 @@
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Phone</label>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                     <input type="text" numbers-only maxlength="12" placeholder="Phone" ng-model = "phone" class="form-control"/>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <label>Status</label>
@@ -376,6 +394,114 @@
                     %
                 </div>
             </div>
+
+
+            <div class="row topMarginButton">
+                <div class="row setRowLeftRightMarginZero">
+                    <span class="skillText">Skill Map (Choose & Rate your Skills to get a right Job) </span>
+                </div>
+                <div class="row setRowLeftRightMarginZero">
+
+                    <table class="table table-striped skillMatrixTable" st-table="rowCollection">
+                        <thead>
+                            <tr style="background:#ECECEC; color:#000000;">
+                                <th class="panelPd5px skillKeyWord newSkillFieldJob"><span class="padding-left4">Skill</span></th>
+                                <th class="panelPd5px skillExpertiesJob msg_pos">Expertise Level</th>
+                                <th class="panelPd5px from_size msg_pos">Experience(Years)</th>
+                                <th class="panelPd5px from_size msg_pos">Active Skills</th>
+                                <th class="panelPd5px skillAction msg_pos">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="">
+                            <tr>
+                                <td colspan="5">
+                                    <div class="setTableFixHeight">
+                                        <table style="width: 100%;">
+
+                                            <tr ng-repeat="skill in skillMatrix">
+                                                <td class="panelPd5px newSkillFieldJobText" ng-hide="(!editMode[$index]) && ($index == 0)">
+                                                    <span ng-hide="editMode[$index]">{{skillMatrix[$index].skillname}}</span>
+                                                    <div class="ui-widget " ng-show="editMode[$index]">
+                                                        <input class="form-control" type="text" id="tags{{$index}}" ng-keyup="complete($index)"
+                                                               ng-model="editSkill.skillname" placeholder="Type skill here"/>
+                                                    </div>
+                                                </td>
+                                                <td class="panelPd5px skillExpertiesJobDropdown" ng-hide="(!editMode[$index]) && ($index == 0)">
+                                                    <span ng-hide="editMode[$index]">{{expertiseLevels[skillMatrix[$index].expertiseLevel]}}</span>
+                                                   <!-- <select class="form-control" name="expertiesLevel" ng-model="editSkill.expertiseLevel" ng-show="editMode[$index]">
+                                                        <option value="0" default selected> Beginner </option>
+                                                        <option value="1"> Independent </option>
+                                                        <option value="2"> Expert </option>
+                                                        <option value="3"> Master </option>
+                                                    </select>-->
+                                                    <div  talent-multi-select=""
+                                                          input-model="modernBrowsers"
+                                                          output-model="outputBrowsers"
+                                                          button-label=" name"
+                                                          default-button-label="Expertise Level "
+                                                          item-label="name"
+                                                          tick-property="ticked"
+                                                          on-open="fOpen()"
+                                                          on-close="fClose()"
+                                                          on-item-click="fClick( data )"
+                                                          on-select-all="fSelectAll()"
+                                                          on-select-none="fSelectNone()"
+                                                          on-reset="fReset()"
+                                                          on-clear="fClear()"
+                                                          on-search-change="fSearchChange( data )"
+                                                          translation="functionTags"
+                                                          custom-button-class="btn-block"
+                                                          max-labels="0"
+                                                          max-height="150px"
+                                                          helper-elements="">
+                                                    </div>
+                                                </td>
+                                                <td class="panelPd5px msg_pos expSkillMap" ng-hide="(!editMode[$index]) && ($index == 0)">
+                                                    <span ng-hide="editMode[$index]">{{skillMatrix[$index].exp_from}}</span>
+                                                    <span ng-hide="editMode[$index]" style="text-align: right;">{{skillMatrix[$index].exp_to}}</span>
+                                                    <div style="float: left;">
+                                                        <input type="text"
+                                                               ng-show="editMode[$index]"
+                                                               ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }"
+                                                               name="experienceFromYear"
+                                                               maxlength="4"
+                                                               ng-model="editSkill.exp_from"
+                                                               class="form-control newCvExpField text-right"
+                                                               placeholder="Ex. 5.00"/>
+                                                    </div>
+                                                    <div style="float: right;">
+                                                        <input type="text"
+                                                               ng-show="editMode[$index]"
+                                                               ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }"
+                                                               name="experienceYear"
+                                                               maxlength="4"
+                                                               ng-model="editSkill.exp_to"
+                                                               class="form-control newCvExpField text-right"
+                                                               placeholder="Ex. 5.00"/>
+                                                    </div>
+
+                                                     </td>
+                                                <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
+                                                    <input class="newCvActveSkills" type="checkbox" ng-hide="editMode[$index]" ng-disabled="1" ng-model="skillMatrix[$index].active_status"/>
+                                                    <input class="newCvActveSkills" ng-show="editMode[$index]" type="checkbox"  ng-checked="editSkill.active_status" ng-model="editSkill.active_status"/>
+                                                </td>
+                                                <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
+                                                    <button class="btn btn-success btn-xs" ng-show="editMode[$index]" ng-click="saveSkillFn($index)">Add</button>
+                                                    <button class="btn btn-warning btn-xs" ng-hide="editMode[$index]" ng-click="editSkillFn($index)">Edit</button>
+                                                    <button class="btn btn-primary btn-xs panelTextSize" ng-disabled="$index == 0" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</button>
+                                                </td>
+                                            </tr>
+
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
             <div class="row topMarginButton">
                 <div class="col-lg-3 col-md-3 col-sm-2 col-xs-12">
                     <input type="button" ng-click="postJob()" class="btn btn-primary" value="Save">

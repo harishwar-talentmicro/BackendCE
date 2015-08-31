@@ -1,0 +1,89 @@
+<!-- Outbox module goes here -->
+<section id="job-search-result-wrapper" class="hpw ow jsr rpw">
+    <!-- Header menu goes here -->
+    <header-section></header-section>
+
+    <!-- left spacing-->
+    <div class="col-lg-2  col-md-2 col-sm-2 col-xs-2 no-padding">
+    </div>
+
+    <!-- middle bar -->
+    <div class="col-lg-8  col-md-8 col-sm-8 col-xs-12 no-padding">
+        <!-- main content goes here -->
+        <br/>
+
+        <div ng-show="resultData.length" class="individual-tiles pointer" ng-repeat="job in resultData track by $index" ng-click="redirectJobDetailPage(job.tid)">
+            <!-- Heading of the Job tile -->
+            <div class="job-main-content tile-head job-result">
+                <div class="row">
+                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                        <i class="fa fa-tags text-info job-title-icon"></i>
+                        <span title="{{job.jobtitle.length >= 42 ? job.jobtitle : ''}}">{{job.jobtitle | textLength:42}}</span>
+                        <br/>
+                        <small class="company-name" title="{{job.companyname.length >= 42 ? job.companyname : ''}}">{{job.companyname}}</small>
+                    </div>
+
+                    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 text-left setLeftRightPaddingZero">
+                        <span class="text-left" ng-show="job.jobtype == 0">(Full Time)</span>
+                        <span class="text-left" ng-show="job.jobtype == 1">(Part Time)</span>
+                        <span class="text-left" ng-show="job.jobtype == 2">(Work from Home)</span>
+                        <span class="text-left" ng-show="job.jobtype == 3">(Internship)</span>
+                        <span class="text-left" ng-show="job.jobtype == 4">(Apprenticeship)</span>
+                        <span class="text-left" ng-show="job.jobtype == 5">(Job Oriented Training)</span>
+                        <span class="text-left" ng-show="job.jobtype == 6">(Consultant)</span>
+                        <span class="text-left" ng-show="job.jobtype == 7">(Freelancer)</span>
+                    </div>
+
+                    <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 text-right normal-view-buttons">
+                        <div ng-click="$event.stopPropagation()">
+                            &nbsp;<span>
+                                        <button class="btn btn-primary btn-sm" ng-hide="job.hide" ng-click="redirectNotifyPage(job.tid)">Notify</button>
+                                 </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- content of the job tile -->
+            <div class="job-main-content tile-content">
+                <span class="experience-title"><i class="fa fa-briefcase"></i> Exp: {{getExperienceString(job.expfrom,job.expto)}}</span>
+                <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: {{job.location}}</span>
+                <div class="key-skills p-top-10" ng-init="skills = getKeySkillsArray(job.keyskills)">
+                    <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
+                                <span ng-repeat="skill in activeSkillsArray track by $index">
+                                <button class="btn btn-default btn-xs">{{skill}}</button>
+                                    </span>
+                    </p>
+                </div>
+                <div class="row">
+                    <div class="salary col-lg-7">
+                        Salary: {{getSalaryRange(job.salaryfrom,job.salaryto)}}
+                    </div>
+                    <div class="posted-on text-right col-lg-5">
+                        <i class="fa fa-clock-o"></i> {{job.LUdate | ageFilter}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="individual-tiles" ng-hide="resultData.length">
+            <!-- Heading of the Job tile -->
+            <div class="job-main-content tile-head">
+                <div class="row">
+                    <div class="col-lg-7 text-info text-uppercase">
+                        N<i class="fa fa-cog fa-spin text-danger"></i> result f<i class="fa fa-cog fa-spin text-warning"></i>und<br>
+                    </div>
+                    <div class="col-lg-5 text-right normal-view-buttons">
+                        <!--<img class="height-45-px" alt="Oracle India Pvt. Ltd." src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRdSv2I9KbGIvimt1RmpMIhbRX9w8JGWpDfBmGdJvsrvqnuuqW3BQ">-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- right spacing-->
+    <div class="col-lg-2  col-md-2 col-sm-2 col-xs-2 no-padding">
+    </div>
+
+    <!-- Footer goes here -->
+    <footer-section></footer-section>
+</section>

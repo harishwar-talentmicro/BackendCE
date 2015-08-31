@@ -2041,7 +2041,7 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .locationListBox {
     overflow-y: scroll;
-    height: 100px;
+    height: 75px;
     overflow-x: hidden;
 }
 .postJob label
@@ -2099,5 +2099,36 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 }
 .textRed
 {
-    color: #FC1C00;
+    color: #DC6658;
+}
+.setVScrolToLocationBox
+{
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 60px;
+}
+.setPaddingLeft0
+{
+    padding-left: 0px;
+}
+.setPaddingRight0
+{
+    padding-right: 0px;
+}
+.newSkillFieldJob {
+    width: 135px !important;
+}
+.newSkillFieldJobText {
+    width: 315px;
+}
+
+.skillExpertiesJob {
+    width: 115px!important;
+}
+.skillExpertiesJobDropdown {
+    width: 240px;
+}
+.expSkillMap
+{
+    width: 186px;
 }

@@ -576,20 +576,20 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
 
         var Token = req.body.Token;
         var Title = req.body.Title;
-        var FromName = req.body.FromName;
-        var FromEmailID = req.body.FromEmailID;
-        var CCMailIDS = req.body.CCMailIDS;
-        var BCCMailIDS = req.body.BCCMailIDS;
-        var Subject  = req.body.Subject;
+        var FromName = req.body.FromName ? req.body.FromName : '';
+        var FromEmailID = req.body.FromEmailID ? req.body.FromEmailID : '';
+        var CCMailIDS = req.body.CCMailIDS ? req.body.CCMailIDS :'';
+        var BCCMailIDS = req.body.BCCMailIDS ? req.body.BCCMailIDS : '';
+        var Subject  = req.body.Subject ? req.body.Subject : '';
         var Body = req.body.Body;
-        var templateType = req.body.template_type ? req.body.template_type : 1; //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer
-        var tid = req.body.tid ? req.body.tid : 0;
+        var templateType = req.body.template_type ? req.body.template_type : 1; //1-bulkmailer, 2-jobseekers bulkmailer, 3-notification
+        var tid = (req.body.tid) ? parseInt(req.body.tid) : 0;
 
         var RtnMessage = {
             IsSuccessfull: false
         };
 
-        if (Token != null && Title != null && FromName != null && FromEmailID != null && Subject != null && Body != null ) {
+        if (Token != null && Title != null && Body != null ) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result != null) {
@@ -600,6 +600,7 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
 
                         console.log('CALL pSaveMailTemplate(' + query + ')');
                         st.db.query('CALL pSaveMailTemplate(' + query + ')', function (err, InsertResult) {
+                            console.log(InsertResult);
                             if (!err){
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -683,7 +684,7 @@ Audit.prototype.getMailTemplate = function(req,res,next) {
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
-        var templateType = req.query.template_type; //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer
+        var templateType = req.query.template_type; //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer, 3-notification
 
         if (Token != null) {
             st.validateToken(Token, function (err, Result) {
