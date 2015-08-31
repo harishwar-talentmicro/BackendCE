@@ -296,8 +296,6 @@ angular.module('ezeidApp').
 
             function isSuggestionDataReceiverArray(groupName)
             {
-                console.log($scope.receiverArr);
-                console.log(groupName);
                 /* check for duplicate receiver */
                 if($scope.receiverArr.indexOfWhere("GroupName",groupName) >=0)
                     return true;
@@ -411,7 +409,7 @@ angular.module('ezeidApp').
             $scope.pushSelectedSuggestion = function()
             {
                 $scope.visibilityHtml.groupSuggestion = false;
-
+                $scope.composeMsg.MessageTo = "";
                 if(!$scope.groupSuggestionList)
                     return;
 
