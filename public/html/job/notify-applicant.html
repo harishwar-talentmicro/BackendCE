@@ -1,0 +1,93 @@
+<div id="wrapper">
+    <header-section></header-section>
+    <div class="container-fluid">
+
+        <div class="row">
+           <div class="col-sm-10" style="margin: auto; float: none;">
+               <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4>Notify Applicant</h4>
+                    </div><br/>
+                   <div class="templateBoxContainer">
+                       <span>Matching Applicants : </span> <span class="showPointer"><a ng-click="redirectApplicantPage(job_id)">{{applicantCount}}</a></span>
+                       <hr/>
+                   </div><br/>
+
+                    <div>
+
+                        <!--new design of mail template-->
+                        <div style="text-align: center">
+                            <div class="well-lg templateBoxContainer">
+                                <form name="MailTemplateForm" novalidate >
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Template
+                                        </div>
+                                        <div ng-hide="showCreateMailTemplate">
+                                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 searchHeaderAlignment ">
+                                                <select class="form-control" name="TitleSeelect" ng-model="mailTemplateTid"
+                                                        ng-change="getTemplateDetails(mailTemplateTid)"
+                                                        ng-options="template.TID as template.Title for template in templates" required>
+                                                    <option value = ""> -- Select Template -- </option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment setTextToRight">
+                                                <button data-toggle="tooltip" data-placement="right" title="Create new template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('new')" >New</button>
+                                            </div>
+                                            <div ng-show="mailTemplateTid" class="col-lg-1 col-md-1 col-sm-1 col-xs-12 searchHeaderAlignment">
+                                                <button data-toggle="tooltip" data-placement="right" title="Edit template" type="button" class="btn btn-primary" ng-click="addNewTemplateForm('edit')" >Edit</button>
+                                            </div>
+                                        </div>
+
+                                        <div ng-show="showCreateMailTemplate">
+                                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
+                                                <input type="text" name="Title" id="Title" ng-model="Title"
+                                                       class="form-control emptyBox" ng-class="MailTemplateForm.Title.$touched && !Title.length ? 'mandatoryTextBox' : ''"
+                                                       placeholder="Template title" maxlength="100" required>
+                                            </div>
+                                        </div>
+
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign">
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer topMarginButton">
+                                            Body
+                                        </div>
+                                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 searchHeaderAlignment">
+                                            <textarea rows="10" cols="92" name="Body" id="Body" ng-model="Body"
+                                                      class="form-control emptyBox"  ng-class="MailTemplateForm.Body.$touched && !Body.length && validationMode > 0 ? 'mandatoryTextBox' : ''"
+                                                      placeholder="Type here"
+                                                      ng-readonly="validationMode == 0" required></textarea>
+                                        </div>
+                                    </div><br/>
+                                    <div class="row setRowLeftRightMarginZero centerAlign" >
+                                        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 searchHeaderAlignment TemplateTextContainer">
+                                        </div>
+                                        <div ng-hide="showCreateMailTemplate">
+                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="submit" class="btn btn-primary" ng-click="SendNotification()"
+                                                        ng-disabled="!mailTemplateTid" >Send</button>
+                                                <button type="button" class="btn btn-primary" ng-click="closeNotifyForm()" >Close</button>
+                                            </div>
+                                        </div>
+
+                                        <div ng-show="showCreateMailTemplate">
+                                            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 searchHeaderAlignment" style="text-align: left;">
+                                                <button type="submit" class="btn btn-primary" ng-click="saveMailTemplate()"
+                                                        ng-disabled="!Title || !Body">Save</button>
+                                                <button type="button" class="btn btn-primary" ng-click="closeCreateMailTemplateForm()" >Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<footer-section></footer-section>

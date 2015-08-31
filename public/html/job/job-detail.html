@@ -41,9 +41,14 @@
                                 <span ng-show="isLoggedIn">
                                     <span ng-show="_userInfo.Type == 1">
                                         <span ng-show="showButtons">
-                                            <button ng-show="!jobData.isappliedforjob" class="btn btn-primary btn-sm" ng-click="applyForJob(jobData.tid)">APPLY</button>
+                                            <div ng-hide="$root._userInfo.isinstitute_admin">
+                                                <button ng-show="!jobData.isappliedforjob" class="btn btn-primary btn-sm" ng-click="applyForJob(jobData.tid)">APPLY</button>
+                                            </div>
                                         </span>
                                     </span>
+                                    <div ng-show="!$root._userInfo.isinstitute_admin">
+                                        <button ng-show="jobData.isappliedforjob" class="btn btn-primary btn-sm" ng-click="redirectNotifyPage(jobData.tid)">Notify</button>
+                                    </div>
                                 </span>
                             </div>
                         </div>

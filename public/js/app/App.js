@@ -43,6 +43,7 @@
 
     //ezeid.value('GURL',"/");
     ezeid.value('GURL',"http://104.199.128.226:3001/api/");
+    ezeid.value('GURL',angular.appSettings.SERVICE_URL);
     ezeid.value('MURL',"https://ms2.ezeone.com/stomp");
 
     ezeid.value('MsgDelay',2000);
@@ -61,6 +62,9 @@
         '/job',
         '/jobdetail',
         '/appliedjob',
+        '/show-my-institute-jobs',
+        '/notify-applicant',
+        '/applicantslisting',
         '/access-history',
         '/:ezeond/sales',
         '/:ezeone/home_delivery',
@@ -304,6 +308,20 @@
             .when('/appliedjob',{
                 templateUrl: 'html/job/applied-job.html',
                 controller : 'AppliedJobCtrl'
+            })
+            .when('/show-my-institute-jobs',{
+                templateUrl: 'html/job/my-institute-job.html',
+                controller : 'MyInstituteJobCtrl'
+            })
+            .when('/notify-applicant',
+            {
+                templateUrl: 'html/job/notify-applicant.html',
+                controller : 'NotifyApplicantCtrl'
+            })
+            .when('/applicantlisting',
+            {
+                templateUrl: 'html/job/applicant-list.html',
+                controller : 'ApplicantListing'
             })
             .when('/jobappliedsuccess',{
                 templateUrl: 'html/job/job-applied-success.html',

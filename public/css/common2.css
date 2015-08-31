@@ -3613,6 +3613,23 @@ sup.tm{
     padding: 10px;
     border-radius: 10px;
 }
+
+.hpw .min-height-150
+{
+    min-height: 150px;
+}
+
+.ta-scroll-window > .ta-bind
+{
+    height: auto;
+    min-height: 100px !important;
+    padding: 6px 12px;
+}
+
+.hpw .send-button
+{
+    padding-top: 1.8%;
+}
 /*::-webkit-scrollbar {*/
 /*width: 12px;*/
 /*}*/
