@@ -183,7 +183,7 @@ exports.FnJobRefresh = jobModule.jobRefresh;
 exports.FnJobsMatch = jobModule.jobsMatch;
 exports.FnJobsMyInstitute = jobModule.jobsMyInstitute;
 exports.FnNotifyRelevantStudent = jobModule.notifyRelevantStudent;
-exports.FnViewNotifiedCVDetails = jobModule.viewNotifiedCVDetails;
+exports.FnViewApplicantList = jobModule.viewApplicantList;
 exports.FnViewJobDetails = jobModule.viewJobDetails;
 exports.FnJobNotification = jobModule.jobNotification;
 

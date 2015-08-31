@@ -2229,14 +2229,14 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
 };
 
 /**
- * @todo FnViewNotifiedCVDetails
+ * @todo FnViewApplicantList
  * Method : GET
  * @param req
  * @param res
  * @param next
  * @description api code for view cv details
  */
-Job.prototype.viewNotifiedCVDetails = function(req,res,next){
+Job.prototype.viewApplicantList = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
@@ -2458,7 +2458,7 @@ Job.prototype.jobNotification = function(req,res,next) {
     var _this = this;
     var fs = require("fs");
     var token = req.body.token;
-    var ezeid = req.body.ezeid;
+    var ezeid = alterEzeoneId(req.body.ezeid);
     var ids = req.body.ids;    // tid of student ids
     var templateId = req.body.template_id;
     var jobId = req.body.job_id;

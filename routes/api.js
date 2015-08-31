@@ -160,7 +160,7 @@ router.get('/location_details',LocationManager.FnLocationDetails);
 router.get('/job_match',LocationManager.FnJobsMatch);
 router.get('/job_myinstitute',LocationManager.FnJobsMyInstitute);
 router.get('/notify_student',LocationManager.FnNotifyRelevantStudent);
-router.get('/cv_details',LocationManager.FnViewNotifiedCVDetails);
+router.get('/applicant_list',LocationManager.FnViewApplicantList);
 router.get('/profile_image',LocationManager.FnProfileImageURL);
 router.get('/view_job_details',LocationManager.FnViewJobDetails);
 router.post('/job_notification',LocationManager.FnJobNotification);
