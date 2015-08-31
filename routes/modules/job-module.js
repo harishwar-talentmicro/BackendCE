@@ -2149,7 +2149,7 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var jobId = req.query.job_id;
+    var jobId = parseInt(req.query.job_id);
 
     var responseMessage = {
         status: false,
@@ -2570,7 +2570,7 @@ Job.prototype.jobNotification = function(req,res,next) {
                                                                     responseMessage.data = {
                                                                         token: req.body.token,
                                                                         ezeid: req.body.ezeid,
-                                                                        ids: req.body.ids, // tid of student ids
+                                                                        ids: req.body.ids, //tid of student ids
                                                                         templateId: req.body.template_id,
                                                                         jobId: req.body.job_id,
                                                                         message: mailOptions.html
