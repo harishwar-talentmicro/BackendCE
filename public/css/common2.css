@@ -3382,12 +3382,18 @@ sup.tm{
     background-color: rgba(255, 78, 28, 0.75) !important;
 }
 
+.hpw .group-name-suggestion .selected
+{
+    background-color: #203E6B;
+    color: #fff;
+}
+
 .hpw .group-name-suggestion
 {
-    text-align: right;
+    text-align: left;
     position: absolute;
-    background-color: #fff;
-    width: 84%;
+    background-color: #F3F4F9;
+    width: 30%;
     box-shadow: 2px 2px 2px #B1ACAC;
     border: 1px solid #E7D9D9;
     padding: 2px;
@@ -3397,8 +3403,14 @@ sup.tm{
 
 .hpw .group-suggestion
 {
-    padding-right: 2%;
+    padding-left: 2%;
 
+}
+
+.hpw .btn-section
+{
+    border-top: 1px solid #CCCCCC;
+    padding: 3px 3px 0px 0px;
 }
 
 .hpw .group-suggestion:hover

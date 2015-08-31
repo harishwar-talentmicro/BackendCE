@@ -11,7 +11,7 @@
                 <input type="text"
                        ng-model="composeMsg.MessageTo"
                        class="form-control"
-                       ng-keypress="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)"
+                       ng-keyup="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)"
                        id="to"
                        placeholder="To">
                 <div class="input-group-addon no-padding-and-border hidden">
@@ -25,8 +25,15 @@
                 <!-- group suggestions goes here -->
                 <div class="group-suggestion pointer"
                      ng-repeat="list in groupSuggestionList track by $index"
-                     ng-click="selectGroupSuggestion($index)">
-                    <span >{{list.GroupName}}</span>
+                     ng-click="selectGroupSuggestion($index)"
+                        ng-class="list.selected?'selected':''">
+                         <span >{{list.GroupName}}</span>
+                         <i class="fa fa-check" ng-show="list.selected?'selected':''"></i>
+
+                </div>
+                <!-- ok btn -->
+                <div class="btn-section text-right">
+                    <button ng-click="pushSelectedSuggestion()" class="btn btn-primary btn-xs"><i class="fa fa-check-square"></i> OK</button>
                 </div>
             </div>
             <!-- error message of receiver field goes here -->
