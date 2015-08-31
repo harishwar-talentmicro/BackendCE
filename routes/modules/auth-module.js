@@ -688,7 +688,7 @@ Auth.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
-                            //console.log(loginDetails);
+                            console.log(loginDetails[0]);
 
                             if(comparePassword(Password,loginDetails[0].Password)){
                                 st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
@@ -731,6 +731,7 @@ Auth.prototype.login = function(req,res,next){
                                             RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
                                             RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
                                             RtnMessage.group_id = loginDetails[0].group_id;
+                                            RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
 
                                             res.send(RtnMessage);
                                             console.log('FnLogin:tmaster: Login success');
