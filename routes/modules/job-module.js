@@ -524,9 +524,7 @@ Job.prototype.getAll = function(req,res,next){
                                             responseMessage.message = 'Jobs send successfully';
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
-                                                result : getresult[1],
-                                                job_location: getresult[2]
-
+                                                result : getresult[1]
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetJobs: Jobs send successfully');
@@ -1616,7 +1614,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                                                         + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
                                                                                         + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
                                                                                     var query = 'CALL pComposeMessage(' + queryParams + ')';
-                                                                                    //console.log(query);
+                                                                                    console.log(query);
                                                                                     st.db.query(query, function (err, result) {
                                                                                         if (!err) {
                                                                                             if (result) {
@@ -2618,7 +2616,7 @@ Job.prototype.jobNotification = function(req,res,next) {
                                                                                     groupTitle = ezeid;
                                                                                     groupId = gid;
                                                                                     messageText = mailOptions.html;
-                                                                                    messageType = 3;
+                                                                                    messageType = 1;
                                                                                     operationType = 0;
                                                                                     iphoneId = null;
                                                                                     messageId = 0;
@@ -2629,11 +2627,11 @@ Job.prototype.jobNotification = function(req,res,next) {
 
                                                                                 }
                                                                                 else {
-                                                                                    console.log('FnComposeMessage:Error in getting groupid');
+                                                                                    console.log('FnjobNotification:user details not loaded');
                                                                                 }
                                                                             }
                                                                             else {
-                                                                                console.log('FnComposeMessage:Error in getting groupid');
+                                                                                console.log('FnjobNotification:user details not loaded');
                                                                             }
                                                                         });
                                                                     }
