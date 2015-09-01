@@ -1598,41 +1598,69 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                         messageContent = messageContent.replace("{LastName}", jobResult[0][0].LastName);
                                                         messageContent = messageContent.replace("{CompanyName}", jobResult[0][0].CompanyName);
                                                         messageContent = messageContent.replace("{JobTitle}", jobResult[0][0].jobtitle);
-                                                        data = data.replace("{JobID}", jobId);
-                                                        console.log('-----------------');
-                                                        console.log(data);
-                                                        messageContent = messageContent.replace("{link}", data);
-                                                        console.log(messageContent);
 
-                                                        var queryParams = st.db.escape(messageContent) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                            + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
-                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
-                                                        var query = 'CALL pComposeMessage(' + queryParams + ')';
-                                                        console.log(query);
-                                                        st.db.query(query, function (err, result) {
+                                                        data = data.replace("{JobID}", jobId);
+                                                        messageContent = messageContent.replace("{link}", data);
+
+
+                                                        fs.writeFile("jobseeker.html", messageContent, function (err) {
                                                             if (!err) {
-                                                                if (result) {
-                                                                    console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully');
-                                                                    mailDetails(i);
-                                                                    var query = 'CALL pUpdateMailCountForCV(' + st.db.escape(tid) + ')';
-                                                                    st.db.query(query, function (err, result) {
-                                                                        if (!err) {
-                                                                            console.log('FnUpdateMail:UpdateMailCountForCV success');
-                                                                        }
-                                                                        else {
-                                                                            console.log(err);
-                                                                        }
-                                                                    });
-                                                                }
-                                                                else {
-                                                                    console.log('FnSendMessage: Message not Saved Successfully');
-                                                                    mailDetails(i);
-                                                                }
+                                                                fs.exists('./jobseeker.html', function (exists) {
+                                                                    if (exists) {
+                                                                        fs.readFile("jobseeker.html", "utf8", function (err, dataResult) {
+                                                                            if (!err) {
+                                                                                if (dataResult) {
+
+                                                                                    var queryParams = st.db.escape(dataResult) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                        + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
+                                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
+                                                                                    var query = 'CALL pComposeMessage(' + queryParams + ')';
+                                                                                    //console.log(query);
+                                                                                    st.db.query(query, function (err, result) {
+                                                                                        if (!err) {
+                                                                                            if (result) {
+                                                                                                console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully');
+                                                                                                mailDetails(i);
+                                                                                                fs.unlinkSync('jobseeker.html');
+                                                                                                console.log('successfully deleted html file');
+                                                                                                var query = 'CALL pUpdateMailCountForCV(' + st.db.escape(tid) + ')';
+                                                                                                st.db.query(query, function (err, result) {
+                                                                                                    if (!err) {
+                                                                                                        console.log('FnUpdateMail:UpdateMailCountForCV success');
+                                                                                                    }
+                                                                                                    else {
+                                                                                                        console.log(err);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                            else {
+                                                                                                console.log('FnSendMessage: Message not Saved Successfully');
+                                                                                                mailDetails(i);
+                                                                                            }
+                                                                                        }
+                                                                                        else {
+                                                                                            console.log('FnSendMailer: Message not Saved Successfully');
+                                                                                            mailDetails(i);
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnGetJobSeekersMailDetails: HtmlFile not loaded');
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                console.log('FnGetJobSeekersMailDetails: Error in reading html file');
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnGetJobSeekersMailDetails: not exists');
+                                                                    }
+                                                                });
                                                             }
                                                             else {
-                                                                console.log('FnSendMailer: Message not Saved Successfully');
-                                                                mailDetails(i);
+                                                                console.log('FnGetJobSeekersMailDetails: File not write');
                                                             }
                                                         });
                                                     });
@@ -2395,7 +2423,11 @@ Job.prototype.viewJobDetails = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Job Details loaded successfully';
-                                        responseMessage.data = getResult[0];
+                                        responseMessage.data = {
+                                            result: getResult[0],
+                                            location : getResult[1],
+                                            skill:getResult[2]
+                                        };
                                         res.status(200).json(responseMessage);
                                         console.log('FnViewJobDetails: Job Details loaded successfully');
                                     }

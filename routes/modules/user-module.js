@@ -3929,7 +3929,7 @@ User.prototype.getSpecialization = function(req,res,next) {
 
     var _this = this;
     var token = req.query.token;
-    var educationId = parseInt( req.query.education_id);
+    var educationId = req.query.education_id ? req.query.education_id : '';
     var responseMsg = {
         status: false,
         data: [],
