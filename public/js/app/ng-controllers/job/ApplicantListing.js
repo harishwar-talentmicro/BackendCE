@@ -43,13 +43,13 @@ angular.module('ezeidApp').
             $scope.totalResult = 0;//Total results
             $scope.resultThisPage = 0;//Total results you got this page
 
-            $scope.job_id = $routeParams.jobid
+            $scope.cv_ids = $routeParams.cv_ids
             getApplicants();
 
             // Get Applied Job list
             function getApplicants()
             {
-                if($routeParams.jobid)
+                if($scope.cv_ids)
                 {
                     $scope.$emit('$preLoaderStart');
                     $http({
@@ -57,14 +57,17 @@ angular.module('ezeidApp').
                         method : 'GET',
                         params : {
                             token : $rootScope._userInfo.Token,
-                            cv_ids : $routeParams.jobid
+                            cv_ids : $routeParams.cv_ids
                         }
                     }).success(function(resp){
                             $scope.$emit('$preLoaderStop');
 
                             if(resp.status)
                             {
-                                if(resp.data.length)
+                                console.log("Apllicant list......");
+                                console.log(resp.data);
+                                $scope.applicantData = resp.data;
+                               /* if(resp.data.length)
                                 {
                                     $scope.totalResult = resp.count;
                                     $scope.resultThisPage = resp.data.length;
@@ -74,10 +77,10 @@ angular.module('ezeidApp').
                                     $scope.jobData = resp.data;
                                     for(var nCount = 0; nCount < resp.data.length; nCount++)
                                     {
-                                        /*resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
+                                        *//*resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*//*
                                         resp.data[nCount].TaskDateTime = UtilityService.convertTimeToLocal(resp.data[nCount].TaskDateTime);
                                     }
-                                }
+                                }*/
                             }
                         }).error(function(err){
                             $scope.$emit('$preLoaderStop');

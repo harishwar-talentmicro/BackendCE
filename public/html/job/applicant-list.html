@@ -37,37 +37,37 @@
                     <div class="container">
                         <!-- main table goes here -->
                         <div class="main-table p-top-20 col-lg-12">
-                            <div ng-show="jobData" class="hpw">
+                            <div ng-show="applicantData.length" class="hpw">
                                 <div class="col-lg-12 table-head">
                                     <div class="col-lg-2">
-                                        Job Code
+                                        Name
                                     </div>
                                     <div class="col-lg-4">
-                                        Title
+                                        City
                                     </div>
                                     <div class="col-lg-4">
-                                        Company Name
+                                        Education
                                     </div>
                                     <div class="col-lg-2">
-                                        Date
+                                        Specialization
                                     </div>
                                 </div>
-                                <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}" ng-repeat="job in jobData track by $index">
+                                <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}" ng-repeat="applicant in applicantData track by $index">
                                     <div class="col-lg-2">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}">{{job.jobcode | textLength:16}}</span>
+                                        <span>{{applicant.name | textLength:16}}</span>
                                     </div>
                                     <div class="col-lg-4">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:35}}</span>
+                                        <span>{{applicant.location | textLength:35}}</span>
                                     </div>
                                     <div class="col-lg-4">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{job.companyname}}">{{job.companyname | textLength:35}}</span>
+                                        <span>{{applicant.education | textLength:35}}</span>
                                     </div>
                                     <div class="col-lg-2">
-                                        {{job.TaskDateTime | ageFilter}}
+                                        <span>{{applicant.Specialization | textLength:35}}</span>
                                     </div>
                                 </div>
                             </div>
-                            <div ng-hide="jobData" class="text-danger text-center">
+                            <div ng-hide="applicantData.length" class="text-danger text-center">
                                 <b> You have not applied for any job ! </b>
                             </div>
                         </div>

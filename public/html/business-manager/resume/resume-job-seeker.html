@@ -118,6 +118,7 @@
                                           max-labels="0"
                                           max-height="250px"
                                           helper-elements="all none filter">
+                                   </div>
 
                                     <!--<button class="btn btn-default btn-sm dropdown-toggleInstitute opt opt-2 drpFunction">
                                         <span class="normal-view-text custom-select-dropdown"> -- Select Institute ({{selectedInstitute.length}}) -- </span>
@@ -132,8 +133,30 @@
                                         </div>
                                     </div>-->
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekereducation">
-                                    <button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
+                                <!--<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12" id="jobseekereducation">-->
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+                                    <div  talent-multi-select=""
+                                          input-model="educationList"
+                                          output-model="outputEducationList"
+                                          button-label="EducationTitle"
+                                          default-button-label="Select Education "
+                                          item-label="icon EducationTitle "
+                                          tick-property="ticked"
+                                          on-open="educationOpen()"
+                                          on-close="educationClose()"
+                                          on-item-click="educationClick( data )"
+                                          on-select-all="educationSelectAll()"
+                                          on-select-none="educationSelectNone()"
+                                          on-reset="educationReset()"
+                                          on-clear="educationClear()"
+                                          on-search-change="educationSearchChange( data )"
+                                          translation="educationTags"
+                                          custom-button-class="btn-block"
+                                          max-labels="0"
+                                          max-height="250px"
+                                          helper-elements="all none filter">
+                                    </div>
+                                    <!--<button class="btn btn-default btn-sm dropdown-toggle1 opt opt-2 drpFunction">
                                         <span class="normal-view-text custom-select-dropdown"> -- Select Education ({{selectedEducations.length}}) -- </span>
                                         <span class="mobile-view-text"></span>
                                         <span class="caret selectImg"></span></button>
@@ -143,10 +166,33 @@
                                                 <i class="fa " ng-class="selectedEducations.indexOf(education.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{education.EducationTitle}}
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>-->
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12"  id="jobseekerspecialization">
-                                    <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+
+                                    <div  talent-multi-select=""
+                                          input-model="specializationList"
+                                          output-model="outputSpecializationList"
+                                          button-label="Title"
+                                          default-button-label="Select Specialization"
+                                          item-label="icon Title "
+                                          tick-property="ticked"
+                                          on-open="specializationOpen()"
+                                          on-close="specializationClose()"
+                                          on-item-click="specializationClick( data )"
+                                          on-select-all="specializationSelectAll()"
+                                          on-select-none="specializationSelectNone()"
+                                          on-reset="specializationReset()"
+                                          on-clear="specializationClear()"
+                                          on-search-change="specializationSearchChange( data )"
+                                          translation="specializationTags"
+                                          custom-button-class="btn-block"
+                                          max-labels="0"
+                                          max-height="250px"
+                                          helper-elements="all none filter">
+                                    </div>
+
+                                    <!--<button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
                                         <span class="normal-view-text custom-select-dropdown"> -- Select Specialization ({{selectedSpecializations.length}}) -- </span>
                                         <span class="mobile-view-text"></span>
                                         <span class="caret selectImg"></span></button>
@@ -156,7 +202,7 @@
                                                 <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>-->
                                 </div>
 
                                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">

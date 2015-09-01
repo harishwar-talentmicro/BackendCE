@@ -307,7 +307,7 @@
             {
                 if($scope.applicantCount)
                 {
-                    $location.url('/applicantlisting' + '?jobid='+tid);
+                    $location.url('/applicantlisting' + '?cv_ids='+tid);
                 }
             };
 

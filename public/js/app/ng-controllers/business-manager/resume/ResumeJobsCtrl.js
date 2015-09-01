@@ -202,18 +202,21 @@
                             /*resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
                         }
 
-                        for(var jobCount = 0; jobCount < resp.data.result.length; jobCount++)
+                        /*for(var jobCount = 0; jobCount < resp.data.result.length; jobCount++)
                         {
                             resp.data.result[jobCount].locationArray = [];
 
-                            for(var i = 0; i < resp.data.job_location.length; i++)
+                            if(resp.data.job_location.length)
                             {
-                                if(resp.data.result[jobCount].tid == resp.data.job_location[i].jobid)
+                                for(var i = 0; i < resp.data.job_location.length; i++)
                                 {
-                                    resp.data.result[jobCount].locationArray.push(resp.data.job_location[i]);
+                                    if(resp.data.result[jobCount].tid == resp.data.job_location[i].jobid)
+                                    {
+                                        resp.data.result[jobCount].locationArray.push(resp.data.job_location[i]);
+                                    }
                                 }
                             }
-                        }
+                        }*/
 
                         $scope.jobData = resp.data.result;
                         $scope.showJobListing = true;
@@ -363,7 +366,8 @@
                         education_id : $scope.selectedEducations.toString(),
                         specialization_id : $scope.selectedSpecializations.toString(),
                         institute_id : $scope.selectedInstitute.toString(),
-                        aggregate_score : $scope.aggregate_score,
+                        score_from : $scope.score_from,
+                        score_to : $scope.score_to,
                         skillMatrix : $scope.skillMatrix,
                         skill_ids : skillsTid.toString()
                     }
@@ -415,7 +419,8 @@
             }
 
             // Show job posting form
-            $scope.openJobPostForm = function(_index){
+            $scope.openJobPostForm = function(_index)
+            {
                 $scope.$emit('$preLoaderStart');
                 getJobCategories();
                 getEducations();
@@ -465,9 +470,10 @@
                     $scope.selectedEducations = [];
                     $scope.selectedSpecializations = [];
                     $scope.selectedInstitute = [];
-                    $scope.aggregate_score = "";
+                    $scope.score_from = "";
+                    $scope.score_to = "";
                 }
-                else
+               /* else
                 {
                     $timeout(function()
                     {
@@ -546,7 +552,7 @@
                         $scope.$emit('$preLoaderStop');
 
                     },3000);
-                }
+                }*/
             };
 
             // Edit posted job
@@ -596,7 +602,8 @@
                                 $scope.emailContact = jobDetail.emailid;
                                 $scope.jobStatus = jobDetail.status;
                                 $scope.jobCategori = parseInt(jobDetail.jobcategory);
-                                $scope.aggregate_score = jobDetail.Aggregatescore;
+                                $scope.score_from = jobDetail.score_from;
+                                $scope.score_to = jobDetail.score_to;
 
 
                                 for (var nCount = 0; nCount < jobLocationArray.length; nCount++)
@@ -623,7 +630,7 @@
                                 if($scope.selectedEducations.length)
                                 {
                                     getSpecialization();
-                               }
+                                }
 
                                 $scope.selectedSpecializations = [];
                                 if(jobDetail.Specialization)
