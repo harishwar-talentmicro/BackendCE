@@ -39,7 +39,7 @@ angular.module('ezeidApp').
             $routeParams,
             UtilityService
         ) {
-            console.log($rootScope._userInfo);
+
             $scope.result = '';
             /* defaultly getting all the transactions for SALES module */
             $scope.presentSelectedModule = 0;
@@ -336,7 +336,7 @@ angular.module('ezeidApp').
              */
             function setBasicTransactionInfo(tid)
             {
-                console.log($scope.result);
+
                 /* getting the index of the clicked transaction, with the given tid */
                 var selectedIndex = $scope.result.indexOfWhere('tid',tid);
                 /* set basic info based on the index */
