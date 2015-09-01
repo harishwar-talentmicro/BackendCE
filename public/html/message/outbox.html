@@ -19,19 +19,25 @@
                             <h3 class="text-white text-center pointer">
                                 <!--<a href="/message" class="text-white no-style-link"><i class="fa fa-envelope"></i> MessageBox</a>-->
                                 <a ng-click="redirectOrRefresh()" class="text-white no-style-link"><i class="fa fa-envelope"></i> MessageBox</a>
-                                <label title="New request(s)"
-                                       class="label label-warning pointer"
-                                       ng-click="pendingRequestVisbility = !pendingRequestVisbility"
-                                       ng-show="pendingRequestCount > 0">{{pendingRequestCount}}</label>
+
                             </h3>
                             <!-- List of all pending request -->
-                            <div class="pending-request" ng-show="pendingRequestVisbility">
-                                <div class="individual-pending-request" ng-repeat="req in pendingRequestData track by $index">
-                                    <span title="{{req.GroupName.length > 0?req.GroupName:'NA'}}">{{req.GroupName.length > 0?req.GroupName:'NA' | textLength:20}}</span>
+                            <div class="pending-list container" ng-show="pendingRequestVisbility">
+                                <div class="invitaion-heading">
+                                    <span class="inv-head">Invitations</span>
+                                    <span class="close-inv-head pull-right p-right-10 pointer font-0-8"
+                                          ng-click="pendingRequestVisbility = false">
+                                        <i class="fa fa-times"></i>
+                                    </span>
+                                </div>
+                                <div class="pending-request">
+                                    <div class="individual-pending-request" ng-repeat="req in pendingRequestData track by $index">
+                                        <span title="{{req.GroupName.length > 0?req.GroupName:'NA'}}">{{req.GroupName.length > 0?req.GroupName:'NA' | textLength:20}}</span>
                                     <span class="pull-right">
                                         <button ng-click="pendingRequestResponse(req.GroupID, req.MemberID, 1,$index, req.requester)" class="btn btn-primary btn-xs"><i class="fa fa-check"></i></button>
                                         <button ng-click="pendingRequestResponse(req.GroupID, req.MemberID, 2,$index, req.requester)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
                                     </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -42,14 +48,21 @@
                                     <!--<a ng-click="openComposeMessage()" class="pointer"> <i class="fa fa-pencil-square-o"></i> Compose</a>-->
                                     <a href="/message/compose" class="pointer text-white text-bolder"> <i class="fa fa-pencil-square-o"></i> Compose</a>
                                 </li>
-                                <li class="active index-menu-item hidden">
+                                <li class="index-menu-item"
+                                    ng-click="pendingRequestVisbility = true">
                                     <!--<a ng-click="openInbox()" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>-->
-                                    <a href="/message/inbox" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">{{unreadMsgNotify.count}}</span></a>
+                                    <a class="pointer" ng-blur="pendingRequestVisbility = false">
+                                        <i class="fa fa-star text-primary"></i> Invitations
+                                        <label title="New request(s)"
+                                               class="label label-warning pointer"
+                                               ng-click="pendingRequestVisbility = !pendingRequestVisbility"
+                                               ng-show="pendingRequestCount > 0">{{pendingRequestCount}}</label>
+                                    </a>
                                 </li>
                                 <li class="index-menu-item hidden">
                                     <a href="/message/outbox"><i class="fa fa-envelope-o"></i> Outbox</a>
                                 </li>
-                                <li class="index-menu-item">
+                                <li class="index-menu-item hidden">
                                     <a href="/message/trash"><i class="fa fa-trash-o"></i> Trash</a>
                                 </li>
 

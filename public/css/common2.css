@@ -3707,3 +3707,17 @@ sup.tm{
     font-size: 1.3em;
     color: #524CEA;
 }
+
+.hpw .invitaion-heading
+{
+    padding: 3px;
+    background-color: #2C4754;
+    color: #fff;
+    font-size: 1.4em;
+    text-shadow: 1px 1px 1px #fff;
+}
+
+.hpw .font-0-8
+{
+    font-size: 0.8em;
+}
