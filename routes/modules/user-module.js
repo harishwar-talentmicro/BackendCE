@@ -3929,6 +3929,7 @@ User.prototype.getSpecialization = function(req,res,next) {
 
     var _this = this;
     var token = req.query.token;
+    var educationId = parseInt( req.query.education_id);
     var responseMsg = {
         status: false,
         data: [],
@@ -3952,7 +3953,7 @@ User.prototype.getSpecialization = function(req,res,next) {
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        st.db.query('CALL pGetSpecialization()', function (err, result) {
+                        st.db.query('CALL pGetSpecialization(' + st.db.escape(educationId) + ')', function (err, result) {
                             if (err) {
                                 console.log('Error : FnGetSpecialization :' + err);
                                 res.status(400).json(responseMsg);
