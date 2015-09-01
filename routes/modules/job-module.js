@@ -74,7 +74,8 @@ Job.prototype.create = function(req,res,next){
     var educationID= (req.body.education_id) ? req.body.education_id : '';
     var specializationID = (req.body.specialization_id) ? req.body.specialization_id : '';
     var instituteID = (req.body.institute_id) ? req.body.institute_id : '';
-    var aggregateScore = req.body.aggregate_score;
+    var scoreFrom = req.body.score_from;
+    var scoreTo = req.body.score_to;
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
@@ -181,7 +182,8 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
                                 + ',' + st.db.escape(categoryID)+ ',' + st.db.escape(educationID)+ ',' + st.db.escape(specializationID)
-                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(aggregateScore)+ ',' + st.db.escape(skillIds);
+                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(skillIds)
+                                + ',' + st.db.escape(scoreTo);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
                                     if (!err) {
@@ -213,7 +215,8 @@ Job.prototype.create = function(req,res,next){
                                             educationID: educationID,
                                             specializationID: specializationID,
                                             instituteID: instituteID,
-                                            aggregateScore: aggregateScore
+                                            score_from: scoreFrom,
+                                            score_to : scoreTo
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveJobs: Jobs save successfully');
