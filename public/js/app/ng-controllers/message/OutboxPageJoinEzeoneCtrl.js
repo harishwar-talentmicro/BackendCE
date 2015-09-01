@@ -229,7 +229,7 @@ angular.module('ezeidApp').
                 $scope.modalAddEzeoneVisible = !$scope.modalAddEzeoneVisible;
                 /* send an API request with the new status */
                 connectionRequestApi().then(function(){
-                        Notification.success({ message: "You have successfuly send a request to connect you", delay: MsgDelay });
+                        Notification.success({ message: "Connection request sent successfully", delay: MsgDelay });
                     },
                     function(){
                         Notification.error({ message: "Error Occured, Try again later", delay: MsgDelay });
@@ -280,10 +280,10 @@ angular.module('ezeidApp').
             $scope.individualMemberJoinResponse = function(status,groupId)
             {
                 $scope.modalAddEzeoneVisible = !$scope.modalAddEzeoneVisible;
-                var msgType = "rejected";
+                var msg = "Connection request rejected";
                 if(parseInt(status) === 1)
                 {
-                    msgType = "accepted";
+                    msg = "Connection request accepted successfully";
                 }
 
                 /* manage the notifications and group list */
@@ -294,7 +294,7 @@ angular.module('ezeidApp').
                     return;
 
                 joinResponseApi(status,groupId).then(function(){
-                    Notification.success({ message: "You have successfuly "+msgType+" the group join request!", delay: MsgDelay });
+                    Notification.success({ message: msg, delay: MsgDelay });
                 },function(){
                     Notification.error({ message: "Error occured! Try again later", delay: MsgDelay });
                 });

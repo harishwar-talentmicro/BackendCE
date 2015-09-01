@@ -492,6 +492,7 @@ angular.module('ezeidApp').
 
                         $scope.pendingRequestData.push(val);
                     });
+                    console.log($scope.pendingRequestData);
                     $scope.pendingRequestCount = count;
                 });
             }
@@ -519,7 +520,7 @@ angular.module('ezeidApp').
             {
                 /* perform appropriate action after user gives response */
                 managePendingRequestNotification(groupId,status,index);
-
+                console.log(groupId, masterId, status,index, requester);
                 updateMemberStatusApi(groupId, masterId, status, requester).then(function(){
 
                         $scope.pendingRequestData.splice(index,1);
