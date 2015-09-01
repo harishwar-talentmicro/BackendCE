@@ -86,6 +86,7 @@
                                         <a href="#" title="{{grp.GroupName}}" >
                                             <i class="fa fa-group"></i>
                                             <i class="fa fa-shield text-warning" title="You are admin" ng-show="grp.isAdmin == 1"></i> {{grp.GroupName | textLength:25}}
+                                            <label ng-show="grp.unreadcount > 0" class="label label-info label-tx-alarm"><span class="unread-count">{{grp.unreadcount}}</span></label>
                                         </a>
                                         <span class="pull-right p-right-10 on-hover-active" ng-show="grp.isAdmin == 1">
                                             <button ng-click="toggleEditGroupModalVisibility($index,grp.GroupID)" title="edit group" class="btn btn-success btn-xs"><i class="fa fa-edit"></i></button>
@@ -109,7 +110,9 @@
                                 <div class="individual-member-list grp-hover overflow-y-250 css_version">
                                     <li class="index-menu-item people" ng-hide="loggedInUserEzeone == member.GroupName"
                                         ng-repeat="member in individualMember track by $index">
-                                        <a href="#" title="{{member.GroupName}}" ng-click="redirectGroupMessage(member.GroupID,member.GroupType)"><i class="fa fa-comments"></i> {{member.GroupName | textLength:25}}</a>
+                                        <a href="#" title="{{member.GroupName}}" ng-click="redirectGroupMessage(member.GroupID,member.GroupType)"><i class="fa fa-comments"></i> {{member.GroupName | textLength:25}}
+                                            <label ng-show="member.unreadcount > 0" class="label label-info label-tx-alarm"><span class="unread-count">{{member.unreadcount}}</span></label>
+                                        </a>
                                          <span class="pull-right p-right-10 ">
                                             <button class="btn btn-danger btn-xs"
                                                     title="Remove Contact"
