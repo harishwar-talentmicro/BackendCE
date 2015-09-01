@@ -95,19 +95,17 @@
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success pointer">
-                        <!--<b class="ng-binding showPointer" ng-click="openCandidateListPopup(job.tid,job.totalapplied)" data-toggle="tooltip" title="" data-original-title="View Applicants">{{job.totalapplied}} Applicants</b>-->
                         <b class="ng-binding showPointer" ng-click="openCandidateListPopup(job.tid,job.totalapplied)" title="View Applicants">{{job.totalapplied}} Applicants</b>
                     </small>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                    <!--<button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="openJobPostForm($index)" data-original-title="Edit Details">-->
-                    <button class="btn btn-xs btn-block btn-warning no-radius" title="Edit Details" ng-click="openJobPostForm($index)">
+                    <!--<button class="btn btn-xs btn-block btn-warning no-radius" title="Edit Details" ng-click="openJobPostForm($index)">-->
+                    <button class="btn btn-xs btn-block btn-warning no-radius" title="Edit Details" ng-click="editPostedJob(job.tid)">
                         <span class="glyphicon glyphicon-pencil"></span>
                         Edit
                     </button>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                    <!--<button class="btn btn-xs btn-block btn-warning no-radius" data-toggle="tooltip" title="" ng-click="refreshJob(job.tid)" data-original-title="Refresh">-->
                     <button class="btn btn-xs btn-block btn-warning no-radius" title="Refresh" ng-click="refreshJob(job.tid)">
                         <span class="glyphicon glyphicon-refresh"></span>
                         Refresh
@@ -353,10 +351,11 @@
                     <label>Specialization</label>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw" id="jobpostSpeci">
-                    <button class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
+                    <button ng-click="getSpecilizationForEducation()" class="btn btn-default btn-sm dropdown-toggleSpecialization opt opt-2 drpFunction">
                         <span class="normal-view-text custom-select-dropdown"> -- Select ({{selectedSpecializations.length}}) -- </span>
                         <span class="mobile-view-text"></span>
-                        <span class="caret selectImg"></span></button>
+                        <span class="caret selectImg"></span>
+                    </button>
                     <div class="opt opt-2">
                         <div  class="filter-dropdownspecialization width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
@@ -377,7 +376,11 @@
                     <div class="opt opt-2">
                         <div class="filter-dropdownInstitute width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="institute in instituteList track by $index" ng-click="selectInstitute(institute.TID)">
-                                <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{institute.InstituteTitle}}
+                                <i class="fa " ng-class="selectedInstitute.indexOf(institute.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i>
+
+                                    <span class="text-left">{{institute.InstituteTitle}}</span>
+                                    <span style="float: right;">{{institute.rating }}Star</span>
+
                             </div>
                         </div>
                     </div>
@@ -401,7 +404,6 @@
                     <span class="skillText">Skill Map (Choose & Rate your Skills to get a right Job) </span>
                 </div>
                 <div class="row setRowLeftRightMarginZero">
-
                     <table class="table table-striped skillMatrixTable" st-table="rowCollection">
                         <thead>
                             <tr style="background:#ECECEC; color:#000000;">
@@ -412,7 +414,7 @@
                                 <th class="panelPd5px skillAction msg_pos">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="">
+                        <tbody>
                             <tr>
                                 <td colspan="5">
                                     <div class="setTableFixHeight">
@@ -427,15 +429,21 @@
                                                     </div>
                                                 </td>
                                                 <td class="panelPd5px skillExpertiesJobDropdown" ng-hide="(!editMode[$index]) && ($index == 0)">
-                                                    <span ng-hide="editMode[$index]">{{expertiseLevels[skillMatrix[$index].expertiseLevel]}}</span>
-                                                   <!-- <select class="form-control" name="expertiesLevel" ng-model="editSkill.expertiseLevel" ng-show="editMode[$index]">
-                                                        <option value="0" default selected> Beginner </option>
-                                                        <option value="1"> Independent </option>
-                                                        <option value="2"> Expert </option>
-                                                        <option value="3"> Master </option>
-                                                    </select>-->
-                                                    <div  talent-multi-select=""
-                                                          input-model="modernBrowsers"
+                                                    <!--<span ng-hide="editMode[$index]">{{expertiseLevels[skillMatrix[$index].expertiseLevel]}}</span>-->
+                                                    <span ng-hide="editMode[$index]" title="{{skillMatrix[$index].expertiseText}}">{{skillMatrix[$index].expertiseText}}</span>
+
+                                                 <!--   <span ng-hide="editMode[$index]">
+                                                        {{skill.expertiseLevel}}
+                                                       &lt;!&ndash; <span ng-repeat="exp in skill.expertiseLevel">
+                                                            {{exp}}
+                                                        </span>&ndash;&gt;
+                                                       &lt;!&ndash; {{skillMatrix[$index].expertiseText}}&ndash;&gt;
+                                                    </span>
+-->
+                                                    <div
+                                                          ng-show="editMode[$index]"
+                                                          talent-multi-select=""
+                                                          input-model="inputExpertise"
                                                           output-model="outputBrowsers"
                                                           button-label=" name"
                                                           default-button-label="Expertise Level "
@@ -458,7 +466,10 @@
                                                 </td>
                                                 <td class="panelPd5px msg_pos expSkillMap" ng-hide="(!editMode[$index]) && ($index == 0)">
                                                     <span ng-hide="editMode[$index]">{{skillMatrix[$index].exp_from}}</span>
-                                                    <span ng-hide="editMode[$index]" style="text-align: right;">{{skillMatrix[$index].exp_to}}</span>
+                                                    <div style="float: right;">
+                                                        <span ng-hide="editMode[$index]">{{skillMatrix[$index].exp_to}}</span>
+                                                    </div>
+
                                                     <div style="float: left;">
                                                         <input type="text"
                                                                ng-show="editMode[$index]"

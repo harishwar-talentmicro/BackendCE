@@ -46,8 +46,8 @@
                                             </div>
                                         </span>
                                     </span>
-                                    <div ng-show="!$root._userInfo.isinstitute_admin">
-                                        <button ng-show="jobData.isappliedforjob" class="btn btn-primary btn-sm" ng-click="redirectNotifyPage(jobData.tid)">Notify</button>
+                                   <div ng-show="$root._userInfo.isinstitute_admin">
+                                        <button class="btn btn-primary btn-sm" ng-click="redirectNotifyPage(jobData.tid)">Notify</button>
                                     </div>
                                 </span>
                             </div>

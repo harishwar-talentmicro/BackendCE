@@ -19,6 +19,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
     var skillsTid = [];
     $scope.availableTags = [];
 
+
     CVAttachCtrl._CVInfo.job_type = 0;
     $scope.locationName = "";
     // CVAttachCtrl._CVInfo.job_location1 = "";

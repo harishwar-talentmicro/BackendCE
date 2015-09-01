@@ -43,43 +43,50 @@ angular.module('ezeidApp').
             $scope.totalResult = 0;//Total results
             $scope.resultThisPage = 0;//Total results you got this page
 
-            getAppliedJob();
+            $scope.job_id = $routeParams.jobid
+            getApplicants();
 
             // Get Applied Job list
-            function getAppliedJob()
+            function getApplicants()
             {
-                $scope.$emit('$preLoaderStart');
-                $http({
-                    url : GURL + 'applied_job',
-                    method : 'GET',
-                    params : {
-                        token : $rootScope._userInfo.Token,
-                        page_size : $scope.pageSize,
-                        page_count : $scope.pageCount
-                    }
-                }).success(function(resp){
-                    $scope.$emit('$preLoaderStop');
-
-                    if(resp.status)
-                    {
-                        if(resp.data.length)
-                        {
-                            $scope.totalResult = resp.count;
-                            $scope.resultThisPage = resp.data.length;
-
-                            $scope.paginationVisibility();
-
-                            $scope.jobData = resp.data;
-                            for(var nCount = 0; nCount < resp.data.length; nCount++)
-                            {
-                                /*resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
-                                  resp.data[nCount].TaskDateTime = UtilityService.convertTimeToLocal(resp.data[nCount].TaskDateTime);
-                            }
+                if($routeParams.jobid)
+                {
+                    $scope.$emit('$preLoaderStart');
+                    $http({
+                        url : GURL + 'applicant_list',
+                        method : 'GET',
+                        params : {
+                            token : $rootScope._userInfo.Token,
+                            cv_ids : $routeParams.jobid
                         }
-                    }
-                }).error(function(err){
-                    $scope.$emit('$preLoaderStop');
-                });
+                    }).success(function(resp){
+                            $scope.$emit('$preLoaderStop');
+
+                            if(resp.status)
+                            {
+                                if(resp.data.length)
+                                {
+                                    $scope.totalResult = resp.count;
+                                    $scope.resultThisPage = resp.data.length;
+
+                                    $scope.paginationVisibility();
+
+                                    $scope.jobData = resp.data;
+                                    for(var nCount = 0; nCount < resp.data.length; nCount++)
+                                    {
+                                        /*resp.data[nCount].TaskDateTime = convertTimeToLocal(resp.data[nCount].TaskDateTime,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
+                                        resp.data[nCount].TaskDateTime = UtilityService.convertTimeToLocal(resp.data[nCount].TaskDateTime);
+                                    }
+                                }
+                            }
+                        }).error(function(err){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                }
+                else
+                {
+                    $location.url('/');
+                }
             }
 
             /*Code for pagging*/

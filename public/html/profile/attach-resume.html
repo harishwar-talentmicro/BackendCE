@@ -55,25 +55,6 @@
                                                 custom-button-class="btn-block"
                                                 max-labels="0"
                                                 max-height="250px">
-                                        </div><div  talent-multi-select=""
-                                                input-model="modernBrowsers"
-                                                output-model="outputBrowsers"
-                                                button-label="icon name"
-                                                default-button-label="Select Function "
-                                                item-label="icon FunctionName maker"
-                                                tick-property="ticked"
-                                                on-open="fOpen()"
-                                                on-close="fClose()"
-                                                on-item-click="fClick( data )"
-                                                on-select-all="fSelectAll()"
-                                                on-select-none="fSelectNone()"
-                                                on-reset="fReset()"
-                                                on-clear="fClear()"
-                                                on-search-change="fSearchChange( data )"
-                                                translation="functionTags"
-                                                custom-button-class="btn-block"
-                                                max-labels="0"
-                                                max-height="250px">
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
@@ -131,8 +112,6 @@
                                                </div>
                                            </div>
                                        </div>
-
-
                                    </div>
                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-8">
                                    </div>
@@ -148,6 +127,7 @@
                                                ng-click = "instituteTextBoxClicked()"
                                                class = "form-control instittuteClass"/>
 
+                                        <!--<div ng-show="showInstituteDropDown" ng-hide="institute.InstituteTitle.length" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">-->
                                         <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
                                             <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
                                                 {{institute.InstituteTitle}}

@@ -284,6 +284,7 @@
                 }
             };
 
+            $scope.outputInstituteList = [];
             // Get Institute list
             function getInstituteList()
             {
@@ -303,7 +304,7 @@
             /**
              * Select - Unselect institute
              */
-            $scope.selectInstitute = function(_instituteID)
+           /* $scope.selectInstitute = function(_instituteID)
             {
                 if($scope.selectedInstitute.indexOf(_instituteID)!=-1)
                 {
@@ -314,7 +315,7 @@
                 {
                     $scope.selectedInstitute.push(_instituteID);
                 }
-            };
+            };*/
 
             /**
              * Search job seeker
@@ -549,6 +550,17 @@
             $scope.resetJobSeekerSearch = function()
             {
                 clearSearchFilter();
+
+                if($scope.instituteList.length)
+                {
+                    $scope.selectedInstitute = [];
+
+                    for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
+                    {
+                      //  $scope.instituteList
+                        $scope.selectedInstitute.push(parseInt($scope.instituteList[nCount].TID));
+                    }
+                }
             };
 
             // Validation function
@@ -859,6 +871,68 @@
                        $scope.searchJobSeeker();
                     }
                 }
+            };
+
+            /*------------------------ multi selection of Institute ----------------*/
+
+            $scope.fOpen = function() {
+                // console.log( 'On-open' );
+            };
+
+            $scope.fClose = function() {
+                //console.log( 'On-close' );
+            };
+
+            $scope.fClick = function( data )
+            {
+                var insstituteID = "";
+                insstituteID = data.TID;
+
+                if($scope.selectedInstitute.indexOf(insstituteID)!=-1)
+                {
+                    var index = $scope.selectedInstitute.indexOf(insstituteID);
+                    $scope.selectedInstitute.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedInstitute.push(insstituteID);
+                }
+            };
+
+            $scope.fSelectAll = function()
+            {
+                if($scope.instituteList.length)
+                {
+                    $scope.selectedInstitute = [];
+
+                    for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
+                    {
+                        $scope.selectedInstitute.push(parseInt($scope.instituteList[nCount].TID));
+                    }
+                }
+            };
+
+            $scope.fSelectNone = function() {
+                $scope.selectedInstitute = [];
+            };
+
+            $scope.fClear = function() {
+                // console.log( 'On-clear' );
+            };
+
+            $scope.fSearchChange = function( data ) {
+                /*console.log( 'On-search-change' );
+                 console.log( 'On-search-change - keyword: ' + data.keyword );
+                 console.log( 'On-search-change - result: ' );
+                 console.log( data.result );*/
+            };
+
+            $scope.InstituteTags = {
+                selectAll : "Select All",
+                reset : "Reset",
+                search : "Search Institute",
+                selectNone : "Deselect All",
+                nothingSelected  : "Select Institute"
             };
 
 

@@ -49,9 +49,9 @@
                 <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: {{job.location}}</span>
                 <div class="key-skills p-top-10" ng-init="skills = getKeySkillsArray(job.keyskills)">
                     <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
-                                <span ng-repeat="skill in activeSkillsArray track by $index">
-                                <button class="btn btn-default btn-xs">{{skill}}</button>
-                                    </span>
+                        <span ng-repeat="skill in activeSkillsArray track by $index">
+                            <button class="btn btn-default btn-xs">{{skill}}</button>
+                        </span>
                     </p>
                 </div>
                 <div class="row">
