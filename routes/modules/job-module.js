@@ -21,11 +21,21 @@ function alterEzeoneId(ezeoneId){
     }
     return alteredEzeoneId;
 }
+
+
+var Notification = require('./notification/notification-master.js');
+var NotificationQueryManager = require('./notification/notification-query.js');
+var notification = null;
+var notificationQmManager = null;
+
+
 var st = null;
 function Job(db,stdLib){
 
     if(stdLib){
         st = stdLib;
+        notification = new Notification(db,stdLib);
+        notificationQmManager = new NotificationQueryManager(db,stdLib);
     }
 };
 
@@ -72,6 +82,9 @@ Job.prototype.create = function(req,res,next){
     var resultvalue = '';
     var skillMatrix1 = req.body.skillMatrix;
     skillMatrix1= JSON.parse(JSON.stringify(skillMatrix1));
+    if (!skillMatrix1){
+        skillMatrix1=[];
+    }
     var skillIds = req.body.skill_ids ? req.body.skill_ids : '';
 
     var responseMessage = {
@@ -295,7 +308,7 @@ Job.prototype.create = function(req,res,next){
 
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
-
+                            console.log('CALL psavejoblocation(' + queryParams + ')');
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
                                 if (results) {
                                     if (results[0]) {
@@ -315,21 +328,21 @@ Job.prototype.create = function(req,res,next){
                                         else {
                                             console.log('FnSaveJobLocation:results no found');
                                             responseMessage.message = 'results no found';
-                                            console.log('FnSaveJobLocation: results no found');
+                                            console.log('FnSaveJobLocation: results no found..1');
                                             res.status(200).json(responseMessage);
                                         }
                                     }
                                     else {
                                         console.log('FnSaveJobLocation:results no found');
                                         responseMessage.message = 'results no found';
-                                        console.log('FnSaveJobLocation: results no found');
+                                        console.log('FnSaveJobLocation: results no found..2');
                                         res.status(200).json(responseMessage);
                                     }
                                 }
                                 else {
                                     console.log('FnSaveJobLocation:results no found');
                                     responseMessage.message = 'results no found';
-                                    console.log('FnSaveJobLocation: results no found');
+                                    console.log('FnSaveJobLocation: results no found..3');
                                     res.status(200).json(responseMessage);
                                 }
                             });
@@ -511,9 +524,7 @@ Job.prototype.getAll = function(req,res,next){
                                             responseMessage.message = 'Jobs send successfully';
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
-                                                result : getresult[1],
-                                                job_location: getresult[2]
-
+                                                result : getresult[1]
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetJobs: Jobs send successfully');
@@ -1127,7 +1138,7 @@ Job.prototype.getJobDetails = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !'
+            responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnGetJobDetails ' + ex.description);
             var errorDate = new Date();
@@ -1494,7 +1505,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
     var ids = req.body.ids;
     var templateId = req.body.template_id;
     var jobId = req.body.job_id;
-    var id, i,tid,jobResult,link;
+    var id, i,tid,jobResult,messageContent,link;
 
     if(ids){
         id = ids.split(",");
@@ -1542,9 +1553,6 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                 var query = 'CALL pGetjobseekersmailDetails(' + queryParams + ')';
                                 console.log(query);
                                 st.db.query(query, function (err, getResult) {
-                                    console.log('------------------');
-                                    console.log(getResult);
-
                                     if (!err) {
                                         if (getResult) {
                                             if (getResult[0].length > 0) {
@@ -1580,54 +1588,85 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                     if (!err) {
                                         if (TemplateResult) {
                                             if (TemplateResult.length > 0) {
-                                                fs.readFile("jobseeker_mail.html", "utf8", function (err, data) {
+                                                if (TemplateResult[0]) {
+                                                    console.log(TemplateResult);
+                                                    fs.readFile("jobseeker_mail.html", "utf8", function (err, data) {
+                                                        messageContent = TemplateResult[0].Body;
+                                                        messageContent = messageContent.replace("{FirstName}", jobResult[0][0].FirstName);
+                                                        messageContent = messageContent.replace("{LastName}", jobResult[0][0].LastName);
+                                                        messageContent = messageContent.replace("{CompanyName}", jobResult[0][0].CompanyName);
+                                                        messageContent = messageContent.replace("{JobTitle}", jobResult[0][0].jobtitle);
 
-                                                    data = data.replace("[FirstName]", jobResult[0][0].FirstName);
-                                                    data = data.replace("[LastName]", jobResult[0][0].LastName);
-                                                    data = data.replace("[CompanyName]", jobResult[0][0].CompanyName);
-                                                    data = data.replace("[JobTitle]", jobResult[0][0].jobtitle);
-                                                    data = data.replace("[JobID]", jobId);
-                                                    var mailOptions = {
-                                                        replyto: (TemplateResult[0].FromMailID != 'undefined') ? TemplateResult[0].FromMailID : " ",
-                                                        to: jobResult[0][0].AdminEmailID,
-                                                        subject: TemplateResult[0].Subject,
-                                                        html: data// html body
-                                                    };
+                                                        data = data.replace("{JobID}", jobId);
+                                                        messageContent = messageContent.replace("{link}", data);
 
-                                                    var queryParams = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                        + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
-                                                        + ',' + st.db.escape(1)+ ',' + st.db.escape('')+ ',' + st.db.escape(1);
-                                                    var query = 'CALL pComposeMessage(' + queryParams + ')';
-                                                    console.log(query);
-                                                    st.db.query(query, function (err, result) {
-                                                        if (!err) {
-                                                            if (result) {
-                                                                console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully');
-                                                                mailDetails(i);
-                                                                var query = 'CALL pUpdateMailCountForCV(' + st.db.escape(tid) + ')';
-                                                                st.db.query(query, function (err, result) {
-                                                                    if (!err) {
-                                                                        console.log('FnUpdateMail:UpdateMailCountForCV success');
+
+                                                        fs.writeFile("jobseeker.html", messageContent, function (err) {
+                                                            if (!err) {
+                                                                fs.exists('./jobseeker.html', function (exists) {
+                                                                    if (exists) {
+                                                                        fs.readFile("jobseeker.html", "utf8", function (err, dataResult) {
+                                                                            if (!err) {
+                                                                                if (dataResult) {
+
+                                                                                    var queryParams = st.db.escape(dataResult) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                        + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
+                                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
+                                                                                    var query = 'CALL pComposeMessage(' + queryParams + ')';
+                                                                                    console.log(query);
+                                                                                    st.db.query(query, function (err, result) {
+                                                                                        if (!err) {
+                                                                                            if (result) {
+                                                                                                console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully');
+                                                                                                mailDetails(i);
+                                                                                                fs.unlinkSync('jobseeker.html');
+                                                                                                console.log('successfully deleted html file');
+                                                                                                var query = 'CALL pUpdateMailCountForCV(' + st.db.escape(tid) + ')';
+                                                                                                st.db.query(query, function (err, result) {
+                                                                                                    if (!err) {
+                                                                                                        console.log('FnUpdateMail:UpdateMailCountForCV success');
+                                                                                                    }
+                                                                                                    else {
+                                                                                                        console.log(err);
+                                                                                                    }
+                                                                                                });
+                                                                                            }
+                                                                                            else {
+                                                                                                console.log('FnSendMessage: Message not Saved Successfully');
+                                                                                                mailDetails(i);
+                                                                                            }
+                                                                                        }
+                                                                                        else {
+                                                                                            console.log('FnSendMailer: Message not Saved Successfully');
+                                                                                            mailDetails(i);
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnGetJobSeekersMailDetails: HtmlFile not loaded');
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                console.log('FnGetJobSeekersMailDetails: Error in reading html file');
+                                                                            }
+                                                                        });
                                                                     }
                                                                     else {
-                                                                        console.log(err);
+                                                                        console.log('FnGetJobSeekersMailDetails: not exists');
                                                                     }
                                                                 });
                                                             }
                                                             else {
-                                                                console.log('FnSendMessage: Message not Saved Successfully');
-                                                                mailDetails(i);
+                                                                console.log('FnGetJobSeekersMailDetails: File not write');
                                                             }
-                                                        }
-                                                        else {
-                                                            console.log('FnSendMailer: Message not Saved Successfully');
-                                                            mailDetails(i);
-                                                        }
+                                                        });
                                                     });
-                                                });
+                                                }
+                                            else {
+                                                console.log('FnGetJobSeekersMailDetails: TemplateResult not loaded');
                                             }
-
+                                            }
                                             else {
                                                 console.log('FnGetJobSeekersMailDetails: Result not loaded');
                                             }
@@ -1654,7 +1693,12 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                             console.log('FnJobSeekerMail:Invalid ids');
                         }
                         responseMessage.message = 'JobSeeker Message Send Successfully';
-                        responseMessage.data = link;
+                        responseMessage.data = {
+                            token : req.body.token,
+                            ids : req.body.ids,
+                            templateId : req.body.template_id,
+                            jobId : req.body.job_id
+                        };
                         res.status(200).json(responseMessage);
                         console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully..');
 
@@ -2111,7 +2155,6 @@ Job.prototype.jobsMyInstitute = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnNotifyRelevantStudent
  * Method : GET
@@ -2124,7 +2167,7 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var jobId = req.query.job_id;
+    var jobId = parseInt(req.query.job_id);
 
     var responseMessage = {
         status: false,
@@ -2149,7 +2192,7 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(jobId);
+                        var queryParams = st.db.escape(jobId) + ',' + st.db.escape(token);
                         var query = 'CALL PNotifyRelevantStudent(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -2220,14 +2263,14 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
 };
 
 /**
- * @todo FnViewNotifiedCVDetails
+ * @todo FnViewApplicantList
  * Method : GET
  * @param req
  * @param res
  * @param next
  * @description api code for view cv details
  */
-Job.prototype.viewNotifiedCVDetails = function(req,res,next){
+Job.prototype.viewApplicantList = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
@@ -2326,7 +2369,372 @@ Job.prototype.viewNotifiedCVDetails = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnViewJobDetails
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for view job details
+ */
+Job.prototype.viewJobDetails = function(req,res,next){
+    var _this = this;
+    var token = req.query.token;
+    var jobId = req.query.job_id;
 
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!jobId){
+        error['jobId'] = 'Invalid job ID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =  st.db.escape(jobId);
+                        var query = 'CALL pviewjobDetails(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    if(getResult[0].length > 0){
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Job Details loaded successfully';
+                                        responseMessage.data = {
+                                            result: getResult[0],
+                                            location : getResult[1],
+                                            skill:getResult[2]
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnViewJobDetails: Job Details loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Job Details not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnViewJobDetails:Job Details not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Job Details not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnViewJobDetails:Job Details not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnViewJobDetails: error in getting Job Details :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnViewJobDetails: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnViewJobDetails:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnViewJobDetails ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnJobNotification
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for Get Job Seekers Mail Details
+*/
+Job.prototype.jobNotification = function(req,res,next) {
+    var _this = this;
+    var fs = require("fs");
+    var token = req.body.token;
+    var ezeid = alterEzeoneId(req.body.ezeid);
+    var ids = req.body.ids;    // tid of student ids
+    var templateId = req.body.template_id;
+    var jobId = req.body.job_id;
+    var id, i, types='',idType,gid, jobResult, link;
+    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
+
+    console.log(req.body);
+
+    if (ids) {
+        id = ids.split(",");
+        console.log(id.length);
+        console.log(id);
+    }
+    if(id.length) {
+        for (var i = 0; i < id.length; i++) {
+            types += 1 + ',';
+        }
+    }
+    types = types.slice(0,-1);
+    console.log(types);
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if (!ezeid) {
+        error['ezeid'] = 'Invalid ezeid';
+        validateStatus *= false;
+    }
+    if (!ids) {
+        error['ids'] = 'Invalid ids';
+        validateStatus *= false;
+    }
+    if (!templateId) {
+        error['templateId'] = 'Invalid templateId';
+        validateStatus *= false;
+    }
+
+    if (!validateStatus) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(templateId);
+                        st.db.query(templateQuery, function (err, templateResult) {
+
+                            if (!err) {
+                                if (templateResult) {
+                                    if (templateResult.length > 0) {
+                                        if (templateResult[0]) {
+                                            console.log(templateResult[0].Body);
+
+                                            var mailOptions = {
+                                                html: templateResult[0].Body // html body
+                                            };
+
+
+                                            var queryParams1 = st.db.escape(ezeid) + ',' + st.db.escape(ids);
+                                            var query1 = 'CALL pSendMsgRequestbyPO(' + queryParams1 + ')';
+                                            console.log(query1);
+                                            st.db.query(query1, function (err, getResult) {
+                                                if (!err) {
+                                                    if (getResult) {
+                                                        console.log(getResult);
+
+                                                        var queryParams3 = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                            + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(ids)
+                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
+                                                        var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
+                                                        console.log(query3);
+                                                        st.db.query(query3, function (err, result) {
+                                                            if (!err) {
+                                                                if (result) {
+                                                                    responseMessage.status = true;
+                                                                    responseMessage.error = null;
+                                                                    responseMessage.message = 'Notification send successfully';
+                                                                    responseMessage.data = {
+                                                                        token: req.body.token,
+                                                                        ezeid: req.body.ezeid,
+                                                                        ids: req.body.ids, //tid of student ids
+                                                                        templateId: req.body.template_id,
+                                                                        jobId: req.body.job_id,
+                                                                        message: mailOptions.html
+                                                                    };
+
+                                                                    res.status(200).json(responseMessage);
+                                                                    console.log('FnjobNotification:Message Composed successfully');
+                                                                    for (var i = 0; i < id.length; i++) {
+                                                                        gid = id[i];
+                                                                        console.log(gid);
+
+                                                                        var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + gid;
+                                                                        console.log(query2);
+                                                                        st.db.query(query2, function (err, getDetails) {
+                                                                            if (getDetails) {
+                                                                                if (getDetails[0]) {
+                                                                                    console.log('----------------------------');
+                                                                                    console.log(getDetails);
+                                                                                    receiverId = getDetails[0].tid;
+                                                                                    senderTitle = ezeid;
+                                                                                    groupTitle = ezeid;
+                                                                                    groupId = gid;
+                                                                                    messageText = mailOptions.html;
+                                                                                    messageType = 1;
+                                                                                    operationType = 0;
+                                                                                    iphoneId = null;
+                                                                                    messageId = 0;
+                                                                                    masterid = '';
+                                                                                    console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnjobNotification:user details not loaded');
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                console.log('FnjobNotification:user details not loaded');
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    responseMessage.message = 'Notification not send';
+                                                                    res.status(200).json(responseMessage);
+                                                                    console.log('FnjobNotification:Error getting from composeMessage');
+
+                                                                }
+                                                            }
+                                                            else {
+                                                                responseMessage.error = {
+                                                                    server: 'Internal Server Error'
+                                                                };
+                                                                responseMessage.message = 'An error occurred !';
+                                                                res.status(500).json(responseMessage);
+                                                                console.log('FnjobNotification:Error getting from composeMessage');
+
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        responseMessage.message = 'Notification not send';
+                                                        res.status(200).json(responseMessage);
+                                                        console.log('FnjobNotification:Error getting from UserDaetils');
+
+                                                    }
+                                                }
+                                                else {
+                                                    responseMessage.error = {
+                                                        server: 'Internal Server Error'
+                                                    };
+                                                    responseMessage.message = 'An error occurred !';
+                                                    res.status(500).json(responseMessage);
+                                                    console.log('FnjobNotification:Error getting from UserDaetils');
+
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            responseMessage.message = 'Notification not send';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnjobNotification:Error getting from templateResult');
+
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'Notification not send';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnjobNotification:Error getting from templateResult');
+
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Notification not send';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnjobNotification:Error getting from templateResult');
+
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('FnjobNotification:Error getting from templateResult');
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnjobNotification: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnjobNotification:Error in validating Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnJobNotification ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = Job;

@@ -30,7 +30,7 @@
                                     <span title="{{req.GroupName.length > 0?req.GroupName:'NA'}}">{{req.GroupName.length > 0?req.GroupName:'NA' | textLength:20}}</span>
                                     <span class="pull-right">
                                         <button ng-click="pendingRequestResponse(req.GroupID, req.MemberID, 1,$index, req.requester)" class="btn btn-primary btn-xs"><i class="fa fa-check"></i></button>
-                                        <button ng-click="pendingRequestResponse(req.groupId, req.MemberID, 2,$index, req.requester)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
+                                        <button ng-click="pendingRequestResponse(req.GroupID, req.MemberID, 2,$index, req.requester)" class="btn btn-danger btn-xs"><i class="fa fa-times"></i></button>
                                     </span>
                                 </div>
                             </div>
@@ -42,11 +42,11 @@
                                     <!--<a ng-click="openComposeMessage()" class="pointer"> <i class="fa fa-pencil-square-o"></i> Compose</a>-->
                                     <a href="/message/compose" class="pointer text-white text-bolder"> <i class="fa fa-pencil-square-o"></i> Compose</a>
                                 </li>
-                                <li class="active index-menu-item">
+                                <li class="active index-menu-item hidden">
                                     <!--<a ng-click="openInbox()" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">2</span></a>-->
                                     <a href="/message/inbox" class="pointer"><i class="fa fa-inbox"></i> Inbox <span class="label label-danger ">{{unreadMsgNotify.count}}</span></a>
                                 </li>
-                                <li class="index-menu-item">
+                                <li class="index-menu-item hidden">
                                     <a href="/message/outbox"><i class="fa fa-envelope-o"></i> Outbox</a>
                                 </li>
                                 <li class="index-menu-item">

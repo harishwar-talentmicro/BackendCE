@@ -3382,12 +3382,18 @@ sup.tm{
     background-color: rgba(255, 78, 28, 0.75) !important;
 }
 
+.hpw .group-name-suggestion .selected
+{
+    background-color: #203E6B;
+    color: #fff;
+}
+
 .hpw .group-name-suggestion
 {
-    text-align: right;
+    text-align: left;
     position: absolute;
-    background-color: #fff;
-    width: 84%;
+    background-color: #F3F4F9;
+    width: 30%;
     box-shadow: 2px 2px 2px #B1ACAC;
     border: 1px solid #E7D9D9;
     padding: 2px;
@@ -3395,10 +3401,21 @@ sup.tm{
     margin-left: 5%;
 }
 
+.hpw .p-3
+{
+    padding: 3px;
+}
+
 .hpw .group-suggestion
 {
-    padding-right: 2%;
+    padding-left: 2%;
 
+}
+
+.hpw .btn-section
+{
+    border-top: 1px solid #CCCCCC;
+    padding: 3px 3px 0px 0px;
 }
 
 .hpw .group-suggestion:hover
@@ -3630,16 +3647,25 @@ sup.tm{
 {
     padding-top: 1.8%;
 }
-/*::-webkit-scrollbar {*/
-/*width: 12px;*/
-/*}*/
 
-/*::-webkit-scrollbar-track {*/
-/*-webkit-box-shadow: inset 0 0 6px rgba(43, 18, 8, 0.3);*/
-/*border-radius: 10px;*/
-/*}*/
+.hpw .message-landing
+{
+    text-align: center;
+    padding-top: 10%;
+}
 
-/*::-webkit-scrollbar-thumb {*/
-/*border-radius: 10px;*/
-/*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
-/*}*/
+.hpw .message-landing-subhead
+{
+    color: gray;
+    letter-spacing: 8px;
+}
+.hpw .message-landing-head
+{
+    font-size: 3.5em;
+    color: gray;
+}
+
+.hpw .logo-style
+{
+    margin-top:3px;font-family: 'Arial',sans-serif;cursor:pointer
+}
