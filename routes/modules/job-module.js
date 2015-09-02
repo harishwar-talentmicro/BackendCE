@@ -50,6 +50,7 @@ function Job(db,stdLib){
   */
 Job.prototype.create = function(req,res,next){
     var _this = this;
+    var fs = require("fs");
 
     var token = req.body.token;
     var tid = req.body.tid;
@@ -87,6 +88,32 @@ Job.prototype.create = function(req,res,next){
         skillMatrix1=[];
     }
     var skillIds = req.body.skill_ids ? req.body.skill_ids : '';
+    var jobtype,masterid='',gid,receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,userID;
+
+    if (jobType == 0){
+        jobtype = 'Full Time';
+    }
+    else if (jobType == 1){
+        jobtype = 'Part Time';
+    }
+    else if (jobType == 2){
+        jobtype = 'Work from Home';
+    }
+    else if (jobType == 3){
+        jobtype = 'Internship';
+    }
+    else if (jobType == 4){
+        jobtype = 'Apprenticeship';
+    }
+    else if (jobType == 5){
+        jobtype = 'Job Oriented Training';
+    }
+    else if (jobType == 6){
+        jobtype = 'Consultant';
+    }
+    else if (jobType == 7){
+        jobtype = 'Freelancer';
+    }
 
     var responseMessage = {
         status: false,
@@ -186,6 +213,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(scoreTo);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
+                                console.log(insertresult);
                                     if (!err) {
                                     if (insertresult) {
                                         responseMessage.status = true;
@@ -216,7 +244,7 @@ Job.prototype.create = function(req,res,next){
                                             specializationID: specializationID,
                                             instituteID: instituteID,
                                             score_from: scoreFrom,
-                                            score_to : scoreTo
+                                            score_to: scoreTo
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveJobs: Jobs save successfully');
@@ -250,8 +278,8 @@ Job.prototype.create = function(req,res,next){
                                                         };
                                                         if (SkillItems) {
                                                             var queryParams = st.db.escape(SkillItems.jobid) + ',' + st.db.escape(SkillItems.skillID)
-                                                                + ',' + st.db.escape(SkillItems.expFrom)+ ',' + st.db.escape(SkillItems.expTo)
-                                                                + ',' + st.db.escape(SkillItems.skillstatusid)+ ',' + st.db.escape(SkillItems.expertlevel)
+                                                                + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
+                                                                + ',' + st.db.escape(SkillItems.skillstatusid) + ',' + st.db.escape(SkillItems.expertlevel)
                                                                 + ',' + st.db.escape(parseInt(skills.tid));
                                                             var query = 'CALL pSaveJobSkill(' + queryParams + ')';
                                                             console.log(query);
@@ -259,6 +287,7 @@ Job.prototype.create = function(req,res,next){
                                                                 if (!err) {
                                                                     if (result) {
                                                                         console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                                        postNotification();
                                                                     }
                                                                     else {
                                                                         console.log('FnupdateSkill:  skill matrix not updated');
@@ -284,6 +313,118 @@ Job.prototype.create = function(req,res,next){
                                                 }
                                             });
                                         });
+
+                                        //notification
+                                        var postNotification = function () {
+                                            var queryParams1 = st.db.escape(insertresult[0][0].jobid) + ',' + st.db.escape(location_id)
+                                                + ',' + st.db.escape(req.body.education_id) + ',' + st.db.escape(req.body.specialization_id)
+                                                + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to);
+                                            console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
+                                            st.db.query('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')', function (err, results) {
+                                                console.log('---------------------------notify');
+                                                if (!err) {
+                                                    if (results) {
+                                                        if (results[0]) {
+                                                            if (results[0][0]) {
+                                                                console.log(results[0][0].MasterID);
+                                                                for (var i = 0; i < results[0].length; i++) {
+                                                                    userID = results[0][i].MasterID;
+
+                                                                    var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID);
+                                                                    var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
+                                                                    console.log(query2);
+                                                                    st.db.query(query2, function (err, getResult) {
+                                                                        if (!err) {
+                                                                            if (getResult) {
+                                                                                fs.readFile("job_post.html", "utf8", function (err, data) {
+                                                                                    var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeone_id);
+                                                                                    st.db.query(name, function (err, companyResult) {
+                                                                                        if (companyResult) {
+                                                                                            data = data.replace("[JobType]", jobtype);
+                                                                                            data = data.replace("[JobTitle]", job_title);
+                                                                                            data = data.replace("[JobCode]", job_code);
+                                                                                            data = data.replace("[CompanyName]", companyResult[0].CompanyName);
+                                                                                            console.log(data);
+
+                                                                                            var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                                + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userID)
+                                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
+                                                                                            var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
+                                                                                            console.log(query3);
+                                                                                            st.db.query(query3, function (err, messageResult) {
+                                                                                                if (!err) {
+                                                                                                    if (messageResult) {
+                                                                                                        console.log('FnComposeMessage:Message Composed successfully');
+                                                                                                        var query4 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
+                                                                                                        console.log(query4);
+                                                                                                        st.db.query(query4, function (err, getDetails) {
+                                                                                                            if (getDetails) {
+                                                                                                                if (getDetails[0]) {
+                                                                                                                    console.log('----------------------------');
+                                                                                                                    console.log(getDetails);
+                                                                                                                    receiverId = getDetails[0].tid;
+                                                                                                                    senderTitle = ezeone_id;
+                                                                                                                    groupTitle = ezeone_id;
+                                                                                                                    groupId = companyResult[0].tid;
+                                                                                                                    messageText = data;
+                                                                                                                    messageType = 1;
+                                                                                                                    operationType = 0;
+                                                                                                                    iphoneId = null;
+                                                                                                                    messageId = 0;
+                                                                                                                    masterid = '';
+                                                                                                                    console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                                }
+                                                                                                                else {
+                                                                                                                    console.log('FnjobNotification:user details not loaded');
+                                                                                                                }
+                                                                                                            }
+                                                                                                            else {
+                                                                                                                console.log('FnjobNotification:user details not loaded');
+                                                                                                            }
+                                                                                                        });
+                                                                                                    }
+                                                                                                    else {
+                                                                                                        console.log("FnComposeMessage:Message Result not loaded");
+                                                                                                    }
+                                                                                                }
+                                                                                                else {
+                                                                                                    console.log("FnSaveJobs:Error in loading Message Result:" + err);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                    });
+                                                                                });
+                                                                            }
+                                                                            else {
+                                                                                console.log("FnSaveJobs:Result not loaded");
+                                                                            }
+                                                                        }
+                                                                        else {
+                                                                            console.log("FnSaveJobs:Error:" + err);
+                                                                        }
+                                                                    });
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log("FnSaveJobs:MasterId not loaded");
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log("FnSaveJobs:MasterId not loaded");
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log("FnSaveJobs:MasterId not loaded");
+                                                    }
+                                                }
+                                                else {
+                                                    console.log("FnSaveJobs:Error:" + err);
+                                                }
+                                            });
+                                        };
                                     }
                                     else {
                                         responseMessage.message = 'No save Jobs details';

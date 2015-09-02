@@ -422,7 +422,6 @@ Auth.prototype.register = function(req,res,next){
         else
         {
             console.log('----------req.body for Operation type other than 1--------------');
-            console.log(req.body);
             if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null  && Gender.toString() != 'NaN') {
                 if (LastName == null) {
                     LastName = '';
@@ -478,6 +477,8 @@ Auth.prototype.register = function(req,res,next){
                                         RtnMessage.Token = TokenNo;
                                         RtnMessage.Type = IDTypeID;
                                         RtnMessage.Icon = Icon;
+                                        RtnMessage.tid = InsertResult[0][0].TID;
+                                        RtnMessage.group_id = InsertResult[0][0].group_id;
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
                                             //res.send(RtnMessage);
