@@ -81,7 +81,7 @@
                 "expertiseText":"",
                 "exp_from":0.00,
                 "exp_to":0.00,
-                "active_status":true
+                "active_status":1
             };
 
             $scope.expertiseLevelsIDs = ["0"];
@@ -585,8 +585,8 @@
                             var jobResponseData = resp.data;
                             var jobDetail = jobResponseData.result[0];
                             var jobLocationArray = jobResponseData.location;
-
-                            console.log(resp.data);
+                            var skillMapData = resp.data.skill;
+                            console.log(skillMapData);
 
                             $scope.jobTid = jobDetail.tid;
                             $scope.jobTitle = jobDetail.jobtitle;
@@ -662,6 +662,63 @@
                             {
                                 $scope.selectedInstitute = [];
                             }
+
+                            for(var nCount=0; nCount < skillMapData.length; nCount++)
+                            {
+                                skillMapData[nCount].expertiseText = [];
+
+                                var EditExpArray = skillMapData[nCount].expertiseLevel.split(',');
+                                for (var nCountExperties = 0; nCountExperties < EditExpArray.length; nCountExperties++)
+                                {
+                                     skillMapData[nCount].expertiseText.push($scope.expertiseLevels[EditExpArray[nCountExperties]]);
+                                }
+                                 skillMapData[nCount].expertiseText = skillMapData[nCount].expertiseText.toString();
+                                console.log(skillMapData[nCount].expertiseText);
+                            }
+
+                            $scope.skillMatrix = [];
+                            $scope.skillMatrix.push(
+                                {
+                                    "tid":0,
+                                    "skillname":"",
+                                    "expertiseLevel":0,
+                                    "expertiseText":"",
+                                    "exp_from":0.00,
+                                    "exp_to":0.00,
+                                    "active_status":1
+                                }
+                            );
+
+                            for (var nCount = 0; nCount < skillMapData.length; nCount++)
+                            {
+                                $scope.skillMatrix.push(skillMapData[nCount]);
+                            }
+
+
+
+
+
+
+                            for(var ct=0; ct < $scope.skillMatrix.length; ct++)
+                            {
+                                if(ct == 0)
+                                {
+                                    $scope.editMode[ct] = true;
+                                }
+                                else
+                                {
+                                    $scope.editMode[ct] = false;
+                                }
+                            }
+
+                            for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++)
+                            {
+                              //  $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == 1) ? true : false;
+                                skillsTid.push($scope.skillMatrix[nCount].tid);
+                            }
+
+                            $scope.editSkill = angular.copy($scope.skillMatrix[0]);
+
 
                             $scope.$emit('$preLoaderStop');
                         }
@@ -1315,13 +1372,13 @@
                             "expertiseText":"",
                             "exp_from":0.00,
                             "exp_to":0.00,
-                            "active_status":true
+                            "active_status":1
                         };
                         return;
                     }
 
-
                     var newSkill = angular.copy($scope.editSkill);
+
                     $scope.editMode.push(false);
 
                     /*if(newSkill.skillname && newSkill.exp)*/
@@ -1340,7 +1397,7 @@
                         "expertiseText":"",
                         "exp_from":0.00,
                         "exp_to":0.00,
-                        "active_status":true
+                        "active_status":1
                     };
 
 
@@ -1370,7 +1427,7 @@
                         "expertiseText":"",
                         "exp_from":0.00,
                         "exp_to":0.00,
-                        "active_status":true
+                        "active_status":1
                     };
 
                     $scope.expertiseLevelsIDs = ["0"];
@@ -1393,7 +1450,7 @@
                     "expertiseText":"",
                     "exp_from":0.00,
                     "exp_to":0.00,
-                    "active_status":true
+                    "active_status":1
                 };
             };
 
@@ -1405,6 +1462,11 @@
                 "exp_from":"1",
                 "exp_to":"2",
                 "active_status":1
+            };
+
+            $scope.setActiveSkill = function(_skillID)
+            {
+                $scope.editSkill.active_status = _skillID;
             };
 
             $scope.editSkillFn = function(index)
