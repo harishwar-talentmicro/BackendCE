@@ -1,6 +1,4 @@
 /**
- * Controller to manage all the functionaloties in OUTBOX
- *
  * @author: Krunal[EZEOne]
  * @since 30082015
  */
@@ -43,7 +41,7 @@ angular.module('ezeidApp').
             $scope.lat = "";
             $scope.lng = "";
 
-
+            getMyInstituteJob();
 
             var handleNoGeolocation = function () {
             };
@@ -76,9 +74,12 @@ angular.module('ezeidApp').
                         url: GURL + 'job_myinstitute',
                         params:
                         {
-                            latitude: $scope.lat,
-                            longitude: $scope.lng,
+                            latitude: 54.54,
+                            longitude: 1545.55,
                             token: $rootScope._userInfo.Token
+                            /*latitude: $scope.lat,
+                            longitude: $scope.lng,
+                            token: $rootScope._userInfo.Token*/
                         }
                     }).success(function (response) {
                             $scope.$emit('$preLoaderStop');

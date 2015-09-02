@@ -35,8 +35,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     $scope.modernBrowsers = [];
 
-
-
     $scope.instituteText = "";
     $scope.instituteID = 0;
     $scope.specilizationText = "";
@@ -57,17 +55,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
      */
     function hideAllDropdoowns(id)
     {
-        if(parseInt(id) != 1)
-        {
-            $('.filter-dropdown').hide();
-        }
         if(parseInt(id) != 2)
         {
             $('.filter-dropdownInstitute').hide();
-        }
-        if(parseInt(id) != 3)
-        {
-            $('.filter-dropdownSpecialization').hide();
         }
     }
 
@@ -75,33 +65,8 @@ angular.module('ezeidApp').controller('CVAttachController',[
     {
         if ($rootScope._userInfo.IsAuthenticate == true)
         {
-            $('.dropdown-toggle1').click(function(){$( ".filter-dropdown" ).slideToggle( "slow", function() {
-                // Animation complete.
-                hideAllDropdoowns(1);
-            });})
-
-            $('html').click(function() {
-                $('.filter-dropdown').hide();
-            });
-
-            $('#functionDiv').click(function(e){
-                e.stopPropagation();
-            });
-
             $('html').click(function() {
                 $('.filter-dropdownInstitute').hide();
-            });
-
-            $('#instituteDiv').click(function(e){
-                e.stopPropagation();
-            });
-
-            $('html').click(function() {
-                $('.filter-dropdownSpecialization').hide();
-            });
-
-            $('#specializationDiv').click(function(e){
-                e.stopPropagation();
             });
 
             $scope.spcializationGetResponse = false;
@@ -111,7 +76,7 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
             getSpecialization();
             getJobCategories();
-            getInstituteList();
+           // getInstituteList();
             getEducations();
         }
         else

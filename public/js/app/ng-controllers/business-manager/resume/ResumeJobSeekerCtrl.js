@@ -66,10 +66,10 @@
                 $scope.mailTemplateTid = 0;
                 $scope.job_id = 0;
                 $scope.searchListMapFlag = false;//1: List, 2:Flag
+                $scope.specializationList = [];
             }
 
             $scope.jobSeekerResults = "";
-
 
             //Pagination settings
             $scope.pageSize = 10;//Results per page
@@ -79,83 +79,9 @@
 
             getCountryList();
             getEducations();
-            getSpecialization();
             getInstituteList();
             getTemplateList();
             getJobList();
-
-            /**
-             * Hide all the open dropdown
-             */
-            function hideAllDropdoowns(id)
-            {
-                if(parseInt(id) != 1)
-                {
-                    $('.filter-dropdown').hide();
-                }
-                if(parseInt(id) != 2)
-                {
-                    $('.filter-dropdownspecialization').hide();
-                }
-                if(parseInt(id) != 3)
-                {
-                    $('.filter-dropdownInstitute').hide();
-                }
-                if(parseInt(id) != 4)
-                {
-                    $('.filter-dropdownCity').hide();
-                }
-            }
-
-            $scope.$watch('_userInfo.IsAuthenticate', function () {
-               $('.dropdown-toggle1').click(function(){
-                     hideAllDropdoowns(1);
-                    $( ".filter-dropdown" ).slideToggle( "slow", function() {
-                        // Animation complete.
-                    });})
-
-                $('.dropdown-toggleSpecialization').click(function(){
-                    hideAllDropdoowns(2);
-                    $( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
-                        // Animation complete.
-                    });})
-
-                $('.dropdown-toggleCity1').click(function(){
-                    hideAllDropdoowns(4);
-                    $( ".filter-dropdownCity" ).slideToggle( "slow", function() {
-                        // Animation complete.
-                    });})
-
-                $('.dropdown-toggleInstitute').click(function(){
-                    hideAllDropdoowns(3);
-                    $( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
-                        // Animation complete.
-                    });})
-
-
-
-                $('html').click(function()
-                {
-                    $('.filter-dropdownCity').hide();
-                    $('.filter-dropdown').hide();
-                    $('.filter-dropdownspecialization').hide();
-                    $('.filter-dropdownInstitute').hide();
-                })
-
-                $('#jobseekercity').click(function(e){
-                    e.stopPropagation();
-                });
-                $('#jobseekerinstitute').click(function(e){
-                    e.stopPropagation();
-                });
-                $('#jobseekereducation').click(function(e){
-                    e.stopPropagation();
-                });
-                $('#jobseekerspecialization').click(function(e){
-                    e.stopPropagation();
-                });
-
-            });
 
             // Get Country list
             function getCountryList()
@@ -218,6 +144,7 @@
                 }
             };
 
+            $scope.outputEducationList = [];
             // Get Education list
             function getEducations()
             {
@@ -238,7 +165,7 @@
             /**
              * Select - Unselect Education
              */
-            $scope.selectEducation = function(_educationID)
+          /*  $scope.selectEducation = function(_educationID)
             {
                 if($scope.selectedEducations.indexOf(_educationID)!=-1)
                 {
@@ -249,29 +176,33 @@
                 {
                     $scope.selectedEducations.push(_educationID);
                 }
-            }
+            }*/
 
+            $scope.outputSpecializationList = [];
             // Get Specialization list
             function getSpecialization()
             {
+                $scope.$emit('$preLoaderStart');
                 $http({
                     url : GURL + 'specialization',
                     method : 'GET',
                     params : {
-                        token : $rootScope._userInfo.Token
+                        token : $rootScope._userInfo.Token,
+                        education_id : $scope.selectedEducations.toString()
                     }
                 }).success(function(resp){
                         $scope.specializationList = resp.data;
+                        $scope.$emit('$preLoaderStop');
                     })
                     .error(function(err){
-
+                        $scope.$emit('$preLoaderStop');
                     });
             }
 
             /**
              * Select - Unselect specialization
              */
-            $scope.selectSpecialization = function(_specializationID)
+            /*$scope.selectSpecialization = function(_specializationID)
             {
                 if($scope.selectedSpecializations.indexOf(_specializationID)!=-1)
                 {
@@ -282,7 +213,7 @@
                 {
                     $scope.selectedSpecializations.push(_specializationID);
                 }
-            };
+            };*/
 
             $scope.outputInstituteList = [];
             // Get Institute list
@@ -557,8 +488,17 @@
 
                     for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
                     {
-                      //  $scope.instituteList
-                        $scope.selectedInstitute.push(parseInt($scope.instituteList[nCount].TID));
+                       $scope.instituteList[nCount].ticked = false;
+                    }
+                }
+
+                if($scope.educationList.length)
+                {
+                    $scope.selectedEducations = [];
+
+                    for (var nCount = 0; nCount < $scope.educationList.length; nCount++)
+                    {
+                        $scope.educationList[nCount].ticked = false;
                     }
                 }
             };
@@ -791,8 +731,8 @@
                     {
                         /* get the current location coordinates and if it don't exists then update with the present Coordinates */
                         var coordinates = getSearchedCoordinates($scope.googleMap.currentMarkerPosition.latitude,$scope.googleMap.currentMarkerPosition.longitude);
-
                         $scope.googleMap.getReverseGeolocation(coordinates[0],coordinates[1]).then(function (resp) {
+
                             if(resp)
                             {
                                 placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
@@ -804,7 +744,6 @@
                                         if($scope.countryLists[nCount].countryname.toUpperCase() == placeDetail.country.toUpperCase())
                                         {
                                             $scope.countrySelect = $scope.countryLists[nCount].countryname;
-
                                             //to set default city
                                             $scope.getCityListOfCountry($scope.countrySelect);
                                         }
@@ -876,11 +815,9 @@
             /*------------------------ multi selection of Institute ----------------*/
 
             $scope.fOpen = function() {
-                // console.log( 'On-open' );
             };
 
             $scope.fClose = function() {
-                //console.log( 'On-close' );
             };
 
             $scope.fClick = function( data )
@@ -917,14 +854,9 @@
             };
 
             $scope.fClear = function() {
-                // console.log( 'On-clear' );
             };
 
             $scope.fSearchChange = function( data ) {
-                /*console.log( 'On-search-change' );
-                 console.log( 'On-search-change - keyword: ' + data.keyword );
-                 console.log( 'On-search-change - result: ' );
-                 console.log( data.result );*/
             };
 
             $scope.InstituteTags = {
@@ -935,7 +867,119 @@
                 nothingSelected  : "Select Institute"
             };
 
+            /*------------------------ multi selection of Education ----------------*/
 
+            $scope.educationOpen = function() {
+            };
+
+            $scope.educationClose = function() {
+                if($scope.selectedEducations.length)
+                {
+                    getSpecialization();
+                }
+            };
+
+            $scope.educationClick = function( data )
+            {
+                var educationID = "";
+                educationID = data.TID;
+
+                if($scope.selectedEducations.indexOf(educationID)!=-1)
+                {
+                    var index = $scope.selectedEducations.indexOf(educationID);
+                    $scope.selectedEducations.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedEducations.push(educationID);
+                }
+            };
+
+            $scope.educationSelectAll = function()
+            {
+                if($scope.educationList.length)
+                {
+                    $scope.selectedEducations = [];
+
+                    for (var nCount = 0; nCount < $scope.educationList.length; nCount++)
+                    {
+                        $scope.selectedEducations.push(parseInt($scope.educationList[nCount].TID));
+                    }
+                }
+            };
+
+            $scope.educationSelectNone = function() {
+                $scope.selectedEducations = [];
+            };
+
+            $scope.educationClear = function() {
+            };
+
+            $scope.educationSearchChange = function( data ) {
+            };
+
+            $scope.educationTags = {
+                selectAll : "Select All",
+                reset : "Reset",
+                search : "Search Education",
+                selectNone : "Deselect All",
+                nothingSelected  : "Select Education"
+            };
+
+            /*------------------------ multi selection of Specialization ----------------*/
+
+            $scope.specializationOpen = function() {
+            };
+
+            $scope.specializationClose = function() {
+            };
+
+            $scope.specializationClick = function( data )
+            {
+                var specializationID = "";
+                specializationID = data.TID;
+
+                if($scope.selectedSpecializations.indexOf(specializationID)!=-1)
+                {
+                    var index = $scope.selectedSpecializations.indexOf(specializationID);
+                    $scope.selectedSpecializations.splice(index,1);
+                }
+                else
+                {
+                    $scope.selectedSpecializations.push(specializationID);
+                }
+            };
+
+            $scope.specializationSelectAll = function()
+            {
+                if($scope.specializationList.length)
+                {
+                    $scope.selectedSpecializations = [];
+
+                    for (var nCount = 0; nCount < $scope.specializationList.length; nCount++)
+                    {
+                        $scope.selectedSpecializations.push(parseInt($scope.specializationList[nCount].TID));
+                    }
+                }
+            };
+
+            $scope.specializationSelectNone = function() {
+                $scope.selectedSpecializations = [];
+            };
+
+            $scope.specializationClear = function() {
+            };
+
+            $scope.specializationSearchChange = function( data ) {
+            };
+
+            $scope.specializationTags = {
+                selectAll : "Select All",
+                reset : "Reset",
+                search : "Search Specialization",
+                selectNone : "Deselect All",
+                nothingSelected  : "Select Specialization"
+            };
 
 
         }]);

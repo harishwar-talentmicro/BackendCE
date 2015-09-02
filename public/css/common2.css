@@ -3485,6 +3485,13 @@ sup.tm{
     background-color: #fff;
 }
 
+.hpw .messsage-chat .selected
+{
+    /*background-color: rgb(94, 116, 245);*/
+    background-color: rgb(158, 169, 255);
+    color: #fff !important;
+}
+
 .hpw .bg-white
 {
     background-color: #fff !important;
@@ -3668,4 +3675,49 @@ sup.tm{
 .hpw .logo-style
 {
     margin-top:3px;font-family: 'Arial',sans-serif;cursor:pointer
+}
+
+.hpw .flying-trash
+{
+    position: fixed;
+    top: 58%;
+    left: 94%;
+    box-shadow: 3px 4px 14px #EF6767;
+}
+
+.hpw .flying-select-all
+{
+    position: fixed;
+    top: 64%;
+    left: 94%;
+    box-shadow: 3px 4px 14px #5566ef;
+}
+
+.hpw .flying-reset
+{
+    position: fixed;
+    top: 70%;
+    left: 94%;
+    box-shadow: 3px 4px 14px #5566ef;
+}
+
+.hpw .checkbox1
+{
+    cursor: pointer;
+    font-size: 1.3em;
+    color: #524CEA;
+}
+
+.hpw .invitaion-heading
+{
+    padding: 3px;
+    background-color: #2C4754;
+    color: #fff;
+    font-size: 1.4em;
+    text-shadow: 1px 1px 1px #fff;
+}
+
+.hpw .font-0-8
+{
+    font-size: 0.8em;
 }

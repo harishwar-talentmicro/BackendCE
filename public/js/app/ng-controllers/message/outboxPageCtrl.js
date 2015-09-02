@@ -125,12 +125,12 @@ angular.module('ezeidApp').
                 else if ($routeParams.action == 'inbox')
                 {
                     $scope.activeTemplate = $scope.inboxListing;
-                    $scope.titleText = "Inbox";
+                    $scope.titleText = "";
                 }
                 else if ($routeParams.action == 'outbox')
                 {
                     $scope.activeTemplate = $scope.outboxListing;
-                    $scope.titleText = "Outbox";
+                    $scope.titleText = "";
                 }
                 else if ($routeParams.action == 'trash')
                 {
@@ -145,14 +145,14 @@ angular.module('ezeidApp').
                 else
                 {
                     $scope.activeTemplate = $scope.inboxListing;
-                    $scope.titleText = "Inbox";
+                    $scope.titleText = "";
                 }
             }
             else
             {
                 // Default Inbox is selected
                 $scope.activeTemplate = $scope.inboxListing;
-                $scope.titleText = "Inbox";
+                $scope.titleText = "";
             }
 
             /* initialization fot getting all the transaction history */
