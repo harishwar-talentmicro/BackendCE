@@ -35,6 +35,38 @@ angular.module('ezeidApp').controller('ActionTypesCtrl',['$scope','$rootScope','
         resume : []
     };
 
+    $scope.deleteActionTypes = function(functionType,index){
+
+        var ftMap = ['sales','reservation','homeDelivery','service','resume'];
+        var data = {
+            Token : $rootScope._userInfo.Token,
+            TID : $scope.txActionTypes[ftMap[functionType]][index].TID,
+            ActionTitle : $scope.txActionTypes[ftMap[functionType]][index].title,
+            Status : 2,
+            FunctionType : functionType
+        };
+
+        $http({
+            url : GURL + 'ewmSaveActionType',
+            data : data,
+            method : 'POST'
+        }).success(function(resp){
+            if(resp && resp !== 'null' && resp.hasOwnProperty('IsSuccessfull')){
+                if(resp.IsSuccessfull){
+                    $scope.txActionTypes[ftMap[functionType]].splice(index,1);
+                    Notification.success({ message : 'Action deleted successfully', delay : MsgDelay});
+                }
+                else{
+                    Notification.error({ message : 'An error occurred while deleting action', delay : MsgDelay});
+                }
+            }
+            else{
+                Notification.error({ message : 'An error occurred while deleting action', delay : MsgDelay});
+            }
+        }).error(function(err){
+            Notification.error({ message : 'An error occurred while deleting action', delay : MsgDelay});
+        });
+    };
 
 
     // Item types (functionTypes) available to the system
