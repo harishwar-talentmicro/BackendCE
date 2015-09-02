@@ -41,8 +41,6 @@ angular.module('ezeidApp').
             $scope.lat = "";
             $scope.lng = "";
 
-            getMyInstituteJob();
-
             var handleNoGeolocation = function () {
             };
             $scope.googleMap = new GoogleMap();
@@ -77,9 +75,6 @@ angular.module('ezeidApp').
                             latitude: 54.54,
                             longitude: 1545.55,
                             token: $rootScope._userInfo.Token
-                            /*latitude: $scope.lat,
-                            longitude: $scope.lng,
-                            token: $rootScope._userInfo.Token*/
                         }
                     }).success(function (response) {
                             $scope.$emit('$preLoaderStop');
@@ -121,14 +116,15 @@ angular.module('ezeidApp').
                 }
             };
 
-            /**
+           /* *//**
              * Set keySkills
-             */
+             *//*
             $scope.activeSkillsArray = [];
             $scope.getKeySkillsArray = function(skillString)
             {
                 $scope.activeSkillsArray = skillString.split(",");
-            };
+                console.log($scope.activeSkillsArray);
+            };*/
 
             /**
              * Get the salary range
