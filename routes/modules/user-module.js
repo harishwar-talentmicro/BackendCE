@@ -2506,7 +2506,6 @@ User.prototype.saveResume = function(req,res,next){
          */
         salary = (parseFloat(salary) !== NaN && salary > 0) ? parseFloat(salary) : 0;
         noticePeriod = (parseInt(noticePeriod) !== NaN && parseInt(noticePeriod) > 0) ? parseInt(noticePeriod) : 0;
-        experience = (parseInt(experience) !== NaN && parseInt(experience)) ? parseInt(experience) : 0;
 
 
         var RtnMessage = {
