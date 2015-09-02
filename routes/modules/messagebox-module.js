@@ -1386,7 +1386,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !';s
+            responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnGetMembersList ' + ex.description);
             var errorDate = new Date();

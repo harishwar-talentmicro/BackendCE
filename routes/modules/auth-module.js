@@ -422,7 +422,6 @@ Auth.prototype.register = function(req,res,next){
         else
         {
             console.log('----------req.body for Operation type other than 1--------------');
-            console.log(req.body);
             if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null  && Gender.toString() != 'NaN') {
                 if (LastName == null) {
                     LastName = '';
@@ -478,6 +477,8 @@ Auth.prototype.register = function(req,res,next){
                                         RtnMessage.Token = TokenNo;
                                         RtnMessage.Type = IDTypeID;
                                         RtnMessage.Icon = Icon;
+                                        RtnMessage.tid = InsertResult[0][0].TID;
+                                        RtnMessage.group_id = InsertResult[0][0].group_id;
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
                                             //res.send(RtnMessage);
@@ -644,7 +645,6 @@ Auth.prototype.login = function(req,res,next){
             ezeone_id:'',
             FirstName: '',
             Type: 0,
-            Icon: '',
             Verified: 0,
             SalesModuleTitle: '',
             AppointmentModuleTitle: '',
@@ -688,7 +688,7 @@ Auth.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
-                            //console.log(loginDetails);
+                            console.log(loginDetails[0]);
 
                             if(comparePassword(Password,loginDetails[0].Password)){
                                 st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
@@ -706,7 +706,6 @@ Auth.prototype.login = function(req,res,next){
                                             RtnMessage.FirstName = loginDetails[0].FirstName;
                                             RtnMessage.CompanyName = loginDetails[0].CompanyName;
                                             RtnMessage.Type = loginDetails[0].IDTypeID;
-                                            RtnMessage.Icon = loginDetails[0].Icon;
                                             RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
                                             RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
                                             RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
@@ -731,6 +730,7 @@ Auth.prototype.login = function(req,res,next){
                                             RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
                                             RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
                                             RtnMessage.group_id = loginDetails[0].group_id;
+                                            RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
 
                                             res.send(RtnMessage);
                                             console.log('FnLogin:tmaster: Login success');

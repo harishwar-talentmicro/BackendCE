@@ -106,6 +106,8 @@ angular.module('ezeidApp').
                 paginationNextVisibility:false,
                 paginationPreviousVisibility:false
             };
+
+            $scope.selectedMsg = [];
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +175,7 @@ angular.module('ezeidApp').
                         var message = data;
                         if($routeParams.type == 0)
                         {
-                           message = data.messages;
+                            message = data.messages;
                         }
 
                         if(!message || !message.length > 0)
@@ -554,10 +556,96 @@ angular.module('ezeidApp').
 
             $scope.anchorScroll = function()
             {
+                var old = $location.hash();
                 $location.hash('compose-message');
-                $('#compose-message').click();
                 $anchorScroll();
+                $location.hash(old);
             }
+
+            $scope.selectMessage = function(index)
+            {
+                $scope.messageData[index].isSelected = !$scope.messageData[index].isSelected;
+
+                var tid = $scope.messageData[index].tid;
+                if($scope.messageData[index].isSelected)
+                {
+                    $scope.selectedMsg.push($scope.messageData[index]);
+                }
+                else
+                {
+                    var index = $scope.selectedMsg.indexOfWhere('tid',tid);
+                    $scope.selectedMsg.splice(index,1);
+                }
+            }
+
+            /**
+             * select all the messages
+             */
+            $scope.selectAllMessage = function()
+            {
+                $scope.messageData.forEach(function(data){
+                    data.isSelected = true;
+                    $scope.selectedMsg.push(data);
+                });
+            }
+
+            /**
+             * unselect all the messages
+             */
+            $scope.resetMessage = function()
+            {
+                $scope.messageData.forEach(function(data){
+                    data.isSelected = false;
+                });
+                $scope.selectedMsg = [];
+            }
+
+            /**
+             * Action for trashing messages from the system
+             */
+            $scope.trashMessage = function()
+            {
+                var selectedMsgId = convertSelectedMessageToCsv($scope.selectedMsg);
+                messageActivityApi(selectedMsgId,3).then(function(){
+                        removeTrashMessageFromDOM();
+                        Notification.success({ message: "Messages deleted", delay: MsgDelay });
+                        $scope.selectedMsgIdArray = [];
+                    },
+                    function(){
+                        Notification.error({ message: "Something went wrong! Try again later", delay: MsgDelay });
+                    });
+            }
+
+            /**
+             * Remove all the selected trashed message from dom and empty the selected message aeeay
+             */
+            function removeTrashMessageFromDOM()
+            {
+                $scope.selectedMsg.forEach(function(data){
+                    var index = $scope.messageData.indexOfWhere('tid',data.tid);
+                    $scope.messageData.splice(index,1);
+                });
+                $scope.selectedMsg = [];
+            }
+
+            /**
+             * Convert selected messages id array to csv format
+             * @returns {string}
+             */
+            function convertSelectedMessageToCsv(array)
+            {
+                var arr = [];
+                /* traverse */
+                array.forEach(function(data){
+                    console.log(data);
+                    if(data)
+                    {
+                        arr.push(data.tid);
+                    }
+                });
+                return arr.join(',');
+            }
+
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////API CALLS///////////////////////////////////////////////////////////////
@@ -695,6 +783,43 @@ angular.module('ezeidApp').
                         return defer.promise;
                     }
 
+                    defer.resolve(resp.data);
+                }).error(function(err){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({ message: "Something went wrong! Check your connection", delay: MsgDelay });
+                    defer.reject();
+                });
+                return defer.promise;
+            }
+
+            /**
+             * Api to handle all the request to [mark as read,mark as unread,trash]
+             * @param messageId: message ID of the messages for which this request is called
+             * @param status:: 1: read, 2: unread., 3:Trash
+             * @param trash: 1:YES, 0: NO
+             * @param isOpened: 1:YES, 0: NO
+             */
+            function messageActivityApi(messageId,status,isOpened)
+            {
+                $scope.$emit('$preLoaderStart');
+                var defer = $q.defer();
+                var openStatus = isOpened?1:0;
+                $http({
+                    url : GURL + 'message_activity',
+                    method : "put",
+                    data :{
+                        token : $rootScope._userInfo.Token,
+                        message_id:messageId,
+                        status:status,
+                        ismessage_open:openStatus
+                    }
+                }).success(function(resp){
+                    $scope.$emit('$preLoaderStop');
+                    if(!resp.status)
+                    {
+                        defer.resolve(resp.status);
+                        return defer.promise;
+                    }
                     defer.resolve(resp.data);
                 }).error(function(err){
                     $scope.$emit('$preLoaderStop');

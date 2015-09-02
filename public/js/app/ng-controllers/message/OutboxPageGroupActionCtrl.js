@@ -204,12 +204,11 @@ angular.module('ezeidApp').
              */
             function arrowKeyControl(key)
             {
-                console.log(key);
+
             }
 
             $scope.groupSubscriptionKeyPressEvent = function(keyId)
             {
-                console.log("Hello  "+keyId);
                 if(parseInt(keyId) == 13)
                     $scope.groupSearchAction();
                 else if(parseInt(keyId) == 38 || parseInt(keyId) == 40)
@@ -498,7 +497,6 @@ angular.module('ezeidApp').
                 /**
                  * Validate the group name and take appropriate ACTION
                  */
-                console.log("Ezeone validating");
                 validateGroupNameApi(ezeone,1,groupId).then(function(data){
                     if(!data)
                         return;
@@ -580,8 +578,6 @@ angular.module('ezeidApp').
                     Notification.error({message: "Please select the group member once again", delay: MsgDelay});
                     return;
                 }
-                console.log($scope.activeEzeOneId);
-                console.log($scope.groupMember);
                 /* check for repetition */
                 var index = parseInt($scope.groupMember.indexOfWhere('id', $scope.activeEzeOneId));
                 if (index >= 0) {
@@ -637,7 +633,6 @@ angular.module('ezeidApp').
              * Remove individual member from group[called from DOM]
              */
             $scope.removeGroupMember = function (id) {
-                console.log($scope.groupMember);
                 var index = $scope.groupMember.indexOfWhere('id', id);
                 if (index >= 0) {
                     var data = $scope.groupMember[index];
@@ -776,7 +771,7 @@ angular.module('ezeidApp').
                 {
                     $scope.groupSuggestionOpen = false;
                     changeCheckBtn(1);
-                    console.log("No result found");
+
                     $scope.noSuggestionError = true;
                     enteredGroupNameInValidAction();
                 }
@@ -808,6 +803,7 @@ angular.module('ezeidApp').
                 /* populate the input box with the selected input */
                 $scope.groupName = $scope.suggestedGroup[index].GroupName;
                 $scope.activeGroupId = $scope.suggestedGroup[index].tid;
+                $scope.activeGroupAutoJoinStatus = $scope.suggestedGroup[index].autojoin;
                 $('#group-name').val($scope.groupName);
                 /* close the suggestion */
                 $scope.groupSuggestionOpen = false;
@@ -844,11 +840,28 @@ angular.module('ezeidApp').
                 /* API call for requesting to join group */
                 addMemberAndGroupMembershipRequestApiCall(2).then(function () {
                         $scope.modalAddGroupVisible = false;
-                        Notification.success({message: "You've successfully joined this group", delay: MsgDelay});
+
+                        //If it is a public group add in the group list LIVE DATA
+                        var msg = " requested to join ";
+                        if($scope.activeGroupAutoJoinStatus)
+                        {
+                            addLiveGroupOnRequestToPublicGroup();
+                            msg = " joined ";
+                        }
+
+                        Notification.success({message: "You've successfully "+msg+" this group", delay: MsgDelay});
                     },
                     function () {
                         Notification.error({message: "Failed to join this group, Try again later", delay: MsgDelay});
                     });
+            }
+
+            function addLiveGroupOnRequestToPublicGroup()
+            {
+                var data = [];
+                data.groupId = $scope.activeGroupId;
+                data.groupName = $scope.groupName;
+                appendGroupList(data,data.groupName,data.groupId,0);
             }
 
             /**
@@ -860,7 +873,7 @@ angular.module('ezeidApp').
 
                 /* if MEMBER: give information */
                 if ($scope.isMember && !$scope.isAdmin) {
-                    console.log("Is member");
+
                     $scope.leaveGroupBtnVisible = true;
                     return;
                 }
@@ -891,12 +904,12 @@ angular.module('ezeidApp').
                 }
                 /* if the request is pending */
                 if ($scope.isJoinRequestPending) {
-                    console.log("pending");
+
                     $scope.groupJoinResponseBtn = true;
                     $scope.pendingRequestMsg = true;
                     return;
                 }
-                console.log("normal");
+
                 //JOIN GROUP MODULES
                 /* enable relationship dropdown */
                 $scope.groupRelationShipFormVisibility = true;
@@ -1280,7 +1293,7 @@ angular.module('ezeidApp').
              * Append in the meain group list
              * @param data
              */
-            function appendGroupList(data,groupName,groupId)
+            function appendGroupList(data,groupName,groupId,isAdmin)
             {
                 if(!data)
                     return;
@@ -1294,6 +1307,9 @@ angular.module('ezeidApp').
                     grpId = groupId;
                 }
 
+                var admin = 1;
+                if(isAdmin != undefined)
+                    admin = isAdmin;
 
                 var temp = {
                     AdminID: $rootScope._userInfo.ezeone_id,
@@ -1302,7 +1318,7 @@ angular.module('ezeidApp').
                     GroupType: 0,
                     MemberID: $rootScope._userInfo.ezeone_id,
                     Status: 1,
-                    isAdmin: 1,
+                    isAdmin: admin,
                     requester: 1
                 };
                 /* push in to the group list */

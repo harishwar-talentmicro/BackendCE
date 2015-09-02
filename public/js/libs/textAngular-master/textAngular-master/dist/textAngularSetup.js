@@ -46,7 +46,8 @@ angular.module('textAngularSetup', [])
 		//['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'pre', 'quote'],
 		['bold', 'italics', 'underline', 'strikeThrough', 'ul', 'ol', 'redo', 'undo', 'clear'],
 		['justifyLeft','justifyCenter','justifyRight','justifyFull','indent','outdent'],
-		['html', 'insertImage', 'insertLink', 'insertVideo', 'wordcount', 'charcount']
+		//['html', 'insertImage', 'insertLink', 'insertVideo', 'wordcount', 'charcount']
+		['html', 'insertImage', 'insertLink', 'charcount']
 	],
 	classes: {
 		focussed: "focussed",
@@ -758,7 +759,7 @@ angular.module('textAngularSetup', [])
 		}
 	});
 	taRegisterTool('charcount', {
-		display: '<div id="toolbarCC" style="display:block; min-width:120px;">Characters: <span ng-bind="charcount"></span></div>',
+		display: '<div id="toolbarCC" style="display:block; min-width:120px;">Chars: <span ng-bind="charcount"></span></div>',
 		disabled: true,
 		charcount: 0,
 		activeState: function(){ // this fires on keyup

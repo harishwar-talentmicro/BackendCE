@@ -39,7 +39,7 @@ angular.module('ezeidApp').
             $routeParams,
             UtilityService
         ) {
-            console.log($rootScope._userInfo);
+
             $scope.result = '';
             /* defaultly getting all the transactions for SALES module */
             $scope.presentSelectedModule = 0;
@@ -125,12 +125,12 @@ angular.module('ezeidApp').
                 else if ($routeParams.action == 'inbox')
                 {
                     $scope.activeTemplate = $scope.inboxListing;
-                    $scope.titleText = "Inbox";
+                    $scope.titleText = "";
                 }
                 else if ($routeParams.action == 'outbox')
                 {
                     $scope.activeTemplate = $scope.outboxListing;
-                    $scope.titleText = "Outbox";
+                    $scope.titleText = "";
                 }
                 else if ($routeParams.action == 'trash')
                 {
@@ -145,14 +145,14 @@ angular.module('ezeidApp').
                 else
                 {
                     $scope.activeTemplate = $scope.inboxListing;
-                    $scope.titleText = "Inbox";
+                    $scope.titleText = "";
                 }
             }
             else
             {
                 // Default Inbox is selected
                 $scope.activeTemplate = $scope.inboxListing;
-                $scope.titleText = "Inbox";
+                $scope.titleText = "";
             }
 
             /* initialization fot getting all the transaction history */
@@ -336,7 +336,7 @@ angular.module('ezeidApp').
              */
             function setBasicTransactionInfo(tid)
             {
-                console.log($scope.result);
+
                 /* getting the index of the clicked transaction, with the given tid */
                 var selectedIndex = $scope.result.indexOfWhere('tid',tid);
                 /* set basic info based on the index */
@@ -492,6 +492,7 @@ angular.module('ezeidApp').
 
                         $scope.pendingRequestData.push(val);
                     });
+                    console.log($scope.pendingRequestData);
                     $scope.pendingRequestCount = count;
                 });
             }
@@ -519,7 +520,7 @@ angular.module('ezeidApp').
             {
                 /* perform appropriate action after user gives response */
                 managePendingRequestNotification(groupId,status,index);
-
+                console.log(groupId, masterId, status,index, requester);
                 updateMemberStatusApi(groupId, masterId, status, requester).then(function(){
 
                         $scope.pendingRequestData.splice(index,1);

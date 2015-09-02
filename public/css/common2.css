@@ -3382,12 +3382,18 @@ sup.tm{
     background-color: rgba(255, 78, 28, 0.75) !important;
 }
 
+.hpw .group-name-suggestion .selected
+{
+    background-color: #203E6B;
+    color: #fff;
+}
+
 .hpw .group-name-suggestion
 {
-    text-align: right;
+    text-align: left;
     position: absolute;
-    background-color: #fff;
-    width: 84%;
+    background-color: #F3F4F9;
+    width: 30%;
     box-shadow: 2px 2px 2px #B1ACAC;
     border: 1px solid #E7D9D9;
     padding: 2px;
@@ -3395,10 +3401,21 @@ sup.tm{
     margin-left: 5%;
 }
 
+.hpw .p-3
+{
+    padding: 3px;
+}
+
 .hpw .group-suggestion
 {
-    padding-right: 2%;
+    padding-left: 2%;
 
+}
+
+.hpw .btn-section
+{
+    border-top: 1px solid #CCCCCC;
+    padding: 3px 3px 0px 0px;
 }
 
 .hpw .group-suggestion:hover
@@ -3466,6 +3483,13 @@ sup.tm{
     color: black;
     text-shadow: 1px 1px 1px #D6D5D5;
     background-color: #fff;
+}
+
+.hpw .messsage-chat .selected
+{
+    /*background-color: rgb(94, 116, 245);*/
+    background-color: rgb(158, 169, 255);
+    color: #fff !important;
 }
 
 .hpw .bg-white
@@ -3613,16 +3637,87 @@ sup.tm{
     padding: 10px;
     border-radius: 10px;
 }
-/*::-webkit-scrollbar {*/
-/*width: 12px;*/
-/*}*/
 
-/*::-webkit-scrollbar-track {*/
-/*-webkit-box-shadow: inset 0 0 6px rgba(43, 18, 8, 0.3);*/
-/*border-radius: 10px;*/
-/*}*/
+.hpw .min-height-150
+{
+    min-height: 150px;
+}
 
-/*::-webkit-scrollbar-thumb {*/
-/*border-radius: 10px;*/
-/*-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);*/
-/*}*/
+.ta-scroll-window > .ta-bind
+{
+    height: auto;
+    min-height: 100px !important;
+    padding: 6px 12px;
+}
+
+.hpw .send-button
+{
+    padding-top: 1.8%;
+}
+
+.hpw .message-landing
+{
+    text-align: center;
+    padding-top: 10%;
+}
+
+.hpw .message-landing-subhead
+{
+    color: gray;
+    letter-spacing: 8px;
+}
+.hpw .message-landing-head
+{
+    font-size: 3.5em;
+    color: gray;
+}
+
+.hpw .logo-style
+{
+    margin-top:3px;font-family: 'Arial',sans-serif;cursor:pointer
+}
+
+.hpw .flying-trash
+{
+    position: fixed;
+    top: 58%;
+    left: 94%;
+    box-shadow: 3px 4px 14px #EF6767;
+}
+
+.hpw .flying-select-all
+{
+    position: fixed;
+    top: 64%;
+    left: 94%;
+    box-shadow: 3px 4px 14px #5566ef;
+}
+
+.hpw .flying-reset
+{
+    position: fixed;
+    top: 70%;
+    left: 94%;
+    box-shadow: 3px 4px 14px #5566ef;
+}
+
+.hpw .checkbox1
+{
+    cursor: pointer;
+    font-size: 1.3em;
+    color: #524CEA;
+}
+
+.hpw .invitaion-heading
+{
+    padding: 3px;
+    background-color: #2C4754;
+    color: #fff;
+    font-size: 1.4em;
+    text-shadow: 1px 1px 1px #fff;
+}
+
+.hpw .font-0-8
+{
+    font-size: 0.8em;
+}

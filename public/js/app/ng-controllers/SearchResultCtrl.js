@@ -47,6 +47,7 @@ var res = angular.module('ezeidApp').
         )
         {
             $scope.resultPerPage = 20;
+            $scope.isLoggedIn = $rootScope._userInfo.IsAuthenticate;
 
             var selectAll = false;
             var isResultNumber = 1; /* 1: Results,0:no results */
@@ -201,6 +202,24 @@ var res = angular.module('ezeidApp').
             var final = finalVal;
 
 
+
+            /**
+             * Filter the individual's data when the user is not logged IN
+             */
+            function filterIndividualData(data)
+            {
+                if(!data || !data.length > 0)
+                    return [];
+
+                var arr = [];
+                data.forEach(function(val){
+                    //If the user is not logged in then don't show individual's data
+                    if(val && ($scope.isLoggedIn || parseInt(val.IDTypeID) > 1))
+                        arr.push(val);
+                });
+                return arr;
+            }
+
             //Below function is for getting key word search result
             function getSearchKeyWord(_filterValue,isTotalNumberRequired)
             {
@@ -299,7 +318,7 @@ var res = angular.module('ezeidApp').
                         }
                     }
 
-                    var result = data['Result'];
+                    var result = filterIndividualData(data['Result']);
 
                     $rootScope.$broadcast('$preLoaderStop');
                     /* put the maps coordinates in array */
@@ -394,7 +413,6 @@ var res = angular.module('ezeidApp').
                 });
                 return defer.promise;
             }
-
 
             /**
              * Master search function

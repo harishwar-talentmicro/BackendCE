@@ -294,6 +294,15 @@ angular.module('ezeidApp').
                 $scope.visibilityMsgBodyErrorMsg = false;
             }
 
+            function isSuggestionDataReceiverArray(groupName)
+            {
+                /* check for duplicate receiver */
+                if($scope.receiverArr.indexOfWhere("GroupName",groupName) >=0)
+                    return true;
+                else
+                    return false;
+            }
+
             /**
              * Gives a suggestion list to the enterd group
              * and it is connected to the logged in user
@@ -309,20 +318,23 @@ angular.module('ezeidApp').
                 {
                     return;
                 }
-
-                if(parseInt(type) == 1)
-                {
-                    data = $scope.groupListData;
-                }
-                else
-                {
-                    data = $scope.individualMember;
-                }
+                /* combine the group of group and individual member */
+                $scope.groupListData.forEach(function(val){
+                    data.push(val);
+                });
+                $scope.individualMember.forEach(function(val){
+                    data.push(val);
+                });
 
                 var count = 0;
                 data.forEach(function(data){
-                    if(data.GroupName.toLowerCase().indexOf(keyword) >= 0)
+                    if(data.GroupName.toLowerCase().indexOf(keyword.toLowerCase()) >= 0)
                     {
+                        //check if data exists in receiver's list
+                        if(isSuggestionDataReceiverArray(data.GroupName))
+                            data.selected = true;
+                        else
+                            data.selected = false;
                         $scope.groupSuggestionList.push(data);
                     }
                 });
@@ -370,7 +382,12 @@ angular.module('ezeidApp').
             $scope.selectGroupSuggestion = function(index)
             {
                 $scope.composeMsg.MessageTo = "";
-                $scope.visibilityHtml.groupSuggestion = false;
+
+                //Check and uncheck functionality for the suggestion list
+                $scope.groupSuggestionList[index].selected = !$scope.groupSuggestionList[index].selected;
+                console.log($scope.groupSuggestionList[index].selected);
+                return;
+
 
                 var selectedGroupName = $scope.groupSuggestionList[index].GroupName;
                 /* check for duplicate receiver */
@@ -387,6 +404,34 @@ angular.module('ezeidApp').
                 };
                 /* append the receiver's list */
                 $scope.receiverArr.push(temp);
+            }
+
+            $scope.pushSelectedSuggestion = function()
+            {
+                $scope.visibilityHtml.groupSuggestion = false;
+                $scope.composeMsg.MessageTo = "";
+                if(!$scope.groupSuggestionList)
+                    return;
+
+                var index = 0;
+                $scope.groupSuggestionList.forEach(function(data){
+                    if(data.selected)//if the added suggestion is unique
+                    {
+                        var selectedGroupName = $scope.groupSuggestionList[index].GroupName;
+                        if($scope.receiverArr.indexOfWhere("GroupName",selectedGroupName) == -1)
+                        {
+                            var selectedGroupName = $scope.groupSuggestionList[index].GroupName;
+                            var temp = {
+                                GroupID:$scope.groupSuggestionList[index].GroupID,
+                                GroupType:$scope.groupSuggestionList[index].GroupType,
+                                GroupName:$scope.groupSuggestionList[index].GroupName
+                            };
+                            /* append the receiver's list */
+                            $scope.receiverArr.push(temp);
+                        }
+                    }
+                    index++;
+                });
             }
 
             /**
