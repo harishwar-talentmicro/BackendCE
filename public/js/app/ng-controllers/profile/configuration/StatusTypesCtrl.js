@@ -23,6 +23,47 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
     };
 
 
+    $scope.deleteStatusTypes = function(functionType,index){
+
+        var ftMap = ['sales','reservation','homeDelivery','service','resume'];
+
+        var data = {
+            Token : $rootScope._userInfo.Token,
+            TID : $scope.txStatuses[ftMap[functionType]][index].TID,
+            StatusTitle : $scope.txStatuses[ftMap[functionType]][index].title,
+            Status : 2,
+            FunctionType : functionType,
+            MasterID : $scope.masterUser.MasterID,
+            ProgressPercent : $scope.txStatuses[ftMap[functionType]][index].progress,
+            NotificationMsg : $scope.txStatuses[ftMap[functionType]][index].notificationMsg,
+            NotificationMailMsg : $scope.txStatuses[ftMap[functionType]][index].notificationMailMsg,
+            StatusValue : $scope.txStatuses[ftMap[functionType]][index].statusValue
+        };
+
+        $http({
+            url : GURL + 'ewmSaveStatusType',
+            data : data,
+            method : 'POST'
+        }).success(function(resp){
+            if(resp && resp !== 'null' && resp.hasOwnProperty('IsSuccessfull')){
+                if(resp.IsSuccessfull){
+                    $scope.txStatuses[ftMap[functionType]].splice(index,1);
+                    Notification.success({ message : 'Stage deleted successfully', delay : MsgDelay});
+                }
+                else{
+                    Notification.error({ message : 'An error occurred while deleting stage', delay : MsgDelay});
+                }
+            }
+            else{
+                Notification.error({ message : 'An error occurred while deleting stage', delay : MsgDelay});
+            }
+        }).error(function(err){
+            Notification.error({ message : 'An error occurred while deleting stage', delay : MsgDelay});
+        });
+    };
+
+
+
     /***
      * All types of items will reside in this model
      * @type {{sales: Array, reservation: Array, homeDelivery: Array, service: Array, resume: Array}}

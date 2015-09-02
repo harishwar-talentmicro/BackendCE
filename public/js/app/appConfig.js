@@ -2,7 +2,8 @@
     var settings = {
         dev : {
             RECAPTCHA_SITE_KEY : '',
-            SERVICE_URL : 'http://104.199.128.226:3001/api/'
+            //SERVICE_URL : 'http://104.199.128.226:3001/api/'
+            SERVICE_URL : 'http://localhost:3001/api/'
         },
         pro : {
             RECAPTCHA_SITE_KEY : '',

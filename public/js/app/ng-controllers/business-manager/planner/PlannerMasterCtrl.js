@@ -121,8 +121,8 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
                 //console.log(view);
                 //$log.debug("View Changed: ", view.visStart, view.visEnd, view.start, view.end);
 
-                sTime = view.start.format('YYYY-MM-DD HH:mm:ss');
-                eTime = view.end.format('YYYY-MM-DD HH:mm:ss');
+                sTime = view.start.subtract(2,'days').startOf('day').format('YYYY-MM-DD HH:mm:ss');
+                eTime = view.end.add(2,'days').endOf('day').format('YYYY-MM-DD HH:mm:ss');
                 $scope.loadNextActionList();
             },
             timeFormat : 'hh:mm A'
@@ -190,7 +190,7 @@ angular.module('ezeidApp').controller('PlannerMasterCtrl',[
                                 };
                                 $scope.eventsList.push(nextAction);
                             }
-                            //$scope.renderCalender();
+                            $scope.renderCalender();
                         }
                     }
                 }

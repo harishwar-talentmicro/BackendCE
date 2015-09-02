@@ -400,8 +400,6 @@ angular.module('ezeidApp').
             $scope.validateSignUpData = function(){
                 var validationStatus = true;
 
-
-
                 if($scope.password.length < 4){
                     $scope.error.password = '*Password should be minimum 4 characters';
                     validationStatus *= false;
@@ -412,18 +410,21 @@ angular.module('ezeidApp').
                     validationStatus *= false;
                 }
 
-
-                if(!$scope.companyName){
-                    $scope.error.companyName = '*Company Name cannot be empty';
-                    validationStatus *= false;
-                }
-
-                if(typeof($scope.companyName) !== "undefined"){
-                    if($scope.companyName.length < 1){
-                        $scope.error.companyName = "*Company Name cannot be empty";
+                if($scope.userType == 2){
+                    if(!$scope.companyName){
+                        $scope.error.companyName = '*Company Name cannot be empty';
                         validationStatus *= false;
                     }
+
+                    if(typeof($scope.companyName) !== "undefined"){
+                        if($scope.companyName.length < 1){
+                            $scope.error.companyName = "*Company Name cannot be empty";
+                            validationStatus *= false;
+                        }
+                    }
                 }
+
+
 
                 if($scope.userType != 3)
                 {
@@ -434,17 +435,20 @@ angular.module('ezeidApp').
                         validationStatus *= false;
                     }
 
-                    //if(!$scope.firstName){
-                    //    $scope.error.firstName = '*First Name cannot be empty';
-                    //    validationStatus *= false;
-                    //}
-                    //
-                    //if(typeof($scope.firstName) !== "undefined"){
-                    //    if($scope.firstName.length < 1){
-                    //        $scope.error.firstName = "*First Name cannot be empty";
-                    //        validationStatus *= false;
-                    //    }
-                    //}
+                    if($scope.userType == 1){
+                        if(!$scope.firstName){
+                            $scope.error.firstName = '*First Name cannot be empty';
+                            validationStatus *= false;
+                        }
+
+                        if(typeof($scope.firstName) !== "undefined"){
+                            if($scope.firstName.length < 1){
+                                $scope.error.firstName = "*First Name cannot be empty";
+                                validationStatus *= false;
+                            }
+                        }
+
+                    }
 
                     //if(!$scope.lastName){
                     //    $scope.error.lastName = 'Last Name cannot be empty';
@@ -472,10 +476,10 @@ angular.module('ezeidApp').
                     //    }
                     //}
 
-                    //if($scope.userType === 1 && typeof($scope.dateOfBirth) === "undefined"){
-                    //    $scope.error.dateOfBirth = '*Please enter your date of Birth'
-                    //    validationStatus *= false;
-                    //}
+                    if($scope.userType == 1 && typeof($scope.dateOfBirth) === "undefined"){
+                        $scope.error.dateOfBirth = '*Please enter your date of Birth'
+                        validationStatus *= false;
+                    }
 
                     //    if(($scope.userType === 2) && ((!$scope.mobile) && (!$scope.email))){
                     //        ////////////console.log('Email or Mobile cannot be empty');
@@ -603,7 +607,7 @@ angular.module('ezeidApp').
                                         sResp.userName = $scope.ezeid;
                                     }
                                     console.log(sResp);
-                                    var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEID");
+                                    var encrypted = CryptoJS.AES.encrypt(JSON.stringify(sResp), "EZEOneID");
 
                                     localStorage.setItem("_token", encrypted);
                                     document.cookie="login=1; expires=Thu, 18 Dec 2016 12:00:00 UTC; path=/";
@@ -667,7 +671,7 @@ angular.module('ezeidApp').
             $rootScope.$watch('_userInfo',function(newVal){
                 if(newVal){
                     if(newVal.IsAuthenticate){
-                        $location.path('/profile-manager/user');
+                        $location.path('/profile-manager/new');
                     }
                 }
             });
