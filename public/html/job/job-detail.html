@@ -119,9 +119,12 @@
                 <div class="job-main-content text-dark-gray detailed-desc-job">
                     <div class="job-desc">
                         <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
-                            <span ng-repeat="skill in skillArr track by $index">
+                            <!--<span ng-repeat="skill in skillArr track by $index">
                             <button class="btn btn-default btn-xs">{{skill}}</button>
-                                </span>
+                                </span>-->
+                            <span>
+                                <button class="btn btn-default btn-xs">{{jobData.keyskills}}</button>
+                            </span>
                         </p>
                     </div>
                 </div>

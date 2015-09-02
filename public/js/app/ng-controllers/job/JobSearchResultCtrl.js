@@ -565,11 +565,11 @@ angular.module('ezeidApp').
             /**
              * Set keySkills
              */
-            $scope.activeSkillsArray = [];
+            /*$scope.activeSkillsArray = [];
             $scope.getKeySkillsArray = function(skillString)
             {
                 $scope.activeSkillsArray = skillString.split(",");
-            };
+            };*/
 
             /**
              * Get the salary range

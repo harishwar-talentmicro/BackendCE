@@ -339,13 +339,22 @@
                     <div class="job-main-content tile-content">
                         <span class="experience-title"><i class="fa fa-briefcase"></i> Exp: {{getExperienceString(job.expfrom,job.expto)}}</span>
                         <span class="experience-title p-left-16"><i class="fa fa-map-marker"></i> Location: {{job.location}}</span>
-                        <div class="key-skills p-top-10" ng-init="skills = getKeySkillsArray(job.keyskills)">
+                        <!--<div class="key-skills p-top-10" ng-init="skills = getKeySkillsArray(job.keyskills)">
                             <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
                                 <span ng-repeat="skill in activeSkillsArray track by $index">
                                 <button class="btn btn-default btn-xs">{{skill}}</button>
                                     </span>
                             </p>
+                        </div>-->
+
+                        <div class="key-skills p-top-10">
+                            <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
+                                <span>
+                                    <button class="btn btn-default btn-xs">{{job.keyskills}}</button>
+                                </span>
+                            </p>
                         </div>
+
                         <div class="row">
                             <div class="salary col-lg-7">
                                 Salary: {{getSalaryRange(job.salaryfrom,job.salaryto)}}

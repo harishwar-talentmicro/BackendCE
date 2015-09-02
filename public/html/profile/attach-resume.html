@@ -54,7 +54,8 @@
                                                 translation="functionTags"
                                                 custom-button-class="btn-block"
                                                 max-labels="0"
-                                                max-height="250px">
+                                                max-height="250px"
+                                                helper-elements="all none filter">
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 cvBottomSpace label">
@@ -85,7 +86,7 @@
                                    </div>
                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                                        <div class="input-group">
-                                           <input type="text" id="google-map-search-box" placeholder="Type City" ng-model = "locationName" class="form-control"/>
+                                           <input type="text" id="google-map-search-box" placeholder="Type City" ng-model = "locationName" class="form-control emptyBox"/>
                                             <span class="input-group-addon noPaddingNoBorder">
                                                 <button type="button" class="btn btn-primary" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
                                             </span>

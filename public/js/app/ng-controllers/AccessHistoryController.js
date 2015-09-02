@@ -6,10 +6,8 @@ angular.module('ezeidApp').controller('HistoryController',[
     '$scope', '$rootScope', '$http', 'Notification', '$filter', '$interval','GURL','MsgDelay','$location',
     function ($scope, $rootScope, $http, Notification, $filter, $interval,GURL,MsgDelay,$location) {
     var msgSen = this;
-    var _pageValue = 1;
     var MsgDelay = 2000;
     msgSen.msgs = [];
-    var showPaging = "N";
 
     //Pagination settings
     $scope.pageSize = 10;//Results per page
@@ -55,7 +53,8 @@ angular.module('ezeidApp').controller('HistoryController',[
 
     $scope.$watch('_userInfo.IsAuthenticate', function () {
         if ($rootScope._userInfo.IsAuthenticate == true) {
-            LoadHistory(_pageValue);
+          //  LoadHistory(_pageValue);
+            LoadHistory();
         }
         else {
             window.location.href = "/";
@@ -84,32 +83,32 @@ angular.module('ezeidApp').controller('HistoryController',[
         return moment(localTime).utc().format(dateFormat);
     };
 
-    function LoadHistory(_pageValue){
-
+   /* function LoadHistory(_pageValue){*/
+    function LoadHistory(){
+        msgSen.msgs = [];
         $http({
             method: 'get',
-            url: GURL + 'ewtGetAccessHistory?TokenNo=' + $rootScope._userInfo.Token + '&Page='+_pageValue
-        }).success(function (data)
+
+            url : GURL + 'ewtGetAccessHistory',
+            method : 'GET',
+            params : {
+                TokenNo : $rootScope._userInfo.Token,
+                page_size : $scope.pageSize,
+                page_count : $scope.pageCount
+            }
+       }).success(function (data)
         {
-            if ((data != 'null') && (data))
+
+            if (data.status)
             {
                 $scope.totalResult = data.count;
-                $scope.resultThisPage = data.length;
+                $scope.resultThisPage = data.data.length;
                 $scope.paginationVisibility();
 
-                for (var i = 0; i < data.length; i++)
+                for (var i = 0; i < data.data.length; i++)
                 {
-                    data[i].AccessDate = convertTimeToLocal(data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
-                    msgSen.msgs.push(data[i]);
-                    showPaging = data[0]['NextPage'];
-                }
-                if(showPaging == 'Y')
-                {
-                    msgSen.showMoreButton = true;
-                }
-                else
-                {
-                    msgSen.showMoreButton = false;
+                    data.data[i].AccessDate = convertTimeToLocal(data.data[i].AccessDate,'DD-MMM-YYYY hh:mm A');
+                    msgSen.msgs.push(data.data[i]);
                 }
             }
             else
@@ -120,11 +119,6 @@ angular.module('ezeidApp').controller('HistoryController',[
         });
     }
 
-    //More button click
-    this.getMoreHistory = function (){
-        _pageValue = _pageValue + 1;
-        LoadHistory(_pageValue);
-    };
 
     /* redirect to full details page */
     $scope.redirectFullPage = function(ezeoneId)
@@ -156,8 +150,6 @@ angular.module('ezeidApp').controller('HistoryController',[
         $scope.paginationNextClick = function()
         {
             $scope.pageCount += $scope.pageSize;
-            /* trigger next results */
-            // $scope.triggerSearch(1);
             LoadHistory();
             $scope.paginationVisibility();
         };
@@ -168,8 +160,6 @@ angular.module('ezeidApp').controller('HistoryController',[
         $scope.paginationPreviousClick = function()
         {
             $scope.pageCount -= $scope.pageSize;
-            /* trigger previous results */
-            // $scope.triggerSearch(1);
             LoadHistory();
             $scope.paginationVisibility();
         };
