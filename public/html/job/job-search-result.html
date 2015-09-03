@@ -49,8 +49,14 @@
                                 </button>
                             </div>
 
-                            <input id="searchTextField" type="text" placeholder="Type your Skills to locate nearest Jobs" ng-model="params.searchTerm" ng-keypress="triggerSearchOnEnterKey($event.keyCode)"
-                                   class="form-control width-search-bar dropdown-toggle" aria-label="..." data-toggle="dropdown" />
+                            <input id="searchTextField"
+                                   type="text"
+                                   placeholder="Type your Skills to locate nearest Jobs"
+                                   ng-model="params.searchTerm"
+                                   ng-keypress="triggerSearchOnEnterKey($event.keyCode)"
+                                   class="form-control width-search-bar dropdown-toggle"
+                                   aria-label="..."
+                                   data-toggle="dropdown" />
 
                             <div class="input-group-btn">
                                 <!-- Advance Search BTN -->
@@ -137,9 +143,11 @@
                                 <span disabled class="input-group-addon no-padding-and-border">
                                     <button class="btn btn-primary btn-sm form-control">Experience</button>
                                 </span>
-                                <input type="text" numbers-only maxlength="2" class="form-control text-right" ng-model="params.experience" placeholder="Your experience in years" />
+
+                                <input type="text" decimals-only maxlength="4" placeholder="Your experience in years" ng-model="params.experience" class="form-control text-right"/>
+                                <!--<input type="text" numbers-only maxlength="2" class="form-control text-right" ng-model="params.experience" placeholder="Your experience in years" />-->
                                 <span class="input-group-addon no-padding-and-border">
-                                    <button disabled class="btn btn-default btn-sm form-control">Yrs</button>
+                                    <button disabled class="btn btn-default btn-sm form-control">Years</button>
                                 </span>
                             </div>
                         </div>
