@@ -441,6 +441,7 @@
                                     <div class="setTableFixHeight">
                                         <table style="width: 100%;">
 
+                                            {{skillMatrix}}
                                             <tr ng-repeat="skill in skillMatrix">
                                                 <td class="panelPd5px newSkillFieldJobText" ng-hide="(!editMode[$index]) && ($index == 0)">
                                                     <span ng-hide="editMode[$index]">{{skillMatrix[$index].skillname}}</span>
