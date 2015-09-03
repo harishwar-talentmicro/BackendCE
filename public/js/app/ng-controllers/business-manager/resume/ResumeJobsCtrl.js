@@ -60,6 +60,8 @@
             $scope.locIndexToEdit = "";
             $scope.disabledAddLocation = true;
             $scope.disabledAddLocationOnMapPopup = true;
+            $scope.score_from = "";
+            $scope.score_to = "";
 
             //Pagination settings
             $scope.pageSize = 10;//Results per page
@@ -71,6 +73,7 @@
             $scope.skillMatrix = [];
             $scope.editMode = [];
             var skillsTid = [];
+            var skillsTexts = [];
             $scope.availableTags = [];
             $scope.editSkill = {
                 "tid":0,
@@ -79,14 +82,13 @@
                 "expertiseText":"",
                 "exp_from":0.00,
                 "exp_to":0.00,
-                "active_status":true
+                "active_status":1
             };
 
             $scope.expertiseLevelsIDs = ["0"];
             $scope.expertiseLevelsTexts = ["Beginner"];
             $scope.editSkill.expertiseLevel = $scope.expertiseLevelsIDs.toString();
             $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();
-
 
 
             /**
@@ -199,24 +201,7 @@
                         for(var i = 0; i < resp.data.result.length; i++)
                         {
                             resp.data.result[i].posteddate = UtilityService.convertTimeToLocal(resp.data.result[i].posteddate);
-                            /*resp.data.result[i].posteddate = convertTimeToLocal(resp.data.result[i].posteddate,'DD-MMM-YYYY hh:mm A','DD-MMM-YYYY hh:mm A');*/
                         }
-
-                        /*for(var jobCount = 0; jobCount < resp.data.result.length; jobCount++)
-                        {
-                            resp.data.result[jobCount].locationArray = [];
-
-                            if(resp.data.job_location.length)
-                            {
-                                for(var i = 0; i < resp.data.job_location.length; i++)
-                                {
-                                    if(resp.data.result[jobCount].tid == resp.data.job_location[i].jobid)
-                                    {
-                                        resp.data.result[jobCount].locationArray.push(resp.data.job_location[i]);
-                                    }
-                                }
-                            }
-                        }*/
 
                         $scope.jobData = resp.data.result;
                         $scope.showJobListing = true;
@@ -240,13 +225,6 @@
                 if($scope.jobDescription.length < 1){
                     err.push('Job Description is empty');
                 }
-
-                /*
-                if($scope.skillKeyWords.length < 1){
-                    err.push('Skill Keywords is empty');
-                }
-                */
-
                 if(($scope.jobVacancies == "") || ($scope.jobVacancies.length == 0) || (parseInt($scope.jobVacancies) == 0))
                 {
                     err.push('Job Vacancies is empty');
@@ -273,9 +251,6 @@
                 if(parseInt($scope.salaryTo) < parseInt($scope.salaryFrom)){
                     err.push('Salary From is smaller than Salary To');
                 }
-                /*  if($scope.jobType == 0){
-                    err.push('Please select Job type');
-                }*/
                 if($scope.contactName.length < 1){
                     err.push('Contact Name is empty');
                 }
@@ -301,6 +276,11 @@
                     err.push('Please select Job Function');
                 }
 
+                if(!$scope.skillMatrix.length > 1)
+                {
+                    err.push('Skill Map is empty');
+                }
+
                 if(err.length > 0)
                 {
                     for(var i = 0; i < err.length; i++)
@@ -315,34 +295,29 @@
             // save job to system
             $scope.postJob = function(){
 
-                for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++)
-                {
-                    $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == true) ? 1 : 0;
-                }
-
-                if($scope.skillMatrix[0])
-                {
-                    if((!$scope.skillMatrix[0].skillname) && (!$scope.skillMatrix[0].exp))
-                    {
-                        var index = 0;
-                        if (index > -1)
-                        {
-                            $scope.skillMatrix.splice(index, 1);
-                            skillsTid.splice(index,1);
-                        }
-                        if($scope.skillMatrix.length == 0)
-                        {
-                            $scope.skillMatrix = [];
-                            skillsTid = [];
-                        }
-                    }
-                }
-
+             //   $scope.skillMatrixToSave = $scope.skillMatrix;
                 if(validateItem())
                 {
                     $scope.$emit('$preLoaderStart');
 
-                    $scope.jobData = {
+
+                    if($scope.skillMatrix[0])
+                    {
+                        if((!$scope.skillMatrix[0].skillname) && (!$scope.skillMatrix[0].exp_from) && (!$scope.skillMatrix[0].exp_to))
+                        {
+                            var index = 0;
+                            $scope.skillMatrix.splice(index, 1);
+                            skillsTid.splice(index,1);
+                        }
+                    }
+                    skillsTexts = [];
+                    for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++)
+                    {
+                        skillsTexts.push($scope.skillMatrix[nCount].skillname);
+                    }
+
+
+                   $scope.jobData = {
                         token : $rootScope._userInfo.Token,
                         tid : $scope.jobTid,
                         ezeone_id : $rootScope._userInfo.ezeid,
@@ -354,7 +329,7 @@
                         salaryFrom : $scope.salaryFrom,
                         salaryTo :  $scope.salaryTo,
                         salaryType : $scope.salaryType,
-                        keySkills : $scope.skillKeyWords,
+                        keySkills : skillsTexts.toString(),
                         openings : $scope.jobVacancies,
                         jobType : $scope.jobType,
                         status : $scope.jobStatus,
@@ -385,8 +360,6 @@
                             $scope.jobFilterStatus = 0;
 
                             getPostedJob();
-
-                          //  $scope.showJobListing = true;
                             Notification.success({message: "Saved..", delay: MsgDelay});
                         }
                     })
@@ -394,9 +367,24 @@
                         $scope.$emit('$preLoaderStop');
                     });
                 }
+                else
+                {
+                    if(!$scope.skillMatrix.length)
+                    {
+                       $scope.skillMatrix.push(
+                            {
+                                "tid":0,
+                                "skillname":"",
+                                "expertiseLevel":0,
+                                "expertiseText":"",
+                                "exp_from":"",
+                                "exp_to":"",
+                                "active_status":1
+                            }
+                        );
+                    }
+                }
             };
-
-           // $scope.SalaryTypeList = [{ id: 1, label: "Per Hour" }, { id: 2, label: "Per Month" }, { id: 3, label: "Per Annum" }];
 
             // Get job Categories
             function getJobCategories()
@@ -409,7 +397,6 @@
                         LangID : 1
                     }
                 }).success(function(resp){
-                   // $scope.$emit('$preLoaderStop');
                     $scope.jobCategories = resp;
                 }).error(function(err){
                     var msg = 'Something went wrong! Please try again';
@@ -424,7 +411,6 @@
                 $scope.$emit('$preLoaderStart');
                 getJobCategories();
                 getEducations();
-               // getSpecialization();
                 getInstituteList();
                 getAllSkills();
 
@@ -473,86 +459,7 @@
                     $scope.score_from = "";
                     $scope.score_to = "";
                 }
-               /* else
-                {
-                    $timeout(function()
-                    {
-                        $scope.jobTid = $scope.jobData[_index].tid;
-                        $scope.jobTitle = $scope.jobData[_index].jobtitle;
-                        $scope.jobCode = $scope.jobData[_index].jobcode;
-                        $scope.jobDescription = $scope.jobData[_index].jobdescription;
-                        $scope.skillKeyWords = $scope.jobData[_index].keyskills;
-                        $scope.jobVacancies = $scope.jobData[_index].openings;
-                        $scope.experienceFrom = $scope.jobData[_index].expfrom;
-                        $scope.experienceTo = $scope.jobData[_index].expto;
 
-                        //    $scope.jobLocation = $scope.jobData[_index].location;
-
-                        $scope.salaryFrom = $scope.jobData[_index].salaryfrom;
-                        $scope.salaryTo = $scope.jobData[_index].salaryto;
-                        $scope.salaryType = $scope.jobData[_index].salarytype;
-                        $scope.jobType = $scope.jobData[_index].jobtype;
-                        $scope.contactName = $scope.jobData[_index].contactname;
-                        $scope.phone = $scope.jobData[_index].mobile;
-                        $scope.emailContact = $scope.jobData[_index].emailid;
-                        $scope.jobStatus = $scope.jobData[_index].status;
-                        $scope.jobCategori = parseInt($scope.jobData[_index].jobcategory);
-
-                        for (var nCount = 0; nCount < $scope.jobData[_index].locationArray.length; nCount++)
-                        {
-                            delete $scope.jobData[_index].locationArray[nCount].jobid;
-                            $scope.mainLocationArray.push($scope.jobData[_index].locationArray[nCount]);
-                            $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].location_title);
-                        }
-
-                        $scope.selectedEducations = [];
-                        if($scope.jobData[_index].Education)
-                        {
-                            $scope.EducationArray = $scope.jobData[_index].Education.split(',');
-                            for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
-                            {
-                                $scope.selectedEducations.push(parseInt($scope.EducationArray[nCount]));
-                            }
-                        }
-                        else
-                        {
-                             $scope.selectedEducations = [];
-                        }
-
-                        $scope.selectedSpecializations = [];
-                        if($scope.jobData[_index].Specialization)
-                        {
-                            $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
-                            for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
-                            {
-                                $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
-                            }
-                        }
-                        else
-                        {
-                           $scope.selectedSpecializations = [];
-                        }
-
-                        $scope.selectedInstitute = [];
-                        if($scope.jobData[_index].Institute)
-                        {
-                            $scope.InstituteArray = $scope.jobData[_index].Institute.split(',');
-                            for (var nCount = 0; nCount < $scope.InstituteArray.length; nCount++)
-                            {
-                                $scope.selectedInstitute.push(parseInt($scope.InstituteArray[nCount]));
-                            }
-                        }
-                        else
-                        {
-                            $scope.selectedInstitute = [];
-                        }
-
-                        $scope.aggregate_score = $scope.jobData[_index].Aggregatescore;
-
-                        $scope.$emit('$preLoaderStop');
-
-                    },3000);
-                }*/
             };
 
             // Edit posted job
@@ -579,93 +486,143 @@
                         }
                     }).success(function(resp){
 
-                            if(resp.status)
+                        if(resp.status)
+                        {
+                            var jobResponseData = resp.data;
+                            var jobDetail = jobResponseData.result[0];
+                            var jobLocationArray = jobResponseData.location;
+                            var skillMapData = resp.data.skill;
+
+                            $scope.jobTid = jobDetail.tid;
+                            $scope.jobTitle = jobDetail.jobtitle;
+                            $scope.jobCode = jobDetail.jobcode;
+                            $scope.jobDescription = jobDetail.jobdescription;
+                            $scope.skillKeyWords = jobDetail.keyskills;
+                            $scope.jobVacancies = jobDetail.openings;
+                            $scope.experienceFrom = jobDetail.expfrom;
+                            $scope.experienceTo = jobDetail.expto;
+                            $scope.salaryFrom = jobDetail.salaryfrom;
+                            $scope.salaryTo = jobDetail.salaryto;
+                            $scope.salaryType = jobDetail.salarytype;
+                            $scope.jobType = jobDetail.jobtype;
+                            $scope.contactName = jobDetail.contactname;
+                            $scope.phone = jobDetail.mobile;
+                            $scope.emailContact = jobDetail.emailid;
+                            $scope.jobStatus = jobDetail.status;
+                            $scope.jobCategori = parseInt(jobDetail.jobcategory);
+                            $scope.score_from = jobDetail.score_from;
+                            $scope.score_to = jobDetail.score_to;
+
+                            for (var nCount = 0; nCount < jobLocationArray.length; nCount++)
                             {
-                                var jobResponseData = resp.data;
-                                var jobDetail = jobResponseData.result[0];
-                                var jobLocationArray = jobResponseData.location;
+                                delete jobLocationArray[nCount].jobid;
+                                $scope.mainLocationArray.push(jobLocationArray[nCount]);
+                                $scope.locationArrayString.push(jobLocationArray[nCount].location_title);
+                            }
 
-                                $scope.jobTid = jobDetail.tid;
-                                $scope.jobTitle = jobDetail.jobtitle;
-                                $scope.jobCode = jobDetail.jobcode;
-                                $scope.jobDescription = jobDetail.jobdescription;
-                                $scope.skillKeyWords = jobDetail.keyskills;
-                                $scope.jobVacancies = jobDetail.openings;
-                                $scope.experienceFrom = jobDetail.expfrom;
-                                $scope.experienceTo = jobDetail.expto;
-                                $scope.salaryFrom = jobDetail.salaryfrom;
-                                $scope.salaryTo = jobDetail.salaryto;
-                                $scope.salaryType = jobDetail.salarytype;
-                                $scope.jobType = jobDetail.jobtype;
-                                $scope.contactName = jobDetail.contactname;
-                                $scope.phone = jobDetail.mobile;
-                                $scope.emailContact = jobDetail.emailid;
-                                $scope.jobStatus = jobDetail.status;
-                                $scope.jobCategori = parseInt(jobDetail.jobcategory);
-                                $scope.score_from = jobDetail.score_from;
-                                $scope.score_to = jobDetail.score_to;
-
-
-                                for (var nCount = 0; nCount < jobLocationArray.length; nCount++)
+                            $scope.selectedEducations = [];
+                            if(jobDetail.Education)
+                            {
+                                $scope.EducationArray = jobDetail.Education.split(',');
+                                for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
                                 {
-                                    delete jobLocationArray[nCount].jobid;
-                                    $scope.mainLocationArray.push(jobLocationArray[nCount]);
-                                    $scope.locationArrayString.push(jobLocationArray[nCount].location_title);
+                                    $scope.selectedEducations.push(parseInt($scope.EducationArray[nCount]));
                                 }
-
-                                $scope.selectedEducations = [];
-                                if(jobDetail.Education)
-                                {
-                                    $scope.EducationArray = jobDetail.Education.split(',');
-                                    for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
-                                    {
-                                        $scope.selectedEducations.push(parseInt($scope.EducationArray[nCount]));
-                                    }
-                                }
-                                else
-                                {
-                                    $scope.selectedEducations = [];
-                                }
-
-                                if($scope.selectedEducations.length)
-                                {
-                                    getSpecialization();
-                                }
-
-                                $scope.selectedSpecializations = [];
-                                if(jobDetail.Specialization)
-                                {
-                                    $scope.SpecializationArray = jobDetail.Specialization.split(',');
-                                    for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
-                                    {
-                                        $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
-                                    }
-                                }
-                                else
-                                {
-                                    $scope.selectedSpecializations = [];
-                                }
-
-                                $scope.selectedInstitute = [];
-                                if(jobDetail.Institute)
-                                {
-                                    $scope.InstituteArray = jobDetail.Institute.split(',');
-                                    for (var nCount = 0; nCount < $scope.InstituteArray.length; nCount++)
-                                    {
-                                        $scope.selectedInstitute.push(parseInt($scope.InstituteArray[nCount]));
-                                    }
-                                }
-                                else
-                                {
-                                    $scope.selectedInstitute = [];
-                                }
-
-                                $scope.$emit('$preLoaderStop');
                             }
                             else
                             {
-                                $scope.$emit('$preLoaderStop');
+                                $scope.selectedEducations = [];
                             }
+
+                            if($scope.selectedEducations.length)
+                            {
+                                getSpecialization();
+                            }
+
+                            $scope.selectedSpecializations = [];
+                            if(jobDetail.Specialization)
+                            {
+                                $scope.SpecializationArray = jobDetail.Specialization.split(',');
+                                for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
+                                {
+                                    $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
+                                }
+                            }
+                            else
+                            {
+                                $scope.selectedSpecializations = [];
+                            }
+
+                            $scope.selectedInstitute = [];
+                            if(jobDetail.Institute)
+                            {
+                                $scope.InstituteArray = jobDetail.Institute.split(',');
+                                for (var nCount = 0; nCount < $scope.InstituteArray.length; nCount++)
+                                {
+                                    $scope.selectedInstitute.push(parseInt($scope.InstituteArray[nCount]));
+                                }
+                            }
+                            else
+                            {
+                                $scope.selectedInstitute = [];
+                            }
+
+                            for(var nCount=0; nCount < skillMapData.length; nCount++)
+                            {
+                                skillMapData[nCount].expertiseText = [];
+
+                                  var EditExpArray = skillMapData[nCount].expertiseLevel.split(',');
+                                    for (var nCountExperties = 0; nCountExperties < EditExpArray.length; nCountExperties++)
+                                    {
+                                        skillMapData[nCount].expertiseText.push($scope.expertiseLevels[EditExpArray[nCountExperties]]);
+                                    }
+
+                                 skillMapData[nCount].expertiseText = skillMapData[nCount].expertiseText.toString();
+                            }
+
+                            $scope.skillMatrix = [];
+                            $scope.skillMatrix.push(
+                                {
+                                    "tid":0,
+                                    "skillname":"",
+                                    "expertiseLevel":0,
+                                    "expertiseText":"",
+                                    "exp_from":0.00,
+                                    "exp_to":0.00,
+                                    "active_status":1
+                                }
+                            );
+
+                            for (var nCount = 0; nCount < skillMapData.length; nCount++)
+                            {
+                                $scope.skillMatrix.push(skillMapData[nCount]);
+                            }
+
+                            for(var ct=0; ct < $scope.skillMatrix.length; ct++)
+                            {
+                                if(ct == 0)
+                                {
+                                    $scope.editMode[ct] = true;
+                                }
+                                else
+                                {
+                                    $scope.editMode[ct] = false;
+                                }
+                            }
+
+                            for (var nCount = 0; nCount < $scope.skillMatrix.length; nCount++)
+                            {
+                              //  $scope.skillMatrix[nCount].active_status = ($scope.skillMatrix[nCount].active_status == 1) ? true : false;
+                                skillsTid.push($scope.skillMatrix[nCount].tid);
+                            }
+
+                            $scope.editSkill = angular.copy($scope.skillMatrix[0]);
+                            $scope.$emit('$preLoaderStop');
+                        }
+                        else
+                        {
+                            $scope.$emit('$preLoaderStop');
+                        }
                 })
                 .error(function(err)
                 {
@@ -675,83 +632,6 @@
                 });
 
                 },3000);
-
-                   /* $timeout(function()
-                    {
-                        $scope.jobTid = $scope.jobData[_index].tid;
-                        $scope.jobTitle = $scope.jobData[_index].jobtitle;
-                        $scope.jobCode = $scope.jobData[_index].jobcode;
-                        $scope.jobDescription = $scope.jobData[_index].jobdescription;
-                        $scope.skillKeyWords = $scope.jobData[_index].keyskills;
-                        $scope.jobVacancies = $scope.jobData[_index].openings;
-                        $scope.experienceFrom = $scope.jobData[_index].expfrom;
-                        $scope.experienceTo = $scope.jobData[_index].expto;
-
-                        //    $scope.jobLocation = $scope.jobData[_index].location;
-
-                        $scope.salaryFrom = $scope.jobData[_index].salaryfrom;
-                        $scope.salaryTo = $scope.jobData[_index].salaryto;
-                        $scope.salaryType = $scope.jobData[_index].salarytype;
-                        $scope.jobType = $scope.jobData[_index].jobtype;
-                        $scope.contactName = $scope.jobData[_index].contactname;
-                        $scope.phone = $scope.jobData[_index].mobile;
-                        $scope.emailContact = $scope.jobData[_index].emailid;
-                        $scope.jobStatus = $scope.jobData[_index].status;
-                        $scope.jobCategori = parseInt($scope.jobData[_index].jobcategory);
-
-                        for (var nCount = 0; nCount < $scope.jobData[_index].locationArray.length; nCount++)
-                        {
-                            delete $scope.jobData[_index].locationArray[nCount].jobid;
-                            $scope.mainLocationArray.push($scope.jobData[_index].locationArray[nCount]);
-                            $scope.locationArrayString.push($scope.jobData[_index].locationArray[nCount].location_title);
-                        }
-
-                        $scope.selectedEducations = [];
-                        if($scope.jobData[_index].Education)
-                        {
-                            $scope.EducationArray = $scope.jobData[_index].Education.split(',');
-                            for (var nCount = 0; nCount < $scope.EducationArray.length; nCount++)
-                            {
-                                $scope.selectedEducations.push(parseInt($scope.EducationArray[nCount]));
-                            }
-                        }
-                        else
-                        {
-                            $scope.selectedEducations = [];
-                        }
-
-                        $scope.selectedSpecializations = [];
-                        if($scope.jobData[_index].Specialization)
-                        {
-                            $scope.SpecializationArray = $scope.jobData[_index].Specialization.split(',');
-                            for (var nCount = 0; nCount < $scope.SpecializationArray.length; nCount++)
-                            {
-                                $scope.selectedSpecializations.push(parseInt($scope.SpecializationArray[nCount]));
-                            }
-                        }
-                        else
-                        {
-                            $scope.selectedSpecializations = [];
-                        }
-
-                        $scope.selectedInstitute = [];
-                        if($scope.jobData[_index].Institute)
-                        {
-                            $scope.InstituteArray = $scope.jobData[_index].Institute.split(',');
-                            for (var nCount = 0; nCount < $scope.InstituteArray.length; nCount++)
-                            {
-                                $scope.selectedInstitute.push(parseInt($scope.InstituteArray[nCount]));
-                            }
-                        }
-                        else
-                        {
-                            $scope.selectedInstitute = [];
-                        }
-
-                        $scope.aggregate_score = $scope.jobData[_index].Aggregatescore;
-
-                        $scope.$emit('$preLoaderStop');
-                    },3000);*/
 
             };
 
@@ -1033,7 +913,6 @@
                 {
                     if(resp.data)
                     {
-
                         var data = $scope.googleMap.parseReverseGeolocationData(resp.data);
                         $scope.jobLocation = data.city;
                         $scope.country = data.country;
@@ -1267,10 +1146,9 @@
 
             $scope.deleteSkilFromMartix=function(_index, _tid)
             {
-                if (_index > -1) {
-
+                if (_index > -1)
+                {
                     $scope.editMode.splice(_index,1);
-
                     $scope.skillMatrix.splice(_index, 1);
                     skillsTid.splice(_index,1);
                 }
@@ -1284,12 +1162,6 @@
 
             $scope.checkExp = function(index)
             {
-                /*if(parseFloat($scope.skillMatrix[index].exp) == NaN)
-                {
-                    $scope.skillMatrix[index].exp = 0.00;
-                }
-                $scope.skillMatrix[index].exp = (parseFloat($scope.skillMatrix[index].exp)).toFixed(2);*/
-
                 if((parseFloat($scope.skillMatrix[index].exp_from) == NaN) && (parseFloat($scope.skillMatrix[index].exp_to) == NaN))
                 {
                     $scope.skillMatrix[index].exp_from = 0.00;
@@ -1305,7 +1177,6 @@
                     var ind = $scope.skillMatrix.indexOfWhere('skillname',$scope.editSkill.skillname);
                     if(ind > 0)
                     {
-                        console.log("SAi ind");
                         $scope.editSkill = {
                             "tid":0,
                             "skillname":"",
@@ -1313,13 +1184,13 @@
                             "expertiseText":"",
                             "exp_from":0.00,
                             "exp_to":0.00,
-                            "active_status":true
+                            "active_status":1
                         };
                         return;
                     }
 
-
                     var newSkill = angular.copy($scope.editSkill);
+
                     $scope.editMode.push(false);
 
                     /*if(newSkill.skillname && newSkill.exp)*/
@@ -1338,7 +1209,7 @@
                         "expertiseText":"",
                         "exp_from":0.00,
                         "exp_to":0.00,
-                        "active_status":true
+                        "active_status":1
                     };
 
 
@@ -1357,19 +1228,19 @@
                 }
                 else
                 {
-                        $scope.skillMatrix[index] = angular.copy($scope.editSkill);
-                        $scope.editMode[index] = false;
-                        $scope.editMode[0] = true;
+                    $scope.skillMatrix[index] = angular.copy($scope.editSkill);
+                    $scope.editMode[index] = false;
+                    $scope.editMode[0] = true;
 
-                        $scope.editSkill = {
-                            "tid":0,
-                            "skillname":"",
-                            "expertiseLevel":0,
-                            "expertiseText":"",
-                            "exp_from":0.00,
-                            "exp_to":0.00,
-                            "active_status":true
-                        };
+                    $scope.editSkill = {
+                        "tid":0,
+                        "skillname":"",
+                        "expertiseLevel":0,
+                        "expertiseText":"",
+                        "exp_from":0.00,
+                        "exp_to":0.00,
+                        "active_status":1
+                    };
 
                     $scope.expertiseLevelsIDs = ["0"];
                     $scope.expertiseLevelsTexts = ["Beginner"];
@@ -1391,7 +1262,7 @@
                     "expertiseText":"",
                     "exp_from":0.00,
                     "exp_to":0.00,
-                    "active_status":true
+                    "active_status":1
                 };
             };
 
@@ -1405,8 +1276,15 @@
                 "active_status":1
             };
 
-            $scope.editSkillFn = function(index){
+            $scope.setActiveSkill = function(_skillID)
+            {
+                $scope.editSkill.active_status = _skillID;
+            };
+
+            $scope.editSkillFn = function(index)
+            {
                 $scope.editSkill = angular.copy($scope.skillMatrix[index]);
+
                 for(var ct=0; ct < $scope.skillMatrix.length; ct++){
                     if($scope.editMode[ct] && ct !== index){
                         $scope.editMode[ct] = false;
@@ -1417,41 +1295,41 @@
                 }
 
                 $scope.expertiesArray = [];
-
                 $scope.expertiesArray = $scope.skillMatrix[index].expertiseLevel.split(',');
+                $scope.inputExpertise = [];
+                $scope.inputExpertise = [
+                    {name: "Beginner",value:"0", ticked: false },
+                    {name: "Independent",value:"1", ticked: false},
+                    {name: "Expert",value:"2",ticked: false},
+                    {name: "Master",value:"3",ticked: false}
+                ];
 
-                console.log($scope.expertiesArray);
-                console.log("Browswe1");
-                console.log($scope.inputExpertise);
-
-//                for (var nCount = 0; nCount < $scope.expertiesArray.length; nCount++)
-//                {
-//                    for (var nCountLevel = 0; nCountLevel < $scope.modernBrowsers.length; nCountLevel++)
-//                    {
-//                        if(parseInt($scope.expertiesArray[nCount]) == parseInt($scope.modernBrowsers[nCountLevel].value))
-//                        {
-//                           $scope.modernBrowsers[nCountLevel].ticked = true;
-//
-//                            console.log($scope.modernBrowsers[nCountLevel].ticked);
-//                        }
-//                        else
-//                        {
-//                           $scope.modernBrowsers[nCountLevel].ticked = false;
-//                           console.log($scope.modernBrowsers[nCountLevel].ticked);
-//                        }
-//                    }
-//                }
-
-                for(var i =0; i < $scope.expertiesArray.length; i++){
+                for(var i =0; i < $scope.expertiesArray.length; i++)
+                {
                     var eIndex = $scope.inputExpertise.indexOfWhere('value',$scope.expertiesArray[i]);
-                    if(eIndex !== -1){
+                    if(eIndex !== -1)
+                    {
                         $scope.inputExpertise[eIndex].ticked = true;
                     }
                 }
 
-                console.log("Browswe2");
-                console.log($scope.inputExpertise);
+                $scope.expertiseLevelsIDs = [];
+                $scope.expertiseLevelsTexts = [];
 
+                var editExpertiesArray = [];
+                editExpertiesArray = $scope.editSkill.expertiseLevel.split(',');
+                for(var i = 0; i < editExpertiesArray.length; i++)
+                {
+                    $scope.expertiseLevelsIDs.push(editExpertiesArray[i]);
+                }
+
+                var editExpertiesTextArray = [];
+                editExpertiesTextArray = $scope.editSkill.expertiseText.split(',');
+
+                for(var i = 0; i < editExpertiesTextArray.length; i++)
+                {
+                    $scope.expertiseLevelsTexts.push(editExpertiesTextArray[i]);
+                }
             };
 
             $scope.$watch('editSkill.exp_from',function(n,v){
@@ -1482,7 +1360,6 @@
 
                 }).success(function (res)
                     {
-                      //  $scope.$emit('$preLoaderStop');
                         if(res.status)
                         {
                             for (var nCount = 0; nCount < res.data.length; nCount++)
@@ -1503,11 +1380,6 @@
             $scope.fClose = function() {
             };
 
-            /*$scope.expertiseLevelsIDs = ["0"];
-            $scope.expertiseLevelsTexts = ["Beginner"];
-            $scope.editSkill.expertiseLevel = $scope.expertiseLevelsIDs.toString();
-            $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();*/
-
             $scope.fClick = function( data )
             {
                 if($scope.expertiseLevelsIDs.indexOf(data.value)!=-1)
@@ -1524,7 +1396,6 @@
 
                 $scope.editSkill.expertiseLevel = $scope.expertiseLevelsIDs.toString();
                 $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();
-
             };
 
             $scope.fSelectAll = function()

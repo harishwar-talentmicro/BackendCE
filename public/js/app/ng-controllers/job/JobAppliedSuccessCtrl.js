@@ -37,7 +37,7 @@ angular.module('ezeidApp').
             UtilityService
             ) {
 
-            $scope.job_id = 0;
+          //  $scope.job_id = 0;
             $scope.showSuccessMsg = false;
             if(!$rootScope._userInfo.IsAuthenticate)
             {
@@ -51,19 +51,27 @@ angular.module('ezeidApp').
                 },2000);
 
                 defer.promise.then(function(){
-                    applayJob($routeParams.jobid);
+                   // applayJob($routeParams.jobid);
+
+                     /**
+                     * Redirect to jobDetail page
+                     */
+
+                     $location.url('/jobdetail' + '?jobid='+$routeParams.jobid);
+
                 });
             }
             else
             {
                 if($routeParams.jobid)
                 {
-                    applayJob($routeParams.jobid);
+                   // applayJob($routeParams.jobid);
+                    $location.url('/jobdetail' + '?jobid='+$routeParams.jobid);
                 }
             }
 
             // Apply for job
-            function applayJob(_jobId)
+           /* function applayJob(_jobId)
             {
                 if($rootScope._userInfo.IsAuthenticate)
                 {
@@ -98,6 +106,6 @@ angular.module('ezeidApp').
                     });
                 }
             }
-
+*/
 
         }]);

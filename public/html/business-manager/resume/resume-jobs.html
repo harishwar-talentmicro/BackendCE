@@ -394,7 +394,7 @@
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 fotterButtonContainer">
                     <div class="row">
                         <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12 ">
-                            <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="75" aria-describedby="sizing-addon1"/>
+                            <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="score_from" placeholder="75" aria-describedby="sizing-addon1"/>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 topMargin-three">
                             to
@@ -441,6 +441,7 @@
                                     <div class="setTableFixHeight">
                                         <table style="width: 100%;">
 
+                                            {{skillMatrix}}
                                             <tr ng-repeat="skill in skillMatrix">
                                                 <td class="panelPd5px newSkillFieldJobText" ng-hide="(!editMode[$index]) && ($index == 0)">
                                                     <span ng-hide="editMode[$index]">{{skillMatrix[$index].skillname}}</span>
@@ -514,8 +515,21 @@
 
                                                      </td>
                                                 <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
-                                                    <input class="newCvActveSkills" type="checkbox" ng-hide="editMode[$index]" ng-disabled="1" ng-model="skillMatrix[$index].active_status"/>
-                                                    <input class="newCvActveSkills" ng-show="editMode[$index]" type="checkbox"  ng-checked="editSkill.active_status" ng-model="editSkill.active_status"/>
+
+                                                    <select ng-show="editMode[$index]" class="form-control" ng-change="setActiveSkill(skillMatrix[$index].active_status)" ng-model="skillMatrix[$index].active_status">
+                                                        <option value="1"> Active </option>
+                                                        <option value="0"> Inactive </option>
+                                                        <option value="2"> Both </option>
+                                                    </select>
+
+                                                    <span ng-hide="editMode[$index]">
+                                                        <span ng-show="skillMatrix[$index].active_status == 1">Active </span>
+                                                        <span ng-show="skillMatrix[$index].active_status == 0">Inactive </span>
+                                                        <span ng-show="skillMatrix[$index].active_status == 2">Both </span>
+                                                    </span>
+
+                                                    <!--<input class="newCvActveSkills" type="checkbox" ng-hide="editMode[$index]" ng-disabled="1" ng-model="skillMatrix[$index].active_status"/>
+                                                    <input class="newCvActveSkills" ng-show="editMode[$index]" type="checkbox"  ng-checked="editSkill.active_status" ng-model="editSkill.active_status"/>-->
                                                 </td>
                                                 <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
                                                     <button class="btn btn-success btn-xs" ng-show="editMode[$index]" ng-click="saveSkillFn($index)">Add</button>

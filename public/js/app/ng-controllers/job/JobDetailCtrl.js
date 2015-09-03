@@ -45,7 +45,7 @@ angular.module('ezeidApp').
             $scope.jobData = [];
             $scope.locationData = "NA";
             $scope.isResultEmpty = true;
-            $scope.skillArr = [];
+           // $scope.skillArr = [];
             $scope.salaryType = ["","Per Hour","Per Month","Per Annum"]
 
             $scope.isLoggedIn = $rootScope._userInfo;
@@ -101,7 +101,7 @@ angular.module('ezeidApp').
                            /* set the location data */
                             setLocation();
                             /* set the skill array */
-                            setSkillsArray();
+                            //setSkillsArray();
                         }
                         else{
                             invalidUrlRedirection();
@@ -166,13 +166,13 @@ angular.module('ezeidApp').
             /**
              * Set skills in the array
              */
-            function setSkillsArray()
+            /*function setSkillsArray()
             {
                 if($scope.jobData)
                 {
                     $scope.skillArr = $scope.jobData.keyskills.split(',');
                 }
-            }
+            }*/
 
             /**
              * Apply for job

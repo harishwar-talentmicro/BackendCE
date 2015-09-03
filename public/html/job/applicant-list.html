@@ -9,31 +9,6 @@
                 </div>
                 <div class="panel-default panel-body">
                     <!-- search bar to search job keyword by skill keywords -->
-
-                    <div class="container">
-                        <div class="col-lg-12">
-                            <hr>
-                        </div>
-                        <div class="col-lg-6">
-                            <div ng-show="jobData">
-                                Showing {{pageCount+1}}-{{pageCount+resultThisPage}} of {{totalResult}} results
-                            </div>
-                        </div>
-                        <div ng-show="jobData" class="col-lg-6 text-right">
-                            <button class="btn"
-                                    ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
-                                    ng-disabled="!paginationPreviousVisibility"
-                                    ng-click="paginationPreviousClick()">
-                                Previous <i class="fa fa-arrow-circle-left"></i>
-                            </button>
-                            <button class="btn btn-primary"
-                                    ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
-                                    ng-disabled="!paginationNextVisibility"
-                                    ng-click="paginationNextClick()">
-                                <i class="fa fa-arrow-circle-right"></i> Next
-                            </button>
-                        </div>
-                    </div>
                     <div class="container">
                         <!-- main table goes here -->
                         <div class="main-table p-top-20 col-lg-12">
@@ -42,28 +17,28 @@
                                     <div class="col-lg-2">
                                         Name
                                     </div>
-                                    <div class="col-lg-4">
+                                    <div class="col-lg-2">
                                         City
                                     </div>
                                     <div class="col-lg-4">
                                         Education
                                     </div>
-                                    <div class="col-lg-2">
+                                    <div class="col-lg-4">
                                         Specialization
                                     </div>
                                 </div>
                                 <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}" ng-repeat="applicant in applicantData track by $index">
                                     <div class="col-lg-2">
-                                        <span>{{applicant.name | textLength:16}}</span>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <span>{{applicant.location | textLength:35}}</span>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <span>{{applicant.education | textLength:35}}</span>
+                                        <span title="{{applicant.name}}">{{applicant.name | textLength:18}}</span>
                                     </div>
                                     <div class="col-lg-2">
-                                        <span>{{applicant.Specialization | textLength:35}}</span>
+                                        <span title="{{applicant.location}}">{{applicant.location | textLength:18}}</span>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <span title="{{applicant.education}}">{{applicant.education | textLength:40}}</span>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <span title="{{applicant.Specialization}}">{{applicant.Specialization | textLength:40}}</span>
                                     </div>
                                 </div>
                             </div>
