@@ -251,6 +251,12 @@
                 templateUrl: 'html/landing.html',
                 controller : 'LandingPageCtrl'
             })
+
+            .when('/payment_test',{
+                templateUrl : 'html/payment-init.html',
+                controller : 'PaymentInitCtrl'
+            })
+
             .when('/wyswyg',{
                 templateUrl : 'html/wyswyg.html',
                 controller : 'WYSWYGCtrl'

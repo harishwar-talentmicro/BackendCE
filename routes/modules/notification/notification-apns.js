@@ -35,7 +35,8 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload){
             console.log("Note " + notification);
         };
         var options = {
-            gateway: 'gateway.sandbox.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+            //gateway: 'gateway.sandbox.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+            gateway: 'gateway.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
             errorCallback: callback,
             cert: 'cert.pem',
             key:  'key.pem',
