@@ -2171,12 +2171,13 @@ MessageBox.prototype.getGroupList = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var groupId,count,date,arrayResult,arrayResult1,finalResult = [];
+    var groupId,count,date,arrayResult,arrayResult1,finalResult = [],invitation_count;
 
     var responseMessage = {
         status: false,
         error: {},
         message: '',
+        i_count:'',
         data: null
     };
 
@@ -2213,23 +2214,36 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                                                     getResult[0][i].unreadcount = get_result[0][j].count;
                                                                     getResult[0][i].date = get_result[0][j].CreatedDate;
                                                                     //res.status(200).json(responseMessage);
-                                                                    }
+                                                                }
                                                             }
                                                         }
-                                                        responseMessage.status = true;
-                                                        responseMessage.error = null;
-                                                        responseMessage.message = 'GroupList loaded successfully';
-                                                        responseMessage.data = getResult[0];
-                                                        res.status(200).json(responseMessage);
-                                                        console.log('FnGetGroupList: GroupList loaded successfully');
+                                                        var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                                        st.db.query(queryCount, function (err, invitationResult) {
+
+                                                            console.log(invitationResult[0].length);
+                                                            responseMessage.status = true;
+                                                            responseMessage.error = null;
+                                                            responseMessage.message = 'GroupList loaded successfully';
+                                                            responseMessage.i_count = invitationResult[0].length;
+                                                            responseMessage.data = getResult[0];
+                                                            res.status(200).json(responseMessage);
+                                                            console.log('FnGetGroupList: GroupList loaded successfully');
+                                                        });
                                                     }
                                                     else {
-                                                        responseMessage.status = true;
-                                                        responseMessage.error = null;
-                                                        responseMessage.message = 'GroupList loaded successfully';
-                                                        responseMessage.data = getResult[0];
-                                                        res.status(200).json(responseMessage);
-                                                        console.log('FnGetGroupList: GroupList loaded successfully');
+
+
+                                                        var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                                        st.db.query(queryCount, function (err, invitationResult) {
+                                                            console.log(invitationResult[0].length);
+                                                            responseMessage.status = true;
+                                                            responseMessage.error = null;
+                                                            responseMessage.message = 'GroupList loaded successfully';
+                                                            responseMessage.i_count = invitationResult[0].length;
+                                                            responseMessage.data = getResult[0];
+                                                            res.status(200).json(responseMessage);
+                                                            console.log('FnGetGroupList: GroupList loaded successfully');
+                                                        });
                                                     }
                                                 }
                                                 else {
