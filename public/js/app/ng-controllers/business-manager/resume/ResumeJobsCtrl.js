@@ -227,7 +227,7 @@
                 }
                 if(($scope.jobVacancies == "") || ($scope.jobVacancies.length == 0) || (parseInt($scope.jobVacancies) == 0))
                 {
-                    err.push('Job Vacancies is empty');
+                    err.push('No. of Vacancies is empty');
                 }
                 if($scope.experienceFrom.length < 1){
                     err.push('Experience From is empty');
@@ -276,7 +276,7 @@
                     err.push('Please select Job Function');
                 }
 
-                if(!$scope.skillMatrix.length > 1)
+                if(!($scope.skillMatrix.length > 1))
                 {
                     err.push('Skill Map is empty');
                 }
@@ -299,8 +299,6 @@
                 if(validateItem())
                 {
                     $scope.$emit('$preLoaderStart');
-
-
                     if($scope.skillMatrix[0])
                     {
                         if((!$scope.skillMatrix[0].skillname) && (!$scope.skillMatrix[0].exp_from) && (!$scope.skillMatrix[0].exp_to))
@@ -1128,6 +1126,7 @@
             /**   Skill map functions Start */
 
             $scope.complete=function(_index){
+
                 $( "#tags"+_index ).autocomplete({
                     source: $scope.availableTags
                 });
