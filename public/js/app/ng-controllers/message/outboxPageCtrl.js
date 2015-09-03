@@ -101,7 +101,7 @@ angular.module('ezeidApp').
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////Default Function Calls//////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            loadDashBoardMessages();
+            //loadDashBoardMessages();
             getPendingRequestUserList();
             paginationReConfigration();
 
@@ -156,9 +156,9 @@ angular.module('ezeidApp').
             }
 
             /* initialization fot getting all the transaction history */
-            getTransactionHistory().then(function(){
-                reConfigurePaginationButton();
-            });
+            //getTransactionHistory().then(function(){
+            //    reConfigurePaginationButton();
+            //});
 
             /**
              * getting all the groups of the logged in user
@@ -520,7 +520,6 @@ angular.module('ezeidApp').
             {
                 /* perform appropriate action after user gives response */
                 managePendingRequestNotification(groupId,status,index);
-                console.log(groupId, masterId, status,index, requester);
                 updateMemberStatusApi(groupId, masterId, status, requester).then(function(){
 
                         $scope.pendingRequestData.splice(index,1);
