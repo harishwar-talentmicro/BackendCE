@@ -294,10 +294,9 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                             ', ' + st.db.escape(jobId)
                             + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType);
                         // st.db.escape(NextActionDateTime);
-                        console.log('CALL pSaveTrans(' + query + ')');
+                        //console.log('CALL pSaveTrans(' + query + ')');
                         st.db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
                             if (!err) {
-                                console.log(InsertResult);
                                 if (InsertResult[0] != null) {
                                     if (InsertResult[0].length > 0) {
                                         RtnMessage.IsSuccessfull = true;

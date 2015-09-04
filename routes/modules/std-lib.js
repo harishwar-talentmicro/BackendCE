@@ -69,6 +69,8 @@ StdLib.prototype.generateToken = function(ip,userAgent,ezeoneId,callBack){
         + ',' + _this.db.escape(ezeoneId) + ',' + _this.db.escape(deviceType);
     var tokenGenQuery = 'CALL pGenerateTokenNew('+tokenGenQueryParams + ')';
 
+    console.log(tokenGenQuery);
+
     _this.db.query(tokenGenQuery,function(err,results){
        if(err){
            callBack(err,null);
@@ -427,8 +429,8 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
             //    toEzeid
 
             var fs = require('fs');
-            var i = 1,verified, masterId, LocID, email, verifiedID, salesEmail;
-            if (MessageContent.messageType == 1) {
+            var i = 1,verified, messageType = MessageContent.messageType,masterId, LocID, email, verifiedID, salesEmail;
+            if (messageType == 1) {
                 fs.readFile("SalesEnquiry_receiver.html", "utf8", function (err, data) {
                     var query1 = 'select EZEID,FirstName,LastName,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + _this.db.escape(MessageContent.ezeid);
                     _this.db.query(query1, function (err, getResult) {
@@ -596,7 +598,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                     });
                 });
             }
-            else if (MessageContent.messagetype == 3) {
+            else if (messageType == 3) {
                 fs.readFile("homedelivery.html", "utf8", function (err, data) {
                     var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + _this.db.escape(EZEID);
                     _this.db.query(query1, function (err, getResult) {
@@ -712,7 +714,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                     });
                 });
             }
-            else if (MessageContent.messagetype == 4) {
+            else if (messageType == 4) {
                 fs.readFile("ServiceMail.html", "utf8", function (err, data) {
                     var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + _this.db.escape(EZEID);
                     _this.db.query(query1, function (err, getResult) {
@@ -828,7 +830,9 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                     });
                 });
             }
-            else if (MessageContent.messageType == 5) {
+            else if (messageType == 5) {
+                console.log('--------------------------');
+                console.log('coming to cv mail...');
                 var query = 'select TID from tlocations where EZEID=' + _this.db.escape(MessageContent.toEzeid);
                 _this.db.query(query, function (err, getResult) {
                     if (getResult[0]) {
@@ -836,9 +840,6 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                         var query = _this.db.escape(MessageContent.token) + ',' + _this.db.escape(LocID) + ',' + _this.db.escape(MessageContent.messageType);
                         console.log('CALL PgetMailSendingDetails(' + query + ')');
                         _this.db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, MessageContentResult) {
-                            console.log('--------------------------');
-                            console.log(MessageContentResult);
-                            console.log('--------------------------');
                             if (!err) {
                                 if (MessageContentResult[0] != null) {
                                     if (MessageContentResult[0].length > 0) {
@@ -942,26 +943,31 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                         }
                                         else {
                                             console.log('FnMessageMail: Mail  is empty');
+                                            CallBack(null, null);
                                         }
                                     }
                                     else {
                                         console.log('FnMessageMail: MessageContent  is empty');
+                                        CallBack(null, null);
 
                                     }
                                 }
                                 else {
                                     console.log('FnMessageMail: MessageContent  is empty');
+                                    CallBack(null, null);
 
                                 }
                             }
                             else {
                                 console.log('FnMessageMail: error');
+                                CallBack(null, null);
 
                             }
                         });
                     }
                     else {
                         console.log('FnMessage:Result is empty');
+                        CallBack(null, null);
                     }
                 });
             }
