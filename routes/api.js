@@ -145,7 +145,6 @@ router.get('/job_details',LocationManager.FnGetJobDetails);
 router.get('/institutes',LocationManager.FnGetInstitutes);
 router.get('/educations',LocationManager.FnGetEducations);
 router.get('/specialization',LocationManager.FnGetSpecialization);
-//router.get('/specialization_new',LocationManager.FnGetSpecializationNew);
 router.get('/jobs',LocationManager.FnJobs);
 router.get('/applied_job',LocationManager.FnGetAppliedJob);
 router.get('/job_country',LocationManager.FnGetJobcountry);

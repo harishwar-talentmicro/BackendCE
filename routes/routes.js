@@ -54,7 +54,6 @@ exports.FnGetSpecialization = userModule.getSpecialization;
 exports.FnGetVerifiedInstitutes = userModule.getVerifiedInstitutes;
 exports.FnSaveUserDetails = userModule.saveUserDetails;
 exports.FnGetUserDetailsNew = userModule.getUserDetailsNew;
-//exports.FnGetSpecializationNew = userModule.getSpecializationNew;
 
 var Audit = require('./modules/audit-module.js');
 var auditModule = new Audit(db,stdLib);

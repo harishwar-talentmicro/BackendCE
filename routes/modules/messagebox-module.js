@@ -1055,7 +1055,6 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                             console.log(query1);
                                             st.db.query(query1, function (err, groupDetails) {
                                                 if (groupDetails) {
-                                                    if (groupDetails[0].length > 0) {
                                                         console.log('----------------------------1');
                                                         console.log(groupDetails);
                                                         var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
@@ -1089,10 +1088,6 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                                             }
                                                         });
                                                     }
-                                                    else {
-                                                        console.log('FnSendMessageRequest:Error getting from groupdetails');
-                                                    }
-                                                }
                                                 else {
                                                     console.log('FnSendMessageRequest:Error getting from groupdetails');
                                                 }
@@ -1929,7 +1924,7 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
 
     var _this = this;
 
-    var groupId = req.body.group_id;
+    var groupId = parseInt(req.body.group_id);
     var memberId  = req.body.member_id;
     var relationType  = req.body.relation_type;
     var requester = req.body.requester; // 1 for group, 2 for user
