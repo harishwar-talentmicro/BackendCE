@@ -54,6 +54,7 @@ exports.FnGetSpecialization = userModule.getSpecialization;
 exports.FnGetVerifiedInstitutes = userModule.getVerifiedInstitutes;
 exports.FnSaveUserDetails = userModule.saveUserDetails;
 exports.FnGetUserDetailsNew = userModule.getUserDetailsNew;
+//exports.FnGetSpecializationNew = userModule.getSpecializationNew;
 
 var Audit = require('./modules/audit-module.js');
 var auditModule = new Audit(db,stdLib);
@@ -186,6 +187,7 @@ exports.FnNotifyRelevantStudent = jobModule.notifyRelevantStudent;
 exports.FnViewApplicantList = jobModule.viewApplicantList;
 exports.FnViewJobDetails = jobModule.viewJobDetails;
 exports.FnJobNotification = jobModule.jobNotification;
+exports.FnFindInstitute = jobModule.findInstitute;
 
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);

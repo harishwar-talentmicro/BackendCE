@@ -637,16 +637,36 @@ angular.module('ezeidApp').
              */
             function markAsRead(loadedMsgId)
             {
-                console.log(loadedMsgId);
                 if(!loadedMsgId || !loadedMsgId.length > 0)
                     return;
                 var selectedMsgId = loadedMsgId.join(',');
-                messageActivityApi(selectedMsgId,1).then(function(){
+                /* remove unread count label */
+                var tid = $routeParams.id;
+                removeUnreadCountLabel(tid);
 
+                messageActivityApi(selectedMsgId,1).then(function(){
                     },
                     function(){
                         Notification.error({ message: "Something went wrong! Try again later", delay: MsgDelay });
                     });
+            }
+
+            function removeUnreadCountLabel(tid)
+            {
+                $scope.groupListData.forEach(function(data){
+                    if(data.GroupID == tid)
+                    {
+                        data.unreadcount = 0;
+                        return;
+                    }
+                });
+
+                $scope.individualMember.forEach(function(data){
+                    if(data.GroupID == tid)
+                    {
+                        data.unreadcount = 0;
+                    }
+                });
             }
             /**
              * Remove all the selected trashed message from dom and empty the selected message aeeay
