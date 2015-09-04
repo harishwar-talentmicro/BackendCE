@@ -10,6 +10,15 @@
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 
+var st = null;
+
+function Auth_AP(db,stdLib){
+
+    if(stdLib){
+        st = stdLib;
+    }
+};
+
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -23,14 +32,32 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-var st = null;
 
-function Auth_AP(db,stdLib){
+function FnGenerateToken() {
+    try {
+        var text = "";
+        var possible = "1234567890abcdefghjklmnopqrstuvwxyz!@#$%";
 
-    if(stdLib){
-        st = stdLib;
+        for (var i = 0; i < 10; i++) {
+
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+
+        var crypto = require('crypto'),
+            algorithm = 'aes-256-ctr',
+            key = 'hire@123';
+
+        var cipher = crypto.createCipher(algorithm, key)
+        var crypted = cipher.update(text, 'utf8', 'hex')
+        crypted += cipher.final('hex');
+        return crypted;
     }
-};
+    catch (ex) {
+        console.log('OTP generate error:' + ex.description);
+        throw new Error(ex);
+        return 'error'
+    }
+}
 
 function FnRandomPassword() {
     try {
@@ -84,6 +111,7 @@ Auth_AP.prototype.loginAP = function(req,res,next){
     /**
      * @todo FnLoginAP
      */
+
     var _this = this;
     try {
         //res.setHeader("Access-Control-Allow-Origin", "*");
@@ -95,6 +123,11 @@ Auth_AP.prototype.loginAP = function(req,res,next){
         //res.setHeader('content-type', 'application/json');
         var UserName = req.body.UserName;
         var Password = req.body.Password;
+        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+        var ip = req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress;
         var RtnMessage = {
             Token: '',
             IsAuthenticate: false,
@@ -108,9 +141,11 @@ Auth_AP.prototype.loginAP = function(req,res,next){
             st.db.query(Query, function (err, loginResult) {
                 if (!err) {
                     if (loginResult.length > 0) {
-                        var Encrypt = st.generateToken();
+                        var Encrypt = FnGenerateToken();
+                        console.log(Encrypt);
                         var Query = 'update tapuser set Token=' + st.db.escape(Encrypt) + ' where TID=' + st.db.escape(loginResult[0].TID);
                         st.db.query(Query, function (err, TokenResult) {
+                            console.log(TokenResult);
                             if (!err) {
                                 if (TokenResult.affectedRows > 0) {
                                     RtnMessage.Token = Encrypt;
