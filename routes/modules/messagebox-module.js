@@ -1055,7 +1055,6 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                             console.log(query1);
                                             st.db.query(query1, function (err, groupDetails) {
                                                 if (groupDetails) {
-                                                    if (groupDetails[0].length > 0) {
                                                         console.log('----------------------------1');
                                                         console.log(groupDetails);
                                                         var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
@@ -1089,10 +1088,6 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                                             }
                                                         });
                                                     }
-                                                    else {
-                                                        console.log('FnSendMessageRequest:Error getting from groupdetails');
-                                                    }
-                                                }
                                                 else {
                                                     console.log('FnSendMessageRequest:Error getting from groupdetails');
                                                 }
@@ -1929,7 +1924,7 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
 
     var _this = this;
 
-    var groupId = req.body.group_id;
+    var groupId = parseInt(req.body.group_id);
     var memberId  = req.body.member_id;
     var relationType  = req.body.relation_type;
     var requester = req.body.requester; // 1 for group, 2 for user
@@ -2033,12 +2028,6 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
 
                             // dont send notification to public group admin
 
-                            var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid='+memberId;
-                            st.db.query(queryParameters, function (err, iosResult) {
-                                if (iosResult) {
-                                    iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
-                                    console.log(iphoneID);
-
                                     var getQuery = 'select EZEID from tmaster where tid=' + st.db.escape(memberId);
                                     console.log(getQuery);
                                     st.db.query(getQuery, function (err, memberDetails) {
@@ -2050,7 +2039,6 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
                                                 st.db.query(query1, function (err, groupDetails) {
                                                     if (groupDetails) {
                                                         if (groupDetails[0]) {
-                                                            if (groupDetails[0].length > 0) {
                                                                 console.log(groupDetails);
                                                                 var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + groupDetails[0].AdminID;
                                                                 console.log(query2);
@@ -2059,19 +2047,29 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
                                                                         if (getDetails[0]) {
                                                                             console.log('----------------------------');
                                                                             console.log(getDetails);
-                                                                            receiverId = getDetails[0].tid;
-                                                                            senderTitle = memberDetails[0].EZEID;
-                                                                            groupTitle = groupDetails[0].GroupName;
-                                                                            groupID = groupId;
-                                                                            messageText = 'has sent a request';
-                                                                            messageType = 3;
-                                                                            operationType = 0;
-                                                                            iphoneId = iphoneID;
-                                                                            messageId = 0;
-                                                                            console.log('senderid:' + groupID + '     receiverid:' + receiverId);
-                                                                            console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId);
-                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId);
+                                                                            var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + groupDetails[0].AdminID;
+                                                                            st.db.query(queryParameters, function (err, iosResult) {
+                                                                                if (iosResult) {
+                                                                                    iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                                                                    console.log(iphoneID);
+                                                                                    receiverId = getDetails[0].tid;
+                                                                                    senderTitle = memberDetails[0].EZEID;
+                                                                                    groupTitle = groupDetails[0].GroupName;
+                                                                                    groupID = groupId;
+                                                                                    messageText = 'has sent a request';
+                                                                                    messageType = 3;
+                                                                                    operationType = 0;
+                                                                                    iphoneId = iphoneID;
+                                                                                    messageId = 0;
+                                                                                    console.log('senderid:' + groupID + '     receiverid:' + receiverId);
+                                                                                    console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId);
+                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId);
 
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnAddGroupMembers:Error getting from iphoneid');
+                                                                                }
+                                                                            });
                                                                         }
                                                                         else {
                                                                             console.log('FnAddGroupMembers:Error getting from Admin Details');
@@ -2082,10 +2080,6 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
                                                                     }
                                                                 });
                                                             }
-                                                            else {
-                                                                console.log('FnAddGroupMembers:No adminID : No send notification');
-                                                            }
-                                                        }
                                                         else {
                                                             console.log('FnAddGroupMembers:No adminID : No send notification');
                                                         }
@@ -2104,8 +2098,6 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
                                         }
                                     });
                                 }
-                            });
-                        }
                     }
                     else {
                         responseMessage.message = 'Members already added';

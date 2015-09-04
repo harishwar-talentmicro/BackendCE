@@ -21,7 +21,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     CVAttachCtrl._CVInfo.job_type = 0;
     $scope.locationName = "";
-    // CVAttachCtrl._CVInfo.job_location1 = "";
     CVAttachCtrl._CVInfo.experience = 0;
     CVAttachCtrl._CVInfo.education_id = 0;
     CVAttachCtrl._CVInfo.specialization_id = 0;
@@ -31,14 +30,15 @@ angular.module('ezeidApp').controller('CVAttachController',[
     CVAttachCtrl._CVInfo.institute_id = 0;
     CVAttachCtrl._CVInfo.institute_title = "";
     CVAttachCtrl._CVInfo.Status = 1;
+    $scope.instituteTitle = "";
+    CVAttachCtrl.Functions = "";
 
     $scope.modernBrowsers = [];
-    $scope.instituteText = "";
-    $scope.instituteID = 0;
     $scope.specilizationText = "";
     $scope.showSpecializationDropDown = true;
     $scope.showInstituteDropDown = false;
     $scope.changeInstituteButton = false;
+    $scope.showNoInstituteFound = false;
 
     // Bellow code id for apply for job
     $scope.job_id = 0;
@@ -49,6 +49,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     $scope.selectedFunctions = [];
     $scope.selectedCategories = [];
+
+    // To get list of functions
+    getFunctions();
 
     /**
      * Hide all the open dropdown
@@ -69,11 +72,9 @@ angular.module('ezeidApp').controller('CVAttachController',[
                 $('.filter-dropdownInstitute').hide();
             });
 
-            //$scope.instituteGetResponse = false;
             $scope.educationsGetResponse = false;
 
-           // getInstituteList();
-            getEducations();
+           getEducations();
         }
         else
         {
@@ -107,10 +108,18 @@ angular.module('ezeidApp').controller('CVAttachController',[
             });
         },false);
 
-    $http({ method: 'get', url: GURL + 'ewmGetFunctions?LangID=1'}).success(function (data) {
-        CVAttachCtrl.Functions = data;
-       // $scope.modernBrowsers = data;
-    });
+
+        // Get Functions list
+        function getFunctions()
+        {
+           $http({
+                method: 'get',
+                url: GURL + 'ewmGetFunctions?LangID=1'
+            }).success(function (data)
+            {
+                CVAttachCtrl.Functions = data;
+            });
+        }
 
     //if secure pin checkbox is uncheck remove PIN Value
     this.securePinCliked = function () {
@@ -213,28 +222,22 @@ angular.module('ezeidApp').controller('CVAttachController',[
         /**
          * if user select institute from list than send id other wise send text as title
          */
-        if($scope.instituteTitle)
+        if(CVAttachCtrl._CVInfo.institute_id)
         {
-            if($scope.instituteTitle == $scope.instituteText)
+            if(CVAttachCtrl._CVInfo.institute_title != $scope.instituteTitle)
             {
-                CVAttachCtrl._CVInfo.institute_id = $scope.instituteID;
-                CVAttachCtrl._CVInfo.institute_title = "";
-                $scope.instituteText = "";
+                CVAttachCtrl._CVInfo.institute_id = "";
             }
-            else
-            {
-                CVAttachCtrl._CVInfo.institute_id = 0;
-                $scope.instituteID = 0;
-                $scope.instituteText = "";
-                CVAttachCtrl._CVInfo.institute_title = $scope.instituteTitle;
-            }
+            CVAttachCtrl._CVInfo.institute_title = "";
         }
         else
         {
-            CVAttachCtrl._CVInfo.institute_id = 0;
-            CVAttachCtrl._CVInfo.institute_title = "";
-            $scope.instituteText = "";
-            $scope.instituteID = 0;
+            CVAttachCtrl._CVInfo.institute_id = "";
+            if(CVAttachCtrl._CVInfo.institute_title != $scope.instituteTitle)
+            {
+                CVAttachCtrl._CVInfo.institute_title = "";
+                CVAttachCtrl._CVInfo.institute_id = "";
+            }
         }
 
         CVAttachCtrl._CVInfo.job_type = (CVAttachCtrl._CVInfo.job_type) ? CVAttachCtrl._CVInfo.job_type : 0;
@@ -266,19 +269,18 @@ angular.module('ezeidApp').controller('CVAttachController',[
         CVAttachCtrl._CVInfo.FunctionID = $scope.selectedFunctions.toString();
         CVAttachCtrl._CVInfo.category_id = $scope.selectedCategories.toString();
 
-
         CVAttachCtrl._CVInfo.skillMatrix = $scope.skillMatrix;
         CVAttachCtrl._CVInfo.skillsTid = skillsTid.toString();
 
         if(isValidate())
         {
             $scope.$emit('$preLoaderStart');
-            $scope.instituteText = "";
-            $scope.instituteID = 0;
 
             $scope.selectedFunctions = [];
             $scope.selectedCategories = [];
 
+            $scope.changeInstituteButton = false;
+            $scope.showNoInstituteFound = false;
 
             CVAttachCtrl._CVInfo.TokenNo = $rootScope._userInfo.Token;
             CVAttachCtrl._CVInfo.Status = parseInt(CVAttachCtrl._CVInfo.Status);
@@ -297,8 +299,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         $scope.selectedCategories = [];
                         skillsTid = [];
 
-                        getInstituteList();
-
                         $timeout(function()
                         {
                             $scope.locationArrayString = [];
@@ -307,14 +307,13 @@ angular.module('ezeidApp').controller('CVAttachController',[
                             $scope.isCvUploded = true;
 
                             applyJob($scope.job_id);
+                            $scope.instituteTitle = "";
 
                             getCVInfo();
                             getAllSkills();
                             $scope.$emit('$preLoaderStop');
                         },3000);
 
-                       // $scope.jobCategoriesGetResponse = false;
-                        $scope.instituteGetResponse = false;
                         $scope.educationsGetResponse = false;
 
                     }else{
@@ -338,7 +337,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
         }
         else
         {
-
             if(!CVAttachCtrl._CVInfo.skillMatrix.length)
             {
                 $scope.skillMatrix.push(
@@ -411,20 +409,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-                    /**
-                     *  Below line is for assign functions to functions dropdown
-                     *  @type {*}
-                     */
-                    if(parseInt(CVAttachCtrl._CVInfo.category_id))
-                    {
-                        $scope.categoryArray = CVAttachCtrl._CVInfo.category_id.split(',');
-                        CVAttachCtrl._CVInfo.category_id = "";
-                        for (var nCount = 0; nCount < $scope.categoryArray.length; nCount++)
-                        {
-                            $scope.selectedCategories.push(parseInt($scope.categoryArray[nCount]));
-                        }
-                    }
-
                     if(res.job_location.length)
                     {
                         if((res.job_location[0].country) && (res.job_location[0].latitude) && (res.job_location[0].location_title))
@@ -438,20 +422,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         }
                     }
 
-                    /*if($scope.instituteList.length)
+                    if(CVAttachCtrl._CVInfo.institute_title.length)
                     {
-                        for (var nCount = 0; nCount < $scope.instituteList.length; nCount++)
-                        {
-                            if($scope.instituteList[nCount].TID == CVAttachCtrl._CVInfo.institute_id)
-                            {
-                                $scope.instituteTitle = ($scope.instituteList[nCount].InstituteTitle) ? $scope.instituteList[nCount].InstituteTitle : "";
-                                $scope.instituteText = ($scope.instituteList[nCount].InstituteTitle) ? $scope.instituteList[nCount].InstituteTitle : "";
-                                $scope.instituteID = $scope.instituteList[nCount].TID;
-                            }
-                        }
-                    }*/
+                        $scope.instituteTitle = CVAttachCtrl._CVInfo.institute_title;
+                        $scope.changeInstituteButton = true;
+                    }
 
-                    //  $scope.specializationList
                     $timeout(function()
                     {
                         if($scope.specializationList.length)
@@ -754,15 +730,12 @@ angular.module('ezeidApp').controller('CVAttachController',[
 
     $scope.findInstitute = function(_instituteTitle)
     {
-        console.log("SAi1");
         if(!_instituteTitle || typeof(_instituteTitle) == undefined)
         {
-            console.log("SAi2");
             return;
         }
         else
         {
-            console.log("SAi3");
             $scope.$emit('$preLoaderStart');
 
             $http({
@@ -772,20 +745,28 @@ angular.module('ezeidApp').controller('CVAttachController',[
                     token : $rootScope._userInfo.Token,
                     keywords: _instituteTitle
                 }
-            }).success(function(resp){
-                    console.log(resp);
-                    $scope.instituteList = resp.data;
+            }).success(function(resp)
+                {
                     $scope.$emit('$preLoaderStop');
-                    $('.filter-dropdownInstitute').show();
-                    $scope.showInstituteDropDown = true;
-                    hideAllDropdoowns(2);
+                    if(resp.status)
+                    {
+                        $scope.instituteList = resp.data;
+                        $('.filter-dropdownInstitute').show();
+                        $scope.showNoInstituteFound = false;
+                        $scope.showInstituteDropDown = true;
+                        hideAllDropdoowns(2);
+                    }
+                    else
+                    {
+                        $scope.showInstituteDropDown = false;
+                        $scope.showNoInstituteFound = true;
+                    }
                 })
-                .error(function(err){
+                .error(function(err)
+                {
                     $scope.$emit('$preLoaderStop');
                 });
         }
-
-
     };
 
     $scope.changeInstitute = function()
@@ -793,123 +774,36 @@ angular.module('ezeidApp').controller('CVAttachController',[
         $scope.changeInstituteButton = false;
     };
 
-    /**
-     * Select - Unselect Function
-     *//*
-    $scope.selectFunction = function(_functionID)
+    $scope.addNewInstitute = function(_title)
     {
-        if($scope.selectedFunctions.indexOf(_functionID)!=-1)
-        {
-            var index = $scope.selectedFunctions.indexOf(_functionID);
-            $scope.selectedFunctions.splice(index,1);
-        }
-        else
-        {
-            $scope.selectedFunctions.push(_functionID);
-        }
-    }*/
+        CVAttachCtrl._CVInfo.institute_title = _title;
+        $scope.changeInstituteButton = true;
+        $scope.showNoInstituteFound = false;
+        CVAttachCtrl._CVInfo.institute_id = "";
+    };
 
-    /**
-     * Select - Unselect Job Category
-     */
-   /* $scope.selectJobCategories = function(_categoryID)
+    $scope.cancleAddingNewInstitute = function()
     {
-        if($scope.selectedCategories.indexOf(_categoryID)!=-1)
-        {
-            var index = $scope.selectedCategories.indexOf(_categoryID);
-            $scope.selectedCategories.splice(index,1);
-        }
-        else
-        {
-            $scope.selectedCategories.push(_categoryID);
-        }
-    }*/
+        $scope.changeInstituteButton = false;
+        $scope.showNoInstituteFound = false;
 
-    // Get job Categories
- /*   function getJobCategories()
-    {
-        $http({
-            url : GURL + 'ewmGetCategory',
-            method : 'GET',
-            params : {
-                LangID : 1
-            }
-        }).success(function(resp){
-            $scope.jobCategories = resp;
-           // $scope.jobCategoriesGetResponse = true;
-            getCVDetails();
-          })
-        .error(function(err){
-            $scope.$emit('$preLoaderStop');
-        });
-    }*/
+        $scope.instituteTitle = "";
+        CVAttachCtrl._CVInfo.institute_title = "";
+        CVAttachCtrl._CVInfo.institute_id = "";
+    };
 
-    // Get Institute list
-    function getInstituteList()
-    {
-        console.log("Sai124");
-        $http({
-            url : GURL + 'institutes',
-            method : 'GET',
-            params : {
-                token : $rootScope._userInfo.Token
-            }
-        }).success(function(resp){
-            $scope.instituteList = resp.data;
-            $scope.instituteGetResponse = true;
-            getCVDetails();
-        })
-        .error(function(err){
-            $scope.$emit('$preLoaderStop');
-        });
-    }
-
-    CVAttachCtrl._CVInfo.institute_id = 0;
-    $scope.instituteTitle = "";
-
-    // Below function Call on key press of institute text field
-    $scope.instituteKeyPress = function(keyEvent) {
-        $('.filter-dropdownInstitute').show();
-        $scope.showInstituteDropDown = true;
-        hideAllDropdoowns(2);
-    }
     // Below function Call on click of institute text field
     $scope.instituteTextBoxClicked = function() {
         $scope.showInstituteDropDown = !$scope.showInstituteDropDown;
         hideAllDropdoowns(2);
-    }
+    };
 
-    /*$scope.instituteText = "";
-    $scope.instituteID = 0;*/
     // Below function Call on selection of institute
     $scope.selectInstitute = function(instituteID,title) {
         $scope.changeInstituteButton = true;
-
         CVAttachCtrl._CVInfo.institute_title = title;
         CVAttachCtrl._CVInfo.institute_id = instituteID;
-
-        $scope.instituteText = title;
-        $scope.instituteID = instituteID;
-
-        console.log("SAi1");
-        console.log(CVAttachCtrl._CVInfo.institute_id);
-        console.log(CVAttachCtrl._CVInfo.institute_title);
-
         $scope.instituteTitle = title;
-        if(CVAttachCtrl._CVInfo.institute_id != 0)
-        {
-            CVAttachCtrl._CVInfo.institute_title = "";
-        }
-        else
-        {
-            CVAttachCtrl._CVInfo.institute_title = title;
-            CVAttachCtrl._CVInfo.institute_id = 0;
-        }
-
-        console.log("SAi2");
-        console.log(CVAttachCtrl._CVInfo.institute_id);
-        console.log(CVAttachCtrl._CVInfo.institute_title);
-
         $scope.showInstituteDropDown = false;
     };
 
@@ -917,8 +811,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
     // Below function Call on key press of specialization text field
     $scope.specializationKeyPress = function(keyEvent) {
         $scope.showSpecializationDropDown = false;
-       /* $('.filter-dropdownSpecialization').show();
-        */
         hideAllDropdoowns(3);
     }
     // Below function Call on click of institute text field
@@ -957,7 +849,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
     $scope.specializationList = [];
     function getSpecialization()
     {
-       // $scope.specializationList =[];
         $scope.specializationList2 = [];
         $scope.$emit('$preLoaderStart');
         $http({
@@ -989,7 +880,6 @@ angular.module('ezeidApp').controller('CVAttachController',[
                         if((!$scope.specializationList[nCount].ticked) && ($scope.specializationList2.length))
                         {
                             $scope.specializationList.splice(nCount, 1);
-                            console.log(nCount);
                         }
                     }
                 }
