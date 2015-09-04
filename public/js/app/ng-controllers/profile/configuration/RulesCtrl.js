@@ -455,14 +455,15 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                 error.push('folder status');
             }
 
-            if($scope.modalBox.rule.RuleType !== 1){
+            console.log($scope.modalBox.rule);
+            if(parseInt($scope.modalBox.rule.RuleType) !== 1){
                 if($scope.modalBox.rule.MappedNames.length < 1){
                     error.push('mapped names');
                 }
             }
 
-            if($scope.modalBox.rule.RuleType == 1){
-                if($scope.modalBox.rule.Proximity){
+            if(parseInt($scope.modalBox.rule.RuleType) == 1){
+                if(parseInt($scope.modalBox.rule.Proximity) == NaN || parseInt($scope.modalBox.rule.Proximity) < 1){
                     error.push('proximity');
                 }
             }
@@ -490,7 +491,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
 
             $scope.$emit('$preLoaderStart');
             $http({
-                url : 'ewmSaveFolderRules',
+                url : GURL + 'ewmSaveFolderRules',
                 method : "POST",
                 data :ruleData
             }).success(function(resp){
