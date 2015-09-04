@@ -455,6 +455,7 @@ angular.module('ezeidApp').controller('RulesCtrl',['$scope','$interval','$http',
                 error.push('folder status');
             }
 
+            console.log($scope.modalBox.rule);
             if($scope.modalBox.rule.RuleType !== 1){
                 if($scope.modalBox.rule.MappedNames.length < 1){
                     error.push('mapped names');
