@@ -219,6 +219,7 @@ angular.module('ezeidApp').
                             {
                                 /* reset all the data */
                                 resetSearchResultData();
+                                $scope.paginationVisibility();
                                 return;
                             }
 
@@ -956,7 +957,6 @@ angular.module('ezeidApp').
                 var totalResult = parseInt($scope.totalResult);
                 var currentCount = parseInt($scope.pageCount);
                 var resultSize = parseInt($scope.pageSize);
-
                 /* initial state */
                 if((totalResult <= (currentCount+resultSize)) && currentCount == 0)
                 {
