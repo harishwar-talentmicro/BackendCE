@@ -836,6 +836,8 @@ Auth.prototype.logout = function(req,res,next){
         res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
         //res.setHeader('content-type', 'application/json');
         var Token = req.query.Token;
+        var isIphone = req.query.device ? parseInt(req.query.device) : 0;
+        var deviceToken = req.query.device_token ? req.query.device_token : '';
 
         var RtnMessage = {
             Token: '',
@@ -847,29 +849,65 @@ Auth.prototype.logout = function(req,res,next){
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (Token != null && Token != '') {
+            if (isIphone == 1) {
+                var queryParameter = 'select masterid from tloginout where token=' + st.db.escape(Token);
+                st.db.query(queryParameter, function (err, getResult) {
+                    if (getResult[0]) {
+                        var queryParameter1 = 'select EZEID from tmaster where tid=' + getResult[0].masterid;
+                        st.db.query(queryParameter1, function (err, details) {
+                            if (details[0]) {
+                                var queryParams = st.db.escape(details[0].EZEID) + ',' + st.db.escape(deviceToken);
+                                var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                console.log(query);
+                                st.db.query(query, function (err, result) {
+                                    if (!err) {
+                                        console.log('FnLogin:IphoneDevice save successfully');
+                                        var Query = 'CALL pLogout(' + st.db.escape(Token) + ')';
+                                        st.db.query(Query, function (err, result) {
+                                            if (!err) {
+                                                if (result) {
+                                                    RtnMessage.IsAuthenticate = false;
+                                                    console.log('FnLogout: tmaster: Logout success');
+                                                    res.clearCookie('Token');
+                                                    res.send(RtnMessage);
+                                                }
+                                            }
+                                            else {
+                                                res.statusCode = 500;
+                                                console.log('FnLogout:tmaster:' + err);
+                                                res.send(RtnMessage);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        console.log(err);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            else {
 
-            var Query = 'CALL pLogout('+st.db.escape(Token)+')';
-            st.db.query(Query, function (err, result) {
-                if (!err) {
-                    if(result){
-                        console.log(result);
-                        /**
-                         * @todo Please check if the code is working or not
-                         */
+                var Query = 'CALL pLogout(' + st.db.escape(Token) + ')';
+                st.db.query(Query, function (err, result) {
+                    if (!err) {
+                        if (result) {
+                            RtnMessage.IsAuthenticate = false;
+                            console.log('FnLogout: tmaster: Logout success');
+                            res.clearCookie('Token');
+                            res.send(RtnMessage);
+                        }
+                    }
 
-                        RtnMessage.IsAuthenticate = false;
-                        console.log('FnLogout: tmaster: Logout success');
-                        res.clearCookie('Token');
+                    else {
+                        res.statusCode = 500;
+                        console.log('FnLogout:tmaster:' + err);
                         res.send(RtnMessage);
                     }
-                }
-                else {
-                    res.statusCode = 500;
-                    console.log('FnLogout:tmaster:' + err);
-                    res.send(RtnMessage);
-                }
-            });
-
+                });
+            }
         }
         else {
             if (Token == null || Token == '') {

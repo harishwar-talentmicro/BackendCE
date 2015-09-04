@@ -145,6 +145,7 @@ router.get('/job_details',LocationManager.FnGetJobDetails);
 router.get('/institutes',LocationManager.FnGetInstitutes);
 router.get('/educations',LocationManager.FnGetEducations);
 router.get('/specialization',LocationManager.FnGetSpecialization);
+//router.get('/specialization_new',LocationManager.FnGetSpecializationNew);
 router.get('/jobs',LocationManager.FnJobs);
 router.get('/applied_job',LocationManager.FnGetAppliedJob);
 router.get('/job_country',LocationManager.FnGetJobcountry);
@@ -164,6 +165,7 @@ router.get('/applicant_list',LocationManager.FnViewApplicantList);
 router.get('/profile_image',LocationManager.FnProfileImageURL);
 router.get('/view_job_details',LocationManager.FnViewJobDetails);
 router.post('/job_notification',LocationManager.FnJobNotification);
+router.get('/find_institute',LocationManager.FnFindInstitute);
 
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);
