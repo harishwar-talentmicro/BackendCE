@@ -2141,3 +2141,16 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     margin-right: 0px;
 }
+.noInstituteFound {
+    position: absolute;
+    padding-top: 3px;
+    background-color: #fff;
+    z-index: 999;
+    padding: 4px;
+    width: 25%;
+    border: 1px solid rgb(161, 161, 161);
+}
+.row .multiSelect > button
+{
+    min-height: 35px !important;
+}

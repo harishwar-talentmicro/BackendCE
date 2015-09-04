@@ -124,23 +124,34 @@
                                         <div class="input-group">
                                             <input type="text" placeholder="Full Institute Name" ng-model = "instituteTitle" ng-disabled="changeInstituteButton" class="form-control emptyBox"/>
                                             <span class="input-group-addon noPaddingNoBorder">
-                                                <button type="button" ng-show="changeInstituteButton" class="btn btn-primary" ng-click="changeInstitute()"><i class="fa fa-search"></i> Change</button>
+                                                <button type="button" ng-show="changeInstituteButton" class="btn btn-primary" ng-click="changeInstitute()"><i class="fa fa-pencil"></i> Change</button>
                                                 <button type="button" ng-hide="changeInstituteButton" class="btn btn-primary" ng-click="findInstitute(instituteTitle)"><i class="fa fa-search"></i> Find</button>
                                             </span>
                                         </div>
-                                        <!--<input type = "text"
-                                               placeholder = "Full and Correct College Name"
-                                               ng-model = "instituteTitle"
-                                               ng-keypress = "instituteKeyPress($event.keyCode)"
-                                               ng-click = "instituteTextBoxClicked()"
-                                               class = "form-control instittuteClass"/>-->
-
-                                        <!--<div ng-show="showInstituteDropDown" ng-hide="institute.InstituteTitle.length" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">-->
-                                        {{showInstituteDropDown}}
-                                        <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
-                                            <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
+                                        <div ng-show="showInstituteDropDown && results.length" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
+                                            <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle as results" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
                                                 {{institute.InstituteTitle}}
                                             </div>
+                                        </div>
+                                        <div ng-show="showNoInstituteFound" class="noInstituteFound width-105 search-option-content setTableFixHeight text-center">
+                                            <div class="row setRowLeftRightMarginZero">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+                                                    <span class="text-danger">No result found!!</span>
+                                                </div>
+                                            </div>
+                                            <div class="row setRowLeftRightMarginZero">
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+                                                    <span>You want to add as new institute ? </span>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setLeftRightPaddingZero">
+                                                    <button type="button" class="btn btn-primary" ng-click="addNewInstitute(instituteTitle)"><i class="fa fa-check"></i> Yes</button>
+                                                    <button type="button" class="btn btn-primary" ng-click="cancleAddingNewInstitute()"><i class="fa fa-times"></i> No</button>
+                                                </div>
+                                            </div>
+
+                                           <!-- <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
+                                                {{institute.InstituteTitle}}
+                                            </div>-->
                                         </div>
                                     </div>
                                </div>
