@@ -45,7 +45,6 @@
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 bottom-clearfix setLeftRightPaddingZero">
-                            <!--<button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" data-toggle="tooltip" title="" data-original-title="Add New Job">-->
                             <button class="btn btn-sm btn-success no-radius" ng-click="openJobPostForm('add')" title="Add New Job">
                                 <span class="glyphicon glyphicon-plus-sign"></span> Add New Job
                             </button>
@@ -75,7 +74,6 @@
             <div class="row tx-row {{(($index%2) == 0) ? 'even' : 'odd'}} setRowLeftRightMarginZero" ng-class="(editModes[$index]) ? 'edit' : ''" tabindex="1">
                 <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success">
-                        <!--<b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}"> <span title="{{job.jobcode.length > 15 ? job.jobcode : ''}}"></span>JobCode:{{ job.jobcode | textLength:15}}</b>-->
                         <b class="ng-binding" >
                             <span title="{{job.jobcode.length >= 12 ? job.jobcode : ''}}">JobCode:{{' '+job.jobcode | textLength:12}}
                             </span>
@@ -84,7 +82,6 @@
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 bottom-clearfix" style="word-wrap:break-word;">
                     <small class="text-success">
-                        <!--<b class="ng-binding" data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:25}}</b>-->
                         <b class="ng-binding"  title="{{job.jobtitle.length >= 40 ? job.jobtitle : ''}}" >{{job.jobtitle | textLength:40}}</b>
                     </small>
                 </div>
@@ -99,7 +96,6 @@
                     </small>
                 </div>
                 <div class="col-lg-1 col-md-1 col-sm-12 col-xs-12">
-                    <!--<button class="btn btn-xs btn-block btn-warning no-radius" title="Edit Details" ng-click="openJobPostForm($index)">-->
                     <button class="btn btn-xs btn-block btn-warning no-radius" title="Edit Details" ng-click="editPostedJob(job.tid)">
                         <span class="glyphicon glyphicon-pencil"></span>
                         Edit
@@ -195,23 +191,6 @@
                             <button type="button" class="btn btn-primary" ng-disabled="disabledAddLocation" ng-click="addJobLocation(true)"><i class="fa fa-plus"></i> Add</button>
                         </div>
                     </div>
-                    <!--<div class="row topMargin-three setBorderColor setRowLeftRightMarginZero locationListBox" ng-show="locationArrayString.length">
-                        <div class="row setRowLeftRightMarginZero" ng-repeat="location in locationArrayString track by $index">
-                            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-12">
-                                <span data-toggle="tooltip" title="" data-original-title="{{location}}">{{location | textLength:15}}</span>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                                <a class="showPointer">
-                                    <i class="fa fa-map-marker" ng-click="modalVisibility($index + 1)">
-                                      {{mainLocationArray[$index].maptype == 0 ? 'Set Job Location' : 'Change Job Location'}}
-                                    </i>
-                                </a>
-                            </div>
-                            <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 setLeftRightPaddingZero">
-                                <span class="showPointer"><img src="/images/Droped_Red_16.png" ng-click="removeLocation($index)" class="width-100-px"></span>
-                            </div>
-                        </div>
-                    </div>-->
                 </div>
 
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -404,21 +383,10 @@
                         </div>
                     </div>
                 </div>
-
-                <!--<div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 ">
-                    <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="87" aria-describedby="sizing-addon1"/>
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 ">
-                    to
-                </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 ">
-                    <input type="text" class="form-control text-right" numbers-only maxlength="3" ng-model="aggregate_score" placeholder="87" aria-describedby="sizing-addon1"/>
-                </div>-->
                 <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12 topPaddingOne setLeftRightPaddingZero">
                     %
                 </div>
             </div>
-
 
             <div class="row topMarginButton">
                 <div class="row setRowLeftRightMarginZero">
@@ -441,6 +409,7 @@
                                     <div class="setTableFixHeight">
                                         <table style="width: 100%;">
 
+                                            <!--{{skillMatrix}}-->
                                             <tr ng-repeat="skill in skillMatrix">
                                                 <td class="panelPd5px newSkillFieldJobText" ng-hide="(!editMode[$index]) && ($index == 0)">
                                                     <span ng-hide="editMode[$index]">{{skillMatrix[$index].skillname}}</span>
@@ -450,17 +419,8 @@
                                                     </div>
                                                 </td>
                                                 <td class="panelPd5px skillExpertiesJobDropdown" ng-hide="(!editMode[$index]) && ($index == 0)">
-                                                    <!--<span ng-hide="editMode[$index]">{{expertiseLevels[skillMatrix[$index].expertiseLevel]}}</span>-->
                                                     <span ng-hide="editMode[$index]" title="{{skillMatrix[$index].expertiseText}}">{{skillMatrix[$index].expertiseText}}</span>
 
-                                                 <!--   <span ng-hide="editMode[$index]">
-                                                        {{skill.expertiseLevel}}
-                                                       &lt;!&ndash; <span ng-repeat="exp in skill.expertiseLevel">
-                                                            {{exp}}
-                                                        </span>&ndash;&gt;
-                                                       &lt;!&ndash; {{skillMatrix[$index].expertiseText}}&ndash;&gt;
-                                                    </span>
--->
                                                     <div
                                                           ng-show="editMode[$index]"
                                                           talent-multi-select=""
@@ -526,9 +486,6 @@
                                                         <span ng-show="skillMatrix[$index].active_status == 0">Inactive </span>
                                                         <span ng-show="skillMatrix[$index].active_status == 2">Both </span>
                                                     </span>
-
-                                                    <!--<input class="newCvActveSkills" type="checkbox" ng-hide="editMode[$index]" ng-disabled="1" ng-model="skillMatrix[$index].active_status"/>
-                                                    <input class="newCvActveSkills" ng-show="editMode[$index]" type="checkbox"  ng-checked="editSkill.active_status" ng-model="editSkill.active_status"/>-->
                                                 </td>
                                                 <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
                                                     <button class="btn btn-success btn-xs" ng-show="editMode[$index]" ng-click="saveSkillFn($index)">Add</button>
@@ -536,7 +493,6 @@
                                                     <button class="btn btn-primary btn-xs panelTextSize" ng-disabled="$index == 0" ng-click="deleteSkilFromMartix($index,skillMatrix[$index].tid)">Delete</button>
                                                 </td>
                                             </tr>
-
                                         </table>
                                     </div>
                                 </td>
@@ -545,7 +501,6 @@
                     </table>
                 </div>
             </div>
-
 
             <div class="row topMarginButton">
                 <div class="col-lg-3 col-md-3 col-sm-2 col-xs-12">

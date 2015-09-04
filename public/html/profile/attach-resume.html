@@ -80,7 +80,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row cvBottomSpace">
+                                <div class="row cvBottomSpace marginRight0">
                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12 label">
                                        <h5 class="text-primary text-left">Preferred Location</h5>
                                    </div>
@@ -121,14 +121,22 @@
                                        <h5 class="text-primary text-left">Institute</h5>
                                    </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 hpw" id="instituteDiv">
-                                        <input type = "text"
+                                        <div class="input-group">
+                                            <input type="text" placeholder="Full Institute Name" ng-model = "instituteTitle" ng-disabled="changeInstituteButton" class="form-control emptyBox"/>
+                                            <span class="input-group-addon noPaddingNoBorder">
+                                                <button type="button" ng-show="changeInstituteButton" class="btn btn-primary" ng-click="changeInstitute()"><i class="fa fa-search"></i> Change</button>
+                                                <button type="button" ng-hide="changeInstituteButton" class="btn btn-primary" ng-click="findInstitute(instituteTitle)"><i class="fa fa-search"></i> Find</button>
+                                            </span>
+                                        </div>
+                                        <!--<input type = "text"
                                                placeholder = "Full and Correct College Name"
                                                ng-model = "instituteTitle"
                                                ng-keypress = "instituteKeyPress($event.keyCode)"
                                                ng-click = "instituteTextBoxClicked()"
-                                               class = "form-control instittuteClass"/>
+                                               class = "form-control instittuteClass"/>-->
 
                                         <!--<div ng-show="showInstituteDropDown" ng-hide="institute.InstituteTitle.length" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">-->
+                                        {{showInstituteDropDown}}
                                         <div ng-show="showInstituteDropDown" class="filter-dropdownInstitute width-105 search-option-content setTableFixHeight">
                                             <div class="checkbox-dropdown" ng-repeat="institute in instituteList | filter:instituteTitle" ng-click="selectInstitute(institute.TID,institute.InstituteTitle)">
                                                 {{institute.InstituteTitle}}

@@ -264,3 +264,26 @@ app.use(function(req, res, next) {
 
 
 module.exports = app;
+
+
+
+
+   var respMsg = {
+       "merchantTxnId" : "akagar379erqw8937489fae",
+       "orderAmount" : 15000,
+       "currency" : "INR",
+       "returnUrl" : "https://www.ezeone.com/payment_details.html",
+       "secSignature" : "aq37qrufaa38475qfa89473qrfahzhvhe78qy5ihfajhfjha8tgkjashnzneqr8tu",
+       "notifyUrl" : "https://www.ezeone.com/api/payment_notify",
+       "paymentFormActionUrl" : "https://www.citruspay.com/ezeone",
+       "customParams" : [
+           {
+               "name" : "ezTxId",
+               "value" : 5221
+           },
+           {
+               "name" : "subscriptionId",
+               "value": 3
+           }
+       ]
+   };

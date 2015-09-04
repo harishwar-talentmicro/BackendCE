@@ -108,6 +108,8 @@ angular.module('ezeidApp').
             };
 
             $scope.selectedMsg = [];
+
+            $scope.loadedMsgId = [];
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////DEFAULT CALLS///////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,6 +180,8 @@ angular.module('ezeidApp').
                             message = data.messages;
                         }
 
+                        markAsRead(loadedMsgId);
+
                         if(!message || !message.length > 0)
                         {
                             $scope.totalMessage = 0;
@@ -204,6 +208,15 @@ angular.module('ezeidApp').
                             return;
 
                         message = reverseArray(message);
+
+                        /* get tid of all the loaded messages[change the read status] */
+                        var loadedMsgId = [];
+                        message.forEach(function(data){
+                            loadedMsgId.push(data.tid);
+                        });
+                        /* mark the messages as read */
+                        markAsRead(loadedMsgId);
+
                         $scope.messageData = message;
                     },
                     function(){
@@ -439,9 +452,12 @@ angular.module('ezeidApp').
                             return;
 
                         //message = reverseArray(message);
+                        var loadedMsgId = [];
                         message.forEach(function(data){
                             $scope.messageData.unshift(data);
+                            loadedMsgId.push(data.tid);
                         });
+                        markAsRead(loadedMsgId);
                     });
                 }
             }
@@ -617,6 +633,42 @@ angular.module('ezeidApp').
             }
 
             /**
+             * make all the loaded messages - Mark as read
+             */
+            function markAsRead(loadedMsgId)
+            {
+                if(!loadedMsgId || !loadedMsgId.length > 0)
+                    return;
+                var selectedMsgId = loadedMsgId.join(',');
+                /* remove unread count label */
+                var tid = $routeParams.id;
+                removeUnreadCountLabel(tid);
+
+                messageActivityApi(selectedMsgId,1).then(function(){
+                    },
+                    function(){
+                        Notification.error({ message: "Something went wrong! Try again later", delay: MsgDelay });
+                    });
+            }
+
+            function removeUnreadCountLabel(tid)
+            {
+                $scope.groupListData.forEach(function(data){
+                    if(data.GroupID == tid)
+                    {
+                        data.unreadcount = 0;
+                        return;
+                    }
+                });
+
+                $scope.individualMember.forEach(function(data){
+                    if(data.GroupID == tid)
+                    {
+                        data.unreadcount = 0;
+                    }
+                });
+            }
+            /**
              * Remove all the selected trashed message from dom and empty the selected message aeeay
              */
             function removeTrashMessageFromDOM()
@@ -634,10 +686,10 @@ angular.module('ezeidApp').
              */
             function convertSelectedMessageToCsv(array)
             {
+                console.log(array);
                 var arr = [];
                 /* traverse */
                 array.forEach(function(data){
-                    console.log(data);
                     if(data)
                     {
                         arr.push(data.tid);
