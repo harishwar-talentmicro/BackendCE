@@ -1170,6 +1170,39 @@
                 $scope.skillMatrix[index].exp_to = (parseFloat($scope.skillMatrix[index].exp_to)).toFixed(2);
             };
 
+            // SkillMap Validation function
+            function validateSkillMap(_skillArray){
+
+                var newSkill = _skillArray;
+                var err = [];
+
+                if(newSkill.skillname.length < 1 ){
+                    err.push('Skill is empty');
+                }
+                if((newSkill.exp_from.length < 1) || (!(newSkill.exp_from)) || (newSkill.exp_from.length == undefined))
+                {
+                    err.push('Experience From is empty');
+                }
+                if((newSkill.exp_to.length < 1) || (!(newSkill.exp_to)) || (newSkill.exp_to.length == undefined))
+                {
+                    err.push('Experience To is empty');
+                }
+                if(parseInt(newSkill.exp_to) < parseInt(newSkill.exp_from)){
+                    err.push('Experience From is smaller than Experience To');
+                }
+
+                if(err.length > 0)
+                {
+                    for(var i = 0; i < err.length; i++)
+                    {
+                        Notification.error({ message : err[i], delay : 3000});
+                    }
+                    return false;
+                }
+                return true;
+            };
+
+
             $scope.saveSkillFn = function(index){
                 if(index == 0)
                 {
@@ -1193,65 +1226,74 @@
                     $scope.editMode.push(false);
 
                     /*if(newSkill.skillname && newSkill.exp)*/
-                    if(newSkill.skillname)
+                    if(validateSkillMap(newSkill))
                     {
                         $scope.skillMatrix.push(newSkill);
                     }
-                    else{
-                        $scope.editMode.pop();
-                    }
+                    else
+                    {
+                      //  $scope.editMode.pop();
+                        $scope.editSkill = {
+                            "tid":0,
+                            "skillname":"",
+                            "expertiseLevel":0,
+                            "expertiseText":"",
+                            "exp_from":0.00,
+                            "exp_to":0.00,
+                            "active_status":1
+                        };
 
-                    $scope.editSkill = {
-                        "tid":0,
-                        "skillname":"",
-                        "expertiseLevel":0,
-                        "expertiseText":"",
-                        "exp_from":0.00,
-                        "exp_to":0.00,
-                        "active_status":1
-                    };
 
+                        $scope.expertiseLevelsIDs = ["0"];
+                        $scope.expertiseLevelsTexts = ["Beginner"];
+                        $scope.editSkill.expertiseLevel = $scope.expertiseLevelsIDs.toString();
+                        $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();
 
-                    $scope.expertiseLevelsIDs = ["0"];
-                    $scope.expertiseLevelsTexts = ["Beginner"];
-                    $scope.editSkill.expertiseLevel = $scope.expertiseLevelsIDs.toString();
-                    $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();
-
-                    $scope.inputExpertise = [
+                        $scope.inputExpertise = [
                         {name: "Beginner",value:"0", ticked: true },
                         {name: "Independent",value:"1", ticked: false},
                         {name: "Expert",value:"2",ticked: false},
                         {name: "Master",value:"3",ticked: false}
-                    ];
-
+                        ];
+                    }
                 }
                 else
                 {
-                    $scope.skillMatrix[index] = angular.copy($scope.editSkill);
-                    $scope.editMode[index] = false;
-                    $scope.editMode[0] = true;
+                    var editedSkill = angular.copy($scope.editSkill);
+                   // if(editedSkill.skillname)
+                    if(validateSkillMap(editedSkill))
+                    {
 
-                    $scope.editSkill = {
-                        "tid":0,
-                        "skillname":"",
-                        "expertiseLevel":0,
-                        "expertiseText":"",
-                        "exp_from":0.00,
-                        "exp_to":0.00,
-                        "active_status":1
-                    };
+                        $scope.skillMatrix[index] = editedSkill;
+                        //$scope.skillMatrix[index] = angular.copy($scope.editSkill);
+                        $scope.editMode[index] = false;
+                        $scope.editMode[0] = true;
 
-                    $scope.expertiseLevelsIDs = ["0"];
-                    $scope.expertiseLevelsTexts = ["Beginner"];
-                    $scope.editSkill.expertiseLevel = $scope.expertiseLevelsIDs.toString();
-                    $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();
+                        $scope.editSkill = {
+                            "tid":0,
+                            "skillname":"",
+                            "expertiseLevel":0,
+                            "expertiseText":"",
+                            "exp_from":0.00,
+                            "exp_to":0.00,
+                            "active_status":1
+                        };
 
-                    $scope.inputExpertise = [
-                        {name: "Beginner",value:"0", ticked: true },
-                        {name: "Independent",value:"1", ticked: false},
-                        {name: "Expert",value:"2",ticked: false},
-                        {name: "Master",value:"3",ticked: false}
-                    ];
+                        $scope.expertiseLevelsIDs = ["0"];
+                        $scope.expertiseLevelsTexts = ["Beginner"];
+                        $scope.editSkill.expertiseLevel = $scope.expertiseLevelsIDs.toString();
+                        $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();
+
+                        $scope.inputExpertise = [
+                            {name: "Beginner",value:"0", ticked: true },
+                            {name: "Independent",value:"1", ticked: false},
+                            {name: "Expert",value:"2",ticked: false},
+                            {name: "Master",value:"3",ticked: false}
+                        ];
+                    }
+                   /* else{
+                        $scope.editMode.pop();
+                    }*/
                 }
 
                 $scope.skillMatrix[0] = {
