@@ -276,12 +276,23 @@ angular.module('ezeidApp').
                             ctx.lineWidth = 1;
                             ctx.fillStyle = '#337ab7';
                             ctx.strokeStyle = '#337ab7';
+
+
                             /*var x = 300 / ($scope.SearchInfo.Website == '' ? 8 : 4);*/
-                            var x = 340 / 4;
-                            var y = 30 / 2;
+
+                            var x = 225 / 10;
+                            var y = 30 / 1.5;
+
+                            /*var x = 340 / 4;
+                            var y = 30 / 2;*/
+
+                           $scope.emailTextWidth = ctx.measureText($scope.SearchInfo.EMailID).width;
+
+                            console.log("Sai width");
+                            console.log($scope.emailTextWidth);
 
                          //   ctx.fillText($scope.SearchInfo.EMailID, x, 25);
-                            ctx.strokeText($scope.SearchInfo.EMailID, x, 25);
+                            ctx.strokeText($scope.SearchInfo.EMailID, x, y);
 
 
                             getPictureOfSearchedTerm(_ezeone);
