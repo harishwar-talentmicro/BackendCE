@@ -671,7 +671,13 @@ angular.module('ezeidApp').
             $rootScope.$watch('_userInfo',function(newVal){
                 if(newVal){
                     if(newVal.IsAuthenticate){
-                        $location.path('/profile-manager/new');
+                        if(parseInt(newVal.Verified) === 0){
+                            $location.path('/profile-manager/new');
+                        }
+                        else{
+                            $location.path('/');
+                        }
+
                     }
                 }
             });
