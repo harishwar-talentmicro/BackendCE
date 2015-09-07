@@ -179,7 +179,7 @@
                                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 setPaddingLeftRight0">
                                                             <hr class="style-three">
                                                             <!-- Star ratings goes here -->
-                                                            <div class="starRating">
+                                                            <div class="starRating p-bottom-4">
                                                                 <div>
                                                                     <div>
                                                                         <div>
@@ -199,7 +199,6 @@
                                                                 <input id="rating5" disabled type="radio" name="form_rating" ng-model="form_rating" value="5">
                                                                 <label for="rating5"><span>5</span></label>
                                                             </div>
-                                                            <div ng-click="toggleReviewModalVisibility()" class="small pointer">0 Reviews </div>
                                                             <hr class="style-three">
                                                         </div>
                                                     </div>
@@ -1139,6 +1138,9 @@
                             <small class="pull-right">
                                 <span> {{totalReview}} Reviews | </span>
                                 <button class="btn btn-default btn-xs disabled">{{avgRating}} <i class="fa fa-star text-default"></i></button>
+                                <div ng-click="toggleReviewModalVisibility()"
+                                     class="pointer btn btn-default btn-xs">Post Reviews
+                                </div>
                             </small>
                         </div>
                         <!-- Review body -->
