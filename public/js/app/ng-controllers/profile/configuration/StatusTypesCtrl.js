@@ -212,10 +212,10 @@ angular.module('ezeidApp').controller('StatusTypesCtrl',['$scope','$rootScope','
         if(!txStatus.title){
             verror.push('stage title');
         }
-        if(txStatus.progress == ''){
+        if(parseInt(txStatus.progress) < 0 ||  parseInt(txStatus.progress) == NaN){
             verror.push('progress');
         }
-        if(txStatus.statusValue == ''){
+        if(parseInt(txStatus.statusValue) < 0 ||  parseInt(txStatus.statusValue) == NaN){
             verror.push('stage value');
         }
         ////console.log(verror);
