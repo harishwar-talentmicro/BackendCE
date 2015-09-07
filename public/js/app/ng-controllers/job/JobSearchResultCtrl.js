@@ -48,7 +48,6 @@ angular.module('ezeidApp').
             $scope.isProcessing = true;
             $scope.sortByToggle = false;
 
-
             $scope.modalVisible = false;
             $scope.modalVisibility = function () {
                 /* toggle map visibility status */
@@ -1227,5 +1226,80 @@ angular.module('ezeidApp').
                 $window.open('/profile-manager/resume?jobid='+$scope.job_id, '_blank');
             };
 
+            $scope.showMyCVMatchingJob = function()
+            {
+                /* set job type data */
+                //resetJobTypeData();
+
+                console.log("sai123");
+                if($rootScope._userInfo.IsAuthenticate)
+                {
+                    $scope.$emit('$preLoaderStart');
+                    $http({ method: 'get', url: GURL + 'job_match',
+                        params:
+                        {
+                            token: $rootScope._userInfo.Token
+                        }
+                    }).success(function (response) {
+                            $scope.$emit('$preLoaderStop');
+
+                            console.log(response);
+
+                            if(response.status)
+                            {
+                               // $scope.showFilterButton = false;
+                               // $scope.isResultEmpty = true;
+                                $scope.resultData = "";
+                             //   $scope.resultThisPage = 0;
+                            }
+
+
+/*
+
+                            if(response.status)
+                            {
+                                for(var i = 0; i < response.data.result.length; i++)
+                                {
+                                   response.data.result[i].LUdate = UtilityService.convertTimeToLocal(response.data.result[i].LUdate);
+                                }
+                            }
+
+                            */
+/* set the total count of the result *//*
+
+                            $scope.totalResult = response.data.total_count;
+
+                            */
+/* set result data *//*
+
+                            setData(response.data.result);
+
+                            */
+/* Reset the pagination buttons *//*
+
+                            $scope.paginationVisibility();
+
+
+                            */
+/* Set Advance-filter [Right-side] *//*
+
+                            setJobLocationData(response.data.job_location);
+                            setSalaryData(response.data.salary);
+                            setCategoryData(response.data.category);
+*/
+
+
+                            $scope.jsTileHoverEffect();
+
+                        }).error(function(){
+                            Notification.error({ message : 'An error occurred', delay : MsgDelay});
+                            $scope.$emit('$preLoaderStop');
+                        });
+                }
+                else
+                {
+                    $location.url('/');
+                }
+            };
 
         }]);
