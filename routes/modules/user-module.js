@@ -4117,26 +4117,10 @@ User.prototype.saveUserDetails = function(req,res,next){
         error['firstName'] = 'Invalid firstName';
         validateStatus *= false;
     }
-    if(!lastName){
-        error['lastName'] = 'Invalid lastName';
-        validateStatus *= false;
-    }
     if(!companyName){
         error['companyName'] = 'Invalid companyName';
         validateStatus *= false;
     }
-    //if(!jobTitle){
-    //    error['jobTitle'] = 'Invalid jobTitle';
-    //    validateStatus *= false;
-    //}
-    //if(!gender){
-    //    error['gender'] = 'Invalid gender';
-    //    validateStatus *= false;
-    //}
-    //if(!dob){
-    //    error['dob'] = 'Invalid dob';
-    //    validateStatus *= false;
-    //}
     if(!email){
         error['email'] = 'Invalid email';
         validateStatus *= false;
