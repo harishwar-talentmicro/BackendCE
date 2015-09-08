@@ -836,59 +836,50 @@ Location.prototype.getLocationPicture = function(req,res,next){
                                         console.log('FnShareLocation: location send successfully');
 
                                         //send notification
-                                        fs.readFile("share_location.html", "utf8", function (err, data) {
-                                          if(!err){
-                                            data = data.replace("[title]", locationTitle);
-                                            data = data.replace("[latitude]", latitude);
-                                            data = data.replace("[longitude]", longitude);
-                                            data = data.replace("[Name]", getResult[0][0].name);
-                                            data = data.replace("[EZEOneID]", getResult[0][0].ezeid);
-
-                                            console.log(data);
-                                        var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where EZEID='+st.db.escape(getResult[0][0].ezeid);
+                                        var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where EZEID=' + st.db.escape(getResult[0][0].ezeid);
                                         st.db.query(queryParameters, function (err, iosResult) {
                                             if (iosResult) {
                                                 iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                                                 console.log(iphoneID);
-                                        var queryParams = 'select tid,GroupName from tmgroups where GroupName=' + st.db.escape(ezeone_id);
-                                        st.db.query(queryParams, function (err, userDetails) {
-                                            if (userDetails) {
-                                                if (userDetails[0]) {
-                                                  console.log(userDetails);
+                                                var queryParams = 'select tid,GroupName from tmgroups where GroupName=' + st.db.escape(ezeone_id);
+                                                st.db.query(queryParams, function (err, userDetails) {
+                                                    if (userDetails) {
+                                                        if (userDetails[0]) {
+                                                            console.log(userDetails);
+                                                            receiverId = userDetails[0].tid;
+                                                            senderTitle = getResult[0][0].ezeid;
+                                                            groupTitle = userDetails[0].GroupName;
+                                                            groupID = userDetails[0].tid;
+                                                            if(locationTitle) {
+                                                                messageText = 'click here to navigate and reach ' + senderTitle.slice(1) + ' in ' + locationTitle;
+                                                            }
+                                                            else
+                                                            {
+                                                                messageText = 'click here to navigate and reach ' + senderTitle.slice(1);
+                                                            }
+                                                            messageType = 9;
+                                                            operationType = 0;
+                                                            iphoneId = iphoneID;
+                                                            messageId = 0;
+                                                            masterid = '';
+                                                            console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
 
-                                                    receiverId = userDetails[0].tid;
-                                                    senderTitle = getResult[0][0].ezeid;
-                                                    groupTitle = userDetails[0].GroupName;
-                                                    groupID = userDetails[0].tid;
-                                                    messageText = data;
-                                                    messageType = 9;
-                                                    operationType = 0;
-                                                    iphoneId = iphoneID;
-                                                    messageId = 0;
-                                                    masterid = '';
-                                                    console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                    notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid);
-
-                                                }
-                                                else {
-                                                    console.log('FnShareLocation:userDetails not loaded');
-                                                }
-                                              }
-                                                else {
-                                                    console.log('FnShareLocation:userDetails not loaded');
-                                                }
-                                              });
+                                                        }
+                                                        else {
+                                                            console.log('FnShareLocation:userDetails not loaded');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnShareLocation:userDetails not loaded');
+                                                    }
+                                                });
                                             }
                                             else {
                                                 console.log('FnShareLocation:iphoneID not loaded');
                                             }
-                                          });
-                                        }
-                                        else {
-                                            console.log('FnShareLocation:file not read');
-                                        }
-                                      });
-                                }
+                                        });
+                                    }
                                     else {
                                         responseMessage.message = 'location not send';
                                         res.status(200).json(responseMessage);
