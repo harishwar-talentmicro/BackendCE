@@ -836,12 +836,14 @@ Location.prototype.getLocationPicture = function(req,res,next){
                                         console.log('FnShareLocation: location send successfully');
 
                                         //send notification
-                                        var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where EZEID=' + st.db.escape(getResult[0][0].ezeid);
+                                        var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where EZEID=' + st.db.escape(ezeone_id);
+                                        console.log(queryParameters);
                                         st.db.query(queryParameters, function (err, iosResult) {
                                             if (iosResult) {
                                                 iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                                                 console.log(iphoneID);
                                                 var queryParams = 'select tid,GroupName from tmgroups where GroupName=' + st.db.escape(ezeone_id);
+                                                console.log(queryParams);
                                                 st.db.query(queryParams, function (err, userDetails) {
                                                     if (userDetails) {
                                                         if (userDetails[0]) {
