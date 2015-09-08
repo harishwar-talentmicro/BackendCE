@@ -1202,7 +1202,17 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Message Composed successfully';
-                                    responseMessage.data = insertResult[0][0];
+                                    responseMessage.data = {
+                                        message: req.body.message,
+                                        attachmentFilename: req.body.attachment_filename,
+                                        priority: req.body.priority,
+                                        targetDate: req.body.target_date,
+                                        expiryDate: req.body.expiry_date,
+                                        token: req.body.token,
+                                        previousMessageID: req.body.previous_messageID,
+                                        toID: req.body.to_id,
+                                        idType: req.body.id_type
+                                    };
                                     res.status(200).json(responseMessage);
 
                                     /**
