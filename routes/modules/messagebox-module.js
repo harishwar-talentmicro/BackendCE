@@ -1146,7 +1146,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
-    var c=0,toIds,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type,msgId;
+    var c=0,toIds,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type,msgId,iphoneID;
 
 
     if(idType){
@@ -1227,8 +1227,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                 var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + toIds[c];
                                                 st.db.query(queryParameters, function (err, iosResult) {
                                                     if (iosResult) {
-                                                        iphoneId = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
-                                                        console.log(iphoneId);
+                                                        iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                                        console.log(iphoneID);
                                                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
                                                         var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
                                                         st.db.query(messageQuery, function (err, groupDetails) {
@@ -1256,7 +1256,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                                             messageText = message;
                                                                                             messageType = id_type;
                                                                                             operationType = 0;
-                                                                                            iphoneId = iphoneId;
+                                                                                            iphoneId = iphoneID;
                                                                                             messageId = msgId;
                                                                                             masterid = groupDetails[0][0].AdminID;
                                                                                             console.log('senderid:' + groupId + '     receiverid:' + receiverId);
@@ -1338,7 +1338,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !'
+            responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnComposeMessage ' + ex.description);
             var errorDate = new Date();
