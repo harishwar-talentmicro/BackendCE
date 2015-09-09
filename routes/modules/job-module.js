@@ -806,32 +806,40 @@ Job.prototype.searchJobs = function(req,res,next){
             +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue)+',' + st.db.escape(type);
         console.log('CALL psearchjobs(' + query + ')');
         st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
+            console.log(getresult[1]);
             if (!err) {
                 if (getresult) {
                     if (getresult[0]) {
                         if (getresult[0][0]) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Jobs Search result loaded successfully';
-                            if(filter == 0) {
-                                responseMessage.data = {
-                                    total_count: getresult[0][0].count,
-                                    result: getresult[1],
-                                    job_location: getresult[2],
-                                    salary: getresult[3],
-                                    category: getresult[4],
-                                    company_details:getresult[5]
-                                };
+                            if (getresult[1].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Jobs Search result loaded successfully';
+                                if (filter == 0) {
+                                    responseMessage.data = {
+                                        total_count: getresult[0][0].count,
+                                        result: getresult[1],
+                                        job_location: getresult[2],
+                                        salary: getresult[3],
+                                        category: getresult[4],
+                                        company_details: getresult[5]
+                                    };
+                                }
+                                else {
+                                    responseMessage.data = {
+                                        total_count: getresult[0][0].count,
+                                        result: getresult[1]
+                                    };
+                                }
+                                res.status(200).json(responseMessage);
+                                console.log('FnSearchJobs: Jobs Search result loaded successfully');
                             }
-                            else {
-                                responseMessage.data = {
-                                    total_count: getresult[0][0].count,
-                                    result: getresult[1]
-                                };
-                            }
+                        else {
+                            responseMessage.message = 'Search result not found';
                             res.status(200).json(responseMessage);
-                            console.log('FnSearchJobs: Jobs Search result loaded successfully');
+                            console.log('FnSearchJobs:Search result not found');
                         }
+                    }
                         else {
                             responseMessage.message = 'Search result not found';
                             res.status(200).json(responseMessage);

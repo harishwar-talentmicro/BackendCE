@@ -21,7 +21,7 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload){
 
 
         var note = new apn.Notification();
-        note.badge = 2;
+        note.badge = 0;
         note.sound = "notification-beep.wav";
         note.alert = { "body" : payload.g_title +' : ' +payload.message, "action-loc-key" : "Play" ,
             "launch-image" :
