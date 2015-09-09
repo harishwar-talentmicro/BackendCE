@@ -973,7 +973,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
     var auto_join = req.body.auto_join ? req.body.auto_join : 0;
     var relationType = req.body.relation_type;
     var userID = req.body.user_id ? req.body.user_id : 0;
-    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
+    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,iphoneID;
 
     var responseMessage = {
         status: false,
@@ -1033,7 +1033,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                     var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid='+userID;
                                     st.db.query(queryParameters, function (err, iosResult) {
                                         if (iosResult) {
-                                            iphoneId = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                            iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                                             console.log(iphoneId);
                                             var query1 = 'select tid from tmgroups where GroupName=' + st.db.escape(groupName);
                                             st.db.query(query1, function (err, groupDetails) {
@@ -1045,11 +1045,11 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                                                     receiverId = getDetails[0].tid;
                                                                     senderTitle = groupName;
                                                                     groupTitle = groupName;
-                                                                    groupId = (groupDetails[0].tid) ? (groupDetails[0].tid) : '';
+                                                                    groupId = groupDetails[0].tid;
                                                                     messageText = 'has sent an invitation ';
                                                                     messageType = 3;
                                                                     operationType = 0;
-                                                                    iphoneId = iphoneId;
+                                                                    iphoneId = iphoneID;
                                                                     messageId = 0;
                                                                     masterid = '';
                                                                     console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);

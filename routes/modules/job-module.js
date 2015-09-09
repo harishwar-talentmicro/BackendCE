@@ -806,7 +806,6 @@ Job.prototype.searchJobs = function(req,res,next){
             +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue)+',' + st.db.escape(type);
         console.log('CALL psearchjobs(' + query + ')');
         st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
-            console.log(getresult[1]);
             if (!err) {
                 if (getresult) {
                     if (getresult[0]) {
@@ -834,12 +833,12 @@ Job.prototype.searchJobs = function(req,res,next){
                                 res.status(200).json(responseMessage);
                                 console.log('FnSearchJobs: Jobs Search result loaded successfully');
                             }
-                        else {
-                            responseMessage.message = 'Search result not found';
-                            res.status(200).json(responseMessage);
-                            console.log('FnSearchJobs:Search result not found');
+                            else {
+                                responseMessage.message = 'Search result not found';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSearchJobs:Search result not found');
+                            }
                         }
-                    }
                         else {
                             responseMessage.message = 'Search result not found';
                             res.status(200).json(responseMessage);
