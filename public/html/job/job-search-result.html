@@ -104,33 +104,7 @@
                                     <button disabled class="btn btn-default btn-sm form-control">Years</button>
                                 </span>
                             </div>
-                                <div  ng-show="false">
-                                    <button ng-click="toggleVisibility(1)" class="btn btn-default form-control btn-sm">Proximity <span class="caret"></span></button>
-                                    <div ng-show="showProximityFilter" class="filter-dropdown job-type-dropdown search-proximity-content">
-                                        <div class="select-option" ng-class="proximity == 1?'selected':''" ng-click="changeProximity(1)">
-                                            1 Mile (1.6 Km)
-                                        </div>
-                                        <div class="select-option"  ng-class="proximity == 2?'selected':''" ng-click="changeProximity(2)">
-                                            2 Mile (3.2 Km)
-                                        </div>
-                                        <div class="select-option"  ng-class="proximity == 5?'selected':''" ng-click="changeProximity(5)">
-                                            5 Mile (8 Km)
-                                        </div>
-                                        <div class="select-option"  ng-class="proximity == 10?'selected':''" ng-click="changeProximity(10)">
-                                            10 Mile (16 Km)
-                                        </div>
-                                        <div class="select-option"  ng-class="proximity == 25?'selected':''" ng-click="changeProximity(25)">
-                                            25 Mile (40 Km)
-                                        </div>
-                                        <div class="select-option"  ng-class="proximity == 50?'selected':''" ng-click="changeProximity(50)">
-                                            50 Mile (80 Km)
-                                        </div>
-                                        <div class="select-option"  ng-class="proximity == 0?'selected':''" ng-click="changeProximity(0)">
-                                            Any
-                                        </div>
-                                    </div>
-                                </div>
-                             </div>
+                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 filter-item-border">
                             <button ng-click="toggleVisibility()" class="btn btn-default form-control btn-sm">Job Type <span class="caret"></span></button>
                             <div ng-show="jobTypeFilter" class="job-type-dropdown">
@@ -352,8 +326,13 @@
                             <div class="col-lg-2 col-md-2 col-sm-12 col-xs-12 text-right normal-view-buttons">
                                 <div ng-click="$event.stopPropagation()">
                                     &nbsp;<span ng-show="_userInfo.Type == 1">
-                                            <button class="btn btn-primary btn-sm" ng-hide="job.hide" ng-click="applyForJob(job.tid,$index)">APPLY</button>
-                                        </span>
+                                            <span ng-hide="$root._userInfo.isinstitute_admin">
+                                                <button class="btn btn-primary btn-sm" ng-hide="job.hide" ng-click="applyForJob(job.tid,$index)">APPLY</button>
+                                            </span>
+                                         </span>
+                                    <span ng-show="$root._userInfo.isinstitute_admin">
+                                        <button class="btn btn-primary btn-sm" ng-click="redirectNotifyPage(job.tid)">Notify</button>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -370,13 +349,26 @@
                             </p>
                         </div>-->
 
-                        <div class="key-skills p-top-10">
+                        <div class="row">
+                            <div class="salary col-lg-7">
+                                <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
+                                    <span>
+                                        <button class="btn btn-default btn-xs">{{job.keyskills}}</button>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="posted-on text-right col-lg-5">
+                                <i class="fa fa-road"></i> {{job.distance}}&nbsp;Km
+                            </div>
+                        </div>
+
+                        <!--<div class="key-skills p-top-10">
                             <p><i class="fa fa-arrow-circle-right"></i> Key Skills:
                                 <span>
                                     <button class="btn btn-default btn-xs">{{job.keyskills}}</button>
                                 </span>
                             </p>
-                        </div>
+                        </div>-->
 
                         <div class="row">
                             <div class="salary col-lg-7">
