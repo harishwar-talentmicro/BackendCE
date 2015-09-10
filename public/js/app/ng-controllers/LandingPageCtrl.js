@@ -48,6 +48,9 @@ angular.module('ezeidApp').
              * @type {{searchType: number}}
              */
 
+            // Set show my institute job filter 0(null)
+            $rootScope._userInfo.instituteJobFilter = 0;
+
             resizeTile();
 
             var placeDetail = [];
@@ -57,7 +60,6 @@ angular.module('ezeidApp').
             $scope.parkingStatus = 0;
             $scope.openStatus = 0;
             $scope.homeDelivery = 0;
-
 
             var mapLatitude;
             var mapLongitude;

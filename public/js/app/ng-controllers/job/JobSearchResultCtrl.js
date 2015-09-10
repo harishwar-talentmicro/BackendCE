@@ -42,7 +42,7 @@ angular.module('ezeidApp').
              * All initialization goes here
              */
                 //Basic initialization
-            $scope.params = [];
+           // $scope.params = [];
             $scope.resultData = [];
             $scope.isResultEmpty = true;//YES - by default
             $scope.isProcessing = true;
@@ -56,24 +56,21 @@ angular.module('ezeidApp').
 
             $scope.job_id = 0;
 
-            console.log("SAi12345");
-            console.log($routeParams);
-
-
             /**
              * Initilization of variabes for additional options filter elements
              */
-            $scope.params.proximity = 0;//Default any is selected
+            /*$scope.params.proximity = 0;//Default any is selected
             $scope.params.jobType = '0,1,2,3,4,5,6,7';//Checkboxes for job type
             $scope.params.searchTerm = $routeParams.searchTerm;
             $scope.params.orderBy = 1;//1: Asc, 2: Desc
-            $scope.params.locations = "";//comma separated ids
-            $scope.params.category = "";//comma separated ids
-            $scope.params.salary = "";//1-2,5-6
-           // $scope.params.filter = 0;
-            $scope.searchFilter = 0;
+            $scope.params.locations = ($routeParams.locations) ? $routeParams.locations : ""; //comma separated ids
+            $scope.params.category = ($routeParams.category) ? $routeParams.category : "";//comma separated ids
+            $scope.params.salary = ($routeParams.salary) ? $routeParams.salary : "";//1-2,5-6*/
+
+            $scope.searchFilter = ($rootScope._userInfo.instituteJobFilter) ? 1 : 0;
+            //$scope.searchFilter = 0;
             $scope.searchType = 0;
-            $scope.filterCollege = false;
+
             $scope.showFilterButton = false;
 
             $scope.searchKeyWord = $routeParams.searchTerm;
@@ -82,11 +79,31 @@ angular.module('ezeidApp').
             $scope.jobTypeFilter = false;
             $scope.advanceSearchVisibility = false;
 
+
+            console.log("Sai1");
+            console.log($routeParams);
+
+            $scope.filterCollege = ($routeParams.filterCollege) ? ($routeParams.filterCollege == 1) ? true : false : false;
+
+           // $scope.filterCollege == false ? 0 : 1,
+
+            $scope.latitude = $routeParams.lat,
+            $scope.longitude = $routeParams.lng,
+            $scope.proximity = ($routeParams.proximity) ? $routeParams.proximity : 0;
+            $scope.jobType = ($routeParams.jobType) ? $routeParams.jobType : '0,1,2,3,4,5,6,7';
+            $scope.searchTerm = ($routeParams.searchTerm) ? $routeParams.searchTerm : "";
+            $scope.locations = ($routeParams.locations) ? $routeParams.locations : ""; //comma separated ids
+            $scope.category = ($routeParams.category) ? $routeParams.category : "";//comma separated ids
+            $scope.salary = ($routeParams.salary) ? $routeParams.salary : "";
+            $scope.experience = ($routeParams.experience) ? $routeParams.experience : ""
+
+            console.log("Sai2");
+            console.log($scope.locations);
+
             /**
              *  set search type
              * @type {number}
              */
-
             if($routeParams.ShowMyInstituteJobs)
             {
                 $scope.searchType = (parseInt($routeParams.ShowMyInstituteJobs) == 1) ? 1 : 0 ;
@@ -106,7 +123,8 @@ angular.module('ezeidApp').
                 minSalary:0,
                 maxSalary:0
             };
-
+            console.log("Sai3");
+            console.log($scope.locations);
             /**
              * Make-array for checkbox effect
              */
@@ -116,6 +134,9 @@ angular.module('ezeidApp').
                 salary:[]
             };
 
+            console.log("Sai4");
+            console.log($scope.locations);
+
             /**
              * Make-array for holding temporary value of selected checkbox
              */
@@ -124,6 +145,9 @@ angular.module('ezeidApp').
                 industry:[],
                 salary:[]
             };
+
+            console.log("Sai5");
+            console.log($scope.locations);
 
             /* selected Filter options */
             $scope.selectedFilter = {
@@ -135,31 +159,30 @@ angular.module('ezeidApp').
             //easy and default calling of functions
             initiateSearch();
 
-            /***********************************************************************************************************
-             /***********************************************************************************************************
+            console.log("Sai6");
+            console.log($scope.locations);
              /***********************************************************************************************************
              * All ACTIONS goes here
-             ***********************************************************************************************************
-             /**********************************************************************************************************
-             /**********************************************************************************************************
+            /**********************************************************************************************************
 
              /**
              * initiate the search process
              */
             function initiateSearch()
             {
+                console.log("Sai7");
+                console.log($scope.locations);
                 /* save all the route params in a temporary variable[params] */
-                $scope.params = $routeParams;
+               // $scope.params = $routeParams;
                 cleanExperienceData();
 
-               /* if(!parseInt(($scope.params.searchTerm) ? $scope.params.searchTerm.length : 0) > 0)
-                {
-                    Notification.error({ message : 'Invalid request', delay : MsgDelay});
-                }*/
-
+                console.log("Sai8");
+                console.log($scope.locations);
                 /* set job type data */
                 resetJobTypeData();
 
+                console.log("Sai9");
+                console.log($scope.locations);
                 /* call the search API */
                 setSearchResult();
             }
@@ -169,10 +192,15 @@ angular.module('ezeidApp').
              */
             function cleanExperienceData()
             {
-                var exp = $scope.params.experience;
+                /*var exp = $scope.params.experience;
                 if(exp == 'null' || exp == '' || typeof(exp) == undefined)
                 {
                     $scope.params.experience = '';
+                }*/
+                var exp = $scope.experience;
+                if(exp == 'null' || exp == '' || typeof(exp) == undefined)
+                {
+                    $scope.experience = '';
                 }
             }
 
@@ -182,61 +210,85 @@ angular.module('ezeidApp').
             function setSearchResult(isRequestFromFilter)
             {
                 var requestFromFilter = false;
-                if(typeof(isRequestFromFilter) !== undefined && parseInt(isRequestFromFilter) == 1)
+                if((typeof(isRequestFromFilter) !== undefined) && (parseInt(isRequestFromFilter) == 1))
                 {
-                    requestFromFilter = true;
+                   requestFromFilter = true;
                 }
                 else
                 {
-                    /* reset all the filters */
-                    resetFilters();
+                   /* reset all the filters */
+                    //resetFilters();
                 }
 
                 if($rootScope._userInfo.IsAuthenticate)
                 {
-                    var category = "";
+                    /*var category = "";
                     if($scope.params.category && parseInt($scope.params.category) > 0)
                     {
                         category = parseInt($scope.params.category);
-                    }
+                    }*/
 
                     /* make an API request to get the data */
-                    var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
+                   // var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
+
+console.log("sai99");
+console.log($scope.locations);
+
+
+
                     $scope.$emit('$preLoaderStart');
                     $http({ method: 'get', url: GURL + 'job_search',
                         params:
                         {
-                            latitude:$scope.params.lat,
-                            longitude:$scope.params.lng,
-                            proximity:$scope.params.proximity,
-                            jobType:$scope.params.jobType,
-                            exp:experience,
-                            keywords:$scope.params.searchTerm,
+                            latitude:$scope.latitude,
+                            longitude:$scope.longitude,
+                            proximity:$scope.proximity,
+                            jobType:$scope.jobType,
+                            exp:$scope.experience,
+                            keywords:$scope.searchTerm,
                             token: $rootScope._userInfo.Token,
                             page_size: $scope.pageSize,
                             page_count: $scope.pageCount,
-                            /*order_by: $scope.params.orderBy,*/
-                            //Exclusively for Advance filters
-                            locations: $scope.params.locations,
-                            category: category,
-                            salary: $scope.params.salary,
+                            locations: $scope.locations,
+                            category: $scope.category,
+                            salary: $scope.salary,
                             restrict: $scope.filterCollege == false ? 0 : 1,
                             type: $scope.searchType,  // 0 = normal job search, 1 = Show my institue jobs(menu item), 2 = my cv matching jobs
                             filter:$scope.searchFilter
                         }
+
                     }).success(function (response) {
                             $scope.$emit('$preLoaderStop');
                             $scope.isProcessing = false;
 
-                            /* YIPPE! Got response */
-                            var isEmpty = !(response.data.result.length > 0);
-                            if(isEmpty)//No Result found
+                            if(response.data)//No Result found
                             {
-                                /* reset all the data */
+                                var isEmpty = !(response.data.result.length > 0);
+                                if(isEmpty)//No Result found
+                                {
+                                    /* reset all the data */
+                                    resetSearchResultData();
+                                    $scope.paginationVisibility();
+                                    return;
+                                }
+                            }
+                            else
+                            {
                                 resetSearchResultData();
                                 $scope.paginationVisibility();
                                 return;
                             }
+
+
+                            /* YIPPE! Got response */
+                          /*  var isEmpty = !(response.data.result.length > 0);
+                            if(isEmpty)//No Result found
+                            {
+                                *//* reset all the data *//*
+                                resetSearchResultData();
+                                $scope.paginationVisibility();
+                                return;
+                            }*/
 
                             if(response.status)
                             {
@@ -258,27 +310,24 @@ angular.module('ezeidApp').
 
                             if(requestFromFilter)
                             {
-                                return;
+                               return;
                             }
-                            /* Set Advance-filter [Right-side] */
 
-                            console.log("SAi 44");
-                            console.log($scope.searchFilter);
-                            if(!$scope.searchFilter)
-                            {
-                                console.log("SAi 456");
+                            /* Set Advance-filter [Right-side] */
+                           if(!$scope.searchFilter)
+                           {
                                 setJobLocationData(response.data.job_location);
                                 setSalaryData(response.data.salary);
                                 setCategoryData(response.data.category);
-                            }
-
+                           }
 
                             /* set all the advance filter */
                             advanceFilter();
 
                             $scope.jsTileHoverEffect();
 
-                        }).error(function(){
+                        }).error(function()
+                        {
                             $scope.isSearchInProgress = false;
                             Notification.error({ message : 'An error occurred', delay : MsgDelay});
                             $scope.$emit('$preLoaderStop');
@@ -295,9 +344,13 @@ angular.module('ezeidApp').
              */
             function resetFilters()
             {
-                $scope.params.salary = null;
+               /* $scope.params.salary = null;
                 $scope.params.category = null;
-                $scope.params.locations = null;
+                $scope.params.locations = null;*/
+
+                $scope.salary = "";
+                $scope.category = "";
+                $scope.locations =  "";
             }
 
             /**
@@ -306,6 +359,8 @@ angular.module('ezeidApp').
             function resetSearchResultData()
             {
                // $scope.params = [];
+
+
 
                 $scope.isResultEmpty = true;
                 $scope.resultData = [];
@@ -417,9 +472,9 @@ angular.module('ezeidApp').
              */
             function preSetFilterLocation()
             {
-                if($scope.params.locations)
+                if($scope.locations)
                 {
-                    var dataArr = $scope.params.locations.split(",");
+                    var dataArr = $scope.locations.split(",");
                     var tempIndexArr = [];
                     for(var i = 0;i < dataArr.length; i++)
                     {
@@ -448,7 +503,7 @@ angular.module('ezeidApp').
                     return false;
                 }
                 return status;
-            }
+            };
 
             /**
              * When user clicking for the first time delete all the temporay location array
@@ -467,9 +522,9 @@ angular.module('ezeidApp').
              */
             function preSetFilterCategory()
             {
-                if($scope.params.category)
+                if($scope.category)
                 {
-                    var dataArr = $scope.params.category.split(",");
+                    var dataArr = $scope.category.split(",");
                     var tempIndexArr = [];
                     for(var i = 0;i < dataArr.length; i++)
                     {
@@ -512,9 +567,9 @@ angular.module('ezeidApp').
              */
             function preSetFilterSalary()
             {
-                if($scope.params.salary)
+                if($scope.salary)
                 {
-                    var dataArr = $scope.params.salary.split(",");
+                    var dataArr = $scope.salary.split(",");
                     var tempIndexArr = [];
                     for(var i = 0;i < dataArr.length; i++)
                     {
@@ -623,9 +678,8 @@ angular.module('ezeidApp').
              */
             $scope.changeProximity = function(proximityValue)
             {
-                $scope.params.proximity = proximityValue;
+                $scope.proximity  = proximityValue;
             };
-
 
             /**
              * change the value of Job-types
@@ -730,9 +784,9 @@ angular.module('ezeidApp').
              */
             $scope.resetAdvanceFilters = function()
             {
-                $scope.params.experience = 0;
+                $scope.proximity = 0;
                 $scope.activeJobType = [false,false,false,false,false,false,false,false];
-                $scope.params.proximity = 0;
+                $scope.proximity = 0;
             };
 
             /**
@@ -742,7 +796,6 @@ angular.module('ezeidApp').
             {
                 if(parseInt(isTriggeredFromFilter) == 1)
                 {
-                   // $scope.params.filter = 1;
                     $scope.searchFilter = 1;
                     /* Just update the result parameter */
                     setSearchResult(1);
@@ -751,13 +804,30 @@ angular.module('ezeidApp').
                 else
                 {
                     $scope.searchFilter = 0;
-                   // $scope.searchType = 0;
                     setJobTypeData();
+                    $rootScope._userInfo.instituteJobFilter = $scope.searchFilter;
+
                     /* redirect to search page */
-                    var searchStr = getSearchtermString();
-                    $location.url('/jobsearch?' + searchStr);
+                 //   var searchStr = getSearchtermString();
+
+                    var searchParams = 'searchTerm='+ $scope.searchTerm +
+                        '&proximity='+ $scope.proximity +
+                        '&experience='+ $scope.experience +
+                        '&lat='+ $scope.latitude +
+                        '&lng='+ $scope.longitude +
+                        '&jobType='+ $scope.jobType +
+                        '&salary='+ $scope.salary +
+                        '&category='+ $scope.category +
+                        '&locations='+ $scope.locations +
+                        '&filterCollege=' +$scope.filterCollege ;
+
+
+
+
+                    //$location.url('/jobsearch?' + searchStr);
+                    $location.url('/jobsearch?' + searchParams);
                     $scope.triggerSearchOnEnterKey();
-                    $scope.showFilterButton = false;
+                  //  $scope.showFilterButton = false;
                 }
             };
 
@@ -788,7 +858,7 @@ angular.module('ezeidApp').
                         tempStringArr.push(parseInt(i));
                     }
                 }
-                $scope.params.jobType = tempStringArr.join(',');
+                $scope.jobType = tempStringArr.join(',');
             }
 
             /**
@@ -810,7 +880,6 @@ angular.module('ezeidApp').
              */
             $scope.selectLocationFilter = function(code,status)
             {
-
                 if(!status)
                 {
                     var index = $scope.selectedFilter.locationCode.indexOf(code);
@@ -830,7 +899,7 @@ angular.module('ezeidApp').
              */
             function setFilterLocation()
             {
-                $scope.params.locations = $scope.selectedFilter.locationCode.join(",");
+                $scope.locations = $scope.selectedFilter.locationCode.join(",");
             }
 
             /**
@@ -858,9 +927,8 @@ angular.module('ezeidApp').
              */
             function setFilterIndustry()
             {
-                $scope.params.category = $scope.selectedFilter.industryCode.join(",");
+                $scope.category = $scope.selectedFilter.industryCode.join(",");
             }
-
 
             /**
              * Select salary filter
@@ -887,7 +955,7 @@ angular.module('ezeidApp').
              */
             function setFilterSalary()
             {
-                $scope.params.salary = $scope.selectedFilter.salaryRange.join(",");
+                $scope.salary = $scope.selectedFilter.salaryRange.join(",");
             }
 
             /**
@@ -1008,59 +1076,6 @@ angular.module('ezeidApp').
 
             $scope.googleMap = new GoogleMap();
 
-         /*   var promise = $scope.googleMap.getCurrentLocation()
-            promise.then(function (resp) {
-                if (resp) {
-
-                    *//* get the current location coordinates and if it don't exists then update with the present Coordinates *//*
-                  //  var coordinates = getSearchedCoordinates($scope.googleMap.currentMarkerPosition.latitude,$scope.googleMap.currentMarkerPosition.longitude);
-
-                    $scope.googleMap.getReverseGeolocation(coordinates[0],coordinates[1]).then(function (resp) {
-                        if (resp) {
-                            $rootScope.coordinatesLat = $scope.googleMap.currentMarkerPosition.latitude;
-                            $rootScope.coordinatesLng = $scope.googleMap.currentMarkerPosition.longitude;
-                     //       placeDetail = $scope.googleMap.parseReverseGeolocationData(resp.data);
-
-                            //$scope.locationString = placeDetail.city != '' ? 'Your current location is: ' + placeDetail.area + ", " + placeDetail.city + ", " + placeDetail.state : '';
-                            var options = {
-                                route : true,
-                                sublocality3 : true,
-                                sublocality2 : true,
-                                area : true,
-                                city : true,
-                                state : true,
-                                country : false,
-                                postalCode : false
-                            };
-                            $scope.locationString = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
-                            $scope.location = $scope.googleMap.createAddressFromGeolocation(placeDetail,options);
-                            *//* Setting up default lattitude & longitude of the map *//*
-                            $scope.searchParams.lat = $scope.googleMap.currentMarkerPosition.latitude;
-                            $scope.searchParams.lng = $scope.googleMap.currentMarkerPosition.longitude;
-                        }
-                        if ($routeParams['ezeid']) {
-                            $scope.triggerSearch();
-                        }
-                    }, function () {
-                        if ($routeParams['ezeid']) {
-                            $scope.triggerSearch();
-                        }
-                    });
-                }
-                else {
-                    handleNoGeolocation();
-                    if ($routeParams['ezeid']) {
-                        $scope.triggerSearch();
-                    }
-                }
-            }, function () {
-                if ($routeParams['ezeid']) {
-                    $scope.triggerSearch();
-                }
-                handleNoGeolocation();
-            });
-*/
-
             /* Callback function for get current location functionality */
             $scope.findCurrentLocation = function(){
                 $scope.googleMap.getCurrentLocation().then(function(){
@@ -1113,8 +1128,8 @@ angular.module('ezeidApp').
 
             /* update the coordinates on drag event of map marker */
             var getNewCoordinates = function (lat, lng) {
-                $scope.params.lat = lat;
-                $scope.params.lng = lng;
+                $scope.latitude = lat;
+                $scope.longitude = lng;
 
                     /* get new location string */
                 $scope.googleMap.getReverseGeolocation(lat, lng).then(function (resp)
@@ -1221,7 +1236,7 @@ angular.module('ezeidApp').
                 });
             };
 
-            /* get lattitude and longitude based on present lat and lng */
+            /* get latitude and longitude based on present lat and lng */
             function getSearchedCoordinates(lat,lng)
             {
                 if(typeof($routeParams.lat) != 'undefined' && typeof($routeParams.lng) != 'undefined')
@@ -1258,40 +1273,9 @@ angular.module('ezeidApp').
                 {
                     $scope.searchFilter = 0;
                     $scope.searchType = 2;
-                    $scope.params.searchTerm = '';
-
+                    $scope.searchTerm = '';
                     setSearchResult(2);
                 }
-
-
-                /* set job type data */
-               /* if($rootScope._userInfo.IsAuthenticate)
-                {
-                    $scope.$emit('$preLoaderStart');
-                    $http({ method: 'get', url: GURL + 'job_match',
-                        params:
-                        {
-                            token: $rootScope._userInfo.Token
-                        }
-                    }).success(function (response)
-                        {
-                            $scope.$emit('$preLoaderStop');
-
-                            if(response.status)
-                            {
-                                $scope.resultData = "";
-                            }
-                            $scope.jsTileHoverEffect();
-
-                        }).error(function(){
-                            Notification.error({ message : 'An error occurred', delay : MsgDelay});
-                            $scope.$emit('$preLoaderStop');
-                        });
-                }
-                else
-                {
-                    $location.url('/');
-                }*/
             };
 
         }]);

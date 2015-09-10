@@ -49,10 +49,19 @@
                                 </button>
                             </div>
 
-                            <input id="searchTextField"
+                           <!-- <input id="searchTextField"
                                    type="text"
                                    placeholder="Type your Skills to locate nearest Jobs"
                                    ng-model="params.searchTerm"
+                                   ng-keypress="triggerSearchOnEnterKey($event.keyCode)"
+                                   class="form-control width-search-bar dropdown-toggle"
+                                   aria-label="..."
+                                   data-toggle="dropdown" />-->
+
+                            <input id="searchTextField"
+                                   type="text"
+                                   placeholder="Type your Skills to locate nearest Jobs"
+                                   ng-model="searchTerm"
                                    ng-keypress="triggerSearchOnEnterKey($event.keyCode)"
                                    class="form-control width-search-bar dropdown-toggle"
                                    aria-label="..."
@@ -86,25 +95,25 @@
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
                             <button ng-click="toggleVisibility(1)" class="btn btn-default form-control btn-sm">Proximity <span class="caret"></span></button>
                             <div ng-show="showProximityFilter" class="filter-dropdown job-type-dropdown search-proximity-content">
-                                <div class="select-option" ng-class="params.proximity == 1?'selected':''" ng-click="changeProximity(1)">
+                                <div class="select-option" ng-class="proximity == 1?'selected':''" ng-click="changeProximity(1)">
                                     1 Mile (1.6 Km)
                                 </div>
-                                <div class="select-option"  ng-class="params.proximity == 2?'selected':''" ng-click="changeProximity(2)">
+                                <div class="select-option"  ng-class="proximity == 2?'selected':''" ng-click="changeProximity(2)">
                                     2 Mile (3.2 Km)
                                 </div>
-                                <div class="select-option"  ng-class="params.proximity == 5?'selected':''" ng-click="changeProximity(5)">
+                                <div class="select-option"  ng-class="proximity == 5?'selected':''" ng-click="changeProximity(5)">
                                     5 Mile (8 Km)
                                 </div>
-                                <div class="select-option"  ng-class="params.proximity == 10?'selected':''" ng-click="changeProximity(10)">
+                                <div class="select-option"  ng-class="proximity == 10?'selected':''" ng-click="changeProximity(10)">
                                     10 Mile (16 Km)
                                 </div>
-                                <div class="select-option"  ng-class="params.proximity == 25?'selected':''" ng-click="changeProximity(25)">
+                                <div class="select-option"  ng-class="proximity == 25?'selected':''" ng-click="changeProximity(25)">
                                     25 Mile (40 Km)
                                 </div>
-                                <div class="select-option"  ng-class="params.proximity == 50?'selected':''" ng-click="changeProximity(50)">
+                                <div class="select-option"  ng-class="proximity == 50?'selected':''" ng-click="changeProximity(50)">
                                     50 Mile (80 Km)
                                 </div>
-                                <div class="select-option"  ng-class="params.proximity == 0?'selected':''" ng-click="changeProximity(0)">
+                                <div class="select-option"  ng-class="proximity == 0?'selected':''" ng-click="changeProximity(0)">
                                     Any
                                 </div>
                             </div>
@@ -144,7 +153,7 @@
                                     <button class="btn btn-primary btn-sm form-control">Experience</button>
                                 </span>
 
-                                <input type="text" decimals-only maxlength="4" placeholder="Your experience in years" ng-model="params.experience" class="form-control text-right"/>
+                                <input type="text" decimals-only maxlength="4" placeholder="Your experience in years" ng-model="experience" class="form-control text-right"/>
                                 <!--<input type="text" numbers-only maxlength="2" class="form-control text-right" ng-model="params.experience" placeholder="Your experience in years" />-->
                                 <span class="input-group-addon no-padding-and-border">
                                     <button disabled class="btn btn-default btn-sm form-control">Years</button>
@@ -173,18 +182,21 @@
             <!-- Maps ends here -->
 
             <!-- main sorting div goes here -->
+
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 result-info-div">
                 <div class="sorting-block row">
                     <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 setLeftRightPaddingZero text-left">
                         <div ng-show="isResultEmpty && !isProcessing">
-                            No result found for <b>{{searchKeyWord}}</b>
+                           <!-- No result found for <b>{{searchKeyWord}}</b>-->
+                            No result found for <b>{{searchTerm}}</b>
                         </div>
                         <div ng-hide="isResultEmpty && !isProcessing">
-                            {{getResultRange()}} for <b>{{searchKeyWord}}</b>
+                            <!--{{getResultRange()}} for <b>{{searchKeyWord}}</b>-->
+                            {{getResultRange()}} for <b>{{searchTerm}}</b>
                         </div>
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setLeftRightPaddingZero text-right">
-                        <button class="btn btn-primary btn-sm" ng-click="showMyCVMatchingJob()"> Show My CV Matching Jobs</button>
+                        <button ng-show="_userInfo.Type == 1" class="btn btn-primary btn-sm" ng-click="showMyCVMatchingJob()"> Show My CV Matching Jobs</button>
                     </div>
                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 text-right hidden">
                         <button class="btn btn-default btn-sm" ng-click="sortByToggle = !sortByToggle">
