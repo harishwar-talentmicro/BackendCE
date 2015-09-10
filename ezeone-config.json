@@ -5,6 +5,10 @@
   "DB_PASS" : "",
   "DB_HOST" : "",
   "MQTT" : {
-    "ADMIN" : ["@indrajeet", "@hvj", "@ind1","@sandeep"]
+    "ADMIN" : ["@indrajeet", "@hvj", "@ind1","@sandeep"],
+    "HOST" : "104.199.128.226",
+    "PORT" : "61612",
+    "USERNAME" : "indrajeet",
+    "PASSWORD" : "indrajeet"
   }
 }
