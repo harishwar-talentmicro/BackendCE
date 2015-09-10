@@ -27,9 +27,11 @@ function Notification(db,stdLib){
  * @param operationType (Operation type decides what kind of notification it is)
  * @param iphoneId (If user is having iphone id then pass it also)
  * @param masterId (masterId of adminid or pass empty)
+ * @param latitude (latitude of location)
+ * @param longitude (longitude of location)
 _ */
 Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,
-                                          messageType,operationType,iphoneId,messageId,masterId){
+                                          messageType,operationType,iphoneId,messageId,masterId,latitude,longitude){
 
     console.log('It is coming to publish block of Notification');
     var validationStatus = true;
@@ -61,6 +63,12 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
     if(!masterId){
         masterId = "";
     }
+    if(!latitude){
+        latitude = "";
+    }
+    if(!longitude){
+        longitude = "";
+    }
 
 
     if(validationStatus){
@@ -75,7 +83,9 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             ts : moment().format("YYYY-MM-DD HH:mm:ss"),
             op: operationType,
             mid : messageId,
-            masterid : masterId
+            masterid : masterId,
+            lat : latitude,
+            long : longitude
         };
 
         console.log('Actual receiver Id : '+receiverId);

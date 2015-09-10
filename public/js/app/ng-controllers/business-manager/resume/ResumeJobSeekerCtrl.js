@@ -83,6 +83,79 @@
             getTemplateList();
             getJobList();
 
+            /**
+             * Hide all the open dropdown
+             */
+            function hideAllDropdoowns(id)
+            {
+                if(parseInt(id) != 1)
+                {
+                    $('.filter-dropdown').hide();
+                }
+                if(parseInt(id) != 2)
+                {
+                    $('.filter-dropdownspecialization').hide();
+                }
+                if(parseInt(id) != 3)
+                {
+                    $('.filter-dropdownInstitute').hide();
+                }
+                if(parseInt(id) != 4)
+                {
+                    $('.filter-dropdownCity').hide();
+                }
+            }
+
+            $scope.$watch('_userInfo.IsAuthenticate', function () {
+                $('.dropdown-toggle1').click(function(){
+                    hideAllDropdoowns(1);
+                    $( ".filter-dropdown" ).slideToggle( "slow", function() {
+                        // Animation complete.
+                    });})
+
+                $('.dropdown-toggleSpecialization').click(function(){
+                    hideAllDropdoowns(2);
+                    $( ".filter-dropdownspecialization" ).slideToggle( "slow", function() {
+                        // Animation complete.
+                    });})
+
+                $('.dropdown-toggleCity1').click(function(){
+                    hideAllDropdoowns(4);
+                    $( ".filter-dropdownCity" ).slideToggle( "slow", function() {
+                        // Animation complete.
+                    });})
+
+                $('.dropdown-toggleInstitute').click(function(){
+                    hideAllDropdoowns(3);
+                    $( ".filter-dropdownInstitute" ).slideToggle( "slow", function() {
+                        // Animation complete.
+                    });})
+
+
+
+                $('html').click(function()
+                {
+                    $('.filter-dropdownCity').hide();
+                    $('.filter-dropdown').hide();
+                    $('.filter-dropdownspecialization').hide();
+                    $('.filter-dropdownInstitute').hide();
+                })
+
+                $('#jobseekercity').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekerinstitute').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekereducation').click(function(e){
+                    e.stopPropagation();
+                });
+                $('#jobseekerspecialization').click(function(e){
+                    e.stopPropagation();
+                });
+
+            });
+
             // Get Country list
             function getCountryList()
             {

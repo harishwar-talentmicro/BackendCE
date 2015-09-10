@@ -184,9 +184,9 @@
                 <form class="" role="form">
                     <ul class="nav navbar-nav navbar-right">
 
-                        <li ng-show="($root._userInfo.IsAuthenticate) && ($root._userInfo.isinstitute_admin)">
+                        <!--<li ng-show="($root._userInfo.IsAuthenticate) && ($root._userInfo.isinstitute_admin)">
                             <a title="Show my institute jobs" href="/show-my-institute-jobs" class="btn-link header-link"><i class="fa fa-arrow-circle-up"></i> Show Jobs</a>
-                        </li>
+                        </li>-->
 
                         <!-- Signin Link -->
                         <li ng-show="$root._userInfo.IsAuthenticate">
@@ -238,10 +238,11 @@
                                 <li ng-show="$root._userInfo.Type == 1">
                                     <a href="/appliedjob"><i class="fa fa-server"></i> Applied Job</a>
                                 </li>
-                                <!-- Outbox -->
-                                <!--<li>-->
-                                    <!--<a href="/outbox"><i class="fa fa-check-square-o"></i> Your Transactions</a>-->
-                                <!--</li>-->
+                                <!--Show My Institute Jobs-->
+                                <li ng-show="($root._userInfo.IsAuthenticate) && ($root._userInfo.isinstitute_admin)">
+                                   <!-- <a title="Show my institute jobs" href="/show-my-institute-jobs"><i class="fa fa-arrow-circle-up"></i> Show Jobs</a>-->
+                                    <a href="/show-my-institute-jobs"><i class="fa fa-university"></i> Show My Institute Jobs</a>
+                                </li>
                                 <!-- Change Password -->
                                 <li>
                                     <a href="/profile-manager/password"><i class="fa fa-warning"></i> Change Password</a>

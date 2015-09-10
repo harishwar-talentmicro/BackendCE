@@ -53,7 +53,11 @@ angular.module('ezeidApp').
                    $scope.lng = $scope.googleMap.currentMarkerPosition.longitude;
 
                     // call for get my institute jobs
-                    getMyInstituteJob();
+                    //getMyInstituteJob();
+
+                    //Redirect to search job page
+                    RedirectToSearchPage();
+
                 }
                 else
                 {
@@ -62,6 +66,11 @@ angular.module('ezeidApp').
             }, function () {
                 handleNoGeolocation();
             });
+
+            function RedirectToSearchPage()
+            {
+                $location.url('/jobsearch?searchTerm=&proximity=0&experience=null&lat='+ $scope.lat +'&lng='+ $scope.lng+'&jobType=0,1,2,3,4,5,6,7&ShowMyInstituteJobs=1');
+            }
 
             function getMyInstituteJob()
             {

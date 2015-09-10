@@ -62,6 +62,7 @@
         '/job',
         '/jobdetail',
         '/appliedjob',
+        '/alumni',
         '/show-my-institute-jobs',
         '/notify-applicant',
         '/applicantslisting',
@@ -340,6 +341,10 @@
             .when('/jobdetail',{
                 templateUrl: 'html/job/job-detail.html',
                 controller : 'JobDetailCtrl'
+            })
+            .when('/alumni',{
+                templateUrl: 'html/alumni/alumni.html',
+                controller : 'AlumniCtrl'
             })
             .when('/payment',{
                 templateUrl: 'html/payment-api.html',

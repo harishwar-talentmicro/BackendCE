@@ -272,16 +272,45 @@ angular.module('ezeidApp').
 
 
                             var ctx = document.querySelector('canvas').getContext('2d');
-                            ctx.font = "18px SANS SERIF";
+                            ctx.font = "16px SANS SERIF";
                             ctx.lineWidth = 1;
                             ctx.fillStyle = '#337ab7';
                             ctx.strokeStyle = '#337ab7';
-                            /*var x = 300 / ($scope.SearchInfo.Website == '' ? 8 : 4);*/
-                            var x = 340 / 4;
-                            var y = 30 / 2;
+
+                            ctx.textAlign = 'center';
+
+
+                            /*if no web link than set 300/2 else 300/1.5*/
+                           /*var x = 300 / 2;
+                           var y = 30 / 1.5;*/
+
+                            // setting alignment of text over image x = for width, y = for height
+
+                            $scope.emailTextWidth = ctx.measureText($scope.SearchInfo.EMailID).width;
+
+                             //var imgWidthSet = ($scope.SearchInfo.Website.length) ? ($scope.emailTextWidth < 194) ? 1.5 : 1.8 : 2;
+                             //var imgWidthSet = ($scope.SearchInfo.Website.length) ? ($scope.emailTextWidth < 194) ? 1.3 : 1.8 : 2;
+                             var imgWidthSet = ($scope.SearchInfo.Website.length) ? ($scope.emailTextWidth < 194) ? ($scope.emailTextWidth > 125) ? 1.5 : 1.3 : 1.8 : 2;
+
+                            var x = 300 / imgWidthSet;
+                            var y = 30 / 1.5;
+
+
+
+                        //    ctx.textAlign = ($scope.SearchInfo.Website.length) ? 'center' : 'right';
+                         //   var x = ($scope.SearchInfo.Website.length) ? 300 / 2 : 300 / 1.1;
+                            /*ctx.textAlign = ($scope.emailTextWidth < 120) ? 'center' : 'right';
+                            var x = ($scope.emailTextWidth < 120) ? 300 / 1.5 : 300 / 1.1;*/
+
+                            console.log("Sai width");
+                            console.log($scope.emailTextWidth);
+                            console.log(ctx.textAlign);
+                            console.log($scope.SearchInfo.Website);
+                            console.log("img width",imgWidthSet);
+
 
                          //   ctx.fillText($scope.SearchInfo.EMailID, x, 25);
-                            ctx.strokeText($scope.SearchInfo.EMailID, x, 25);
+                            ctx.strokeText($scope.SearchInfo.EMailID, x, y);
 
 
                             getPictureOfSearchedTerm(_ezeone);

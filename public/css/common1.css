@@ -1794,8 +1794,10 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .idp .company-text-font
 {
     font-size: 1.3em;
-    color: rgb(40, 158, 158);
-    text-shadow: 1px 1px 1px #2970A3 !important;
+    color: rgb(1, 6, 6);
+    font-weight: bold;
+    /*color: rgb(40, 158, 158);
+    text-shadow: 1px 1px 1px #2970A3 !important;*/
 }
 
 .idp .text-company-gray
@@ -1816,7 +1818,8 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 
 .idp .quote-style
 {
-    color: #825BAD !important;
+
+    color: #000000!important;
     font-size: 1.2em;
 }
 
@@ -1837,14 +1840,16 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .idp .mobile-font
 {
     font-size: 1.1em;
-    text-shadow: 1px 1px #BBB;
-    color: grey;
+    color: #000000;
+    /*text-shadow: 1px 1px #BBB;
+    color: grey;*/
 }
 
 .idp .address-font
 {
-    text-shadow: 1px 1px #CBCBCB;
-    color: rgb(0, 148, 255);
+    color: #000000;
+    /*text-shadow: 1px 1px #CBCBCB;
+    color: rgb(0, 148, 255);*/
 }
 
 .idp .btn-cont .col-lg-4
@@ -1868,8 +1873,11 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 .idp .about-company-text-font
 {
     font-size: 1.3em;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+   /* font-size: 1.3em;
     color: rgb(144, 145, 150);
-    text-shadow: 1px 1px 1px #B2B6B8 !important;
+    text-shadow: 1px 1px 1px #B2B6B8 !important;*/
 }
 .tabs-row-sales .nav > li > a{
     font-size: 12px;

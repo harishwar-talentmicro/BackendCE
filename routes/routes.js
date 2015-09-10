@@ -77,6 +77,8 @@ exports.FnGetLocationListForEZEID = locationModule.getAllForEzeid;
 exports.FnGetLocationList = locationModule.getLoactionList;
 exports.FnGetLocationPicture = locationModule.getLocationPicture;
 exports.FnLocationDetails = locationModule.getLocationDetails;
+exports.FnShareLocation = locationModule.shareLocation;
+
 
 var BusinessManager = require('./modules/business-module.js');
 var businessManager = new BusinessManager(db,stdLib);
@@ -288,24 +290,3 @@ exports.FnGetGatesVES = vesModule.getGatesVES;
 exports.FnSaveDepartmentsVES = vesModule.saveDepartmentsVES;
 exports.FnSaveGatesVES = vesModule.saveGatesVES;
 exports.FnSaveCitysVES = vesModule.saveCitysVES;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
