@@ -810,27 +810,34 @@ Job.prototype.searchJobs = function(req,res,next){
                 if (getresult) {
                     if (getresult[0]) {
                         if (getresult[0][0]) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Jobs Search result loaded successfully';
-                            if(filter == 0) {
-                                responseMessage.data = {
-                                    total_count: getresult[0][0].count,
-                                    result: getresult[1],
-                                    job_location: getresult[2],
-                                    salary: getresult[3],
-                                    category: getresult[4],
-                                    company_details:getresult[5]
-                                };
+                            if (getresult[1].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Jobs Search result loaded successfully';
+                                if (filter == 0) {
+                                    responseMessage.data = {
+                                        total_count: getresult[0][0].count,
+                                        result: getresult[1],
+                                        job_location: getresult[2],
+                                        salary: getresult[3],
+                                        category: getresult[4],
+                                        company_details: getresult[5]
+                                    };
+                                }
+                                else {
+                                    responseMessage.data = {
+                                        total_count: getresult[0][0].count,
+                                        result: getresult[1]
+                                    };
+                                }
+                                res.status(200).json(responseMessage);
+                                console.log('FnSearchJobs: Jobs Search result loaded successfully');
                             }
                             else {
-                                responseMessage.data = {
-                                    total_count: getresult[0][0].count,
-                                    result: getresult[1]
-                                };
+                                responseMessage.message = 'Search result not found';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSearchJobs:Search result not found');
                             }
-                            res.status(200).json(responseMessage);
-                            console.log('FnSearchJobs: Jobs Search result loaded successfully');
                         }
                         else {
                             responseMessage.message = 'Search result not found';
