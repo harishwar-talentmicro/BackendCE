@@ -68,25 +68,15 @@ angular.module('ezeidApp').
             $scope.params.salary = ($routeParams.salary) ? $routeParams.salary : "";//1-2,5-6*/
 
             $scope.searchFilter = ($rootScope._userInfo.instituteJobFilter) ? 1 : 0;
-            //$scope.searchFilter = 0;
             $scope.searchType = 0;
-
             $scope.showFilterButton = false;
-
             $scope.searchKeyWord = $routeParams.searchTerm;
             $scope.activeJobType = [false,false,false,false,false,false,false,false];//Checkboxes for job type
             $scope.showProximityFilter = false;
             $scope.jobTypeFilter = false;
             $scope.advanceSearchVisibility = false;
 
-
-            console.log("Sai1");
-            console.log($routeParams);
-
-            $scope.filterCollege = ($routeParams.filterCollege) ? ($routeParams.filterCollege == 1) ? true : false : false;
-
-           // $scope.filterCollege == false ? 0 : 1,
-
+            $scope.filterCollege = ($routeParams.filterCollege) ? ($routeParams.filterCollege == 'true') ? true : false : false;
             $scope.latitude = $routeParams.lat,
             $scope.longitude = $routeParams.lng,
             $scope.proximity = ($routeParams.proximity) ? $routeParams.proximity : 0;
@@ -96,9 +86,7 @@ angular.module('ezeidApp').
             $scope.category = ($routeParams.category) ? $routeParams.category : "";//comma separated ids
             $scope.salary = ($routeParams.salary) ? $routeParams.salary : "";
             $scope.experience = ($routeParams.experience) ? $routeParams.experience : ""
-
-            console.log("Sai2");
-            console.log($scope.locations);
+            $scope.searchType = ($routeParams.jobSearchType) ? $routeParams.jobSearchType : 0;
 
             /**
              *  set search type
@@ -123,8 +111,6 @@ angular.module('ezeidApp').
                 minSalary:0,
                 maxSalary:0
             };
-            console.log("Sai3");
-            console.log($scope.locations);
             /**
              * Make-array for checkbox effect
              */
@@ -133,10 +119,6 @@ angular.module('ezeidApp').
                 industry:[],
                 salary:[]
             };
-
-            console.log("Sai4");
-            console.log($scope.locations);
-
             /**
              * Make-array for holding temporary value of selected checkbox
              */
@@ -145,10 +127,6 @@ angular.module('ezeidApp').
                 industry:[],
                 salary:[]
             };
-
-            console.log("Sai5");
-            console.log($scope.locations);
-
             /* selected Filter options */
             $scope.selectedFilter = {
                 locationCode:[],
@@ -158,9 +136,6 @@ angular.module('ezeidApp').
 
             //easy and default calling of functions
             initiateSearch();
-
-            console.log("Sai6");
-            console.log($scope.locations);
              /***********************************************************************************************************
              * All ACTIONS goes here
             /**********************************************************************************************************
@@ -170,19 +145,12 @@ angular.module('ezeidApp').
              */
             function initiateSearch()
             {
-                console.log("Sai7");
-                console.log($scope.locations);
                 /* save all the route params in a temporary variable[params] */
                // $scope.params = $routeParams;
                 cleanExperienceData();
 
-                console.log("Sai8");
-                console.log($scope.locations);
                 /* set job type data */
                 resetJobTypeData();
-
-                console.log("Sai9");
-                console.log($scope.locations);
                 /* call the search API */
                 setSearchResult();
             }
@@ -217,7 +185,7 @@ angular.module('ezeidApp').
                 else
                 {
                    /* reset all the filters */
-                    //resetFilters();
+                    // resetFilters();
                 }
 
                 if($rootScope._userInfo.IsAuthenticate)
@@ -230,11 +198,6 @@ angular.module('ezeidApp').
 
                     /* make an API request to get the data */
                    // var experience = ($scope.params.experience != '' && $scope.params.experience != 'null')?$scope.params.experience:null;
-
-console.log("sai99");
-console.log($scope.locations);
-
-
 
                     $scope.$emit('$preLoaderStart');
                     $http({ method: 'get', url: GURL + 'job_search',
@@ -512,7 +475,7 @@ console.log($scope.locations);
             $scope.clearTempLocationChecks = function()
             {
                 $scope.tempFilterCheck.location = [];
-            }
+            };
 
 
             ////////////////////////////// INDUSTRY FILTER PRE - CHECK /////////////////////
@@ -808,7 +771,7 @@ console.log($scope.locations);
                     $rootScope._userInfo.instituteJobFilter = $scope.searchFilter;
 
                     /* redirect to search page */
-                 //   var searchStr = getSearchtermString();
+                    //  var searchStr = getSearchtermString();
 
                     var searchParams = 'searchTerm='+ $scope.searchTerm +
                         '&proximity='+ $scope.proximity +
@@ -819,8 +782,8 @@ console.log($scope.locations);
                         '&salary='+ $scope.salary +
                         '&category='+ $scope.category +
                         '&locations='+ $scope.locations +
-                        '&filterCollege=' +$scope.filterCollege ;
-
+                        '&filterCollege=' +$scope.filterCollege +
+                        '&jobSearchType=' +$scope.searchType ;
 
 
 
@@ -1271,9 +1234,16 @@ console.log($scope.locations);
             {
                 if($rootScope._userInfo.IsAuthenticate)
                 {
-                    $scope.searchFilter = 0;
-                    $scope.searchType = 2;
+                    $scope.proximity = 0;
+                    $scope.jobType = '0,1,2,3,4,5,6,7';
+                    $scope.experience = '';
                     $scope.searchTerm = '';
+                    $scope.locations = '';
+                    $scope.category = '';
+                    $scope.salary = '';
+                    $scope.filterCollege = 0;
+                    $scope.searchType = 2;  // 0 = normal job search, 1 = Show my institue jobs(menu item), 2 = my cv matching jobs
+                    $scope.searchFilter = 0;
                     setSearchResult(2);
                 }
             };

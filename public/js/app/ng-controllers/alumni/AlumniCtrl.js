@@ -42,7 +42,20 @@ angular.module('ezeidApp').
             $scope.totalResult = 0;//Total results
             $scope.resultThisPage = 0;//Total results you got this page
 
-         //   getAppliedJob();
+            $scope.showHomePageContent = true;
+
+            $scope.showHomePage = function()
+            {
+                $scope.showHomePageContent = true;
+            };
+            $scope.showProfiles = function()
+            {
+                $scope.showHomePageContent = false;
+            };
+
+
+
+            //   getAppliedJob();
             // Get Applied Job list
             function getAppliedJob()
             {
@@ -103,9 +116,7 @@ angular.module('ezeidApp').
             $scope.paginationNextClick = function()
             {
                 $scope.pageCount += $scope.pageSize;
-                /* trigger next results */
-                // $scope.triggerSearch(1);
-                getAppliedJob();
+                 getAppliedJob();
                 $scope.paginationVisibility();
             };
 
@@ -115,8 +126,6 @@ angular.module('ezeidApp').
             $scope.paginationPreviousClick = function()
             {
                 $scope.pageCount -= $scope.pageSize;
-                /* trigger previous results */
-                // $scope.triggerSearch(1);
                 getAppliedJob();
                 $scope.paginationVisibility();
             };

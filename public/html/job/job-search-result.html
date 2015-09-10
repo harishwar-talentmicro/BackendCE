@@ -93,31 +93,44 @@
                 <div class="advance-filter-content border-style-bottom">
                     <div class="container">
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 p-bottom-3 filter-item-border">
-                            <button ng-click="toggleVisibility(1)" class="btn btn-default form-control btn-sm">Proximity <span class="caret"></span></button>
-                            <div ng-show="showProximityFilter" class="filter-dropdown job-type-dropdown search-proximity-content">
-                                <div class="select-option" ng-class="proximity == 1?'selected':''" ng-click="changeProximity(1)">
-                                    1 Mile (1.6 Km)
-                                </div>
-                                <div class="select-option"  ng-class="proximity == 2?'selected':''" ng-click="changeProximity(2)">
-                                    2 Mile (3.2 Km)
-                                </div>
-                                <div class="select-option"  ng-class="proximity == 5?'selected':''" ng-click="changeProximity(5)">
-                                    5 Mile (8 Km)
-                                </div>
-                                <div class="select-option"  ng-class="proximity == 10?'selected':''" ng-click="changeProximity(10)">
-                                    10 Mile (16 Km)
-                                </div>
-                                <div class="select-option"  ng-class="proximity == 25?'selected':''" ng-click="changeProximity(25)">
-                                    25 Mile (40 Km)
-                                </div>
-                                <div class="select-option"  ng-class="proximity == 50?'selected':''" ng-click="changeProximity(50)">
-                                    50 Mile (80 Km)
-                                </div>
-                                <div class="select-option"  ng-class="proximity == 0?'selected':''" ng-click="changeProximity(0)">
-                                    Any
-                                </div>
+                            <div class="input-group">
+                                <span disabled class="input-group-addon no-padding-and-border">
+                                    <button class="btn btn-primary btn-sm form-control">Experience</button>
+                                </span>
+
+                                <input type="text" decimals-only maxlength="4" placeholder="" ng-model="experience" class="form-control text-right"/>
+                                <!--<input type="text" numbers-only maxlength="2" class="form-control text-right" ng-model="params.experience" placeholder="Your experience in years" />-->
+                                <span class="input-group-addon no-padding-and-border">
+                                    <button disabled class="btn btn-default btn-sm form-control">Years</button>
+                                </span>
                             </div>
-                        </div>
+                                <div  ng-show="false">
+                                    <button ng-click="toggleVisibility(1)" class="btn btn-default form-control btn-sm">Proximity <span class="caret"></span></button>
+                                    <div ng-show="showProximityFilter" class="filter-dropdown job-type-dropdown search-proximity-content">
+                                        <div class="select-option" ng-class="proximity == 1?'selected':''" ng-click="changeProximity(1)">
+                                            1 Mile (1.6 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="proximity == 2?'selected':''" ng-click="changeProximity(2)">
+                                            2 Mile (3.2 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="proximity == 5?'selected':''" ng-click="changeProximity(5)">
+                                            5 Mile (8 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="proximity == 10?'selected':''" ng-click="changeProximity(10)">
+                                            10 Mile (16 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="proximity == 25?'selected':''" ng-click="changeProximity(25)">
+                                            25 Mile (40 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="proximity == 50?'selected':''" ng-click="changeProximity(50)">
+                                            50 Mile (80 Km)
+                                        </div>
+                                        <div class="select-option"  ng-class="proximity == 0?'selected':''" ng-click="changeProximity(0)">
+                                            Any
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
                         <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 filter-item-border">
                             <button ng-click="toggleVisibility()" class="btn btn-default form-control btn-sm">Job Type <span class="caret"></span></button>
                             <div ng-show="jobTypeFilter" class="job-type-dropdown">
@@ -147,19 +160,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 filter-item-border">
-                            <div class="input-group">
-                                <span disabled class="input-group-addon no-padding-and-border">
-                                    <button class="btn btn-primary btn-sm form-control">Experience</button>
-                                </span>
 
-                                <input type="text" decimals-only maxlength="4" placeholder="Your experience in years" ng-model="experience" class="form-control text-right"/>
-                                <!--<input type="text" numbers-only maxlength="2" class="form-control text-right" ng-model="params.experience" placeholder="Your experience in years" />-->
-                                <span class="input-group-addon no-padding-and-border">
-                                    <button disabled class="btn btn-default btn-sm form-control">Years</button>
-                                </span>
-                            </div>
-                        </div>
 
                     </div>
                     <div class="done-btn text-right p-5">
@@ -192,7 +193,7 @@
                         </div>
                         <div ng-hide="isResultEmpty && !isProcessing">
                             <!--{{getResultRange()}} for <b>{{searchKeyWord}}</b>-->
-                            {{getResultRange()}} for <b>{{searchTerm}}</b>
+                            {{getResultRange()}} {{searchTerm.length ? 'for'  : ''}}  <b>{{searchTerm}}</b>
                         </div>
                     </div>
                     <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 setLeftRightPaddingZero text-right">
