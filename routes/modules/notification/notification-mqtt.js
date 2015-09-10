@@ -8,6 +8,11 @@
  * @since Aug 13, 2015 07:14 PM IST
  */
 
+var fs = require('fs');
+console.log(__dirname+'../../../ezeone-config.json');
+var CONFIG = JSON.parse(fs.readFileSync('./ezeone-config.json'));
+
+
 function MqttFalse(){};
 function MqttFalseClient(){};
 
@@ -20,7 +25,7 @@ MqttFalseClient.prototype.publish = function(topic,payload){};
 
 var crypto = require('crypto');
 
-var brokerUrl = 'mqtt://ms1.ezeone.com:80';
+var brokerUrl = 'mqtt://'+ CONFIG.MQTT.HOST+':'+CONFIG.MQTT.PORT;
 var connOpt = {
     username : 'indrajeet',
     password : 'indrajeet',

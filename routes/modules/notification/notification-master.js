@@ -122,34 +122,34 @@ Notification.prototype.authUser = function(req,res,next){
         status *= false;
     }
 
-    try{
-        st.validateToken(token,function(err,result){
-            if(err){
-                console.log('Error : Notification Module authUser - while token validation');
-                console.log(err);
-                var errorDate = new Date();
-                console.log(errorDate.toTimeString() + ' ......... error ...........');
-                res.send('deny');
-            }
-            else{
-                if(result){
-                    res.send('allow');
-                }
-                else{
-                    console.log('Access Denied : Notification Module authUser - while token validation');
-                    res.send('deny');
-                }
-            }
-        });
-    }
-    catch(ex){
-        console.log('Error : Notification Module authUser');
-        console.log(ex);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        res.send('deny');
-    }
-
+    //try{
+    //    st.validateToken(token,function(err,result){
+    //        if(err){
+    //            console.log('Error : Notification Module authUser - while token validation');
+    //            console.log(err);
+    //            var errorDate = new Date();
+    //            console.log(errorDate.toTimeString() + ' ......... error ...........');
+    //            res.send('deny');
+    //        }
+    //        else{
+    //            if(result){
+    //                res.send('allow');
+    //            }
+    //            else{
+    //                console.log('Access Denied : Notification Module authUser - while token validation');
+    //                res.send('deny');
+    //            }
+    //        }
+    //    });
+    //}
+    //catch(ex){
+    //    console.log('Error : Notification Module authUser');
+    //    console.log(ex);
+    //    var errorDate = new Date();
+    //    console.log(errorDate.toTimeString() + ' ......... error ...........');
+    //    res.send('deny');
+    //}
+    res.send('allow');
 
 };
 
