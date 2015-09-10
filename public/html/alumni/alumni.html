@@ -8,70 +8,123 @@
                     <i class="fa fa-th-list"></i>  Alumni
                 </div>
                 <div class="panel-default panel-body">
-                    <!-- search bar to search job keyword by skill keywords -->
-
-                    <div class="container">
-                        <div class="col-lg-12">
-                            <hr>
+                    <div class="row">
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                            <button ng-class="showHomePageContent ? 'btn btn-primary btn-sm' : 'btn btn-default btn-sm'" ng-click="showHomePage()"> Home Page</button>
                         </div>
-                        <div class="col-lg-6">
-                            <div ng-show="jobData">
-                                Showing {{pageCount+1}}-{{pageCount+resultThisPage}} of {{totalResult}} results
-                            </div>
-                        </div>
-                        <div ng-show="jobData" class="col-lg-6 text-right">
-                            <button class="btn"
-                                    ng-class="paginationPreviousVisibility?' btn-primary':' btn-default'"
-                                    ng-disabled="!paginationPreviousVisibility"
-                                    ng-click="paginationPreviousClick()">
-                                Previous <i class="fa fa-arrow-circle-left"></i>
-                            </button>
-                            <button class="btn btn-primary"
-                                    ng-class="paginationNextVisibility?' btn-primary':' btn-default'"
-                                    ng-disabled="!paginationNextVisibility"
-                                    ng-click="paginationNextClick()">
-                                <i class="fa fa-arrow-circle-right"></i> Next
-                            </button>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+                            <button ng-class="showHomePageContent ? 'btn btn-default btn-sm' : 'btn btn-primary btn-sm'" ng-click="showProfiles()"> Profiles</button>
                         </div>
                     </div>
+
                     <div class="container">
                         <!-- main table goes here -->
                         <div class="main-table p-top-20 col-lg-12">
-                            <div ng-show="jobData" class="hpw">
-                                <div class="col-lg-12 table-head">
-                                    <div class="col-lg-2">
-                                        Job Code
+
+                            <div ng-show="showHomePageContent">
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Page Title
                                     </div>
-                                    <div class="col-lg-4">
-                                        Title
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input
+                                               type="text"
+                                               placeholder="Page Title"
+                                               ng-model="pageTitle"
+                                               class="form-control"/>
                                     </div>
-                                    <div class="col-lg-4">
-                                        Company Name
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Page SubTitle
                                     </div>
-                                    <div class="col-lg-2">
-                                        Date
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input
+                                                type="text"
+                                                placeholder="Page SubTitle"
+                                                ng-model="pageSubTitle"
+                                                class="form-control"/>
                                     </div>
-                                </div>
-                                <div class="col-lg-12 table-body {{(($index%2) == 0) ? '' : 'table-striped-bg'}}" ng-repeat="job in jobData track by $index">
-                                    <div class="col-lg-2">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{job.jobcode}}">{{job.jobcode | textLength:16}}</span>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Page Picture
                                     </div>
-                                    <div class="col-lg-4">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{job.jobtitle}}">{{job.jobtitle | textLength:35}}</span>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input type="file" onchange="angular.element(this).scope().uploadFile(this.files)">
                                     </div>
-                                    <div class="col-lg-4">
-                                        <span data-toggle="tooltip" title="" data-original-title="{{job.companyname}}">{{job.companyname | textLength:35}}</span>
+                                </div><br/>
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Footer L1
                                     </div>
-                                    <div class="col-lg-2">
-                                        {{job.TaskDateTime | ageFilter}}
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input
+                                                type="text"
+                                                placeholder="Footer L1"
+                                                ng-model="footerL1"
+                                                class="form-control"/>
                                     </div>
-                                </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Footer L2
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input
+                                                type="text"
+                                                placeholder="Footer L2"
+                                                ng-model="footerL2"
+                                                class="form-control"/>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Idea Title
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input
+                                                type="text"
+                                                placeholder="Idea Title"
+                                                ng-model="ideaTitle"
+                                                class="form-control"/>
+                                    </div>
+                                </div><br/>
+
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Idea Text
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input
+                                                type="text"
+                                                placeholder="Idea Text"
+                                                ng-model="ideaText"
+                                                class="form-control"/>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Purpose Title
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input
+                                                type="text"
+                                                placeholder="Purpose Title"
+                                                ng-model="purposetitle"
+                                                class="form-control"/>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        Purpose Text
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                                        <input
+                                                type="text"
+                                                placeholder="Purpose Text"
+                                                ng-model="purposeText"
+                                                class="form-control"/>
+                                    </div>
+                                </div><br/>
+
                             </div>
-                            <div ng-hide="jobData" class="text-danger text-center">
-                                <b> You have not applied for any job ! </b>
+
+                            <div ng-hide="showHomePageContent">
+                                profile page
                             </div>
+
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
