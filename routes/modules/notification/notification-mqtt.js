@@ -9,9 +9,11 @@
  */
 
 var fs = require('fs');
-console.log(__dirname+'../../../ezeone-config.json');
-var CONFIG = JSON.parse(fs.readFileSync('./ezeone-config.json'));
+//console.log(__dirname+'../../../ezeone-config.json');
+//var CONFIG = JSON.parse(fs.readFileSync('./ezeone-config.json'));
 
+var CONFIG = require('../../../ezeone-config.json');
+console.log(CONFIG);
 
 function MqttFalse(){};
 function MqttFalseClient(){};
@@ -185,6 +187,40 @@ NotificationMqtt.prototype.createQueue = function(topic){
         console.log(ex);
     }
 
+
+};
+
+NotificationMqtt.prototype.checkQueue = function(topic){
+    var qs = require('querystring');
+    var exec=require('child_process').exec,child;
+
+    var executeCmd = function(cmdStr,callbackFn){
+
+        child = exec(cmdStr, function(err,stdout,stderr){
+            console.log('Error : '+ err);
+            console.log('stdout: '+ stdout);
+            console.log('stderr : '+ stderr);
+            if(callbackFn){
+                callbackFn(stdout);
+            }
+        });
+    };
+
+    try{
+        var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
+            '"Content-type: application/json" '+
+            ' -X GET  https://ms3.ezeone.com/api/queues/%2F/'+topic.toString();
+
+        console.log(curlCmdString);
+
+        executeCmd(curlCmdString,function(respOutput){
+            console.log(respOutput);
+        });
+    }
+    catch(ex){
+        console.log('Error in finding queue notification-mqtt.js');
+        console.log(ex);
+    }
 
 };
 
