@@ -763,8 +763,6 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
 };
 
-
-
 /**
  * @todo FnShareLocation
  * Method : Get

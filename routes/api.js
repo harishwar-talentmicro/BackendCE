@@ -196,6 +196,14 @@ router.get('/message_fullview_new',LocationManager.FnViewMessageNew);
 router.get('/tasks',LocationManager.FnGetAllTask);
 router.get('/ewtGetTransaction',LocationManager.FnGetTrans);
 
+//Alumni module
+router.post('/alumni_content',LocationManager.FnSaveAlumniContent);
+router.post('/alumni_team',LocationManager.FnSaveAlumniTeam);
+router.get('/alumni_content',LocationManager.FnGetAlumniContent);
+router.get('/alumni_team',LocationManager.FnGetAlumniTeam);
+router.delete('/alumni_team',LocationManager.FnDeleteAlumniTeam);
+
+
 
 //below service are for EZEIDAP
 router.post('/ewLoginAP', LocationManager.FnLoginAP);

@@ -215,6 +215,16 @@ exports.FnGetGroupInfo = messageBox.getGroupInfo;
 exports.FnCountOfUnreadMessage = messageBox.countOfUnreadMessage;
 exports.FnViewMessageNew = messageBox.viewMessageNew;
 
+//Alumni module
+var Alumni = require('./modules/alumni-module.js');
+var alumniModule = new Alumni(db,stdLib);
+exports.FnSaveAlumniContent = alumniModule.saveAlumniContent;
+exports.FnSaveAlumniTeam = alumniModule.saveAlumniTeam;
+exports.FnGetAlumniContent = alumniModule.getAlumniContent;
+exports.FnGetAlumniTeam = alumniModule.getAlumniTeam;
+exports.FnDeleteAlumniTeam = alumniModule.deleteAlumniTeam;
+
+
 
 var Notification = require('./modules/notification/notification-master.js');
 var notification = new Notification(db,stdLib);

@@ -514,7 +514,7 @@ Job.prototype.create = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server error'
             };
-            responseMessage.message = 'An error occurred !'
+            responseMessage.message = 'An error occurred !';
             console.log('FnSaveJobs:error ' + ex.description);
             var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
             res.status(400).json(responseMessage);
