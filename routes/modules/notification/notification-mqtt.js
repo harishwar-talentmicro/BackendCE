@@ -9,6 +9,8 @@
  */
 
 var fs = require('fs');
+
+var request = require('request');
 //console.log(__dirname+'../../../ezeone-config.json');
 //var CONFIG = JSON.parse(fs.readFileSync('./ezeone-config.json'));
 
@@ -92,10 +94,15 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
     }
     if(validationFlag){
         try{
-            mqttClient.publish('/'+topic,JSON.stringify(messagePayload),{qos : 1},function(){
-                console.log('Message published : '+ topic);
+            this.checkQueue(topic,function(){
+                mqttClient.publish('/'+topic,JSON.stringify(messagePayload),{qos : 1},function(){
+                    console.log('Message published : '+ topic);
+                });
+                console.log('You are publishing to topic:'+'/'+topic);
+            },function(){
+                console.log('Error publishing message to topic : '+topic);
+                console.log(JSON.stringify(messagePayload));
             });
-            console.log('You are publishing to topic:'+'/'+topic);
         }
         catch(ex){
             console.log(ex);
@@ -154,68 +161,138 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
  * Create a message queue for each EZEID when they signup or subuser is created
  * @param topic
  */
-NotificationMqtt.prototype.createQueue = function(topic){
+NotificationMqtt.prototype.createQueue = function(topic,callback,failedCallback){
 
-    var qs = require('querystring');
-    var exec=require('child_process').exec,child;
+    //var qs = require('querystring');
+    //var exec=require('child_process').exec,child;
+    //
+    //var executeCmd = function(cmdStr,callbackFn){
+    //
+    //    child = exec(cmdStr, function(err,stdout,stderr){
+    //        console.log('Error : '+ err);
+    //        console.log('stdout: '+ stdout);
+    //        console.log('stderr : '+ stderr);
+    //        if(callbackFn){
+    //            callbackFn(stdout);
+    //        }
+    //    });
+    //};
+    //
+    //try{
+    //    var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
+    //        '"Content-type: application/json" -d \'{"durable":true,"autodelete":false}\' '+
+    //        ' -X PUT  https://ms3.ezeone.com/api/queues/%2F/'+topic.toString();
+    //
+    //    console.log(curlCmdString);
+    //
+    //    executeCmd(curlCmdString,function(respOutput){
+    //        console.log(respOutput);
+    //    });
+    //}
+    //catch(ex){
+    //    console.log('Error in createQueue notification-mqtt.js');
+    //    console.log(ex);
+    //}
 
-    var executeCmd = function(cmdStr,callbackFn){
 
-        child = exec(cmdStr, function(err,stdout,stderr){
-            console.log('Error : '+ err);
-            console.log('stdout: '+ stdout);
-            console.log('stderr : '+ stderr);
-            if(callbackFn){
-                callbackFn(stdout);
+    request({
+        url: 'https://'+CONFIG.MQTT.HOST+'/api/queues/%2F/'+topic.toString(), //URL to hit
+        method: 'PUT',
+        auth : {
+            'user': CONFIG.MQTT.USERNAME,
+            'pass': CONFIG.MQTT.PASSWORD,
+            'sendImmediately': true
+        },
+        body: {
+            durable : true,
+            autodelete : false
+        },
+        json : true
+    }, function(error, response, body){
+        if(parseInt(response.statusCode) === 204){
+            console.log('Topic created successfully : '+ topic.toString());
+            if(callback){
+                if(typeof(callback) == 'function'){
+                    callback();
+                }
             }
-        });
-    };
-
-    try{
-        var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
-            '"Content-type: application/json" -d \'{"durable":true,"autodelete":false}\' '+
-            ' -X PUT  https://ms3.ezeone.com/api/queues/%2F/'+topic.toString();
-
-        console.log(curlCmdString);
-
-        executeCmd(curlCmdString,function(respOutput){
-            console.log(respOutput);
-        });
-    }
-    catch(ex){
-        console.log('Error in createQueue notification-mqtt.js');
-        console.log(ex);
-    }
-
+        }
+        else{
+            if(failedCallback){
+                if(typeof(failedCallback) == 'function'){
+                    failedCallback();
+                }
+            }
+        }
+    });
 
 };
 
-NotificationMqtt.prototype.checkQueue = function(topic){
-    var qs = require('querystring');
-    var exec=require('child_process').exec,child;
-
-    var executeCmd = function(cmdStr,callbackFn){
-
-        child = exec(cmdStr, function(err,stdout,stderr){
-            console.log('Error : '+ err);
-            console.log('stdout: '+ stdout);
-            console.log('stderr : '+ stderr);
-            if(callbackFn){
-                callbackFn(stdout);
-            }
-        });
-    };
+/**
+ * Callback to be executed after finishing checking queue
+ * @param topic
+ * @param callback
+ */
+NotificationMqtt.prototype.checkQueue = function(topic,callback,failedCallback){
+    var _this = this;
+    //var qs = require('querystring');
+    //var exec=require('child_process').exec,child;
+    //
+    //var executeCmd = function(cmdStr,callbackFn){
+    //
+    //    child = exec(cmdStr, function(err,stdout,stderr){
+    //        console.log('Error : '+ err);
+    //        console.log('stdout: '+ stdout);
+    //        console.log('stderr : '+ stderr);
+    //        if(callbackFn){
+    //            callbackFn(stdout);
+    //        }
+    //    });
+    //};
 
     try{
-        var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
-            '"Content-type: application/json" '+
-            ' -X GET  https://ms3.ezeone.com/api/queues/%2F/'+topic.toString();
+        //var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
+        //    '"Content-type: application/json" '+
+        //    ' -X GET  https://ms3.ezeone.com/api/queues/%2F/'+topic.toString();
+        //
+        //console.log(curlCmdString);
+        //
+        //executeCmd(curlCmdString,function(respOutput){
+        //    console.log(respOutput);
+        //});
 
-        console.log(curlCmdString);
 
-        executeCmd(curlCmdString,function(respOutput){
-            console.log(respOutput);
-        });
+
+        request
+            .get('https://'+CONFIG.MQTT.HOST+'/api/queues/%2F/'+topic.toString(),{
+                'auth': {
+                    'user': CONFIG.MQTT.USERNAME,
+                    'pass': CONFIG.MQTT.PASSWORD,
+                    'sendImmediately': true
+                }
+            })
+            .on('response', function(response) {
+                if(parseInt(response.statusCode) === 200){
+                    console.log('Topic :'+topic.toString() + ' exists');
+                    if(callback){
+                        if(typeof(callback) == 'function'){
+                            callback();
+                        }
+                    }
+                }
+                else if(parseInt(response.statusCode) === 404){
+                    _this.createQueue(topic,callback,failedCallback);
+                }
+                else{
+                    if(failedCallback){
+                        if(typeof(failedCallback) == 'function'){
+                            failedCallback();
+                        }
+                    }
+                    console.log('Error connecting to rabbit server at '+Date.now());
+                    console.log('Message delayed for topic: ' + topic.toString());
+                }
+            });
     }
     catch(ex){
         console.log('Error in finding queue notification-mqtt.js');
