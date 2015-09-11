@@ -191,13 +191,12 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                             + ',' + st.db.escape(mentorSubtitle)+ ',' + st.db.escape(facultyTitle)+ ',' + st.db.escape(facultySubtitle)
                             + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType)+ ',' + st.db.escape(pictureTitle)
                             + ',' + st.db.escape(pictureType);
-                        console.log('CALL pSaveAlumniContent(' + query + ')');
                         st.db.query('CALL pSaveAlumniContent(' + query + ')', function (err, insertresult) {
                             if (!err) {
                                 if (insertresult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Alumni Content save successfully';
+                                    responseMessage.message = 'Alumni Content saved successfully';
                                     responseMessage.data = {
                                         token: req.body.token,
                                         tid: req.body.tid,
@@ -227,7 +226,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                         f_subtitle : req.body.f_subtitle
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnSaveAlumniContent: Alumni Content save successfully');
+                                    console.log('FnSaveAlumniContent: Alumni Content saved successfully');
                                 }
                                 else {
                                     responseMessage.message = 'No save Alumni Content';
@@ -369,13 +368,12 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                             + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
                             + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
                             + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType);
-                        console.log('CALL pSaveAlumniTeam(' + query + ')');
                         st.db.query('CALL pSaveAlumniTeam(' + query + ')', function (err, insertresult) {
                             if (!err) {
                                 if (insertresult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Alumni Team save successfully';
+                                    responseMessage.message = 'Alumni Team saved successfully';
                                     responseMessage.data = {
                                         token : req.body.token,
                                         tid : req.body.tid,
@@ -391,7 +389,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                         alumni_role : req.body.alumni_role
                                     };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnSaveAlumniTeam: Alumni Team save successfully');
+                                    console.log('FnSaveAlumniTeam: Alumni Team saved successfully');
                                 }
                                 else {
                                     responseMessage.message = 'No save Alumni Team';
@@ -486,12 +484,19 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
                         st.db.query('CALL pGetAlumniContent(' + query + ')', function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Alumni content loaded successfully';
-                                    responseMessage.data = getResult[0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetAlumniContent: Alumni content loaded successfully');
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Alumni content loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniContent: Alumni content loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Alumni content not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniContent: Alumni content not loaded');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Alumni content not loaded';
@@ -596,12 +601,19 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
                         st.db.query('CALL pGetAlumniTeam(' + query + ')', function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Alumni team loaded successfully';
-                                    responseMessage.data = getResult[0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetAlumniTeam: Alumni team loaded successfully');
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Alumni team loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniTeam: Alumni team loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Alumni team not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniTeam: Alumni team not loaded');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Alumni team not loaded';
