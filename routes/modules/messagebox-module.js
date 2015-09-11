@@ -208,9 +208,7 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
         try {
             if (ezeidArray.length > 1) {
                 ezeid = ezeidArray[0];
-                pin = parseInt(ezeidArray[1]);
-                console.log(ezeid);
-                console.log(pin);
+                pin = parseInt(ezeidArray[1]) ? parseInt(ezeidArray[1]) : ezeidArray[1];
             }
             else
             {
@@ -318,9 +316,7 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
                     if (result) {
                         if (ezeidArray.length > 1) {
                             ezeid = ezeidArray[0];
-                            pin = parseInt(ezeidArray[1]);
-                            console.log(ezeid);
-                            console.log(pin);
+                            pin = parseInt(ezeidArray[1]) ? parseInt(ezeidArray[1]) : ezeidArray[1];
                         }
                         else
                         {

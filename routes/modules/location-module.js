@@ -947,7 +947,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
 Location.prototype.validateEZEOne = function(req,res,next){
     var _this = this;
 
-    var name = req.query.ezeone_id;
+    var name = alterEzeoneId(req.query.ezeone_id);
     var ezeid,pin = null ;
 
     var ezeidArray = name.split('.');
@@ -975,7 +975,7 @@ Location.prototype.validateEZEOne = function(req,res,next){
         try {
             if (ezeidArray.length > 1) {
                 ezeid = ezeidArray[0];
-                pin = parseInt(ezeidArray[1]);
+                pin = parseInt(ezeidArray[1]) ? parseInt(ezeidArray[1]) : ezeidArray[1];
             }
             else
             {
@@ -986,7 +986,6 @@ Location.prototype.validateEZEOne = function(req,res,next){
             var query = 'CALL pvalidateEZEOne(' + queryParams + ')';
             console.log(query);
             st.db.query(query, function (err, getResult) {
-                console.log(getResult);
                 if (!err) {
                     if (getResult) {
                         if (getResult[0]) {
@@ -994,24 +993,27 @@ Location.prototype.validateEZEOne = function(req,res,next){
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'EZEoneID is available';
-                                responseMessage.data = getResult[0][0];
+                                responseMessage.data = getResult[0][0].masterid;
                                 res.status(200).json(responseMessage);
                                 console.log('FnValidateEZEOne: EZEoneID is available');
                             }
                             else {
                                 responseMessage.message = 'EZEoneID is not available';
+                                responseMessage.data = getResult[0][0].masterid;
                                 res.status(200).json(responseMessage);
                                 console.log('FnValidateEZEOne:EZEoneID is not available');
                             }
                         }
                         else {
                             responseMessage.message = 'EZEoneID is not available';
+                            responseMessage.data = getResult[0][0].masterid;
                             res.status(200).json(responseMessage);
                             console.log('FnValidateEZEOne:EZEoneID is not available');
                         }
                     }
                     else {
                         responseMessage.message = 'EZEoneID is not available';
+                        responseMessage.data = getResult[0][0].masterid;
                         res.status(200).json(responseMessage);
                         console.log('FnValidateEZEOne:EZEoneID is not available');
                     }
