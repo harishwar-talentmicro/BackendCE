@@ -297,6 +297,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var type = req.body.type;     // 0=core group 1=mentor 2=faculty
     var alumniId = req.body.alumni_id;
     var alumniRole = req.body.alumni_role;
+    var username = req.body.username;
 
     var responseMessage = {
         status: false,
@@ -367,7 +368,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                         var query = st.db.escape(tid) + ',' + st.db.escape(picture) + ',' + st.db.escape(jobTitle)
                             + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
                             + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
-                            + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType);
+                            + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username);
                         st.db.query('CALL pSaveAlumniTeam(' + query + ')', function (err, insertresult) {
                             if (!err) {
                                 if (insertresult) {
@@ -386,7 +387,8 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                         seq_no : req.body.seq_no,
                                         type : req.body.type,
                                         alumni_id : req.body.alumni_id,
-                                        alumni_role : req.body.alumni_role
+                                        alumni_role : req.body.alumni_role,
+                                        username : req.body.username
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveAlumniTeam: Alumni Team saved successfully');
