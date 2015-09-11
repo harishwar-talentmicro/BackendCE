@@ -45,6 +45,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     //var token = req.body.token;
     var tid = req.body.tid;      // while saving time 0 else id of user
     var picture = req.body.pg_pic;
+    var pictureTitle = req.body.pg_picName;
+    var pictureType = req.body.pg_picType;
     var title = req.body.pg_title;
     var subTitle = req.body.pg_subtitle;
     var footerL1 = req.body.footerL1;
@@ -58,6 +60,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var mainFooter1 = req.body.m_footer1;
     var mainFooter2 = req.body.m_footer2;
     var logo = req.body.logo;
+    var logoName = req.body.l_name;
+    var logoType = req.body.l_type;
     var logoTitle = req.body.logo_title;
     var alumniId = req.body.alumni_id;
     var mentorTitle = req.body.m_title;
@@ -184,7 +188,9 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                             + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
                             + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(logo)
                             + ',' + st.db.escape(logoTitle)+ ',' + st.db.escape(alumniId)+ ',' + st.db.escape(mentorTitle)
-                            + ',' + st.db.escape(mentorSubtitle)+ ',' + st.db.escape(facultyTitle)+ ',' + st.db.escape(facultySubtitle);
+                            + ',' + st.db.escape(mentorSubtitle)+ ',' + st.db.escape(facultyTitle)+ ',' + st.db.escape(facultySubtitle)
+                            + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType)+ ',' + st.db.escape(pictureTitle)
+                            + ',' + st.db.escape(pictureType);
                         console.log('CALL pSaveAlumniContent(' + query + ')');
                         st.db.query('CALL pSaveAlumniContent(' + query + ')', function (err, insertresult) {
                             if (!err) {
@@ -196,6 +202,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                         token: req.body.token,
                                         tid: req.body.tid,
                                         pg_pic: req.body.pg_pic,
+                                        pg_picName : req.body.pg_picName,
+                                        pg_picType : req.body.pg_picType,
                                         pg_title: req.body.pg_title,
                                         pg_subtitle: req.body.pg_subtitle,
                                         footerL1: req.body.footerL1,
@@ -209,6 +217,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                         m_footer1: req.body.m_footer1,
                                         m_footer2: req.body.m_footer2,
                                         logo: req.body.logo,
+                                        l_name : req.body.l_name,
+                                        l_type : req.body.l_type,
                                         logo_title: req.body.logo_title,
                                         alumni_id : req.body.alumni_id,
                                         m_title : req.body.m_title,
