@@ -936,5 +936,108 @@ Location.prototype.getLocationPicture = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnValidateEZEOne
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for validate group name
+ */
+Location.prototype.validateEZEOne = function(req,res,next){
+    var _this = this;
+
+    var name = req.query.ezeone_id;
+    var ezeid,pin = null ;
+
+    var ezeidArray = name.split('.');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!name){
+        error['name'] = 'Invalid name';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            if (ezeidArray.length > 1) {
+                ezeid = ezeidArray[0];
+                pin = parseInt(ezeidArray[1]);
+            }
+            else
+            {
+                ezeid = name;
+                pin = null;
+            }
+            var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(pin);
+            var query = 'CALL pvalidateEZEOne(' + queryParams + ')';
+            console.log(query);
+            st.db.query(query, function (err, getResult) {
+                console.log(getResult);
+                if (!err) {
+                    if (getResult) {
+                        if (getResult[0]) {
+                            if (getResult[0][0].masterid != 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'EZEoneID is available';
+                                responseMessage.data = getResult[0][0];
+                                res.status(200).json(responseMessage);
+                                console.log('FnValidateEZEOne: EZEoneID is available');
+                            }
+                            else {
+                                responseMessage.message = 'EZEoneID is not available';
+                                res.status(200).json(responseMessage);
+                                console.log('FnValidateEZEOne:EZEoneID is not available');
+                            }
+                        }
+                        else {
+                            responseMessage.message = 'EZEoneID is not available';
+                            res.status(200).json(responseMessage);
+                            console.log('FnValidateEZEOne:EZEoneID is not available');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'EZEoneID is not available';
+                        res.status(200).json(responseMessage);
+                        console.log('FnValidateEZEOne:EZEoneID is not available');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnValidateEZEOne: error in validating EZEoneID :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnValidateEZEOne ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 module.exports = Location;

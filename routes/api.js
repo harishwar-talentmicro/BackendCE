@@ -31,6 +31,7 @@ router.get('/ewmGetRelationType', LocationManager.FnGetRelationType);
 router.get('/ewmGetState', LocationManager.FnGetState);
 router.get('/ewmGetMTitle', LocationManager.FnGetMTitle);
 router.get('/ewGetEZEID', LocationManager.FnCheckEzeid);
+router.get('/validate_ezeone', LocationManager.FnValidateEZEOne);
 router.post('/ewmAddLocation', LocationManager.FnAddLocation);
 router.post('/ewSearchByKeywords', LocationManager.FnSearchByKeywords);
 router.get('/ewtGetUserDetails', LocationManager.FnGetUserDetails);

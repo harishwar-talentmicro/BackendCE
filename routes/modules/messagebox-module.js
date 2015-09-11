@@ -177,6 +177,9 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
     var name = req.query.group_name;
     var token = req.query.token;
     var groupType = req.query.group_type ? req.query.group_type : 0;
+    var ezeid,pin = null ;
+
+    var ezeidArray = name.split('.');
 
     var responseMessage = {
         status: false,
@@ -203,12 +206,25 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
     }
     else {
         try {
-            var queryParams = st.db.escape(name) + ',' +  st.db.escape(token)+ ',' +  st.db.escape(groupType);
-            var query = 'CALL pValidateGroupName(' + queryParams + ')';
-            st.db.query(query, function (err, getResult) {
-                if (!err) {
-                    if (getResult) {
-                        if(getResult[0]){
+            if (ezeidArray.length > 1) {
+                ezeid = ezeidArray[0];
+                pin = parseInt(ezeidArray[1]);
+                console.log(ezeid);
+                console.log(pin);
+            }
+            else
+            {
+                ezeid = name;
+                pin = null;
+            }
+                var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
+                    + ',' + st.db.escape(pin);
+                var query = 'CALL pValidateGroupName(' + queryParams + ')';
+                console.log(query);
+                st.db.query(query, function (err, getResult) {
+                    if (!err) {
+                        if (getResult) {
+                            if (getResult[0]) {
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Name is available';
@@ -227,22 +243,22 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
                             res.status(200).json(responseMessage);
                             console.log('FnValidateGroupName:Name is not available');
                         }
-                }
-                else {
-                    responseMessage.message = 'An error occured ! Please try again';
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    res.status(500).json(responseMessage);
-                    console.log('FnValidateGroupName: error in validating Group Name :' + err);
-                }
-            });
+                    }
+                    else {
+                        responseMessage.message = 'An error occured ! Please try again';
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        res.status(500).json(responseMessage);
+                        console.log('FnValidateGroupName: error in validating Group Name :' + err);
+                    }
+                });
         }
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !'
+            responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnValidateGroupName ' + ex.description);
             var errorDate = new Date();
@@ -266,6 +282,10 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
     var groupId = (parseInt(req.query.group_id) !== NaN && parseInt(req.query.group_id ) > 0) ? parseInt(req.query.group_id) : 0;
     var token = (req.query.token) ? req.query.token : null;
     var ezeoneId = (req.query.ezeone_id) ? alterEzeoneId(req.query.ezeone_id) : null;
+    var ezeid,pin = null ;
+
+    var ezeidArray = ezeoneId.split('.');
+
 
     var error  = {};
     var status = true;
@@ -296,7 +316,18 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeoneId);
+                        if (ezeidArray.length > 1) {
+                            ezeid = ezeidArray[0];
+                            pin = parseInt(ezeidArray[1]);
+                            console.log(ezeid);
+                            console.log(pin);
+                        }
+                        else
+                        {
+                            ezeid = ezeoneId;
+                            pin = null;
+                        }
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(ezeid)+ ',' + st.db.escape(pin);
                         var query = 'CALL pValidateGroupMember('+queryParams+')';
                         console.log(query);
                         st.db.query(query,function(err,results){
