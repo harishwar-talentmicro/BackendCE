@@ -163,40 +163,8 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
  */
 NotificationMqtt.prototype.createQueue = function(topic,callback,failedCallback){
 
-    //var qs = require('querystring');
-    //var exec=require('child_process').exec,child;
-    //
-    //var executeCmd = function(cmdStr,callbackFn){
-    //
-    //    child = exec(cmdStr, function(err,stdout,stderr){
-    //        console.log('Error : '+ err);
-    //        console.log('stdout: '+ stdout);
-    //        console.log('stderr : '+ stderr);
-    //        if(callbackFn){
-    //            callbackFn(stdout);
-    //        }
-    //    });
-    //};
-    //
-    //try{
-    //    var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
-    //        '"Content-type: application/json" -d \'{"durable":true,"autodelete":false}\' '+
-    //        ' -X PUT  https://ms3.ezeone.com/api/queues/%2F/'+topic.toString();
-    //
-    //    console.log(curlCmdString);
-    //
-    //    executeCmd(curlCmdString,function(respOutput){
-    //        console.log(respOutput);
-    //    });
-    //}
-    //catch(ex){
-    //    console.log('Error in createQueue notification-mqtt.js');
-    //    console.log(ex);
-    //}
-
-
     request({
-        url: 'https://'+CONFIG.MQTT.HOST+'/api/queues/%2F/'+topic.toString(), //URL to hit
+        url: CONFIG.MQTT.ADMIN_PROTOCOL+ '://'+CONFIG.MQTT.ADMIN_HOST+ ((CONFIG.MQTT.ADMIN_PORT) ? ':'+ CONFIG.MQTT.ADMIN_PORT : '') +'/api/queues/%2F/'+topic.toString(), //URL to hit
         method: 'PUT',
         auth : {
             'user': CONFIG.MQTT.USERNAME,
@@ -235,36 +203,10 @@ NotificationMqtt.prototype.createQueue = function(topic,callback,failedCallback)
  */
 NotificationMqtt.prototype.checkQueue = function(topic,callback,failedCallback){
     var _this = this;
-    //var qs = require('querystring');
-    //var exec=require('child_process').exec,child;
-    //
-    //var executeCmd = function(cmdStr,callbackFn){
-    //
-    //    child = exec(cmdStr, function(err,stdout,stderr){
-    //        console.log('Error : '+ err);
-    //        console.log('stdout: '+ stdout);
-    //        console.log('stderr : '+ stderr);
-    //        if(callbackFn){
-    //            callbackFn(stdout);
-    //        }
-    //    });
-    //};
 
     try{
-        //var curlCmdString = 'curl -i -u indrajeet:indrajeet -H '+
-        //    '"Content-type: application/json" '+
-        //    ' -X GET  https://ms3.ezeone.com/api/queues/%2F/'+topic.toString();
-        //
-        //console.log(curlCmdString);
-        //
-        //executeCmd(curlCmdString,function(respOutput){
-        //    console.log(respOutput);
-        //});
-
-
-
         request
-            .get('https://'+CONFIG.MQTT.HOST+'/api/queues/%2F/'+topic.toString(),{
+            .get(CONFIG.MQTT.ADMIN_PROTOCOL+ '://'+CONFIG.MQTT.ADMIN_HOST+ ((CONFIG.MQTT.ADMIN_PORT) ? ':'+ CONFIG.MQTT.ADMIN_PORT : '')+'/api/queues/%2F/'+topic.toString(),{
                 'auth': {
                     'user': CONFIG.MQTT.USERNAME,
                     'pass': CONFIG.MQTT.PASSWORD,
