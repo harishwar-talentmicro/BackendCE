@@ -1248,4 +1248,12 @@ angular.module('ezeidApp').
                 }
             };
 
+            /**
+             * Redirect to notify-applicant page
+             */
+            $scope.redirectNotifyPage = function(tid)
+            {
+                $location.url('/notify-applicant' + '?jobid='+tid);
+            };
+
         }]);
