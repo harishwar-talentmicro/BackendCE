@@ -129,7 +129,7 @@
                 </div>
 
                 <!----------------- EZEID Availability Check Block ---------------------------------->
-                <div ng-show="isEzeidCheckBlockVisible" class="animation-slideup signup-details-row row">
+                <div ng-show="isEzeidCheckBlockVisible" class="signup-details-row row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"></div>
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <h4 class="text-center text-black font-roboto">{{selectionString}}</h4>
@@ -313,7 +313,7 @@
                                                     max-length="30"
                                                     placeholder="{{(userType == 2 || userType == 3) ? 'Contact First Name': 'First Name'}}"
                                                     ng-class="(signUpForm.firstName.$dirty && signUpForm.firstName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                    class="form-control emptyBox" />
+                                                    class="form-control {{(userType == 3) ? '' : 'emptyBox' }}" />
                                         </div>
                                         <small class="text-danger">{{error.firstName}}</small>
                                     </div>
@@ -388,7 +388,7 @@
                                                     maxlength="50"
                                                     placeholder="{{'Email'}}"
                                                     ng-class="(signUpForm.email.$dirty && signUpForm.email.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                    class="form-control emptyBox" />
+                                                    class="form-control {{(userType == 3) ? '' : 'emptyBox' }}" />
                                         </div>
                                         <small class="text-danger">{{error.email}}</small>
                                     </div>
@@ -432,7 +432,7 @@
                                                         numbers-only
                                                         placeholder="Mobile"
                                                         ng-class="(signUpForm.mobile.$dirty && signUpForm.mobile.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                        class="form-control emptyBox" />
+                                                        class="form-control  {{(userType == 3) ? '' : 'emptyBox' }}" />
 
 
                                             </div>
