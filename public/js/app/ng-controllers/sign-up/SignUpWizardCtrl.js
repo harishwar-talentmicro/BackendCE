@@ -602,9 +602,6 @@ angular.module('ezeidApp').
                     };
                     // ////////////console.log($scope.error);
 
-                    console.log(signUpData);
-                    return;
-
 
                     $http({
                         method: "POST",
