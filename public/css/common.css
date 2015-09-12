@@ -3066,3 +3066,8 @@ h4.front-business-form.warning-text{
     min-height: 150px;
     height: 150px;
 }
+
+.isd-list{
+    max-height: 200px;
+    overflow-y: scroll;
+}
