@@ -185,8 +185,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
             //    if (!err) {
             //        if (result) {
             var imageParams = {
-                path: req.files.picture[0].path,
-                path1 : req.files.picture[1].path,
+                path: req.files.picture.path,
+                //path1 : req.files.picture[1].path,
                 type: pictureType,
                 width: width,
                 height: height,
@@ -325,7 +325,8 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var height = req.body.height ? req.body.height : 600;
 
     console.log('req.files....');
-    console.log(req.files);
+    console.log(req.files.picture.path);
+    //console.log(req.files.picture[0].path);
 
     var responseMessage = {
         status: false,
@@ -400,14 +401,16 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
             //        if (result) {
 
             var imageParams = {
-                path : req.files.picture[0].path,
-                path1 : req.files.picture[1].path,
+                path : req.files.picture.path,
+                //path1 : req.files.picture[1].path,
                 type : pictureType,
                 width : width,
                 height : height,
                 scale : '',
                 crop : ''
             };
+
+            console.log(imageParams);
 
             FnCropImage(imageParams, function (err, imageResult) {
                 if(imageResult) {
@@ -505,10 +508,9 @@ function FnCropImage(imageParams, callback){
     var _this = this;
 
     var fs = require('fs');
-
     var deleteTempFile = function(){
         fs.unlink('../bin/'+imageParams.path);
-        fs.unlink('../bin/'+imageParams.path1);
+        //fs.unlink('../bin/'+imageParams.path1);
     };
 
     var respMsg = {
