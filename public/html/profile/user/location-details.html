@@ -129,7 +129,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-show="userDetails.IDTypeID !== 1">
         <label>Website</label>
         <div class="form-group form-group-sm">
             <input type="text"
@@ -143,7 +143,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-show="userDetails.IDTypeID !== 1">
         <label>Parking</label>
         <div class="form-group form-group-sm">
             <select class="form-control" ng-model="editLocationDetails.ParkingStatus" name="editLocationDetails.ParkingStatus">
@@ -153,7 +153,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12" ng-show="userDetails.IDTypeID !== 1">
         <label>Working Hour Template</label>
         <div class="form-group form-group-sm">
             <div class="form-group form-group-sm">

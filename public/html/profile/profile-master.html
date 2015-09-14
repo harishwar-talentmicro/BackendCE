@@ -1,12 +1,12 @@
 <script type="text/ng-template" id="/tpl/profile/navigation.html">
     <div class="col-sm-12 col-xs-12 hidden-lg hidden-md hidden-sm navbar-collapse">
         <ul class="nav nav-pills nav-justified nav-configuration">
-            <li role="presentation" ng-class="{'active':pageUserDetails === activeSubTemplate}">
-                <a ng-click="changeActive(0,false)" class="btn-link">
-                    <i class="fa fa-circle-o" ng-hide="(pageUserDetails === activeSubTemplate)"></i>
-                    <i class="fa fa-circle" ng-show="(pageUserDetails === activeSubTemplate)"></i>
-                    Profile </a>
-            </li>
+            <!--<li role="presentation" ng-class="{'active':pageUserDetails === activeSubTemplate}">-->
+                <!--<a ng-click="changeActive(0,false)" class="btn-link">-->
+                    <!--<i class="fa fa-circle-o" ng-hide="(pageUserDetails === activeSubTemplate)"></i>-->
+                    <!--<i class="fa fa-circle" ng-show="(pageUserDetails === activeSubTemplate)"></i>-->
+                    <!--Profile </a>-->
+            <!--</li>-->
             <li ng-repeat="loc in locCount track by $index" role="presentation" ng-class="{'active': ((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))}">
                 <a ng-click="changeActive($index,true)" class="btn-link">
                     <i class="fa fa-circle-o" ng-hide="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
@@ -18,12 +18,12 @@
     <!------ Only on Desktop ------------------------------------>
     <div class="col-lg-3 col-md-3 hidden-xs">
         <ul class="nav nav-pills nav-stacked nav-configuration">
-            <li role="presentation" ng-class="{'active':pageUserDetails === activeSubTemplate}">
-                <a ng-click="changeActive(0,false)" class="btn-link">
-                    <i class="fa fa-circle-o" ng-hide="(pageUserDetails === activeSubTemplate)"></i>
-                    <i class="fa fa-circle" ng-show="(pageUserDetails === activeSubTemplate)"></i>
-                    Profile </a>
-            </li>
+            <!--<li role="presentation" ng-class="{'active':pageUserDetails === activeSubTemplate}">-->
+                <!--<a ng-click="changeActive(0,false)" class="btn-link">-->
+                    <!--<i class="fa fa-circle-o" ng-hide="(pageUserDetails === activeSubTemplate)"></i>-->
+                    <!--<i class="fa fa-circle" ng-show="(pageUserDetails === activeSubTemplate)"></i>-->
+                    <!--Profile </a>-->
+            <!--</li>-->
             <li ng-repeat="loc in locCount track by $index" role="presentation" ng-class="{'active': ((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))}">
                 <a ng-click="changeActive($index,true)" class="btn-link">
                     <i class="fa fa-circle-o" ng-hide="((pageLocationDetails === activeSubTemplate) && ($index == activeLoc))"></i>
@@ -49,17 +49,24 @@
     <div class="panel-body">
 
         <ul class="nav nav-pills nav-wizard">
-            <li ng-class="((pageUserDetails === activeSubTemplate) ? 'active' : '')">
+            <li>
                 <a>
-                    <small class="tiny">Step 1 : Profile</small>
+                    <small class="tiny">Step 1 : EZEID</small>
                     </a>
                 <div class="nav-arrow"></div>
             </li>
-            <li ng-class="((pageUserDetails === activeSubTemplate) ? '' : 'active')">
+            <li>
 
                 <a>
-                    <small class="tiny">Step 2 : Primary Location</small>
+                    <small class="tiny">Step 2 : Primary Details</small>
                     </a>
+                <div class="nav-arrow"></div>
+            </li>
+            <li ng-class="((pageUserDetails === pageLocationDetails) ? '' : 'active')">
+
+                <a>
+                    <small class="tiny">Step 3 : Location Details</small>
+                </a>
                 <div class="nav-arrow"></div>
             </li>
         </ul>

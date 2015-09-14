@@ -36,7 +36,8 @@ angular.module('ezeidApp').controller('ProfileMasterCtrl',[
 
         $scope.pageUserDetails = "html/profile/user/user-details.html";
         $scope.pageLocationDetails = "html/profile/user/location-details.html";
-        $scope.activeSubTemplate = $scope.pageUserDetails;
+        //$scope.activeSubTemplate = $scope.pageUserDetails;
+        $scope.activeSubTemplate = $scope.pageLocationDetails;
 
         $scope.activeLoc = 0;
 
