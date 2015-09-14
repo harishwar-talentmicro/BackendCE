@@ -6,56 +6,68 @@
             <i class="fa fa-envelope-o"></i> {{titleText}}
         </div>
         <div class="message-body">
-            <div class="input-group p-bottom-4">
-                <div class="input-group-addon">To</div>
-                <input type="text"
-                       ng-model="composeMsg.MessageTo"
-                       class="form-control"
-                       ng-keyup="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)"
-                       id="to"
-                       placeholder="To">
-                <div class="input-group-addon no-padding-and-border hidden">
-                    <div class="btn btn-primary no-radius"
-                         ng-click="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)">
-                        <i class="fa fa-check"></i> Check</div>
+
+            <div class="container no-padding">
+                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 no-padding">
+                    <div class="input-group p-bottom-4">
+                        <div class="input-group-addon">To</div>
+                        <input type="text"
+                               ng-model="composeMsg.MessageTo"
+                               class="form-control"
+                               ng-keyup="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)"
+                               id="to"
+                               placeholder="To">
+                        <div class="input-group-addon no-padding-and-border hidden">
+                            <div class="btn btn-primary no-radius"
+                                 ng-click="validateEnteredEzeoneOrGroup(composeMsg.MessageTo)">
+                                <i class="fa fa-check"></i> Check</div>
+                        </div>
+                    </div>
+
+                    <div class="group-name-suggestion" ng-show="visibilityHtml.groupSuggestion">
+                        <!-- group suggestions goes here -->
+                        <div class="group-suggestion pointer"
+                             ng-repeat="list in groupSuggestionList track by $index"
+                             ng-click="selectGroupSuggestion($index)"
+                             ng-class="list.selected?'selected':''">
+                            <span >{{list.GroupName}}</span>
+                            <i class="fa fa-check pull-right p-3" ng-show="list.selected?'selected':''"></i>
+
+                        </div>
+                        <!-- ok btn -->
+                        <div class="btn-section text-right">
+                            <button ng-click="pushSelectedSuggestion()" class="btn btn-primary btn-xs"><i class="fa fa-check-square"></i> OK</button>
+                        </div>
+                    </div>
+                    <!-- error message of receiver field goes here -->
+                    <div class="invalid-ezeone-msg text-danger"
+                         ng-show="visibilityReceiverErrorMsg"
+                         ng-click="removeMessage()">
+                        <i class="fa fa-exclamation-circle"></i> {{errorMsgArr[currentErrorMsg]}} <i class="fa fa-times pointer"></i>
+                    </div>
+
+                    <!-- List of receiver -->
+                    <div class="receiver-list p-bottom-10">
+                        <span class="receivers" ng-repeat="grp in receiverArr track by $index">
+                            <button class="btn btn-danger btn-xs" disabled><i>{{grp.GroupName}}</i></button>
+                            <i class="fa fa-times pointer" ng-click="removeReceiver($index)"></i>
+                        </span>
+                    </div>
+
+                    <div class="input-group p-bottom-4 hidden">
+                        <div class="input-group-addon">From</div>
+                        <input type="text" ng-model="composeMsg.MessageFrom" class="form-control" id="from" placeholder="From">
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 no-padding">
+                    <select class="form-control" ng-model="composeMsg.Priority">
+                        <option ng-repeat="pr in priority track by $index" value="{{$index}}"
+                                ng-selected="composeMsg.Priority == $index">{{priority[$index]}}</option>
+                    </select>
+
                 </div>
             </div>
-
-            <div class="group-name-suggestion" ng-show="visibilityHtml.groupSuggestion">
-                <!-- group suggestions goes here -->
-                <div class="group-suggestion pointer"
-                     ng-repeat="list in groupSuggestionList track by $index"
-                     ng-click="selectGroupSuggestion($index)"
-                        ng-class="list.selected?'selected':''">
-                         <span >{{list.GroupName}}</span>
-                         <i class="fa fa-check pull-right p-3" ng-show="list.selected?'selected':''"></i>
-
-                </div>
-                <!-- ok btn -->
-                <div class="btn-section text-right">
-                    <button ng-click="pushSelectedSuggestion()" class="btn btn-primary btn-xs"><i class="fa fa-check-square"></i> OK</button>
-                </div>
-            </div>
-            <!-- error message of receiver field goes here -->
-            <div class="invalid-ezeone-msg text-danger"
-                 ng-show="visibilityReceiverErrorMsg"
-                 ng-click="removeMessage()">
-                <i class="fa fa-exclamation-circle"></i> {{errorMsgArr[currentErrorMsg]}} <i class="fa fa-times pointer"></i>
-            </div>
-
-            <!-- List of receiver -->
-            <div class="receiver-list p-bottom-10">
-                <span class="receivers" ng-repeat="grp in receiverArr track by $index">
-                    <button class="btn btn-danger btn-xs" disabled><i>{{grp.GroupName}}</i></button>
-                    <i class="fa fa-times pointer" ng-click="removeReceiver($index)"></i>
-                </span>
-            </div>
-
-            <div class="input-group p-bottom-4 hidden">
-                <div class="input-group-addon">From</div>
-                <input type="text" ng-model="composeMsg.MessageFrom" class="form-control" id="from" placeholder="From">
-            </div>
-
             <div class="p-bottom-4 bg-white">
                 <div text-angular ng-model="composeMsg.MessageBody"
                      name="demo-editor"
@@ -84,18 +96,21 @@
                     </button><i class="fa fa-times pointer hidden" ng-click="resetAttachmentData()"></i>
                 </span>
             </span>
-            <hr>
-            <!-- Additional Filters -->
-            <div class="additional-filter p-bottom-4 container">
-
-                <span class="col-lg-3 no-padding">
-                <div class="">Priority</div>
-                <select class="form-control" ng-model="composeMsg.Priority">
-                    <option ng-repeat="pr in priority track by $index" value="{{$index}}">{{priority[$index]}}</option>
-                </select>
+             <span class="pull-right send-button text-right" ng-disabled="visibilityHtml.disabledSendBtn">
+                     <button class="btn btn-primary"
+                             ng-click="sendMessage()"><i class="fa fa-send"></i> Send</button>
                 </span>
+            <!-- Additional Filters -->
+            <div class="additional-filter p-bottom-4 container hidden">
 
-                <span class="col-lg-3 ">
+                <!--<span class="col-lg-3 no-padding">-->
+                <!--<div class="">Priority</div>-->
+                <!--<select class="form-control" ng-model="composeMsg.Priority">-->
+                <!--<option ng-repeat="pr in priority track by $index" value="{{$index}}">{{priority[$index]}}</option>-->
+                <!--</select>-->
+                <!--</span>-->
+
+                <span class="col-lg-3 hidden">
                     <div class="">Target Date</div>
                          <date-time-picker input-group-class="input-group-sm" recipient="composeMsg.TargetDate" settings='{
                                                                         "format" : "d M Y H:m",
@@ -107,7 +122,7 @@
                     <!--<date-time-picker recipient="composeMsg.TargetDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>-->
                 </span>
 
-                <span class="col-lg-3 no-padding">
+                <span class="col-lg-3 no-padding hidden">
                     <div class="">Expiry Date</div>
                     <date-time-picker input-group-class="input-group-sm" recipient="composeMsg.ExpiryDate" settings='{
                                                                         "format" : "d M Y H:m",
@@ -118,10 +133,10 @@
                     <!--<date-time-picker recipient="composeMsg.ExpiryDate" settings='{"format" : "d-M-Y", "hours12" : false, "timepicker" : false}' ></date-time-picker>-->
                 </span>
 
-                <span class="col-lg-3 send-button text-right" ng-disabled="visibilityHtml.disabledSendBtn">
-                     <button class="btn btn-primary no-radius"
-                        ng-click="sendMessage()"><i class="fa fa-send"></i> Send</button>
-                </span>
+                <!--<span class="col-lg-3 send-button text-right" ng-disabled="visibilityHtml.disabledSendBtn">-->
+                     <!--<button class="btn btn-primary no-radius"-->
+                             <!--ng-click="sendMessage()"><i class="fa fa-send"></i> Send</button>-->
+                <!--</span>-->
             </div>
         </div>
     </div>
