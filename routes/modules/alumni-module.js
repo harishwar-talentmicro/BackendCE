@@ -336,10 +336,16 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
         validateStatus *= false;
     }
     if(!seqNo){
+        seqNo = 0;
+    }
+    if(parseInt(seqNo) == NaN){
         error['seqNo'] = 'Invalid seqNo';
         validateStatus *= false;
     }
     if(!type){
+        type = 0;
+    }
+    if(parseInt(type) == NaN){
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
@@ -351,7 +357,6 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
         error['alumniRole'] = 'Invalid alumniRole';
         validateStatus *= false;
     }
-
 
     if(!validateStatus){
         responseMessage.status = false;
@@ -365,7 +370,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-                        var query = st.db.escape(tid) + ',' + st.db.escape(picture) + ',' + st.db.escape(jobTitle)
+            var query = st.db.escape(tid) + ',' + st.db.escape(picture) + ',' + st.db.escape(jobTitle)
                             + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
                             + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
                             + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username);
@@ -376,26 +381,26 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                     responseMessage.error = null;
                                     responseMessage.message = 'Alumni Team saved successfully';
                                     responseMessage.data = {
-                                        token : req.body.token,
-                                        tid : req.body.tid,
-                                        picture : req.body.picture,
-                                        p_title : req.body.p_title,
-                                        p_type : req.body.p_type,
-                                        job_title : req.body.job_title,
-                                        company : req.body.company,
-                                        profile : req.body.profile,
-                                        seq_no : req.body.seq_no,
-                                        type : req.body.type,
-                                        alumni_id : req.body.alumni_id,
-                                        alumni_role : req.body.alumni_role,
-                                        username : req.body.username
+                                        token: req.body.token,
+                                        tid: req.body.tid,
+                                        picture: req.body.picture,
+                                        p_title: req.body.p_title,
+                                        p_type: req.body.p_type,
+                                        job_title: req.body.job_title,
+                                        company: req.body.company,
+                                        profile: req.body.profile,
+                                        seq_no: req.body.seq_no,
+                                        type: req.body.type,
+                                        alumni_id: req.body.alumni_id,
+                                        alumni_role: req.body.alumni_role,
+                                        username: req.body.username
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveAlumniTeam: Alumni Team saved successfully');
                                 }
                                 else {
                                     responseMessage.message = 'No save Alumni Team';
-                                    res.status(400).json(responseMessage);
+                                    res.status(200).json(responseMessage);
                                     console.log('FnSaveAlumniTeam:No save Alumni Team');
                                 }
                             }
@@ -405,7 +410,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                 console.log('FnSaveAlumniTeam: error in saving Alumni Team:' + err);
                             }
                         });
-                    }
+        }
         //            else {
         //                responseMessage.message = 'Invalid token';
         //                responseMessage.error = {
@@ -584,6 +589,9 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
         validateStatus *= false;
     }
     if(!type){
+        type = 0;
+    }
+    if(parseInt(type) == NaN){
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
