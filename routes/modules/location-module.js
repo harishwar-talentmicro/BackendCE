@@ -299,7 +299,7 @@ Location.prototype.deleteLocation = function(req,res,next) {
                         //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
                         st.db.query(query, function (err, DeleteResult) {
                             if (!err) {
-                                console.log('DeleteQuery: ' + DeleteResult);
+                               //console.log('DeleteQuery: ' + DeleteResult);
                                 if (DeleteResult.affectedRows > 0) {
                                     RtnMessage.IsDeleted = true;
                                     res.send(RtnMessage);
@@ -368,13 +368,11 @@ Location.prototype.getAllForEzeid = function(req,res,next){
             Result: [],
             Message: ''
         };
-        console.log(req.query.Token);
-        console.log(Token);
+
         if (Token) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        console.log(Result);
                         //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+st.db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+st.db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+st.db.escape(TID);
                         st.db.query('CALL pGetSubUserLocationList(' + st.db.escape(Result.masterid) + ')', function (err, GetResult) {
                             if (!err) {
@@ -554,7 +552,7 @@ Location.prototype.getLocationDetails = function(req,res,next){
 
         try{
             var queryParams = st.db.escape(token) +','+st.db.escape(locationSequence);
-            console.log(queryParams);
+            //console.log(queryParams);
             st.db.query('CALL pGetLocationDetails('+queryParams+')',function(err,result){
                 if(err){
 
@@ -670,7 +668,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
             var queryParams = st.db.escape(token) +',' + st.db.escape(ezeoneId) + ',' +
                 st.db.escape(locationSequence) +',' + st.db.escape(pin);
-            console.log(queryParams);
+           // console.log(queryParams);
             st.db.query('CALL pSearchInfnPic('+queryParams+')',function(err,result){
                 if(err){
                     respMsg.status = false;
@@ -835,17 +833,17 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
                                         //send notification
                                         var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where EZEID=' + st.db.escape(ezeone_id);
-                                        console.log(queryParameters);
+                                        //console.log(queryParameters);
                                         st.db.query(queryParameters, function (err, iosResult) {
                                             if (iosResult) {
                                                 iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
-                                                console.log(iphoneID);
+                                                //console.log(iphoneID);
                                                 var queryParams = 'select tid,GroupName from tmgroups where GroupName=' + st.db.escape(ezeone_id);
-                                                console.log(queryParams);
+                                                //console.log(queryParams);
                                                 st.db.query(queryParams, function (err, userDetails) {
                                                     if (userDetails) {
                                                         if (userDetails[0]) {
-                                                            console.log(userDetails);
+                                                            //console.log(userDetails);
                                                             receiverId = userDetails[0].tid;
                                                             senderTitle = getResult[0][0].ezeid;
                                                             groupTitle = userDetails[0].GroupName;
@@ -862,7 +860,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
                                                             iphoneId = iphoneID;
                                                             messageId = 0;
                                                             masterid = '';
-                                                            console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
+                                                           // console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
                                                             notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
 
                                                         }
@@ -984,7 +982,7 @@ Location.prototype.validateEZEOne = function(req,res,next){
             }
             var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(pin);
             var query = 'CALL pvalidateEZEOne(' + queryParams + ')';
-            console.log(query);
+            //console.log(query);
             st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult) {
