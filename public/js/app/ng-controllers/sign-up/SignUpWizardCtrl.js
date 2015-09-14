@@ -21,6 +21,7 @@ angular.module('ezeidApp').
         'ScaleAndCropImage',
         'MsgDelay',
         '$location',
+        'CountryISDList',
         function (
             $rootScope,
             $scope,
@@ -34,9 +35,19 @@ angular.module('ezeidApp').
             $interval,
             ScaleAndCropImage,
             MsgDelay,
-            $location
+            $location,
+            CountryISDList
         )
         {
+            /**
+             * Default is India
+             * @type {string}
+             */
+            $scope.ISDMobile = '+91';
+            $scope.countryISDList = CountryISDList;
+            $scope.setISDMobileNumber = function(number){
+                $scope.ISDMobile = number;
+            };
 
             /**
              * Visibility setting for feature list type block
@@ -283,6 +294,7 @@ angular.module('ezeidApp').
                 $scope.isSignUpTypeBlockVisible = true;
                 $scope.showBusinnessSelectionType = false;
                 $scope.isEzeidCheckBlockVisible = false;
+                $scope.error = {};
             };
 
 
@@ -410,7 +422,7 @@ angular.module('ezeidApp').
                     validationStatus *= false;
                 }
 
-                if($scope.userType == 2){
+                if(parseInt($scope.userType) == 2){
                     if(!$scope.companyName){
                         $scope.error.companyName = '*Company Name cannot be empty';
                         validationStatus *= false;
@@ -426,14 +438,34 @@ angular.module('ezeidApp').
 
 
 
-                if($scope.userType != 3)
+                if(parseInt($scope.userType) !== 3)
                 {
                     var emailPattern = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
                     var emailRegEx = new RegExp(emailPattern);
-                    if($scope.email.length > 0 && !(emailRegEx.test($scope.email))){
-                        $scope.error.email = '*Email ID is invalid';
-                        validationStatus *= false;
+
+                    var contactInfoStatus = false;
+
+                    if($scope.email){
+                        if(!(emailRegEx.test($scope.email))){
+                            $scope.error.email = '*Email ID is invalid';
+                            validationStatus *= false;
+                        }
+                        else{
+                            contactInfoStatus = true;
+                        }
                     }
+
+                    if($scope.mobile){
+                        if($scope.ISDMobile){
+                            contactInfoStatus = true;
+                        }
+                    }
+
+                    if(!contactInfoStatus){
+                        $scope.error.email = '*Please enter email or mobile number';
+                    }
+
+
 
                     if($scope.userType == 1){
                         if(!$scope.firstName){
@@ -450,42 +482,16 @@ angular.module('ezeidApp').
 
                     }
 
-                    //if(!$scope.lastName){
-                    //    $scope.error.lastName = 'Last Name cannot be empty';
-                    //    validationStatus *= false;
-                    //}
 
-                    //if(typeof($scope.lastName) !== "undefined"){
-                    //    if($scope.lastName.length < 1){
-                    //        $scope.error.lastName = "First Name cannot be empty";
-                    //        validationStatus *= false;
-                    //    }
-                    //}
+                    if(parseInt($scope.userType) === 1){
+                        if(!moment($scope.dateOfBirth).isValid()){
+                            $scope.error.dateOfBirth = '*Please enter your date of Birth'
+                            validationStatus *= false;
+                        }
 
-                    //if(!$scope.about){
-                    //    $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
-                    //        'Please enter tagline about your company' : 'Please enter tagline about public place';
-                    //    validationStatus *= false;
-                    //}
-
-                    //if(typeof($scope.about) !== "undefined"){
-                    //    if($scope.about.length < 1){
-                    //        $scope.error.about = ($scope.userType === 1 || $scope.userType === 2) ?
-                    //            '*Please enter tagline for your company' : 'Please enter tagline for public place';
-                    //        validationStatus *= false;
-                    //    }
-                    //}
-
-                    if($scope.userType == 1 && typeof($scope.dateOfBirth) === "undefined"){
-                        $scope.error.dateOfBirth = '*Please enter your date of Birth'
-                        validationStatus *= false;
                     }
 
-                    //    if(($scope.userType === 2) && ((!$scope.mobile) && (!$scope.email))){
-                    //        ////////////console.log('Email or Mobile cannot be empty');
-                    //        $scope.error.email = '*Either Mobile or email is mandatory ! Please fill any one of them';
-                    //        validationStatus *= false;
-                    //    }
+
                 }
 
 
@@ -503,6 +509,18 @@ angular.module('ezeidApp').
                         }
                     }
 
+                }
+
+                console.log($scope.dateOfBirth);
+
+                if(parseInt($scope.userType) === 1){
+                    if(moment($scope.dateOfBirth).isValid()){
+
+                    }
+                    else{
+                        validationStatus *= false;
+                        $scope.error.dateOfBirth = 'Please enter valid date of birth';
+                    }
                 }
                 return validationStatus;
 
@@ -577,13 +595,12 @@ angular.module('ezeidApp').
                         ISDPhoneNumber : null ,
                         ISDMobileNumber : null ,
                         Gender : $scope.gender ,
-                        DOB : $scope.dateOfBirth ,
+                        DOB : moment($scope.dateOfBirth).format('YYYY-MM-DD') ,
                         OperationType : 1 ,
                         SelectionType : $scope.planSelectionType ,
                         ParkingStatus : null
                     };
                     // ////////////console.log($scope.error);
-
 
 
                     $http({
@@ -689,5 +706,80 @@ angular.module('ezeidApp').
             $scope.closeForm = function(){
                 $location.path('/');
             };
+
+
+
+            $scope.today = function() {
+                $scope.dateOfBirth = moment().subtract(10,'years').toDate();
+            };
+            $scope.today();
+
+            $scope.clear = function () {
+                $scope.dateOfBirth = null;
+            };
+
+            // Disable weekend selection
+            $scope.disabled = function(date, mode) {
+                return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+            };
+
+            $scope.toggleMin = function() {
+                $scope.minDate = $scope.minDate ? null : moment().subtract(100,'years').toDate();
+            };
+            $scope.toggleMin();
+            $scope.maxDate = new Date();
+
+            $scope.open = function($event) {
+                $scope.status.opened = true;
+            };
+
+            $scope.dateOptions = {
+                formatYear: 'yy',
+                startingDay: 1
+            };
+
+            $scope.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+            $scope.format = $scope.formats[0];
+
+            $scope.status = {
+                opened: false
+            };
+
+            var tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            var afterTomorrow = new Date();
+            afterTomorrow.setDate(tomorrow.getDate() + 2);
+            $scope.events =
+                [
+                    {
+                        date: tomorrow,
+                        status: 'full'
+                    },
+                    {
+                        date: afterTomorrow,
+                        status: 'partially'
+                    }
+                ];
+
+            $scope.getDayClass = function(date, mode) {
+                if (mode === 'day') {
+                    var dayToCheck = new Date(date).setHours(0,0,0,0);
+
+                    for (var i=0;i<$scope.events.length;i++){
+                        var currentDay = new Date($scope.events[i].date).setHours(0,0,0,0);
+
+                        if (dayToCheck === currentDay) {
+                            return $scope.events[i].status;
+                        }
+                    }
+                }
+
+                return '';
+            };
+
+            $timeout(function(){
+                $scope.gender = 2;
+            },1000);
+
 
         }]);

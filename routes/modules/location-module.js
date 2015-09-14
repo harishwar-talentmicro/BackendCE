@@ -299,7 +299,7 @@ Location.prototype.deleteLocation = function(req,res,next) {
                         //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
                         st.db.query(query, function (err, DeleteResult) {
                             if (!err) {
-                                console.log('DeleteQuery: ' + DeleteResult);
+                               //console.log('DeleteQuery: ' + DeleteResult);
                                 if (DeleteResult.affectedRows > 0) {
                                     RtnMessage.IsDeleted = true;
                                     res.send(RtnMessage);
@@ -368,13 +368,11 @@ Location.prototype.getAllForEzeid = function(req,res,next){
             Result: [],
             Message: ''
         };
-        console.log(req.query.Token);
-        console.log(Token);
+
         if (Token) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        console.log(Result);
                         //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+st.db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+st.db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+st.db.escape(TID);
                         st.db.query('CALL pGetSubUserLocationList(' + st.db.escape(Result.masterid) + ')', function (err, GetResult) {
                             if (!err) {
@@ -554,7 +552,7 @@ Location.prototype.getLocationDetails = function(req,res,next){
 
         try{
             var queryParams = st.db.escape(token) +','+st.db.escape(locationSequence);
-            console.log(queryParams);
+            //console.log(queryParams);
             st.db.query('CALL pGetLocationDetails('+queryParams+')',function(err,result){
                 if(err){
 
@@ -670,7 +668,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
             var queryParams = st.db.escape(token) +',' + st.db.escape(ezeoneId) + ',' +
                 st.db.escape(locationSequence) +',' + st.db.escape(pin);
-            console.log(queryParams);
+           // console.log(queryParams);
             st.db.query('CALL pSearchInfnPic('+queryParams+')',function(err,result){
                 if(err){
                     respMsg.status = false;
@@ -835,17 +833,17 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
                                         //send notification
                                         var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where EZEID=' + st.db.escape(ezeone_id);
-                                        console.log(queryParameters);
+                                        //console.log(queryParameters);
                                         st.db.query(queryParameters, function (err, iosResult) {
                                             if (iosResult) {
                                                 iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
-                                                console.log(iphoneID);
+                                                //console.log(iphoneID);
                                                 var queryParams = 'select tid,GroupName from tmgroups where GroupName=' + st.db.escape(ezeone_id);
-                                                console.log(queryParams);
+                                                //console.log(queryParams);
                                                 st.db.query(queryParams, function (err, userDetails) {
                                                     if (userDetails) {
                                                         if (userDetails[0]) {
-                                                            console.log(userDetails);
+                                                            //console.log(userDetails);
                                                             receiverId = userDetails[0].tid;
                                                             senderTitle = getResult[0][0].ezeid;
                                                             groupTitle = userDetails[0].GroupName;
@@ -862,7 +860,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
                                                             iphoneId = iphoneID;
                                                             messageId = 0;
                                                             masterid = '';
-                                                            console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
+                                                           // console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
                                                             notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
 
                                                         }
@@ -930,6 +928,111 @@ Location.prototype.getLocationPicture = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnShareLocation ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnValidateEZEOne
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for validate group name
+ */
+Location.prototype.validateEZEOne = function(req,res,next){
+    var _this = this;
+
+    var name = alterEzeoneId(req.query.ezeone_id);
+    var ezeid,pin = null ;
+
+    var ezeidArray = name.split('.');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!name){
+        error['name'] = 'Invalid name';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            if (ezeidArray.length > 1) {
+                ezeid = ezeidArray[0];
+                pin = parseInt(ezeidArray[1]) ? parseInt(ezeidArray[1]) : ezeidArray[1];
+            }
+            else
+            {
+                ezeid = name;
+                pin = null;
+            }
+            var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(pin);
+            var query = 'CALL pvalidateEZEOne(' + queryParams + ')';
+            //console.log(query);
+            st.db.query(query, function (err, getResult) {
+                if (!err) {
+                    if (getResult) {
+                        if (getResult[0]) {
+                            if (getResult[0][0].masterid != 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'EZEoneID is available';
+                                responseMessage.data = getResult[0][0].masterid;
+                                res.status(200).json(responseMessage);
+                                console.log('FnValidateEZEOne: EZEoneID is available');
+                            }
+                            else {
+                                responseMessage.message = 'EZEoneID is not available';
+                                responseMessage.data = getResult[0][0].masterid;
+                                res.status(200).json(responseMessage);
+                                console.log('FnValidateEZEOne:EZEoneID is not available');
+                            }
+                        }
+                        else {
+                            responseMessage.message = 'EZEoneID is not available';
+                            responseMessage.data = getResult[0][0].masterid;
+                            res.status(200).json(responseMessage);
+                            console.log('FnValidateEZEOne:EZEoneID is not available');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'EZEoneID is not available';
+                        responseMessage.data = getResult[0][0].masterid;
+                        res.status(200).json(responseMessage);
+                        console.log('FnValidateEZEOne:EZEoneID is not available');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnValidateEZEOne: error in validating EZEoneID :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnValidateEZEOne ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

@@ -16,7 +16,6 @@ exports.FnVerifySecretCode = authModule.verifySecretCode;
 
 var User = require('./modules/user-module.js');
 var userModule = new User(db,stdLib);
-
 exports.FnGetCountry = userModule.getCountry;
 exports.FnGetState = userModule.getState;
 exports.FnGetCity = userModule.getCity;
@@ -24,7 +23,6 @@ exports.FnGetUserDetails = userModule.getUserDetails;
 exports.FnCheckEzeid = userModule.checkEzeid;
 exports.FnChangePassword = userModule.changePassword;
 exports.FnForgetPassword = userModule.forgetPassword;
-
 exports.FnDecryptPassword = userModule.decryptPassword;
 exports.FnGetCompanyProfile = userModule.getCompanyProfile;
 exports.FnSaveCompanyProfile = userModule.saveCompanyProfile;
@@ -78,6 +76,7 @@ exports.FnGetLocationList = locationModule.getLoactionList;
 exports.FnGetLocationPicture = locationModule.getLocationPicture;
 exports.FnLocationDetails = locationModule.getLocationDetails;
 exports.FnShareLocation = locationModule.shareLocation;
+exports.FnValidateEZEOne = locationModule.validateEZEOne;
 
 
 var BusinessManager = require('./modules/business-module.js');
@@ -223,7 +222,7 @@ exports.FnSaveAlumniTeam = alumniModule.saveAlumniTeam;
 exports.FnGetAlumniContent = alumniModule.getAlumniContent;
 exports.FnGetAlumniTeam = alumniModule.getAlumniTeam;
 exports.FnDeleteAlumniTeam = alumniModule.deleteAlumniTeam;
-
+exports.FnGetAlumniContentImage = alumniModule.getAlumniContentImage;
 
 
 var Notification = require('./modules/notification/notification-master.js');

@@ -20,7 +20,7 @@
                     </div>
                 </div>
                 <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 col-lg-offset-5 col-md-offset-5 col-sm-offset-5 col-xs-offset-5 bottom-clearfix">
-                    <button class="btn btn-primary" ng-click="toggleTermsAndConditions()">Close</button>
+                    <button class="btn btn-danger no-radius btn-sm" ng-click="toggleTermsAndConditions()">Close</button>
                 </div>
             </div>
         </div>
@@ -129,7 +129,7 @@
                 </div>
 
                 <!----------------- EZEID Availability Check Block ---------------------------------->
-                <div ng-show="isEzeidCheckBlockVisible" class="animation-slideup signup-details-row row">
+                <div ng-show="isEzeidCheckBlockVisible" class="signup-details-row row">
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix"></div>
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
                         <h4 class="text-center text-black font-roboto">{{selectionString}}</h4>
@@ -140,13 +140,42 @@
                         </p>
 
                     </div>
+
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bottom-clearfix">
+                        <ul class="nav nav-pills nav-wizard">
+                            <li ng-class="((!isEzeidAvailable) || (!isEzeidAvailabilityChecked))  ? 'active' : ''">
+                                <a>
+                                    <small class="tiny">Step 1 : EZEID</small>
+                                </a>
+                                <div class="nav-arrow"></div>
+                            </li>
+                            <li ng-class="(isEzeidAvailabilityChecked && isEzeidAvailable) ? 'active' : ''">
+
+                                <a>
+                                    <small class="tiny">Step 2 : Primary Details</small>
+                                </a>
+                                <div class="nav-arrow"></div>
+                            </li>
+
+                            <li>
+
+                                <a>
+                                    <small class="tiny">Step 3 : Location Details</small>
+                                </a>
+                                <div class="nav-arrow"></div>
+                            </li>
+                        </ul>
+                    </div>
+
+
                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                         <div class="container-fluid">
                             <form name="signUpForm">
                                 <div class="row">
 
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4 bottom-clearfix min-form-height">
-                                        <div class="input-group">
+                                        <div class="input-group input-group-sm">
                                             <!---
                                             Validation Added for ezeid input
                                             Constraints :
@@ -171,7 +200,7 @@
                                     </div>
 
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 bottom-clearfix">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <!---
                                                 Validation Added for SignUp form
                                                 Constraints :
@@ -179,7 +208,7 @@
                                                 2. Availability is already checked for ezeid or not
                                             -->
                                             <button
-                                                    class="form-control btn btn-primary btn-sm"
+                                                    class="form-control btn btn-danger no-radius btn-sm btn-sm"
                                                     ng-disabled="(!signUpForm.ezeid.$modelValue) || signUpForm.ezeid.$modelValue == '' || isEzeidAvailabilityChecked || isEzeidCheckInProgress"
                                                     ng-click="checkEzeidAvailability()">
                                                 {{isEzeidCheckInProgress ? 'Checking ...' : 'Check Availability'}}
@@ -203,7 +232,7 @@
 
                                 <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="password"
                                                     ng-model="password"
@@ -217,7 +246,7 @@
                                         <small class="text-danger">{{error.password}}</small>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="repassword"
                                                     ng-model="repassword"
@@ -230,7 +259,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4" ng-show="(signUpForm.password.$dirty || signUpForm.repassword.$dirty) && password.length > 0 && repassword.length > 0">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <p class="text-success center-vertical" ng-show="password === repassword">Passwords matched</p>
                                             <p class="text-danger center-vertical" ng-hide="password === repassword">Passwords mismatch</p>
                                         </div>
@@ -246,7 +275,7 @@
                                 ------------------------->
                                 <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable && (userType !== 1)">
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="companyName"
                                                     ng-model="companyName"
@@ -263,7 +292,7 @@
                                     </div>
 
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="about"
                                                     ng-model="about"
@@ -283,7 +312,7 @@
 
                                 <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="firstName"
                                                     ng-model="firstName"
@@ -292,13 +321,13 @@
                                                     max-length="30"
                                                     placeholder="{{(userType == 2 || userType == 3) ? 'Contact First Name': 'First Name'}}"
                                                     ng-class="(signUpForm.firstName.$dirty && signUpForm.firstName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                    class="form-control emptyBox" />
+                                                    class="form-control {{(userType == 3) ? '' : 'emptyBox' }}" />
                                         </div>
                                         <small class="text-danger">{{error.firstName}}</small>
                                     </div>
 
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="lastName"
                                                     ng-model="lastName"
@@ -319,7 +348,7 @@
                                  ------------------------->
                                 <div class="row bottom-clearfix"ng-show="isEzeidAvailabilityChecked && isEzeidAvailable && (userType == 1)">
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="companyName"
                                                     ng-model="companyName"
@@ -329,13 +358,13 @@
                                                     placeholder="{{'Company Name'}}"
                                                     ng-change="signUpForm.companyName.$setDirty()"
                                                     ng-class="(signUpForm.companyName.$dirty && signUpForm.companyName.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                    class="form-control emptyBox" />
+                                                    class="form-control" />
                                         </div>
                                         <small class="text-danger">{{error.companyName}}</small>
                                     </div>
 
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="about"
                                                     ng-model="about"
@@ -346,7 +375,7 @@
                                                     placeholder="{{'Job Title'}}"
                                                     ng-change="signUpForm.about.$setDirty()"
                                                     ng-class="(signUpForm.about.$dirty && signUpForm.about.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                    class="form-control emptyBox" />
+                                                    class="form-control" />
                                         </div>
                                         <small class="text-danger">{{error.about}}</small>
                                     </div>
@@ -357,7 +386,7 @@
 
                                 <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     name="email"
                                                     ng-model="email"
@@ -367,25 +396,55 @@
                                                     maxlength="50"
                                                     placeholder="{{'Email'}}"
                                                     ng-class="(signUpForm.email.$dirty && signUpForm.email.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                    class="form-control emptyBox" />
+                                                    class="form-control {{(userType == 3) ? '' : 'emptyBox' }}" />
                                         </div>
                                         <small class="text-danger">{{error.email}}</small>
                                     </div>
 
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
-                                            <input
-                                                    name="mobile"
-                                                    ng-model="mobile"
-                                                    type="text"
-                                                    min-length="10"
-                                                    max-length="13"
-                                                    maxlength="13"
-                                                    numbers-only
-                                                    placeholder="Mobile"
-                                                    ng-class="(signUpForm.mobile.$dirty && signUpForm.mobile.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
-                                                    class="form-control emptyBox" />
-                                        </div>
+                                        <div class="form-group-sm">
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-btn">
+                                                    <button type="button" class="btn btn-default dropdown-toggle"
+                                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ISDMobile}}
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu isd-list">
+                                                        <li>
+                                                            <a>
+                                                                <div class="form-group form-group-sm">
+                                                                    <div class="input-group input-group-sm">
+                                                                        <span class="input-group-addon">
+                                                                            <i class="fa fa-search"></i>
+                                                                        </span>
+                                                                        <input type="text" class="form-control" ng-model="ISDMobileSearch" ng-click="$event.stopPropagation()" ng-focus="$event.preventDefault()" />
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+
+                                                        </li>
+                                                        <li ng-repeat="country in countryISDList | filter:ISDMobileSearch">
+                                                            <a class="btn-link" ng-click="setISDMobileNumber(country.value)">{{country.value}} ({{country.abbr}})</a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+
+                                                <input
+                                                        name="mobile"
+                                                        ng-model="mobile"
+                                                        type="text"
+                                                        min-length="10"
+                                                        max-length="13"
+                                                        maxlength="13"
+                                                        numbers-only
+                                                        placeholder="Mobile"
+                                                        ng-class="(signUpForm.mobile.$dirty && signUpForm.mobile.$modelValue.length < 1) ? 'mandatoryTextBox' : ''"
+                                                        class="form-control  {{(userType == 3) ? '' : 'emptyBox' }}" />
+
+
+                                            </div>
+                                           </div>
                                         <small class="text-danger">{{error.contact}}</small>
                                     </div>
                                 </div>
@@ -394,7 +453,7 @@
                                 <!---------------------- Visible only in case of Individual ------------------------->
                                 <div class="row" ng-show="(userType == 1) && isEzeidAvailabilityChecked && isEzeidAvailable">
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <select class="form-control" ng-model="gender">
                                                 <option value="2">Unspecified Gender</option>
                                                 <option value="0">Male</option>
@@ -403,15 +462,25 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">
-                                        <div class="form-group" title="Date of Birth">
-                                            <date-time-picker placeholder="Date of Birth" recipient="dateOfBirth" settings='{
-                                                                    "format" : "d-M-Y",
-                                                                    "timepicker" : false,
-                                                                    "mask" : false,
-                                                                    "hours12" : false,
-                                                                    "maxDate" : "+1970/01/01"
-                                                                    }'></date-time-picker>
+                                        <!--<div class="form-group-sm" title="Date of Birth">-->
+                                            <!--<date-time-picker placeholder="Date of Birth" recipient="dateOfBirth" settings='{-->
+                                                                    <!--"format" : "d-M-Y",-->
+                                                                    <!--"timepicker" : false,-->
+                                                                    <!--"mask" : false,-->
+                                                                    <!--"hours12" : false,-->
+                                                                    <!--"maxDate" : "+1970/01/01"-->
+                                                                    <!--}'></date-time-picker>-->
+                                        <!--</div>-->
+
+                                        <div class="form-group-sm">
+                                            <p class="input-group emptyBox">
+                                                <input type="date" class="form-control" datepicker-popup ng-model="dateOfBirth" is-open="status.opened" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" />
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default btn-sm" ng-click="open($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </p>
                                         </div>
+
 
                                         <small class="text-danger">{{error.dateOfBirth}}</small>
                                     </div>
@@ -421,7 +490,7 @@
                                 <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
 
                                     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                                        <div class="form-group center-vertical">
+                                        <div class="form-group-sm center-vertical">
                                             <input type="checkbox" id="pin-applicable" ng-model="isPinApplicable" name="isPinApplicable" ng-click="pinApplicable = (isPinApplicable == true) ? false : true" />
                                             <label for="pin-applicable">
                                                 Secure Your EZEOne ID by a PIN
@@ -430,7 +499,7 @@
                                     </div>
 
                                     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
-                                        <div class="form-group">
+                                        <div class="form-group-sm">
                                             <input
                                                     ng-disabled="!isPinApplicable"
                                                     name="pin"
@@ -451,7 +520,7 @@
 
                                 <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
                                     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                        <div class="form-group form-group-lg">
+                                        <div class="form-group-sm form-group-sm-lg">
                                             <label for="terms" class="center-vertical">
                                                 <input type="checkbox" ng-model="termsAccepted" id="terms" />
                                                 I have fully read and understood the <a class="btn-link" ng-click="toggleTermsAndConditions()">Terms and Conditions </a> of EZEOne ID
@@ -462,13 +531,13 @@
 
                                 <div class="row bottom-clearfix" ng-show="isEzeidAvailabilityChecked && isEzeidAvailable">
                                     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4">
-                                        <div class="form-group">
-                                            <button class="btn btn-primary" ng-click="doSignUp()" ng-disabled="(!isEzeidAvailable) || (!termsAccepted)">Generate EZEOne ID</button>
+                                        <div class="form-group-sm">
+                                            <button class="btn btn-danger no-radius btn-sm" ng-click="doSignUp()" ng-disabled="(!isEzeidAvailable) || (!termsAccepted)">Generate EZEOne ID</button>
                                         </div>
                                     </div>
                                     <div class="col-lg-2 col-md-2 col-sm-3 col-xs-4">
-                                        <div class="form-group">
-                                            <button class="btn btn-primary" ng-click="closeForm()">Close</button>
+                                        <div class="form-group-sm">
+                                            <button class="btn btn-danger no-radius btn-sm" ng-click="closeForm()">Close</button>
                                         </div>
                                     </div>
                                 </div>
