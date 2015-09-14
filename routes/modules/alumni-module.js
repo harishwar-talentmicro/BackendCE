@@ -68,6 +68,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var mentorSubtitle = req.body.m_subtitle;
     var facultyTitle = req.body.f_title;
     var facultySubtitle = req.body.f_subtitle;
+    var width = req.body.width ?  req.body.width : 1200;
+    var height = req.body.height ? req.body.height : 600;
 
 
     var responseMessage = {
@@ -88,10 +90,10 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    if(!picture){
-        error['picture'] = 'Invalid page picture';
-        validateStatus *= false;
-    }
+    //if(!picture){
+    //    error['picture'] = 'Invalid page picture';
+    //    validateStatus *= false;
+    //}
     if(!title){
         error['title'] = 'Invalid page title';
         validateStatus *= false;
@@ -182,65 +184,86 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-                        var query = st.db.escape(tid) + ',' + st.db.escape(picture) + ',' + st.db.escape(title)
-                            + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
-                            + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
-                            + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
-                            + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(logo)
-                            + ',' + st.db.escape(logoTitle)+ ',' + st.db.escape(alumniId)+ ',' + st.db.escape(mentorTitle)
-                            + ',' + st.db.escape(mentorSubtitle)+ ',' + st.db.escape(facultyTitle)+ ',' + st.db.escape(facultySubtitle)
-                            + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType)+ ',' + st.db.escape(pictureTitle)
-                            + ',' + st.db.escape(pictureType);
-                        st.db.query('CALL pSaveAlumniContent(' + query + ')', function (err, insertresult) {
-                            if (!err) {
-                                if (insertresult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Alumni Content saved successfully';
-                                    responseMessage.data = {
-                                        token: req.body.token,
-                                        tid: req.body.tid,
-                                        pg_pic: req.body.pg_pic,
-                                        pg_picName : req.body.pg_picName,
-                                        pg_picType : req.body.pg_picType,
-                                        pg_title: req.body.pg_title,
-                                        pg_subtitle: req.body.pg_subtitle,
-                                        footerL1: req.body.footerL1,
-                                        footerL2: req.body.footerL2,
-                                        idea_title: req.body.idea_title,
-                                        idea_text: req.body.idea_text,
-                                        purpose_title: req.body.purpose_title,
-                                        purpose_text: req.body.purpose_text,
-                                        team_title: req.body.team_title,
-                                        team_subtitle: req.body.team_subtitle,
-                                        m_footer1: req.body.m_footer1,
-                                        m_footer2: req.body.m_footer2,
-                                        logo: req.body.logo,
-                                        l_name : req.body.l_name,
-                                        l_type : req.body.l_type,
-                                        logo_title: req.body.logo_title,
-                                        alumni_id : req.body.alumni_id,
-                                        m_title : req.body.m_title,
-                                        m_subtitle : req.body.m_subtitle,
-                                        f_title : req.body.f_title,
-                                        f_subtitle : req.body.f_subtitle
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveAlumniContent: Alumni Content saved successfully');
-                                }
-                                else {
-                                    responseMessage.message = 'No save Alumni Content';
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnSaveAlumniContent:No save Alumni Content');
-                                }
+            var imageParams = {
+                path: req.files.picture[0].path,
+                path1 : req.files.picture[1].path,
+                type: pictureType,
+                width: width,
+                height: height,
+                scale: '',
+                crop: ''
+            };
+
+            FnCropImage(imageParams, function (err, imageResult) {
+                if (imageResult) {
+                    var query = st.db.escape(tid) + ',' + st.db.escape(imageResult) + ',' + st.db.escape(title)
+                        + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
+                        + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
+                        + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
+                        + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(logo)
+                        + ',' + st.db.escape(logoTitle) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(mentorTitle)
+                        + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
+                        + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
+                        + ',' + st.db.escape(pictureType);
+                    st.db.query('CALL pSaveAlumniContent(' + query + ')', function (err, insertresult) {
+                        if (!err) {
+                            if (insertresult) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Alumni Content saved successfully';
+                                responseMessage.data = {
+                                    token: req.body.token,
+                                    tid: req.body.tid,
+                                    pg_pic: req.body.pg_pic,
+                                    pg_picName: req.body.pg_picName,
+                                    pg_picType: req.body.pg_picType,
+                                    pg_title: req.body.pg_title,
+                                    pg_subtitle: req.body.pg_subtitle,
+                                    footerL1: req.body.footerL1,
+                                    footerL2: req.body.footerL2,
+                                    idea_title: req.body.idea_title,
+                                    idea_text: req.body.idea_text,
+                                    purpose_title: req.body.purpose_title,
+                                    purpose_text: req.body.purpose_text,
+                                    team_title: req.body.team_title,
+                                    team_subtitle: req.body.team_subtitle,
+                                    m_footer1: req.body.m_footer1,
+                                    m_footer2: req.body.m_footer2,
+                                    logo: req.body.logo,
+                                    l_name: req.body.l_name,
+                                    l_type: req.body.l_type,
+                                    logo_title: req.body.logo_title,
+                                    alumni_id: req.body.alumni_id,
+                                    m_title: req.body.m_title,
+                                    m_subtitle: req.body.m_subtitle,
+                                    f_title: req.body.f_title,
+                                    f_subtitle: req.body.f_subtitle,
+                                    height : height,
+                                    width : width
+                                };
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveAlumniContent: Alumni Content saved successfully');
                             }
                             else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveAlumniContent: error in saving Alumni Content:' + err);
+                                responseMessage.message = 'No save Alumni Content';
+                                res.status(400).json(responseMessage);
+                                console.log('FnSaveAlumniContent:No save Alumni Content');
                             }
-                        });
-                    }
+                        }
+                        else {
+                            responseMessage.message = 'An error occured ! Please try again';
+                            res.status(500).json(responseMessage);
+                            console.log('FnSaveAlumniContent: error in saving Alumni Content:' + err);
+                        }
+                    });
+                }
+                else {
+                    responseMessage.message = 'Picture not uploaded';
+                    res.status(200).json(responseMessage);
+                    console.log('FnSaveAlumniTeam:Picture not uploaded');
+                }
+            });
+        }
         //            else {
         //                responseMessage.message = 'Invalid token';
         //                responseMessage.error = {
@@ -298,6 +321,11 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var alumniId = req.body.alumni_id;
     var alumniRole = req.body.alumni_role;
     var username = req.body.username;
+    var width = req.body.width ?  req.body.width : 1200;
+    var height = req.body.height ? req.body.height : 600;
+
+    console.log('req.files....');
+    console.log(req.files);
 
     var responseMessage = {
         status: false,
@@ -319,10 +347,10 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    if(!picture){
-        error['picture'] = 'Invalid picture';
-        validateStatus *= false;
-    }
+    //if(!picture){
+    //    error['picture'] = 'Invalid picture';
+    //    validateStatus *= false;
+    //}
     if(!jobTitle){
         error['jobTitle'] = 'Invalid jobTitle';
         validateStatus *= false;
@@ -370,46 +398,69 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-            var query = st.db.escape(tid) + ',' + st.db.escape(picture) + ',' + st.db.escape(jobTitle)
-                            + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
-                            + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
-                            + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username);
-                        st.db.query('CALL pSaveAlumniTeam(' + query + ')', function (err, insertresult) {
-                            if (!err) {
-                                if (insertresult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Alumni Team saved successfully';
-                                    responseMessage.data = {
-                                        token: req.body.token,
-                                        tid: req.body.tid,
-                                        picture: req.body.picture,
-                                        p_title: req.body.p_title,
-                                        p_type: req.body.p_type,
-                                        job_title: req.body.job_title,
-                                        company: req.body.company,
-                                        profile: req.body.profile,
-                                        seq_no: req.body.seq_no,
-                                        type: req.body.type,
-                                        alumni_id: req.body.alumni_id,
-                                        alumni_role: req.body.alumni_role,
-                                        username: req.body.username
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveAlumniTeam: Alumni Team saved successfully');
-                                }
-                                else {
-                                    responseMessage.message = 'No save Alumni Team';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveAlumniTeam:No save Alumni Team');
-                                }
+
+            var imageParams = {
+                path : req.files.picture[0].path,
+                path1 : req.files.picture[1].path,
+                type : pictureType,
+                width : width,
+                height : height,
+                scale : '',
+                crop : ''
+            };
+
+            FnCropImage(imageParams, function (err, imageResult) {
+                if(imageResult) {
+                    var query = st.db.escape(tid) + ',' + st.db.escape(imageResult) + ',' + st.db.escape(jobTitle)
+                        + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
+                        + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
+                        + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username);
+
+                    st.db.query('CALL pSaveAlumniTeam(' + query + ')', function (err, insertresult) {
+                        if (!err) {
+                            if (insertresult) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Alumni Team saved successfully';
+                                responseMessage.data = {
+                                    token: req.body.token,
+                                    tid: req.body.tid,
+                                    picture: req.body.picture,
+                                    p_title: req.body.p_title,
+                                    p_type: req.body.p_type,
+                                    job_title: req.body.job_title,
+                                    company: req.body.company,
+                                    profile: req.body.profile,
+                                    seq_no: req.body.seq_no,
+                                    type: req.body.type,
+                                    alumni_id: req.body.alumni_id,
+                                    alumni_role: req.body.alumni_role,
+                                    username: req.body.username,
+                                    height : height,
+                                    width : width
+                                };
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveAlumniTeam: Alumni Team saved successfully');
                             }
                             else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveAlumniTeam: error in saving Alumni Team:' + err);
+                                responseMessage.message = 'No save Alumni Team';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveAlumniTeam:No save Alumni Team');
                             }
-                        });
+                        }
+                        else {
+                            responseMessage.message = 'An error occured ! Please try again';
+                            res.status(500).json(responseMessage);
+                            console.log('FnSaveAlumniTeam: error in saving Alumni Team:' + err);
+                        }
+                    });
+                }
+                else {
+                    responseMessage.message = 'Picture not uploaded';
+                    res.status(200).json(responseMessage);
+                    console.log('FnSaveAlumniTeam:Picture not uploaded');
+                }
+        });
         }
         //            else {
         //                responseMessage.message = 'Invalid token';
@@ -442,6 +493,245 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
             res.status(400).json(responseMessage);
         }
     }
+};
+
+
+
+//crop image
+function FnCropImage(imageParams, callback){
+    /**
+     * @todo FnCropImage
+     */
+    var _this = this;
+
+    var fs = require('fs');
+
+    var deleteTempFile = function(){
+        fs.unlink('../bin/'+imageParams.path);
+        fs.unlink('../bin/'+imageParams.path1);
+    };
+
+    var respMsg = {
+        status : false,
+        message : 'Invalid image',
+        picture : null,
+        error : {
+            picture : 'Image file is invalid or corrupted'
+        }
+    };
+
+    var allowedTypes = ['jpg','png'];
+
+    var  targetHeight = (imageParams.height) ? (!isNaN(parseInt(imageParams.height)) ? parseInt(imageParams.height) : 0 ) : 0  ,
+        targetWidth = (imageParams.width) ? (!isNaN(parseInt(imageParams.width)) ? parseInt(imageParams.width) : 0 ) : 0  ;
+
+
+    var scaleHeight = null,scaleWidth = null;
+
+    var cropFlag = (imageParams.crop) ? imageParams.crop : true;
+    var scaleFlag = (imageParams.scale) ? imageParams.scale : true;
+    //var token = (req.body.Token && req.body.Token !==2 ) ? req.body.Token : '';
+    var outputType = (allowedTypes.indexOf(imageParams.type) == -1) ? 'png' : imageParams.type;
+
+    if(!(targetHeight && targetWidth)){
+        respMsg.message = 'Invalid target dimensions';
+        respMsg.error = {
+            required_height : (targetHeight) ? 'Invalid target height' : null,
+            required_width : (targetWidth) ? 'Invalid target width' : null
+        };
+        //res.status(400).json(respMsg);
+        callback(null, null);
+        deleteTempFile();
+        return;
+    }
+
+    //if(!token){
+    //    respMsg.message = 'Please login to continue';
+    //    respMsg.error = {
+    //        Token : 'Token is invalid'
+    //    };
+    //    res.status(401).json(respMsg);
+    //    //deleteTempFile();
+    //    return;
+    //}
+
+    //st.validateToken(token, function (err, Result) {
+    //    if (!err) {
+    //        if (Result != null) {
+                try{
+                    fs.readFile('../bin/'+ imageParams.path,function(err,data){
+                        if(!err){
+                           var bitmap = data;
+                            var gm = require('gm').subClass({ imageMagick: true });
+                            gm(bitmap).size(function (err, size) {
+                                if (!err) {
+                                    // Orientation landscape
+                                    if(size.height < size.width){
+                                        // scale++
+                                        if(size.height < targetHeight || size.width < targetWidth){
+                                            if(targetHeight > targetWidth){
+                                                console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
+                                                scaleHeight = targetHeight.toString();
+                                                ////
+                                                scaleWidth = (size.width * scaleHeight)/ size.height;
+                                            }
+                                            else{
+                                                console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
+                                                scaleHeight = targetHeight;
+                                                scaleWidth = (size.width * scaleHeight) / size.height;
+                                            }
+                                        }
+                                        // scale--
+                                        else{
+                                            if(targetHeight > targetWidth){
+                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
+                                                scaleWidth = targetWidth.toString();
+                                                ////
+                                                scaleHeight = (scaleWidth * size.height)/ size.width;
+                                            }
+                                            else{
+
+                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                                scaleHeight = targetHeight.toString();
+                                                scaleWidth = (scaleHeight * size.width) / size.height;
+
+                                            }
+                                        }
+                                    }
+
+                                    // Orientation is potrait
+                                    else{
+                                        //scale++
+                                        if(size.height < targetHeight || size.width < targetHeight){
+                                            if(targetHeight > targetWidth){
+                                                console.log('condition false');
+
+                                                scaleHeight = targetHeight.toString();
+                                                scaleWidth = (scaleHeight * size.width)/ size.height;
+                                            }
+                                            else{
+                                                scaleWidth = targetWidth.toString();
+                                                scaleHeight = (scaleWidth * size.height) / size.width;
+                                            }
+                                        }
+                                        else{
+                                            scaleWidth = targetWidth.toString();
+                                            scaleHeight = (scaleWidth * size.height) / size.width;
+                                        }
+                                    }
+
+                                    var dimensions = {
+                                        originalHeight : size.height,
+                                        originalWidth : size.width,
+                                        scaleHeight : scaleHeight,
+                                        scaleWidth : scaleWidth,
+                                        targetHeight : targetHeight,
+                                        targetWidth : targetWidth
+                                    };
+
+                                    console.log(dimensions);
+
+                                    if(scaleFlag && cropFlag){
+                                        console.log('Scale and crop');
+                                        gm(bitmap)
+                                            .resize(scaleWidth,scaleHeight)
+                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                    callback(null, picUrl);
+                                                    deleteTempFile();
+                                                    console.log('FnCropImage:Picture cropped successfully...');
+                                                }
+                                                else{
+                                                    //res.status(400).json(respMsg);
+                                                    callback(null, null);
+                                                    deleteTempFile();
+                                                    console.log('FnCropImage:Picture not cropped');
+                                                }
+                                            });
+                                    }
+
+                                    else if(scaleFlag && !cropFlag){
+                                        gm(bitmap)
+                                            .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                    callback(null, picUrl);
+                                                    console.log('FnCropImage:Picture cropped successfully');
+                                                    deleteTempFile();
+
+                                                }
+                                                else{
+                                                    //res.status(400).json(respMsg);
+                                                    callback(null, null);
+                                                    deleteTempFile();
+                                                    console.log('FnCropImage:Picture not cropped');
+                                                }
+                                            });
+
+                                    }
+
+                                    else if(!scaleFlag && cropFlag){
+                                        gm(bitmap)
+                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                                if(!err){
+                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                                    //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                                    callback(null, picUrl);
+                                                    console.log('FnCropImage:Picture cropped successfully');
+                                                }
+                                                else{
+                                                    //res.status(400).json(respMsg);
+                                                    callback(null, null);
+                                                    console.log('FnCropImage:Picture not cropped');
+                                                }
+                                            });
+                                        deleteTempFile();
+                                    }
+                                }
+                                else{
+                                    console.log('FnCropImage : Invalid image file. Unable to find image size :' +err);
+                                    callback(null, null);
+
+                                }
+                            });
+                        }
+                       else{
+                            callback(null, null);
+                            console.log('FnCropImage : Error in reading file :' +err);
+
+                       }
+                    });
+
+                }
+                catch(ex){
+                    console.log(ex);
+                    callback(null, null);
+                    console.log('FnCropImage : '+ ex.description);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            //}
+    //        else{
+    //            respMsg.message = 'Please login to continue';
+    //            respMsg.error = {
+    //                Token : 'Token is invalid'
+    //            };
+    //            res.status(401).json(respMsg);
+    //            throw new Error('FnCropImage : '+ 'Invalid Token');
+    //        }
+    //    }
+    //    else{
+    //        throw new Error('FnCropImage : '+ 'Error in query execution while validating token');
+    //        res.status(400).json(respMsg);
+    //    }
+    //});
+
 };
 
 /**
@@ -721,12 +1011,13 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
                         var query = st.db.escape(id);
                         console.log('CALL PDeleteAlumniTeam(' + query + ')');
                         st.db.query('CALL PDeleteAlumniTeam(' + query + ')', function (err, getResult) {
+                            console.log(getResult);
                             if (!err) {
-                                if (getResult[0]) {
+                                if (getResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Alumni team deleted successfully';
-                                    responseMessage.data = getResult[0];
+                                    responseMessage.data = { id : req.query.id };
                                     res.status(200).json(responseMessage);
                                     console.log('FnDeleteAlumniTeam: Alumni team deleted successfully');
                                 }
