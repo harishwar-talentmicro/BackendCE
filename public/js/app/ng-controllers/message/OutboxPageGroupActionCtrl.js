@@ -934,6 +934,7 @@ angular.module('ezeidApp').
                 /* hide join group response buttons */
                 $scope.groupJoinResponseBtn = false;
                 $scope.pendingRequestMsg = false;
+                $scope.groupDeleteBtn = false;
             }
 
             /**
