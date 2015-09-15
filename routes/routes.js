@@ -223,6 +223,7 @@ exports.FnGetAlumniContent = alumniModule.getAlumniContent;
 exports.FnGetAlumniTeam = alumniModule.getAlumniTeam;
 exports.FnDeleteAlumniTeam = alumniModule.deleteAlumniTeam;
 exports.FnGetAlumniContentImage = alumniModule.getAlumniContentImage;
+exports.FnSaveAlumniProfile = alumniModule.saveAlumniProfile;
 
 
 var Notification = require('./modules/notification/notification-master.js');

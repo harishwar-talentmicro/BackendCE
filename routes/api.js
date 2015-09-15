@@ -204,6 +204,7 @@ router.get('/alumni_content',LocationManager.FnGetAlumniContent);
 router.get('/alumni_team',LocationManager.FnGetAlumniTeam);
 router.delete('/alumni_team',LocationManager.FnDeleteAlumniTeam);
 router.get('/cover_image',LocationManager.FnGetAlumniContentImage);
+router.post('/alumni_profile',LocationManager.FnSaveAlumniProfile);
 
 
 
