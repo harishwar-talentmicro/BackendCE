@@ -1315,7 +1315,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
  * @param next
  * @description api code for get alumni content
  */
-Alumni.prototype.getAlumniTeamDeatils = function(req,res,next){
+Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
     var _this = this;
 
     //var token = req.query.token;
