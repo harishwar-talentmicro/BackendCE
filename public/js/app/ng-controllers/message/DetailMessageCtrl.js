@@ -21,6 +21,7 @@ angular.module('ezeidApp').
         '$routeParams',
         'UtilityService',
         '$anchorScroll',
+        '$sce',
         function (
             $rootScope,
             $scope,
@@ -36,7 +37,8 @@ angular.module('ezeidApp').
             $location,
             $routeParams,
             UtilityService,
-            $anchorScroll
+            $anchorScroll,
+            $sce
         ) {
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////INITIALIZATION//////////////////////////////////////////////////////////
@@ -156,7 +158,6 @@ angular.module('ezeidApp').
                             $scope.msg.totalResult = data[0].count;
                         /* re configure pagination for inbox-message visibility */
                         msgPaginationVisibility();
-
                         $scope.messageData = data;
                     },
                     function()
@@ -222,6 +223,11 @@ angular.module('ezeidApp').
                     function(){
                         redirectInboxPage();
                     });
+            }
+
+            $scope.purifySanitizedData = function(htmlBody)
+            {
+                return $sce.trustAsHtml(htmlBody);
             }
 
             function reverseArray(data)

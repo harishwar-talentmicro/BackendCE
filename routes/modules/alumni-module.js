@@ -185,8 +185,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
             //    if (!err) {
             //        if (result) {
             var imageParams = {
-                path: req.files.picture[0].path,
-                path1 : req.files.picture[1].path,
+                path: req.files.picture.path,
+                //path1 : req.files.picture[1].path,
                 type: pictureType,
                 width: width,
                 height: height,
@@ -324,9 +324,6 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
 
-    console.log('req.files....');
-    console.log(req.files);
-
     var responseMessage = {
         status: false,
         error: {},
@@ -400,8 +397,8 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
             //        if (result) {
 
             var imageParams = {
-                path : req.files.picture[0].path,
-                path1 : req.files.picture[1].path,
+                path : req.files.picture.path,
+                //path1 : req.files.picture[1].path,
                 type : pictureType,
                 width : width,
                 height : height,
@@ -505,10 +502,9 @@ function FnCropImage(imageParams, callback){
     var _this = this;
 
     var fs = require('fs');
-
     var deleteTempFile = function(){
         fs.unlink('../bin/'+imageParams.path);
-        fs.unlink('../bin/'+imageParams.path1);
+        //fs.unlink('../bin/'+imageParams.path1);
     };
 
     var respMsg = {
@@ -1141,6 +1137,281 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnGetAlumniContentImage ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnSaveAlumniProfile
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save alumni team profile
+ */
+Alumni.prototype.saveAlumniProfile = function(req,res,next) {
+    var _this = this;
+
+    //var token = req.body.token;
+    var ezeone_id = req.body.ezeone_id;
+    var profile = req.body.profile;
+    var studentID = req.body.student_id;
+    var education = req.body.education;
+    var specialization = req.body.specialization;
+    var batch = req.body.batch;
+    var code = req.body.code;     // college code
+    var accesstype = req.body.access_type;  // 0-no relation, 1-is admin, 2-is member
+    var tid = req.body.tid;           // while saving first time 0 else give tid
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var error = {},validateStatus = true;
+
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
+    if(!ezeone_id){
+        error['ezeone_id'] = 'Invalid ezeone_id';
+        validateStatus *= false;
+    }
+    if(!profile){
+        error['profile'] = 'Invalid profile';
+        validateStatus *= false;
+    }
+    if(!studentID){
+        error['studentID'] = 'Invalid studentID';
+        validateStatus *= false;
+    }
+    if(!education){
+        error['education'] = 'Invalid education';
+        validateStatus *= false;
+    }
+    if(!specialization){
+        error['specialization'] = 'Invalid specialization';
+        validateStatus *= false;
+    }
+    if(!batch){
+        error['batch'] = 'Invalid batch';
+        validateStatus *= false;
+    }
+    if(!code){
+        error['code'] = 'Invalid code';
+        validateStatus *= false;
+    }
+    if(!accesstype){
+        accesstype = 0;
+    }
+    if(parseInt(code) == NaN){
+        error['accesstype'] = 'Invalid accesstype';
+        validateStatus *= false;
+    }
+    if(!tid){
+        tid = 0;
+    }
+    if(parseInt(tid) == NaN){
+        error['tid'] = 'Invalid tid';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
+                    var query = st.db.escape(ezeone_id) + ',' + st.db.escape(profile) + ',' + st.db.escape(studentID)
+                        + ',' + st.db.escape(education) + ',' + st.db.escape(specialization) + ',' + st.db.escape(batch)
+                        + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype) + ',' + st.db.escape(tid);
+
+                    st.db.query('CALL pSaveAlumniProfile(' + query + ')', function (err, insertresult) {
+                        if (!err) {
+                            if (insertresult) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Alumni Profile saved successfully';
+                                responseMessage.data = {
+                                    ezeone_id : req.body.ezeone_id,
+                                    profile : req.body.profile,
+                                    student_id : req.body.student_id,
+                                    education : req.body.education,
+                                    specialization : req.body.specialization,
+                                    batch : req.body.batch,
+                                    code : req.body.code,
+                                    access_type : req.body.access_type,
+                                    tid : req.body.tid
+
+                            };
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveAlumniProfile: Alumni Profile saved successfully');
+                            }
+                            else {
+                                responseMessage.message = 'No save Alumni Profile';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveAlumniProfile:No save Alumni Profile');
+                            }
+                        }
+                        else {
+                            responseMessage.message = 'An error occured ! Please try again';
+                            res.status(500).json(responseMessage);
+                            console.log('FnSaveAlumniProfile: error in saving Alumni Profile:' + err);
+                        }
+            });
+        }
+            //            else {
+            //                responseMessage.message = 'Invalid token';
+            //                responseMessage.error = {
+            //                    token: 'Invalid token'
+            //                };
+            //                responseMessage.data = null;
+            //                res.status(401).json(responseMessage);
+            //                console.log('FnSaveAlumniProfile: Invalid token');
+            //            }
+            //        }
+            //        else {
+            //            responseMessage.error = {
+            //                server: 'Internal server error'
+            //            };
+            //            responseMessage.message = 'Error in validating Token';
+            //            res.status(500).json(responseMessage);
+            //            console.log('FnSaveAlumniProfile:Error in processing Token' + err);
+            //        }
+            //    });
+            //}
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSaveAlumniProfile:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
+
+
+/**
+ * @todo FnGetAlumniTeamPicture
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get alumni content
+ */
+Alumni.prototype.getAlumniTeamPicture = function(req,res,next){
+    var _this = this;
+
+    //var token = req.query.token;
+    var tid = req.query.tid;   // college code
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
+    if(!tid){
+        error['tid'] = 'Invalid tid';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
+            var query = st.db.escape(tid);
+            console.log('CALL pGetAlumniTeamPicture(' + query + ')');
+            st.db.query('CALL pGetAlumniTeamPicture(' + query + ')', function (err, getResult) {
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'AlumniTeam Picture loaded successfully';
+                            responseMessage.data = getResult[0][0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetAlumniTeamPicture: AlumniTeam Picture loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'AlumniTeam Picture not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetAlumniTeamPicture: AlumniTeam Picture not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'AlumniTeam Picture not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetAlumniTeamPicture:AlumniTeam Picture not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetAlumniTeamPicture: error in getting alumniteam picture :' + err);
+                }
+
+            });
+        }
+            //            else {
+            //                responseMessage.message = 'Invalid token';
+            //                responseMessage.error = {
+            //                    token: 'Invalid Token'
+            //                };
+            //                responseMessage.data = null;
+            //                res.status(401).json(responseMessage);
+            //                console.log('FnGetAlumniTeamPicture: Invalid token');
+            //            }
+            //        }
+            //        else {
+            //            responseMessage.error = {
+            //                server: 'Internal Server Error'
+            //            };
+            //            responseMessage.message = 'Error in validating Token';
+            //            res.status(500).json(responseMessage);
+            //            console.log('FnGetAlumniTeamPicture:Error in processing Token' + err);
+            //        }
+            //    });
+            //}
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetAlumniTeamPicture ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

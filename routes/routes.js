@@ -223,6 +223,13 @@ exports.FnGetAlumniContent = alumniModule.getAlumniContent;
 exports.FnGetAlumniTeam = alumniModule.getAlumniTeam;
 exports.FnDeleteAlumniTeam = alumniModule.deleteAlumniTeam;
 exports.FnGetAlumniContentImage = alumniModule.getAlumniContentImage;
+exports.FnSaveAlumniProfile = alumniModule.saveAlumniProfile;
+exports.FnGetAlumniTeamPicture = alumniModule.getAlumniTeamPicture;
+
+//Recruitment module
+var Recruitment = require('./modules/recruitment-module.js');
+var recruitmentModule = new Recruitment(db,stdLib);
+exports.FnGetRecruitmentMasters = recruitmentModule.getRecruitmentMasters;
 
 
 var Notification = require('./modules/notification/notification-master.js');

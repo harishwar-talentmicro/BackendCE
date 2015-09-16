@@ -619,7 +619,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                                                                         if (groupDetails) {
                                                                                                             if (groupDetails[0]) {
                                                                                                                 receiverId = groupDetails[0].tid;
-                                                                                                                senderTitle = getDetails[0].GroupName;
+                                                                                                                senderTitle = memberDetails[0].EZEID;
                                                                                                                 groupTitle = getDetails[0].GroupName;
                                                                                                                 groupID = groupId;
                                                                                                                 messageText = 'has accepted your request ';
@@ -628,7 +628,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                                                                                 iphoneId = iphoneID;
                                                                                                                 messageId = 0;
                                                                                                                 masterid = '';
-                                                                                                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                                 notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                             }
                                                                                                             else {
@@ -662,7 +662,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                                                                                                 iphoneId = iphoneID;
                                                                                                                 messageId = 0;
                                                                                                                 masterid = '';
-                                                                                                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                                 notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                             }
                                                                                                             else {

@@ -1258,6 +1258,9 @@ Configuration.prototype.createSubuser = function(req,res,next){
                         + ',' + st.db.escape(HomeDeliveryRules) + ',' + st.db.escape(ServiceRules) + ',' + st.db.escape(ResumeRules) + ',' + st.db.escape(MasterID) + ',' + st.db.escape(templateID);
                     console.log(query);
                     st.db.query('CALL pCreateSubUser(' + query + ')', function (err, InsertResult) {
+
+                        console.log('InsertResult......');
+                        console.log(InsertResult);
                         if (!err){
                             if (InsertResult[0])
                             {
@@ -1268,10 +1271,6 @@ Configuration.prototype.createSubuser = function(req,res,next){
                                     {
                                         RtnMessage.IsSuccessfull = true;
                                         RtnMessage.TID = Result[0].TID;
-
-                                        if(parseInt(TID) == 0){
-                                            st.generateRabbitQueue(Result[0].TID);
-                                        }
 
                                         res.send(RtnMessage);
                                         console.log('FnCreateSubUser: Sub User details save successfully');}

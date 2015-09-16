@@ -968,6 +968,7 @@
                 });
             };
 
+            $scope.reoloadText = 'Reload';
             /**
              * This function will be called when status types filter selection box value is changed
              */

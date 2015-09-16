@@ -111,7 +111,7 @@ Auth.prototype.register = function(req,res,next){
         if(SelectionTypes.toString() == 'NaN'){
             SelectionTypes = 0;
         }
-        console.log(SelectionTypes);
+        //console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = alterEzeoneId(req.body.EZEID);
         if(EZEID != null)
@@ -206,10 +206,10 @@ Auth.prototype.register = function(req,res,next){
             group_id:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        console.log(OperationType);
+        //console.log(OperationType);
         if(parseInt(OperationType) == 1){
             console.log('----------req.body for Operation type 1--------------');
-            console.log(req.body);
+            //console.log(req.body);
             if( IDTypeID != null && EZEID != null && Password != null ){
                 if(FirstName == null)
                     FirstName='';
@@ -248,12 +248,12 @@ Auth.prototype.register = function(req,res,next){
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)  + ',' + st.db.escape(CategoryID);
 
 
-                console.log(InsertQuery);
+                //console.log(InsertQuery);
 
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         //console.log('InsertResult: ');
-                        console.log( InsertResult);
+                        //console.log( InsertResult);
                         if (InsertResult != null) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
@@ -292,7 +292,7 @@ Auth.prototype.register = function(req,res,next){
                                             if(isIphone == 1){
                                                 var queryParams = st.db.escape(EZEID) + ',' + st.db.escape(deviceToken);
                                                 var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                                console.log(query);
+                                               // console.log(query);
                                                 st.db.query(query, function (err, result) {
                                                     if(!err){
                                                         //console.log(result);
@@ -441,7 +441,7 @@ Auth.prototype.register = function(req,res,next){
                     EncryptPWD = hashPassword(Password);
                 }
                 var DOBDate = null;
-                console.log(EZEID.toUpperCase());
+                //console.log(EZEID.toUpperCase());
                 if (DOB != null && DOB != '') {
                     // datechange = new Date(new Date(TaskDateTime).toUTCString());
                     DOBDate = new Date(DOB);
@@ -681,7 +681,7 @@ Auth.prototype.login = function(req,res,next){
             //console.log('findarray: ' + FindArray.length);
 
             var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
-            console.log(Query);
+            //console.log(Query);
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 //console.log(loginResult);
                 if (!err) {
@@ -693,7 +693,6 @@ Auth.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
-                            console.log(loginDetails[0]);
 
                             if (!token) {
                                 if (comparePassword(Password, loginDetails[0].Password)) {
@@ -744,7 +743,7 @@ Auth.prototype.login = function(req,res,next){
                                                 if (isIphone == 1) {
                                                     var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
                                                     var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                                    console.log(query);
+                                                    //console.log(query);
                                                     st.db.query(query, function (err, result) {
                                                         if (!err) {
                                                             //console.log(result);
@@ -813,7 +812,7 @@ Auth.prototype.login = function(req,res,next){
                                     if (isIphone == 1) {
                                         var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
                                         var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                        console.log(query);
+                                        //console.log(query);
                                         st.db.query(query, function (err, result) {
                                             if (!err) {
                                                 //console.log(result);
@@ -906,10 +905,10 @@ Auth.prototype.logout = function(req,res,next){
                             if (details[0]) {
                                 var queryParams = st.db.escape(details[0].EZEID) + ',' + st.db.escape('');
                                 var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                console.log(query);
+                                //console.log(query);
                                 st.db.query(query, function (err, result) {
                                     if (!err) {
-                                        console.log('FnDeleteIphoneID:IphoneDeviceID deleted successfully');
+                                        //console.log('FnDeleteIphoneID:IphoneDeviceID deleted successfully');
                                         var Query = 'CALL pLogout(' + st.db.escape(Token) + ')';
                                         st.db.query(Query, function (err, result) {
                                             if (!err) {
@@ -1017,8 +1016,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
             var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode);
             var query = 'CALL pverifyresetcode('+queryParams+')';
 
-
-            console.log(query);
+            //console.log(query);
 
             st.db.query(query, function (err, verifyRes) {
                 if(err){
@@ -1036,7 +1034,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
                 }
 
                 else{
-                    console.log(verifyRes);
+                    //console.log(verifyRes);
 
                     if(verifyRes){
                         if(verifyRes[0]){
@@ -1132,7 +1130,7 @@ Auth.prototype.verifySecretCode = function(req,res,next) {
             var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.body.new_password);
             var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
 
-            console.log(verifyQuery);
+            //console.log(verifyQuery);
 
             st.db.query(verifyQuery, function (err, verifyRes) {
                 if (err) {
