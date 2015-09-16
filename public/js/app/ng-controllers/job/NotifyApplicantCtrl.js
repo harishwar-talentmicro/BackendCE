@@ -69,9 +69,12 @@
                         $scope.$emit('$preLoaderStop');
                         if(resp.status)
                         {
-                            $scope.applicantData = resp.data;
-                            $scope.applicantCount = $scope.applicantData[0].count;
-                            $scope.applicantIDs = $scope.applicantData[0].ids;
+                            if(resp.data.length)
+                            {
+                                $scope.applicantData = resp.data;
+                                $scope.applicantCount = $scope.applicantData[0].count;
+                                $scope.applicantIDs = $scope.applicantData[0].ids;
+                            }
                         }
                     })
                     .error(function(err){
@@ -190,7 +193,7 @@
                                 $scope.mailTemplateTid = "";
 
                                 getTemplateList();
-                                Notification.success({ message: 'Template save success...', delay: MsgDelay });
+                                Notification.success({ message: 'Template saved successfully...', delay: MsgDelay });
                                 $scope.showCreateMailTemplate = false;
                                 $scope.validationMode = 0;
                             }

@@ -2162,3 +2162,12 @@ table.rwd-table > tbody > tr > td.serachResultSelectAll
 {
     min-height: 35px !important;
 }
+.setActiveSkillsAlign
+{
+   float: left;
+   margin-left: 3%;
+}
+.setJobPostExpFromAlign
+{
+    margin-right: 6%;
+}

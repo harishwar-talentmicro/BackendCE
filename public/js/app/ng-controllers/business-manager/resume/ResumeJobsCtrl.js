@@ -754,6 +754,7 @@
              */
             $scope.selectEducation = function(_educationID)
             {
+                $scope.specializationList = [];
                 if($scope.selectedEducations.indexOf(_educationID)!=-1)
                 {
                     var index = $scope.selectedEducations.indexOf(_educationID);
@@ -763,6 +764,8 @@
                 {
                     $scope.selectedEducations.push(_educationID);
                 }
+
+                 getSpecialization();
             };
 
             /**
@@ -783,26 +786,26 @@
 
             $scope.getSpecilizationForEducation = function()
             {
-                if($scope.selectedEducations.length)
+                if(!$scope.selectedEducations.length)
                 {
-                    getSpecialization();
-                }
-                else
-                {
-                    Notification.error({ message : "Select Education..", delay : MsgDelay});
+                    Notification.error({ message : "Select Last Education..", delay : MsgDelay});
                 }
             };
 
             function getSpecialization()
             {
-                $http({
-                    url : GURL + 'specialization',
-                    method : 'GET',
-                    params : {
-                        token : $rootScope._userInfo.Token,
-                        education_id : $scope.selectedEducations.toString()
-                    }
-                }).success(function(resp){
+                $scope.specializationList = [];
+
+                if($scope.selectedEducations.length)
+                {
+                    $http({
+                        url : GURL + 'specialization',
+                        method : 'GET',
+                        params : {
+                            token : $rootScope._userInfo.Token,
+                            education_id : $scope.selectedEducations.toString()
+                        }
+                    }).success(function(resp){
                         $scope.specializationList = resp.data;
                     })
                     .error(function(err){
@@ -810,6 +813,7 @@
                         Notification.error({ message : msg, delay : MsgDelay});
                         $scope.$emit('$preLoaderStop');
                     });
+                }
             }
 
             // Get Institute list
@@ -1484,6 +1488,8 @@
                 {name: "Expert",value:"2",ticked: false},
                 {name: "Master",value:"3",ticked: false}
             ];
+
+
 
 
 

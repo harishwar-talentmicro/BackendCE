@@ -943,9 +943,11 @@
             /*------------------------ multi selection of Education ----------------*/
 
             $scope.educationOpen = function() {
+                $scope.specializationList = [];
             };
 
             $scope.educationClose = function() {
+                $scope.specializationList = [];
                 if($scope.selectedEducations.length)
                 {
                     getSpecialization();
@@ -1002,6 +1004,10 @@
             /*------------------------ multi selection of Specialization ----------------*/
 
             $scope.specializationOpen = function() {
+                if(!$scope.selectedEducations.length)
+                {
+                    Notification.error({ message : "Select Education..", delay : MsgDelay});
+                }
             };
 
             $scope.specializationClose = function() {
