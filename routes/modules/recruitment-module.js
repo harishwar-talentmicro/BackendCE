@@ -86,28 +86,21 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
                         st.db.query('CALL pGetAllApplicanttrackermasterData(' + query + ')', function (err, getResult) {
                             if(!err){
                                 if (getResult) {
-                                    if (getResult[0]) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Recruitment Masters List loaded successfully';
-                                        responseMessage.data = {
-                                            institutes: getResult[0],
-                                            folders: getResult[1],
-                                            specialization: getResult[2],
-                                            educations: getResult[3],
-                                            jobs: getResult[4],
-                                            subusers: getResult[5],
-                                            actions: getResult[6],
-                                            stages: getResult[7]
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetRecruitmentMasters: Recruitment Masters List loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Recruitment Masters List not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetRecruitmentMasters:Recruitment Masters List not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Recruitment Masters List loaded successfully';
+                                    responseMessage.data = {
+                                        institutes: getResult[0],
+                                        folders: getResult[1],
+                                        specialization: getResult[2],
+                                        educations: getResult[3],
+                                        jobs: getResult[4],
+                                        subusers: getResult[5],
+                                        actions: getResult[6],
+                                        stages: getResult[7]
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetRecruitmentMasters: Recruitment Masters List loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Recruitment Masters List not loaded';
