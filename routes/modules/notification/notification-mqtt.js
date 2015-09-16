@@ -9,6 +9,7 @@
  */
 
 var fs = require('fs');
+var uuid = require('node-uuid');
 
 var request = require('request');
 //console.log(__dirname+'../../../ezeone-config.json');
@@ -93,6 +94,10 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
         validationFlag *= false;
     }
     if(validationFlag){
+        var uniqueMid = uuid.v4();
+
+        messagePayload._id = Date.now() + '-' + uniqueMid;
+
         try{
             this.checkQueue(topic,function(){
                 mqttClient.publish('/'+topic,JSON.stringify(messagePayload),{qos : 1},function(){

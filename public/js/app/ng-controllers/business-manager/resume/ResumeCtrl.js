@@ -1953,6 +1953,110 @@
                 //});
             };
 
+            $scope.loadResumeMasters = function(){
+                var defer = $q.defer();
+                $http({
+                    url : GURL + '/recruitment_masters',
+                    params : {
+                        token : $rootScope._userInfo.Token,
+                        function_type : 4,
+                        master_id : $rootScope._userInfo.MasterID
+                    }
+                }).success(function(resp){
+                    var errMsg = 'Something went wrong ! Please try again';
+                    if(resp){
+                        if(resp.status && resp.data){
+                            $scope.institutesList = (resp.data.institutes) ? resp.data.institutes : [];
+                            $scope.txFolderRules = (resp.data.folders) ? resp.data.folders : [];
+
+                            /** Setting folder load flag to true **/
+                            allFoldersLoaded  = true;
+                            if(allFoldersLoaded && userFoldersLoaded){
+                                assignUserFolders();
+                            }
+
+                            $scope.specializationsList  = (resp.data.specialization) ? resp.data.specialization : [];
+                            $scope.educationsList = (resp.data.educations) ? resp.data.educations : [];
+                            $scope.jobsList = (resp.data.jobs) ? resp.data.jobs : [];
+
+                            jobsLoaded  = true;
+                            if(jobsLoaded){
+                                assignJobs();
+                            }
+
+                            var userResp = (resp.data.subusers) ? resp.data.subusers : [];
+
+                            /** Setting userFoldersLoaded Flag to true and doing the data conversion operations **/
+                            var index = userResp.indexOfWhere('EZEID',$rootScope._userInfo.ezeid);
+                            if(index !== -1){
+                                var userFolders = (userResp[index].ResumeIDs) ? userResp[index].ResumeIDs.split(',') : [];
+                                ////console.log(userFolders);
+                                for(var b=0;b<userFolders.length;b++){
+                                    userFolders[b] = parseInt(userFolders[b]);
+                                }
+                                userFoldersList = userFolders;
+                            }
+                            userFoldersLoaded = true;
+                            if(allFoldersLoaded && userFoldersLoaded){
+                                assignUserFolders();
+                            }
+
+
+                            $scope.txActionTypes = (resp.data.actions) ? resp.data.actions : [];
+                            $scope.txStatusTypes = (resp.data.stages) ? resp.data.stages : [];
+                        }
+                        else{
+
+                            Notification.error({title : 'Error', message : errMsg, delay : MsgDelay});
+                        }
+                    }
+                    else{
+                        Notification.error({title : 'Error', message : errMsg, delay : MsgDelay});
+                    }
+                    defer.resolve(resp);
+                }).error(function(err,statusCode){
+                    var errMsg = 'Something went wrong ! Please try again';
+                    if(!statusCode){
+                        msg = 'Unable to reach server ! Please check your connection';
+                    }
+
+                    Notification.error({title : 'Error', message : msg, delay : MsgDelay});
+                    defer.reject(err);
+                });
+
+                return defer.promise;
+            };
+
+            var initNew = function(){
+                $scope.loadResumeMasters().then(function(resp){
+                    if($scope.jobTid){
+                        loadApplicantForOneJob(1).then(function(){
+                            $scope.$emit('$preLoaderStop');
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                        });
+                    }
+                    else{
+                        $scope.loadTransaction(1,-2,$scope.txSearchTerm,$scope.sortBy).then(function(){
+                            $scope.$emit('$preLoaderStop');
+                            watchPageNumber();
+                            watchSortBy();
+                            //watchMyFolders();
+
+                            /**
+                             * Item loading is not required in case of recruitment module
+                             */
+
+                        },function(){
+                            $scope.$emit('$preLoaderStop');
+                            Notification.error({message : 'Unable to load applicant list', delay : MsgDelay} );
+                        });
+                    }
+                },function(){
+                    $scope.$emit('$preLoaderStop');
+                    Notification.error({message : 'Something went wrong ! Please try again', delay : MsgDelay} );
+                });
+            };
 
             var makeAddress = function(){
                 var address = [];
@@ -2232,7 +2336,7 @@
                 if(!_domLoaded){
                     $timeout(function(){
                         $scope.$emit('$preLoaderStart');
-                        init();
+                        initNew();
                     },1000);
                     _domLoaded = true;
                 }
