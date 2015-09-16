@@ -206,6 +206,7 @@ router.delete('/alumni_team',LocationManager.FnDeleteAlumniTeam);
 router.get('/cover_image',LocationManager.FnGetAlumniContentImage);
 router.post('/alumni_profile',LocationManager.FnSaveAlumniProfile);
 router.get('/alumniteam_picture',LocationManager.FnGetAlumniTeamPicture);
+router.get('/alumni_profile',LocationManager.FnGetAlumniProfile);
 
 //Recruitment module
 router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
