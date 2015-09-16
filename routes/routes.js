@@ -224,7 +224,7 @@ exports.FnGetAlumniTeam = alumniModule.getAlumniTeam;
 exports.FnDeleteAlumniTeam = alumniModule.deleteAlumniTeam;
 exports.FnGetAlumniContentImage = alumniModule.getAlumniContentImage;
 exports.FnSaveAlumniProfile = alumniModule.saveAlumniProfile;
-exports.FnGetAlumniTeamPicture = alumniModule.getAlumniTeamPicture;
+exports.FnGetAlumniTeamDetails = alumniModule.getAlumniTeamDetails;
 exports.FnGetAlumniProfile = alumniModule.getAlumniProfile;
 
 //Recruitment module
