@@ -224,12 +224,14 @@ exports.FnGetAlumniTeam = alumniModule.getAlumniTeam;
 exports.FnDeleteAlumniTeam = alumniModule.deleteAlumniTeam;
 exports.FnGetAlumniContentImage = alumniModule.getAlumniContentImage;
 exports.FnSaveAlumniProfile = alumniModule.saveAlumniProfile;
-exports.FnGetAlumniTeamPicture = alumniModule.getAlumniTeamPicture;
+exports.FnGetAlumniTeamDetails = alumniModule.getAlumniTeamDetails;
+exports.FnGetAlumniProfile = alumniModule.getAlumniProfile;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');
 var recruitmentModule = new Recruitment(db,stdLib);
 exports.FnGetRecruitmentMasters = recruitmentModule.getRecruitmentMasters;
+exports.FnGetSalesMasters = recruitmentModule.getSalesMasters;
 
 
 var Notification = require('./modules/notification/notification-master.js');

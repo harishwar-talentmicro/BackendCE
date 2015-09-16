@@ -446,7 +446,7 @@ angular.module('ezeidApp').
                         ezeOneValidationAction(2);
                         $scope.activeEzeOneId = 0;
                         $scope.activeEzeOneName = "";
-                        Notification.error({message: "EZEONE doesn't exists in the system", delay: MsgDelay});
+                        Notification.error({message: "EZEOne Id doesn't exists in the system", delay: MsgDelay});
                     }
                     else {
                         ezeOneValidationAction(3);
@@ -523,7 +523,7 @@ angular.module('ezeidApp').
                         ezeOneValidationAction(2);
                         $scope.activeEzeOneId = 0;
                         $scope.activeEzeOneName = "";
-                        Notification.error({message: "EZEONE doesn't exists in the system", delay: MsgDelay});
+                        Notification.error({message: "EZEOne Id doesn't exists in the system", delay: MsgDelay});
                     }
                     else {
                         ezeOneValidationAction(3);

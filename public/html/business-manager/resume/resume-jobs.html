@@ -336,7 +336,7 @@
                         <span class="caret selectImg"></span>
                     </button>
                     <div class="opt opt-2">
-                        <div  class="filter-dropdownspecialization width89 search-option-content setTableFixHeight" style="display: none;">
+                        <div class="filter-dropdownspecialization width89 search-option-content setTableFixHeight" style="display: none;">
                             <div class="checkbox-dropdown" ng-repeat="specialization in specializationList track by $index" ng-click="selectSpecialization(specialization.TID)">
                                 <i class="fa " ng-class="selectedSpecializations.indexOf(specialization.TID)!=-1 ?'fa-check-square':'fa-square-o'"></i> {{specialization.Title}}
                             </div>
@@ -447,7 +447,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="panelPd5px msg_pos expSkillMap" ng-hide="(!editMode[$index]) && ($index == 0)">
-                                                    <span ng-hide="editMode[$index]">{{skillMatrix[$index].exp_from}}</span>
+                                                    <span class="setJobPostExpFromAlign" ng-hide="editMode[$index]">{{skillMatrix[$index].exp_from}}</span>
                                                     <div style="float: right;">
                                                         <span ng-hide="editMode[$index]">{{skillMatrix[$index].exp_to}}</span>
                                                     </div>
@@ -473,20 +473,21 @@
                                                                placeholder="Ex. 5.00"/>
                                                     </div>
 
-                                                     </td>
+                                                 </td>
                                                 <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
-
                                                     <select ng-show="editMode[$index]" class="form-control" ng-change="setActiveSkill(skillMatrix[$index].active_status)" ng-model="skillMatrix[$index].active_status">
                                                         <option value="1"> Active </option>
                                                         <option value="0"> Inactive </option>
                                                         <option value="2"> Both </option>
                                                     </select>
 
-                                                    <span ng-hide="editMode[$index]">
-                                                        <span ng-show="skillMatrix[$index].active_status == 1">Active </span>
-                                                        <span ng-show="skillMatrix[$index].active_status == 0">Inactive </span>
-                                                        <span ng-show="skillMatrix[$index].active_status == 2">Both </span>
-                                                    </span>
+                                                    <div>
+                                                         <span ng-hide="editMode[$index]" class="setActiveSkillsAlign">
+                                                            <span ng-show="skillMatrix[$index].active_status == 1">Active </span>
+                                                            <span ng-show="skillMatrix[$index].active_status == 0">Inactive </span>
+                                                            <span ng-show="skillMatrix[$index].active_status == 2">Both </span>
+                                                         </span>
+                                                    </div>
                                                 </td>
                                                 <td class="panelPd5px msg_pos" ng-hide="(!editMode[$index]) && ($index == 0)">
                                                     <button class="btn btn-success btn-xs" ng-show="editMode[$index]" ng-click="saveSkillFn($index)">Add</button>
