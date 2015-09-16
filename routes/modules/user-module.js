@@ -2557,7 +2557,7 @@ User.prototype.saveResume = function(req,res,next){
                                             FnSaveSkills(skills, function (err, Result) {
                                                 if (!err) {
                                                     if (Result) {
-                                                        resultvalue = Result.SkillID
+                                                        resultvalue = Result.SkillID;
                                                         var SkillItems = {
                                                             skillID: resultvalue,
                                                             expertlevel: skills.expertiseLevel,

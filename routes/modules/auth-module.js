@@ -111,7 +111,7 @@ Auth.prototype.register = function(req,res,next){
         if(SelectionTypes.toString() == 'NaN'){
             SelectionTypes = 0;
         }
-        console.log(SelectionTypes);
+        //console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = alterEzeoneId(req.body.EZEID);
         if(EZEID != null)
@@ -206,10 +206,10 @@ Auth.prototype.register = function(req,res,next){
             group_id:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        console.log(OperationType);
+        //console.log(OperationType);
         if(parseInt(OperationType) == 1){
             console.log('----------req.body for Operation type 1--------------');
-            console.log(req.body);
+            //console.log(req.body);
             if( IDTypeID != null && EZEID != null && Password != null ){
                 if(FirstName == null)
                     FirstName='';
@@ -248,12 +248,12 @@ Auth.prototype.register = function(req,res,next){
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)  + ',' + st.db.escape(CategoryID);
 
 
-                console.log(InsertQuery);
+                //console.log(InsertQuery);
 
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         //console.log('InsertResult: ');
-                        console.log( InsertResult);
+                        //console.log( InsertResult);
                         if (InsertResult != null) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
@@ -292,7 +292,7 @@ Auth.prototype.register = function(req,res,next){
                                             if(isIphone == 1){
                                                 var queryParams = st.db.escape(EZEID) + ',' + st.db.escape(deviceToken);
                                                 var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                                console.log(query);
+                                               // console.log(query);
                                                 st.db.query(query, function (err, result) {
                                                     if(!err){
                                                         //console.log(result);
@@ -441,7 +441,7 @@ Auth.prototype.register = function(req,res,next){
                     EncryptPWD = hashPassword(Password);
                 }
                 var DOBDate = null;
-                console.log(EZEID.toUpperCase());
+                //console.log(EZEID.toUpperCase());
                 if (DOB != null && DOB != '') {
                     // datechange = new Date(new Date(TaskDateTime).toUTCString());
                     DOBDate = new Date(DOB);
@@ -638,6 +638,10 @@ Auth.prototype.login = function(req,res,next){
             req.connection.remoteAddress ||
             req.socket.remoteAddress ||
             req.connection.socket.remoteAddress;
+
+        var token = req.body.token ? req.body.token : '';
+        var code = req.body.code ? req.body.code : '';
+
         var RtnMessage = {
             Token: '',
             TID:'',
@@ -666,7 +670,8 @@ Auth.prototype.login = function(req,res,next){
             PersonalEZEID:'',
             ReservationDisplayFormat:'',
             mobilenumber:'',
-            ISPrimaryLocAdded:''
+            ISPrimaryLocAdded:'',
+            accesstype :''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -675,8 +680,8 @@ Auth.prototype.login = function(req,res,next){
 
             //console.log('findarray: ' + FindArray.length);
 
-            var Query = st.db.escape(UserName);
-            console.log(Query);
+            var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
+            //console.log(Query);
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 //console.log(loginResult);
                 if (!err) {
@@ -688,100 +693,143 @@ Auth.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
-                            console.log(loginDetails[0]);
 
-                            if(comparePassword(Password,loginDetails[0].Password)){
-                                st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
-                                    if (!err) {
-                                        // console.log(TokenResult);
+                            if (!token) {
+                                if (comparePassword(Password, loginDetails[0].Password)) {
+                                    st.generateToken(ip, userAgent, UserName, function (err, TokenResult) {
+                                        if (!err) {
+                                            // console.log(TokenResult);
 
-                                        if (TokenResult) {
-                                            //res.setHeader('Cookie','Token='+Encrypt);
-                                            //console.log(loginDetails[0]);
-                                            res.cookie('Token', TokenResult, { maxAge: 900000, httpOnly: true });
-                                            RtnMessage.Token = TokenResult;
-                                            RtnMessage.IsAuthenticate = true;
-                                            RtnMessage.TID = loginDetails[0].TID;
-                                            RtnMessage.ezeone_id = loginDetails[0].EZEID;
-                                            RtnMessage.FirstName = loginDetails[0].FirstName;
-                                            RtnMessage.CompanyName = loginDetails[0].CompanyName;
-                                            RtnMessage.Type = loginDetails[0].IDTypeID;
-                                            RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                            RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                            RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                            RtnMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                            RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                            RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                            RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                            RtnMessage.SalesFormMsg= loginDetails[0].SalesFormMsg;
-                                            RtnMessage.ReservationFormMsg= loginDetails[0].ReservationFormMsg;
-                                            RtnMessage.HomeDeliveryFormMsg= loginDetails[0].HomeDeliveryFormMsg;
-                                            RtnMessage.ServiceFormMsg= loginDetails[0].ServiceFormMsg;
-                                            RtnMessage.CVFormMsg= loginDetails[0].CVFormMsg;
-                                            RtnMessage.SalesItemListType= loginDetails[0].SalesItemListType;
-                                            RtnMessage.RefreshInterval= loginDetails[0].RefreshInterval;
-                                            RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                            RtnMessage.MasterID= loginDetails[0].ParentMasterID;
-                                            RtnMessage.PersonalEZEID= loginDetails[0].PersonalEZEID;
-                                            RtnMessage.VisibleModules= loginDetails[0].VisibleModules;
-                                            RtnMessage.FreshersAccepted= loginDetails[0].FreshersAccepted;
-                                            RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                            RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                            RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                            RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
-                                            RtnMessage.group_id = loginDetails[0].group_id;
-                                            RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                            if (TokenResult) {
+                                                //res.setHeader('Cookie','Token='+Encrypt);
+                                                //console.log(loginDetails[0]);
+                                                res.cookie('Token', TokenResult, {maxAge: 900000, httpOnly: true});
+                                                RtnMessage.Token = TokenResult;
+                                                RtnMessage.IsAuthenticate = true;
+                                                RtnMessage.TID = loginDetails[0].TID;
+                                                RtnMessage.ezeone_id = loginDetails[0].EZEID;
+                                                RtnMessage.FirstName = loginDetails[0].FirstName;
+                                                RtnMessage.CompanyName = loginDetails[0].CompanyName;
+                                                RtnMessage.Type = loginDetails[0].IDTypeID;
+                                                RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                                RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                                RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                                RtnMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                                RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                                RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                                RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                                RtnMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                                RtnMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                                RtnMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                                RtnMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                                RtnMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                                RtnMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                                RtnMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                                RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                                RtnMessage.MasterID = loginDetails[0].ParentMasterID;
+                                                RtnMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                                RtnMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                                RtnMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                                RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                                RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                                RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                                RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
+                                                RtnMessage.group_id = loginDetails[0].group_id;
+                                                RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                                RtnMessage.accesstype = loginDetails[0].accesstype; //accesstype=1 then is admin ..if accesstype=2 then is member
 
-                                            res.send(RtnMessage);
-                                            console.log('FnLogin:tmaster: Login success');
-                                            if(isIphone == 1){
-                                                var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
-                                                var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                                console.log(query);
-                                                st.db.query(query, function (err, result) {
-                                                    if(!err){
-                                                        //console.log(result);
-                                                        console.log('FnLogin:IphoneDevice save successfully');
-                                                    }
-                                                    else
-                                                    {
-                                                        console.log(err);
-                                                    }
-                                                });
+                                                res.send(RtnMessage);
+                                                console.log('FnLogin:tmaster: Login success');
+                                                if (isIphone == 1) {
+                                                    var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
+                                                    var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                                    //console.log(query);
+                                                    st.db.query(query, function (err, result) {
+                                                        if (!err) {
+                                                            //console.log(result);
+                                                            console.log('FnLogin:IphoneDevice save successfully');
+                                                        }
+                                                        else {
+                                                            console.log(err);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                            else {
+
+                                                res.send(RtnMessage);
+                                                console.log('FnLogin:tmaster:Fail to generate Token');
                                             }
                                         }
                                         else {
-
+                                            res.statusCode = 500;
                                             res.send(RtnMessage);
-                                            console.log('FnLogin:tmaster:Fail to generate Token');
+                                            console.log('FnLogin:tmaster:' + err);
                                         }
-                                    }
-                                    else {
-                                        res.statusCode = 500;
-                                        res.send(RtnMessage);
-                                        console.log('FnLogin:tmaster:' + err);
-                                    }
-                                });
+                                    });
+                                }
                             }
+                            else {
+                                    //res.setHeader('Cookie','Token='+Encrypt);
+                                    //console.log(loginDetails[0]);
+                                    //res.cookie('Token', TokenResult, {maxAge: 900000, httpOnly: true});
+                                    RtnMessage.Token = token;
+                                    RtnMessage.IsAuthenticate = true;
+                                    RtnMessage.TID = loginDetails[0].TID;
+                                    RtnMessage.ezeone_id = loginDetails[0].EZEID;
+                                    RtnMessage.FirstName = loginDetails[0].FirstName;
+                                    RtnMessage.CompanyName = loginDetails[0].CompanyName;
+                                    RtnMessage.Type = loginDetails[0].IDTypeID;
+                                    RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                    RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                    RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                    RtnMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                    RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                    RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                    RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                    RtnMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                    RtnMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                    RtnMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                    RtnMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                    RtnMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                    RtnMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                    RtnMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                    RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                    RtnMessage.MasterID = loginDetails[0].ParentMasterID;
+                                    RtnMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                    RtnMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                    RtnMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                    RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                    RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                    RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                    RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
+                                    RtnMessage.group_id = loginDetails[0].group_id;
+                                    RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                    RtnMessage.accesstype = loginDetails[0].accesstype; //accesstype=1 then is admin ..if accesstype=2 then is member
 
-                            else{
+                                    res.send(RtnMessage);
+                                    console.log('FnLogin:tmaster: Login success');
+                                    if (isIphone == 1) {
+                                        var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
+                                        var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                        //console.log(query);
+                                        st.db.query(query, function (err, result) {
+                                            if (!err) {
+                                                //console.log(result);
+                                                console.log('FnLogin:IphoneDevice save successfully');
+                                            }
+                                            else {
+                                                console.log(err);
+                                            }
+                                        });
+                                    }
+                            }
+                        }
+                        else{
                                 res.send(RtnMessage);
                             }
-
-
-
-
-                            //console.log(loginDetails[0].TID);
-
-                        }
-
-                        else {
-                            res.send(RtnMessage);
-                            console.log('FnLogin:tmaster: Invalid login credentials');
-                        }
                     }
                     else {
-
                         res.send(RtnMessage);
                         console.log('FnLogin:tmaster: Invalid login credentials');
                     }
@@ -857,10 +905,10 @@ Auth.prototype.logout = function(req,res,next){
                             if (details[0]) {
                                 var queryParams = st.db.escape(details[0].EZEID) + ',' + st.db.escape('');
                                 var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                console.log(query);
+                                //console.log(query);
                                 st.db.query(query, function (err, result) {
                                     if (!err) {
-                                        console.log('FnDeleteIphoneID:IphoneDeviceID deleted successfully');
+                                        //console.log('FnDeleteIphoneID:IphoneDeviceID deleted successfully');
                                         var Query = 'CALL pLogout(' + st.db.escape(Token) + ')';
                                         st.db.query(Query, function (err, result) {
                                             if (!err) {
@@ -968,8 +1016,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
             var queryParams = st.db.escape(ezeoneId) + ',' + st.db.escape(resetCode);
             var query = 'CALL pverifyresetcode('+queryParams+')';
 
-
-            console.log(query);
+            //console.log(query);
 
             st.db.query(query, function (err, verifyRes) {
                 if(err){
@@ -987,7 +1034,7 @@ Auth.prototype.verifyResetCode = function(req,res,next){
                 }
 
                 else{
-                    console.log(verifyRes);
+                    //console.log(verifyRes);
 
                     if(verifyRes){
                         if(verifyRes[0]){
@@ -1083,7 +1130,7 @@ Auth.prototype.verifySecretCode = function(req,res,next) {
             var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.body.new_password);
             var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
 
-            console.log(verifyQuery);
+            //console.log(verifyQuery);
 
             st.db.query(verifyQuery, function (err, verifyRes) {
                 if (err) {

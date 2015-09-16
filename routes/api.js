@@ -31,6 +31,7 @@ router.get('/ewmGetRelationType', LocationManager.FnGetRelationType);
 router.get('/ewmGetState', LocationManager.FnGetState);
 router.get('/ewmGetMTitle', LocationManager.FnGetMTitle);
 router.get('/ewGetEZEID', LocationManager.FnCheckEzeid);
+router.get('/validate_ezeone', LocationManager.FnValidateEZEOne);
 router.post('/ewmAddLocation', LocationManager.FnAddLocation);
 router.post('/ewSearchByKeywords', LocationManager.FnSearchByKeywords);
 router.get('/ewtGetUserDetails', LocationManager.FnGetUserDetails);
@@ -203,6 +204,11 @@ router.get('/alumni_content',LocationManager.FnGetAlumniContent);
 router.get('/alumni_team',LocationManager.FnGetAlumniTeam);
 router.delete('/alumni_team',LocationManager.FnDeleteAlumniTeam);
 router.get('/cover_image',LocationManager.FnGetAlumniContentImage);
+router.post('/alumni_profile',LocationManager.FnSaveAlumniProfile);
+router.get('/alumniteam_picture',LocationManager.FnGetAlumniTeamPicture);
+
+//Recruitment module
+router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
 
 
 

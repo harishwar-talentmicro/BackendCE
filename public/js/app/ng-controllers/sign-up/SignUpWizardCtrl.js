@@ -422,7 +422,7 @@ angular.module('ezeidApp').
                     validationStatus *= false;
                 }
 
-                if($scope.userType == 2){
+                if(parseInt($scope.userType) == 2){
                     if(!$scope.companyName){
                         $scope.error.companyName = '*Company Name cannot be empty';
                         validationStatus *= false;
@@ -438,7 +438,7 @@ angular.module('ezeidApp').
 
 
 
-                if(parseInt($scope.userType) != 3)
+                if(parseInt($scope.userType) !== 3)
                 {
                     var emailPattern = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
                     var emailRegEx = new RegExp(emailPattern);
@@ -510,6 +510,18 @@ angular.module('ezeidApp').
                     }
 
                 }
+
+                console.log($scope.dateOfBirth);
+
+                if(parseInt($scope.userType) === 1){
+                    if(moment($scope.dateOfBirth).isValid()){
+
+                    }
+                    else{
+                        validationStatus *= false;
+                        $scope.error.dateOfBirth = 'Please enter valid date of birth';
+                    }
+                }
                 return validationStatus;
 
             };
@@ -542,9 +554,6 @@ angular.module('ezeidApp').
                             message : 'Please check all the errors before registration',
                             delay : MsgDelay
                         });
-                        return false;
-                    }
-                    else{
                         return false;
                     }
 
@@ -586,13 +595,12 @@ angular.module('ezeidApp').
                         ISDPhoneNumber : null ,
                         ISDMobileNumber : null ,
                         Gender : $scope.gender ,
-                        DOB : $scope.dateOfBirth ,
+                        DOB : moment($scope.dateOfBirth).format('YYYY-MM-DD') ,
                         OperationType : 1 ,
                         SelectionType : $scope.planSelectionType ,
                         ParkingStatus : null
                     };
                     // ////////////console.log($scope.error);
-
 
 
                     $http({

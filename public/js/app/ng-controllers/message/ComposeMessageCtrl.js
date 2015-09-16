@@ -52,7 +52,7 @@ angular.module('ezeidApp').
             };
             $scope.visibilityReceiverErrorMsg = false;
             $scope.visibilityMsgBodyErrorMsg = false;
-            $scope.composeMsg.Priority = 0;
+            $scope.composeMsg.Priority = 1;
             /* Error messages goes here */
             $scope.errorMsgArr = [
                 "Invalid Ezeone",
@@ -65,9 +65,9 @@ angular.module('ezeidApp').
 
             /* PRIORITY */
             $scope.priority = [
-                "High",
-                "Medium",
-                "Low"
+                "High Priority",
+                "Medium Priority",
+                "Low Priority"
             ];
             $scope.currentErrorMsg = 0;
             $scope.currentMsgBodyErrorMsg = 0;

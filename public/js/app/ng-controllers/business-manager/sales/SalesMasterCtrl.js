@@ -37,8 +37,8 @@
             //$scope.salesStatisticsTab = false;
             //$scope.salesTaskTab = false;
 
-            $scope.salesEnquiryTab = false;
-            $scope.salesStatisticsTab = true;
+            $scope.salesEnquiryTab = true;
+            $scope.salesStatisticsTab = false;
             $scope.salesTaskTab = false;
 
             $scope.tplSalesEnquiryTab = 'html/business-manager/sales/sales.html';

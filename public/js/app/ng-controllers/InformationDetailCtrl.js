@@ -37,6 +37,7 @@ angular.module('ezeidApp').
             UtilityService
         )
         {
+            $scope.activeEzeOneId = "";
 
 
             $scope.review = {
@@ -295,23 +296,9 @@ angular.module('ezeidApp').
                             var x = 300 / imgWidthSet;
                             var y = 30 / 1.5;
 
-
-
-                        //    ctx.textAlign = ($scope.SearchInfo.Website.length) ? 'center' : 'right';
-                         //   var x = ($scope.SearchInfo.Website.length) ? 300 / 2 : 300 / 1.1;
-                            /*ctx.textAlign = ($scope.emailTextWidth < 120) ? 'center' : 'right';
-                            var x = ($scope.emailTextWidth < 120) ? 300 / 1.5 : 300 / 1.1;*/
-
-                            console.log("Sai width");
-                            console.log($scope.emailTextWidth);
-                            console.log(ctx.textAlign);
-                            console.log($scope.SearchInfo.Website);
-                            console.log("img width",imgWidthSet);
-
-
-                         //   ctx.fillText($scope.SearchInfo.EMailID, x, 25);
                             ctx.strokeText($scope.SearchInfo.EMailID, x, y);
 
+                            $scope.activeEzeOneId = $scope.SearchInfo.EZEID;
 
                             getPictureOfSearchedTerm(_ezeone);
 
@@ -743,7 +730,7 @@ angular.module('ezeidApp').
             /* basic setting for loading review-form */
             $scope.ngTransId = 0;
             $scope.ngResourceId = 0;
-            $scope.ngToEzeId = $routeParams.ezeone;
+            $scope.ngToEzeId = $scope.activeEzeOneId;
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////GET FEEDBACK////////////////////////////////////////////////////////////////

@@ -207,7 +207,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(categoryID)+ ',' + st.db.escape(educationID)+ ',' + st.db.escape(specializationID)
                                 + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(skillIds)
                                 + ',' + st.db.escape(scoreTo);
-                            console.log('CALL pSaveJobs(' + query + ')');
+                            //console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
                                     if (!err) {
                                     if (insertresult) {
@@ -316,7 +316,9 @@ Job.prototype.create = function(req,res,next){
                             });
                         }
                         else {
-                            postNotification(jobID);
+                            if( parseInt(req.body.tid) == 0) {
+                                postNotification(jobID);
+                            }
                         }
                     };
 
@@ -325,8 +327,10 @@ Job.prototype.create = function(req,res,next){
                         var postNotification = function (jobID) {
                             var queryParams1 = st.db.escape(jobID) + ',' + st.db.escape(location_id)
                                 + ',' + st.db.escape(req.body.education_id) + ',' + st.db.escape(req.body.specialization_id)
-                                + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to);
-                            console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
+                                + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to)
+                                + ',' + st.db.escape(req.body.salaryFrom)+ ',' + st.db.escape(req.body.salaryTo)
+                                + ',' + st.db.escape(req.body.salaryType);
+                           //console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
                             st.db.query('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')', function (err, results) {
                                 if (!err) {
                                     if (results) {
@@ -352,7 +356,7 @@ Job.prototype.create = function(req,res,next){
                                                                             var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                 + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                 + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userID)
-                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
+                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0);
                                                                             var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
                                                                             st.db.query(query3, function (err, messageResult) {
                                                                                 if (!err) {
@@ -372,7 +376,7 @@ Job.prototype.create = function(req,res,next){
                                                                                                     iphoneId = null;
                                                                                                     messageId = 0;
                                                                                                     masterid = '';
-                                                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                   //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                 }
                                                                                                 else {
@@ -436,7 +440,7 @@ Job.prototype.create = function(req,res,next){
 
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
-                            console.log('CALL psavejoblocation(' + queryParams + ')');
+                           // console.log('CALL psavejoblocation(' + queryParams + ')');
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
                                 if (results) {
                                     if (results[0]) {
@@ -454,21 +458,18 @@ Job.prototype.create = function(req,res,next){
                                         else {
                                             console.log('FnSaveJobLocation:results no found');
                                             responseMessage.message = 'results no found';
-                                            console.log('FnSaveJobLocation: results no found..1');
                                             res.status(200).json(responseMessage);
                                         }
                                     }
                                     else {
                                         console.log('FnSaveJobLocation:results no found');
                                         responseMessage.message = 'results no found';
-                                        console.log('FnSaveJobLocation: results no found..2');
                                         res.status(200).json(responseMessage);
                                     }
                                 }
                                 else {
                                     console.log('FnSaveJobLocation:results no found');
                                     responseMessage.message = 'results no found';
-                                    console.log('FnSaveJobLocation: results no found..3');
                                     res.status(200).json(responseMessage);
                                 }
                             });
@@ -537,11 +538,11 @@ Job.prototype.create = function(req,res,next){
                 st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname), function (err, SkillResult) {
                     if ((!err)) {
                         if (SkillResult[0]) {
-                            console.log(SkillResult);
-                            console.log('Skill value:' + SkillResult[0].SkillID);
-                            console.log('Skill exists');
+                            //console.log(SkillResult);
+                            //console.log('Skill value:' + SkillResult[0].SkillID);
+                            //console.log('Skill exists');
                             RtnResponse.SkillID = SkillResult[0].SkillID;
-                            console.log(RtnResponse.SkillID);
+                            //console.log(RtnResponse.SkillID);
                             CallBack(null, RtnResponse);
                         }
                         else {
@@ -551,7 +552,7 @@ Job.prototype.create = function(req,res,next){
                                         st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, SkillMaxResult) {
                                             if (!err) {
                                                 if (SkillMaxResult[0]) {
-                                                    console.log('New Skill');
+                                                    //console.log('New Skill');
                                                     RtnResponse.SkillID = SkillMaxResult[0].SkillID;
                                                     CallBack(null, RtnResponse);
                                                 }
@@ -638,7 +639,7 @@ Job.prototype.getAll = function(req,res,next){
                     if (result) {
                         var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
                             + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy);
-                        console.log('CALL pGetJobs(' + query + ')');
+                        //console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
 
                             if (!err) {
@@ -707,7 +708,7 @@ Job.prototype.getAll = function(req,res,next){
             responseMessage.error = {
                 server : 'Internal server error'
             };
-            responseMessage.message = 'An error occured !'
+            responseMessage.message = 'An error occured !';
             console.log('FnGetJobs:error ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -804,7 +805,7 @@ Job.prototype.searchJobs = function(req,res,next){
             + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
             +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)
             +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue)+',' + st.db.escape(type);
-        console.log('CALL psearchjobs(' + query + ')');
+        //console.log('CALL psearchjobs(' + query + ')');
         st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
             if (!err) {
                 if (getresult) {
@@ -928,7 +929,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
                 + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount);
 
         var query = 'CALL pGetjobseekers(' + queryParams + ')';
-            console.log(query);
+            //console.log(query);
             st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult) {
@@ -1018,7 +1019,7 @@ Job.prototype.applyJob = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var query = st.db.escape(jobId) + ',' + st.db.escape(token);
-                        console.log('CALL pApplyjob(' + query + ')');
+                        //console.log('CALL pApplyjob(' + query + ')');
                         st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
                             if (!err) {
                                 if (insertResult[0]) {
@@ -1041,7 +1042,6 @@ Job.prototype.applyJob = function(req,res,next){
                                     responseMessage.message = 'Job not apply';
                                     res.status(200).json(responseMessage);
                                     console.log('FnApplyJob:Job not apply');
-                                    console.log(responseMessage);
                                 }
                             }
                             else {
@@ -1122,7 +1122,7 @@ Job.prototype.appliedJobList = function(req,res,next){
     }
     else {
         try {
-            console.log('CALL pgetlistofcandappliedforjob(' + st.db.escape(jobId) + ')');
+            //console.log('CALL pgetlistofcandappliedforjob(' + st.db.escape(jobId) + ')');
             st.db.query('CALL pgetlistofcandappliedforjob(' + st.db.escape(jobId) + ')', function (err, getResult) {
                 if (!err) {
                     if (getResult) {
@@ -1208,7 +1208,7 @@ Job.prototype.getJobDetails = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(jobId) + ',' + st.db.escape(token);
                         var query = 'CALL pgetjobDetails(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -1326,7 +1326,7 @@ Job.prototype.jobs = function(req,res,next){
                             + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy);
 
                         var query = 'CALL pGetJobs(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
                                 if (getresult) {
@@ -1455,7 +1455,7 @@ Job.prototype.getAppliedJob = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
                         var query = 'CALL pGetAppliedJobs(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -1635,8 +1635,8 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
 
     if(ids){
         id = ids.split(",");
-        console.log(id.length);
-        console.log(id);
+        //console.log(id.length);
+        //console.log(id);
     }
 
     var responseMessage = {
@@ -1677,7 +1677,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                 tid = id[i];
                                 var queryParams = st.db.escape(token) + ',' + st.db.escape(tid)+ ',' + st.db.escape(jobId);
                                 var query = 'CALL pGetjobseekersmailDetails(' + queryParams + ')';
-                                console.log(query);
+                                //console.log(query);
                                 st.db.query(query, function (err, getResult) {
                                     if (!err) {
                                         if (getResult) {
@@ -1715,7 +1715,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                         if (TemplateResult) {
                                             if (TemplateResult.length > 0) {
                                                 if (TemplateResult[0]) {
-                                                    console.log(TemplateResult);
+                                                    //console.log(TemplateResult);
                                                     fs.readFile("jobseeker_mail.html", "utf8", function (err, data) {
                                                         messageContent = TemplateResult[0].Body;
                                                         messageContent = messageContent.replace("{FirstName}", jobResult[0][0].FirstName);
@@ -1740,7 +1740,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                                                         + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
                                                                                         + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
                                                                                     var query = 'CALL pComposeMessage(' + queryParams + ')';
-                                                                                    console.log(query);
+                                                                                    //console.log(query);
                                                                                     st.db.query(query, function (err, result) {
                                                                                         if (!err) {
                                                                                             if (result) {
@@ -1901,7 +1901,7 @@ Job.prototype.getListOfJobs = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token);
                         var query = 'CALL PgetListofjobs(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -2009,7 +2009,7 @@ Job.prototype.jobRefresh = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        console.log('CALL pRefreshJob(' + st.db.escape(jobId) + ')');
+                        //console.log('CALL pRefreshJob(' + st.db.escape(jobId) + ')');
                         st.db.query('CALL pRefreshJob(' + st.db.escape(jobId) + ')', function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -2105,7 +2105,7 @@ Job.prototype.jobsMatch = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        console.log('CALL pShowMatchingJobsofCV(' + st.db.escape(token) + ')');
+                        //console.log('CALL pShowMatchingJobsofCV(' + st.db.escape(token) + ')');
                         st.db.query('CALL pShowMatchingJobsofCV(' + st.db.escape(token) + ')', function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -2213,7 +2213,7 @@ Job.prototype.jobsMyInstitute = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude);
                         var query = 'CALL pShowMyInstituteJob(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -2320,7 +2320,7 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(jobId) + ',' + st.db.escape(token);
                         var query = 'CALL PNotifyRelevantStudent(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -2427,7 +2427,7 @@ Job.prototype.viewApplicantList = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(cvId);
                         var query = 'CALL pViewNotifiedCVDetails(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -2539,7 +2539,7 @@ Job.prototype.viewJobDetails = function(req,res,next){
                     if (result) {
                         var queryParams =  st.db.escape(jobId);
                         var query = 'CALL pviewjobDetails(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
@@ -2629,12 +2629,12 @@ Job.prototype.jobNotification = function(req,res,next) {
     var id, i, types='',idType,gid, jobResult, link;
     var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
 
-    console.log(req.body);
+    //console.log(req.body);
 
     if (ids) {
         id = ids.split(",");
-        console.log(id.length);
-        console.log(id);
+        //console.log(id.length);
+        //console.log(id);
     }
     if(id.length) {
         for (var i = 0; i < id.length; i++) {
@@ -2642,7 +2642,7 @@ Job.prototype.jobNotification = function(req,res,next) {
         }
     }
     types = types.slice(0,-1);
-    console.log(types);
+    //console.log(types);
 
 
     var responseMessage = {
@@ -2688,7 +2688,7 @@ Job.prototype.jobNotification = function(req,res,next) {
                                 if (templateResult) {
                                     if (templateResult.length > 0) {
                                         if (templateResult[0]) {
-                                            console.log(templateResult[0].Body);
+                                            //console.log(templateResult[0].Body);
 
                                             var mailOptions = {
                                                 html: templateResult[0].Body // html body
@@ -2697,18 +2697,18 @@ Job.prototype.jobNotification = function(req,res,next) {
 
                                             var queryParams1 = st.db.escape(ezeid) + ',' + st.db.escape(ids);
                                             var query1 = 'CALL pSendMsgRequestbyPO(' + queryParams1 + ')';
-                                            console.log(query1);
+                                            //console.log(query1);
                                             st.db.query(query1, function (err, getResult) {
                                                 if (!err) {
                                                     if (getResult) {
-                                                        console.log(getResult);
+                                                        //console.log(getResult);
 
                                                         var queryParams3 = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                             + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                             + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(ids)
-                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
+                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0);
                                                         var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
-                                                        console.log(query3);
+                                                        //console.log(query3);
                                                         st.db.query(query3, function (err, result) {
                                                             if (!err) {
                                                                 if (result) {
@@ -2728,15 +2728,13 @@ Job.prototype.jobNotification = function(req,res,next) {
                                                                     console.log('FnjobNotification:Message Composed successfully');
                                                                     for (var i = 0; i < id.length; i++) {
                                                                         gid = id[i];
-                                                                        console.log(gid);
+                                                                        //console.log(gid);
 
                                                                         var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + gid;
-                                                                        console.log(query2);
+                                                                        //console.log(query2);
                                                                         st.db.query(query2, function (err, getDetails) {
                                                                             if (getDetails) {
                                                                                 if (getDetails[0]) {
-                                                                                    console.log('----------------------------');
-                                                                                    console.log(getDetails);
                                                                                     receiverId = getDetails[0].tid;
                                                                                     senderTitle = ezeid;
                                                                                     groupTitle = ezeid;
@@ -2747,8 +2745,8 @@ Job.prototype.jobNotification = function(req,res,next) {
                                                                                     iphoneId = null;
                                                                                     messageId = 0;
                                                                                     masterid = '';
-                                                                                    console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                    //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                                                    //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
 
                                                                                 }
@@ -2902,7 +2900,7 @@ Job.prototype.findInstitute = function(req,res,next){
                     if (result) {
                         var queryParams =  st.db.escape(keywords);
                         var query = 'CALL pFindInstitute(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {

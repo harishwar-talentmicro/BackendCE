@@ -90,7 +90,6 @@
             $scope.editSkill.expertiseLevel = $scope.expertiseLevelsIDs.toString();
             $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();
 
-
             /**
              * Hide all the open dropdown
              */
@@ -295,13 +294,14 @@
             // save job to system
             $scope.postJob = function(){
 
-             //   $scope.skillMatrixToSave = $scope.skillMatrix;
+                // $scope.skillMatrixToSave = $scope.skillMatrix;
                 if(validateItem())
                 {
                     $scope.$emit('$preLoaderStart');
                     if($scope.skillMatrix[0])
                     {
-                        if((!$scope.skillMatrix[0].skillname) && (!$scope.skillMatrix[0].exp_from) && (!$scope.skillMatrix[0].exp_to))
+                        /*if((!$scope.skillMatrix[0].skillname) && (!$scope.skillMatrix[0].exp_from) && (!$scope.skillMatrix[0].exp_to))*/
+                        if(!$scope.skillMatrix[0].skillname)
                         {
                             var index = 0;
                             $scope.skillMatrix.splice(index, 1);
@@ -313,7 +313,6 @@
                     {
                         skillsTexts.push($scope.skillMatrix[nCount].skillname);
                     }
-
 
                    $scope.jobData = {
                         token : $rootScope._userInfo.Token,
@@ -415,6 +414,7 @@
                 $scope.showJobListing = false;
                 $scope.locationArrayString = [];
                 $scope.mainLocationArray = [];
+                $scope.specializationList = [];
 
                 if(_index == 'add')
                 {
@@ -584,7 +584,7 @@
                                     "tid":0,
                                     "skillname":"",
                                     "expertiseLevel":0,
-                                    "expertiseText":"",
+                                    "expertiseText":"Beginner",
                                     "exp_from":0.00,
                                     "exp_to":0.00,
                                     "active_status":1
@@ -1179,14 +1179,14 @@
                 if(newSkill.skillname.length < 1 ){
                     err.push('Skill is empty');
                 }
-                if((newSkill.exp_from.length < 1) || (!(newSkill.exp_from)) || (newSkill.exp_from.length == undefined))
+               /* if((newSkill.exp_from.length < 1) || (!(newSkill.exp_from)) || (newSkill.exp_from.length == undefined))
                 {
                     err.push('Experience From is empty');
                 }
                 if((newSkill.exp_to.length < 1) || (!(newSkill.exp_to)) || (newSkill.exp_to.length == undefined))
                 {
                     err.push('Experience To is empty');
-                }
+                }*/
                 if(parseInt(newSkill.exp_to) < parseInt(newSkill.exp_from)){
                     err.push('Experience From is smaller than Experience To');
                 }
@@ -1203,7 +1203,8 @@
             };
 
 
-            $scope.saveSkillFn = function(index){
+            $scope.saveSkillFn = function(index)
+            {
                 if(index == 0)
                 {
                     var ind = $scope.skillMatrix.indexOfWhere('skillname',$scope.editSkill.skillname);
@@ -1213,7 +1214,7 @@
                             "tid":0,
                             "skillname":"",
                             "expertiseLevel":0,
-                            "expertiseText":"",
+                            "expertiseText":"Beginner",
                             "exp_from":0.00,
                             "exp_to":0.00,
                             "active_status":1
@@ -1229,20 +1230,35 @@
                     if(validateSkillMap(newSkill))
                     {
                         $scope.skillMatrix.push(newSkill);
-                    }
-                    else
-                    {
-                      //  $scope.editMode.pop();
+
                         $scope.editSkill = {
                             "tid":0,
                             "skillname":"",
                             "expertiseLevel":0,
-                            "expertiseText":"",
+                            "expertiseText":"Beginner",
                             "exp_from":0.00,
                             "exp_to":0.00,
                             "active_status":1
                         };
 
+                        $scope.inputExpertise = [
+                            {name: "Beginner",value:"0", ticked: true },
+                            {name: "Independent",value:"1", ticked: false},
+                            {name: "Expert",value:"2",ticked: false},
+                            {name: "Master",value:"3",ticked: false}
+                        ];
+                    }
+                    else
+                    {
+                        $scope.editSkill = {
+                            "tid":0,
+                            "skillname":"",
+                            "expertiseLevel":0,
+                            "expertiseText":"Beginner",
+                            "exp_from":0.00,
+                            "exp_to":0.00,
+                            "active_status":1
+                        };
 
                         $scope.expertiseLevelsIDs = ["0"];
                         $scope.expertiseLevelsTexts = ["Beginner"];
@@ -1250,10 +1266,10 @@
                         $scope.editSkill.expertiseText = $scope.expertiseLevelsTexts.toString();
 
                         $scope.inputExpertise = [
-                        {name: "Beginner",value:"0", ticked: true },
-                        {name: "Independent",value:"1", ticked: false},
-                        {name: "Expert",value:"2",ticked: false},
-                        {name: "Master",value:"3",ticked: false}
+                            {name: "Beginner",value:"0", ticked: true },
+                            {name: "Independent",value:"1", ticked: false},
+                            {name: "Expert",value:"2",ticked: false},
+                            {name: "Master",value:"3",ticked: false}
                         ];
                     }
                 }
@@ -1273,7 +1289,7 @@
                             "tid":0,
                             "skillname":"",
                             "expertiseLevel":0,
-                            "expertiseText":"",
+                            "expertiseText":"Beginner",
                             "exp_from":0.00,
                             "exp_to":0.00,
                             "active_status":1
@@ -1300,7 +1316,7 @@
                     "tid":0,
                     "skillname":"",
                     "expertiseLevel":0,
-                    "expertiseText":"",
+                    "expertiseText":"Beginner",
                     "exp_from":0.00,
                     "exp_to":0.00,
                     "active_status":1
@@ -1311,7 +1327,7 @@
                 "tid":0,
                 "skillname":"",
                 "expertiseLevel":0,
-                "expertiseText":"",
+                "expertiseText":"Beginner",
                 "exp_from":"1",
                 "exp_to":"2",
                 "active_status":1
