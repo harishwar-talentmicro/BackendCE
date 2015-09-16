@@ -206,6 +206,9 @@ router.delete('/alumni_team',LocationManager.FnDeleteAlumniTeam);
 router.get('/cover_image',LocationManager.FnGetAlumniContentImage);
 router.post('/alumni_profile',LocationManager.FnSaveAlumniProfile);
 
+//Recruitment module
+router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
+
 
 
 //below service are for EZEIDAP

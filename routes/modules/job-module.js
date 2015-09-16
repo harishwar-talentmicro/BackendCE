@@ -316,7 +316,9 @@ Job.prototype.create = function(req,res,next){
                             });
                         }
                         else {
-                            postNotification(jobID);
+                            if( parseInt(req.body.tid) == 0) {
+                                postNotification(jobID);
+                            }
                         }
                     };
 
@@ -325,7 +327,9 @@ Job.prototype.create = function(req,res,next){
                         var postNotification = function (jobID) {
                             var queryParams1 = st.db.escape(jobID) + ',' + st.db.escape(location_id)
                                 + ',' + st.db.escape(req.body.education_id) + ',' + st.db.escape(req.body.specialization_id)
-                                + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to);
+                                + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to)
+                                + ',' + st.db.escape(req.body.salaryFrom)+ ',' + st.db.escape(req.body.salaryTo)
+                                + ',' + st.db.escape(req.body.salaryType);
                            //console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
                             st.db.query('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')', function (err, results) {
                                 if (!err) {
@@ -372,7 +376,7 @@ Job.prototype.create = function(req,res,next){
                                                                                                     iphoneId = null;
                                                                                                     messageId = 0;
                                                                                                     masterid = '';
-                                                                                                   // console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                   //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                 }
                                                                                                 else {

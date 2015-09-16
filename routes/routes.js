@@ -225,6 +225,11 @@ exports.FnDeleteAlumniTeam = alumniModule.deleteAlumniTeam;
 exports.FnGetAlumniContentImage = alumniModule.getAlumniContentImage;
 exports.FnSaveAlumniProfile = alumniModule.saveAlumniProfile;
 
+//Recruitment module
+var Recruitment = require('./modules/recruitment-module.js');
+var recruitmentModule = new Recruitment(db,stdLib);
+exports.FnGetRecruitmentMasters = recruitmentModule.getRecruitmentMasters;
+
 
 var Notification = require('./modules/notification/notification-master.js');
 var notification = new Notification(db,stdLib);
