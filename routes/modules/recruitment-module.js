@@ -151,6 +151,112 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetSalesMasters
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get Recruitment Masters list
+ */
+Recruitment.prototype.getSalesMasters = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var functionType = req.query.function_type;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var query = st.db.escape(token) + ',' + st.db.escape(functionType);
+                        st.db.query('CALL pGetSalesMasterData(' + query + ')', function (err, getResult) {
+                            if(!err){
+                                if (getResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Sales Masters List loaded successfully';
+                                    responseMessage.data = {
+                                        company_details: getResult[0],
+                                        folders: getResult[1],
+                                        subusers: getResult[2],
+                                        actions: getResult[3],
+                                        stages: getResult[4],
+                                        items : getResult[5]
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetSalesMasters: Sales Masters List loaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Sales Masters List not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetSalesMasters:Sales Masters List not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetSalesMasters: error in getting SalesMasters:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetSalesMasters: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetSalesMasters:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetSalesMasters ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 module.exports = Recruitment;
 

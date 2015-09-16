@@ -210,6 +210,7 @@ router.get('/alumni_profile',LocationManager.FnGetAlumniProfile);
 
 //Recruitment module
 router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
+router.get('/sales_masters',LocationManager.FnGetSalesMasters);
 
 
 

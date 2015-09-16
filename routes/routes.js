@@ -231,6 +231,7 @@ exports.FnGetAlumniProfile = alumniModule.getAlumniProfile;
 var Recruitment = require('./modules/recruitment-module.js');
 var recruitmentModule = new Recruitment(db,stdLib);
 exports.FnGetRecruitmentMasters = recruitmentModule.getRecruitmentMasters;
+exports.FnGetSalesMasters = recruitmentModule.getSalesMasters;
 
 
 var Notification = require('./modules/notification/notification-master.js');
