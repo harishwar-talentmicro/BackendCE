@@ -3071,3 +3071,21 @@ h4.front-business-form.warning-text{
     max-height: 200px;
     overflow-y: scroll;
 }
+
+.round-control{
+    position: fixed;
+    z-index: 999;
+    width: 90%;
+    top: 50%;
+    outline: none;
+}
+
+.round-control .btn{
+    border-radius: 100px;
+    height: 60px;
+    width: 60px;
+    background-color: #377DCE;
+    border: 1px solid #2E56B1;
+    box-shadow: 0px 0px 20px #BFBFBF;
+    outline: none;
+}
