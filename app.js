@@ -15,9 +15,11 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.engine('.ejs', require('ejs').__express);
+
+// Optional since express defaults to CWD/views
+
+app.set('views', __dirname + '/views');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -59,25 +61,25 @@ function setHeaders(res, path) {
 }
 var api = require('./routes/api.js');
 app.use('/api',api);
-
-app.use('/css', express.static(path.join(__dirname, 'public/css/'),{
-    setHeaders : function(res,path){
-        res.setHeader('Content-type','text/css');
-    }
-}));
-app.use('/html', express.static(path.join(__dirname, 'public/html/'),{
-    setHeaders : function(res,path){
-        res.setHeader('Content-type','text/html');
-    }
-}));
-app.use('/js', express.static(path.join(__dirname, 'public/js/'),{
-    setHeaders : function(res,path){
-        res.setHeader('Content-type','text/javascript');
-    }
-}));
-app.use('/fonts', express.static(path.join(__dirname, 'public/fonts/')));
-app.use('/directives', express.static(path.join(__dirname, 'public/directives/')));
-app.use('/images', express.static(path.join(__dirname, 'public/images/')));
+app.use(express.static(path.join(__dirname,'public/')));
+//app.use('/css', express.static(path.join(__dirname, 'public/css/'),{
+//    setHeaders : function(res,path){
+//        res.setHeader('Content-type','text/css');
+//    }
+//}));
+//app.use('/html', express.static(path.join(__dirname, 'public/html/'),{
+//    setHeaders : function(res,path){
+//        res.setHeader('Content-type','text/html');
+//    }
+//}));
+//app.use('/js', express.static(path.join(__dirname, 'public/js/'),{
+//    setHeaders : function(res,path){
+//        res.setHeader('Content-type','text/javascript');
+//    }
+//}));
+//app.use('/fonts', express.static(path.join(__dirname, 'public/fonts/')));
+//app.use('/directives', express.static(path.join(__dirname, 'public/directives/')));
+//app.use('/images', express.static(path.join(__dirname, 'public/images/')));
 
 
 // error handlers
@@ -104,30 +106,39 @@ app.use(function(err, req, res, next) {
     });
 });
 
+var htmlIndexFile =  'Under maintainence ! We will be up in a few minutes';
+try{
+    htmlIndexFile = fs.readFileSync(__dirname + '/public/html/index.html');
+}
+catch(ex){
+    console.log('indexFileNotFound');
+}
 
 app.get('/legal.html',function(req,res,next){
-    res.sendFile(__dirname + '/public/html/legal.html');
+    res.render('index.ejs',{htmlContent : htmlIndexFile});
 });
 
 app.get('/:page/:subpage/:xsubpage',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
+    res.render('index.ejs',{htmlContent : htmlIndexFile});
 });
 
 
 app.get('/:page/:subpage',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
+    res.render('index.ejs',{htmlContent : htmlIndexFile});
 });
 
 app.get('/:id',LocationManager.FnWebLinkRedirect);
 
 app.get('/:page',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
+
+    res.render('index.ejs',{htmlContent : htmlIndexFile});
     
 });
 
 
 app.get('/',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
+    console.log(htmlIndexFile);
+    res.render('index.ejs',{htmlContent : htmlIndexFile});
 });
 
 
