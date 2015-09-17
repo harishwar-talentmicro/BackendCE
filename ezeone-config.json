@@ -1,5 +1,9 @@
 
 {
+  "CONSTANT" : {
+    "INDEX_PATH" : "../public/html/index.html",
+    "INDEX_TPL" : "index.ejs"
+  },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
   "PASS_RESET_PAGE_LINK" : "reset_password",

@@ -4,7 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser'), cors = require('cors');
-var LocationManager = require('./routes/routes.js');
+
 var compress = require('compression');
 var fs = require('fs');
 var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
@@ -30,6 +30,7 @@ app.use(cookieParser());
 var multer  = require('multer');
 
 app.use(multer({ dest: './uploads/'}));
+app.use(express.static(path.join(__dirname,'public/')));
 
 // Add headers
 app.all('*',function(req,res,next){
@@ -60,29 +61,12 @@ function setHeaders(res, path) {
     res.setHeader('Content-Disposition', contentDisposition(path))
 }
 var api = require('./routes/api.js');
+var index = require('./routes/index.js');
+
 app.use('/api',api);
-app.use(express.static(path.join(__dirname,'public/')));
-//app.use('/css', express.static(path.join(__dirname, 'public/css/'),{
-//    setHeaders : function(res,path){
-//        res.setHeader('Content-type','text/css');
-//    }
-//}));
-//app.use('/html', express.static(path.join(__dirname, 'public/html/'),{
-//    setHeaders : function(res,path){
-//        res.setHeader('Content-type','text/html');
-//    }
-//}));
-//app.use('/js', express.static(path.join(__dirname, 'public/js/'),{
-//    setHeaders : function(res,path){
-//        res.setHeader('Content-type','text/javascript');
-//    }
-//}));
-//app.use('/fonts', express.static(path.join(__dirname, 'public/fonts/')));
-//app.use('/directives', express.static(path.join(__dirname, 'public/directives/')));
-//app.use('/images', express.static(path.join(__dirname, 'public/images/')));
 
+app.use('/',index);
 
-// error handlers
 
 // development error handler
 // will print stacktrace
@@ -96,6 +80,8 @@ if (app.get('env') === 'development') {
     });
 }
 
+
+
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
@@ -104,41 +90,6 @@ app.use(function(err, req, res, next) {
         message: err.message,
         error: {}
     });
-});
-
-var htmlIndexFile =  'Under maintainence ! We will be up in a few minutes';
-try{
-    htmlIndexFile = fs.readFileSync(__dirname + '/public/html/index.html');
-}
-catch(ex){
-    console.log('indexFileNotFound');
-}
-
-app.get('/legal.html',function(req,res,next){
-    res.render('index.ejs',{htmlContent : htmlIndexFile});
-});
-
-app.get('/:page/:subpage/:xsubpage',function(req,res){
-    res.render('index.ejs',{htmlContent : htmlIndexFile});
-});
-
-
-app.get('/:page/:subpage',function(req,res){
-    res.render('index.ejs',{htmlContent : htmlIndexFile});
-});
-
-app.get('/:id',LocationManager.FnWebLinkRedirect);
-
-app.get('/:page',function(req,res){
-
-    res.render('index.ejs',{htmlContent : htmlIndexFile});
-    
-});
-
-
-app.get('/',function(req,res){
-    console.log(htmlIndexFile);
-    res.render('index.ejs',{htmlContent : htmlIndexFile});
 });
 
 
