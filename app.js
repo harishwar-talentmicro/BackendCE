@@ -3,31 +3,38 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser'), cors = require('cors');
+var bodyParser = require('body-parser');
+var cors = require('cors');
 
 var compress = require('compression');
 var fs = require('fs');
-var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
+var multer  = require('multer');
 
 var app = express();
+var alumni = require('./routes/alumni.js');
+
 app.use(compress());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
-app.engine('.ejs', require('ejs').__express);
-
-// Optional since express defaults to CWD/views
-
-app.set('views', __dirname + '/views');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-var multer  = require('multer');
+
+
+/**
+ * EZEOne Alumni Middleware
+ */
+
+app.use(alumni);
+
+
+app.engine('.ejs', require('ejs').__express);
+app.set('views', __dirname + '/views');
+
+var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 
 app.use(multer({ dest: './uploads/'}));
 app.use(express.static(path.join(__dirname,'public/')));
