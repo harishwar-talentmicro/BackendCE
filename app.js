@@ -6,11 +6,16 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 
+
 var compress = require('compression');
 var fs = require('fs');
 var multer  = require('multer');
 
 var app = express();
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+
 var alumni = require('./routes/alumni.js');
 
 app.use(compress());
@@ -29,10 +34,6 @@ app.use(cookieParser());
  */
 
 app.use(alumni);
-
-
-app.engine('.ejs', require('ejs').__express);
-app.set('views', __dirname + '/views');
 
 var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 
