@@ -29,17 +29,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 
-/**
- * EZEOne Alumni Middleware
- */
-
-app.use(alumni);
-
-var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
-
-app.use(multer({ dest: './uploads/'}));
-app.use(express.static(path.join(__dirname,'public/')));
-
 // Add headers
 app.all('*',function(req,res,next){
     console.log();
@@ -61,6 +50,20 @@ app.all('*',function(req,res,next){
     // Pass to next layer of middleware
     next();
 });
+
+
+
+/**
+ * EZEOne Alumni Middleware
+ */
+
+app.use('/',alumni);
+
+var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
+
+app.use(multer({ dest: './uploads/'}));
+app.use(express.static(path.join(__dirname,'public/')));
+
 
 
 //app.use(express.static(path.join(__dirname, 'public')));
@@ -93,6 +96,7 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+    console.log(err);
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,

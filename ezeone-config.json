@@ -1,8 +1,9 @@
 
 {
   "CONSTANT" : {
-    "INDEX_PATH" : "../public/html/index.html",
-    "INDEX_TPL" : "index.ejs"
+    "INDEX_PATH" : "../public/index.html",
+    "INDEX_TPL" : "index.ejs",
+    "ALUMNI_INDEX_PATH" : "../public-alumni/index.html"
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
