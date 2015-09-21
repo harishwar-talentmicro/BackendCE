@@ -1,5 +1,10 @@
 
 {
+  "CONSTANT" : {
+    "INDEX_PATH" : "../public/index.html",
+    "INDEX_TPL" : "index.ejs",
+    "ALUMNI_INDEX_PATH" : "../public-alumni/index.html"
+  },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
   "PASS_RESET_PAGE_LINK" : "reset_password",

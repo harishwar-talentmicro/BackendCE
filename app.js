@@ -3,31 +3,31 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser'), cors = require('cors');
-var LocationManager = require('./routes/routes.js');
+var bodyParser = require('body-parser');
+var cors = require('cors');
+
+
 var compress = require('compression');
 var fs = require('fs');
-var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
+var multer  = require('multer');
 
 var app = express();
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+
+var alumni = require('./routes/alumni.js');
+
 app.use(compress());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-var multer  = require('multer');
 
-app.use(multer({ dest: './uploads/'}));
 
 // Add headers
 app.all('*',function(req,res,next){
@@ -52,35 +52,32 @@ app.all('*',function(req,res,next){
 });
 
 
+
+/**
+ * EZEOne Alumni Middleware
+ */
+
+app.use('/',alumni);
+
+var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
+
+app.use(multer({ dest: './uploads/'}));
+app.use(express.static(path.join(__dirname,'public/')));
+
+
+
 //app.use(express.static(path.join(__dirname, 'public')));
 // Set header to force download
 function setHeaders(res, path) {
     res.setHeader('Content-Disposition', contentDisposition(path))
 }
 var api = require('./routes/api.js');
+var index = require('./routes/index.js');
+
 app.use('/api',api);
 
-app.use('/css', express.static(path.join(__dirname, 'public/css/'),{
-    setHeaders : function(res,path){
-        res.setHeader('Content-type','text/css');
-    }
-}));
-app.use('/html', express.static(path.join(__dirname, 'public/html/'),{
-    setHeaders : function(res,path){
-        res.setHeader('Content-type','text/html');
-    }
-}));
-app.use('/js', express.static(path.join(__dirname, 'public/js/'),{
-    setHeaders : function(res,path){
-        res.setHeader('Content-type','text/javascript');
-    }
-}));
-app.use('/fonts', express.static(path.join(__dirname, 'public/fonts/')));
-app.use('/directives', express.static(path.join(__dirname, 'public/directives/')));
-app.use('/images', express.static(path.join(__dirname, 'public/images/')));
+app.use('/',index);
 
-
-// error handlers
 
 // development error handler
 // will print stacktrace
@@ -94,40 +91,17 @@ if (app.get('env') === 'development') {
     });
 }
 
+
+
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+    console.log(err);
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
         error: {}
     });
-});
-
-
-app.get('/legal.html',function(req,res,next){
-    res.sendFile(__dirname + '/public/html/legal.html');
-});
-
-app.get('/:page/:subpage/:xsubpage',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
-});
-
-
-app.get('/:page/:subpage',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
-});
-
-app.get('/:id',LocationManager.FnWebLinkRedirect);
-
-app.get('/:page',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
-    
-});
-
-
-app.get('/',function(req,res){
-    res.sendFile(__dirname + '/public/html/index.html');
 });
 
 

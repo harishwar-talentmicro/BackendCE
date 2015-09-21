@@ -253,6 +253,12 @@ router.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
 router.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
 router.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
 
-
+/**
+ * Default error handler
+ * Add every API call above this
+ */
+router.all('*',function(req,res,next){
+    res.status(404).json({ status : false, error : { api : 'API'}, message : 'Not found'});
+});
 
 module.exports = router;
