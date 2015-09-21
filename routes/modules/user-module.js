@@ -147,7 +147,7 @@ User.prototype.register = function(req,res,next){
         if(SelectionTypes.toString() == 'NaN'){
             SelectionTypes = 0;
         }
-        console.log(SelectionTypes);
+        //console.log(SelectionTypes);
         var IDTypeID = req.body.IDTypeID;
         var EZEID = alterEzeoneId(req.body.EZEID);
         if(EZEID != null)
@@ -238,10 +238,10 @@ User.prototype.register = function(req,res,next){
             Icon: ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        console.log(OperationType);
+        //console.log(OperationType);
         if(parseInt(OperationType) == 1){
-            console.log('----------req.body for Operation type 1--------------');
-            console.log(req.body);
+            //console.log('----------req.body for Operation type 1--------------');
+            //console.log(req.body);
             if( IDTypeID != null && EZEID != null && Password != null ){
                 if(FirstName == null)
                     FirstName='';
@@ -280,12 +280,12 @@ User.prototype.register = function(req,res,next){
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)  + ',' + st.db.escape(CategoryID);
 
 
-                console.log(InsertQuery);
+                //console.log(InsertQuery);
 
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
-                        console.log('InsertResult: ');
-                        console.log( InsertResult);
+                        //console.log('InsertResult: ');
+                        //console.log( InsertResult);
                         if (InsertResult != null) {
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
@@ -424,8 +424,8 @@ User.prototype.register = function(req,res,next){
         }
         else
         {
-            console.log('----------req.body for Operation type other than 1--------------');
-            console.log(req.body);
+            //console.log('----------req.body for Operation type other than 1--------------');
+            //console.log(req.body);
             if (IDTypeID != null && EZEID != null && AddressLine1 != null && Citytitle != null && StateID != null && CountryID != null && PostalCode != null  && Gender.toString() != 'NaN') {
                 if (LastName == null) {
                     LastName = '';
@@ -445,7 +445,7 @@ User.prototype.register = function(req,res,next){
                     EncryptPWD = hashPassword(Password);
                 }
                 var DOBDate = null;
-                console.log(EZEID.toUpperCase());
+                //console.log(EZEID.toUpperCase());
                 if (DOB != null && DOB != '') {
                     // datechange = new Date(new Date(TaskDateTime).toUTCString());
                     DOBDate = new Date(DOB);
@@ -693,7 +693,7 @@ User.prototype.login = function(req,res,next){
             //console.log('findarray: ' + FindArray.length);
 
             var Query = st.db.escape(UserName);
-            console.log(Query);
+            //console.log(Query);
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 //console.log(loginResult);
                 if (!err) {
@@ -705,7 +705,7 @@ User.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
-                            console.log(loginDetails);
+                            //console.log(loginDetails);
 
                             if(comparePassword(Password,loginDetails[0].Password)){
                                 st.generateToken(ip,userAgent,UserName,function (err, TokenResult) {
@@ -1172,7 +1172,7 @@ User.prototype.getUserDetails = function(req,res,next){
         if (Token != null && Token != '') {
             st.validateToken(Token, function (err, Result) {
                 console.log(err);
-                console.log(Result);
+                //console.log(Result);
                 if (!err) {
                     if (Result) {
                         st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ')', function (err, UserDetailsResult) {
@@ -1473,7 +1473,7 @@ User.prototype.forgetPassword = function(req,res,next){
                                                 data = data.replace("[reset link]", passwordResetLink);
                                                 data = data.replace("[resetlink]", passwordResetLink);
 
-                                                console.log(UserResult);
+                                                //console.log(UserResult);
                                                 //console.log('Body:' + data);
                                                 var mailOptions = {
                                                     from: EZEIDEmail,
@@ -1837,7 +1837,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
 
         var Token = req.query.Token;
         var TID = req.query.TID;
-        console.log(req.query);
+       // console.log(req.query);
         var RtnMessage = {
             Result: [],
             Message: ''
@@ -1850,7 +1850,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
             Token = 0;
         }
         if(Token != null && TID != null ){
-            console.log('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')');
+            //console.log('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')');
             st.db.query('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult[0]) {
@@ -1928,7 +1928,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
                     if (Result) {
                         var query = st.db.escape(Token)+ ',' + st.db.escape(CompanyProfile);
                         st.db.query('CALL pSaveTagLine(' + query + ')', function (err, InsertResult) {
-                            console.log(InsertResult[0]);
+                            //console.log(InsertResult[0]);
                             if (!err) {
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
@@ -2008,9 +2008,9 @@ User.prototype.getWebLink = function(req,res,next){
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        console.log('CALL pGetWebLink(' + st.db.escape(Token) + ')');
+                        //console.log('CALL pGetWebLink(' + st.db.escape(Token) + ')');
                         st.db.query('CALL pGetWebLink(' + st.db.escape(Token) + ')', function (err, GetResult) {
-                            console.log(GetResult);
+                            //console.log(GetResult);
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0]) {
@@ -2100,7 +2100,7 @@ User.prototype.saveWebLink = function(req,res,next){
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
-                        console.log(Token,URL,URLNumber);
+                        //console.log(Token,URL,URLNumber);
                         var query = st.db.escape(Token) + ',' + st.db.escape(URL) + ',' + st.db.escape(URLNumber) ;
                         st.db.query('CALL pSaveWebLinks(' + query + ')', function (err, InsertResult) {
                             if (!err){
@@ -2263,7 +2263,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
         var EZEID = alterEzeoneId(req.query.EZEID);
-        console.log(req.query);
+        //console.log(req.query);
         if (Token != null && EZEID != null ) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
@@ -2272,7 +2272,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
                         var FindArray =EZEID.split('.');
                         if (FindArray.length > 0) {
                             EZEID = FindArray[0];
-                            console.log(EZEID);
+                            //console.log(EZEID);
                             if (FindArray.length > 1) {
                                 if (FindArray[1] != '') {
                                     if (FindArray[1].charAt(0).toUpperCase() == 'L') {
@@ -2535,13 +2535,13 @@ User.prototype.saveResume = function(req,res,next){
                                 + ',' + st.db.escape(educationID) + ',' + st.db.escape(specializationID) + ',' + st.db.escape(yearOfPassing)
                                 + ','+ st.db.escape(aggregateScore)+ ','+ st.db.escape(institueTitle) +',' + st.db.escape(expectedSalary);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
-                            console.log(query);
+                            //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
                                 if (!err) {
                                     if (InsertResult[0]) {
                                         var async = require('async');
                                         var count = skillMatrix1.length;
-                                        console.log(count);
+                                        //console.log(count);
                                         async.each(skillMatrix1, function iterator(skillDetails,callback) {
 
                                             count = count -1;
@@ -2652,7 +2652,7 @@ User.prototype.saveResume = function(req,res,next){
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
 
-                            console.log(queryParams);
+                            //console.log(queryParams);
 
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
 
@@ -2665,7 +2665,7 @@ User.prototype.saveResume = function(req,res,next){
                                         if (results[0]) {
                                             if (results[0][0]) {
 
-                                                console.log(results[0][0].id);
+                                                //console.log(results[0][0].id);
                                                 location_id += results[0][0].id + ',';
                                                 locCount +=1;
                                                 if(locCount < locationsList.length){
@@ -2677,19 +2677,16 @@ User.prototype.saveResume = function(req,res,next){
                                             }
                                             else {
                                                 console.log('FnSaveJobLocation:results no found');
-                                                console.log('FnSaveJobLocation: results no found');
                                                 res.status(200).json(RtnMessage);
                                             }
                                         }
                                         else {
                                             console.log('FnSaveJobLocation:results no found');
-                                            console.log('FnSaveJobLocation: results no found');
                                             res.status(200).json(RtnMessage);
                                         }
                                     }
                                     else {
                                         console.log('FnSaveJobLocation:results no found');
-                                        console.log('FnSaveJobLocation: results no found');
                                         res.status(200).json(RtnMessage);
                                     }
                                 }
@@ -2759,11 +2756,11 @@ function FnSaveSkills(skill, CallBack) {
             st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname), function (err, SkillResult) {
                 if ((!err)) {
                     if (SkillResult[0]) {
-                        console.log(SkillResult);
-                        console.log('Skill value:' + SkillResult[0].SkillID);
-                        console.log('Skill exists');
+                        //console.log(SkillResult);
+                        //console.log('Skill value:' + SkillResult[0].SkillID);
+                        //console.log('Skill exists');
                         RtnResponse.SkillID = SkillResult[0].SkillID;
-                        console.log(RtnResponse.SkillID);
+                        //console.log(RtnResponse.SkillID);
                         CallBack(null, RtnResponse);
                     }
                     else {
@@ -2773,7 +2770,7 @@ function FnSaveSkills(skill, CallBack) {
                                     st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, SkillMaxResult) {
                                         if (!err) {
                                             if (SkillMaxResult[0]) {
-                                                console.log('New Skill');
+                                                //console.log('New Skill');
                                                 RtnResponse.SkillID = SkillMaxResult[0].SkillID;
                                                 CallBack(null, RtnResponse);
                                             }
@@ -4141,10 +4138,10 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(dob + ' 00:00') + ',' + st.db.escape(companyTagline)+ ',' + st.db.escape(email)
                             + ',' + st.db.escape(token);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, insertResult) {
                             if (!err) {
-                                console.log(insertResult);
+                                //console.log(insertResult);
                                 if (insertResult.affectedRows) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
