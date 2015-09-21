@@ -207,6 +207,7 @@ router.get('/cover_image',LocationManager.FnGetAlumniContentImage);
 router.post('/alumni_profile',LocationManager.FnSaveAlumniProfile);
 router.get('/alumniteam_details',LocationManager.FnGetAlumniTeamDetails);
 router.get('/alumni_profile',LocationManager.FnGetAlumniProfile);
+router.post('/alumni_signup',LocationManager.FnRegistrationAlumni);
 
 //Recruitment module
 router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
