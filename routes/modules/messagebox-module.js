@@ -1392,7 +1392,13 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                         //console.log(queryParameters);
                                                         st.db.query(queryParameters, function (err, iosResult) {
                                                             if (iosResult) {
-                                                                iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                                                if (iosResult[0].iphoneID) {
+                                                                    iphoneID = iosResult[0].iphoneID;
+                                                                }
+                                                                    else
+                                                                    {
+                                                                        iphoneID = '';
+                                                                    }
                                                                 //console.log(iphoneID);
                                                                 var queryParams = st.db.escape(token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
                                                                 var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
