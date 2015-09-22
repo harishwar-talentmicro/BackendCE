@@ -1272,7 +1272,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
-    var b_id='',get_tid,i=0,c=0,toIds,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type,msgId,iphoneID;
+    var b_id='',get_tid,i=0,c=0,toIds,to_ids,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type,msgId,iphoneID;
     var isBussinessChat = req.body.isBussinessChat ? req.body.isBussinessChat : 0;
     var ezeid = req.body.ezeid;
 
@@ -1369,19 +1369,21 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                     for (var c = 0; c < id.length; c++) {
                                                         id_type = parseInt(id[c]);
                                                         if(toID){
-                                                            toIds = toID.split(",");
+                                                            var toIDS = toID;
+                                                            to_ids = toIDS.split(",");
                                                             //console.log(toIds.length);
                                                             //console.log(toIds);
                                                         }
-                                                        gid = parseInt(toIds[c]);
+                                                        gid = parseInt(to_ids[c]);
                                                         console.log('------------------');
-                                                        console.log(toIds[c]);
-                                                        var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + toIds[c];
+                                                        console.log(gid);
+                                                        var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + gid;
+                                                        console.log(queryParameters);
                                                         st.db.query(queryParameters, function (err, iosResult) {
                                                             if (iosResult) {
                                                                 iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                                                                 //console.log(iphoneID);
-                                                                var queryParams = st.db.escape(token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(toIds[c]);
+                                                                var queryParams = st.db.escape(token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
                                                                 var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
                                                                 console.log(messageQuery);
                                                                 st.db.query(messageQuery, function (err, groupDetails) {
@@ -1390,7 +1392,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                             if (groupDetails[0].length > 0) {
                                                                                 if (groupDetails[1]) {
                                                                                     if (groupDetails[1].length > 0) {
-                                                                                        var queryParams1 = st.db.escape(toIds[c]) + ',' + st.db.escape(id_type);
+                                                                                        var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type);
                                                                                         var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
                                                                                         console.log(messageQuery1);
                                                                                         st.db.query(messageQuery1, function (err, groupDetails1) {
