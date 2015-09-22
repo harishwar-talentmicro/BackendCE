@@ -27,7 +27,8 @@
     "request":"~2.53.0",
     "querystring":"~0.2.0",
     "node-uuid" : "~1.4.3",
-    "ejs" : "~2.3.4"
+    "ejs" : "~2.3.4",
+    "nodemailer" : "~1.4.0"
   },
   "devDependencies": {
     "grunt-ngmin": "0.0.3"

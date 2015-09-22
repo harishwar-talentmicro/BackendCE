@@ -5,9 +5,11 @@
  *  @description Handles functions related to alumni profile and events
  */
 "use strict";
+var nodemailer = require("nodemailer");
 
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
+var moment = require('moment');
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -22,14 +24,558 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+var NotificationMqtt = require('./notification/notification-mqtt.js');
+var notificationMqtt = new NotificationMqtt();
+var NotificationQueryManager = require('./notification/notification-query.js');
+var notificationQmManager = null;
+
 var st = null;
-
 function Alumni(db,stdLib){
-
     if(stdLib){
         st = stdLib;
+        notificationQmManager = new NotificationQueryManager(db,st);
+    }
+}
+
+
+
+var bcrypt = null;
+
+try{
+    bcrypt = require('bcrypt');
+}
+catch(ex){
+    console.log('Bcrypt not found, falling back to bcrypt-nodejs');
+    bcrypt = require('bcrypt-nodejs');
+}
+
+
+/**
+ * Hashes the password for saving into database
+ * @param password
+ * @returns {*}
+ */
+function hash(password){
+    if(!password){
+        return null;
+    }
+    try{
+        var hash = bcrypt.hashSync(password, 12);
+        return hash;
+    }
+    catch(ex){
+        console.log(ex);
+    }
+}
+
+/**
+ * Compare the password and the hash for authenticating purposes
+ * @param password
+ * @param hash
+ * @returns {*}
+ */
+function comparePassword(password,hash){
+    if(!password){
+        return false;
+    }
+    if(!hash){
+        return false;
+    }
+    return bcrypt.compareSync(password,hash);
+}
+
+
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Alumni.prototype.registerAlumni = function(req,res,next){
+    /**
+     * @todo FnRegistrationAlumni
+     */
+    var _this = this;
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var OperationType = req.body.OperationType;
+        var IPAddress = req._remoteAddress;
+        var SelectionTypes = parseInt(req.body.SelectionType);
+        if(SelectionTypes.toString() == 'NaN'){
+            SelectionTypes = 0;
+        }
+
+        var IDTypeID = req.body.IDTypeID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
+        if(EZEID != null)
+            EZEID = EZEID.toUpperCase();
+        var Password = req.body.Password;
+        var FirstName = req.body.FirstName;
+        var LastName = req.body.LastName ? req.body.LastName : '';
+        var CompanyName = req.body.CompanyName;
+        var JobTitle = req.body.JobTitle;
+        var CategoryID = parseInt(req.body.CategoryID);
+
+        if (CategoryID.toString() == 'NaN') {
+            CategoryID = 0;
+        }
+        var FunctionID = req.body.FunctionID;
+        if (FunctionID == null || FunctionID == '') {
+            FunctionID = 0;
+        }
+        var RoleID = req.body.RoleID;
+        if (RoleID == null || RoleID == '') {
+            RoleID = 0;
+        }
+        var LanguageID = req.body.LanguageID;
+        if (LanguageID == null || LanguageID == '') {
+            LanguageID = 0;
+        }
+        var NameTitleID = req.body.NameTitleID;
+
+        var Latitude = req.body.Latitude;
+        if (Latitude == null || Latitude == '') {
+            Latitude = 0.0;
+        }
+        var Longitude = req.body.Longitude;
+        if (Longitude == null || Longitude == '') {
+            Longitude = 0.0;
+        }
+        var Altitude = req.body.Altitude;
+        if (Altitude == null || Altitude == '') {
+            Altitude = 0;
+        }
+
+        var AddressLine1 = req.body.AddressLine1 ? req.body.AddressLine1 : '';
+        var AddressLine2 = req.body.AddressLine2 ? req.body.AddressLine2 : '';
+        var Area = req.body.Area ? req.body.Area : '';
+        var Citytitle = req.body.CityTitle ? req.body.CityTitle : '';
+        var StateID = req.body.StateID ? req.body.StateID : 0;
+        var CountryID = req.body.CountryID ? req.body.CountryID :0;
+        var PostalCode = req.body.PostalCode ? req.body.PostalCode : 0;
+        var PIN = req.body.PIN ? req.body.PIN : null;
+        var PhoneNumber = req.body.PhoneNumber ? req.body.PhoneNumber : 0;
+        var MobileNumber = req.body.MobileNumber;
+        var EMailID = req.body.EMailID;
+        var Picture = req.body.Picture;
+        var PictureFileName = req.body.PictureFileName;
+        var WebSite = req.body.Website;
+        var AboutCompany = req.body.AboutCompany;
+        var StatusID = 1;
+        var TokenNo = req.body.Token;
+        var Operation = "I";
+        if (TokenNo != '' && TokenNo != null) {
+            Operation = "U";
+        }
+        var Icon = req.body.Icon;
+        var IconFileName = req.body.IconFileName;
+        var ISDPhoneNumber = req.body.ISDPhoneNumber;
+        var ISDMobileNumber = req.body.ISDMobileNumber;
+        var ParkingStatus = req.body.ParkingStatus;
+        var Gender = parseInt(req.body.Gender);
+        var DOB = req.body.DOB;
+        if(Gender.toString() == 'NaN')
+            Gender = 2;
+        if (PIN == '') {
+            PIN = null;
+        }
+        var TemplateID = parseInt(req.body.TemplateID);
+        if(TemplateID.toString() == 'NaN')
+            TemplateID =0;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
+
+        var RtnMessage = {
+            Token: '',
+            IsAuthenticate: false,
+            FirstName: '',
+            Type: 0,
+            Icon: '',
+            tid:'',
+            group_id:''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if(parseInt(OperationType) == 1){
+            console.log('----------req.body for Operation type 1--------------');
+            if( IDTypeID != null && EZEID != null && Password != null ){
+                if(FirstName == null)
+                    FirstName='';
+                if (LastName == null) {
+                    LastName = '';
+                }
+                if (StateID == null || StateID == '') {
+                    StateID = 0;
+                }
+                if (CountryID == null || CountryID == '') {
+                    CountryID = 0;
+                }
+
+                //if (Operation == 'I') {
+                //    TokenNo = st.generateToken();
+                //}
+                var EncryptPWD = '';
+                if (Password != null) {
+                    EncryptPWD = hash(Password);
+                }
+                var DOBDate = null;
+
+                if (DOB != null && DOB != '') {
+                    // datechange = new Date(new Date(TaskDateTime).toUTCString());
+                    DOBDate = new Date(DOB);
+                    // console.log(TaskDate);
+                }
+                var InsertQuery = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD) + ',' + st.db.escape(FirstName) + ',' +
+                    st.db.escape(LastName) + ',' + st.db.escape(CompanyName) + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' +
+                    st.db.escape(RoleID) + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' +
+                    st.db.escape(TokenNo) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude) + ',' +
+                    st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle) + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' +
+                    st.db.escape(PostalCode) + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber) + ',' + st.db.escape(EMailID) + ',' +
+                    st.db.escape(Picture) + ',' + st.db.escape(PictureFileName) + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany) + ','
+                    + st.db.escape(StatusID) + ',' + st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
+                    + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)  + ',' + st.db.escape(CategoryID);
+
+
+                //console.log(InsertQuery);
+
+                st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                    if (!err) {
+                        //console.log('InsertResult: ');
+                        //console.log( InsertResult);
+                        if (InsertResult != null) {
+                            if(InsertResult[0]){
+                                if (InsertResult[0].length > 0) {
+                                    var RegResult = InsertResult[0];
+                                    if(RegResult[0].TID != 0)
+                                    {
+                                        if(IDTypeID == 2)
+                                            RtnMessage.FirstName=CompanyName;
+                                        else
+                                            RtnMessage.FirstName = FirstName;
+
+                                        RtnMessage.IsAuthenticate = true;
+                                        RtnMessage.Token = TokenNo;
+                                        RtnMessage.Type = IDTypeID;
+                                        RtnMessage.Icon = Icon;
+                                        RtnMessage.tid = InsertResult[0][0].TID;
+                                        RtnMessage.group_id = InsertResult[0][0].group_id;
+                                        if (CompanyName == null)
+                                            CompanyName='';
+                                        if (Operation == 'I') {
+                                            console.log('FnRegistrationAlumni:tmaster: Registration success');
+
+                                            /**
+                                             * Creating queue for the user dynamically on rabbit server
+                                             *
+                                             */
+                                            notificationQmManager.getIndividualGroupId(RegResult[0].TID,function(err1,getIndividualGroupIdRes){
+                                                if(!err1){
+                                                    if(getIndividualGroupIdRes){
+                                                        notificationMqtt.createQueue(getIndividualGroupIdRes.tid);
+                                                    }
+                                                }
+                                            });
+
+                                            //res.send(RtnMessage);
+                                            if(isIphone == 1){
+                                                var queryParams = st.db.escape(EZEID) + ',' + st.db.escape(deviceToken);
+                                                var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                                // console.log(query);
+                                                st.db.query(query, function (err, result) {
+                                                    if(!err){
+                                                        //console.log(result);
+                                                        console.log('FnLogin:IphoneDevice save successfully');
+                                                    }
+                                                    else
+                                                    {
+                                                        console.log(err);
+                                                    }
+                                                });
+                                            }
+                                            if (EMailID != '' && EMailID != null) {
+                                                var fs = require('fs');
+                                                fs.readFile("registration.html", "utf8", function (err, data) {
+                                                    if (err) throw err;
+                                                    data = data.replace("[Firstname]", FirstName);
+                                                    data = data.replace("[Lastname]", LastName);
+                                                    data = data.replace("[EZEOneID]", EZEID);
+                                                    var mailOptions = {
+                                                        from: 'noreply@ezeone.com',
+                                                        to: EMailID,
+                                                        subject: 'Welcome to EZEOneID',
+                                                        html: data // html body
+                                                    };
+                                                    //console.log('Mail Option:' + mailOptions);
+                                                    // send mail with defined transport object
+                                                    var post = { MessageType: 8, Priority: 3,ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID:RegResult[0].TID };
+                                                    // console.log(post);
+                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                        // Neat!
+                                                        if (!err) {
+                                                            console.log('FnRegistration: Mail saved Successfully');
+                                                        }
+                                                        else {
+                                                            console.log('FnRegistration: Mail not Saved Successfully' + err);
+
+                                                        }
+                                                        if (Operation == 'I') {
+                                                            var ip =  req.headers['x-forwarded-for'] ||
+                                                                req.connection.remoteAddress ||
+                                                                req.socket.remoteAddress ||
+                                                                req.connection.socket.remoteAddress;
+                                                            var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                                                            st.generateToken(ip,userAgent,EZEID,function(err,token){
+                                                                if(err){
+                                                                    console.log('FnRegistrationAlumni: Token Generation Error' + err);
+                                                                }
+                                                                else{
+                                                                    RtnMessage.Token = token;
+                                                                }
+                                                                res.send(RtnMessage);
+                                                            });
+                                                        }
+
+
+                                                    });
+                                                });
+                                            }
+                                            else {
+                                                console.log('FnRegistrationAlumni: tmaster: registration success but email is empty so mail not sent');
+                                                console.log(RtnMessage);
+                                                res.send(RtnMessage);
+                                            }
+                                        }
+                                        else {
+                                            console.log('FnRegistrationAlumni: tmaster: Update operation success');
+                                            console.log(RtnMessage);
+                                            res.send(RtnMessage);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnRegistrationAlumni:tmaster: Registration Failed..1');
+                                    }
+
+                                }
+                                else {
+                                    console.log(RtnMessage);
+                                    res.send(RtnMessage);
+                                    console.log('FnRegistrationAlumni:tmaster: Registration Failed..2');
+                                }
+                            }
+
+                            else {
+                                console.log(RtnMessage);
+                                res.send(RtnMessage);
+                                console.log('FnRegistrationAlumni:tmaster: Registration Failed..3');
+                            }
+
+                        }
+                        else {
+                            console.log(RtnMessage);
+                            res.send(RtnMessage);
+                            console.log('FnRegistrationAlumni:tmaster: Registration Failed..4');
+                        }
+                    }
+                    else {
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnRegistrationAlumni:tmaster:' + err);
+                    }
+                });
+
+            }
+            else
+            {
+                console.log('FnRegistrationAlumni: Wizard Insertion Failed');
+                if(IDTypeID == null ) {
+                    console.log('FnRegistrationAlumni: IDTypeID is Empty');
+                }
+                else if(EZEID == null){
+                    console.log('FnRegistrationAlumni: EZEID is Empty');
+                }
+                else if(Password == null) {
+                    console.log('FnRegistrationAlumni: Password is Empty');
+                }
+
+                console.log('Insert method validation');
+                console.log('Mandatory fields required');
+                res.statusCode = 400;
+                res.send(RtnMessage);
+            }
+        }
+        else
+        {
+            console.log('----------req.body for Operation type other than 1--------------');
+            if (IDTypeID != null && EZEID != null && Gender.toString() != 'NaN') {
+                var EncryptPWD = '';
+                if (Password) {
+                    EncryptPWD = hash(Password);
+
+                    //console.log(EncryptPWD);
+                }
+                var DOBDate = null;
+                if (DOB != null && DOB != '') {
+                    DOBDate = new Date(DOB);
+                }
+
+                var InsertQuery = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD) + ',' + st.db.escape(FirstName) + ',' +
+                    st.db.escape(LastName) + ',' + st.db.escape(CompanyName) + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' +
+                    st.db.escape(RoleID) + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' +
+                    st.db.escape(TokenNo) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude) + ',' +
+                    st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle) + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' +
+                    st.db.escape(PostalCode) + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber) + ',' + st.db.escape(EMailID) + ',' +
+                    st.db.escape(Picture) + ',' + st.db.escape(PictureFileName) + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany)
+                    + ',' + st.db.escape(StatusID) + ',' + st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber)
+                    + ',' + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes)+ ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID) + ',' + st.db.escape(CategoryID);
+
+                 //console.log(InsertQuery);
+                st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                    if (!err) {
+                        //console.log('InsertResult....');
+                        //console.log(InsertResult);
+                        if (InsertResult) {
+
+                            if(InsertResult[0]){
+                                if (InsertResult[0].length > 0) {
+                                    var RegResult = InsertResult[0];
+                                    if(RegResult[0].TID != 0)
+                                    {
+                                        if(IDTypeID == 2)
+                                            RtnMessage.FirstName=CompanyName;
+                                        else
+                                            RtnMessage.FirstName = FirstName;
+                                        RtnMessage.IsAuthenticate = true;
+                                        RtnMessage.Token = TokenNo;
+                                        RtnMessage.Type = IDTypeID;
+                                        RtnMessage.Icon = Icon;
+                                        RtnMessage.tid = InsertResult[0][0].TID;
+                                        RtnMessage.group_id = InsertResult[0][0].group_id;
+                                        if (Operation == 'I') {
+                                            console.log('FnRegistrationAlumni:tmaster: Registration success');
+                                            //res.send(RtnMessage);
+                                            if (EMailID != '' || EMailID != null) {
+                                                var fs = require('fs');
+                                                fs.readFile("registration.html", "utf8", function (err, data) {
+                                                    if (err) throw err;
+                                                    data = data.replace("[Firstname]", FirstName);
+                                                    data = data.replace("[Lastname]", LastName);
+                                                    data = data.replace("[EZEOneID]", EZEID);
+
+                                                    var mailOptions = {
+                                                        from: 'noreply@ezeone.com',
+                                                        to: EMailID,
+                                                        subject: 'Welcome to EZEOneID',
+                                                        html: data // html body
+                                                    };
+                                                    //console.log('Mail Option:' + mailOptions);
+                                                    // send mail with defined transport object
+                                                    var post = { MessageType: 8, Priority: 3, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html, SentbyMasterID:RegResult[0].TID };
+                                                    // console.log(post);
+                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                        // Neat!
+                                                        if (!err) {
+                                                            console.log('FnRegistrationAlumni: Mail saved Successfully');
+                                                        }
+                                                        else {
+                                                            console.log('FnRegistrationAlumni: Mail not Saved Successfully' + err);
+                                                        }
+
+                                                        var ip =  req.headers['x-forwarded-for'] ||
+                                                            req.connection.remoteAddress ||
+                                                            req.socket.remoteAddress ||
+                                                            req.connection.socket.remoteAddress;
+                                                        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                                                        st.generateToken(ip,userAgent,EZEID,function(err,token) {
+                                                            if (err) {
+                                                                console.log('FnRegistrationAlumni: Token Generation Error' + err);
+                                                            }
+                                                            else {
+                                                                RtnMessage.Token = token;
+                                                            }
+                                                            res.send(RtnMessage);
+                                                        });
+
+                                                    });
+                                                });
+                                            }
+                                            else {
+                                                console.log('FnRegistrationAlumni: tmaster: registration success but email is empty so mail not sent');
+                                                console.log(RtnMessage);
+                                                res.send(RtnMessage);
+                                            }
+                                        }
+                                        else {
+                                            console.log('FnRegistrationAlumni: tmaster: Update operation success');
+                                            console.log(RtnMessage);
+                                            res.send(RtnMessage);
+                                        }
+                                    }
+                                    else {
+                                        console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnRegistrationAlumni:tmaster: Registration Failed..1');
+                                    }
+                                }
+                                else{
+                                    console.log(RtnMessage);
+                                    res.send(RtnMessage);
+                                    console.log('FnRegistrationAlumni:tmaster: Registration Failed..2');
+                                }
+                            }
+
+                            else{
+                                console.log(RtnMessage);
+                                res.send(RtnMessage);
+                                console.log('FnRegistrationAlumni:tmaster: Registration Failed..3');
+                            }
+                        }
+                        else{
+                            console.log(RtnMessage);
+                            res.send(RtnMessage);
+                            console.log('FnRegistrationAlumni:tmaster: Registration Failed..4');
+                        }
+                    }
+                    else {
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnRegistrationAlumni:tmaster:' + err);
+                    }
+                });
+            }
+            else {
+                console.log('Update method validation');
+                if (IDTypeID == null) {
+                    console.log('FnRegistrationAlumni: IDTypeID is empty');
+                } else if (EZEID == null) {
+                    console.log('FnRegistrationAlumni: EZEID is empty');
+                }
+                else if (Gender.toString() == 'NaN') {
+                    console.log('FnRegistrationAlumni: Gender is empty')
+                }
+                res.statusCode = 400;
+                res.send(RtnMessage);
+                console.log('FnRegistrationAlumni:tmaster: Manditatory field empty');
+            }
+        }
+
+    }
+    catch (ex) {
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log('FnRegistrationAlumni error:' + ex.description);
+        //throw new Error(ex);
     }
 };
+
+
 
 /**
  * @todo FnSaveAlumniContent
@@ -40,6 +586,7 @@ function Alumni(db,stdLib){
  * @description save alumni details of a person
  */
 Alumni.prototype.saveAlumniContent = function(req,res,next) {
+
     var _this = this;
 
     //var token = req.body.token;
@@ -90,10 +637,10 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    //if(!picture){
-    //    error['picture'] = 'Invalid page picture';
-    //    validateStatus *= false;
-    //}
+    if(!picture){
+        error['picture'] = 'Invalid page picture';
+        validateStatus *= false;
+    }
     if(!title){
         error['title'] = 'Invalid page title';
         validateStatus *= false;
@@ -194,6 +741,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                 crop: ''
             };
 
+            console.log(imageParams);
+
             FnCropImage(imageParams, function (err, imageResult) {
                 if (imageResult) {
                     var query = st.db.escape(tid) + ',' + st.db.escape(imageResult) + ',' + st.db.escape(title)
@@ -205,6 +754,9 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                         + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
                         + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
                         + ',' + st.db.escape(pictureType);
+
+                    console.log(query);
+
                     st.db.query('CALL pSaveAlumniContent(' + query + ')', function (err, insertresult) {
                         if (!err) {
                             if (insertresult) {
@@ -1532,6 +2084,202 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
         }
     }
 };
+
+
+
+/**
+ * @todo FnSendMailGingerbite
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save alumni team profile
+ */
+Alumni.prototype.sendMailGingerbite = function(req,res,next) {
+
+    var fs = require('fs');
+    var _this = this;
+
+    var token = req.body.token;
+    var firstName = req.body.f_name;
+    var lastName = req.body.l_name;
+    var email = req.body.email;
+    var mobile = req.body.mobile;
+    var address = req.body.address;
+    var hashCode = req.body.hash_code ? req.body.hash_code : '4537457854';
+    var to_email;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var error = {},validateStatus = true;
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!firstName){
+        error['firstName'] = 'Invalid firstName';
+        validateStatus *= false;
+    }
+    if(!lastName){
+        error['lastName'] = 'Invalid lastName';
+        validateStatus *= false;
+    }
+    if(!email){
+        error['email'] = 'Invalid email';
+        validateStatus *= false;
+    }
+    if(!mobile){
+        error['mobile'] = 'Invalid mobile';
+        validateStatus *= false;
+    }
+    if(!address){
+        error['mobile'] = 'Invalid address';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var code = email + 'gingerbite123';
+                        var crypto = require('crypto');
+                        var hash = crypto.createHash('md5').update(code).digest("hex");
+                        console.log(hash);
+                        if (hash && hashCode) {
+                            if (hash == hashCode) {
+                                console.log('FnSendMailGingerbite: Hash code matched');
+                                fs.readFile("gingerbite.html", "utf8", function (err, data) {
+                                    if (!err) {
+                                        if (data) {
+                                            data = data.replace("[FirstName]", firstName);
+                                            data = data.replace("[LastName]", lastName);
+                                            data = data.replace("[email]", email);
+                                            data = data.replace("[mobile]", mobile);
+                                            data = data.replace("[address]", address);
+
+                                            to_email = 'sgowrishankar26@gmail.com';
+                                            //to_email = 'aditya@gingerbite.com';
+
+                                            if (to_email) {
+
+                                                var mail = {
+                                                    from: 'site@gingerbite.com',
+                                                    to: to_email,
+                                                    subject: 'New chef request for gingerbite',
+                                                    html: data // html body
+                                                };
+
+                                                var nodemailer = require('nodemailer');
+                                                var transporter = nodemailer.createTransport();
+
+                                                transporter.sendMail(mail, function (error, info) {
+                                                    if (!error) {
+                                                        responseMessage.status = true;
+                                                        responseMessage.error = null;
+                                                        responseMessage.message = 'Mail send successfully';
+                                                        responseMessage.data = {
+                                                            firstName: firstName,
+                                                            lastName: lastName,
+                                                            email: email,
+                                                            mobile: mobile,
+                                                            address: address
+                                                        };
+
+                                                        res.status(200).json(responseMessage);
+                                                        console.log('FnSendMailGingerbite: Mail send Successfully');
+                                                        //console.log('Message sent');
+                                                    }
+                                                    else {
+                                                        res.status(200).json(responseMessage);
+                                                        responseMessage.error = error;
+                                                        responseMessage.message = 'Mail not send';
+                                                        console.log('FnSendMailGingerbite: Mail not send : ' + error);
+                                                    }
+                                                });
+                                            }
+                                            else {
+                                                res.status(200).json(responseMessage);
+                                                responseMessage.message = 'Invalid email';
+                                                console.log('FnSendMailGingerbite: Invalid email');
+                                            }
+                                        }
+                                        else {
+                                            res.status(200).json(responseMessage);
+                                            responseMessage.message = 'File is not read';
+                                            responseMessage.error = err;
+                                            console.log('FnSendMailGingerbite: File is not read:' + err);
+                                        }
+                                    }
+                                    else {
+                                        res.status(200).json(responseMessage);
+                                        responseMessage.message = 'File is not read';
+                                        responseMessage.error = err;
+                                        console.log('FnSendMailGingerbite: File is not read:' + err);
+                                    }
+                                });
+                            }
+                            else {
+                                res.status(200).json(responseMessage);
+                                responseMessage.message = 'Hash code not matched';
+                                console.log('FnSendMailGingerbite: Hash code not matched');
+                            }
+                        }
+                        else {
+                            res.status(200).json(responseMessage);
+                            responseMessage.message = 'Invalid Hash code';
+                            console.log('FnSendMailGingerbite: Invalid Hash code');
+                        }
+                    }
+                    else {
+                    responseMessage.message = 'Invalid token';
+                    responseMessage.error = {
+                        token: 'Invalid token'
+                    };
+                    responseMessage.data = null;
+                    res.status(401).json(responseMessage);
+                    console.log('FnSendMailGingerbite: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSendMailGingerbite:Error in processing Token' + err);
+                }
+            });
+        }
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSendMailGingerbite:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
+
 
 
 module.exports = Alumni;
