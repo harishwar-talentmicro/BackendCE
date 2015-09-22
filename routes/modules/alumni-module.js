@@ -2100,12 +2100,12 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
     var fs = require('fs');
     var _this = this;
 
-    //var token = req.body.token;
-    var firstName = req.body.f_name ? req.body.f_name : 'David';
-    var lastName = req.body.l_name ? req.body.l_name : 'Raj';
-    var email = req.body.email ? req.body.email : 'davidraj@gmail.com';
-    var mobile = req.body.mobile ? req.body.mobile : '9785445874';
-    var address = req.body.address ? req.body.address :'#410,HSR Layout,Bangalore';
+    var token = req.body.token;
+    var firstName = req.body.f_name;
+    var lastName = req.body.l_name;
+    var email = req.body.email;
+    var mobile = req.body.mobile;
+    var address = req.body.address;
     var to_email;
 
 
@@ -2118,12 +2118,28 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
 
     var error = {},validateStatus = true;
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
     if(!firstName){
         error['firstName'] = 'Invalid firstName';
+        validateStatus *= false;
+    }
+    if(!lastName){
+        error['lastName'] = 'Invalid lastName';
+        validateStatus *= false;
+    }
+    if(!email){
+        error['email'] = 'Invalid email';
+        validateStatus *= false;
+    }
+    if(!mobile){
+        error['mobile'] = 'Invalid mobile';
+        validateStatus *= false;
+    }
+    if(!address){
+        error['mobile'] = 'Invalid address';
         validateStatus *= false;
     }
 
@@ -2137,51 +2153,37 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
     }
     else{
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
-            fs.readFile("gingerbite.html", "utf8", function (err, data) {
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (data) {
-                        data = data.replace("[FirstName]", firstName);
-                        data = data.replace("[LastName]", lastName);
-                        data = data.replace("[email]", email);
-                        data = data.replace("[mobile]", mobile);
-                        data = data.replace("[address]", address);
+                    if (result) {
+                        fs.readFile("gingerbite.html", "utf8", function (err, data) {
+                            if (!err) {
+                                if (data) {
+                                    data = data.replace("[FirstName]", firstName);
+                                    data = data.replace("[LastName]", lastName);
+                                    data = data.replace("[email]", email);
+                                    data = data.replace("[mobile]", mobile);
+                                    data = data.replace("[address]", address);
 
-                        var nodemailer = require('nodemailer');
-                        var transporter = nodemailer.createTransport();
+                                    to_email = 'dev.sandeep@hotmail.com';
+                                    //to_email = 'aditya@gingerbite.com';
 
-                        to_email = 'sgowrishankar26@gmail.com';
+                                    if (to_email) {
 
-                        if (to_email) {
+                                        var mail = {
+                                            from: 'site@gingerbite.com',
+                                            to: to_email,
+                                            subject: 'New chef request for gingerbite',
+                                            html: data // html body
+                                        };
 
-                            var mailOptions = {
-                                from: 'noreply@ezeone.com',
-                                to: to_email,
-                                subject: '',
-                                html: data // html body
-                            };
+                                        var nodemailer = require('nodemailer');
+                                        var transporter = nodemailer.createTransport();
 
-                            var post = {
-                                MessageType: 8,
-                                Priority: 3,
-                                ToMailID: mailOptions.to,
-                                Subject: mailOptions.subject,
-                                Body: mailOptions.html,
-                                SentbyMasterID: 324
-                            };
-
-
-                            transporter.sendMail(mailOptions, function (error, info) {
-                                if (error) {
-                                    console.log(error);
-                                }
-                                else {
-                                    console.log('Message sent from node mailer');
-                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                        if (!err) {
-                                            if (result) {
+                                        transporter.sendMail(mail, function(error, info){
+                                            if(error){
+                                                console.log(error);
+                                            }else{
                                                 responseMessage.status = true;
                                                 responseMessage.error = null;
                                                 responseMessage.message = 'Mail send successfully';
@@ -2195,67 +2197,51 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
 
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnSendMailGingerbite: Mail send Successfully');
+                                                console.log('Message sent');
                                             }
-                                            else {
-                                                res.status(200).json(responseMessage);
-                                                responseMessage.message = 'Mail not send';
-                                                responseMessage.error = err;
-                                                console.log('FnSendMailGingerbite: Mail not send');
-                                            }
-                                        }
-                                        else {
-                                            res.status(200).json(responseMessage);
-                                            responseMessage.message = 'Mail not send';
-                                            responseMessage.error = err;
-                                            console.log('FnSendMailGingerbite: Mail not send' + err);
-
-                                        }
-                                    });
+                                        });
+                                    }
+                                    else {
+                                        res.status(200).json(responseMessage);
+                                        responseMessage.message = 'Invaild To EmailId';
+                                        console.log('FnSendMailGingerbite: Invaild To EmailId');
+                                    }
                                 }
-                            });
-                        }
-                        else {
-                            res.status(200).json(responseMessage);
-                            responseMessage.message = 'Invaild To EmailId';
-                            console.log('FnSendMailGingerbite: Invaild To EmailId');
-                        }
+                                else {
+                                    res.status(200).json(responseMessage);
+                                    responseMessage.message = 'File is not read';
+                                    responseMessage.error = err;
+                                    console.log('FnSendMailGingerbite: File is not read:' + err);
+                                }
+                            }
+                            else {
+                                res.status(200).json(responseMessage);
+                                responseMessage.message = 'File is not read';
+                                responseMessage.error = err;
+                                console.log('FnSendMailGingerbite: File is not read:' + err);
+                            }
+                        });
                     }
                     else {
-                            res.status(200).json(responseMessage);
-                            responseMessage.message = 'File is not read';
-                            responseMessage.error = err;
-                            console.log('FnSendMailGingerbite: File is not read:' + err);
-                        }
+                    responseMessage.message = 'Invalid token';
+                    responseMessage.error = {
+                        token: 'Invalid token'
+                    };
+                    responseMessage.data = null;
+                    res.status(401).json(responseMessage);
+                    console.log('FnSendMailGingerbite: Invalid token');
+                    }
                 }
                 else {
-                    res.status(200).json(responseMessage);
-                    responseMessage.message = 'File is not read';
-                    responseMessage.error = err;
-                    console.log('FnSendMailGingerbite: File is not read:' + err);
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSendMailGingerbite:Error in processing Token' + err);
                 }
             });
         }
-
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnSaveAlumniProfile: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal server error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnSaveAlumniProfile:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
         catch(ex){
             responseMessage.error = {
                 server: 'Internal Server error'

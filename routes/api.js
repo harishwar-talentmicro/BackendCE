@@ -208,7 +208,7 @@ router.post('/alumni_profile',LocationManager.FnSaveAlumniProfile);
 router.get('/alumniteam_details',LocationManager.FnGetAlumniTeamDetails);
 router.get('/alumni_profile',LocationManager.FnGetAlumniProfile);
 router.post('/alumni_signup',LocationManager.FnRegistrationAlumni);
-router.post('/send',LocationManager.FnSendMailGingerbite);
+router.post('/chef_mail',LocationManager.FnSendMailGingerbite);
 
 //Recruitment module
 router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
