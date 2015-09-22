@@ -5,6 +5,7 @@
  *  @description Handles functions related to alumni profile and events
  */
 "use strict";
+var nodemailer = require("nodemailer");
 
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
@@ -585,6 +586,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
  * @description save alumni details of a person
  */
 Alumni.prototype.saveAlumniContent = function(req,res,next) {
+
     var _this = this;
 
     //var token = req.body.token;
@@ -635,10 +637,10 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    //if(!picture){
-    //    error['picture'] = 'Invalid page picture';
-    //    validateStatus *= false;
-    //}
+    if(!picture){
+        error['picture'] = 'Invalid page picture';
+        validateStatus *= false;
+    }
     if(!title){
         error['title'] = 'Invalid page title';
         validateStatus *= false;
@@ -739,6 +741,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                 crop: ''
             };
 
+            console.log(imageParams);
+
             FnCropImage(imageParams, function (err, imageResult) {
                 if (imageResult) {
                     var query = st.db.escape(tid) + ',' + st.db.escape(imageResult) + ',' + st.db.escape(title)
@@ -750,6 +754,9 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                         + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
                         + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
                         + ',' + st.db.escape(pictureType);
+
+                    console.log(query);
+
                     st.db.query('CALL pSaveAlumniContent(' + query + ')', function (err, insertresult) {
                         if (!err) {
                             if (insertresult) {
@@ -2077,6 +2084,191 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
         }
     }
 };
+
+
+
+/**
+ * @todo FnSendMailGingerbite
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save alumni team profile
+ */
+Alumni.prototype.sendMailGingerbite = function(req,res,next) {
+
+    var fs = require('fs');
+    var _this = this;
+
+    //var token = req.body.token;
+    var firstName = req.body.f_name ? req.body.f_name : 'David';
+    var lastName = req.body.l_name ? req.body.l_name : 'Raj';
+    var email = req.body.email ? req.body.email : 'davidraj@gmail.com';
+    var mobile = req.body.mobile ? req.body.mobile : '9785445874';
+    var address = req.body.address ? req.body.address :'#410,HSR Layout,Bangalore';
+    var to_email;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var error = {},validateStatus = true;
+
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
+    if(!firstName){
+        error['firstName'] = 'Invalid firstName';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
+            fs.readFile("gingerbite.html", "utf8", function (err, data) {
+                if (!err) {
+                    if (data) {
+                        data = data.replace("[FirstName]", firstName);
+                        data = data.replace("[LastName]", lastName);
+                        data = data.replace("[email]", email);
+                        data = data.replace("[mobile]", mobile);
+                        data = data.replace("[address]", address);
+
+                        var nodemailer = require('nodemailer');
+                        var transporter = nodemailer.createTransport();
+
+                        to_email = 'sgowrishankar26@gmail.com';
+
+                        if (to_email) {
+
+                            var mailOptions = {
+                                from: 'noreply@ezeone.com',
+                                to: to_email,
+                                subject: '',
+                                html: data // html body
+                            };
+
+                            var post = {
+                                MessageType: 8,
+                                Priority: 3,
+                                ToMailID: mailOptions.to,
+                                Subject: mailOptions.subject,
+                                Body: mailOptions.html,
+                                SentbyMasterID: 324
+                            };
+
+
+                            transporter.sendMail(mailOptions, function (error, info) {
+                                if (error) {
+                                    console.log(error);
+                                }
+                                else {
+                                    console.log('Message sent from node mailer');
+                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                        if (!err) {
+                                            if (result) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Mail send successfully';
+                                                responseMessage.data = {
+                                                    firstName: firstName,
+                                                    lastName: lastName,
+                                                    email: email,
+                                                    mobile: mobile,
+                                                    address: address
+                                                };
+
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSendMailGingerbite: Mail send Successfully');
+                                            }
+                                            else {
+                                                res.status(200).json(responseMessage);
+                                                responseMessage.message = 'Mail not send';
+                                                responseMessage.error = err;
+                                                console.log('FnSendMailGingerbite: Mail not send');
+                                            }
+                                        }
+                                        else {
+                                            res.status(200).json(responseMessage);
+                                            responseMessage.message = 'Mail not send';
+                                            responseMessage.error = err;
+                                            console.log('FnSendMailGingerbite: Mail not send' + err);
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            res.status(200).json(responseMessage);
+                            responseMessage.message = 'Invaild To EmailId';
+                            console.log('FnSendMailGingerbite: Invaild To EmailId');
+                        }
+                    }
+                    else {
+                            res.status(200).json(responseMessage);
+                            responseMessage.message = 'File is not read';
+                            responseMessage.error = err;
+                            console.log('FnSendMailGingerbite: File is not read:' + err);
+                        }
+                }
+                else {
+                    res.status(200).json(responseMessage);
+                    responseMessage.message = 'File is not read';
+                    responseMessage.error = err;
+                    console.log('FnSendMailGingerbite: File is not read:' + err);
+                }
+            });
+        }
+
+            //            else {
+            //                responseMessage.message = 'Invalid token';
+            //                responseMessage.error = {
+            //                    token: 'Invalid token'
+            //                };
+            //                responseMessage.data = null;
+            //                res.status(401).json(responseMessage);
+            //                console.log('FnSaveAlumniProfile: Invalid token');
+            //            }
+            //        }
+            //        else {
+            //            responseMessage.error = {
+            //                server: 'Internal server error'
+            //            };
+            //            responseMessage.message = 'Error in validating Token';
+            //            res.status(500).json(responseMessage);
+            //            console.log('FnSaveAlumniProfile:Error in processing Token' + err);
+            //        }
+            //    });
+            //}
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSendMailGingerbite:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
+
 
 
 module.exports = Alumni;
