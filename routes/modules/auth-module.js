@@ -642,6 +642,8 @@ Auth.prototype.login = function(req,res,next){
         var token = req.body.token ? req.body.token : '';
         var code = req.body.code ? req.body.code : '';
 
+        console.log(req.body);
+
         var RtnMessage = {
             Token: '',
             TID:'',
@@ -681,7 +683,7 @@ Auth.prototype.login = function(req,res,next){
             //console.log('findarray: ' + FindArray.length);
 
             var Query = st.db.escape(UserName) + ',' + st.db.escape(code)+ ',' + st.db.escape(token);
-            //console.log(Query);
+            console.log(Query);
             st.db.query('CALL PLoginNew(' + Query + ')', function (err, loginResult) {
                 //console.log(loginResult);
                 if (!err) {
@@ -693,10 +695,17 @@ Auth.prototype.login = function(req,res,next){
 
                             var loginDetails = loginResult[0];
 
+                            console.log(loginDetails);
+
 
                             if (!token) {
+                                console.log('c1..');
                                 if (comparePassword(Password, loginDetails[0].Password)) {
                                     st.generateToken(ip, userAgent, UserName, function (err, TokenResult) {
+
+                                        console.log(err);
+
+                                        console.log(TokenResult);
                                         if (!err) {
                                             // console.log(TokenResult);
 
@@ -767,6 +776,10 @@ Auth.prototype.login = function(req,res,next){
                                             console.log('FnLogin:tmaster:' + err);
                                         }
                                     });
+                                }
+                                else
+                                {
+                                    res.send(RtnMessage);
                                 }
                             }
                             else {

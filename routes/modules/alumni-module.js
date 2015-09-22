@@ -2127,7 +2127,7 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
     var email = req.body.email;
     var mobile = req.body.mobile;
     var address = req.body.address;
-    var hashCode = req.body.hash_code ? req.body.hash_code : '4537457854';
+    var hashCode = req.body.hash_code ? req.body.hash_code : '9b1feaee73615783ebf4c7cc9a028252';
     var to_email;
 
 
@@ -2183,9 +2183,7 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
                         var crypto = require('crypto');
                         var hash = crypto.createHash('md5').update(code).digest("hex");
                         console.log(hash);
-                        if (hash && hashCode) {
-                            if (hash == hashCode) {
-                                console.log('FnSendMailGingerbite: Hash code matched');
+
                                 fs.readFile("gingerbite.html", "utf8", function (err, data) {
                                     if (!err) {
                                         if (data) {
@@ -2196,6 +2194,7 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
                                             data = data.replace("[address]", address);
 
                                             to_email = 'sgowrishankar26@gmail.com';
+                                           // to_email = 'dev.sandeep@hotmail.com';
                                             //to_email = 'aditya@gingerbite.com';
 
                                             if (to_email) {
@@ -2208,32 +2207,53 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
                                                 };
 
                                                 var nodemailer = require('nodemailer');
+                                                var sendgrid  = require('sendgrid')('ezeid', 'Ezeid2015');
                                                 var transporter = nodemailer.createTransport();
 
-                                                transporter.sendMail(mail, function (error, info) {
-                                                    if (!error) {
-                                                        responseMessage.status = true;
-                                                        responseMessage.error = null;
-                                                        responseMessage.message = 'Mail send successfully';
-                                                        responseMessage.data = {
-                                                            firstName: firstName,
-                                                            lastName: lastName,
-                                                            email: email,
-                                                            mobile: mobile,
-                                                            address: address
-                                                        };
+                                                if (hash && hashCode) {
+                                                    if (hash == hashCode) {
+                                                        console.log('FnSendMailGingerbite: Hash code matched');
+                                                        sendgrid.send(mail,function(err,result) {
+                                                            if (!err) {
+                                                                //console.log('Message sent');
+                                                                //transporter.sendMail(mail, function (error, info) {
+                                                                  //  if (!error) {
+                                                                        responseMessage.status = true;
+                                                                        responseMessage.error = null;
+                                                                        responseMessage.message = 'Mail send successfully';
+                                                                        responseMessage.data = {
+                                                                            firstName: firstName,
+                                                                            lastName: lastName,
+                                                                            email: email,
+                                                                            mobile: mobile,
+                                                                            address: address
+                                                                        };
 
-                                                        res.status(200).json(responseMessage);
-                                                        console.log('FnSendMailGingerbite: Mail send Successfully');
-                                                        //console.log('Message sent');
+                                                                        res.status(200).json(responseMessage);
+                                                                        console.log('FnSendMailGingerbite: Mail send Successfully');
+                                                                        //console.log('Message sent');
+                                                                    }
+                                                                    else {
+                                                                        res.status(200).json(responseMessage);
+                                                                        responseMessage.error = error;
+                                                                        responseMessage.message = 'Mail not send';
+                                                                        console.log('FnSendMailGingerbite: Mail not send : ' + error);
+                                                                    }
+                                                                });
+                                                            //}
+                                                        //});
                                                     }
                                                     else {
                                                         res.status(200).json(responseMessage);
-                                                        responseMessage.error = error;
-                                                        responseMessage.message = 'Mail not send';
-                                                        console.log('FnSendMailGingerbite: Mail not send : ' + error);
+                                                        responseMessage.message = 'Hash code not matched';
+                                                        console.log('FnSendMailGingerbite: Hash code not matched');
                                                     }
-                                                });
+                                                }
+                                                else {
+                                                    res.status(200).json(responseMessage);
+                                                    responseMessage.message = 'Invalid Hash code';
+                                                    console.log('FnSendMailGingerbite: Invalid Hash code');
+                                                }
                                             }
                                             else {
                                                 res.status(200).json(responseMessage);
@@ -2256,18 +2276,6 @@ Alumni.prototype.sendMailGingerbite = function(req,res,next) {
                                     }
                                 });
                             }
-                            else {
-                                res.status(200).json(responseMessage);
-                                responseMessage.message = 'Hash code not matched';
-                                console.log('FnSendMailGingerbite: Hash code not matched');
-                            }
-                        }
-                        else {
-                            res.status(200).json(responseMessage);
-                            responseMessage.message = 'Invalid Hash code';
-                            console.log('FnSendMailGingerbite: Invalid Hash code');
-                        }
-                    }
                     else {
                     responseMessage.message = 'Invalid token';
                     responseMessage.error = {
