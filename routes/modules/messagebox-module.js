@@ -1174,10 +1174,14 @@ function FnBussinessChat(params, callback) {
     var _this = this;
     var i= 0,id1='';
     if (params) {
-        console.log('coming business chat func..');
-        //console.log(params);
+        //console.log('coming business chat func..');
+        //console.log(params.toids.length);
         var a = function(i) {
+            console.log(i);
             if( i < params.toids.length) {
+
+               //console.log(params.toids[i]);
+               // console.log(params.toids[i].charAt(0));
                 if (params.toids[i].charAt(0) == '@') {
                     //console.log('print ezeid..');
                     //console.log(params.toids[i]);
@@ -1235,7 +1239,7 @@ function FnBussinessChat(params, callback) {
                 }
             else
             {
-                console.log('callback')
+                console.log('callback..');
                 callback(null,id1);
             }
         };
@@ -1339,7 +1343,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                     + ',' + st.db.escape(token) + ',' + st.db.escape(previousMessageID) + ',' + st.db.escape(toID)
                                     + ',' + st.db.escape(idType) + ',' + st.db.escape(mimeType) + ',' + st.db.escape(isJobseeker);
                                 var query = 'CALL pComposeMessage(' + queryParams + ')';
-                                console.log(query);
+                                //console.log(query);
                                 st.db.query(query, function (err, insertResult) {
                                     if (!err) {
                                         if (insertResult) {
@@ -1368,24 +1372,31 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                     msgId = messageResult[0].id;
                                                     for (var c = 0; c < id.length; c++) {
                                                         id_type = parseInt(id[c]);
-                                                        if(toID){
+                                                        if(toID.length > 1){
                                                             var toIDS = toID;
                                                             to_ids = toIDS.split(",");
                                                             //console.log(toIds.length);
                                                             //console.log(toIds);
                                                         }
+                                                        else
+                                                        {
+                                                            to_ids = [];
+                                                            to_ids.push(toID);
+                                                           // console.log('to_ids..');
+                                                           // console.log(to_ids);
+                                                        }
                                                         gid = parseInt(to_ids[c]);
                                                         console.log('------------------');
                                                         console.log(gid);
                                                         var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + gid;
-                                                        console.log(queryParameters);
+                                                        //console.log(queryParameters);
                                                         st.db.query(queryParameters, function (err, iosResult) {
                                                             if (iosResult) {
                                                                 iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                                                                 //console.log(iphoneID);
                                                                 var queryParams = st.db.escape(token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
                                                                 var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
-                                                                console.log(messageQuery);
+                                                               // console.log(messageQuery);
                                                                 st.db.query(messageQuery, function (err, groupDetails) {
                                                                     if (groupDetails) {
                                                                         if (groupDetails[0]) {
