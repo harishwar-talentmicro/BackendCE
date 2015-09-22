@@ -744,19 +744,20 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                 crop: ''
             };
 
-            console.log(imageParams);
+            //console.log(imageParams);
 
             FnCropImage(imageParams, function (err, pictureResult) {
                 if (pictureResult) {
                     var imageParams1 = {
                         path: req.files.logo.path,
                         //path1 : req.files.logo.path,
-                        type: pictureType,
+                        type: logoType,
                         width: width,
                         height: height,
                         scale: '',
                         crop: ''
                     };
+                    //console.log(imageParams1);
                     FnCropImage(imageParams1, function (err, logoResult) {
                         if (logoResult) {
                             //console.log(logoResult);
@@ -1138,13 +1139,13 @@ function FnCropImage(imageParams, callback){
                                         // scale++
                                         if(size.height < targetHeight || size.width < targetWidth){
                                             if(targetHeight > targetWidth){
-                                                console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
+                                                //console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
                                                 scaleHeight = targetHeight.toString();
                                                 ////
                                                 scaleWidth = (size.width * scaleHeight)/ size.height;
                                             }
                                             else{
-                                                console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
+                                                //console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
                                                 scaleHeight = targetHeight;
                                                 scaleWidth = (size.width * scaleHeight) / size.height;
                                             }
@@ -1152,14 +1153,14 @@ function FnCropImage(imageParams, callback){
                                         // scale--
                                         else{
                                             if(targetHeight > targetWidth){
-                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
+                                                //console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
                                                 scaleWidth = targetWidth.toString();
                                                 ////
                                                 scaleHeight = (scaleWidth * size.height)/ size.width;
                                             }
                                             else{
 
-                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                                //console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
                                                 scaleHeight = targetHeight.toString();
                                                 scaleWidth = (scaleHeight * size.width) / size.height;
 
