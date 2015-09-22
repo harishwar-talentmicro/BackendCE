@@ -66,7 +66,7 @@ app.use(express.static(path.join(__dirname,'public/')));
 
 
 
-//app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 // Set header to force download
 function setHeaders(res, path) {
     res.setHeader('Content-Disposition', contentDisposition(path))
