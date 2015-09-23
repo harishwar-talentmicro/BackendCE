@@ -227,13 +227,17 @@ exports.FnSaveAlumniProfile = alumniModule.saveAlumniProfile;
 exports.FnGetAlumniTeamDetails = alumniModule.getAlumniTeamDetails;
 exports.FnGetAlumniProfile = alumniModule.getAlumniProfile;
 exports.FnRegistrationAlumni = alumniModule.registerAlumni;
-exports.FnSendMailGingerbite = alumniModule.sendMailGingerbite;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');
 var recruitmentModule = new Recruitment(db,stdLib);
 exports.FnGetRecruitmentMasters = recruitmentModule.getRecruitmentMasters;
 exports.FnGetSalesMasters = recruitmentModule.getSalesMasters;
+
+//Gingerbite module
+var Gingerbite = require('./modules/gingerbite-module.js');
+var gingerModule = new Gingerbite(db,stdLib);
+exports.FnSendMailGingerbite = gingerModule.sendMailGingerbite;
 
 
 var Notification = require('./modules/notification/notification-master.js');
