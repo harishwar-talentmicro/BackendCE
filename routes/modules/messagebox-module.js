@@ -206,19 +206,34 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
     }
     else {
         try {
-            if (ezeidArray.length > 1) {
+            if (ezeidArray.length > 2) {
+                console.log('3 params');
                 ezeid = ezeidArray[0];
-                pin = parseInt(ezeidArray[1]) ? parseInt(ezeidArray[1]) : ezeidArray[1];
+                if (ezeidArray[2]) {
+                    pin = ezeidArray[2];
+                }
+            }
+            else if (ezeidArray.length > 1) {
+                console.log('2 params');
+                ezeid = ezeidArray[0];
+                if (ezeidArray[1].charAt(0) == 'L' || ezeidArray[1].charAt(0) == 'l'){
+                        pin = null;
+                    }
+                else
+                {
+                    pin = ezeidArray[1];
+                }
             }
             else
             {
+                console.log('1 params');
                 ezeid = name;
                 pin = null;
             }
                 var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
                     + ',' + st.db.escape(pin);
                 var query = 'CALL pValidateGroupName(' + queryParams + ')';
-                //console.log(query);
+                console.log(query);
                 st.db.query(query, function (err, getResult) {
                     if (!err) {
                         if (getResult) {
