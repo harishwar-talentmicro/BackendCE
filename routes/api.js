@@ -208,6 +208,8 @@ router.post('/alumni_profile',LocationManager.FnSaveAlumniProfile);
 router.get('/alumniteam_details',LocationManager.FnGetAlumniTeamDetails);
 router.get('/alumni_profile',LocationManager.FnGetAlumniProfile);
 router.post('/alumni_signup',LocationManager.FnRegistrationAlumni);
+router.post('/ten_details',LocationManager.FnSaveTENMaster);
+router.get('/ten_details',LocationManager.FnGetTENDetails);
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);

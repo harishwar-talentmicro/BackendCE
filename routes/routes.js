@@ -227,6 +227,8 @@ exports.FnSaveAlumniProfile = alumniModule.saveAlumniProfile;
 exports.FnGetAlumniTeamDetails = alumniModule.getAlumniTeamDetails;
 exports.FnGetAlumniProfile = alumniModule.getAlumniProfile;
 exports.FnRegistrationAlumni = alumniModule.registerAlumni;
+exports.FnSaveTENMaster = alumniModule.saveTENMaster;
+exports.FnGetTENDetails = alumniModule.getTENDetails;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');
