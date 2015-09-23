@@ -936,6 +936,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var username = req.body.username;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
+    var image;
 
     var responseMessage = {
         status: false,
@@ -1009,19 +1010,30 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
             //    if (!err) {
             //        if (result) {
 
-            var imageParams = {
-                path : req.files.picture.path,
-                //path1 : req.files.picture[1].path,
-                type : pictureType,
-                width : width,
-                height : height,
-                scale : '',
-                crop : ''
+            var teamPicture = function() {
+
+                var imageParams = {
+                    path: req.files.picture.path,
+                    //path1 : req.files.picture[1].path,
+                    type: pictureType,
+                    width: width,
+                    height: height,
+                    scale: '',
+                    crop: ''
+                };
+
+                FnCropImage(imageParams, function (err, imageResult) {
+                    if (imageResult) {
+                        image = {
+                            pic : imageResult
+                        };
+                        saveTeam(image);
+                    }
+                });
             };
 
-            FnCropImage(imageParams, function (err, imageResult) {
-                if(imageResult) {
-                    var query = st.db.escape(tid) + ',' + st.db.escape(imageResult) + ',' + st.db.escape(jobTitle)
+            var saveTeam = function(image) {
+                    var query = st.db.escape(tid) + ',' + st.db.escape(image.pic) + ',' + st.db.escape(jobTitle)
                         + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
                         + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
                         + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username);
@@ -1064,13 +1076,18 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                             console.log('FnSaveAlumniTeam: error in saving Alumni Team:' + err);
                         }
                     });
-                }
-                else {
-                    responseMessage.message = 'Picture not uploaded';
-                    res.status(200).json(responseMessage);
-                    console.log('FnSaveAlumniTeam:Picture not uploaded');
-                }
-        });
+
+                    if (req.files.picture) {
+                        teamPicture();
+                    }
+                    else
+                    {
+                        image = {
+                            pic : req.body.picture
+                        };
+                        saveTeam(image);
+                    }
+            };
         }
         //            else {
         //                responseMessage.message = 'Invalid token';
@@ -2346,9 +2363,9 @@ Alumni.prototype.getTENDetails = function(req,res,next){
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-            var query = st.db.escape(code) + ',' + st.db.escape(type);
-            console.log('CALL pGetAlumniTeam(' + query + ')');
-            st.db.query('CALL pGetAlumniTeam(' + query + ')', function (err, getResult) {
+            var query = st.db.escape(type) + ',' + st.db.escape(code);
+            console.log('CALL pGetTENDetails(' + query + ')');
+            st.db.query('CALL pGetTENDetails(' + query + ')', function (err, getResult) {
                 if (!err) {
                     if (getResult[0]) {
                         if (getResult[0].length > 0) {
