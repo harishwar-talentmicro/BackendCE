@@ -3447,29 +3447,39 @@ User.prototype.webLinkRedirect = function(req,res,next) {
         var link = req.params.id;
         var arr = link.split('.');
         if(arr.length > 1){
-            var lastItem = arr[arr.length - 1];
+            if(arr[1].toUpperCase() == 'MAP'){
+                res.redirect('/'+alterEzeoneId(arr[0]) + req.CONFIG.CONSTANT.MAP_REDIRECT_LINK);
 
-            arr.splice(arr.length - 1,1);
+            }
 
-            var ezeid = alterEzeoneId(arr.join('.'));
+            else{
+                var lastItem = arr[arr.length - 1];
 
-            var urlBreaker = lastItem.split('');
-            if(urlBreaker.length > 1 && urlBreaker.length < 4){
-                if(urlBreaker[0] === 'U'){
-                    urlBreaker.splice(0,1);
-                    var urlSeqNumber = parseInt(urlBreaker.join(''));
-                    if(!isNaN(urlSeqNumber)){
-                        if(urlSeqNumber > 0 && urlSeqNumber < 100){
-                            FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+                arr.splice(arr.length - 1,1);
 
-                                if(url){
-                                    res.redirect(url);
-                                }
-                                else{
+                var ezeid = alterEzeoneId(arr.join('.'));
 
-                                    next();
-                                }
-                            });
+                var urlBreaker = lastItem.split('');
+                if(urlBreaker.length > 1 && urlBreaker.length < 4){
+                    if(urlBreaker[0] === 'U'){
+                        urlBreaker.splice(0,1);
+                        var urlSeqNumber = parseInt(urlBreaker.join(''));
+                        if(!isNaN(urlSeqNumber)){
+                            if(urlSeqNumber > 0 && urlSeqNumber < 100){
+                                FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
+
+                                    if(url){
+                                        res.redirect(url);
+                                    }
+                                    else{
+
+                                        next();
+                                    }
+                                });
+                            }
+                            else{
+                                next();
+                            }
                         }
                         else{
                             next();
@@ -3483,9 +3493,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                     next();
                 }
             }
-            else{
-                next();
-            }
+
         }
         else{
             next();

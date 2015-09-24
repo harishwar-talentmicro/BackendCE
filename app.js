@@ -27,7 +27,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 
 // Add headers
 app.all('*',function(req,res,next){
@@ -59,7 +59,7 @@ app.all('*',function(req,res,next){
 
 app.use('/',alumni);
 
-var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
+
 
 app.use(multer({ dest: './uploads/'}));
 app.use(express.static(path.join(__dirname,'public/')));

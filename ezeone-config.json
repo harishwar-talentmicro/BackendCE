@@ -3,7 +3,8 @@
   "CONSTANT" : {
     "INDEX_PATH" : "../public/index.html",
     "INDEX_TPL" : "index.ejs",
-    "ALUMNI_INDEX_PATH" : "../public-alumni/index.html"
+    "ALUMNI_INDEX_PATH" : "../public-alumni/index.html",
+    "MAP_REDIRECT_LINK" : "/map"
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
