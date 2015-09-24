@@ -57,9 +57,9 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
     var mobile = req.body.mobile;
     var address = req.body.address;
     var hashCode = req.body.hash_code ? req.body.hash_code : '9b1feaee73615783ebf4c7cc9a028252';
-    var to_email = 'dev.sandeep@hotmail.com';
+    //var to_email = 'dev.sandeep@hotmail.com';
     //var to_email = 'sgowrishankar26@gmail.com';
-    //var to_email = 'aditya@gingerbite.com';
+    var to_email = 'aditya@gingerbite.com';
 
 
     var responseMessage = {
