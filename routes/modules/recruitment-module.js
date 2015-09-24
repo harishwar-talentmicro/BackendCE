@@ -82,8 +82,39 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(token) + ',' + st.db.escape(functionType);
-                        st.db.query('CALL pGetAllApplicanttrackermasterData(' + query + ')', function (err, getResult) {
+
+                        //institutes
+                        var query = 'CALL pGetInstitutes();';
+
+                        //get folder list
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(functionType);
+                        var query1 = 'CALL pGetFolderList('+ queryParams + ');';
+
+                        //specialization
+                        var query2 = 'CALL pGetSpecialization(' + st.db.escape('') + ');';
+
+                        //GetEducations
+                        var query3 = 'CALL pGetEducations();';
+
+                        //get jobslist
+                        var queryParams2 = st.db.escape(token);
+                        var query4 = 'CALL PgetListofjobs(' + queryParams2 + ');';
+
+                        //get subuser list
+                        var query5 = 'CALL pGetSubUserList('+ queryParams2 + ');';
+
+                        //GetActionType
+                        var query6 = 'CALL pGetActionType('+ queryParams + ');';
+
+                        //GetStatusType
+                        var query7 = 'CALL pGetStatusType('+ queryParams + ');';
+
+                        var combinedQuery = query + query1 + query2 + query3 + query4 + query5 + query6 + query7;
+
+                        //console.log(combinedQuery);
+
+                        st.db.query(combinedQuery, function (err, getResult) {
+
                             if(!err){
                                 if (getResult) {
                                     responseMessage.status = true;
@@ -91,13 +122,13 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
                                     responseMessage.message = 'Recruitment Masters List loaded successfully';
                                     responseMessage.data = {
                                         institutes: getResult[0],
-                                        folders: getResult[1],
-                                        specialization: getResult[2],
-                                        educations: getResult[3],
-                                        jobs: getResult[4],
-                                        subusers: getResult[5],
-                                        actions: getResult[6],
-                                        stages: getResult[7]
+                                        folders: getResult[2],
+                                        specialization: getResult[4],
+                                        educations: getResult[6],
+                                        jobs: getResult[8],
+                                        subusers: getResult[10],
+                                        actions: getResult[12],
+                                        stages: getResult[14]
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetRecruitmentMasters: Recruitment Masters List loaded successfully');
@@ -190,8 +221,30 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(token) + ',' + st.db.escape(functionType);
-                        st.db.query('CALL pGetSalesMasterData(' + query + ')', function (err, getResult) {
+                        //company details
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(functionType);
+                        var query = 'CALL pGetCompanyDetails(' + queryParams + ');';
+
+                        //get folder list
+                        var query1 = 'CALL pGetFolderList('+ queryParams + ');';
+
+                        //get subuser list
+                        var queryParams1 = st.db.escape(token);
+                        var query2 = 'CALL pGetSubUserList('+ queryParams1 + ');';
+
+                        //GetActionType
+                        var query3 = 'CALL pGetActionType('+ queryParams + ');';
+
+                        //GetStatusType
+                        var query4 = 'CALL pGetStatusType('+ queryParams + ');';
+
+                        var combinedQuery = query + query1 + query2 + query3 + query4;
+
+                        console.log(combinedQuery);
+
+                        st.db.query(combinedQuery, function (err, getResult) {
+                            //console.log(getResult);
+
                             if(!err){
                                 if (getResult) {
                                     responseMessage.status = true;
@@ -199,11 +252,11 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
                                     responseMessage.message = 'Sales Masters List loaded successfully';
                                     responseMessage.data = {
                                         company_details: getResult[0],
-                                        folders: getResult[1],
-                                        subusers: getResult[2],
-                                        actions: getResult[3],
-                                        stages: getResult[4],
-                                        items : getResult[5]
+                                        folders: getResult[2],
+                                        subusers: getResult[4],
+                                        actions: getResult[6],
+                                        stages: getResult[8],
+                                        items : getResult[10]
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetSalesMasters: Sales Masters List loaded successfully');
