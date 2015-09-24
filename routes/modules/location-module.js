@@ -1051,7 +1051,6 @@ Location.prototype.validateEZEOne = function(req,res,next){
 
 Location.prototype.getLocationsofezeid = function(req,res,next){
 
-    var token = req.query.token;
     var ezeid = alterEzeoneId(req.query.ezeone_id);
 
     var validationFlag = true;
@@ -1063,10 +1062,6 @@ Location.prototype.getLocationsofezeid = function(req,res,next){
         data : null
     };
 
-    if(!token){
-        error['token'] = 'Invalid token';
-        validationFlag *= false;
-    }
     if(!ezeid){
         error['ezeid'] = 'Invalid ezeid';
         validationFlag *= false;
@@ -1080,75 +1075,49 @@ Location.prototype.getLocationsofezeid = function(req,res,next){
     }
     else{
         try{
-            st.validateToken(token, function (err, result) {
-                if (!err) {
-                    if (result) {
-                        var queryParams = st.db.escape(ezeid);
-                        //console.log(queryParams);
-                        st.db.query('CALL pGetLocationsofezeid(' + queryParams + ')', function (err, getResult) {
-                            if (err) {
-
-                                console.log('FnGetLocationsofezeid error:' + err);
-                                var errorDate = new Date();
-                                console.log(errorDate.toTimeString() + ' ......... error ...........');
-
-                                respMsg.status = false;
-                                respMsg.message = 'Internal Server error';
-                                respMsg.error = {
-                                    server: 'Server Error'
-                                };
-                                respMsg.data = null;
-                                res.status(500).json(respMsg);
+            var queryParams = st.db.escape(ezeid);
+            //console.log(queryParams);
+            st.db.query('CALL pGetLocationsofezeid(' + queryParams + ')', function (err, getResult) {
+                if (err) {
+                    console.log('FnGetLocationsofezeid error:' + err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    respMsg.status = false;
+                    respMsg.message = 'Internal Server error';
+                    respMsg.error = {
+                        server: 'Server Error'
+                    };
+                    respMsg.data = null;
+                    res.status(500).json(respMsg);
+                }
+                else {
+                    if (getResult) {
+                        if (getResult[0]) {
+                            if (getResult[0].length > 0) {
+                                respMsg.status = true;
+                                respMsg.message = 'Locations loaded successfully';
+                                respMsg.error = null;
+                                respMsg.data = getResult[0];
                             }
                             else {
-                                if (getResult) {
-                                    if (getResult[0]) {
-                                        if (getResult[0].length > 0) {
-                                            respMsg.status = true;
-                                            respMsg.message = 'Locations loaded successfully';
-                                            respMsg.error = null;
-                                            respMsg.data = getResult[0];
-                                        }
-                                        else {
-                                            respMsg.message = 'Locations not found';
-                                            respMsg.error = null;
-                                            respMsg.data = null;
-                                        }
-                                    }
-                                    else {
-                                        respMsg.message = 'Locations not found';
-                                        respMsg.error = null;
-                                        respMsg.data = null;
-                                    }
-                                }
-                                else {
-                                    respMsg.message = 'Locations not found';
-                                    respMsg.error = null;
-                                    respMsg.data = null;
-                                }
-
-                                res.status(200).json(respMsg);
+                                respMsg.message = 'Locations not found';
+                                respMsg.error = null;
+                                respMsg.data = null;
                             }
-                        });
-                    }
-                    else {
-                            respMsg.message = 'Invalid token';
-                            respMsg.error = {
-                                token: 'Invalid Token'
-                            };
+                        }
+                        else {
+                            respMsg.message = 'Locations not found';
+                            respMsg.error = null;
                             respMsg.data = null;
-                            res.status(401).json(respMsg);
-                            console.log('FnGetLocationsofezeid: Invalid token');
                         }
                     }
                     else {
-                        respMsg.error = {
-                            server: 'Internal Server Error'
-                        };
-                        respMsg.message = 'Error in validating Token';
-                        res.status(500).json(respMsg);
-                        console.log('FnGetLocationsofezeid:Error in validating Token' + err);
+                        respMsg.message = 'Locations not found';
+                        respMsg.error = null;
+                        respMsg.data = null;
                     }
+                    res.status(200).json(respMsg);
+                }
             });
         }
         catch(ex){
