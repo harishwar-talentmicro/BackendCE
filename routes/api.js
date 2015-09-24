@@ -167,6 +167,7 @@ router.get('/view_job_details',LocationManager.FnViewJobDetails);
 router.post('/job_notification',LocationManager.FnJobNotification);
 router.get('/find_institute',LocationManager.FnFindInstitute);
 router.post('/share_location',LocationManager.FnShareLocation);
+router.get('/location',LocationManager.FnGetLocationsofezeid);
 
 
 //MessageBox module methods

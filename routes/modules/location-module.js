@@ -1039,5 +1039,136 @@ Location.prototype.validateEZEOne = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetLocationsofezeid
+ * @param req
+ * @param res
+ * @param next
+ * @method GET
+ * @service-param token <string>
+ * @service-param ezeid <varchar>
+ */
+
+Location.prototype.getLocationsofezeid = function(req,res,next){
+
+    var token = req.query.token;
+    var ezeid = alterEzeoneId(req.query.ezeone_id);
+
+    var validationFlag = true;
+    var error = {};
+    var respMsg = {
+        status : false,
+        error : null,
+        message : 'Please check the errors',
+        data : null
+    };
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!ezeid){
+        error['ezeid'] = 'Invalid ezeid';
+        validationFlag *= false;
+    }
+
+
+    if(!validationFlag){
+        respMsg.error = error;
+        respMsg.message = 'Please check the errors';
+        res.status(400).json(respMsg);
+    }
+    else{
+        try{
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(ezeid);
+                        //console.log(queryParams);
+                        st.db.query('CALL pGetLocationsofezeid(' + queryParams + ')', function (err, getResult) {
+                            if (err) {
+
+                                console.log('FnGetLocationsofezeid error:' + err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                respMsg.status = false;
+                                respMsg.message = 'Internal Server error';
+                                respMsg.error = {
+                                    server: 'Server Error'
+                                };
+                                respMsg.data = null;
+                                res.status(500).json(respMsg);
+                            }
+                            else {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0) {
+                                            respMsg.status = true;
+                                            respMsg.message = 'Locations loaded successfully';
+                                            respMsg.error = null;
+                                            respMsg.data = getResult[0];
+                                        }
+                                        else {
+                                            respMsg.message = 'Locations not found';
+                                            respMsg.error = null;
+                                            respMsg.data = null;
+                                        }
+                                    }
+                                    else {
+                                        respMsg.message = 'Locations not found';
+                                        respMsg.error = null;
+                                        respMsg.data = null;
+                                    }
+                                }
+                                else {
+                                    respMsg.message = 'Locations not found';
+                                    respMsg.error = null;
+                                    respMsg.data = null;
+                                }
+
+                                res.status(200).json(respMsg);
+                            }
+                        });
+                    }
+                    else {
+                            respMsg.message = 'Invalid token';
+                            respMsg.error = {
+                                token: 'Invalid Token'
+                            };
+                            respMsg.data = null;
+                            res.status(401).json(respMsg);
+                            console.log('FnGetLocationsofezeid: Invalid token');
+                        }
+                    }
+                    else {
+                        respMsg.error = {
+                            server: 'Internal Server Error'
+                        };
+                        respMsg.message = 'Error in validating Token';
+                        res.status(500).json(respMsg);
+                        console.log('FnGetLocationsofezeid:Error in validating Token' + err);
+                    }
+            });
+        }
+        catch(ex){
+            console.log('FnGetLocationsofezeid error:' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+            respMsg.status = false;
+            respMsg.message = 'Internal Server error';
+            respMsg.error = {
+                server : 'Server Error'
+            };
+            respMsg.data = null;
+            res.status(500).json(respMsg);
+
+
+        }
+    }
+};
+
+
 
 module.exports = Location;
