@@ -2183,10 +2183,10 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var status = req.body.status;   // 1(pending),2=closed,3=on-hold,4=canceled
     var regLastDate = req.body.reg_lastdate;
     var type = req.body.type;     // 1(training),2=event,3=news,4=knowledge
-    var ezeid = req.body.ezeone_id;
+    var ezeid = alterEzeoneId(req.body.ezeone_id);
     var note = req.body.note;
     var venueId = req.body.venue_id;
-    var attachment = req.body.attachment;
+    var attachment = req.body.attachment ? req.body.attachment : '';
     var code = req.body.code;
 
     var responseMessage = {
