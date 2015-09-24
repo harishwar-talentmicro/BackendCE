@@ -241,6 +241,7 @@ exports.FnGetSalesMasters = recruitmentModule.getSalesMasters;
 var Gingerbite = require('./modules/gingerbite-module.js');
 var gingerModule = new Gingerbite(db,stdLib);
 exports.FnSendMailGingerbite = gingerModule.sendMailGingerbite;
+exports.FnSendMailTechplasma = gingerModule.sendMailTechplasma;
 
 
 var Notification = require('./modules/notification/notification-master.js');

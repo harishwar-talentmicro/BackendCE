@@ -214,6 +214,7 @@ router.get('/ten_details',LocationManager.FnGetTENDetails);
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);
+router.post('/techplasma_mail',LocationManager.FnSendMailTechplasma);
 
 //Recruitment module
 router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);

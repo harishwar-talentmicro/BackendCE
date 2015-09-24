@@ -229,5 +229,191 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
     }
 };
 
+/**
+ * @todo FnSendMailTechplasma
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save alumni team profile
+ */
+Gingerbite.prototype.sendMailTechplasma = function(req,res,next) {
+
+    var fs = require('fs');
+    var _this = this;
+
+    var firstName = req.body.f_name;
+    var lastName = req.body.l_name;
+    var emailId = req.body.email;
+    var mobile = req.body.mobile;
+    var address = req.body.address;
+    var hashCode = req.body.hash_code ? req.body.hash_code : '9b1feaee73615783ebf4c7cc9a028252';
+    //var to_email = 'dev.sandeep@hotmail.com';
+    var to_email = 'sgowrishankar26@gmail.com';
+    //var to_email = 'aditya@gingerbite.com';
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var error = {},validateStatus = true;
+
+    if(!firstName){
+        error['firstName'] = 'Invalid firstName';
+        validateStatus *= false;
+    }
+    if(!lastName){
+        error['lastName'] = 'Invalid lastName';
+        validateStatus *= false;
+    }
+    if(!emailId){
+        error['emailId'] = 'Invalid emailId';
+        validateStatus *= false;
+    }
+    if(!mobile){
+        error['mobile'] = 'Invalid mobile';
+        validateStatus *= false;
+    }
+    if(!address){
+        error['mobile'] = 'Invalid address';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            if(hashCode) {
+                if (to_email) {
+                    var code = emailId + 'techplasma123';
+                    var hash = new Buffer(code).toString('base64');
+                    console.log(hash);
+                    console.log(hashCode);
+                    fs.readFile("techplasma.html", "utf8", function (err, data) {
+                        if (!err) {
+                            if (data) {
+                                data = data.replace("[FirstName]", firstName);
+                                data = data.replace("[LastName]", lastName);
+                                data = data.replace("[email]", emailId);
+                                data = data.replace("[mobile]", mobile);
+                                data = data.replace("[address]", address);
+
+
+                                var mail = {
+                                    from: 'sales@techplasma.com',
+                                    to: to_email,
+                                    subject: 'Sales request for techplasma solution',
+                                    html: data // html body
+                                };
+
+                                if (hash && hashCode) {
+                                    if (hash == hashCode) {
+                                        console.log('FnSendMailTechplasma: Hash code matched');
+
+                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                        var email = new sendgrid.Email();
+                                        email.from = mail.from;
+                                        email.to = mail.to;
+                                        email.subject = mail.subject;
+                                        email.html = mail.html;
+
+                                        sendgrid.send(email, function (err, result) {
+                                            console.log(result);
+                                            if (!err) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Mail send successfully';
+                                                responseMessage.data = {
+                                                    firstName: firstName,
+                                                    lastName: lastName,
+                                                    email: emailId,
+                                                    mobile: mobile,
+                                                    address: address
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSendMailTechplasma: Mail send Successfully');
+                                                //console.log('Message sent');
+                                            }
+                                            else {
+                                                responseMessage.error = {
+                                                    message : 'Mail not send'
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSendMailTechplasma: Mail not send : ' + error);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        responseMessage.error = {
+                                            message : 'Hash code not matched'
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSendMailTechplasma: Hash code not matched');
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        message : 'Invalid Hash code'
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSendMailTechplasma: Invalid Hash code');
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    message : 'File is not read'
+                                };
+                                res.status(200).json(responseMessage);
+                                console.log('FnSendMailTechplasma: File is not read:' + err);
+                            }
+                        }
+                        else {
+                            responseMessage.error = {
+                                message : 'File is not read'
+                            };
+                            res.status(200).json(responseMessage);
+                            console.log('FnSendMailTechplasma: File is not read:' + err);
+                        }
+                    });
+                }
+                else {
+                    responseMessage.error = {
+                        message : 'Invalid to_email'
+                    };
+                    res.status(200).json(responseMessage);
+                    console.log('FnSendMailTechplasma: Invalid to_email');
+                }
+            }
+            else {
+                responseMessage.error = {
+                    message : 'Invalid Hash code'
+                };
+                res.status(200).json(responseMessage);
+                console.log('FnSendMailTechplasma: Invalid Hash code');
+            }
+        }
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSendMailTechplasma:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
+
 
 module.exports = Gingerbite;
