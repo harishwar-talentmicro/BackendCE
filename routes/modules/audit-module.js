@@ -888,30 +888,46 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                                                     mailOptions.html = mailOptions.html.replace("[CompanyName]", GetResult[0].CompanyName);
 
                                                                     //console.log(mailOptions.html);
-                                                                    var post = {
-                                                                        MessageType: 9,
-                                                                        Priority: 5,
-                                                                        ToMailID: GetResult[i].SalesMailID,
-                                                                        Subject: mailOptions.subject,
-                                                                        Body: mailOptions.html,
-                                                                        Replyto: mailOptions.replyto
-                                                                    };
+                                                                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                                    var email = new sendgrid.Email();
+                                                                    email.from = mailOptions.from;
+                                                                    email.to = mailOptions.to;
+                                                                    email.subject = mailOptions.subject;
+                                                                    email.html = mailOptions.html;
 
-                                                                    //console.log(post);
-                                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                        // Neat!
+                                                                    sendgrid.send(email, function (err, result) {
                                                                         if (!err) {
-                                                                            console.log(result);
-                                                                            console.log('FnSendBulkMailer: Mail saved Successfully');
+                                                                            var post = {
+                                                                                MessageType: 9,
+                                                                                Priority: 5,
+                                                                                ToMailID: GetResult[i].SalesMailID,
+                                                                                Subject: mailOptions.subject,
+                                                                                Body: mailOptions.html,
+                                                                                Replyto: mailOptions.replyto,
+                                                                                SentStatus: 1
+                                                                            };
 
-                                                                            //CallBack(null, RtnMessage);
+                                                                            //console.log(post);
+                                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                                // Neat!
+                                                                                if (!err) {
+                                                                                    console.log(result);
+                                                                                    console.log('FnSendBulkMailer: Mail saved Successfully');
+
+                                                                                    //CallBack(null, RtnMessage);
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                                                    // CallBack(null, null);
+                                                                                }
+                                                                            });
                                                                         }
                                                                         else {
-                                                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                                            console.log('FnSendBulkMailer: Mail not send Successfully');
                                                                             // CallBack(null, null);
                                                                         }
                                                                     });
-                                                                    console.log('FnSendBulkMailer:Mail details sent for processing');
+                                                                    //console.log('FnSendBulkMailer:Mail details sent for processing');
                                                                     //console.log(mailOptions);
                                                                 }
                                                                 else {
