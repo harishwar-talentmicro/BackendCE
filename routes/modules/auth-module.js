@@ -673,8 +673,8 @@ Auth.prototype.login = function(req,res,next){
             ReservationDisplayFormat:'',
             mobilenumber:'',
             ISPrimaryLocAdded:'',
-            accesstype :'',
-            isprofilecomplete :''
+            isinstitute_admin : ''
+
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -746,8 +746,6 @@ Auth.prototype.login = function(req,res,next){
                                                 RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
                                                 RtnMessage.group_id = loginDetails[0].group_id;
                                                 RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                                RtnMessage.accesstype = loginDetails[0].accesstype; //accesstype=1 then is admin ..if accesstype=2 then is member
-                                                RtnMessage.isprofilecomplete = loginDetails[0].isprofilecomplete;
 
                                                 res.send(RtnMessage);
                                                 console.log('FnLogin:tmaster: Login success');
@@ -820,8 +818,6 @@ Auth.prototype.login = function(req,res,next){
                                 RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
                                 RtnMessage.group_id = loginDetails[0].group_id;
                                 RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                RtnMessage.accesstype = loginDetails[0].accesstype; //accesstype=1 then is admin ..if accesstype=2 then is member
-                                RtnMessage.isprofilecomplete = loginDetails[0].isprofilecomplete;
 
                                 res.send(RtnMessage);
                                 console.log('FnLogin:tmaster: Login success');
