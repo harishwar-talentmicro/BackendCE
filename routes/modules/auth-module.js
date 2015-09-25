@@ -673,7 +673,8 @@ Auth.prototype.login = function(req,res,next){
             ReservationDisplayFormat:'',
             mobilenumber:'',
             ISPrimaryLocAdded:'',
-            accesstype :''
+            accesstype :'',
+            isprofilecomplete :''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (UserName != null && UserName != '' && Password != null && Password != '') {
@@ -746,6 +747,7 @@ Auth.prototype.login = function(req,res,next){
                                                 RtnMessage.group_id = loginDetails[0].group_id;
                                                 RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
                                                 RtnMessage.accesstype = loginDetails[0].accesstype; //accesstype=1 then is admin ..if accesstype=2 then is member
+                                                RtnMessage.isprofilecomplete = loginDetails[0].isprofilecomplete;
 
                                                 res.send(RtnMessage);
                                                 console.log('FnLogin:tmaster: Login success');
@@ -783,59 +785,60 @@ Auth.prototype.login = function(req,res,next){
                                 }
                             }
                             else {
-                                    //res.setHeader('Cookie','Token='+Encrypt);
-                                    //console.log(loginDetails[0]);
-                                    //res.cookie('Token', TokenResult, {maxAge: 900000, httpOnly: true});
-                                    RtnMessage.Token = token;
-                                    RtnMessage.IsAuthenticate = true;
-                                    RtnMessage.TID = loginDetails[0].TID;
-                                    RtnMessage.ezeone_id = loginDetails[0].EZEID;
-                                    RtnMessage.FirstName = loginDetails[0].FirstName;
-                                    RtnMessage.CompanyName = loginDetails[0].CompanyName;
-                                    RtnMessage.Type = loginDetails[0].IDTypeID;
-                                    RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                    RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                    RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                    RtnMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                    RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                    RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                    RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                    RtnMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
-                                    RtnMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
-                                    RtnMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
-                                    RtnMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
-                                    RtnMessage.CVFormMsg = loginDetails[0].CVFormMsg;
-                                    RtnMessage.SalesItemListType = loginDetails[0].SalesItemListType;
-                                    RtnMessage.RefreshInterval = loginDetails[0].RefreshInterval;
-                                    RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                    RtnMessage.MasterID = loginDetails[0].ParentMasterID;
-                                    RtnMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
-                                    RtnMessage.VisibleModules = loginDetails[0].VisibleModules;
-                                    RtnMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
-                                    RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                    RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                    RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                    RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
-                                    RtnMessage.group_id = loginDetails[0].group_id;
-                                    RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                    RtnMessage.accesstype = loginDetails[0].accesstype; //accesstype=1 then is admin ..if accesstype=2 then is member
+                                //res.setHeader('Cookie','Token='+Encrypt);
+                                //console.log(loginDetails[0]);
+                                //res.cookie('Token', TokenResult, {maxAge: 900000, httpOnly: true});
+                                RtnMessage.Token = token;
+                                RtnMessage.IsAuthenticate = true;
+                                RtnMessage.TID = loginDetails[0].TID;
+                                RtnMessage.ezeone_id = loginDetails[0].EZEID;
+                                RtnMessage.FirstName = loginDetails[0].FirstName;
+                                RtnMessage.CompanyName = loginDetails[0].CompanyName;
+                                RtnMessage.Type = loginDetails[0].IDTypeID;
+                                RtnMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                RtnMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                RtnMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                RtnMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                RtnMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                RtnMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                RtnMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                RtnMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                RtnMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                RtnMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                RtnMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                RtnMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                RtnMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                RtnMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                RtnMessage.MasterID = loginDetails[0].ParentMasterID;
+                                RtnMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                RtnMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                RtnMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
+                                RtnMessage.group_id = loginDetails[0].group_id;
+                                RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                RtnMessage.accesstype = loginDetails[0].accesstype; //accesstype=1 then is admin ..if accesstype=2 then is member
+                                RtnMessage.isprofilecomplete = loginDetails[0].isprofilecomplete;
 
-                                    res.send(RtnMessage);
-                                    console.log('FnLogin:tmaster: Login success');
-                                    if (isIphone == 1) {
-                                        var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
-                                        var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                        //console.log(query);
-                                        st.db.query(query, function (err, result) {
-                                            if (!err) {
-                                                //console.log(result);
-                                                console.log('FnLogin:IphoneDevice save successfully');
-                                            }
-                                            else {
-                                                console.log(err);
-                                            }
-                                        });
-                                    }
+                                res.send(RtnMessage);
+                                console.log('FnLogin:tmaster: Login success');
+                                if (isIphone == 1) {
+                                    var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
+                                    var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                    //console.log(query);
+                                    st.db.query(query, function (err, result) {
+                                        if (!err) {
+                                            //console.log(result);
+                                            console.log('FnLogin:IphoneDevice save successfully');
+                                        }
+                                        else {
+                                            console.log(err);
+                                        }
+                                    });
+                                }
                             }
                         }
                         else{

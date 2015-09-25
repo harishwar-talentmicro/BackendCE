@@ -1499,7 +1499,8 @@ User.prototype.forgetPassword = function(req,res,next){
                                                             ToMailID: mailOptions.to,
                                                             Subject: mailOptions.subject,
                                                             Body: mailOptions.html,
-                                                            SentbyMasterID: UserResult[0].TID
+                                                            SentbyMasterID: UserResult[0].TID,
+                                                            SentStatus : 1
                                                         };
                                                         //console.log(post);
                                                         var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
@@ -1507,7 +1508,9 @@ User.prototype.forgetPassword = function(req,res,next){
                                                             if (!err) {
                                                                 console.log('FnForgetPassword: Mail saved Successfully');
                                                                 RtnMessage.IsChanged = true;
-                                                                res.send(RtnMessage);
+                                                                res.send(RtnMessage)
+
+                                                                var WebText = require('webtext-api');
                                                             }
                                                             else {
                                                                 console.log('FnForgetPassword: Mail not Saved Successfully' + err);
