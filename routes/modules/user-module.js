@@ -1454,7 +1454,7 @@ User.prototype.forgetPassword = function(req,res,next){
                             RtnMessage.IsChanged = true;
                             var UserQuery = 'Select TID, ifnull(FirstName,"") as FirstName,ifnull(LastName,"") as LastName,' +
                                 'ifnull(AdminEMailID,"") as EMailID from tmaster where EZEID=' + st.db.escape(EZEID);
-                            //  console.log(UserQuery);
+                            //console.log(UserQuery);
                             st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
                                     if(UserResult){
@@ -1484,23 +1484,45 @@ User.prototype.forgetPassword = function(req,res,next){
 
                                                 // send mail with defined transport object
                                                 //message Type 7 - Forgot password mails service
-                                                var post = { MessageType: 7, Priority: 1, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID: UserResult[0].TID};
-                                                //console.log(post);
-                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                    // Neat!
+                                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                var email = new sendgrid.Email();
+                                                email.from = mailOptions.from;
+                                                email.to = mailOptions.to;
+                                                email.subject = mailOptions.subject;
+                                                email.html = mailOptions.html;
+
+                                                sendgrid.send(email, function (err, result) {
                                                     if (!err) {
-                                                        console.log('FnRegistration: Mail saved Successfully');
-                                                        RtnMessage.IsChanged = true;
-                                                        res.send(RtnMessage);
+                                                        var post = {
+                                                            MessageType: 7,
+                                                            Priority: 1,
+                                                            ToMailID: mailOptions.to,
+                                                            Subject: mailOptions.subject,
+                                                            Body: mailOptions.html,
+                                                            SentbyMasterID: UserResult[0].TID
+                                                        };
+                                                        //console.log(post);
+                                                        var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                            // Neat!
+                                                            if (!err) {
+                                                                console.log('FnForgetPassword: Mail saved Successfully');
+                                                                RtnMessage.IsChanged = true;
+                                                                res.send(RtnMessage);
+                                                            }
+                                                            else {
+                                                                console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                                                res.send(RtnMessage);
+                                                            }
+                                                        });
                                                     }
                                                     else {
-                                                        console.log('FnRegistration: Mail not Saved Successfully' + err);
+                                                        console.log('FnForgetPassword: Mail not Saved Successfully' + err);
                                                         res.send(RtnMessage);
                                                     }
                                                 });
                                             });
 
-                                            console.log('FnForgetPassword:tmaster: Password reset successfully');
+                                            console.log('FnForgetPassword: Password reset successfully');
                                         }
                                     }
                                     else{
@@ -1518,25 +1540,25 @@ User.prototype.forgetPassword = function(req,res,next){
                         }
                         else {
                             res.send(RtnMessage);
-                            console.log('FnForgetPassword:tmaster: Password reset  Failed');
+                            console.log('FnForgetPassword: Password reset  Failed');
                         }
 
                     }
                     else {
                         res.send(RtnMessage);
-                        console.log('FnForgetPassword:tmaster: Password reset Failed');
+                        console.log('FnForgetPassword: Password reset Failed');
                     }
                 }
                 else {
                     res.statusCode = 500;
                     res.send(RtnMessage);
-                    console.log('FnForgetPassword:tmaster:' + err);
+                    console.log('FnForgetPassword:' + err);
                 }
             });
 
         }
         else {
-            console.log('FnForgetPassword: EZEID is empty')
+            console.log('FnForgetPassword: EZEID is empty');
             res.statusCode = 400;
             res.send(RtnMessage);
         }
