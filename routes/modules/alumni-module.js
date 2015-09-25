@@ -227,7 +227,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                     DOBDate = new Date(DOB);
                     // console.log(TaskDate);
                 }
-                var InsertQuery = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD) + ',' + st.db.escape(FirstName) + ',' +
+                var queryParams = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD) + ',' + st.db.escape(FirstName) + ',' +
                     st.db.escape(LastName) + ',' + st.db.escape(CompanyName) + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' +
                     st.db.escape(RoleID) + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' +
                     st.db.escape(TokenNo) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude) + ',' +
@@ -237,10 +237,10 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                     + st.db.escape(StatusID) + ',' + st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)  + ',' + st.db.escape(CategoryID);
 
-
+                var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                 //console.log(InsertQuery);
 
-                st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                st.db.query(query, function (err, InsertResult) {
                     if (!err) {
                         //console.log('InsertResult: ');
                         //console.log( InsertResult);
@@ -803,7 +803,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
             };
 
 var saveContent = function(params) {
-    var query = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
+    var queryParams = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
         + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
         + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
         + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
@@ -813,9 +813,9 @@ var saveContent = function(params) {
         + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
         + ',' + st.db.escape(pictureType);
 
+    var query = 'CALL pSaveAlumniContent(' + queryParams + ')';
     //console.log(query);
-
-    st.db.query('CALL pSaveAlumniContent(' + query + ')', function (err, insertresult) {
+    st.db.query(query, function (err, insertresult) {
         if (!err) {
             if (insertresult) {
                 responseMessage.status = true;
@@ -1033,12 +1033,14 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
             };
 
             var saveTeam = function(image) {
-                    var query = st.db.escape(tid) + ',' + st.db.escape(image.pic) + ',' + st.db.escape(jobTitle)
+                    var queryParams = st.db.escape(tid) + ',' + st.db.escape(image.pic) + ',' + st.db.escape(jobTitle)
                         + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
                         + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
                         + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username);
 
-                    st.db.query('CALL pSaveAlumniTeam(' + query + ')', function (err, insertresult) {
+                var query = 'CALL pSaveAlumniTeam(' + queryParams + ')';
+
+                    st.db.query(query, function (err, insertresult) {
                         if (!err) {
                             if (insertresult) {
                                 responseMessage.status = true;
@@ -1520,9 +1522,10 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-                        var query = st.db.escape(code) + ',' + st.db.escape(type);
-                        console.log('CALL pGetAlumniTeam(' + query + ')');
-                        st.db.query('CALL pGetAlumniTeam(' + query + ')', function (err, getResult) {
+                        var queryParams = st.db.escape(code) + ',' + st.db.escape(type);
+                        var query = 'CALL pGetAlumniTeam(' + queryParams + ')';
+
+                        st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
                                     if (getResult[0].length > 0) {
@@ -1784,8 +1787,7 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
 Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var _this = this;
 
-    //var token = req.body.token;
-    var ezeone_id = req.body.ezeone_id;
+    var token = req.body.token;
     var profile = req.body.profile;
     var studentID = req.body.student_id;
     var education = req.body.education;
@@ -1793,7 +1795,6 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var batch = req.body.batch;
     var code = req.body.code;     // college code
     var accesstype = req.body.access_type;  // 0-no relation, 1-is admin, 2-is member
-    //var tid = req.body.tid;           // while saving first time 0 else give tid
 
     var responseMessage = {
         status: false,
@@ -1804,12 +1805,8 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
 
     var error = {},validateStatus = true;
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
-    if(!ezeone_id){
-        error['ezeone_id'] = 'Invalid ezeone_id';
+    if(!token){
+        error['token'] = 'Invalid token';
         validateStatus *= false;
     }
     if(!profile){
@@ -1853,65 +1850,68 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     }
     else{
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
-                    var query = st.db.escape(ezeone_id) + ',' + st.db.escape(profile) + ',' + st.db.escape(studentID)
-                        + ',' + st.db.escape(education) + ',' + st.db.escape(specialization) + ',' + st.db.escape(batch)
-                        + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype);
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(profile) + ',' + st.db.escape(studentID)
+                            + ',' + st.db.escape(education) + ',' + st.db.escape(specialization) + ',' + st.db.escape(batch)
+                            + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype);
 
-                    st.db.query('CALL pSaveAlumniProfile(' + query + ')', function (err, insertresult) {
-                        if (!err) {
-                            if (insertresult) {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Alumni Profile saved successfully';
-                                responseMessage.data = {
-                                    ezeone_id : req.body.ezeone_id,
-                                    profile : req.body.profile,
-                                    student_id : req.body.student_id,
-                                    education : req.body.education,
-                                    specialization : req.body.specialization,
-                                    batch : req.body.batch,
-                                    code : req.body.code,
-                                    access_type : req.body.access_type
-                            };
-                                res.status(200).json(responseMessage);
-                                console.log('FnSaveAlumniProfile: Alumni Profile saved successfully');
+                        var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
+
+                        st.db.query(query, function (err, insertresult) {
+                            console.log(insertresult);
+                            if (!err) {
+                                if (insertresult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Alumni Profile saved successfully';
+                                    responseMessage.data = {
+                                        ezeone_id: req.body.ezeone_id,
+                                        profile: req.body.profile,
+                                        student_id: req.body.student_id,
+                                        education: req.body.education,
+                                        specialization: req.body.specialization,
+                                        batch: req.body.batch,
+                                        code: req.body.code,
+                                        access_type: req.body.access_type
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveAlumniProfile: Alumni Profile saved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'No save Alumni Profile';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveAlumniProfile:No save Alumni Profile');
+                                }
                             }
                             else {
-                                responseMessage.message = 'No save Alumni Profile';
-                                res.status(200).json(responseMessage);
-                                console.log('FnSaveAlumniProfile:No save Alumni Profile');
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveAlumniProfile: error in saving Alumni Profile:' + err);
                             }
-                        }
-                        else {
-                            responseMessage.message = 'An error occured ! Please try again';
-                            res.status(500).json(responseMessage);
-                            console.log('FnSaveAlumniProfile: error in saving Alumni Profile:' + err);
-                        }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveAlumniProfile: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveAlumniProfile:Error in processing Token' + err);
+                }
             });
         }
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnSaveAlumniProfile: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal server error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnSaveAlumniProfile:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
         catch(ex){
             responseMessage.error = {
                 server: 'Internal Server error'
@@ -2083,9 +2083,11 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(token) + ',' + st.db.escape(code);
-                        console.log('CALL pGetAlumniProfile(' + query + ')');
-                        st.db.query('CALL pGetAlumniProfile(' + query + ')', function (err, getResult) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(code);
+
+                        var query = 'CALL pGetAlumniProfile(' + queryParams + ')';
+
+                        st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
                                     if (getResult[0].length > 0) {
@@ -2179,6 +2181,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var venueId = req.body.venue_id;
     var attachment = req.body.attachment ? req.body.attachment : '';
     var code = req.body.code;
+    var capacity = req.body.capacity ? req.body.capacity : 0;
 
     var responseMessage = {
         status: false,
@@ -2226,13 +2229,14 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
             //    if (!err) {
             //        if (result) {
 
-                    var query = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
+                    var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
                         + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
                         + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(ezeid)
                         + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(attachment)
-                        + ',' + st.db.escape(code);
+                        + ',' + st.db.escape(code)+ ',' + st.db.escape(capacity);
+                    var query = 'CALL pSaveTENMaster(' + queryParams + ')';
 
-                    st.db.query('CALL pSaveTENMaster(' + query + ')', function (err, insertresult) {
+                    st.db.query(query, function (err, insertresult) {
                         if (!err) {
                             if (insertresult) {
                                 responseMessage.status = true;
@@ -2354,9 +2358,9 @@ Alumni.prototype.getTENDetails = function(req,res,next){
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-            var query = st.db.escape(type) + ',' + st.db.escape(code);
-            console.log('CALL pGetTENDetails(' + query + ')');
-            st.db.query('CALL pGetTENDetails(' + query + ')', function (err, getResult) {
+            var queryParams = st.db.escape(type) + ',' + st.db.escape(code);
+            var query = 'CALL pGetTENDetails(' + queryParams + ')';
+            st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult[0]) {
                         if (getResult[0].length > 0) {
@@ -2472,9 +2476,9 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-            var query = st.db.escape(masterId) + ',' + st.db.escape(code);
-            console.log('CALL PgetProfileStatus(' + query + ')');
-            st.db.query('CALL PgetProfileStatus(' + query + ')', function (err, getResult) {
+            var queryParams = st.db.escape(masterId) + ',' + st.db.escape(code);
+            var query = 'CALL PgetProfileStatus(' + queryParams + ')';
+            st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult[0]) {
                         if (getResult[0].length > 0) {
@@ -2541,6 +2545,476 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
         }
     }
 };
+
+
+/**
+ * @todo FnSaveTENUsers
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save ten Users details
+ */
+Alumni.prototype.saveTENUsers = function(req,res,next) {
+    var _this = this;
+
+    var token = req.body.token;
+    var tid = req.body.tid;      // tid=0 for new else its tid,
+    var tenID = req.body.ten_id;
+    var type = req.body.type;     // 1(training),2=event,3=news,4=knowledge
+    var profileId = req.body.profile_id;  // profileID is AlumniProfileID of that user
+    var status = req.body.status;   // 0-participating, 1-revoked
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var error = {},validateStatus = true;
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!tid){
+        tid = 0;
+    }
+    if(parseInt(tid) == NaN){
+        error['tid'] = 'Invalid tid';
+        validateStatus *= false;
+    }
+    if(!status){
+        status = 0;
+    }
+    if(parseInt(status) == NaN){
+        error['status'] = 'Invalid status';
+        validateStatus *= false;
+    }
+    if(!type){
+        error['type'] = 'Invalid type';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(tid) + ',' + st.db.escape(tenID)
+                            + ',' + st.db.escape(type) + ',' + st.db.escape(profileId) + ',' + st.db.escape(status);
+
+                        var query = 'CALL pSaveTENUsers(' + queryParams + ')';
+
+                        st.db.query(query, function (err, insertresult) {
+                            if (!err) {
+                                if (insertresult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Data saved successfully';
+                                    responseMessage.data = {
+                                        token: req.body.token,
+                                        tid: req.body.tid,
+                                        ten_id: req.body.ten_id,
+                                        type: req.body.type,
+                                        status: req.body.status
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTENUsers: Data saved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'No save Data';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTENUsers:No save Data');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveTENUsers: error in saving tenUsers data:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveTENUsers: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveTENUsers:Error in processing Token' + err);
+                }
+            });
+        }
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSaveTENUsers:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
+
+/**
+ * @todo FnApproveTEN
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get ten details
+ */
+Alumni.prototype.approveTEN = function(req,res,next){
+    var _this = this;
+
+    var token = req.body.token;
+    var tenID = req.body.ten_id;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!tenID){
+        error['tenID'] = 'Invalid tenID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(tenID);
+                        var query = 'CALL pApproveTEN(' + queryParams + ')';
+                        st.db.query(query, function (err, approveResult) {
+                            if (!err) {
+                                if (approveResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Approved successfully';
+                                    responseMessage.data = {
+                                        token: req.body.token,
+                                        ten_id: req.body.ten_id
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnApproveTEN: Approved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'not Approved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnApproveTEN: not Approved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnApproveTEN: error in getting approve:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnApproveTEN: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnApproveTEN:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnApproveTEN ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnSaveComments
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save comments
+ */
+Alumni.prototype.saveComments = function(req,res,next){
+    var _this = this;
+
+    //var token = req.body.token;
+    var tenID = req.body.ten_id;
+    var profileId = req.body.profile_id;  // profileID is AlumniProfileID of that user
+    var rating = req.body.rating;
+    var comments = req.body.comments;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
+    if(!tenID){
+        error['tenID'] = 'Invalid tenID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
+                        var queryParams = st.db.escape(tenID) + ',' + st.db.escape(profileId)+ ',' + st.db.escape(rating)
+                            + ',' + st.db.escape(comments);
+                        var query = 'CALL pgivecommentsforTEN(' + queryParams + ')';
+                        st.db.query(query, function (err, saveResult) {
+                            if (!err) {
+                                if (saveResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Comments saved successfully';
+                                    responseMessage.data = {
+                                        ten_id : req.body.ten_id,
+                                        profile_id : req.body.profile_id,
+                                        rating : req.body.rating,
+                                        comments : req.body.comments
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveComments: Comments saved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'No save comments';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveComments: No save comments');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveComments: error in saving comments:' + err);
+                            }
+
+                        });
+                    }
+            //        else {
+            //            responseMessage.message = 'Invalid token';
+            //            responseMessage.error = {
+            //                token: 'Invalid Token'
+            //            };
+            //            responseMessage.data = null;
+            //            res.status(401).json(responseMessage);
+            //            console.log('FnSaveComments: Invalid token');
+            //        }
+            //    }
+            //    else {
+            //        responseMessage.error = {
+            //            server: 'Internal Server Error'
+            //        };
+            //        responseMessage.message = 'Error in validating Token';
+            //        res.status(500).json(responseMessage);
+            //        console.log('FnSaveComments:Error in processing Token' + err);
+            //    }
+            //});
+        //}
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveComments ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnGetParticiapatedEventsId
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get profile status
+ */
+Alumni.prototype.getParticiapatedEventsId = function(req,res,next){
+    var _this = this;
+
+    //var token = req.query.token;
+    var profileId = req.body.profile_id;  // profileID is AlumniProfileID of that user
+    var ids = req.query.ids;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
+    if(!profileId){
+        error['profileId'] = 'Invalid profileId';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
+            var queryParams = st.db.escape(profileId) + ',' + st.db.escape(ids);
+            var query = 'CALL pLoadparticiapatedTENId(' + queryParams + ')';
+            st.db.query(query, function (err, getResult) {
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Data loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetParticiapatedEventsId: Data loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Data not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetParticiapatedEventsId: Data not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Data not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetParticiapatedEventsId: Data not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetParticiapatedEventsId: error in getting ten details :' + err);
+                }
+
+            });
+        }
+            //            else {
+            //                responseMessage.message = 'Invalid token';
+            //                responseMessage.error = {
+            //                    token: 'Invalid Token'
+            //                };
+            //                responseMessage.data = null;
+            //                res.status(401).json(responseMessage);
+            //                console.log('FnGetParticiapatedEventsId: Invalid token');
+            //            }
+            //        }
+            //        else {
+            //            responseMessage.error = {
+            //                server: 'Internal Server Error'
+            //            };
+            //            responseMessage.message = 'Error in validating Token';
+            //            res.status(500).json(responseMessage);
+            //            console.log('FnGetParticiapatedEventsId:Error in processing Token' + err);
+            //        }
+            //    });
+            //}
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetParticiapatedEventsId ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 module.exports = Alumni;
 

@@ -231,6 +231,10 @@ exports.FnRegistrationAlumni = alumniModule.registerAlumni;
 exports.FnSaveTENMaster = alumniModule.saveTENMaster;
 exports.FnGetTENDetails = alumniModule.getTENDetails;
 exports.FnGetProfileStatus = alumniModule.getProfileStatus;
+exports.FnSaveTENUsers = alumniModule.saveTENUsers;
+exports.FnApproveTEN = alumniModule.approveTEN;
+exports.FnSaveComments = alumniModule.saveComments;
+exports.FnGetParticiapatedEventsId = alumniModule.getParticiapatedEventsId;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');

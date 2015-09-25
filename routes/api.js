@@ -212,6 +212,10 @@ router.post('/alumni_signup',LocationManager.FnRegistrationAlumni);
 router.post('/ten_details',LocationManager.FnSaveTENMaster);
 router.get('/ten_details',LocationManager.FnGetTENDetails);
 router.get('/profile_status',LocationManager.FnGetProfileStatus);
+router.post('/ten_users',LocationManager.FnSaveTENUsers);
+router.post('/ten_approve',LocationManager.FnApproveTEN);
+router.post('/ten_comments',LocationManager.FnSaveComments);
+router.get('/particiapated_eventsId',LocationManager.FnGetParticiapatedEventsId);
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);
