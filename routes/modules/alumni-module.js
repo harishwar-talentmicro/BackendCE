@@ -3015,6 +3015,119 @@ Alumni.prototype.getParticiapatedEventsId = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetAlumniApprovalList
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get profile status
+ */
+Alumni.prototype.getAlumniApprovalList = function(req,res,next){
+    var _this = this;
+
+    //var token = req.query.token;
+    var code = req.body.code;  // college code
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
+    if(!code){
+        error['code'] = 'Invalid code';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
+            var queryParams = st.db.escape(code);
+            var query = 'CALL pGetAlumniMemberApprovalList(' + queryParams + ')';
+            st.db.query(query, function (err, getResult) {
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'List loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetAlumniApprovalList: List loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'List not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetAlumniApprovalList: List not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'List not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetAlumniApprovalList: List not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetAlumniApprovalList: error in getting ten approval List :' + err);
+                }
+
+            });
+        }
+            //            else {
+            //                responseMessage.message = 'Invalid token';
+            //                responseMessage.error = {
+            //                    token: 'Invalid Token'
+            //                };
+            //                responseMessage.data = null;
+            //                res.status(401).json(responseMessage);
+            //                console.log('FnGetAlumniApprovalList: Invalid token');
+            //            }
+            //        }
+            //        else {
+            //            responseMessage.error = {
+            //                server: 'Internal Server Error'
+            //            };
+            //            responseMessage.message = 'Error in validating Token';
+            //            res.status(500).json(responseMessage);
+            //            console.log('FnGetAlumniApprovalList:Error in processing Token' + err);
+            //        }
+            //    });
+            //}
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetAlumniApprovalList ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 module.exports = Alumni;
 

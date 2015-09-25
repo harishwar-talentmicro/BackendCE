@@ -216,6 +216,7 @@ router.post('/ten_users',LocationManager.FnSaveTENUsers);
 router.post('/ten_approve',LocationManager.FnApproveTEN);
 router.post('/ten_comments',LocationManager.FnSaveComments);
 router.get('/particiapated_eventsId',LocationManager.FnGetParticiapatedEventsId);
+router.get('/ten_approval_list',LocationManager.FnGetAlumniApprovalList);
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);
