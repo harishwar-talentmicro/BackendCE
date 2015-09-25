@@ -1508,9 +1508,7 @@ User.prototype.forgetPassword = function(req,res,next){
                                                             if (!err) {
                                                                 console.log('FnForgetPassword: Mail saved Successfully');
                                                                 RtnMessage.IsChanged = true;
-                                                                res.send(RtnMessage)
-
-                                                                var WebText = require('webtext-api');
+                                                                res.send(RtnMessage);
                                                             }
                                                             else {
                                                                 console.log('FnForgetPassword: Mail not Saved Successfully' + err);

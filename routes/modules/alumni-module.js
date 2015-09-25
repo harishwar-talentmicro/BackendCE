@@ -1793,7 +1793,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var batch = req.body.batch;
     var code = req.body.code;     // college code
     var accesstype = req.body.access_type;  // 0-no relation, 1-is admin, 2-is member
-    var tid = req.body.tid;           // while saving first time 0 else give tid
+    //var tid = req.body.tid;           // while saving first time 0 else give tid
 
     var responseMessage = {
         status: false,
@@ -1843,13 +1843,6 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
         error['accesstype'] = 'Invalid accesstype';
         validateStatus *= false;
     }
-    if(!tid){
-        tid = 0;
-    }
-    if(parseInt(tid) == NaN){
-        error['tid'] = 'Invalid tid';
-        validateStatus *= false;
-    }
 
     if(!validateStatus){
         responseMessage.status = false;
@@ -1865,7 +1858,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
             //        if (result) {
                     var query = st.db.escape(ezeone_id) + ',' + st.db.escape(profile) + ',' + st.db.escape(studentID)
                         + ',' + st.db.escape(education) + ',' + st.db.escape(specialization) + ',' + st.db.escape(batch)
-                        + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype) + ',' + st.db.escape(tid);
+                        + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype);
 
                     st.db.query('CALL pSaveAlumniProfile(' + query + ')', function (err, insertresult) {
                         if (!err) {
@@ -1881,9 +1874,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                                     specialization : req.body.specialization,
                                     batch : req.body.batch,
                                     code : req.body.code,
-                                    access_type : req.body.access_type,
-                                    tid : req.body.tid
-
+                                    access_type : req.body.access_type
                             };
                                 res.status(200).json(responseMessage);
                                 console.log('FnSaveAlumniProfile: Alumni Profile saved successfully');
@@ -2426,6 +2417,124 @@ Alumni.prototype.getTENDetails = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnGetTENDetails ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnGetProfileStatus
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get profile status
+ */
+Alumni.prototype.getProfileStatus = function(req,res,next){
+    var _this = this;
+
+    //var token = req.query.token;
+    var masterId = req.query.master_id;   // college code
+    var code = req.query.code;   // college code
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
+    if(!masterId){
+        error['masterId'] = 'Invalid masterId';
+        validateStatus *= false;
+    }
+    if(!code){
+        error['code'] = 'Invalid code';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
+            var query = st.db.escape(masterId) + ',' + st.db.escape(code);
+            console.log('CALL PgetProfileStatus(' + query + ')');
+            st.db.query('CALL PgetProfileStatus(' + query + ')', function (err, getResult) {
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Data loaded successfully';
+                            responseMessage.data = getResult[0][0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetProfileStatus: Data loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Data not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetProfileStatus: Data not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Data not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetProfileStatus: Data not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetProfileStatus: error in getting ten details :' + err);
+                }
+
+            });
+        }
+            //            else {
+            //                responseMessage.message = 'Invalid token';
+            //                responseMessage.error = {
+            //                    token: 'Invalid Token'
+            //                };
+            //                responseMessage.data = null;
+            //                res.status(401).json(responseMessage);
+            //                console.log('FnGetProfileStatus: Invalid token');
+            //            }
+            //        }
+            //        else {
+            //            responseMessage.error = {
+            //                server: 'Internal Server Error'
+            //            };
+            //            responseMessage.message = 'Error in validating Token';
+            //            res.status(500).json(responseMessage);
+            //            console.log('FnGetProfileStatus:Error in processing Token' + err);
+            //        }
+            //    });
+            //}
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetProfileStatus ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

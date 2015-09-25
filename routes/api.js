@@ -211,6 +211,7 @@ router.get('/alumni_profile',LocationManager.FnGetAlumniProfile);
 router.post('/alumni_signup',LocationManager.FnRegistrationAlumni);
 router.post('/ten_details',LocationManager.FnSaveTENMaster);
 router.get('/ten_details',LocationManager.FnGetTENDetails);
+router.get('/profile_status',LocationManager.FnGetProfileStatus);
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);
