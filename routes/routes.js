@@ -252,6 +252,14 @@ var gingerModule = new Gingerbite(db,stdLib);
 exports.FnSendMailGingerbite = gingerModule.sendMailGingerbite;
 exports.FnSendMailTechplasma = gingerModule.sendMailTechplasma;
 
+//Contact Manager Module
+var ContactManager = require('./modules/contact-manager-module.js');
+var contactManager = new ContactManager(db,stdLib);
+exports.FnGetClientList = contactManager.getClientList;
+exports.FnGetClientContacts = contactManager.getClientContacts;
+exports.FnSaveClient = contactManager.saveClient;
+exports.FnSaveClientContact = contactManager.saveClientContact;
+
 
 var Notification = require('./modules/notification/notification-master.js');
 var notification = new Notification(db,stdLib);
