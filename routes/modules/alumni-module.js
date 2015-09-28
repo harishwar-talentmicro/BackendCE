@@ -2441,7 +2441,7 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
     var _this = this;
 
     //var token = req.query.token;
-    var masterId = req.query.master_id;   // college code
+    var masterId = req.query.token;   // college code
     var code = req.query.code;   // college code
 
     var responseMessage = {
