@@ -99,6 +99,7 @@ exports.FnGetCompanyDetails = businessManager.getCompanyDetails;
 exports.FnGetEZEOneIDInfo = businessManager.getEZEOneIDInfo;
 exports.FnGetTransAttachment = businessManager.getTransAttachment;
 exports.FnSalesStatistics = businessManager.salesStatistics;
+exports.FnGetClientList = businessManager.getClientList;
 
 
 var Configuration = require('./modules/configuration-module.js');

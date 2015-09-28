@@ -109,7 +109,7 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
 
                                         //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
                                         RtnMessage.TotalPage = TotalPage;
-                                        RtnMessage.Result =GetResult[0];
+                                        RtnMessage.Result = GetResult[0];
                                         res.send(RtnMessage);
                                         console.log('FnGetTranscation: Transaction details Send successfully');
                                     }
@@ -1817,7 +1817,7 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnGetTransAttachment:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1901,7 +1901,7 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
                                 total_amount :total_count,
                                 total_items:total_qty,
                                 funnel:GetResult[1]
-                            }
+                            };
                             responseMessage.error = null;
                             responseMessage.message = 'Sales Statistics Send successfully';
                             console.log('FnSalesStatistics: Sales Statistics Send successfully');
@@ -1964,7 +1964,7 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnSalesStatistics:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1972,5 +1972,120 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetClientList
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * * @server_param
+ *  1. token
+ *  2. title
+ * @description api code for get client list
+ */
+BusinessManager.prototype.getClientList = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var title = req.query.title;
+    var pageSize = req.query.page_size;   // constant no of count in one page
+    var pageCount = req.query.page_count; // starting from 0
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var query = st.db.escape(token) + ',' + st.db.escape(title)+ ',' + st.db.escape(pageSize)
+                            + ',' + st.db.escape(pageCount);
+
+                        st.db.query('CALL pGetClientList(' + query + ')', function (err, getResult) {
+                            //console.log(getResult);
+                            if (!err) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Client List loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetClientList: Client List loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Client List not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetClientList: Client List not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Client List not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetClientList: Client List not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetClientList: error in getting Client List :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetClientList: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetClientList:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetClientList ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = BusinessManager;
