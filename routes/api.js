@@ -169,7 +169,6 @@ router.get('/find_institute',LocationManager.FnFindInstitute);
 router.post('/share_location',LocationManager.FnShareLocation);
 router.get('/locations_map_view',LocationManager.FnGetLocationsofezeid);
 
-
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);
 router.get('/validate_groupname',LocationManager.FnValidateGroupName);
@@ -227,6 +226,12 @@ router.post('/techplasma_mail',LocationManager.FnSendMailTechplasma);
 //Recruitment module
 router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
 router.get('/sales_masters',LocationManager.FnGetSalesMasters);
+
+//Contact Manager Module
+router.get('/client',LocationManager.FnGetClientList);
+router.get('/contact',LocationManager.FnGetClientContacts);
+router.post('/client',LocationManager.FnSaveClient);
+router.post('/contact',LocationManager.FnSaveClientContact);
 
 
 

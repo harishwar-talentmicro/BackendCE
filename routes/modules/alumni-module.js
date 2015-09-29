@@ -617,11 +617,11 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var facultySubtitle = req.body.f_subtitle;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var logoWidth = req.body.width ?  req.body.logo_width : 100;
-    var logoHeight = req.body.height ? req.body.logo_height : 100;
     var page_pic,logo_pic;
 
-    //console.log(req.body);
+
+    console.log('logo...................................');
+    console.log(req.body.logo);
 
 
     var responseMessage = {
@@ -675,15 +675,15 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         validateStatus *= false;
     }
     if(!purposeText){
-        responseMessage.error['purposeText'] = 'Invalid purposeText';
+        error['purposeText'] = 'Invalid purposeText';
         validateStatus *= false;
     }
     if(!teamTitle){
-        responseMessage.error['teamTitle'] = 'Invalid teamTitle';
+        error['teamTitle'] = 'Invalid teamTitle';
         validateStatus *= false;
     }
     if(!teamSubtitle){
-        responseMessage.error['teamSubtitle'] = 'Invalid teamSubtitle';
+        error['teamSubtitle'] = 'Invalid teamSubtitle';
         validateStatus *= false;
     }
     if(!mainFooter1){
@@ -691,35 +691,35 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         validateStatus *= false;
     }
     if(!mainFooter2){
-        responseMessage.error['mainFooter2'] = 'Invalid mainFooter2';
+        error['mainFooter2'] = 'Invalid mainFooter2';
         validateStatus *= false;
     }
     //if(!logo){
-    //    responseMessage.error['logo'] = 'Invalid logo';
+    //    error['logo'] = 'Invalid logo';
     //    validateStatus *= false;
     //}
     if(!logoTitle){
-        responseMessage.error['mainFooter2'] = 'Invalid logoTitle';
+        error['mainFooter2'] = 'Invalid logoTitle';
         validateStatus *= false;
     }
     if(!alumniId){
-        responseMessage.error['alumniId'] = 'Invalid alumniId';
+        error['alumniId'] = 'Invalid alumniId';
         validateStatus *= false;
     }
     if(!mentorTitle){
-        responseMessage.error['mentorTitle'] = 'Invalid mentorTitle';
+        error['mentorTitle'] = 'Invalid mentorTitle';
         validateStatus *= false;
     }
     if(!mentorSubtitle){
-        responseMessage.error['mentorSubtitle'] = 'Invalid mentorSubtitle';
+        error['mentorSubtitle'] = 'Invalid mentorSubtitle';
         validateStatus *= false;
     }
     if(!facultyTitle){
-        responseMessage.error['facultyTitle'] = 'Invalid facultyTitle';
+        error['facultyTitle'] = 'Invalid facultyTitle';
         validateStatus *= false;
     }
     if(!facultySubtitle){
-        responseMessage.error['facultySubtitle'] = 'Invalid facultySubtitle';
+        error['facultySubtitle'] = 'Invalid facultySubtitle';
         validateStatus *= false;
     }
 
@@ -736,165 +736,126 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                    //console.log ('------');
-            //console.log(req.files.pg_pic);
-            //data:image/  (length : 11)
 
-            var pagePicture = function () {
-            //console.log('page pic..');
+                        var pagePicture = function () {
 
-                var imageParams = {
-                    path: req.files.pg_pic.path,
-                    type: pictureType,
-                    width: width,
-                    height: height,
-                    scale: '',
-                    crop: ''
-                };
+                            var imageParams = {
+                                path: req.files.pg_pic.path,
+                                type: pictureType,
+                                width: width,
+                                height: height,
+                                scale: '',
+                                crop: ''
+                            };
+                            //console.log(imageParams);
+                            FnCropImage(imageParams, function (err, pictureResult) {
 
-                //console.log(imageParams);
+                                if (pictureResult) {
+                                    var params = {
+                                        page_pic: pictureResult
+                                    };
+                                    saveContent(params);
+                                }
+                            });
+                        };
 
-                FnCropImage(imageParams, function (err, pictureResult) {
-                    if (pictureResult) {
-                        page_pic = pictureResult;
-                        logoPicture(page_pic);
-                    }
-                });
-            };
+                        var saveContent = function(params) {
+                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
+                                + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
+                                + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
+                                + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
+                                + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(req.body.logo)
+                                + ',' + st.db.escape(logoTitle) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(mentorTitle)
+                                + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
+                                + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
+                                + ',' + st.db.escape(pictureType);
 
-            var logoPicture = function (pic) {
-                //console.log('c3...');
-                page_pic = pic;
-                //console.log(page_pic);
+                            var query = 'CALL pSaveAlumniContent(' + queryParams + ')';
+                            //console.log(query);
+                            st.db.query(query, function (err, insertresult) {
+                                if (!err) {
+                                    if (insertresult) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Alumni Content saved successfully';
+                                        responseMessage.data = {
+                                            tid: req.body.tid,
+                                            pg_picName: req.body.pg_picName,
+                                            pg_picType: req.body.pg_picType,
+                                            pg_title: req.body.pg_title,
+                                            pg_subtitle: req.body.pg_subtitle,
+                                            footerL1: req.body.footerL1,
+                                            footerL2: req.body.footerL2,
+                                            idea_title: req.body.idea_title,
+                                            idea_text: req.body.idea_text,
+                                            purpose_title: req.body.purpose_title,
+                                            purpose_text: req.body.purpose_text,
+                                            team_title: req.body.team_title,
+                                            team_subtitle: req.body.team_subtitle,
+                                            m_footer1: req.body.m_footer1,
+                                            m_footer2: req.body.m_footer2,
+                                            l_name: req.body.l_name,
+                                            l_type: req.body.l_type,
+                                            logo_title: req.body.logo_title,
+                                            alumni_id: req.body.alumni_id,
+                                            m_title: req.body.m_title,
+                                            m_subtitle: req.body.m_subtitle,
+                                            f_title: req.body.f_title,
+                                            f_subtitle: req.body.f_subtitle,
+                                            height: height,
+                                            width: width
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveAlumniContent: Alumni Content saved successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'No save Alumni Content';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveAlumniContent:No save Alumni Content');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnSaveAlumniContent: error in saving Alumni Content:' + err);
+                                }
+                            });
+                        };
 
-                if (req.files.logo) {
 
-                    var imageParams1 = {
-                        path: req.files.logo.path,
-                        type: logoType,
-                        width: logoWidth,
-                        height: logoHeight,
-                        scale: '',
-                        crop: ''
-                    };
-                    //console.log(imageParams1);
-                    FnCropImage(imageParams1, function (err, logoResult) {
-                        if (logoResult) {
-                            //console.log(logoResult);
-                            logo_pic = logoResult;
+                        if (req.files.pg_pic) {
+                        console.log('c1...');
+                            pagePicture();
+                        }
+                        else {
+                            console.log('c2...');
                             var params = {
-                                page_pic: page_pic,
-                                logo_image: logo_pic
+                                page_pic: req.body.pg_pic
                             };
                             saveContent(params);
                         }
-                    });
+
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveAlumniContent: Invalid token');
+                    }
                 }
                 else {
-                    //console.log('c4...');
-                    logo_pic = req.body.logo;
-                    var params = {
-                        page_pic: page_pic,
-                        logo_image: logo_pic
+                    responseMessage.error = {
+                        server: 'Internal server error'
                     };
-                    saveContent(params);
-                    //console.log(logo_pic);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveAlumniContent:Error in processing Token' + err);
                 }
-            };
-
-var saveContent = function(params) {
-    var queryParams = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
-        + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
-        + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
-        + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
-        + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(params.logo_image)
-        + ',' + st.db.escape(logoTitle) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(mentorTitle)
-        + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
-        + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
-        + ',' + st.db.escape(pictureType);
-
-    var query = 'CALL pSaveAlumniContent(' + queryParams + ')';
-    //console.log(query);
-    st.db.query(query, function (err, insertresult) {
-        if (!err) {
-            if (insertresult) {
-                responseMessage.status = true;
-                responseMessage.error = null;
-                responseMessage.message = 'Alumni Content saved successfully';
-                responseMessage.data = {
-                    tid: req.body.tid,
-                    pg_pic: req.body.pg_pic,
-                    pg_picName: req.body.pg_picName,
-                    pg_picType: req.body.pg_picType,
-                    pg_title: req.body.pg_title,
-                    pg_subtitle: req.body.pg_subtitle,
-                    footerL1: req.body.footerL1,
-                    footerL2: req.body.footerL2,
-                    idea_title: req.body.idea_title,
-                    idea_text: req.body.idea_text,
-                    purpose_title: req.body.purpose_title,
-                    purpose_text: req.body.purpose_text,
-                    team_title: req.body.team_title,
-                    team_subtitle: req.body.team_subtitle,
-                    m_footer1: req.body.m_footer1,
-                    m_footer2: req.body.m_footer2,
-                    logo: req.body.logo,
-                    l_name: req.body.l_name,
-                    l_type: req.body.l_type,
-                    logo_title: req.body.logo_title,
-                    alumni_id: req.body.alumni_id,
-                    m_title: req.body.m_title,
-                    m_subtitle: req.body.m_subtitle,
-                    f_title: req.body.f_title,
-                    f_subtitle: req.body.f_subtitle,
-                    height: height,
-                    width: width,
-                    logo_width: logoWidth,
-                    logo_height: logoHeight
-                };
-                res.status(200).json(responseMessage);
-                console.log('FnSaveAlumniContent: Alumni Content saved successfully');
-            }
-            else {
-                responseMessage.message = 'No save Alumni Content';
-                res.status(200).json(responseMessage);
-                console.log('FnSaveAlumniContent:No save Alumni Content');
-            }
+            });
         }
-        else {
-            responseMessage.message = 'An error occured ! Please try again';
-            res.status(500).json(responseMessage);
-            console.log('FnSaveAlumniContent: error in saving Alumni Content:' + err);
-        }
-    });
-};
-                        if (req.files.pg_pic) {
-                pagePicture();
-            }
-            else {
-                logoPicture(req.body.pg_pic);
-            }
-        }
-                                        else {
-                                            responseMessage.message = 'Invalid token';
-                                            responseMessage.error = {
-                                                token: 'Invalid token'
-                                            };
-                                            responseMessage.data = null;
-                                            res.status(401).json(responseMessage);
-                                            console.log('FnSaveAlumniContent: Invalid token');
-                                        }
-                                    }
-                                    else {
-                                        responseMessage.error = {
-                                            server: 'Internal server error'
-                                        };
-                                        responseMessage.message = 'Error in validating Token';
-                                        res.status(500).json(responseMessage);
-                                        console.log('FnSaveAlumniContent:Error in processing Token' + err);
-                                    }
-                                });
-    }
         catch(ex){
             responseMessage.error = {
                 server: 'Internal Server error'
@@ -919,7 +880,7 @@ var saveContent = function(params) {
 Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var _this = this;
 
-    //var token = req.body.token;
+    var token = req.body.token;
     var tid = req.body.tid;      // while saving time 0 else id of user
     var picture = req.body.picture;
     var pictureTitle = req.body.p_title;
@@ -947,10 +908,10 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
 
     var error = {},validateStatus = true;
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
     if(!tid){
         tid = 0;
     }
@@ -1006,118 +967,113 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     }
     else{
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
 
-            var teamPicture = function() {
+                        var teamPicture = function () {
 
-                var imageParams = {
-                    path: req.files.picture.path,
-                    //path1 : req.files.picture[1].path,
-                    type: pictureType,
-                    width: width,
-                    height: height,
-                    scale: '',
-                    crop: ''
-                };
+                            var imageParams = {
+                                path: req.files.picture.path,
+                                //path1 : req.files.picture[1].path,
+                                type: pictureType,
+                                width: width,
+                                height: height,
+                                scale: '',
+                                crop: ''
+                            };
 
-                FnCropImage(imageParams, function (err, imageResult) {
-                    if (imageResult) {
-                        image = {
-                            pic : imageResult
+                            FnCropImage(imageParams, function (err, imageResult) {
+                                if (imageResult) {
+                                    image = {
+                                        pic: imageResult
+                                    };
+                                    saveTeam(image);
+                                }
+                                else {
+                                    console.log('No image cropped');
+                                }
+                            });
                         };
-                        saveTeam(image);
-                    }
-                    else{
-                        console.log('No image cropped');
-                    }
-                });
-            };
 
-            var saveTeam = function(image) {
-                    var queryParams = st.db.escape(tid) + ',' + st.db.escape(image.pic) + ',' + st.db.escape(jobTitle)
-                        + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
-                        + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
-                        + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username);
+                        var saveTeam = function (image) {
+                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(image.pic) + ',' + st.db.escape(jobTitle)
+                                + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
+                                + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
+                                + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username)
+                                + ',' + st.db.escape(token);
 
-                console.log(st.db.escape(tid) + ',' + st.db.escape(jobTitle)
-                    + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
-                    + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
-                    + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username));
+                            var query = 'CALL pSaveAlumniTeam(' + queryParams + ')';
 
-                var query = 'CALL pSaveAlumniTeam(' + queryParams + ')';
-
-                    st.db.query(query, function (err, insertresult) {
-                        if (!err) {
-                            if (insertresult) {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Alumni Team saved successfully';
-                                responseMessage.data = {
-                                    token: req.body.token,
-                                    tid: req.body.tid,
-                                    picture: req.body.picture,
-                                    p_title: req.body.p_title,
-                                    p_type: req.body.p_type,
-                                    job_title: req.body.job_title,
-                                    company: req.body.company,
-                                    profile: req.body.profile,
-                                    seq_no: req.body.seq_no,
-                                    type: req.body.type,
-                                    alumni_id: req.body.alumni_id,
-                                    alumni_role: req.body.alumni_role,
-                                    username: req.body.username,
-                                    height : height,
-                                    width : width
-                                };
-                                res.status(200).json(responseMessage);
-                                console.log('FnSaveAlumniTeam: Alumni Team saved successfully');
-                            }
-                            else {
-                                responseMessage.message = 'No save Alumni Team';
-                                res.status(200).json(responseMessage);
-                                console.log('FnSaveAlumniTeam:No save Alumni Team');
-                            }
+                            st.db.query(query, function (err, insertresult) {
+                                if (!err) {
+                                    if (insertresult) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Alumni Team saved successfully';
+                                        responseMessage.data = {
+                                            token: req.body.token,
+                                            tid: req.body.tid,
+                                            picture: req.body.picture,
+                                            p_title: req.body.p_title,
+                                            p_type: req.body.p_type,
+                                            job_title: req.body.job_title,
+                                            company: req.body.company,
+                                            profile: req.body.profile,
+                                            seq_no: req.body.seq_no,
+                                            type: req.body.type,
+                                            alumni_id: req.body.alumni_id,
+                                            alumni_role: req.body.alumni_role,
+                                            username: req.body.username,
+                                            height: height,
+                                            width: width
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveAlumniTeam: Alumni Team saved successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'No save Alumni Team';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveAlumniTeam:No save Alumni Team');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnSaveAlumniTeam: error in saving Alumni Team:' + err);
+                                }
+                            });
+                        };
+                        if (req.files.picture) {
+                            teamPicture();
                         }
                         else {
-                            responseMessage.message = 'An error occured ! Please try again';
-                            res.status(500).json(responseMessage);
-                            console.log('FnSaveAlumniTeam: error in saving Alumni Team:' + err);
+                            image = {
+                                pic: req.body.picture
+                            };
+                            saveTeam(image);
                         }
-                    });
-            };
-            if (req.files.picture) {
-                teamPicture();
-            }
-            else
-            {
-                image = {
-                    pic : req.body.picture
-                };
-                saveTeam(image);
-            }
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveAlumniTeam: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveAlumniTeam:Error in processing Token' + err);
+                }
+            });
         }
-        //            else {
-        //                responseMessage.message = 'Invalid token';
-        //                responseMessage.error = {
-        //                    token: 'Invalid token'
-        //                };
-        //                responseMessage.data = null;
-        //                res.status(401).json(responseMessage);
-        //                console.log('FnSaveAlumniTeam: Invalid token');
-        //            }
-        //        }
-        //        else {
-        //            responseMessage.error = {
-        //                server: 'Internal server error'
-        //            };
-        //            responseMessage.message = 'Error in validating Token';
-        //            res.status(500).json(responseMessage);
-        //            console.log('FnSaveAlumniTeam:Error in processing Token' + err);
-        //        }
-        //    });
-        //}
         catch(ex){
             responseMessage.error = {
                 server: 'Internal Server error'
@@ -1378,7 +1334,7 @@ function FnCropImage(imageParams, callback){
 Alumni.prototype.getAlumniContent = function(req,res,next){
     var _this = this;
 
-    var token = req.query.token;
+    //var token = req.query.token;
     var code = req.query.code;   // college code
 
     var responseMessage = {
@@ -1390,10 +1346,10 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    if(!token){
-        error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
     if(!code){
         error['code'] = 'Invalid code';
         validateStatus *= false;
@@ -1406,12 +1362,13 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
-                if (!err) {
-                    if (result) {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
                         var query = st.db.escape(code);
                         console.log('CALL pGetAlumniContent(' + query + ')');
                         st.db.query('CALL pGetAlumniContent(' + query + ')', function (err, getResult) {
+                            //console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
                                     if (getResult[0].length > 0) {
@@ -1419,6 +1376,7 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
                                         responseMessage.error = null;
                                         responseMessage.message = 'Alumni content loaded successfully';
                                         responseMessage.data = getResult[0];
+
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetAlumniContent: Alumni content loaded successfully');
                                     }
@@ -1445,26 +1403,26 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
 
                         });
                     }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {
-                            token: 'Invalid Token'
-                        };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetAlumniContent: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetAlumniContent:Error in processing Token' + err);
-                }
-            });
-        }
+        //            else {
+        //                responseMessage.message = 'Invalid token';
+        //                responseMessage.error = {
+        //                    token: 'Invalid Token'
+        //                };
+        //                responseMessage.data = null;
+        //                res.status(401).json(responseMessage);
+        //                console.log('FnGetAlumniContent: Invalid token');
+        //            }
+        //        }
+        //        else {
+        //            responseMessage.error = {
+        //                server: 'Internal Server Error'
+        //            };
+        //            responseMessage.message = 'Error in validating Token';
+        //            res.status(500).json(responseMessage);
+        //            console.log('FnGetAlumniContent:Error in processing Token' + err);
+        //        }
+        //    });
+        //}
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -1490,9 +1448,9 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
 Alumni.prototype.getAlumniTeam = function(req,res,next){
     var _this = this;
 
-    //var token = req.query.token;
+    var token = req.query.token;
     var code = req.query.code;   // college code
-    var type = req.query.type;   // 0=core group 1=mentor 2=faculty
+    var type = parseInt(req.query.type);   // 0=core group 1=mentor 2=faculty
 
     var responseMessage = {
         status: false,
@@ -1503,10 +1461,10 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
     if(!code){
         error['code'] = 'Invalid code';
         validateStatus *= false;
@@ -1526,14 +1484,16 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
                         var queryParams = st.db.escape(code) + ',' + st.db.escape(type);
                         var query = 'CALL pGetAlumniTeam(' + queryParams + ')';
+                        //console.log(query);
 
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
+                            //console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
                                     if (getResult[0].length > 0) {
@@ -1567,26 +1527,26 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
 
                         });
                     }
-        //            else {
-        //                responseMessage.message = 'Invalid token';
-        //                responseMessage.error = {
-        //                    token: 'Invalid Token'
-        //                };
-        //                responseMessage.data = null;
-        //                res.status(401).json(responseMessage);
-        //                console.log('FnGetAlumniTeam: Invalid token');
-        //            }
-        //        }
-        //        else {
-        //            responseMessage.error = {
-        //                server: 'Internal Server Error'
-        //            };
-        //            responseMessage.message = 'Error in validating Token';
-        //            res.status(500).json(responseMessage);
-        //            console.log('FnGetAlumniTeam:Error in processing Token' + err);
-        //        }
-        //    });
-        //}
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetAlumniTeam: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetAlumniTeam:Error in processing Token' + err);
+                }
+            });
+        }
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -1612,7 +1572,7 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
 Alumni.prototype.deleteAlumniTeam = function(req,res,next){
     var _this = this;
 
-    //var token = req.query.token;
+    var token = req.query.token;
     var id = req.query.id;     // alumni team id
 
     var responseMessage = {
@@ -1624,10 +1584,10 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
     if(!id){
         error['id'] = 'Invalid id';
         validateStatus *= false;
@@ -1640,9 +1600,10 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
                         var query = st.db.escape(id);
                         console.log('CALL PDeleteAlumniTeam(' + query + ')');
                         st.db.query('CALL PDeleteAlumniTeam(' + query + ')', function (err, getResult) {
@@ -1652,7 +1613,7 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Alumni team deleted successfully';
-                                    responseMessage.data = { id : req.query.id };
+                                    responseMessage.data = {id: req.query.id};
                                     res.status(200).json(responseMessage);
                                     console.log('FnDeleteAlumniTeam: Alumni team deleted successfully');
                                 }
@@ -1673,26 +1634,26 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
 
                         });
                     }
-        //            else {
-        //                responseMessage.message = 'Invalid token';
-        //                responseMessage.error = {
-        //                    token: 'Invalid Token'
-        //                };
-        //                responseMessage.data = null;
-        //                res.status(401).json(responseMessage);
-        //                console.log('FnDeleteAlumniTeam: Invalid token');
-        //            }
-        //        }
-        //        else {
-        //            responseMessage.error = {
-        //                server: 'Internal Server Error'
-        //            };
-        //            responseMessage.message = 'Error in validating Token';
-        //            res.status(500).json(responseMessage);
-        //            console.log('FnDeleteAlumniTeam:Error in processing Token' + err);
-        //        }
-        //    });
-        //}
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnDeleteAlumniTeam: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnDeleteAlumniTeam:Error in processing Token' + err);
+                }
+            });
+        }
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -1945,7 +1906,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
 Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
     var _this = this;
 
-    //var token = req.query.token;
+    var token = req.query.token;
     var tid = req.query.tid;
 
     var responseMessage = {
@@ -1957,10 +1918,10 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
     if(!tid){
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
@@ -1973,65 +1934,65 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
-            var query = st.db.escape(tid);
-            console.log('CALL pGetAlumniTeamDetails(' + query + ')');
-            st.db.query('CALL pGetAlumniTeamDetails(' + query + ')', function (err, getResult) {
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (getResult[0]) {
-                        if (getResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'AlumniTeam Details loaded successfully';
-                            responseMessage.data = getResult[0][0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'AlumniTeam Details not loaded';
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetAlumniTeamDetails: AlumniTeam Details not loaded');
-                        }
+                    if (result) {
+                        var query = st.db.escape(tid);
+                        console.log('CALL pGetAlumniTeamDetails(' + query + ')');
+                        st.db.query('CALL pGetAlumniTeamDetails(' + query + ')', function (err, getResult) {
+                            if (!err) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'AlumniTeam Details loaded successfully';
+                                        responseMessage.data = getResult[0][0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'AlumniTeam Details not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniTeamDetails: AlumniTeam Details not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'AlumniTeam Details not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetAlumniTeamDetails:AlumniTeam v not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetAlumniTeamDetails: error in getting alumniteam Details :' + err);
+                            }
+
+                        });
                     }
                     else {
-                        responseMessage.message = 'AlumniTeam Details not loaded';
-                        res.status(200).json(responseMessage);
-                        console.log('FnGetAlumniTeamDetails:AlumniTeam v not loaded');
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetAlumniTeamDetails: Invalid token');
                     }
                 }
                 else {
-                    responseMessage.message = 'An error occured in query ! Please try again';
                     responseMessage.error = {
                         server: 'Internal Server Error'
                     };
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnGetAlumniTeamDetails: error in getting alumniteam Details :' + err);
+                    console.log('FnGetAlumniTeamDetails:Error in processing Token' + err);
                 }
-
             });
         }
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid Token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnGetAlumniTeamDetails: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal Server Error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnGetAlumniTeamDetails:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -2483,26 +2444,38 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(code);
                         var query = 'CALL PgetProfileStatus(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
                                     if (getResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Data loaded successfully';
-                                        responseMessage.data = getResult[0][0];
+                                        responseMessage.data = {
+                                            isProfileCreated:true,
+                                            result: getResult[0]
+                                        };
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetProfileStatus: Data loaded successfully');
                                     }
                                     else {
-                                        responseMessage.message = 'Data not loaded';
+                                        responseMessage.status = true;
+                                        responseMessage.message = 'Your profile is not created';
+                                        responseMessage.data = {
+                                            isProfileCreated : false
+                                        };
                                         res.status(200).json(responseMessage);
-                                        console.log('FnGetProfileStatus: Data not loaded');
+                                        console.log('FnGetProfileStatus: Your profile is not created');
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'Data not loaded';
+                                    responseMessage.status = true;
+                                    responseMessage.message = 'Your profile is not created';
+                                    responseMessage.data = {
+                                        isProfileCreated : false
+                                    };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnGetProfileStatus: Data not loaded');
+                                    console.log('FnGetProfileStatus: Your profile is not created');
                                 }
                             }
                             else {
@@ -3144,7 +3117,6 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
 Alumni.prototype.getTeamContent = function(req,res,next){
     var _this = this;
 
-    var token = req.query.token;
     var code = req.query.code;   // college code
 
     var responseMessage = {
@@ -3156,10 +3128,6 @@ Alumni.prototype.getTeamContent = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    if(!token){
-        error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
     if(!code){
         error['code'] = 'Invalid code';
         validateStatus *= false;
@@ -3172,14 +3140,11 @@ Alumni.prototype.getTeamContent = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
-                if (!err) {
-                    if (result) {
-                        var queryParams = st.db.escape(code);
+            var queryParams = st.db.escape(code);
                         var query = 'CALL pgetTeamContent(' + queryParams + ')';
 
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
+                            //console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
                                     if (getResult[0].length > 0) {
@@ -3212,26 +3177,6 @@ Alumni.prototype.getTeamContent = function(req,res,next){
                             }
 
                         });
-                    }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {
-                            token: 'Invalid Token'
-                        };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetTeamContent: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetTeamContent:Error in processing Token' + err);
-                }
-            });
         }
         catch (ex) {
             responseMessage.error = {
@@ -3258,7 +3203,6 @@ Alumni.prototype.getTeamContent = function(req,res,next){
 Alumni.prototype.getTeamImage = function(req,res,next){
     var _this = this;
 
-    var token = req.query.token;
     var code = req.query.code;   // college code
     var type = parseInt(req.query.type);   // 0=core group 1=mentor 2=faculty
 
@@ -3271,10 +3215,7 @@ Alumni.prototype.getTeamImage = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    if(!token){
-        error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
+
     if(!code){
         error['code'] = 'Invalid code';
         validateStatus *= false;
@@ -3294,13 +3235,7 @@ Alumni.prototype.getTeamImage = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
-                if (!err) {
-                    if (result) {
                         var query = st.db.escape(code) + ',' + st.db.escape(type);
-                        //var query = 'CALL pgetTeamImages(' + queryParams + ')';
-
-                        console.log(query);
 
                         st.db.query('CALL pgetTeamImages(' + query + ')', function (err, getResult) {
                             //console.log(getResult);
@@ -3337,26 +3272,6 @@ Alumni.prototype.getTeamImage = function(req,res,next){
 
                         });
                     }
-                    else {
-                        responseMessage.message = 'Invalid token';
-                        responseMessage.error = {
-                            token: 'Invalid Token'
-                        };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnGetTeamImage: Invalid token');
-                    }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnGetTeamImage:Error in processing Token' + err);
-                }
-            });
-        }
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'

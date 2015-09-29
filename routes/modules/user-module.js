@@ -1437,7 +1437,8 @@ User.prototype.forgetPassword = function(req,res,next){
             req.connection.socket.remoteAddress;
 
         var RtnMessage = {
-            IsChanged: false
+            IsChanged: false,
+            mailSend : false
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
@@ -1492,29 +1493,37 @@ User.prototype.forgetPassword = function(req,res,next){
                                                 email.html = mailOptions.html;
 
                                                 sendgrid.send(email, function (err, result) {
+                                                    console.log(result);
                                                     if (!err) {
-                                                        var post = {
-                                                            MessageType: 7,
-                                                            Priority: 1,
-                                                            ToMailID: mailOptions.to,
-                                                            Subject: mailOptions.subject,
-                                                            Body: mailOptions.html,
-                                                            SentbyMasterID: UserResult[0].TID,
-                                                            SentStatus : 1
-                                                        };
-                                                        //console.log(post);
-                                                        var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                            // Neat!
-                                                            if (!err) {
-                                                                console.log('FnForgetPassword: Mail saved Successfully');
-                                                                RtnMessage.IsChanged = true;
-                                                                res.send(RtnMessage);
-                                                            }
-                                                            else {
-                                                                console.log('FnForgetPassword: Mail not Saved Successfully' + err);
-                                                                res.send(RtnMessage);
-                                                            }
-                                                        });
+                                                        if (result.message == 'success') {
+                                                            var post = {
+                                                                MessageType: 7,
+                                                                Priority: 1,
+                                                                ToMailID: mailOptions.to,
+                                                                Subject: mailOptions.subject,
+                                                                Body: mailOptions.html,
+                                                                SentbyMasterID: UserResult[0].TID,
+                                                                SentStatus: 1
+                                                            };
+                                                            //console.log(post);
+                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                // Neat!
+                                                                if (!err) {
+                                                                    console.log('FnForgetPassword: Mail saved Successfully');
+                                                                    RtnMessage.IsChanged = true;
+                                                                    RtnMessage.mailSend = true;
+                                                                    res.send(RtnMessage);
+                                                                }
+                                                                else {
+                                                                    console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                                                    res.send(RtnMessage);
+                                                                }
+                                                            });
+                                                        }
+                                                        else {
+                                                            console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                                            res.send(RtnMessage);
+                                                        }
                                                     }
                                                     else {
                                                         console.log('FnForgetPassword: Mail not Saved Successfully' + err);

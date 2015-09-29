@@ -109,7 +109,7 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
 
                                         //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
                                         RtnMessage.TotalPage = TotalPage;
-                                        RtnMessage.Result =GetResult[0];
+                                        RtnMessage.Result = GetResult[0];
                                         res.send(RtnMessage);
                                         console.log('FnGetTranscation: Transaction details Send successfully');
                                     }
@@ -1817,7 +1817,7 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnGetTransAttachment:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1901,7 +1901,7 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
                                 total_amount :total_count,
                                 total_items:total_qty,
                                 funnel:GetResult[1]
-                            }
+                            };
                             responseMessage.error = null;
                             responseMessage.message = 'Sales Statistics Send successfully';
                             console.log('FnSalesStatistics: Sales Statistics Send successfully');
@@ -1964,13 +1964,14 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnSalesStatistics:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
         res.status(400).json(responseMessage);
     }
 };
+
 
 
 module.exports = BusinessManager;

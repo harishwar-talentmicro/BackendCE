@@ -151,6 +151,7 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                                                     firstName: firstName,
                                                     lastName: lastName,
                                                     email: emailId,
+                                                    to_email:to_email,
                                                     mobile: mobile,
                                                     address: address
                                                 };
@@ -249,8 +250,8 @@ Gingerbite.prototype.sendMailTechplasma = function(req,res,next) {
     var address = req.body.address;
     var hashCode = req.body.hash_code ? req.body.hash_code : '9b1feaee73615783ebf4c7cc9a028252';
     //var to_email = 'dev.sandeep@hotmail.com';
-    var to_email = 'sgowrishankar26@gmail.com';
-    //var to_email = 'aditya@gingerbite.com';
+    //var to_email = 'sgowrishankar26@gmail.com';
+    var to_email = 'sales@techplasma.com';
 
 
     var responseMessage = {
@@ -310,7 +311,7 @@ Gingerbite.prototype.sendMailTechplasma = function(req,res,next) {
 
 
                                 var mail = {
-                                    from: 'sales@techplasma.com',
+                                    from: 'techplasma.com',
                                     to: to_email,
                                     subject: 'Sales request for techplasma solution',
                                     html: data // html body
