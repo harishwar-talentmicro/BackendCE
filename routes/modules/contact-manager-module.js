@@ -53,7 +53,7 @@ ContactManager.prototype.getClientList = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var title = req.query.s;
+    var title = req.query.s;   // title
 
     var responseMessage = {
         status: false,
@@ -175,6 +175,8 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
         status: false,
         count : 0,
         cid :'',
+        cn:'',
+        cc:'',
         page :'',
         data: null,
         message: '',
@@ -209,13 +211,15 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
 
                         st.db.query(query, function (err, getResult) {
 
-                            console.log(getResult);
+                            //console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
                                     if (getResult[0][0].count > 0) {
                                         responseMessage.status = true;
                                         responseMessage.count = getResult[0][0].count;
                                         responseMessage.cid = getResult[0][0].cid;
+                                        responseMessage.cn = getResult[0][0].cn;
+                                        responseMessage.cc = getResult[0][0].cc;
                                         responseMessage.page = getResult[0][0].page;
                                         responseMessage.data = getResult[1];
                                         responseMessage.message = 'Contact List loaded successfully';
@@ -347,7 +351,7 @@ ContactManager.prototype.saveClient = function(req,res,next) {
                         var query = 'CALL pSaveClient(' + queryParams + ')';
 
                         st.db.query(query, function (err, insertresult) {
-                            console.log(insertresult);
+                            //console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
                                     responseMessage.status = true;
@@ -482,7 +486,7 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
                         var query = 'CALL pSaveClientcontact(' + queryParams + ')';
 
                         st.db.query(query, function (err, insertresult) {
-                            console.log(insertresult);
+                            //console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
                                     responseMessage.status = true;
@@ -491,6 +495,7 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
                                     responseMessage.data = {
                                         id: parseInt(insertresult[0][0].id),
                                         fn: req.body.fn,
+                                        ln: req.body.ln,
                                         jt: req.body.jt,
                                         mn: req.body.mn,
                                         em: req.body.em,
