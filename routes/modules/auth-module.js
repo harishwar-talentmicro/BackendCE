@@ -306,7 +306,10 @@ Auth.prototype.register = function(req,res,next){
                                             }
                                             if (EMailID != '' && EMailID != null) {
                                                 var fs = require('fs');
-                                                fs.readFile("registration.html", "utf8", function (err, data) {
+                                                var path = require('path');
+                                                var file = path.join(__dirname,'../../mail/templates/registration.html');
+
+                                                fs.readFile(file, "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);
@@ -484,7 +487,10 @@ Auth.prototype.register = function(req,res,next){
                                             //res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
                                                 var fs = require('fs');
-                                                fs.readFile("registration.html", "utf8", function (err, data) {
+                                                var path = require('path');
+                                                var file = path.join(__dirname,'../../mail/templates/registration.html');
+
+                                                fs.readFile(file, "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);

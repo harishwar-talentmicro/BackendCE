@@ -44,7 +44,7 @@ function ContactManager(db,stdLib){
  * @param req
  * @param res
  * @param next
- * * @server_param
+ * @server_param
  *  1. token
  *  2. title
  * @description api code for get client list
@@ -160,7 +160,7 @@ ContactManager.prototype.getClientList = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * * @server_param
+ * @server_param
  *  1. token
  *  2. cid   // client id
  * @description api code for get client contacts
@@ -291,16 +291,22 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
  * @param req
  * @param res
  * @param next
+ * @server_param
+ * token* <char(36)>
+ * id*    <INT>           if id=0 for new else its id.
+ * cc     <VARCHAR(15)>   client code
+ * ct*    <VARCHAR(150)>  client title
+ * cs*    <TINYINT>       client status (1-sales, 2-recruitment, 3-both)
  * @description save client
  */
 ContactManager.prototype.saveClient = function(req,res,next) {
     var _this = this;
 
     var token = req.body.token;
-    var id = parseInt(req.body.id);   //
-    var clientCode = req.body.cc;  // client Code
-    var clientTitle = req.body.ct; // client Title
-    var status = parseInt(req.body.cs);      // client status (1-sales, 2-recruitment , 3-both(1,2))
+    var id = parseInt(req.body.id);
+    var clientCode = req.body.cc;
+    var clientTitle = req.body.ct;
+    var status = parseInt(req.body.cs);
 
 
     var responseMessage = {
@@ -418,6 +424,17 @@ ContactManager.prototype.saveClient = function(req,res,next) {
  * @param req
  * @param res
  * @param next
+ * @server_param
+ * token* <CHAR(36)>
+ * id*    <INT>            if id=0 for new else its id
+ * fn     <VARCHAR(30)>    first name
+ * ln     <VARCHAR(30)>    last name
+ * jt     <VARCHAR(100)>   job title
+ * mn     <VARCHAR(12)>    mobile number
+ * em     <VARCHAR(150)>   email
+ * ph     <VARCHAR(12)>    phone no
+ * st*    <TINYINT>        status //(1-active, 2-deactive)
+ * cid*   <INT>            client id
  * @description save client
  */
 ContactManager.prototype.saveClientContact = function(req,res,next) {

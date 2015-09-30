@@ -119,7 +119,10 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
                                     }
 
                                         /*if (messagetype == 2) {
-                                            fs.readFile("Reservation.html", "utf8", function (err, data) {
+                                         var path = require('path');
+                                         var file = path.join(__dirname,'../../mail/templates/Reservation.html');
+
+                                         fs.readFile(file, "utf8", function (err, data) {
                                                 var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where Token=' + st.db.escape(Token);
                                                 st.db.query(query1, function (err, getResult) {
                                                     if(getResult[0]) {

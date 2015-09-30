@@ -56,7 +56,7 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
     var emailId = req.body.email;
     var mobile = req.body.mobile;
     var address = req.body.address;
-    var hashCode = req.body.hash_code ? req.body.hash_code : '9b1feaee73615783ebf4c7cc9a028252';
+    var hashCode = req.body.hash_code ? req.body.hash_code : 'Z3NAZ21haWwuY29tZ2luZ2VyYml0ZTEyMw==';
     //var to_email = 'dev.sandeep@hotmail.com';
     //var to_email = 'sgowrishankar26@gmail.com';
     var to_email = 'aditya@gingerbite.com';
@@ -108,7 +108,11 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                     var hash = new Buffer(code).toString('base64');
                     console.log(hash);
                     console.log(hashCode);
-                    fs.readFile("gingerbite.html", "utf8", function (err, data) {
+
+                    var path = require('path');
+                    var file = path.join(__dirname,'../../mail/templates/gingerbite.html');
+
+                    fs.readFile(file, "utf8", function (err, data) {
                         if (!err) {
                             if (data) {
                                 data = data.replace("[FirstName]", firstName);
@@ -116,7 +120,6 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                                 data = data.replace("[email]", emailId);
                                 data = data.replace("[mobile]", mobile);
                                 data = data.replace("[address]", address);
-
 
                                 var mail = {
                                     from: 'site@gingerbite.com',
@@ -210,9 +213,7 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                 }
             }
             else {
-                responseMessage.error = {
-                    message : 'Invalid Hash code'
-                };
+                responseMessage.message = 'Invalid Hash code';
                 res.status(200).json(responseMessage);
                 console.log('FnSendMailGingerbite: Invalid Hash code');
             }
@@ -300,7 +301,11 @@ Gingerbite.prototype.sendMailTechplasma = function(req,res,next) {
                     var hash = new Buffer(code).toString('base64');
                     console.log(hash);
                     console.log(hashCode);
-                    fs.readFile("techplasma.html", "utf8", function (err, data) {
+
+                    var path = require('path');
+                    var file = path.join(__dirname,'../../mail/templates/techplasma.html');
+
+                    fs.readFile(file, "utf8", function (err, data) {
                         if (!err) {
                             if (data) {
                                 data = data.replace("[FirstName]", firstName);

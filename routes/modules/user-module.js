@@ -308,7 +308,10 @@ User.prototype.register = function(req,res,next){
                                             //res.send(RtnMessage);
                                             if (EMailID != '' && EMailID != null) {
                                                 var fs = require('fs');
-                                                fs.readFile("registration.html", "utf8", function (err, data) {
+                                                var path = require('path');
+                                                var file = path.join(__dirname,'../../mail/templates/registration.html');
+
+                                                fs.readFile(file, "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);
@@ -486,7 +489,10 @@ User.prototype.register = function(req,res,next){
                                             //res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
                                                 var fs = require('fs');
-                                                fs.readFile("RegTemplate.txt", "utf8", function (err, data) {
+                                                var path = require('path');
+                                                var file = path.join(__dirname,'../../mail/templates/RegTemplate.txt');
+
+                                                fs.readFile(file, "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);
@@ -1465,7 +1471,11 @@ User.prototype.forgetPassword = function(req,res,next){
                                             UserResult[0].FirstName = (UserResult[0].FirstName) ? UserResult[0].FirstName : 'Anonymous';
                                             UserResult[0].LastName = (UserResult[0].LastName) ? UserResult[0].LastName : ' ';
                                             var fs = require('fs');
-                                            fs.readFile("password_reset_req.html", "utf8", function (err, data) {
+                                            var path = require('path');
+                                            var file = path.join(__dirname,'../../mail/templates/password_reset_req.html');
+
+                                            fs.readFile(file, "utf8", function (err, data) {
+
                                                 if (err) throw err;
                                                 var passwordResetLink = req.CONFIG.SCHEME + "://" + req.CONFIG.DOMAIN + "/" +
                                                     req.CONFIG.PASS_RESET_PAGE_LINK + "/" + EZEID + "/" + resetCode
