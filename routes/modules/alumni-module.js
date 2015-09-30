@@ -296,7 +296,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                             }
                                             if (EMailID != '' && EMailID != null) {
                                                 var fs = require('fs');
-                                                fs.readFile("registration.html", "utf8", function (err, data) {
+                                                fs.readFile("./templates/registration.html", "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);
@@ -461,7 +461,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                             //res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
                                                 var fs = require('fs');
-                                                fs.readFile("registration.html", "utf8", function (err, data) {
+                                                fs.readFile("./templates/registration.html", "utf8", function (err, data) {
                                                     if (err) throw err;
                                                     data = data.replace("[Firstname]", FirstName);
                                                     data = data.replace("[Lastname]", LastName);

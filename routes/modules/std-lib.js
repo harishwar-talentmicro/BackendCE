@@ -283,7 +283,7 @@ StdLib.prototype.sendMail = function(req, res){
             if (From != null && To != null && Subject != null) {
 
                 var fs = require('fs');
-                fs.readFile("SimpleMail.txt", "utf8", function (err, data) {
+                fs.readFile("./templates/SimpleMail.txt", "utf8", function (err, data) {
                     if (err) throw err;
                     data = data.replace("[Body]", Body);
                     //console.log('Body:' + data);
@@ -431,7 +431,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
             var fs = require('fs');
             var i = 1,verified, messageType = MessageContent.messageType,masterId, LocID, email, verifiedID, salesEmail;
             if (messageType == 1) {
-                fs.readFile("SalesEnquiry_receiver.html", "utf8", function (err, data) {
+                fs.readFile("./templates/SalesEnquiry_receiver.html", "utf8", function (err, data) {
                     var query1 = 'select EZEID,FirstName,LastName,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + _this.db.escape(MessageContent.ezeid);
                     _this.db.query(query1, function (err, getResult) {
                         if (getResult) {
@@ -599,7 +599,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                 });
             }
             else if (messageType == 3) {
-                fs.readFile("homedelivery.html", "utf8", function (err, data) {
+                fs.readFile("./templates/homedelivery.html", "utf8", function (err, data) {
                     var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + _this.db.escape(EZEID);
                     _this.db.query(query1, function (err, getResult) {
 
@@ -715,7 +715,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                 });
             }
             else if (messageType == 4) {
-                fs.readFile("ServiceMail.html", "utf8", function (err, data) {
+                fs.readFile("./templates/ServiceMail.html", "utf8", function (err, data) {
                     var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + _this.db.escape(EZEID);
                     _this.db.query(query1, function (err, getResult) {
 
@@ -846,7 +846,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
 
                                         if (MessageContentResult[0].ToMailID != '') {
 
-                                            fs.readFile("cv.html", "utf8", function (err, data) {
+                                            fs.readFile("./templates/cv.html", "utf8", function (err, data) {
                                                 if (err) throw err;
                                                 data = data.replace("[IsVerified]", 'Not Verified');
                                                 data = data.replace("[EZEOneID]", MessageContentResult[0][0].EZEID);
@@ -892,7 +892,7 @@ StdLib.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                 });
                                             });
                                             /*                                            var nextMessage = function () {
-                                             fs.readFile("cv_sender.html", "utf8", function (err, data1) {
+                                             fs.readFile("./templates/cv_sender.html", "utf8", function (err, data1) {
                                              if (err) throw err;
                                              data1 = data1.replace("[IsVerified]", 'Not Verified');
                                              data1 = data1.replace("[FirstName]", MessageContentResult[0][0].FirstName);

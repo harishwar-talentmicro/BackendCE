@@ -344,7 +344,7 @@ Job.prototype.create = function(req,res,next){
                                                     st.db.query(query2, function (err, getResult) {
                                                         if (!err) {
                                                             if (getResult) {
-                                                                fs.readFile("job_post.html", "utf8", function (err, data) {
+                                                                fs.readFile("./templates/job_post.html", "utf8", function (err, data) {
                                                                     var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeone_id);
                                                                     st.db.query(name, function (err, companyResult) {
                                                                         if (companyResult) {
@@ -1716,7 +1716,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                             if (TemplateResult.length > 0) {
                                                 if (TemplateResult[0]) {
                                                     //console.log(TemplateResult);
-                                                    fs.readFile("jobseeker_mail.html", "utf8", function (err, data) {
+                                                    fs.readFile("./templates/jobseeker_mail.html", "utf8", function (err, data) {
                                                         messageContent = TemplateResult[0].Body;
                                                         messageContent = messageContent.replace("{FirstName}", jobResult[0][0].FirstName);
                                                         messageContent = messageContent.replace("{LastName}", jobResult[0][0].LastName);

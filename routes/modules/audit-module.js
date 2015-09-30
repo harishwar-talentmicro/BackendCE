@@ -1025,7 +1025,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                     console.log('FnSendBulkMailer:Error in finding EZEID NAME');
 
                                 }
-                                fs.readFile("./LocationMapTemplate.html/", "utf8", function (err, data) {
+                                fs.readFile("./templates/LocationMapTemplate.html", "utf8", function (err, data) {
                                     if (!err){
                                         data = data.replace("[EZEIDNAME]", OutputFileName);
                                         data = data.replace("[EZEID]", EZEID);
