@@ -2143,7 +2143,7 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
 Alumni.prototype.saveTENMaster = function(req,res,next) {
     var _this = this;
 
-    //var token = req.body.token;
+    var token = req.body.token;
     var tid = req.body.tid;      // while saving time 0 else id of user
     var title = req.body.title;
     var description = req.body.description;
@@ -2152,12 +2152,14 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var status = req.body.status;   // 1(pending),2=closed,3=on-hold,4=canceled
     var regLastDate = req.body.reg_lastdate;
     var type = req.body.type;     // 1(training),2=event,3=news,4=knowledge
-    var ezeid = alterEzeoneId(req.body.ezeone_id);
     var note = req.body.note;
     var venueId = req.body.venue_id;
     var attachment = req.body.attachment ? req.body.attachment : '';
     var code = req.body.code;
     var capacity = req.body.capacity ? req.body.capacity : 0;
+    var attachmenttitle = req.body.a_title ? req.body.a_title : '';
+    var attachmenttype = req.body.a_type ? req.body.a_type : '';
+
 
     var responseMessage = {
         status: false,
@@ -2168,10 +2170,10 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
 
     var error = {},validateStatus = true;
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
     if(!tid){
         tid = 0;
     }
@@ -2201,75 +2203,78 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     }
     else{
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
 
-                    var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
-                        + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
-                        + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(ezeid)
-                        + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(attachment)
-                        + ',' + st.db.escape(code)+ ',' + st.db.escape(capacity);
-                    var query = 'CALL pSaveTENMaster(' + queryParams + ')';
+                        var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
+                            + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
+                            + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
+                            + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(attachment)
+                            + ',' + st.db.escape(code) + ',' + st.db.escape(capacity)+ ',' + st.db.escape(attachmenttitle)
+                            + ',' + st.db.escape(attachmenttype);
+                        var query = 'CALL pSaveTENMaster(' + queryParams + ')';
 
-                    st.db.query(query, function (err, insertresult) {
-                        if (!err) {
-                            if (insertresult) {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Data saved successfully';
-                                responseMessage.data = {
-                                    token: req.body.token,
-                                    tid : req.body.tid,
-                                    title : req.body.title,
-                                    description : req.body.description,
-                                    s_date : req.body.s_date,
-                                    e_date : req.body.e_date,
-                                    status : req.body.status,
-                                    reg_lastdate : req.body.reg_lastdate,
-                                    type : req.body.type,
-                                    ezeone_id : req.body.ezeone_id,
-                                    note : req.body.note,
-                                    venue_id : req.body.venue_id,
-                                    attachment : req.body.attachment,
-                                    code : req.body.code
-                                };
-                                res.status(200).json(responseMessage);
-                                console.log('FnSaveTENMaster: Data saved successfully');
+                        st.db.query(query, function (err, insertresult) {
+                            if (!err) {
+                                if (insertresult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Data saved successfully';
+                                    responseMessage.data = {
+                                        token: req.body.token,
+                                        tid: req.body.tid,
+                                        title: req.body.title,
+                                        description: req.body.description,
+                                        s_date: req.body.s_date,
+                                        e_date: req.body.e_date,
+                                        status: req.body.status,
+                                        reg_lastdate: req.body.reg_lastdate,
+                                        type: req.body.type,
+                                        ezeone_id: req.body.ezeone_id,
+                                        note: req.body.note,
+                                        venue_id: req.body.venue_id,
+                                        attachment: req.body.attachment,
+                                        code: req.body.code,
+                                        a_title: req.body.a_title,
+                                        a_type: req.body.a_type
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTENMaster: Data saved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'No save Data';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTENMaster:No save Data');
+                                }
                             }
                             else {
-                                responseMessage.message = 'No save Data';
-                                res.status(200).json(responseMessage);
-                                console.log('FnSaveTENMaster:No save Data');
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveTENMaster: error in saving tenmaster data:' + err);
                             }
-                        }
-                        else {
-                            responseMessage.message = 'An error occured ! Please try again';
-                            res.status(500).json(responseMessage);
-                            console.log('FnSaveTENMaster: error in saving tenmaster data:' + err);
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveTENMaster: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveTENMaster:Error in processing Token' + err);
+                }
+            });
         }
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnSaveTENMaster: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal server error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnSaveTENMaster:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
         catch(ex){
             responseMessage.error = {
                 server: 'Internal Server error'
