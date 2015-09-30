@@ -9,14 +9,12 @@ var ejs = require('ejs');
 var DbHelper = require('./../helpers/DatabaseHandler');
 var db = DbHelper.getDBContext();
 
-
-var alumniIndex = require('./alumni-index.js');
 var maintainenceTemplate = fs.readFileSync('../views/maintainence.ejs','utf-8');
 var htmlAlumniIndex = ejs.render(maintainenceTemplate);
 
 
 
-router.all('*',function(req,res,next){
+router.get('*',function(req,res,next){
     console.log('Hello');
     var hostName = req.headers.host;
     console.log('Hostname : '+hostName);
@@ -45,36 +43,42 @@ router.all('*',function(req,res,next){
                            next();
                         }
                         else{
+                            console.log(results);
                             if(results){
                                 if(results[0]){
                                     if(results[0][0]){
-                                        if(results[0][0].id){
+                                        if(results[0][0].tid){
 
-                                            /**
-                                             * Setting up alumni static path and sending alumni index file
-                                             */
-
-                                            var pt = path.join(__dirname,'../public-alumni/');
-                                            console.log(pt);
-
-                                            var indexTemplate = req.CONFIG.CONSTANT.INDEX_TPL;
-
-                                            try{
-                                                var filePath = req.CONFIG.CONSTANT.ALUMNI_INDEX_PATH;
-                                                htmlAlumniIndex = fs.readFileSync(filePath);
-                                            }
-                                            catch(ex){
-                                                console.log('indexFileNotFound');
-                                            }
-
-
-                                            router.use('/alumni',express.static(pt));
-                                            router.use(express.static(path.join(__dirname, '../public-alumni/')));
-                                            res.render(indexTemplate,{htmlContent : htmlAlumniIndex});
-
+                                            ///**
+                                            // * Setting up alumni static path and sending alumni index file
+                                            // */
+                                            //
+                                            //var pt = path.join(__dirname,'../public-alumni/');
+                                            //console.log(pt);
+                                            //
+                                            //var indexTemplate = req.CONFIG.CONSTANT.INDEX_TPL;
+                                            //
+                                            //try{
+                                            //    var filePath = req.CONFIG.CONSTANT.ALUMNI_INDEX_PATH;
+                                            //    htmlAlumniIndex = fs.readFileSync(filePath);
+                                            //}
+                                            //catch(ex){
+                                            //    console.log('indexFileNotFound');
+                                            //}
+                                            //
+                                            //
+                                            //router.use(express.static(pt));
+                                            //console.log('alumni done');
+                                            //res.render(indexTemplate,{htmlContent : htmlAlumniIndex});
+                                            //console.log('response done');
+                                            //res.end();
+                                            //
+                                            var pt = req.params[0] ? req.params[0] : 'index.html';
+                                            res.sendfile(pt, {root: path.join(__dirname,'../public-alumni')});
 
                                         }
                                         else{
+                                            //router.use('/',express.static(path.join(__dirname,'public/')));
                                             next();
                                         }
                                     }
