@@ -90,6 +90,12 @@ Job.prototype.create = function(req,res,next){
     var skillIds = req.body.skill_ids ? req.body.skill_ids : '';
     var jobID,m= 0,jobtype,masterid='',gid,receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,userID;
 
+    var cid = parseInt(req.body.cid);   // client id
+    var conatctId = parseInt(req.body.ctid);     // contact id
+    var isconfidential = req.body.isconfi ? parseInt(req.body.isconfi) : 0;
+    var alumnicode = req.body.acode;    // alumni code
+
+
     if (jobType == 0){
         jobtype = 'Full Time';
     }
@@ -206,10 +212,11 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
                                 + ',' + st.db.escape(categoryID)+ ',' + st.db.escape(educationID)+ ',' + st.db.escape(specializationID)
                                 + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(skillIds)
-                                + ',' + st.db.escape(scoreTo);
+                                + ',' + st.db.escape(scoreTo)+ ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
+                                + ',' + st.db.escape(isconfidentia) + ',' + st.db.escape(alumnicode);
                             //console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
-                                    if (!err) {
+                                if (!err) {
                                     if (insertresult) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
@@ -239,7 +246,11 @@ Job.prototype.create = function(req,res,next){
                                             specializationID: specializationID,
                                             instituteID: instituteID,
                                             score_from: scoreFrom,
-                                            score_to: scoreTo
+                                            score_to: scoreTo,
+                                            cid : cid,
+                                            ctid : conatctId,
+                                            isconfi : isconfidential,
+                                            acode : alumnicode
                                         };
                                         res.status(200).json(responseMessage);
                                         matrix(insertresult[0][0].jobid);
@@ -259,8 +270,7 @@ Job.prototype.create = function(req,res,next){
                             });
                         };
 
-
-                    var matrix = function(jobId_Result){
+                        var matrix = function(jobId_Result){
                         jobID = jobId_Result;
                         var count = skillMatrix1.length;
                         if(m < skillMatrix1.length) {
@@ -274,7 +284,6 @@ Job.prototype.create = function(req,res,next){
                                 tid: skillMatrix1[m].tid
                             };
                             FnSaveSkills(skills, function (err, Result) {
-
                                 if (!err) {
                                     if (Result) {
                                         resultvalue = Result.SkillID;
@@ -287,23 +296,22 @@ Job.prototype.create = function(req,res,next){
                                             jobid: skills.jobId
                                         };
 
-                                            var queryParams = st.db.escape(SkillItems.jobid) + ',' + st.db.escape(SkillItems.skillID)
-                                                + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
-                                                + ',' + st.db.escape(SkillItems.skillstatusid) + ',' + st.db.escape(SkillItems.expertlevel)
-                                                + ',' + st.db.escape(parseInt(skills.tid));
-                                            var query = 'CALL pSaveJobSkill(' + queryParams + ')';
-
-                                            st.db.query(query, function (err, result) {
-                                                if (!err) {
-                                                        console.log('FnupdateSkill: skill matrix Updated successfully');
-                                                        m = m + 1;
-                                                        matrix(jobID);
-                                                    }
-                                                    else {
-                                                        console.log('FnupdateSkill:  skill matrix not updated:'+err);
-                                                    }
-                                            });
-                                        }
+                                        var queryParams = st.db.escape(SkillItems.jobid) + ',' + st.db.escape(SkillItems.skillID)
+                                            + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
+                                            + ',' + st.db.escape(SkillItems.skillstatusid) + ',' + st.db.escape(SkillItems.expertlevel)
+                                            + ',' + st.db.escape(parseInt(skills.tid));
+                                        var query = 'CALL pSaveJobSkill(' + queryParams + ')';
+                                        st.db.query(query, function (err, result) {
+                                            if (!err) {
+                                                console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                m = m + 1;
+                                                matrix(jobID);
+                                            }
+                                            else {
+                                                console.log('FnupdateSkill:  skill matrix not updated:'+err);
+                                            }
+                                        });
+                                    }
                                     else {
                                         console.log('FnSaveMessage: skillID not loaded');
                                         //res.send(RtnMessage);
@@ -322,100 +330,94 @@ Job.prototype.create = function(req,res,next){
                         }
                     };
 
+                    //send push notification
+                    var postNotification = function (jobID) {
+                        var queryParams1 = st.db.escape(jobID) + ',' + st.db.escape(location_id)
+                            + ',' + st.db.escape(req.body.education_id) + ',' + st.db.escape(req.body.specialization_id)
+                            + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to)
+                            + ',' + st.db.escape(req.body.salaryFrom)+ ',' + st.db.escape(req.body.salaryTo)
+                            + ',' + st.db.escape(req.body.salaryType);
+                        //console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
+                        st.db.query('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')', function (err, results) {
+                            if (!err) {
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+                                            for (var i = 0; i < results[0].length; i++) {
+                                                userID = results[0][i].MasterID;
+                                                var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID);
+                                                var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
+                                                st.db.query(query2, function (err, getResult) {
+                                                    if (!err) {
+                                                        if (getResult) {
 
-                        //send push notification
-                        var postNotification = function (jobID) {
-                            var queryParams1 = st.db.escape(jobID) + ',' + st.db.escape(location_id)
-                                + ',' + st.db.escape(req.body.education_id) + ',' + st.db.escape(req.body.specialization_id)
-                                + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to)
-                                + ',' + st.db.escape(req.body.salaryFrom)+ ',' + st.db.escape(req.body.salaryTo)
-                                + ',' + st.db.escape(req.body.salaryType);
-                           //console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
-                            st.db.query('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')', function (err, results) {
-                                if (!err) {
-                                    if (results) {
-                                        if (results[0]) {
-                                            if (results[0][0]) {
-                                                for (var i = 0; i < results[0].length; i++) {
-                                                    userID = results[0][i].MasterID;
+                                                            var path = require('path');
+                                                            var file = path.join(__dirname,'../../mail/templates/job_post.html');
 
-                                                    var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID);
-                                                    var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
-                                                    st.db.query(query2, function (err, getResult) {
-                                                        if (!err) {
-                                                            if (getResult) {
-                                                                fs.readFile("./templates/job_post.html", "utf8", function (err, data) {
-                                                                    var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeone_id);
-                                                                    st.db.query(name, function (err, companyResult) {
-                                                                        if (companyResult) {
-                                                                            data = data.replace("[JobType]", jobtype);
-                                                                            data = data.replace("[JobTitle]", job_title);
-                                                                            data = data.replace("[JobCode]", job_code);
-                                                                            data = data.replace("[CompanyName]", companyResult[0].CompanyName);
+                                                            fs.readFile(file, "utf8", function (err, data) {
+                                                                var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeone_id);
+                                                                st.db.query(name, function (err, companyResult) {
+                                                                    if (companyResult) {
+                                                                        data = data.replace("[JobType]", jobtype);
+                                                                        data = data.replace("[JobTitle]", job_title);
+                                                                        data = data.replace("[JobCode]", job_code);
+                                                                        data = data.replace("[CompanyName]", companyResult[0].CompanyName);
 
-                                                                            var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                                + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userID)
-                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0);
-                                                                            var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
-                                                                            st.db.query(query3, function (err, messageResult) {
-                                                                                if (!err) {
-                                                                                    if (messageResult) {
-                                                                                        console.log('FnComposeMessage:Message Composed successfully');
-                                                                                        var query4 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
-                                                                                        st.db.query(query4, function (err, getDetails) {
-                                                                                            if (getDetails) {
-                                                                                                if (getDetails[0]) {
-                                                                                                    receiverId = getDetails[0].tid;
-                                                                                                    senderTitle = ezeone_id;
-                                                                                                    groupTitle = ezeone_id;
-                                                                                                    groupId = companyResult[0].tid;
-                                                                                                    messageText = data;
-                                                                                                    messageType = 1;
-                                                                                                    operationType = 0;
-                                                                                                    iphoneId = null;
-                                                                                                    messageId = 0;
-                                                                                                    masterid = '';
-                                                                                                   //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                }
-                                                                                                else {
-                                                                                                    console.log('FnjobNotification:user details not loaded');
-                                                                                                }
+                                                                        var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                            + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userID)
+                                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0);
+                                                                        var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
+                                                                        st.db.query(query3, function (err, messageResult) {
+                                                                            if (!err) {
+                                                                                if (messageResult) {
+                                                                                    console.log('FnComposeMessage:Message Composed successfully');
+                                                                                    var query4 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
+                                                                                    st.db.query(query4, function (err, getDetails) {
+                                                                                        if (getDetails) {
+                                                                                            if (getDetails[0]) {
+                                                                                                receiverId = getDetails[0].tid;
+                                                                                                senderTitle = ezeone_id;
+                                                                                                groupTitle = ezeone_id;
+                                                                                                groupId = companyResult[0].tid;
+                                                                                                messageText = data;
+                                                                                                messageType = 1;
+                                                                                                operationType = 0;
+                                                                                                iphoneId = null;
+                                                                                                messageId = 0;
+                                                                                                masterid = '';
+                                                                                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                             }
                                                                                             else {
                                                                                                 console.log('FnjobNotification:user details not loaded');
                                                                                             }
-                                                                                        });
-                                                                                    }
-                                                                                    else {
-                                                                                        console.log("FnComposeMessage:Message Result not loaded");
-                                                                                    }
+                                                                                        }
+                                                                                        else {
+                                                                                            console.log('FnjobNotification:user details not loaded');
+                                                                                        }
+                                                                                    });
                                                                                 }
                                                                                 else {
-                                                                                    console.log("FnSaveJobs:Error in loading Message Result:" + err);
+                                                                                    console.log("FnComposeMessage:Message Result not loaded");
                                                                                 }
-                                                                            });
-                                                                        }
-                                                                    });
+                                                                            }
+                                                                            else {
+                                                                                console.log("FnSaveJobs:Error in loading Message Result:" + err);
+                                                                            }
+                                                                        });
+                                                                    }
                                                                 });
-                                                            }
-                                                            else {
-                                                                console.log("FnSaveJobs:Result not loaded");
-                                                            }
+                                                            });
                                                         }
-                                                        else {
-                                                            console.log("FnSaveJobs:Error:" + err);
-                                                        }
-                                                    });
+                                                    else {
+                                                        console.log("FnSaveJobs:Result not loaded");
+                                                    }
                                                 }
-                                            }
                                             else {
-                                                console.log("FnSaveJobs:MasterId not loaded");
-                                            }
-                                        }
-                                        else {
-                                            console.log("FnSaveJobs:MasterId not loaded");
+                                                    console.log("FnSaveJobs:Error:" + err);
+                                                }
+                                            });
                                         }
                                     }
                                     else {
@@ -423,29 +425,35 @@ Job.prototype.create = function(req,res,next){
                                     }
                                 }
                                 else {
-                                    console.log("FnSaveJobs:Error:" + err);
+                                    console.log("FnSaveJobs:MasterId not loaded");
                                 }
-                            });
+                            }
+                            else {
+                                console.log("FnSaveJobs:MasterId not loaded");
+                            }
+                        }
+                        else {
+                            console.log("FnSaveJobs:Error:" + err);
+                        }
+                    });
+                    };
+
+                    var insertLocations = function(locationDetails){
+                        var list = {
+                            location_title: locationDetails.location_title,
+                            latitude: locationDetails.latitude,
+                            longitude: locationDetails.longitude,
+                            country: locationDetails.country,
+                            maptype : locationDetails.maptype
                         };
 
-
-                        var insertLocations = function(locationDetails){
-                            var list = {
-                                location_title: locationDetails.location_title,
-                                latitude: locationDetails.latitude,
-                                longitude: locationDetails.longitude,
-                                country: locationDetails.country,
-                                maptype : locationDetails.maptype
-                            };
-
-                            var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
-                           // console.log('CALL psavejoblocation(' + queryParams + ')');
-                            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
-                                if (results) {
-                                    if (results[0]) {
-                                        if (results[0][0]) {
-
+                        var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
+                            + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
+                        // console.log('CALL psavejoblocation(' + queryParams + ')');
+                        st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                            if (results) {
+                                if (results[0]) {
+                                    if (results[0][0]) {
                                             location_id += results[0][0].id + ',';
                                             locCount +=1;
                                             if(locCount < locationsList.length){
@@ -1716,7 +1724,11 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                             if (TemplateResult.length > 0) {
                                                 if (TemplateResult[0]) {
                                                     //console.log(TemplateResult);
-                                                    fs.readFile("./templates/jobseeker_mail.html", "utf8", function (err, data) {
+                                                    var path = require('path');
+                                                    var file = path.join(__dirname,'../../mail/templates/jobseeker_mail.html');
+
+                                                    fs.readFile(file, "utf8", function (err, data) {
+                                                    
                                                         messageContent = TemplateResult[0].Body;
                                                         messageContent = messageContent.replace("{FirstName}", jobResult[0][0].FirstName);
                                                         messageContent = messageContent.replace("{LastName}", jobResult[0][0].LastName);

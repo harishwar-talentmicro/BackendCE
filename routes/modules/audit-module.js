@@ -1025,7 +1025,11 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                     console.log('FnSendBulkMailer:Error in finding EZEID NAME');
 
                                 }
-                                fs.readFile("./templates/LocationMapTemplate.html", "utf8", function (err, data) {
+                                var path = require('path');
+                                var file = path.join(__dirname,'../../mail/templates/LocationMapTemplate.html');
+
+                                fs.readFile(file, "utf8", function (err, data) {
+
                                     if (!err){
                                         data = data.replace("[EZEIDNAME]", OutputFileName);
                                         data = data.replace("[EZEID]", EZEID);
@@ -1035,8 +1039,6 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                     else
                                     {
                                         console.log('FnSendBulkMailer:Error in getting template file');
-
-
                                     }
 
                                     var pdfDocument = require('pdfkit');

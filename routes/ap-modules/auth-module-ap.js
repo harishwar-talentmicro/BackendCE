@@ -292,7 +292,10 @@ try {
                                 //  console.log(UserResult);
 
                                 var fs = require('fs');
-                                fs.readFile("./templates/ForgetPasswordTemplate.txt", "utf8", function (err, data) {
+                                var path = require('path');
+                                var file = path.join(__dirname,'../../mail/templates/ForgetPasswordTemplate.txt');
+
+                                fs.readFile(file, "utf8", function (err, data) {
                                     if (err) throw err;
                                     data = data.replace("[Firstname]", UserResult[0].Fullname);
                                     data = data.replace("[Lastname]", "");

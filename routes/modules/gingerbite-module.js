@@ -108,7 +108,11 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                     var hash = new Buffer(code).toString('base64');
                     console.log(hash);
                     console.log(hashCode);
-                    fs.readFile("./templates/gingerbite.html", "utf8", function (err, data) {
+
+                    var path = require('path');
+                    var file = path.join(__dirname,'../../mail/templates/gingerbite.html');
+
+                    fs.readFile(file, "utf8", function (err, data) {
                         if (!err) {
                             if (data) {
                                 data = data.replace("[FirstName]", firstName);
@@ -116,7 +120,6 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                                 data = data.replace("[email]", emailId);
                                 data = data.replace("[mobile]", mobile);
                                 data = data.replace("[address]", address);
-
 
                                 var mail = {
                                     from: 'site@gingerbite.com',
@@ -298,7 +301,11 @@ Gingerbite.prototype.sendMailTechplasma = function(req,res,next) {
                     var hash = new Buffer(code).toString('base64');
                     console.log(hash);
                     console.log(hashCode);
-                    fs.readFile("./templates/techplasma.html", "utf8", function (err, data) {
+
+                    var path = require('path');
+                    var file = path.join(__dirname,'../../mail/templates/techplasma.html');
+
+                    fs.readFile(file, "utf8", function (err, data) {
                         if (!err) {
                             if (data) {
                                 data = data.replace("[FirstName]", firstName);
