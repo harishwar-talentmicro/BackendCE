@@ -48,37 +48,11 @@ router.get('*',function(req,res,next){
                                 if(results[0]){
                                     if(results[0][0]){
                                         if(results[0][0].tid){
-
-                                            ///**
-                                            // * Setting up alumni static path and sending alumni index file
-                                            // */
-                                            //
-                                            //var pt = path.join(__dirname,'../public-alumni/');
-                                            //console.log(pt);
-                                            //
-                                            //var indexTemplate = req.CONFIG.CONSTANT.INDEX_TPL;
-                                            //
-                                            //try{
-                                            //    var filePath = req.CONFIG.CONSTANT.ALUMNI_INDEX_PATH;
-                                            //    htmlAlumniIndex = fs.readFileSync(filePath);
-                                            //}
-                                            //catch(ex){
-                                            //    console.log('indexFileNotFound');
-                                            //}
-                                            //
-                                            //
-                                            //router.use(express.static(pt));
-                                            //console.log('alumni done');
-                                            //res.render(indexTemplate,{htmlContent : htmlAlumniIndex});
-                                            //console.log('response done');
-                                            //res.end();
-                                            //
                                             var pt = req.params[0] ? req.params[0] : 'index.html';
                                             res.sendfile(pt, {root: path.join(__dirname,'../public-alumni')});
 
                                         }
                                         else{
-                                            //router.use('/',express.static(path.join(__dirname,'public/')));
                                             next();
                                         }
                                     }
