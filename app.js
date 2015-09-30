@@ -53,20 +53,10 @@ app.all('*',function(req,res,next){
 
 
 
-/**
- * EZEOne Alumni Middleware
- */
-
-app.use('/',alumni);
 
 
 
 app.use(multer({ dest: './uploads/'}));
-app.use(express.static(path.join(__dirname,'public/')));
-
-
-
-app.use(express.static(path.join(__dirname, 'public')));
 // Set header to force download
 function setHeaders(res, path) {
     res.setHeader('Content-Disposition', contentDisposition(path))
@@ -75,6 +65,13 @@ var api = require('./routes/api.js');
 var index = require('./routes/index.js');
 
 app.use('/api',api);
+
+/**
+ * EZEOne Alumni Middleware
+ */
+
+app.use('/',alumni);
+app.use(express.static(path.join(__dirname,'public')));
 
 app.use('/',index);
 
