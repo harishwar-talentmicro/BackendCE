@@ -1145,7 +1145,7 @@ Auth.prototype.verifySecretCode = function(req,res,next) {
     if (status) {
         try {
             req.body.ezeone_id = alterEzeoneId(req.body.ezeone_id);
-            var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(req.body.new_password);
+            var queryParams = st.db.escape(req.body.secret_code) + ',' + st.db.escape(req.body.ezeone_id) + ',' + st.db.escape(hashPassword(req.body.new_password));
             var verifyQuery = 'CALL pverifySecretcode(' + queryParams + ')';
 
             //console.log(verifyQuery);
@@ -1189,6 +1189,8 @@ Auth.prototype.verifySecretCode = function(req,res,next) {
                     //else {
                     //    res.status(200).json(respMsg);
                     //}
+
+                    console.log(verifyRes);
 
                     if(verifyRes){
                         if(verifyRes.affectedRows){
