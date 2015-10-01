@@ -69,13 +69,12 @@ ContactManager.prototype.getClientList = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-
-
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
     }
+
     else {
         try {
             st.validateToken(token, function (err, result) {
@@ -83,7 +82,7 @@ ContactManager.prototype.getClientList = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(title);
                         var query = 'CALL pGetClientList(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
 
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -207,7 +206,7 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(cid);
                         var query = 'CALL pGetClientcontacts(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
 
                         st.db.query(query, function (err, getResult) {
 
@@ -304,9 +303,9 @@ ContactManager.prototype.saveClient = function(req,res,next) {
 
     var token = req.body.token;
     var id = parseInt(req.body.id);
-    var clientCode = req.body.cc;
-    var clientTitle = req.body.ct;
-    var status = parseInt(req.body.cs);
+    var clientCode = req.body.cc;          // client code
+    var clientTitle = req.body.ct;        // client title
+    var status = parseInt(req.body.cs);  // client status (1-sales, 2-recruitment, 3-both)
 
 
     var responseMessage = {
