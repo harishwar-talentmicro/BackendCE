@@ -113,7 +113,8 @@ router.get('*',function(req,res,next){
                                                 if(!fileSent){
                                                     var tmpPath = '';
                                                     for(var i = pathSplit.length; i > 0 ; i--){
-                                                        tmpPath = '/' + pathSplit[i] + tmpPath;
+                                                        tmpPath =  ((pathSplit[i]) ? '/' +pathSplit[i] : '') + tmpPath;
+                                                        console.log(tmpPath);
 
                                                         try{
                                                             fileStats = fs.statSync(path.join(__dirname,'../public-alumni')+ tmpPath);
