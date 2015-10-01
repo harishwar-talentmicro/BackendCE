@@ -213,7 +213,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(categoryID)+ ',' + st.db.escape(educationID)+ ',' + st.db.escape(specializationID)
                                 + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(skillIds)
                                 + ',' + st.db.escape(scoreTo)+ ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
-                                + ',' + st.db.escape(isconfidentia) + ',' + st.db.escape(alumnicode);
+                                + ',' + st.db.escape(isconfidential) + ',' + st.db.escape(alumnicode);
                             //console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
                                 if (!err) {
