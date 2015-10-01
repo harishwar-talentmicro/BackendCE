@@ -90,8 +90,8 @@ Job.prototype.create = function(req,res,next){
     var skillIds = req.body.skill_ids ? req.body.skill_ids : '';
     var jobID,m= 0,jobtype,masterid='',gid,receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,userID;
 
-    var cid = parseInt(req.body.cid);   // client id
-    var conatctId = parseInt(req.body.ctid);     // contact id
+    var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
+    var conatctId = req.body.ctid ? parseInt(req.body.ctid) : 0;     // contact id
     var isconfidential = req.body.isconfi ? parseInt(req.body.isconfi) : 0;
     var alumnicode = req.body.acode;    // alumni code
 

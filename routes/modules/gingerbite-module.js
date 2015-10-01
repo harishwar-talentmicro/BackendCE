@@ -58,7 +58,7 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
     var address = req.body.address;
     var hashCode = req.body.hash_code ? req.body.hash_code : 'Z3NAZ21haWwuY29tZ2luZ2VyYml0ZTEyMw==';
     //var to_email = 'dev.sandeep@hotmail.com';
-    //var to_email = 'sgowrishankar26@gmail.com';
+    var cc = 'sgowrishankar26@gmail.com';
     var to_email = 'aditya@gingerbite.com';
 
 
@@ -136,6 +136,7 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                                         var email = new sendgrid.Email();
                                         email.from = mail.from;
                                         email.to = mail.to;
+                                        email.addCc(cc);
                                         email.subject = mail.subject;
                                         email.html = mail.html;
 
@@ -155,6 +156,7 @@ Gingerbite.prototype.sendMailGingerbite = function(req,res,next) {
                                                     lastName: lastName,
                                                     email: emailId,
                                                     to_email:to_email,
+                                                    cc: cc,
                                                     mobile: mobile,
                                                     address: address
                                                 };
