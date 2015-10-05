@@ -261,6 +261,12 @@ exports.FnGetClientContacts = contactManager.getClientContacts;
 exports.FnSaveClient = contactManager.saveClient;
 exports.FnSaveClientContact = contactManager.saveClientContact;
 
+//Task Manager Module
+var TaskManager = require('./modules/task-manager-module.js');
+var taskManager = new TaskManager(db,stdLib);
+exports.FnSaveTaskManager = taskManager.saveTaskManager;
+exports.FnGetTasks = taskManager.getTasks;
+
 
 var Notification = require('./modules/notification/notification-master.js');
 var notification = new Notification(db,stdLib);

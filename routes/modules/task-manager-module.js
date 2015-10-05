@@ -1,0 +1,288 @@
+/**
+ * Created by Gowrishankar on 05-10-2015
+ */
+
+"use strict";
+
+function error(err, req, res, next) {
+    // log it
+    console.error(err.stack);
+    console.log('Error Occurred Please try Again..');
+    // respond with 500 "Internal Server Error".
+    res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
+};
+
+var path ='D:\\EZEIDBanner\\';
+var EZEIDEmail = 'noreply@ezeone.com';
+
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
+
+var st = null;
+
+function TaskManager(db,stdLib){
+
+    if(stdLib){
+        st = stdLib;
+    }
+};
+
+
+/**
+ * @todo FnSaveTaskManager
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @server_param
+ * @description save tasks
+ */
+TaskManager.prototype.saveTaskManager = function(req,res,next) {
+    var _this = this;
+
+    var token = req.body.token;
+    var id = parseInt(req.body.id);            // task id
+    var status = parseInt(req.body.s);
+    var transactionId = parseInt(req.body.tx);   // Transaction id
+    var c_particulars = req.body.cp;           // Conveyance Particulars <string>
+    var c_amount = req.body.ca;             // Conveyance Amount <float>
+    var userIDs = req.body.au;              // Additional User IDs (Comma separted MasterIDs of users) <string>
+    var taskDate = req.body.ts;            // Task Date and Time (YYYY-MM-DD HH:mm:ss)
+    var ownerId = parseInt(req.body.ow);   // Owner ID (Master ID of the task owner)
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var error = {},validateStatus = true;
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!id){
+        id = 0;
+    }
+    if(parseInt(id) == NaN){
+        error['tid'] = 'Invalid id';
+        validateStatus *= false;
+    }
+
+    if(!status){
+        error['status'] = 'Invalid status';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(id)+ ',' + st.db.escape(transactionId)
+                            + ',' + st.db.escape(status) + ',' + st.db.escape(c_particulars) + ',' + st.db.escape(c_amount)
+                            + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId);
+
+                        var query = 'CALL psavetask(' + queryParams + ')';
+
+                        st.db.query(query, function (err, insertresult) {
+                            console.log(insertresult);
+                            if (!err) {
+                                if (insertresult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'TaskManager saved successfully';
+                                    responseMessage.data = {
+                                        id :  parseInt(req.body.id),
+                                        s :  parseInt(req.body.s),
+                                        tx : parseInt(req.body.tx),
+                                        cp : req.body.cp,
+                                        ca : req.body.ca,
+                                        au : req.body.au,
+                                        ts : req.body.ts,
+                                        cd : insertresult[0][0].cd,
+                                        ow : parseInt(req.body.ow)
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTaskManager: TaskManager saved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'No save TaskManager';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTaskManager:No save TaskManager');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveTaskManager: error in saving TaskManager:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveTaskManager: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveTaskManager:Error in processing Token' + err);
+                }
+            });
+        }
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSaveTaskManager:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
+
+/**
+ * @todo FnGetTasks
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get tasks
+ */
+TaskManager.prototype.getTasks = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var transactionId = parseInt(req.query.tx);   // Transaction id
+    var startDate = req.query.st;
+    var endDate = req.query.et;
+    var responseMessage = {
+        status: false,
+        data: null,
+        message: '',
+        error: {}
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(transactionId) + ',' + st.db.escape(startDate)+ ',' + st.db.escape(endDate);
+                        var query = 'CALL pGetTasks(' + queryParams + ')';
+
+                        console.log(query);
+
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = getResult[0];
+                                        responseMessage.message = 'Tasks loaded successfully';
+                                        responseMessage.error = null;
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTasks: Tasks loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Tasks not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTasks: Tasks not loaded');
+                                    }
+                                }
+                                else {
+                                        responseMessage.message = 'Tasks not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTasks: Tasks not loaded');
+                                    }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetTasks: error in getting Client List :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetTasks: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTasks:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetTasks ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+module.exports = TaskManager;

@@ -38,8 +38,6 @@ function MessageBox(db,stdLib){
     }
 };
 
-
-
 /**
  * @todo FnCreateMessageGroup
  * Method : POST
@@ -1291,7 +1289,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
-    var b_id='',get_tid,i=0,c=0,toIds,to_ids,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type,msgId,iphoneID;
+    var b_id='',get_tid,i=0,c=0,toIds,to_ids,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type,msgId,iphoneID,dateTime,prioritys;
+    var latitude = '', longitude = '';
     var isBussinessChat = req.body.isBussinessChat ? req.body.isBussinessChat : 0;
     var ezeid = req.body.ezeid;
 
@@ -1417,7 +1416,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                 //console.log(iphoneID);
                                                                 var queryParams = st.db.escape(token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
                                                                 var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
-                                                               // console.log(messageQuery);
+                                                                //console.log(messageQuery);
                                                                 st.db.query(messageQuery, function (err, groupDetails) {
                                                                     if (groupDetails) {
                                                                         if (groupDetails[0]) {
@@ -1446,9 +1445,16 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                                                     iphoneId = iphoneID;
                                                                                                     messageId = msgId;
                                                                                                     masterid = groupDetails[0][0].AdminID;
+                                                                                                    prioritys = priority;
+                                                                                                    var now = new Date();
+                                                                                                    var t = now.toUTCString();
+                                                                                                    var datetime = t.split(',');
+                                                                                                    datetime = datetime[1];
+                                                                                                    console.log(datetime);
+
                                                                                                     //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                                                     //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude,prioritys,dateTime);
                                                                                                 }
                                                                                             }
                                                                                             else {

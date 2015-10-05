@@ -626,11 +626,6 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var height = req.body.height ? req.body.height : 600;
     var page_pic,logo_pic;
 
-
-    console.log('logo...................................');
-    console.log(req.body.logo);
-
-
     var responseMessage = {
         status: false,
         error: {},
@@ -1021,7 +1016,6 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                         responseMessage.data = {
                                             token: req.body.token,
                                             tid: req.body.tid,
-                                            picture: req.body.picture,
                                             p_title: req.body.p_title,
                                             p_type: req.body.p_type,
                                             job_title: req.body.job_title,

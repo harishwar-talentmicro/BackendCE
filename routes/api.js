@@ -234,6 +234,10 @@ router.get('/contact',LocationManager.FnGetClientContacts);
 router.post('/client',LocationManager.FnSaveClient);
 router.post('/contact',LocationManager.FnSaveClientContact);
 
+//Task Manager Module
+router.post('/task_manager/task',LocationManager.FnSaveTaskManager);
+router.get('/task_manager/task',LocationManager.FnGetTasks);
+
 
 
 //below service are for EZEIDAP
