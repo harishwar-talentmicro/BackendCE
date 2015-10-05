@@ -2303,6 +2303,9 @@ Alumni.prototype.getTENDetails = function(req,res,next){
     //var token = req.query.token;
     var code = req.query.code;   // college code
     var type = req.query.type;   // 1(training),2=event,3=news,4=knowledge
+    var status = parseInt(req.query.status);
+    var pageSize = parseInt(req.query.page_size);
+    var pageCount = parseInt(req.query.page_count);
 
     var responseMessage = {
         status: false,
@@ -2339,7 +2342,8 @@ Alumni.prototype.getTENDetails = function(req,res,next){
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-            var queryParams = st.db.escape(type) + ',' + st.db.escape(code);
+            var queryParams = st.db.escape(type) + ',' + st.db.escape(code)+ ',' + st.db.escape(status)+ ',' + st.db.escape(pageSize)
+                + ',' + st.db.escape(pageCount);
             var query = 'CALL pGetTENDetails(' + queryParams + ')';
             st.db.query(query, function (err, getResult) {
                 if (!err) {
@@ -2681,6 +2685,7 @@ Alumni.prototype.approveTEN = function(req,res,next){
 
     var token = req.body.token;
     var tenID = req.body.ten_id;
+    var status = req.body.status ? parseInt(req.body.status) : 0 ;
 
     var responseMessage = {
         status: false,
@@ -2710,7 +2715,7 @@ Alumni.prototype.approveTEN = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(tenID);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(tenID)+ ',' + st.db.escape(status);
                         var query = 'CALL pApproveTEN(' + queryParams + ')';
                         st.db.query(query, function (err, approveResult) {
                             if (!err) {
@@ -2720,7 +2725,8 @@ Alumni.prototype.approveTEN = function(req,res,next){
                                     responseMessage.message = 'Approved successfully';
                                     responseMessage.data = {
                                         token: req.body.token,
-                                        ten_id: req.body.ten_id
+                                        ten_id: req.body.ten_id,
+                                        status :req.body.status
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnApproveTEN: Approved successfully');
@@ -3298,6 +3304,91 @@ Alumni.prototype.getTeamImage = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetTENAttachment
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get ten attachment
+ */
+Alumni.prototype.getTENAttachment = function(req,res,next){
+    var _this = this;
+
+    var ids = req.query.ids;   // comma separated tids of training
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!ids){
+        error['ids'] = 'Invalid ids';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            var queryParams = st.db.escape(ids);
+            var query = 'CALL pgetTENAttachment(' + queryParams + ')';
+
+            st.db.query(query, function (err, getResult) {
+                //console.log(getResult);
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Attachment loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetTENAttachment:Attachment loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Attachment not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetTENAttachment: Attachment not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Attachment not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetTENAttachment: Attachment not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTENAttachment: error in getting Attachment :' + err);
+                }
+
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetTENAttachment ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = Alumni;
 

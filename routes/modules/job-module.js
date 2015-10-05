@@ -628,6 +628,7 @@ Job.prototype.getAll = function(req,res,next){
     var orderBy = req.query.order_by;  // 1-ascending else descending
         //console.log(req.query);
     var final_result=[],loc_result = [],get_result=[],get_result1,tid, location_result={},jobids,job_location;
+	var alumniCode = req.query.a_code ? req.query.a_code : '';
 
     var responseMessage = {
         status: false,
@@ -656,7 +657,8 @@ Job.prototype.getAll = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
-                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy);
+                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy)
+							+ ',' + st.db.escape(alumniCode);
                         //console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
 

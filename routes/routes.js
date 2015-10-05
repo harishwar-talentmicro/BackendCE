@@ -239,6 +239,7 @@ exports.FnGetParticiapatedEventsId = alumniModule.getParticiapatedEventsId;
 exports.FnGetAlumniApprovalList = alumniModule.getAlumniApprovalList;
 exports.FnGetTeamContent = alumniModule.getTeamContent;
 exports.FnGetTeamImage = alumniModule.getTeamImage;
+exports.FnGetTENAttachment = alumniModule.getTENAttachment;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');
