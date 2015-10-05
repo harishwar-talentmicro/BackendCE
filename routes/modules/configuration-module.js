@@ -1059,7 +1059,8 @@ Configuration.prototype.saveFolder = function(req,res,next){
         var SeqNoFrefix = req.body.SeqNoFrefix;
 
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            message : ''
         };
 
         if (Token != null && TID.toString() != 'NaN') {
@@ -1075,11 +1076,13 @@ Configuration.prototype.saveFolder = function(req,res,next){
                                 console.log(InsertResult);
                                 if (InsertResult.affectedRows > 0) {
                                     RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.message = 'saved';
                                     res.send(RtnMessage);
                                     console.log('FnSaveFolderRules: Folder rules details save successfully');
                                 }
                                 else {
                                     console.log('FnSaveFolderRules:No Folder rules details');
+                                    RtnMessage.message = InsertResult[0][0].message;
                                     res.send(RtnMessage);
                                 }
                             }
