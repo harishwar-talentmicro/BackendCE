@@ -2296,7 +2296,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
 
     var token = req.query.token ? req.query.token : '';
     var code = req.query.code;   // college code
-    var type = req.query.type;   // 1(training),2=event,3=news,4=knowledge
+    var type = parseInt(req.query.type);   // 1(training),2=event,3=news,4=knowledge
     var status = parseInt(req.query.status);
     var pageSize = parseInt(req.query.page_size);
     var pageCount = parseInt(req.query.page_count);
@@ -3367,6 +3367,127 @@ Alumni.prototype.getTENAttachment = function(req,res,next){
         }
     }
 };
+
+/**
+ * @todo FnSaveTENVenue
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save ten venue details
+ */
+Alumni.prototype.saveTENVenue = function(req,res,next) {
+    var _this = this;
+
+    var token = req.body.token;
+    var lat = req.body.lat;
+    var long = req.body.long;
+    var address1 = req.body.address1;
+    var address2 = req.body.address2;
+    var id = parseInt(req.body.id);      // while saving new 0 else id
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var error = {},validateStatus = true;
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!id){
+        id = 0;
+    }
+    if(parseInt(id) == NaN){
+        error['id'] = 'Invalid id';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var queryParams = st.db.escape(lat) + ',' + st.db.escape(long) + ',' + st.db.escape(address1)
+                            + ',' + st.db.escape(address2)+ ',' + st.db.escape(id);
+
+                        var query = 'CALL psaveTENVenue(' + queryParams + ')';
+                        console.log(query);
+
+                        st.db.query(query, function (err, insertresult) {
+                            console.log(insertresult);
+                            if (!err) {
+                                if (insertresult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Venue saved successfully';
+                                    responseMessage.data = {
+                                        id: insertresult[0][0].id
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTENVenue: Venue saved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'No Save Venue';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTENVenue:No save Venue');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveTENVenue: error in saving tenUsers Venue:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveTENVenue: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveTENVenue:Error in processing Token' + err);
+                }
+            });
+        }
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSaveTENVenue:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
+
 
 module.exports = Alumni;
 

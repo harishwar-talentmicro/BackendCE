@@ -219,6 +219,7 @@ router.get('/ten_approval_list',LocationManager.FnGetAlumniApprovalList);
 router.get('/team_content',LocationManager.FnGetTeamContent);
 router.get('/team_image',LocationManager.FnGetTeamImage);
 router.get('/ten_attachment',LocationManager.FnGetTENAttachment);
+router.post('/ten_venue',LocationManager.FnSaveTENVenue);
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);

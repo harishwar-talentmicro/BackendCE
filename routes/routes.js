@@ -248,6 +248,7 @@ exports.FnGetAlumniApprovalList = alumniModule.getAlumniApprovalList;
 exports.FnGetTeamContent = alumniModule.getTeamContent;
 exports.FnGetTeamImage = alumniModule.getTeamImage;
 exports.FnGetTENAttachment = alumniModule.getTENAttachment;
+exports.FnSaveTENVenue = alumniModule.saveTENVenue;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');
