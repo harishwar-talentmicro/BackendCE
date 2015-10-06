@@ -376,13 +376,15 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                         }
                                         //res.send(RtnMessage);
                                         console.log('FnSaveTranscation: Transaction details save successfully');
+
                                         var MessageContent = {
                                             token : req.body.Token,
                                             LocID : LocID,
                                             messageType: messagetype,
                                             message: MessageText,
                                             ezeid : EZEID,
-                                            toEzeid :ToEZEID
+                                            toEzeid :ToEZEID,
+                                            itemsList : ItemsList
                                         };
                                         mail.fnMessageMail(MessageContent, function (err, Result) {
                                             if (!err) {

@@ -2294,7 +2294,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
 Alumni.prototype.getTENDetails = function(req,res,next){
     var _this = this;
 
-    //var token = req.query.token;
+    var token = req.query.token ? req.query.token : '';
     var code = req.query.code;   // college code
     var type = req.query.type;   // 1(training),2=event,3=news,4=knowledge
     var status = parseInt(req.query.status);
@@ -2310,10 +2310,6 @@ Alumni.prototype.getTENDetails = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
     if(!code){
         error['code'] = 'Invalid code';
         validateStatus *= false;
@@ -2337,7 +2333,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
             //    if (!err) {
             //        if (result) {
             var queryParams = st.db.escape(type) + ',' + st.db.escape(code)+ ',' + st.db.escape(status)+ ',' + st.db.escape(pageSize)
-                + ',' + st.db.escape(pageCount);
+                + ',' + st.db.escape(pageCount) + ',' + st.db.escape(token);
             var query = 'CALL pGetTENDetails(' + queryParams + ')';
             st.db.query(query, function (err, getResult) {
                 if (!err) {
@@ -2546,9 +2542,7 @@ Alumni.prototype.saveTENUsers = function(req,res,next) {
     var _this = this;
 
     var token = req.body.token;
-    var tid = req.body.tid;      // tid=0 for new else its tid,
     var tenID = req.body.ten_id;
-    var type = req.body.type;     // 1(training),2=event,3=news,4=knowledge
     var profileId = req.body.profile_id;  // profileID is AlumniProfileID of that user
     var status = req.body.status;   // 0-participating, 1-revoked
 
@@ -2599,8 +2593,8 @@ Alumni.prototype.saveTENUsers = function(req,res,next) {
                 if (!err) {
                     if (result) {
 
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(tid) + ',' + st.db.escape(tenID)
-                            + ',' + st.db.escape(type) + ',' + st.db.escape(profileId) + ',' + st.db.escape(status);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(tenID) + ',' + st.db.escape(profileId)
+                            + ',' + st.db.escape(status);
 
                         var query = 'CALL pSaveTENUsers(' + queryParams + ')';
 

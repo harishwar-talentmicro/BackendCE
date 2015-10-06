@@ -202,12 +202,13 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
             console.log(' this is MessageContent body............');
             console.log(MessageContent);
 
-            //    token
-            //    LocID
-            //    messageType
-            //    message
-            //    ezeid
-            //    toEzeid
+            // token
+            // LocID
+            // messageType
+            // message
+            // ezeid
+            // toEzeid
+            // itemsList
 
             var fs = require('fs');
             var i = 1,verified, messageType = MessageContent.messageType,masterId, LocID, email, verifiedID, salesEmail;
