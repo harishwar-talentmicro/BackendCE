@@ -6,6 +6,7 @@ var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
 exports.FnSendMail = stdLib.sendMail;
 
+//Auth module
 var Auth = require('./modules/auth-module.js');
 var authModule = new Auth(db,stdLib);
 exports.FnRegistration = authModule.register;
@@ -14,6 +15,7 @@ exports.FnLogout = authModule.logout;
 exports.FnVerifyResetPasswordLink = authModule.verifyResetCode;
 exports.FnVerifySecretCode = authModule.verifySecretCode;
 
+//User module
 var User = require('./modules/user-module.js');
 var userModule = new User(db,stdLib);
 exports.FnGetCountry = userModule.getCountry;
@@ -53,6 +55,7 @@ exports.FnGetVerifiedInstitutes = userModule.getVerifiedInstitutes;
 exports.FnSaveUserDetails = userModule.saveUserDetails;
 exports.FnGetUserDetailsNew = userModule.getUserDetailsNew;
 
+//Audit module
 var Audit = require('./modules/audit-module.js');
 var auditModule = new Audit(db,stdLib);
 exports.FnGetAccessHistory = auditModule.getAccessHistory;
@@ -66,6 +69,7 @@ exports.FnGetTemplateList = auditModule.getMailTemplate;
 exports.FnGetTemplateDetails = auditModule.getTemplateDetails;
 exports.FnSendBulkMailer = auditModule.sendBulkMailer;
 
+//Location module
 var Location = require('./modules/location-module.js');
 var locationModule = new Location(db,stdLib);
 exports.FnGetSecondaryLocation = locationModule.getAll;
@@ -79,7 +83,7 @@ exports.FnShareLocation = locationModule.shareLocation;
 exports.FnValidateEZEOne = locationModule.validateEZEOne;
 exports.FnGetLocationsofezeid = locationModule.getLocationsofezeid;
 
-
+//BusinessManager module
 var BusinessManager = require('./modules/business-module.js');
 var businessManager = new BusinessManager(db,stdLib);
 exports.FnGetTransaction = businessManager.getTransactions;
@@ -101,7 +105,7 @@ exports.FnGetTransAttachment = businessManager.getTransAttachment;
 exports.FnSalesStatistics = businessManager.salesStatistics;
 exports.FnGetClientList = businessManager.getClientList;
 
-
+//Configuration module
 var Configuration = require('./modules/configuration-module.js');
 var configurationModule = new Configuration(db,stdLib);
 exports.FnSaveConfig = configurationModule.save;
@@ -134,7 +138,7 @@ exports.FnDeleteHolidayList = configurationModule.deleteHoliday;
 exports.FnDeleteWorkingHours = configurationModule.deleteWorkingHours;
 exports.FnWorkingHoursDetails = configurationModule.getWorkingHoursDetails;
 
-
+//Search module
 var Search = require('./modules/search-module.js');
 var searchModule = new Search(db,stdLib);
 exports.FnSearchByKeywords = searchModule.searchKeyword;
@@ -145,6 +149,8 @@ exports.FnSearchForTracker = searchModule.searchTracker;
 exports.FnGetSearchDocuments = searchModule.getSearchDoc;
 exports.FnSearchBusListing = searchModule.searchBusListing;
 
+
+//Image module
 var Image = require('./modules/image-module.js');
 var imageModule = new Image(db,stdLib);
 exports.FnCropImage = imageModule.cropImage;
@@ -152,6 +158,7 @@ exports.FnImageURL = imageModule.imageURL;
 exports.FnGetPictureOfEzeid = imageModule.getPictureOfEzeid;
 exports.FnProfileImageURL = imageModule.profileImageURL;
 
+//Reservation module
 var Reservation = require('./modules/reservation-module.js');
 var reservationModule = new Reservation(db,stdLib);
 exports.FnSaveReservTransaction = reservationModule.SaveReservTrans;
@@ -164,7 +171,7 @@ exports.FnSaveFeedback = reservationModule.saveFeedback;
 exports.FnGetFeedback = reservationModule.getFeedback;
 exports.FnResourcePicture = reservationModule.getResourcePicture;
 
-
+//Job module
 var Job = require('./modules/job-module.js');
 var jobModule = new Job(db,stdLib);
 exports.FnSaveJobs = jobModule.create;
@@ -191,6 +198,7 @@ exports.FnViewJobDetails = jobModule.viewJobDetails;
 exports.FnJobNotification = jobModule.jobNotification;
 exports.FnFindInstitute = jobModule.findInstitute;
 
+//Messagebox module
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);
 exports.FnCreateMessageGroup = messageBox.createMessageGroup;
@@ -278,7 +286,12 @@ exports.FnMSAuthResource = notification.authResource;
  */
 exports.FnAPNSNotify = notification.sendAppleNS;
 
+//Mail Module
+var Mail = require('./modules/mail-module.js');
+var mailModule = new Mail(db,stdLib);
+exports.FnSendMail = mailModule.sendMail;
 
+//Planner Module
 var Planner = require('./modules/planner-module.js');
 var plannerModule = new Planner(db,stdLib);
 exports.FnGetAllTask = plannerModule.getAllTask;

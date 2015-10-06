@@ -31,7 +31,7 @@ function Notification(db,stdLib){
  * @param longitude (longitude of location)
 _ */
 Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,
-                                          messageType,operationType,iphoneId,messageId,masterId,latitude,longitude,priority,dateTime){
+                                          messageType,operationType,iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name){
 
     console.log('It is coming to publish block of Notification');
     var validationStatus = true;
@@ -72,6 +72,9 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
     if(!priority){
         priority = "";
     }
+    if(!a_name){
+        a_name = "";
+    }
 
 
 
@@ -91,7 +94,8 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             lat : latitude,
             long : longitude,
             priority : priority,
-            date_time : dateTime
+            date_time : dateTime,
+            a_filename : a_name
         };
         console.log('Actual receiver Id : '+receiverId);
         _notificationMqtt.publish(receiverId,messagePayload);

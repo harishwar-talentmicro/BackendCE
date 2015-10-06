@@ -1446,6 +1446,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                                                     messageId = msgId;
                                                                                                     masterid = groupDetails[0][0].AdminID;
                                                                                                     prioritys = priority;
+                                                                                                    var a_name = attachmentFilename;
                                                                                                     var now = new Date();
                                                                                                     var t = now.toUTCString();
                                                                                                     var datetime = t.split(',');
@@ -1454,7 +1455,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
 
                                                                                                     //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                                                     //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude,prioritys,dateTime);
+                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude,prioritys,dateTime,a_name);
                                                                                                 }
                                                                                             }
                                                                                             else {

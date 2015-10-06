@@ -28,11 +28,14 @@ function alterEzeoneId(ezeoneId){
 
 
 var st = null;
+var Mail = require('./mail-module.js');
+var mail = null;
 
 function BusinessManager(db,stdLib){
 
     if(stdLib){
         st = stdLib;
+        mail = new Mail(db,stdLib);
     }
 };
 
@@ -381,7 +384,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                             ezeid : EZEID,
                                             toEzeid :ToEZEID
                                         };
-                                        st.fnMessageMail(MessageContent, function (err, Result) {
+                                        mail.fnMessageMail(MessageContent, function (err, Result) {
                                             if (!err) {
                                                 if (Result) {
                                                     console.log('FnSaveMessage: Mail Sent Successfully');
