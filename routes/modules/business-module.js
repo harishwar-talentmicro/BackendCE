@@ -72,6 +72,8 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
         console.log(req.query);
         var RtnMessage = {
             TotalPage:'',
+            tc : '',   // total task count
+            oc :'',    // open count
             Result:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
@@ -94,10 +96,9 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
                             + ','+ st.db.escape(locationID);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
                         st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
-
                             if (!err) {
                                 if (GetResult) {
-                                    console.log('Length:'+GetResult[0].length);
+                                    //console.log('Length:'+GetResult[0].length);
                                     if (GetResult[0].length > 0) {
                                         var totalRecord=GetResult[0][0].TotalCount;
                                         var limit= 10;
@@ -112,6 +113,8 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
 
                                         //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
                                         RtnMessage.TotalPage = TotalPage;
+                                        RtnMessage.tc = GetResult[0][0].tc;
+                                        RtnMessage.oc = GetResult[0][0].oc;
                                         RtnMessage.Result = GetResult[0];
                                         res.send(RtnMessage);
                                         console.log('FnGetTranscation: Transaction details Send successfully');
@@ -238,8 +241,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var educationId = (req.body.education_id) ? req.body.education_id : 0;
         var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
         var salaryType = req.body.salary_type ? req.body.salary_type : 3;
-
-        //console.log(req.body);
+        var contactId = req.body.ctid;
         var messagetype,verified,masterId,email,MessageContentResult;
 
         if (FunctionType == 0){
@@ -294,8 +296,8 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                             + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ "," + st.db.escape(proabilities)
                             + "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type)+ "," + st.db.escape(alarmDuration)
                             + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)+ ', ' + st.db.escape(instituteId)+
-                            ', ' + st.db.escape(jobId)
-                            + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType);
+                            ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)
+                            + ', ' + st.db.escape(salaryType)+ ', ' + st.db.escape(contactId);
                         // st.db.escape(NextActionDateTime);
                         //console.log('CALL pSaveTrans(' + query + ')');
                         st.db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {

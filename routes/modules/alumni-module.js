@@ -2560,22 +2560,12 @@ Alumni.prototype.saveTENUsers = function(req,res,next) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(!tid){
-        tid = 0;
-    }
-    if(parseInt(tid) == NaN){
-        error['tid'] = 'Invalid tid';
-        validateStatus *= false;
-    }
+
     if(!status){
         status = 0;
     }
     if(parseInt(status) == NaN){
         error['status'] = 'Invalid status';
-        validateStatus *= false;
-    }
-    if(!type){
-        error['type'] = 'Invalid type';
         validateStatus *= false;
     }
 
