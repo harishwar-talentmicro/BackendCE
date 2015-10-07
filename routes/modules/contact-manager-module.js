@@ -53,7 +53,7 @@ ContactManager.prototype.getClientList = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var title = req.query.s;   // title
+    var title = req.query.s ? req.query.s : '';   // title
 
     var responseMessage = {
         status: false,
@@ -206,11 +206,9 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(cid);
                         var query = 'CALL pGetClientcontacts(' + queryParams + ')';
-                        //console.log(query);
+                        console.log(query);
 
                         st.db.query(query, function (err, getResult) {
-
-                            //console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
                                     if (getResult[0][0].count > 0) {

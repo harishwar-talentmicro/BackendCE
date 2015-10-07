@@ -249,6 +249,12 @@ exports.FnGetTeamContent = alumniModule.getTeamContent;
 exports.FnGetTeamImage = alumniModule.getTeamImage;
 exports.FnGetTENAttachment = alumniModule.getTENAttachment;
 exports.FnSaveTENVenue = alumniModule.saveTENVenue;
+//new methods
+exports.FnClientList = alumniModule.getClientList;
+exports.FnClientContacts = alumniModule.getClientContacts;
+exports.FnGetJobList = alumniModule.getAll;
+exports.FnCreateJobs = alumniModule.create;
+exports.FnViewJob = alumniModule.viewJobDetails;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');

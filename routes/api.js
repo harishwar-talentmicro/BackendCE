@@ -220,6 +220,12 @@ router.get('/team_content',LocationManager.FnGetTeamContent);
 router.get('/team_image',LocationManager.FnGetTeamImage);
 router.get('/ten_attachment',LocationManager.FnGetTENAttachment);
 router.post('/ten_venue',LocationManager.FnSaveTENVenue);
+//new url's
+router.get('/client_list',LocationManager.FnClientList);
+router.get('/contact_list',LocationManager.FnClientContacts);
+router.get('/job_list',LocationManager.FnGetJobList);
+router.post('/add_job',LocationManager.FnCreateJobs);
+router.get('/view_job',LocationManager.FnViewJob);
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);
