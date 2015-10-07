@@ -243,12 +243,13 @@ exports.FnGetProfileStatus = alumniModule.getProfileStatus;
 exports.FnSaveTENUsers = alumniModule.saveTENUsers;
 exports.FnApproveTEN = alumniModule.approveTEN;
 exports.FnSaveComments = alumniModule.saveComments;
-exports.FnGetParticiapatedEventsId = alumniModule.getParticiapatedEventsId;
+exports.FnGetParticipatedEventsId = alumniModule.getParticipatedEventsId;
 exports.FnGetAlumniApprovalList = alumniModule.getAlumniApprovalList;
 exports.FnGetTeamContent = alumniModule.getTeamContent;
 exports.FnGetTeamImage = alumniModule.getTeamImage;
 exports.FnGetTENAttachment = alumniModule.getTENAttachment;
 exports.FnSaveTENVenue = alumniModule.saveTENVenue;
+exports.FnGetParticipantsList = alumniModule.getParticipantsList;
 //new methods
 exports.FnClientList = alumniModule.getClientList;
 exports.FnClientContacts = alumniModule.getClientContacts;

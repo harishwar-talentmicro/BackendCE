@@ -214,12 +214,13 @@ router.get('/profile_status',LocationManager.FnGetProfileStatus);
 router.post('/join_event',LocationManager.FnSaveTENUsers);
 router.post('/ten_approve',LocationManager.FnApproveTEN);
 router.post('/ten_comments',LocationManager.FnSaveComments);
-router.get('/particiapated_eventsId',LocationManager.FnGetParticiapatedEventsId);
+router.get('/participated_eventsId',LocationManager.FnGetParticipatedEventsId);
 router.get('/ten_approval_list',LocationManager.FnGetAlumniApprovalList);
 router.get('/team_content',LocationManager.FnGetTeamContent);
 router.get('/team_image',LocationManager.FnGetTeamImage);
 router.get('/ten_attachment',LocationManager.FnGetTENAttachment);
 router.post('/ten_venue',LocationManager.FnSaveTENVenue);
+router.get('/participants_list',LocationManager.FnGetParticipantsList);
 //new url's
 router.get('/client_list',LocationManager.FnClientList);
 router.get('/contact_list',LocationManager.FnClientContacts);

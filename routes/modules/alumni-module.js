@@ -2876,18 +2876,18 @@ Alumni.prototype.saveComments = function(req,res,next){
 
 
 /**
- * @todo FnGetParticiapatedEventsId
+ * @todo FnGetParticipatedEventsId
  * Method : GET
  * @param req
  * @param res
  * @param next
  * @description api code for get profile status
  */
-Alumni.prototype.getParticiapatedEventsId = function(req,res,next){
+Alumni.prototype.getParticipatedEventsId = function(req,res,next){
     var _this = this;
 
     //var token = req.query.token;
-    var profileId = req.body.profile_id;  // profileID is AlumniProfileID of that user
+    var profileId = req.query.profile_id;  // profileID is AlumniProfileID of that user
     var ids = req.query.ids;
 
     var responseMessage = {
@@ -2929,18 +2929,18 @@ Alumni.prototype.getParticiapatedEventsId = function(req,res,next){
                             responseMessage.message = 'Data loaded successfully';
                             responseMessage.data = getResult[0];
                             res.status(200).json(responseMessage);
-                            console.log('FnGetParticiapatedEventsId: Data loaded successfully');
+                            console.log('FnGetParticipatedEventsId: Data loaded successfully');
                         }
                         else {
                             responseMessage.message = 'Data not loaded';
                             res.status(200).json(responseMessage);
-                            console.log('FnGetParticiapatedEventsId: Data not loaded');
+                            console.log('FnGetParticipatedEventsId: Data not loaded');
                         }
                     }
                     else {
                         responseMessage.message = 'Data not loaded';
                         res.status(200).json(responseMessage);
-                        console.log('FnGetParticiapatedEventsId: Data not loaded');
+                        console.log('FnGetParticipatedEventsId: Data not loaded');
                     }
                 }
                 else {
@@ -2949,7 +2949,7 @@ Alumni.prototype.getParticiapatedEventsId = function(req,res,next){
                         server: 'Internal Server Error'
                     };
                     res.status(500).json(responseMessage);
-                    console.log('FnGetParticiapatedEventsId: error in getting ten details :' + err);
+                    console.log('FnGetParticipatedEventsId: error in getting ten details :' + err);
                 }
 
             });
@@ -2961,7 +2961,7 @@ Alumni.prototype.getParticiapatedEventsId = function(req,res,next){
             //                };
             //                responseMessage.data = null;
             //                res.status(401).json(responseMessage);
-            //                console.log('FnGetParticiapatedEventsId: Invalid token');
+            //                console.log('FnGetParticipatedEventsId: Invalid token');
             //            }
             //        }
             //        else {
@@ -2970,7 +2970,7 @@ Alumni.prototype.getParticiapatedEventsId = function(req,res,next){
             //            };
             //            responseMessage.message = 'Error in validating Token';
             //            res.status(500).json(responseMessage);
-            //            console.log('FnGetParticiapatedEventsId:Error in processing Token' + err);
+            //            console.log('FnGetParticipatedEventsId:Error in processing Token' + err);
             //        }
             //    });
             //}
@@ -2980,13 +2980,126 @@ Alumni.prototype.getParticiapatedEventsId = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnGetParticiapatedEventsId ' + ex.description);
+            console.log('Error : FnGetParticipatedEventsId ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
 };
+
+/**
+ * @todo FnGetParticipantsList
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get Participants list
+ */
+Alumni.prototype.getParticipantsList = function(req,res,next){
+    var _this = this;
+
+    //var token = req.query.token;
+    var id = req.query.id;  // id of traning id
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    //if(!token){
+    //    error['token'] = 'Invalid token';
+    //    validateStatus *= false;
+    //}
+    if(!id){
+        error['id'] = 'Invalid id';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            //st.validateToken(token, function (err, result) {
+            //    if (!err) {
+            //        if (result) {
+            var queryParams = st.db.escape(id);
+            var query = 'CALL PgetListofParticipants(' + queryParams + ')';
+            st.db.query(query, function (err, getResult) {
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Data loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetParticipantsList: Data loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Data not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetParticipantsList: Data not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Data not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetParticipantsList: Data not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetParticipantsList: error in getting ten details :' + err);
+                }
+
+            });
+        }
+            //            else {
+            //                responseMessage.message = 'Invalid token';
+            //                responseMessage.error = {
+            //                    token: 'Invalid Token'
+            //                };
+            //                responseMessage.data = null;
+            //                res.status(401).json(responseMessage);
+            //                console.log('FnGetParticipantsList: Invalid token');
+            //            }
+            //        }
+            //        else {
+            //            responseMessage.error = {
+            //                server: 'Internal Server Error'
+            //            };
+            //            responseMessage.message = 'Error in validating Token';
+            //            res.status(500).json(responseMessage);
+            //            console.log('FnGetParticipantsList:Error in processing Token' + err);
+            //        }
+            //    });
+            //}
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetParticipantsList ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 /**
  * @todo FnGetAlumniApprovalList
