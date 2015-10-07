@@ -2999,8 +2999,8 @@ Alumni.prototype.getParticipatedEventsId = function(req,res,next){
 Alumni.prototype.getParticipantsList = function(req,res,next){
     var _this = this;
 
-    //var token = req.query.token;
-    var id = req.query.id;  // id of traning id
+    var token = req.query.token;
+    var tid = req.query.tid;  // id of traning id
 
     var responseMessage = {
         status: false,
@@ -3011,12 +3011,12 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
-    if(!id){
-        error['id'] = 'Invalid id';
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!tid){
+        error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
 
@@ -3027,65 +3027,65 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
-            var queryParams = st.db.escape(id);
-            var query = 'CALL PgetListofParticipants(' + queryParams + ')';
-            st.db.query(query, function (err, getResult) {
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (getResult[0]) {
-                        if (getResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Data loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetParticipantsList: Data loaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'Data not loaded';
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetParticipantsList: Data not loaded');
-                        }
+                    if (result) {
+                        var queryParams = st.db.escape(tid);
+                        var query = 'CALL PgetListofParticipants(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Data loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetParticipantsList: Data loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Data not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetParticipantsList: Data not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Data not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetParticipantsList: Data not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetParticipantsList: error in getting ten details :' + err);
+                            }
+
+                        });
                     }
                     else {
-                        responseMessage.message = 'Data not loaded';
-                        res.status(200).json(responseMessage);
-                        console.log('FnGetParticipantsList: Data not loaded');
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetParticipantsList: Invalid token');
                     }
                 }
                 else {
-                    responseMessage.message = 'An error occured in query ! Please try again';
                     responseMessage.error = {
                         server: 'Internal Server Error'
                     };
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnGetParticipantsList: error in getting ten details :' + err);
+                    console.log('FnGetParticipantsList:Error in processing Token' + err);
                 }
-
             });
         }
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid Token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnGetParticipantsList: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal Server Error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnGetParticipantsList:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
