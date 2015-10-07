@@ -3000,7 +3000,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
     var _this = this;
 
     //var token = req.query.token;
-    var code = req.body.code;  // college code
+    var code = req.query.code;  // college code
 
 
     var responseMessage = {
