@@ -257,6 +257,7 @@ exports.FnGetJobList = alumniModule.getAll;
 exports.FnCreateJobs = alumniModule.create;
 exports.FnViewJob = alumniModule.viewJobDetails;
 exports.FnGetAlumniJobApprovalList = alumniModule.getAlumniJobApprovalList;
+exports.FnApproveAlumniJobs = alumniModule.approveAlumniJobs;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');

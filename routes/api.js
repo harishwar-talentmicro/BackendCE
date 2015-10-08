@@ -228,6 +228,7 @@ router.get('/job_list',LocationManager.FnGetJobList);
 router.post('/add_job',LocationManager.FnCreateJobs);
 router.get('/view_job',LocationManager.FnViewJob);
 router.get('/job_approval_list',LocationManager.FnGetAlumniJobApprovalList);
+router.post('/job_approve',LocationManager.FnApproveAlumniJobs);
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);

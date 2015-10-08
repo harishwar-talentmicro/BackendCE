@@ -4753,6 +4753,114 @@ Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
 };
 
 
+/**
+ * @todo FnApproveAlumniJobs
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save approve alumni job details
+ */
+Alumni.prototype.approveAlumniJobs = function(req,res,next){
+    var _this = this;
+
+    var token = req.body.token;
+    var jobId = req.body.job_id;
+    var status = req.body.st ? parseInt(req.body.st) : 0 ;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!jobId){
+        error['tenID'] = 'Invalid tenID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(jobId)+ ',' + st.db.escape(status);
+                        var query = 'CALL pApproveAlumnijobs(' + queryParams + ')';
+                        st.db.query(query, function (err, approveResult) {
+                            if (!err) {
+                                if (approveResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Approved successfully';
+                                    responseMessage.data = {
+                                        job_id: req.body.job_id,
+                                        status :req.body.st
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnApproveAlumniJobs: Approved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'not Approved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnApproveAlumniJobs: not Approved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnApproveAlumniJobs: error in getting approve:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnApproveAlumniJobs: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnApproveAlumniJobs:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnApproveAlumniJobs ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = Alumni;
 
