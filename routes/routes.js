@@ -256,6 +256,7 @@ exports.FnClientContacts = alumniModule.getClientContacts;
 exports.FnGetJobList = alumniModule.getAll;
 exports.FnCreateJobs = alumniModule.create;
 exports.FnViewJob = alumniModule.viewJobDetails;
+exports.FnGetAlumniJobApprovalList = alumniModule.getAlumniJobApprovalList;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');

@@ -84,8 +84,6 @@ function comparePassword(password,hash){
     return bcrypt.compareSync(password,hash);
 }
 
-
-
 /**
  * Method : POST
  * @param req
@@ -581,8 +579,6 @@ Alumni.prototype.registerAlumni = function(req,res,next){
         //throw new Error(ex);
     }
 };
-
-
 
 /**
  * @todo FnSaveAlumniContent
@@ -1745,7 +1741,6 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnSaveAlumniProfile
  * Method : POST
@@ -1895,7 +1890,6 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     }
 };
 
-
 /**
  * @todo FnGetAlumniTeamDetails
  * Method : GET
@@ -2007,7 +2001,6 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnGetAlumniProfile
@@ -2123,8 +2116,6 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
         }
     }
 };
-
-
 
 /**
  * @todo FnSaveTENMaster
@@ -2282,7 +2273,6 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     }
 };
 
-
 /**
  * @todo FnGetTENDetails
  * Method : GET
@@ -2402,7 +2392,6 @@ Alumni.prototype.getTENDetails = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnGetProfileStatus
@@ -2528,7 +2517,6 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnSaveTENUsers
@@ -2874,7 +2862,6 @@ Alumni.prototype.saveComments = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetParticipatedEventsId
  * Method : GET
@@ -3100,7 +3087,6 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetAlumniApprovalList
  * Method : GET
@@ -3112,7 +3098,7 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
 Alumni.prototype.getAlumniApprovalList = function(req,res,next){
     var _this = this;
 
-    //var token = req.query.token;
+    var token = req.query.token;
     var code = req.query.code;  // college code
 
 
@@ -3125,10 +3111,10 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
     if(!code){
         error['code'] = 'Invalid code';
         validateStatus *= false;
@@ -3141,65 +3127,65 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
-            var queryParams = st.db.escape(code);
-            var query = 'CALL pGetAlumniMemberApprovalList(' + queryParams + ')';
-            st.db.query(query, function (err, getResult) {
+            st.validateToken(token, function (err, result) {
                 if (!err) {
-                    if (getResult[0]) {
-                        if (getResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'List loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetAlumniApprovalList: List loaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'List not loaded';
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetAlumniApprovalList: List not loaded');
-                        }
+                    if (result) {
+                        var queryParams = st.db.escape(code);
+                        var query = 'CALL pGetAlumniMemberApprovalList(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'List loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniApprovalList: List loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'List not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniApprovalList: List not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'List not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetAlumniApprovalList: List not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetAlumniApprovalList: error in getting ten approval List :' + err);
+                            }
+
+                        });
                     }
                     else {
-                        responseMessage.message = 'List not loaded';
-                        res.status(200).json(responseMessage);
-                        console.log('FnGetAlumniApprovalList: List not loaded');
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetAlumniApprovalList: Invalid token');
                     }
                 }
                 else {
-                    responseMessage.message = 'An error occured in query ! Please try again';
                     responseMessage.error = {
                         server: 'Internal Server Error'
                     };
+                    responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnGetAlumniApprovalList: error in getting ten approval List :' + err);
+                    console.log('FnGetAlumniApprovalList:Error in processing Token' + err);
                 }
-
             });
         }
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid Token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnGetAlumniApprovalList: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal Server Error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnGetAlumniApprovalList:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -3213,7 +3199,6 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnGetTeamContent
@@ -3622,8 +3607,8 @@ Alumni.prototype.getClientList = function(req,res,next){
 
     var token = req.query.token;
     var title = req.query.s ? req.query.s : '';   // title
-    var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 1000;       // no of records per page (constant value) eg: 10
-    var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;     // first time its 0
+    var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0
     var functionType = req.query.ft ? parseInt(req.query.ft) : 0;
 
     var responseMessage = {
@@ -3658,7 +3643,6 @@ Alumni.prototype.getClientList = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0][0].count > 0) {
                                         responseMessage.status = true;
                                         responseMessage.count = getResult[0][0].count;
                                         responseMessage.data = getResult[1];
@@ -3666,12 +3650,6 @@ Alumni.prototype.getClientList = function(req,res,next){
                                         responseMessage.error = null;
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetClientList: Client List loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Client List not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientList: Client List not loaded');
-                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Client List not loaded';
@@ -3740,8 +3718,8 @@ Alumni.prototype.getClientContacts = function(req,res,next){
 
     var token = req.query.token;
     var cid = parseInt(req.query.cid);
-    var pageSize = req.query.page_size ? req.query.page_size : 1000;       // no of records per page (constant value) eg: 10
-    var pageCount = req.query.page_count ? req.query.page_count : 0;     // first time its 0
+    var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0
 
     var responseMessage = {
         status: false,
@@ -3782,24 +3760,17 @@ Alumni.prototype.getClientContacts = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0][0].count > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.count = getResult[0][0].count;
-                                        responseMessage.cid = getResult[0][0].cid;
-                                        responseMessage.cn = getResult[0][0].cn;
-                                        responseMessage.cc = getResult[0][0].cc;
-                                        responseMessage.page = getResult[0][0].page;
-                                        responseMessage.data = getResult[1];
-                                        responseMessage.message = 'Contact List loaded successfully';
-                                        responseMessage.error = null;
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientContacts: Contact List loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Contact List not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientContacts: Contact List not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.cid = getResult[0][0].cid;
+                                    responseMessage.cn = getResult[0][0].cn;
+                                    responseMessage.cc = getResult[0][0].cc;
+                                    responseMessage.page = getResult[0][0].page;
+                                    responseMessage.data = getResult[1];
+                                    responseMessage.message = 'Contact List loaded successfully';
+                                    responseMessage.error = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetClientContacts: Contact List loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Contact List not loaded';
@@ -3851,7 +3822,6 @@ Alumni.prototype.getClientContacts = function(req,res,next){
         }
     }
 };
-
 
 //job module
 
@@ -4667,6 +4637,122 @@ Alumni.prototype.viewJobDetails = function(req,res,next){
         }
     }
 };
+//end
+
+/**
+ * @todo FnGetAlumniJobApprovalList
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get job approval list status
+ */
+Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var code = req.query.code;  // college code
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!code){
+        error['code'] = 'Invalid code';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(code);
+                        var query = 'CALL pGetAlumniJobListForApproval(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'ApprovalList loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniJobApprovalList: ApprovalList loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'ApprovalList not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniJobApprovalList: ApprovalList not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'ApprovalList not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetAlumniJobApprovalList: ApprovalList not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetAlumniJobApprovalList: error in getting job approval List :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetAlumniJobApprovalList: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetAlumniJobApprovalList:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetAlumniJobApprovalList ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 
 module.exports = Alumni;
 

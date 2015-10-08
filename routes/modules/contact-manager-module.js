@@ -54,8 +54,8 @@ ContactManager.prototype.getClientList = function(req,res,next){
 
     var token = req.query.token;
     var title = req.query.s ? req.query.s : '';   // title
-    var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 1000;       // no of records per page (constant value) eg: 10
-    var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;     // first time its 0
+    var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0
     var functionType = req.query.ft ? parseInt(req.query.ft) : 0;
     var responseMessage = {
         status: false,
@@ -86,24 +86,17 @@ ContactManager.prototype.getClientList = function(req,res,next){
                             + ',' + st.db.escape(pageCount)+ ',' + st.db.escape(functionType);
                         var query = 'CALL pGetClientList(' + queryParams + ')';
                         //console.log(query);
-
                         st.db.query(query, function (err, getResult) {
+                            //console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0][0].count > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.count = getResult[0][0].count;
-                                        responseMessage.data = getResult[1];
-                                        responseMessage.message = 'Client List loaded successfully';
-                                        responseMessage.error = null;
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientList: Client List loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Client List not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientList: Client List not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.data = getResult[1];
+                                    responseMessage.message = 'Client List loaded successfully';
+                                    responseMessage.error = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetClientList: Client List loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Client List not loaded';
@@ -172,8 +165,8 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
 
     var token = req.query.token;
     var cid = parseInt(req.query.cid);
-    var pageSize = req.query.page_size ? req.query.page_size : 1000;       // no of records per page (constant value) eg: 10
-    var pageCount = req.query.page_count ? req.query.page_count : 0;     // first time its 0
+    var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0
 
     var responseMessage = {
         status: false,
@@ -211,29 +204,21 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(cid)+ ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
                         var query = 'CALL pGetClientcontacts(' + queryParams + ')';
-                        console.log(query);
-
+                        //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0][0].count > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.count = getResult[0][0].count;
-                                        responseMessage.cid = getResult[0][0].cid;
-                                        responseMessage.cn = getResult[0][0].cn;
-                                        responseMessage.cc = getResult[0][0].cc;
-                                        responseMessage.page = getResult[0][0].page;
-                                        responseMessage.data = getResult[1];
-                                        responseMessage.message = 'Contact List loaded successfully';
-                                        responseMessage.error = null;
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientContacts: Contact List loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Contact List not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientContacts: Contact List not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.cid = getResult[0][0].cid;
+                                    responseMessage.cn = getResult[0][0].cn;
+                                    responseMessage.cc = getResult[0][0].cc;
+                                    responseMessage.page = getResult[0][0].page;
+                                    responseMessage.data = getResult[1];
+                                    responseMessage.message = 'Contact List loaded successfully';
+                                    responseMessage.error = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetClientContacts: Contact List loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Contact List not loaded';
@@ -336,7 +321,7 @@ ContactManager.prototype.saveClient = function(req,res,next) {
         validateStatus *= false;
     }
     if(!status){
-        error['status'] = 'Invalid cs';
+        error['status'] = 'Invalid client status';
         validateStatus *= false;
     }
 
