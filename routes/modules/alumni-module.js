@@ -3622,6 +3622,9 @@ Alumni.prototype.getClientList = function(req,res,next){
 
     var token = req.query.token;
     var title = req.query.s ? req.query.s : '';   // title
+    var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;     // first time its 0
+    var functionType = req.query.ft ? parseInt(req.query.ft) : 0;
 
     var responseMessage = {
         status: false,
@@ -3648,7 +3651,8 @@ Alumni.prototype.getClientList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(title);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(title)+ ',' + st.db.escape(pageSize)
+                            + ',' + st.db.escape(pageCount)+ ',' + st.db.escape(functionType);
                         var query = 'CALL pGetClientList(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -3736,6 +3740,8 @@ Alumni.prototype.getClientContacts = function(req,res,next){
 
     var token = req.query.token;
     var cid = parseInt(req.query.cid);
+    var pageSize = req.query.page_size ? req.query.page_size : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = req.query.page_count ? req.query.page_count : 0;     // first time its 0
 
     var responseMessage = {
         status: false,
@@ -3771,7 +3777,7 @@ Alumni.prototype.getClientContacts = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(cid);
+                        var queryParams = st.db.escape(cid)+ ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
                         var query = 'CALL pGetClientcontacts(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
