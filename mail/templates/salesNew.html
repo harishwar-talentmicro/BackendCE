@@ -84,43 +84,23 @@ color: #5d5d5d; line-height: 22px;">
 
 
                             <tr><td>
-							<strong>Dear [FirstName] [LastName],</strong><br><br>
+							<strong>Dear <%=FULLNAME %>,</strong><br><br>
 							
 							Thank you for your order! <br><br>
 							
 							
-                                You have a new sales enquiry from EZE OneID: <strong style="color: #0b89ba;">[EZEOneID]</strong>,<br>
-                                    <strong>Status of user: [IsVerified]</strong><br><br>
+                                You have a new sales enquiry from EZE OneID: <strong style="color: #0b89ba;"><%=EZEOne %></strong>,<br><br>
+                                    <strong>Status of user: <%=STATUS %></strong><br><br>
                                     
                                 </td>
                             </tr>
                             <tr>							
-                                <td>Please find below, the summary of your order<br>[Message].<br><br>
+                                <td>Please find below, the summary of your order<br>
+								<strong style="color: #0b89ba;"><%=MESSAGE %></strong><br><br>
 								
-								<table style="width:100%">
-								<tr>
-								
-								<th><font color="#149EC1">Item Name</font></th>
-								<th><font color="#149EC1">Item Price</font></th> 
-								<th><font color="#149EC1">Quantity</font></th>
-								<th><font color="#149EC1">Sub Total</font></th>								
-								</tr>
-								<tr align="center">
-								<td >Tshirt</td>
-								<td>Rs.380</td> 
-								<td>1</td>
-								<td>Rs.380</td>
-								</tr>
-								<tr align="center">
-								<td >shirt</td>
-								<td>Rs.480</td> 
-								<td>1</td>
-								<td>Rs.480</td>
-								</tr>
-							</table><br>
-								
+														
                                     
-                                    Click on <a href="https://www.ezeone.com/[EZEID1]">https://www.ezeone.com/[EZEID]</a> for detailed information regarding the Sales Enquiry.
+                                    Click on <a href="https://www.ezeone.com/<%=EZEOne %>">https://www.ezeone.com/<%=EZEOne %></a> for detailed information regarding the Sales Enquiry.
                                     <br><br>
 									Our best wishes for successful sign-up of this opportunity. Keep Connecting!!
 									<br><br>

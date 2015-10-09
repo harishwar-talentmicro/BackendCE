@@ -2400,7 +2400,9 @@ User.prototype.getResume = function(req,res,next){
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var Token = req.query.TokenNo;
+
+        var id = req.query.id;
+        var ownerId = req.query.owner_id;   // id=masterid when ownerid=0 and id=jobid when ownerid!=0
 
         var responseMessage = {
             status: false,
@@ -2411,59 +2413,43 @@ User.prototype.getResume = function(req,res,next){
             message:''
         };
 
-        if (Token != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (id) {
+            st.db.query('CALL pgetCVInfo(' + st.db.escape(id) + ',' + st.db.escape(ownerId) + ')', function (err, MessagesResult) {
                 if (!err) {
-                    if (Result) {
-                        st.db.query('CALL pgetCVInfo(' + st.db.escape(Token) + ')', function (err, MessagesResult) {
-                            if (!err) {
-                                if (MessagesResult[0]) {
-                                    if (MessagesResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = MessagesResult[0];
-                                        responseMessage.skillMatrix = MessagesResult[1];
-                                        responseMessage.job_location = MessagesResult[2];
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Cv info send successfully';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetCVInfo: CV Info sent successfully');
-                                    }
-                                    else {
-                                        console.log('FnGetCVInfo: No CV Info  available');
-                                        responseMessage.message = 'Cv info not send successfully';
-                                        res.json(responseMessage);
-                                    }
-                                }
-                                else {
-                                    console.log('FnGetCVInfo: No CV Info  available');
-                                    responseMessage.message = 'Cv info not send successfully';
-                                    res.json(responseMessage);
-                                }
-                            }
-                            else {
-                                console.log('FnGetCVInfo: Error in sending Messages: ' + err);
-                                responseMessage.message = 'Error in sending CV info';
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                    if (MessagesResult[0]) {
+                        if (MessagesResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = MessagesResult[0];
+                            responseMessage.skillMatrix = MessagesResult[1];
+                            responseMessage.job_location = MessagesResult[2];
+                            responseMessage.error = null;
+                            responseMessage.message = 'Cv info send successfully';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetCVInfo: CV Info sent successfully');
+                        }
+                        else {
+                            console.log('FnGetCVInfo: No CV Info  available');
+                            responseMessage.message = 'Cv info not send successfully';
+                            res.json(responseMessage);
+                        }
                     }
                     else {
-                        console.log('FnGetCVInfo: Invalid Token');
-                        responseMessage.message = 'invalid token';
-                        res.status(401).json(responseMessage);
+                        console.log('FnGetCVInfo: No CV Info  available');
+                        responseMessage.message = 'Cv info not send successfully';
+                        res.json(responseMessage);
                     }
                 }
                 else {
-                    console.log('FnGetCVInfo: Token error: ' + err);
-                    responseMessage.message = 'error in validating token';
+                    console.log('FnGetCVInfo: Error in sending Messages: ' + err);
+                    responseMessage.message = 'Error in sending CV info';
                     res.status(500).json(responseMessage);
                 }
             });
         }
         else {
 
-            console.log('FnGetCVInfo: Token is empty');
-            responseMessage.message = 'Token is empty';
+            console.log('FnGetCVInfo: id is empty');
+            responseMessage.message = 'id is empty';
             res.status(400).json(responseMessage);
         }
     }

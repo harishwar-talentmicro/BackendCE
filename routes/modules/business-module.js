@@ -28,14 +28,14 @@ function alterEzeoneId(ezeoneId){
 
 
 var st = null;
-var Mail = require('./mail-module.js');
+var mailModule = require('./mail-module.js');
 var mail = null;
 
 function BusinessManager(db,stdLib){
 
     if(stdLib){
         st = stdLib;
-        mail = new Mail(db,stdLib);
+        mail = new mailModule(db,stdLib);
     }
 };
 
@@ -241,25 +241,8 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var educationId = (req.body.education_id) ? req.body.education_id : 0;
         var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
         var salaryType = req.body.salary_type ? req.body.salary_type : 3;
-        var contactId = req.body.ctid;
-        var messagetype,verified,masterId,email,MessageContentResult;
+        var contactId = req.body.ctid ? req.body.ctid : 1;
 
-        if (FunctionType == 0){
-            //sales
-            messagetype = 1;
-        }
-        else if (FunctionType == 2){
-            //HomeDelivery
-            messagetype = 3;
-        }
-        else if (FunctionType == 3){
-            //Service
-            messagetype = 4;
-        }
-        else if (FunctionType == 4){
-            //Cv
-            messagetype = 5;
-        }
         var RtnMessage = {
             IsSuccessfull: false,
             MessageID:0
@@ -376,33 +359,40 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                                 });
                                             }
                                         }
-                                        //res.send(RtnMessage);
+                                        res.send(RtnMessage);
                                         console.log('FnSaveTranscation: Transaction details save successfully');
 
                                         var MessageContent = {
                                             token : req.body.Token,
                                             LocID : LocID,
-                                            messageType: messagetype,
+                                            messageType: parseInt(req.body.FunctionType),
                                             message: MessageText,
                                             ezeid : EZEID,
-                                            toEzeid :ToEZEID,
-                                            itemsList : ItemsList
+                                            toEzeid :ToEZEID
                                         };
-                                        mail.fnMessageMail(MessageContent, function (err, Result) {
+                                        mail.fnMessageMail(MessageContent, function (err, statusResult) {
+                                            console.log('Save Trans............');
+                                            console.log(statusResult);
+
                                             if (!err) {
                                                 if (Result) {
-                                                    console.log('FnSaveMessage: Mail Sent Successfully');
-                                                    res.send(RtnMessage);
-
+                                                    if (statusResult.status == true) {
+                                                        console.log('FnSendMail: Mail Sent Successfully');
+                                                        //res.send(RtnMessage);
+                                                    }
+                                                    else {
+                                                        console.log('FnSendMail: Mail not Sent...1');
+                                                        //res.send(RtnMessage);
+                                                    }
                                                 }
                                                 else {
-                                                    console.log('FnSaveMessage: Mail not Sent Successfully');
-                                                    res.send(RtnMessage);
+                                                    console.log('FnSendMail: Mail not Sent..2');
+                                                    //res.send(RtnMessage);
                                                 }
                                             }
                                             else {
-                                                console.log('FnSaveMessage:Error in sending mails' + err);
-                                                res.send(RtnMessage);
+                                                console.log('FnSendMail:Error in sending mails' + err);
+                                                //res.send(RtnMessage);
                                             }
                                         });
                                     }
@@ -523,8 +513,8 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
 
                             amount : (req.body.amount) ? ((parseFloat(req.body.amount) !== NaN && parseFloat(req.body.amount) > 0) ? parseFloat(req.body.amount) : 0.00) : 0.00,
                             institute_id :  (req.body.institute_id) ?
-                            ((parseInt(req.body.institute_id) > 0 && parseInt(req.body.institute_id) !== NaN) ?
-                                parseInt(req.body.institute_id) : 0): 0,
+                                ((parseInt(req.body.institute_id) > 0 && parseInt(req.body.institute_id) !== NaN) ?
+                                    parseInt(req.body.institute_id) : 0): 0,
 
                             job_id : (req.body.job_id) ?
                                 ((parseInt(req.body.job_id) > 0 && parseInt(req.body.job_id) !== NaN) ?
@@ -568,7 +558,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnUpdateTransaction:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -661,109 +651,109 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
 };
 
 /**
-* Method : POST
-* @param req
-* @param res
-* @param next
-*/
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
 BusinessManager.prototype.saveTransactionItems = function(req,res,next){
     /**
      * @todo FnSaveTransactionItems
      */
     var _this = this;
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var Token = req.body.Token;
-    var MessageID = req.body.MessageID;
-    var ItemID = req.body.ItemID;
-    var Qty = req.body.Qty;
-    var Rate = req.body.Rate;
-    var Amount = req.body.Amount;
-    var Duration = req.body.Duration;
+        var Token = req.body.Token;
+        var MessageID = req.body.MessageID;
+        var ItemID = req.body.ItemID;
+        var Qty = req.body.Qty;
+        var Rate = req.body.Rate;
+        var Amount = req.body.Amount;
+        var Duration = req.body.Duration;
 
 
-    var RtnMessage = {
-        IsSuccessfull: false
-    };
+        var RtnMessage = {
+            IsSuccessfull: false
+        };
 
-    if (Token != null && MessageID!= null && ItemID != null && Qty !=null && Rate !=null && Amount != null && Duration !=null) {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
+        if (Token != null && MessageID!= null && ItemID != null && Qty !=null && Rate !=null && Amount != null && Duration !=null) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
 
-                    var query = st.db.escape(MessageID) + ',' + st.db.escape(ItemID) + ',' + st.db.escape(Qty) +
-                        ',' + st.db.escape(Rate) + ',' +st.db.escape(Amount) + ',' +st.db.escape(Duration);
-                    st.db.query('CALL pSaveTranscationItems(' + query + ')', function (err, InsertResult) {
-                        if (!err){
-                            if (InsertResult.affectedRows > 0) {
-                                RtnMessage.IsSuccessfull = true;
-                                res.send(RtnMessage);
-                                console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                        var query = st.db.escape(MessageID) + ',' + st.db.escape(ItemID) + ',' + st.db.escape(Qty) +
+                            ',' + st.db.escape(Rate) + ',' +st.db.escape(Amount) + ',' +st.db.escape(Duration);
+                        st.db.query('CALL pSaveTranscationItems(' + query + ')', function (err, InsertResult) {
+                            if (!err){
+                                if (InsertResult.affectedRows > 0) {
+                                    RtnMessage.IsSuccessfull = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                }
+                                else {
+                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                    res.send(RtnMessage);
+                                }
                             }
+
                             else {
-                                console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
+                                res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
-                        }
-
-                        else {
-                            console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
-                            res.statusCode = 500;
-                            res.send(RtnMessage);
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        console.log('FnSaveTranscationItems: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
                 }
                 else {
-                    console.log('FnSaveTranscationItems: Invalid token');
-                    res.statusCode = 401;
+                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
+                    res.statusCode = 500;
                     res.send(RtnMessage);
+
                 }
-            }
-            else {
-                console.log('FnSaveTranscationItems:Error in processing Token' + err);
-                res.statusCode = 500;
-                res.send(RtnMessage);
+            });
 
+        }
+
+        else {
+            if (Token == null) {
+                console.log('FnSaveTranscationItems: Token is empty');
             }
-        });
+            else if (MessageID == null) {
+                console.log('FnSaveTranscationItems: MessageID is empty');
+            }
+            else if (ItemID == null) {
+                console.log('FnSaveTranscationItems: ItemID is empty');
+            }
+            else if (Qty == null) {
+                console.log('FnSaveTranscationItems: Qty is empty');
+            }
+            else if (Rate == null) {
+                console.log('FnSaveTranscationItems: Rate is empty');
+            }
+            else if (Amount == null) {
+                console.log('FnSaveTranscationItems: Amount is empty');
+            }
+            else if (Duration == null) {
+                console.log('FnSaveTranscationItems: Duration is empty');
+            }
+
+            res.statusCode=400;
+            res.send(RtnMessage);
+        }
 
     }
-
-    else {
-        if (Token == null) {
-            console.log('FnSaveTranscationItems: Token is empty');
-        }
-        else if (MessageID == null) {
-            console.log('FnSaveTranscationItems: MessageID is empty');
-        }
-        else if (ItemID == null) {
-            console.log('FnSaveTranscationItems: ItemID is empty');
-        }
-        else if (Qty == null) {
-            console.log('FnSaveTranscationItems: Qty is empty');
-        }
-        else if (Rate == null) {
-            console.log('FnSaveTranscationItems: Rate is empty');
-        }
-        else if (Amount == null) {
-            console.log('FnSaveTranscationItems: Amount is empty');
-        }
-        else if (Duration == null) {
-            console.log('FnSaveTranscationItems: Duration is empty');
-        }
-
-        res.statusCode=400;
-        res.send(RtnMessage);
+    catch (ex) {
+        console.log('FnSaveTranscationItems:error ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
-
-}
-catch (ex) {
-    console.log('FnSaveTranscationItems:error ' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-}
 };
 
 /**
@@ -978,25 +968,30 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
      */
     var _this = this;
     try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var Token = req.query.Token;
-    var FunctionType = req.query.FunctionType;
-    var EZEID = req.query.EZEID;
-    if(Token == "")
-        Token= null;
-    if (Token != null && FunctionType != null && EZEID != null) {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
-                    console.log('CALL pItemListforEZEID(' +  st.db.escape(FunctionType)  + ',' + st.db.escape(EZEID) + ')');
-                    st.db.query('CALL pItemListforEZEID(' +  st.db.escape(FunctionType)  + ',' + st.db.escape(EZEID) + ')', function (err, GetResult) {
-                        if (!err) {
-                            if (GetResult[0] != null) {
-                                if (GetResult[0].length > 0) {
-                                    console.log('FnGetItemListForEZEID: Item list details Send successfully');
-                                    res.send(GetResult[0]);
+        var Token = req.query.Token;
+        var FunctionType = req.query.FunctionType;
+        var EZEID = req.query.EZEID;
+        if(Token == "")
+            Token= null;
+        if (Token != null && FunctionType != null && EZEID != null) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        console.log('CALL pItemListforEZEID(' +  st.db.escape(FunctionType)  + ',' + st.db.escape(EZEID) + ')');
+                        st.db.query('CALL pItemListforEZEID(' +  st.db.escape(FunctionType)  + ',' + st.db.escape(EZEID) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult[0] != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnGetItemListForEZEID: Item list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+                                        console.log('FnGetItemListForEZEID:No Item list details found');
+                                        res.json(null);
+                                    }
                                 }
                                 else {
                                     console.log('FnGetItemListForEZEID:No Item list details found');
@@ -1004,48 +999,43 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
                                 }
                             }
                             else {
-                                console.log('FnGetItemListForEZEID:No Item list details found');
+                                console.log('FnGetItemListForEZEID: error in getting Item list details' + err);
+                                res.statusCode = 500;
                                 res.json(null);
                             }
-                        }
-                        else {
-                            console.log('FnGetItemListForEZEID: error in getting Item list details' + err);
-                            res.statusCode = 500;
-                            res.json(null);
-                        }
-                    });
-                }
-                else {
-                    res.statusCode = 401;
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.json(null);
+                        console.log('FnGetItemListForEZEID: Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
                     res.json(null);
-                    console.log('FnGetItemListForEZEID: Invalid Token');
+                    console.log('FnGetItemListForEZEID: Error in validating token:  ' + err);
                 }
-            } else {
-                res.statusCode = 500;
-                res.json(null);
-                console.log('FnGetItemListForEZEID: Error in validating token:  ' + err);
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetItemListForEZEID: Token is empty');
             }
-        });
+            else if (FunctionType == null) {
+                console.log('FnGetItemListForEZEID: FunctionType is empty');
+            }
+            else if (EZEID == null) {
+                console.log('FnGetItemListForEZEID: EZEID is empty');
+            }
+            res.statusCode=400;
+            res.json(null);
+        }
     }
-    else {
-        if (Token == null) {
-            console.log('FnGetItemListForEZEID: Token is empty');
-        }
-        else if (FunctionType == null) {
-            console.log('FnGetItemListForEZEID: FunctionType is empty');
-        }
-        else if (EZEID == null) {
-            console.log('FnGetItemListForEZEID: EZEID is empty');
-        }
-        res.statusCode=400;
-        res.json(null);
+    catch (ex) {
+        console.log('FnGetItemListForEZEID error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
-}
-catch (ex) {
-    console.log('FnGetItemListForEZEID error:' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-}
 };
 
 /**
@@ -1139,23 +1129,29 @@ BusinessManager.prototype.itemList = function(req,res,next){
     var _this = this;
     try {
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var Token = req.query.Token;
-    var FunctionType = req.query.FunctionType;
+        var Token = req.query.Token;
+        var FunctionType = req.query.FunctionType;
 
-    if (Token != null && FunctionType != null) {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
+        if (Token != null && FunctionType != null) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
 
-                    st.db.query('CALL pItemList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
-                        if (!err) {
-                            if (GetResult != null) {
-                                if (GetResult[0].length > 0) {
-                                    console.log('FnItemList: Item list details Send successfully');
-                                    res.send(GetResult[0]);
+                        st.db.query('CALL pItemList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
+                                        console.log('FnItemList: Item list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetItemList:No Item list details found');
+                                        res.json(null);
+                                    }
                                 }
                                 else {
 
@@ -1165,47 +1161,41 @@ BusinessManager.prototype.itemList = function(req,res,next){
                             }
                             else {
 
-                                console.log('FnGetItemList:No Item list details found');
+                                console.log('FnGetItemList: error in getting Item list details' + err);
+                                res.statusCode = 500;
                                 res.json(null);
                             }
-                        }
-                        else {
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.json(null);
+                        console.log('FnGetItemList: Invalid Token');
+                    }
+                } else {
 
-                            console.log('FnGetItemList: error in getting Item list details' + err);
-                            res.statusCode = 500;
-                            res.json(null);
-                        }
-                    });
-                }
-                else {
-                    res.statusCode = 401;
+                    res.statusCode = 500;
                     res.json(null);
-                    console.log('FnGetItemList: Invalid Token');
+                    console.log('FnGetItemList: Error in validating token:  ' + err);
                 }
-            } else {
-
-                res.statusCode = 500;
-                res.json(null);
-                console.log('FnGetItemList: Error in validating token:  ' + err);
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetItemList: Token is empty');
             }
-        });
-    }
-    else {
-        if (Token == null) {
-            console.log('FnGetItemList: Token is empty');
+            else if (FunctionType == null) {
+                console.log('FnGetItemList: FunctionType is empty');
+            }
+            res.statusCode=400;
+            res.json(null);
         }
-        else if (FunctionType == null) {
-            console.log('FnGetItemList: FunctionType is empty');
-        }
-        res.statusCode=400;
-        res.json(null);
     }
-}
-catch (ex) {
-    console.log('FnGetItemList error:' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-}
+    catch (ex) {
+        console.log('FnGetItemList error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
 };
 
 /**
@@ -1301,76 +1291,76 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
     var _this = this;
     try {
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var Token = req.query.Token;
-    var RuleFunction = req.query.RuleFunction;
+        var Token = req.query.Token;
+        var RuleFunction = req.query.RuleFunction;
 
-    if (Token != null) {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
+        if (Token != null) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
 
-                    st.db.query('CALL pGetUserWiseFolderList(' + st.db.escape(Token) + ',' + st.db.escape(RuleFunction) + ')', function (err, GetResult) {
-                        if (!err) {
-                            if (GetResult != null) {
-                                if (GetResult[0].length > 0) {
+                        st.db.query('CALL pGetUserWiseFolderList(' + st.db.escape(Token) + ',' + st.db.escape(RuleFunction) + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult != null) {
+                                    if (GetResult[0].length > 0) {
 
-                                    console.log('FnGetUserwiseFolderList: Folder list details Send successfully');
-                                    res.send(GetResult[0]);
+                                        console.log('FnGetUserwiseFolderList: Folder list details Send successfully');
+                                        res.send(GetResult[0]);
+                                    }
+                                    else {
+
+                                        console.log('FnGetUserwiseFolderList:No Folder list details found');
+                                        res.json(null);
+                                    }
                                 }
                                 else {
 
                                     console.log('FnGetUserwiseFolderList:No Folder list details found');
                                     res.json(null);
                                 }
+
                             }
                             else {
 
-                                console.log('FnGetUserwiseFolderList:No Folder list details found');
+                                console.log('FnGetUserwiseFolderList: error in getting Folder list details' + err);
+                                res.statusCode = 500;
                                 res.json(null);
                             }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.json(null);
+                        console.log('FnGetUserwiseFolderList: Invalid Token');
+                    }
+                } else {
 
-                        }
-                        else {
-
-                            console.log('FnGetUserwiseFolderList: error in getting Folder list details' + err);
-                            res.statusCode = 500;
-                            res.json(null);
-                        }
-                    });
-                }
-                else {
-                    res.statusCode = 401;
+                    res.statusCode = 500;
                     res.json(null);
-                    console.log('FnGetUserwiseFolderList: Invalid Token');
+                    console.log('FnGetUserwiseFolderList: Error in validating token:  ' + err);
                 }
-            } else {
-
-                res.statusCode = 500;
-                res.json(null);
-                console.log('FnGetUserwiseFolderList: Error in validating token:  ' + err);
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetUserwiseFolderList: Token is empty');
             }
-        });
-    }
-    else {
-        if (Token == null) {
-            console.log('FnGetUserwiseFolderList: Token is empty');
-        }
-        if (RuleFunction == null) {
-            console.log('FnGetUserwiseFolderList: RuleFunction is empty');
-        }
+            if (RuleFunction == null) {
+                console.log('FnGetUserwiseFolderList: RuleFunction is empty');
+            }
 
-        res.statusCode=400;
-        res.json(null);
+            res.statusCode=400;
+            res.json(null);
+        }
     }
-}
-catch (ex) {
-    console.log('FnGetUserwiseFolderList error:' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-}
+    catch (ex) {
+        console.log('FnGetUserwiseFolderList error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
 };
 
 /**
@@ -1384,80 +1374,80 @@ BusinessManager.prototype.updateBussinessList = function(req,res,next){
      * @todo FnUpdateBussinessListing
      */
     var _this = this;
-try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var token = req.body.TokenNo;
-    var CategoryID = parseInt(req.body.CategoryID);
-    var Keywords = req.body.Keywords;
-    var RtnMessage = {
-        IsUpdated: false
-    };
-    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var token = req.body.TokenNo;
+        var CategoryID = parseInt(req.body.CategoryID);
+        var Keywords = req.body.Keywords;
+        var RtnMessage = {
+            IsUpdated: false
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-    if (token != null && token != '' && CategoryID.toString() != 'NaN' && Keywords != null) {
-        st.validateToken(token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
-                    //  var fileName = BrochureDocFile.split('.').pop();
-                    var query = st.db.escape(token) + ',' + st.db.escape(Keywords) + ',' + st.db.escape(CategoryID);
-                    //console.log(query);
-                    st.db.query('CALL pUpdateBusinesslist(' + query + ')', function (err, UpdateResult) {
-                        if (!err) {
-                            //console.log(UpdateResult);
-                            // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                            if (UpdateResult.affectedRows > 0) {
-                                RtnMessage.IsUpdated = true;
-                                res.send(RtnMessage);
-                                console.log('FnUpdateBussinessListing: Bussiness listing update successfully');
+        if (token != null && token != '' && CategoryID.toString() != 'NaN' && Keywords != null) {
+            st.validateToken(token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        //  var fileName = BrochureDocFile.split('.').pop();
+                        var query = st.db.escape(token) + ',' + st.db.escape(Keywords) + ',' + st.db.escape(CategoryID);
+                        //console.log(query);
+                        st.db.query('CALL pUpdateBusinesslist(' + query + ')', function (err, UpdateResult) {
+                            if (!err) {
+                                //console.log(UpdateResult);
+                                // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
+                                if (UpdateResult.affectedRows > 0) {
+                                    RtnMessage.IsUpdated = true;
+                                    res.send(RtnMessage);
+                                    console.log('FnUpdateBussinessListing: Bussiness listing update successfully');
+                                }
+                                else {
+                                    console.log('FnUpdateBussinessListing: Bussiness listing is not avaiable');
+                                    res.send(RtnMessage);
+                                }
                             }
                             else {
-                                console.log('FnUpdateBussinessListing: Bussiness listing is not avaiable');
+                                console.log('FnUpdateBussinessListing: ' + err);
+                                res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
-                        }
-                        else {
-                            console.log('FnUpdateBussinessListing: ' + err);
-                            res.statusCode = 500;
-                            res.send(RtnMessage);
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        console.log('FnUpdateBussinessListing: Invalid token');
+                        res.send(RtnMessage);
+                    }
                 }
                 else {
-                    res.statusCode = 401;
-                    console.log('FnUpdateBussinessListing: Invalid token');
+                    res.statusCode = 500;
+                    console.log('FnUpdateBussinessListing: : ' + err);
                     res.send(RtnMessage);
+
                 }
+            });
+
+        }
+        else {
+            if (token == null || token == '') {
+                console.log('FnUpdateBussinessListing: token is empty');
             }
-            else {
-                res.statusCode = 500;
-                console.log('FnUpdateBussinessListing: : ' + err);
-                res.send(RtnMessage);
-
+            else if (CategoryID.toString() == 'NaN') {
+                console.log('FnUpdateMessageStatus: CategoryID is empty');
             }
-        });
+            else if (Keywords == null) {
+                console.log('FnUpdateMessageStatus: Keywords is empty');
+            }
+            res.statusCode = 400;
+            res.send(RtnMessage);
 
+        }
     }
-    else {
-        if (token == null || token == '') {
-            console.log('FnUpdateBussinessListing: token is empty');
-        }
-        else if (CategoryID.toString() == 'NaN') {
-            console.log('FnUpdateMessageStatus: CategoryID is empty');
-        }
-        else if (Keywords == null) {
-            console.log('FnUpdateMessageStatus: Keywords is empty');
-        }
-        res.statusCode = 400;
-        res.send(RtnMessage);
-
+    catch (ex) {
+        console.log('FnUpdateMessageStatus:  error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
-}
-catch (ex) {
-    console.log('FnUpdateMessageStatus:  error:' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-}
 };
 
 /**
@@ -1473,80 +1463,80 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
     var _this = this;
     try {
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var Token = req.query.Token;
-    var functiontype =  req.query.functiontype;
-    var responseMessage = {
-        status: false,
-        data: null,
-        error:{},
-        message:''
-    };
+        var Token = req.query.Token;
+        var functiontype =  req.query.functiontype;
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
 
-    if (Token) {
+        if (Token) {
 
-        st.db.query('CALL pGetCompanyDetails(' + st.db.escape(Token) + ',' + st.db.escape(functiontype) + ')', function (err, GetResult) {
-            if (!err) {
-                if (GetResult) {
-                    if (GetResult[0].length > 0) {
-                        responseMessage.status = true;
-                        responseMessage.data = GetResult[0] ;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Company details Send successfully';
-                        console.log('FnGetCompanyDetails: Company details Send successfully');
-                        res.status(200).json(responseMessage);
+            st.db.query('CALL pGetCompanyDetails(' + st.db.escape(Token) + ',' + st.db.escape(functiontype) + ')', function (err, GetResult) {
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Company details Send successfully';
+                            console.log('FnGetCompanyDetails: Company details Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
+
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Company details';
+                            console.log('FnGetCompanyDetails: No founded Company details');
+                            res.json(responseMessage);
+                        }
                     }
                     else {
+
 
                         responseMessage.error = {};
                         responseMessage.message = 'No founded Company details';
                         console.log('FnGetCompanyDetails: No founded Company details');
                         res.json(responseMessage);
                     }
+
                 }
                 else {
 
-
+                    responseMessage.data = null ;
                     responseMessage.error = {};
-                    responseMessage.message = 'No founded Company details';
-                    console.log('FnGetCompanyDetails: No founded Company details');
-                    res.json(responseMessage);
+                    responseMessage.message = 'Error in getting Company details';
+                    console.log('FnGetCompanyDetails: error in getting Company details' + err);
+                    res.status(500).json(responseMessage);
                 }
-
-            }
-            else {
-
-                responseMessage.data = null ;
-                responseMessage.error = {};
-                responseMessage.message = 'Error in getting Company details';
-                console.log('FnGetCompanyDetails: error in getting Company details' + err);
-                res.status(500).json(responseMessage);
-            }
-        });
-    }
-
-    else {
-        if (!Token) {
-            responseMessage.message = 'Invalid Token';
-            responseMessage.error = {
-                Token : 'Invalid Token'
-            };
-            console.log('FnGetCompanyDetails: Token is mandatory field');
+            });
         }
 
-        res.status(401).json(responseMessage);
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';
+                responseMessage.error = {
+                    Token : 'Invalid Token'
+                };
+                console.log('FnGetCompanyDetails: Token is mandatory field');
+            }
+
+            res.status(401).json(responseMessage);
+        }
     }
-}
-catch (ex) {
-    responseMessage.error = {};
-    responseMessage.message = 'An error occured !'
-    console.log('FnGetCompanyDetails:error ' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-    res.status(400).json(responseMessage);
-}
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnGetCompanyDetails:error ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(responseMessage);
+    }
 };
 
 /**
@@ -1572,116 +1562,125 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
      * @constructor
      */
     var _this = this;
-var ezeTerm = alterEzeoneId(req.query['ezeoneid']);
-var token = req.query['token'];
-var locationSeq = 0;
-var pin = null;
-var ezeoneId = null;
+    var ezeTerm = alterEzeoneId(req.query['ezeoneid']);
+    var token = req.query['token'];
+    var locationSeq = 0;
+    var pin = null;
+    var ezeoneId = null;
 
-var respMsg = {
-    status : false,
-    message : 'Please login to continue',
-    data : null,
-    error : null
-};
+    var respMsg = {
+        status : false,
+        message : 'Please login to continue',
+        data : null,
+        error : null
+    };
 
-var error = {};
-var validationFlag = true;
-if(!token){
-    error['token'] = 'Invalid Token';
-    validationFlag *= false;
-}
-if(!ezeTerm){
-    error['ezeoneid'] = 'EZEOne ID not found';
-    validationFlag *= false;
-}
+    var error = {};
+    var validationFlag = true;
+    if(!token){
+        error['token'] = 'Invalid Token';
+        validationFlag *= false;
+    }
+    if(!ezeTerm){
+        error['ezeoneid'] = 'EZEOne ID not found';
+        validationFlag *= false;
+    }
 
-if(!validationFlag){
-    respMsg.message = 'Please check all the errors';
-    respMsg.error = error;
-    res.status(400).json(respMsg);
-    return;
-}
-else{
-    try{
-        st.validateToken(token,function(err,tokenResult){
-            if(err){
-                respMsg.status = false;
-                respMsg.data = null;
-                respMsg.message = 'Please check all the errors';
-                respMsg.error = {token : 'Invalid Token'};
-                res.status(401).json(respMsg);
-            }
-            else if(!tokenResult){
-                respMsg.status  = false;
-                respMsg.data = null;
-                respMsg.message = 'Please check all the errors';
-                respMsg.error = {token : 'Invalid Token'};
-                res.status(401).json(respMsg);
-            }
-            else{
-                var ezeArr = ezeTerm.split('.');
-                ezeoneId = ezeArr;
-                if(ezeArr.length > 1){
-                    ezeoneId = ezeArr[0];
-
-                    /**
-                     * Try to find if user has passed the location sequence number
-                     */
-                    if(ezeArr[1] && ezeArr[1].substr(0,1).toUpperCase() === 'L'){
-                        var seqNo = parseInt(ezeArr[1].substring(1));
-                        if(seqNo !== NaN && seqNo > -1){
-                            locationSeq = seqNo;
-                        }
-                    }
-
-                    /**
-                     * If location sequence number is not found assuming that user may have passed the pin
-                     * and therefore validating pin using standard rules
-                     */
-                    else if(parseInt(ezeArr[1]) !== NaN && parseInt(ezeArr[1]) > 99 && parseInt(ezeArr[1]) < 1000){
-                        pin = parseInt(ezeArr[1]).toString();
-                    }
-
-                    /**
-                     * If third element is also there in array then strictly assume it as a pin and then
-                     * assign it to pin
-                     */
-                    else if(ezeArr.length > 2){
-                        if(parseInt(ezeArr[2]) !== NaN && parseInt(ezeArr[2]) > 99 && parseInt(ezeArr[2]) < 1000){
-                            pin = parseInt(ezeArr[2]).toString();
-                        }
-                    }
+    if(!validationFlag){
+        respMsg.message = 'Please check all the errors';
+        respMsg.error = error;
+        res.status(400).json(respMsg);
+        return;
+    }
+    else{
+        try{
+            st.validateToken(token,function(err,tokenResult){
+                if(err){
+                    respMsg.status = false;
+                    respMsg.data = null;
+                    respMsg.message = 'Please check all the errors';
+                    respMsg.error = {token : 'Invalid Token'};
+                    res.status(401).json(respMsg);
                 }
+                else if(!tokenResult){
+                    respMsg.status  = false;
+                    respMsg.data = null;
+                    respMsg.message = 'Please check all the errors';
+                    respMsg.error = {token : 'Invalid Token'};
+                    res.status(401).json(respMsg);
+                }
+                else{
+                    var ezeArr = ezeTerm.split('.');
+                    ezeoneId = ezeArr;
+                    if(ezeArr.length > 1){
+                        ezeoneId = ezeArr[0];
 
-                var moment = require('moment');
-                var dateTime = moment().format('YYYY-MM-DD HH:mm:ss');
-                var ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
-                req.socket.remoteAddress || req.connection.socket.remoteAddress);
+                        /**
+                         * Try to find if user has passed the location sequence number
+                         */
+                        if(ezeArr[1] && ezeArr[1].substr(0,1).toUpperCase() === 'L'){
+                            var seqNo = parseInt(ezeArr[1].substring(1));
+                            if(seqNo !== NaN && seqNo > -1){
+                                locationSeq = seqNo;
+                            }
+                        }
 
-                var queryParams = st.db.escape(token) + ',' + st.db.escape(dateTime) + ',' + st.db.escape(ip) +
-                    ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq) + ',' + st.db.escape(pin);
-                st.db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
-                    if(err){
-                        console.log('Error FnGetEZEOneIDInfo :  '+err);
-                        respMsg.status  = false;
-                        respMsg.data = null;
-                        respMsg.message = 'An error occured';
-                        respMsg.error = {server : 'Internal Server Error'};
-                        res.status(400).json(respMsg);
-                        return;
+                        /**
+                         * If location sequence number is not found assuming that user may have passed the pin
+                         * and therefore validating pin using standard rules
+                         */
+                        else if(parseInt(ezeArr[1]) !== NaN && parseInt(ezeArr[1]) > 99 && parseInt(ezeArr[1]) < 1000){
+                            pin = parseInt(ezeArr[1]).toString();
+                        }
+
+                        /**
+                         * If third element is also there in array then strictly assume it as a pin and then
+                         * assign it to pin
+                         */
+                        else if(ezeArr.length > 2){
+                            if(parseInt(ezeArr[2]) !== NaN && parseInt(ezeArr[2]) > 99 && parseInt(ezeArr[2]) < 1000){
+                                pin = parseInt(ezeArr[2]).toString();
+                            }
+                        }
                     }
 
+                    var moment = require('moment');
+                    var dateTime = moment().format('YYYY-MM-DD HH:mm:ss');
+                    var ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
+                    req.socket.remoteAddress || req.connection.socket.remoteAddress);
 
-                    else{
-                        if(result && result.length > 0){
-                            if(result[0].length > 0){
-                                respMsg.status  = true;
-                                respMsg.data = result[0][0];
-                                respMsg.message = 'EZEOne ID found';
-                                respMsg.error = null;
-                                res.status(200).json(respMsg);
-                                return;
+                    var queryParams = st.db.escape(token) + ',' + st.db.escape(dateTime) + ',' + st.db.escape(ip) +
+                        ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq) + ',' + st.db.escape(pin);
+                    st.db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
+                        if(err){
+                            console.log('Error FnGetEZEOneIDInfo :  '+err);
+                            respMsg.status  = false;
+                            respMsg.data = null;
+                            respMsg.message = 'An error occured';
+                            respMsg.error = {server : 'Internal Server Error'};
+                            res.status(400).json(respMsg);
+                            return;
+                        }
+
+
+                        else{
+                            if(result && result.length > 0){
+                                if(result[0].length > 0){
+                                    respMsg.status  = true;
+                                    respMsg.data = result[0][0];
+                                    respMsg.message = 'EZEOne ID found';
+                                    respMsg.error = null;
+                                    res.status(200).json(respMsg);
+                                    return;
+                                }
+                                else{
+                                    respMsg.status  = false;
+                                    respMsg.data = null;
+                                    respMsg.message = 'Nothing found';
+                                    respMsg.error = { ezeoneid : 'No results found'};
+                                    res.status(404).json(respMsg);
+                                }
+
                             }
                             else{
                                 respMsg.status  = false;
@@ -1690,35 +1689,26 @@ else{
                                 respMsg.error = { ezeoneid : 'No results found'};
                                 res.status(404).json(respMsg);
                             }
-
                         }
-                        else{
-                            respMsg.status  = false;
-                            respMsg.data = null;
-                            respMsg.message = 'Nothing found';
-                            respMsg.error = { ezeoneid : 'No results found'};
-                            res.status(404).json(respMsg);
-                        }
-                    }
-                });
+                    });
 
-            }
-        });
+                }
+            });
+        }
+        catch(ex){
+            console.log('Error : FnGetEZEOneIDInfo' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
     }
-    catch(ex){
-        console.log('Error : FnGetEZEOneIDInfo' + ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-    }
-}
 };
 
 /**
-* Method : GET
-* @param req
-* @param res
-* @param next
-*/
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
 BusinessManager.prototype.getTransAttachment = function(req,res,next){
     /**
      * @todo FnGetTransAttachment

@@ -925,6 +925,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var scoreTo = req.query.score_to ? req.query.score_to : 0;
         var pageSize = req.query.page_size ? req.query.page_size : 10;
         var pageCount = req.query.page_count ? req.query.page_count : 0;
+        var source = parseInt(req.query.source);   // 1-internal, 2-for ezeone cvs
+        var token = req.query.token;
 
         /**
          * Validations
@@ -946,7 +948,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
                 + ',' + st.db.escape(salaryType) +',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
                 + ',' + st.db.escape(experienceTo)+ ',' + st.db.escape(educations)+ ',' + st.db.escape(specializationId)
                 + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(scoreTo)
-                + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount);
+                + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)+ ',' + st.db.escape(source)+ ',' + st.db.escape(token);
 
         var query = 'CALL pGetjobseekers(' + queryParams + ')';
             //console.log(query);
