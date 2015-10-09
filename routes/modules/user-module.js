@@ -2530,8 +2530,13 @@ User.prototype.saveResume = function(req,res,next){
         var yearOfPassing = req.body.year_of_passing;
         var aggregateScore = req.body.aggregate_score;
         var institueTitle = req.body.institute_title ? req.body.institute_title : '';
-
         var expectedSalary = (parseFloat(req.body.exp_salary) !== NaN) ? parseFloat(req.body.exp_salary) : 0.00;
+        var firstName = req.body.fn;
+        var lastName = req.body.ln;
+        var email = req.body.eid;
+        var mobile = req.body.mn;
+        var tid = req.body.tid;
+
 
         if(typeof(locationsList) == "string"){
             locationsList = JSON.parse(locationsList);
@@ -2575,7 +2580,9 @@ User.prototype.saveResume = function(req,res,next){
                                 + ',' + st.db.escape(experience) + ','+ st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle)
                                 + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID) + ',' + st.db.escape(instituteID)
                                 + ',' + st.db.escape(educationID) + ',' + st.db.escape(specializationID) + ',' + st.db.escape(yearOfPassing)
-                                + ','+ st.db.escape(aggregateScore)+ ','+ st.db.escape(institueTitle) +',' + st.db.escape(expectedSalary);
+                                + ','+ st.db.escape(aggregateScore)+ ','+ st.db.escape(institueTitle) +',' + st.db.escape(expectedSalary)
+                                + ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName) +',' + st.db.escape(email)
+                                +',' + st.db.escape(mobile)+',' + st.db.escape(tid);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {

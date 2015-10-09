@@ -4652,6 +4652,7 @@ Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
 
     var token = req.query.token;
     var code = req.query.code;  // college code
+    var status = req.query.status; // 0-Pending,1-Active,2-inactive
 
 
     var responseMessage = {
@@ -4682,7 +4683,7 @@ Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(code);
+                        var queryParams = st.db.escape(code) + ',' + st.db.escape(status);
                         var query = 'CALL pGetAlumniJobListForApproval(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
