@@ -260,6 +260,7 @@ exports.FnGetAlumniJobApprovalList = alumniModule.getAlumniJobApprovalList;
 exports.FnApproveAlumniJobs = alumniModule.approveAlumniJobs;
 exports.FnSearchAlumniTEN = alumniModule.searchAlumniTEN;
 exports.FnSearchAlumniJobs = alumniModule.searchAlumniJobs;
+exports.FnGetMyAlumniJobs = alumniModule.getMyAlumniJobs;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');

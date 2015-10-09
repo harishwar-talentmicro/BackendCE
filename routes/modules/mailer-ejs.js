@@ -57,6 +57,14 @@ catch(ex){
 //    }
 //});
 
+var path = require('path');
+var file = path.join(__dirname,'../../config1.json');
+
+var EJSCONFIG = JSON.parse(fs.readFileSync(file));
+console.log(EJSCONFIG);
+//var EJSCONFIG = JSON.parse(fs.readFileSync(__dirname+'../../../config1.json'));
+
+
 function HussMailer(globalConfig){
     if(!globalConfig){
         globalConfig = defaultConfig;
@@ -89,9 +97,6 @@ HussMailer.prototype.renderTemplate = function(mailType,params){
 HussMailer.prototype.sendMail = function(mailContent, CallBack){
 
     console.log('-----HUSS MAILER OF EJS-----');
-
-    var EJSCONFIG = JSON.parse(path.join(__dirname,  '../../../config1.json'));
-    console.log(EJSCONFIG);
 
     var _this = this;
 
@@ -152,6 +157,8 @@ HussMailer.prototype.sendMail = function(mailContent, CallBack){
             else{
 
                 var htmlContent = _this.renderTemplate(type,mParams);
+
+                console.log(htmlContent);
 
                 if(htmlContent){
                     var mailOptions = {

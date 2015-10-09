@@ -2402,7 +2402,7 @@ User.prototype.getResume = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var id = req.query.id;
-        var ownerId = req.query.owner_id;   // id=masterid when ownerid=0 and id=jobid when ownerid!=0
+        //var ownerId = req.query.owner_id;   // id=masterid when ownerid=0 and id=jobid when ownerid!=0
 
         var responseMessage = {
             status: false,
@@ -2414,7 +2414,7 @@ User.prototype.getResume = function(req,res,next){
         };
 
         if (id) {
-            st.db.query('CALL pgetCVInfo(' + st.db.escape(id) + ',' + st.db.escape(ownerId) + ')', function (err, MessagesResult) {
+            st.db.query('CALL pgetCVInfo(' + st.db.escape(id) + ')', function (err, MessagesResult) {
                 if (!err) {
                     if (MessagesResult[0]) {
                         if (MessagesResult[0].length > 0) {
