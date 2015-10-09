@@ -258,6 +258,8 @@ exports.FnCreateJobs = alumniModule.create;
 exports.FnViewJob = alumniModule.viewJobDetails;
 exports.FnGetAlumniJobApprovalList = alumniModule.getAlumniJobApprovalList;
 exports.FnApproveAlumniJobs = alumniModule.approveAlumniJobs;
+exports.FnSearchAlumniTEN = alumniModule.searchAlumniTEN;
+exports.FnSearchAlumniJobs = alumniModule.searchAlumniJobs;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');

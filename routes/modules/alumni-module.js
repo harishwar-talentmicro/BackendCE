@@ -2288,8 +2288,8 @@ Alumni.prototype.getTENDetails = function(req,res,next){
     var code = req.query.code;   // college code
     var type = parseInt(req.query.type);   // 1(training),2=event,3=news,4=knowledge
     var status = parseInt(req.query.status);
-    var pageSize = parseInt(req.query.page_size);
-    var pageCount = parseInt(req.query.page_count);
+    var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
+    var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;
 
     var responseMessage = {
         status: false,
@@ -4766,7 +4766,7 @@ Alumni.prototype.approveAlumniJobs = function(req,res,next){
 
     var token = req.body.token;
     var jobId = req.body.job_id;
-    var status = req.body.st ? parseInt(req.body.st) : 0 ;
+    var status = req.body.st ? parseInt(req.body.st) : 0 ;   // 0=Pending,1=Active,2=inactive
 
     var responseMessage = {
         status: false,
@@ -4861,6 +4861,237 @@ Alumni.prototype.approveAlumniJobs = function(req,res,next){
         }
     }
 };
+
+
+/**
+ * @todo FnSearchAlumniTEN
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @server_param
+ *  1. token
+ *  2. title   // title of search word
+ * @description api code for search alumni ten
+ */
+Alumni.prototype.searchAlumniTEN = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var title = req.query.title;
+    var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0. start result count
+
+    var responseMessage = {
+        status: false,
+        count : 0,
+        data: null,
+        message: '',
+        error: {}
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(title)+ ',' + st.db.escape(pageCount) + ',' + st.db.escape(pageSize);
+                        var query = 'CALL pSearchAlumniTEN(' + queryParams + ')';
+                        //console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            //console.log(getResult);
+                            if (!err) {
+                                if (getResult[0]) {
+                                    if (getResult[0][0].count > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.count = getResult[0][0].count;
+                                        responseMessage.data = getResult[1];
+                                        responseMessage.message = 'Search Result loaded successfully';
+                                        responseMessage.error = null;
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSearchAlumniTEN: Search Result loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Search Result not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSearchAlumniTEN: Search Result not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Search Result not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSearchAlumniTEN: Search Result not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetClientList: error in getting Search Result :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSearchAlumniTEN: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSearchAlumniTEN:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSearchAlumniTEN ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnSearchAlumniJobs
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description search jobs of a person
+ */
+Alumni.prototype.searchAlumniJobs = function(req,res,next){
+    var _this = this;
+    try{
+        var latitude = req.query.latitude ? req.query.latitude : 0;
+        var longitude = req.query.longitude ? req.query.longitude : 0;
+        var jobType = req.query.jobType ? req.query.jobType : '';
+        var exp = (req.query.exp) ? req.query.exp : -1;
+        var keywords = req.query.keywords ? req.query.keywords : '';
+        var token = (req.query.token) ? req.query.token : '';
+        var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
+        var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;
+        var locations = req.query.locations ? req.query.locations : '';
+        var category = req.query.category ? req.query.category : '';
+        var salary = req.query.salary ? req.query.salary : '';
+        var filter = req.query.filter ? req.query.filter : 0;
+        var type = req.query.type ? parseInt(req.query.type) : 0;  //0-normal job search, 1-Show my institue jobs, 2-for matching jobs of my cv and Default is 0
+        var alumniCode = req.query.alumni_code;  // alumni code
+
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: null
+        };
+
+        var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(jobType)
+            + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
+            +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)
+            +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(type)+',' + st.db.escape(alumniCode);
+        //console.log('CALL psearchjobs(' + query + ')');
+        st.db.query('CALL psearchAlumnijobs(' + query + ')', function (err, getresult) {
+            if (!err) {
+                if (getresult) {
+                    if (getresult[0]) {
+                        if (getresult[0][0]) {
+                            if (getresult[1].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'AlimniJobs Search result loaded successfully';
+                                if (filter == 0) {
+                                    responseMessage.data = {
+                                        total_count: getresult[0][0].count,
+                                        result: getresult[1],
+                                        job_location: getresult[2],
+                                        salary: getresult[3],
+                                        category: getresult[4],
+                                        company_details: getresult[5]
+                                    };
+                                }
+                                else {
+                                    responseMessage.data = {
+                                        total_count: getresult[0][0].count,
+                                        result: getresult[1]
+                                    };
+                                }
+                                res.status(200).json(responseMessage);
+                                console.log('FnSearchAlimniJobs: AlimniJobs Search result loaded successfully');
+                            }
+                            else {
+                                responseMessage.message = 'Search result not found';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSearchAlimniJobs:Search result not found');
+                            }
+                        }
+                        else {
+                            responseMessage.message = 'Search result not found';
+                            res.status(200).json(responseMessage);
+                            console.log('FnSearchAlimniJobs:Search result not found');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Search result not found';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSearchAlimniJobs:Search result not found');
+                    }
+                }
+                else {
+                    responseMessage.message = 'Search result not found';
+                    res.status(200).json(responseMessage);
+                    console.log('FnSearchAlimniJobs:Search result not found');
+                }
+            }
+            else {
+                responseMessage.message = 'An error occured ! Please try again';
+                responseMessage.error = {
+                    server : 'Internal server error'
+                };
+                res.status(500).json(responseMessage);
+                console.log('FnSearchAlimniJobs: error in getting job details:' + err);
+            }
+        });
+    }
+    catch(ex){
+        responseMessage.error = {
+            server : 'Internal server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSearchAlimniJobs:error ' + ex.description);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+
 
 module.exports = Alumni;
 
