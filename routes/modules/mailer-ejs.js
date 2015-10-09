@@ -91,6 +91,7 @@ HussMailer.prototype.renderTemplate = function(mailType,params){
     var fileContent = fs.readFileSync(__dirname + separator + mDirectory + separator + EJSCONFIG.MAIL.TEMPLATES[mailType].file,'utf-8');
     console.log('---HTML RENDER FILE---');
     console.log(EJSCONFIG.MAIL.TEMPLATES[mailType].file);
+    //console.log(fileContent);
     return ejs.render(fileContent,params);
 };
 
@@ -158,8 +159,6 @@ HussMailer.prototype.sendMail = function(mailContent, CallBack){
 
                 var htmlContent = _this.renderTemplate(type,mParams);
 
-                console.log(htmlContent);
-
                 if(htmlContent){
                     var mailOptions = {
                         from: EJSCONFIG.MAIL.SENDER, // sender address
@@ -169,8 +168,10 @@ HussMailer.prototype.sendMail = function(mailContent, CallBack){
                         html: htmlContent // html body
                     };
 
-                    var transporter = nodemailer.createTransport();
-                    transporter.sendMail(mailOptions,function(error,info){
+                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                    //var transporter = nodemailer.createTransport();
+                    //transporter.sendMail(mailOptions,function(error,info){
+                    sendgrid.send(mailOptions, function (error, result) {
                         if(error){
                             console.log('Error in sending mail');
                             console.log(error);
