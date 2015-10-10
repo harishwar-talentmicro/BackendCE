@@ -464,19 +464,19 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
 
         var TID = parseInt(req.body.TID);
         var status = req.body.status;
-        var folderRuleID = parseInt(req.body.folderRuleID);
-        var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
-        var nextActionDateTime = new Date(req.body.nextActionDateTime);
         var Token = req.body.Token;
-        var alarmDuration = (parseInt(req.body.alarm_duration) !== NaN) ? parseInt(req.body.alarm_duration) : 0;
-        var probability = (parseInt(req.body.probability) !== NaN && parseInt(req.body.probability) !== 0) ? parseInt(req.body.probability) : 2 ;
-        var targetDate = req.body.target_date ? req.body.target_date : null;
-        var amount = (req.body.amount) ? req.body.amount : 0;
-        var instituteId = req.body.institute_id ? req.body.institute_id : 0;
-        var jobId = req.body.job_id ? req.body.job_id : 0;
-        var educationId = req.body.education_id ? req.body.education_id : 0;
-        var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
-        var salaryType = req.body.salary_type ? req.body.salary_type : 3;
+        //var folderRuleID = parseInt(req.body.folderRuleID);
+        //var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
+        //var nextActionDateTime = new Date(req.body.nextActionDateTime);
+        //var alarmDuration = (parseInt(req.body.alarm_duration) !== NaN) ? parseInt(req.body.alarm_duration) : 0;
+        //var probability = (parseInt(req.body.probability) !== NaN && parseInt(req.body.probability) !== 0) ? parseInt(req.body.probability) : 2 ;
+        //var targetDate = req.body.target_date ? req.body.target_date : null;
+        //var amount = (req.body.amount) ? req.body.amount : 0;
+        //var instituteId = req.body.institute_id ? req.body.institute_id : 0;
+        //var jobId = req.body.job_id ? req.body.job_id : 0;
+        //var educationId = req.body.education_id ? req.body.education_id : 0;
+        //var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
+        //var salaryType = req.body.salary_type ? req.body.salary_type : 3;
 
 
         var responseMessage = {
@@ -488,11 +488,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
 
         if(Token){
 
-            var query = st.db.escape(TID) + ', ' + st.db.escape(status) + ',' + st.db.escape(folderRuleID)
-                + ',' + st.db.escape(nextAction) + ',' + st.db.escape(nextActionDateTime)
-                + ', ' + st.db.escape(Token)+ ', ' + st.db.escape(alarmDuration)+ ', ' + st.db.escape(probability)
-                + ', ' + st.db.escape(targetDate)+ ', ' + st.db.escape(amount)+ ', ' + st.db.escape(instituteId)+ ', ' + st.db.escape(jobId)
-                + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType);
+            var query = st.db.escape(status) + ', ' + st.db.escape(tid) + ',' + st.db.escape(token);
             console.log(query);
             st.db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
@@ -502,35 +498,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
                         responseMessage.message = 'Transaction details update successfully';
                         responseMessage.data = {
                             TID : req.body.TID,
-                            status : req.body.status,
-                            folderRuleID : req.body.folderRuleID,
-                            nextAction : (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0,
-                            nextActionDateTime : req.body.nextActionDateTime,
-                            token : Token,
-                            alarm_duration : alarmDuration,
-                            probability : probability,
-                            target_date : targetDate,
-
-                            amount : (req.body.amount) ? ((parseFloat(req.body.amount) !== NaN && parseFloat(req.body.amount) > 0) ? parseFloat(req.body.amount) : 0.00) : 0.00,
-                            institute_id :  (req.body.institute_id) ?
-                                ((parseInt(req.body.institute_id) > 0 && parseInt(req.body.institute_id) !== NaN) ?
-                                    parseInt(req.body.institute_id) : 0): 0,
-
-                            job_id : (req.body.job_id) ?
-                                ((parseInt(req.body.job_id) > 0 && parseInt(req.body.job_id) !== NaN) ?
-                                    parseInt(req.body.job_id) : 0): 0,
-
-                            education_id : (req.body.education_id) ?
-                                ((parseInt(req.body.education_id) > 0 && parseInt(req.body.education_id) !== NaN) ?
-                                    parseInt(req.body.education_id) : 0): 0,
-
-                            specialization_id : (req.body.specialization_id) ?
-                                ((parseInt(req.body.specialization_id) > 0 && parseInt(req.body.specialization_id) !== NaN) ?
-                                    parseInt(req.body.specialization_id) : 0): 0,
-
-                            salary_type : (req.body.salary_type) ?
-                                ((parseInt(req.body.salary_type) > 0 && parseInt(req.body.salary_type) !== NaN) ?
-                                    parseInt(req.body.salary_type) : 3): 3
+                            status : req.body.status
                         };
 
                         res.status(200).json(responseMessage);

@@ -4355,5 +4355,112 @@ User.prototype.getUserDetailsNew = function(req,res,next){
 
     }
 };
+/**
+ * @todo FnSendResume
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for send resume
+ */
+User.prototype.sendResume = function(req,res,next){
+    var _this = this;
+
+    var token = req.body.token;
+    var cvid = parseInt(req.body.cvid);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!cvid){
+        error['cvid'] = 'Invalid cvid';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token)+ ',' + st.db.escape(cvid);
+                        var query = 'CALL pSendResume(' + queryParams + ')';
+                        st.db.query(query, function (err, insertResult) {
+                            if (!err) {
+                                if (insertResult.affectedRows > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Resume Send successfully';
+                                    responseMessage.data = {
+                                        cvid: req.body.cvid
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSendResume: Resume send successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Resume not send';
+                                    responseMessage.data = insertResult[0][0].message;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSendResume:Resume not send');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSendResume: error in getting send resume:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSendResume: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSendResume:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSendResume ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = User;
