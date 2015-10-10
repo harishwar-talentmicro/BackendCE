@@ -4879,7 +4879,7 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var title = req.query.title;
+    var title = req.query.keyword;
     var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
     var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0. start result count
 

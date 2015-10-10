@@ -192,6 +192,7 @@ router.get('/message_attachment',LocationManager.FnGetMessageAttachment);
 router.get('/group_info',LocationManager.FnGetGroupInfo);
 router.get('/unread_message_count',LocationManager.FnCountOfUnreadMessage);
 router.get('/message_fullview_new',LocationManager.FnViewMessageNew);
+router.put('/change_group_admin',LocationManager.FnChangeGroupAdmin);
 
 //Planner module
 router.get('/tasks',LocationManager.FnGetAllTask);

@@ -56,6 +56,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var aboutGroup  = req.body.about_group ? req.body.about_group : '';
     var autoJoin  = req.body.auto_join ? req.body.auto_join : 0;
     var tid = req.body.tid ? req.body.tid : 0;
+    var restrictReply = req.body.rr;
 
     var responseMessage = {
         status: false,
@@ -89,7 +90,8 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(groupName) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
-                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(tid);
+                            + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(tid)
+                            + ',' + st.db.escape(restrictReply);
                         var query = 'CALL pCreateMessageGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
@@ -106,7 +108,8 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                                         groupType: req.body.group_type,
                                         aboutGroup: req.body.about_group,
                                         autoJoin: req.body.auto_join,
-                                        tid: req.body.tid
+                                        tid: req.body.tid,
+                                        rr: req.body.rr
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnCreateMessageGroup: Group created successfully');
@@ -1293,6 +1296,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var latitude = '', longitude = '';
     var isBussinessChat = req.body.isBussinessChat ? req.body.isBussinessChat : 0;
     var ezeid = req.body.ezeid;
+    var istask = req.body.istask;
 
     if(idType){
         id = idType.split(",");
@@ -1355,7 +1359,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 var queryParams = st.db.escape(message) + ',' + st.db.escape(attachment) + ',' + st.db.escape(attachmentFilename)
                                     + ',' + st.db.escape(priority) + ',' + st.db.escape(targetDate) + ',' + st.db.escape(expiryDate)
                                     + ',' + st.db.escape(token) + ',' + st.db.escape(previousMessageID) + ',' + st.db.escape(toID)
-                                    + ',' + st.db.escape(idType) + ',' + st.db.escape(mimeType) + ',' + st.db.escape(isJobseeker);
+                                    + ',' + st.db.escape(idType) + ',' + st.db.escape(mimeType) + ',' + st.db.escape(isJobseeker)
+                                    + ',' + st.db.escape(istask);
                                 var query = 'CALL pComposeMessage(' + queryParams + ')';
                                 //console.log(query);
                                 st.db.query(query, function (err, insertResult) {
@@ -3314,6 +3319,123 @@ MessageBox.prototype.viewMessageNew = function(req,res,next){
         }
     }
 };
+
+
+/**
+ * @todo FnChangeGroupAdmin
+ * Method : PUT
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for change group admin
+ */
+MessageBox.prototype.changeGroupAdmin = function(req,res,next){
+
+    var _this = this;
+
+    var token  = req.body.token;
+    var groupId  = req.body.group_id;
+    var masterid  = req.body.masterid; // masterid of new admin
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!groupId){
+        error['groupId'] = 'Invalid groupId';
+        validateStatus *= false;
+    }
+    if(!masterid){
+        error['masterid'] = 'Invalid masterid';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(masterid);
+
+                        var query = 'CALL pchangeGroupAdmin(' + queryParams + ')';
+                        st.db.query(query, function (err, updateResult) {
+                            if (!err) {
+                                if (updateResult) {
+
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Group Admin Changed successfully';
+                                    responseMessage.data = {
+                                        groupId: req.body.group_id,
+                                        new_admin : req.body.new_admin
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnChangeGroupAdmin: Group Admin Changed successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Group Admin is not Changed';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnChangeGroupAdmin:Group Admin is not Changed');
+                                }
+                            }
+
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnChangeGroupAdmin: error in changing groupadmin:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnChangeGroupAdmin: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnChangeGroupAdmin:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnChangeGroupAdmin ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 
 module.exports = MessageBox;

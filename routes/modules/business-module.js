@@ -398,19 +398,19 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                     }
                                     else
                                     {
-                                        console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                        console.log('FnSaveTranscation:No Save Transaction');
                                         res.send(RtnMessage);
                                     }
                                 }
 
                                 else {
-                                    console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                    console.log('FnSaveTranscation:No Save Transaction');
                                     res.send(RtnMessage);
                                 }
                             }
 
                             else {
-                                console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
+                                console.log('FnSaveTranscation: error in saving Transaction' + err);
                                 res.statusCode = 500;
                                 res.send(RtnMessage);
                             }
@@ -418,14 +418,14 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                         });
                     }
                     else {
-                        console.log('FnSaveTranscationItems: Invalid token');
+                        console.log('FnSaveTranscation: Invalid token');
                         res.statusCode = 401;
                         res.send(RtnMessage);
                     }
 
                 }
                 else {
-                    console.log('FnSaveTranscationItems:Error in processing Token' + err);
+                    console.log('FnSaveTranscation:Error in processing Token' + err);
                     res.statusCode = 500;
                     res.send(RtnMessage);
                 }
@@ -433,14 +433,14 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         }
         else {
             if (Token == null) {
-                console.log('FnSaveTranscationItems: Token is empty');
+                console.log('FnSaveTranscation: Token is empty');
             }
             res.statusCode=400;
             res.send(RtnMessage);
         }
     }
     catch (ex) {
-        console.log('FnSaveTranscationItems:error ' + ex.description);
+        console.log('FnSaveTranscation:error ' + ex.description);
         console.log(ex);
         console.log(ex.line);
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');

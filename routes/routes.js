@@ -223,6 +223,7 @@ exports.FnGetMessageAttachment = messageBox.getMessageAttachment;
 exports.FnGetGroupInfo = messageBox.getGroupInfo;
 exports.FnCountOfUnreadMessage = messageBox.countOfUnreadMessage;
 exports.FnViewMessageNew = messageBox.viewMessageNew;
+exports.FnChangeGroupAdmin = messageBox.changeGroupAdmin;
 
 //Alumni module
 var Alumni = require('./modules/alumni-module.js');
