@@ -3011,7 +3011,7 @@ MessageBox.prototype.getGroupInfo = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId)+','+st.db.escape(type);
+                        var queryParams = st.db.escape(groupId)+','+st.db.escape(type)+','+st.db.escape(token);
                         var query = 'CALL pGetGroupInfn(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
