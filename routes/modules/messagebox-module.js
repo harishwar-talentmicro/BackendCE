@@ -3334,7 +3334,7 @@ MessageBox.prototype.changeGroupAdmin = function(req,res,next){
     var _this = this;
 
     var token  = req.body.token;
-    var groupId  = req.body.group_id;
+    var groupId  = parseInt(req.body.gid);
     var masterid  = req.body.masterid; // masterid of new admin
 
     var responseMessage = {
@@ -3372,7 +3372,10 @@ MessageBox.prototype.changeGroupAdmin = function(req,res,next){
                         var queryParams = st.db.escape(groupId) + ',' + st.db.escape(masterid);
 
                         var query = 'CALL pchangeGroupAdmin(' + queryParams + ')';
+
+                        console.log(query);
                         st.db.query(query, function (err, updateResult) {
+                            console.log(updateResult);
                             if (!err) {
                                 if (updateResult) {
 
@@ -3380,8 +3383,8 @@ MessageBox.prototype.changeGroupAdmin = function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'Group Admin Changed successfully';
                                     responseMessage.data = {
-                                        groupId: req.body.group_id,
-                                        new_admin : req.body.new_admin
+                                        groupId: req.body.gid,
+                                        masterid : req.body.masterid
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnChangeGroupAdmin: Group Admin Changed successfully');
