@@ -4360,7 +4360,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
 };
 /**
  * @todo FnSendResume
- * Method : GET
+ * Method : POST
  * @param req
  * @param res
  * @param next
@@ -4459,6 +4459,112 @@ User.prototype.sendResume = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnSendResume ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnDownloadResume
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for download resume
+ */
+User.prototype.downloadResume = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var id = parseInt(req.query.id);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!id){
+        error['id'] = 'Invalid id';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(id);
+                        var query = 'CALL pdownloadresume(' + queryParams + ')';
+                        st.db.query(query, function (err, getResume) {
+                            if (!err) {
+                                if (getResume[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Resume Downloaded successfully';
+                                    responseMessage.data = getResume[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnDownloadResume: Resume Downloaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Resume not Downloaded';
+                                    responseMessage.data = insertResult[0][0].message;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnDownloadResume:Resume not Downloaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnDownloadResume: error in getting download resume:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnDownloadResume: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnDownloadResume:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnDownloadResume ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
