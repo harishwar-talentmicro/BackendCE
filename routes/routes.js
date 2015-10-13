@@ -199,7 +199,7 @@ exports.FnViewJobDetails = jobModule.viewJobDetails;
 exports.FnJobNotification = jobModule.jobNotification;
 exports.FnFindInstitute = jobModule.findInstitute;
 exports.FnAddtoSelectedJob = jobModule.addtoSelectedJob;
-exports.FnSaveJobLoaction = jobModule.saveJobLoaction;
+exports.FnSaveJobLoaction = jobModule.saveJobLocation;
 
 //Messagebox module
 var Messagebox = require('./modules/messagebox-module.js');
@@ -227,6 +227,7 @@ exports.FnGetGroupInfo = messageBox.getGroupInfo;
 exports.FnCountOfUnreadMessage = messageBox.countOfUnreadMessage;
 exports.FnViewMessageNew = messageBox.viewMessageNew;
 exports.FnChangeGroupAdmin = messageBox.changeGroupAdmin;
+exports.FnUpdateTaskStatus = messageBox.updateTaskStatus;
 
 //Alumni module
 var Alumni = require('./modules/alumni-module.js');

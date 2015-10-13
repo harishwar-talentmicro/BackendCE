@@ -2293,9 +2293,11 @@ Alumni.prototype.getTENDetails = function(req,res,next){
 
     var responseMessage = {
         status: false,
-        error: {},
+        count : 0,
+        data: null,
         message: '',
-        data: null
+        error: {}
+
     };
 
     var validateStatus = true,error = {};
@@ -2328,11 +2330,12 @@ Alumni.prototype.getTENDetails = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult[0]) {
-                        if (getResult[0].length > 0) {
+                            if (getResult[0][0].count > 0) {
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Data loaded successfully';
-                            responseMessage.data = getResult[0];
+                            responseMessage.count = getResult[0][0].count;
+                            responseMessage.data = getResult[1];
                             res.status(200).json(responseMessage);
                             console.log('FnGetTENDetails: Data loaded successfully');
                         }
