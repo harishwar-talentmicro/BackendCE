@@ -4290,7 +4290,7 @@ Alumni.prototype.create = function(req,res,next){
                                                                             var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                 + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                 + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userID)
-                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0);
+                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape(0);
                                                                             var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
                                                                             st.db.query(query3, function (err, messageResult) {
                                                                                 if (!err) {
