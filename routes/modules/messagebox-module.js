@@ -1296,7 +1296,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var latitude = '', longitude = '';
     var isBussinessChat = req.body.isBussinessChat ? req.body.isBussinessChat : 0;
     var ezeid = req.body.ezeid;
-    var istask = req.body.istask;
+    var istask = req.body.istask ? req.body.istask : 0;
 
     if(idType){
         id = idType.split(",");
@@ -2591,6 +2591,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
     var groupType = parseInt(req.query.group_type);
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
+    var istask = req.query.istask ? parseInt(req.query.istask) : 0;
 
 
     var responseMessage = {
@@ -2623,7 +2624,7 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams =  st.db.escape(id) + ',' + st.db.escape(groupType)+ ',' + st.db.escape(token)
-                            + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount);
+                            + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)+ ',' + st.db.escape(istask);
                         var query = 'CALL pLoadMessagesofGroup(' + queryParams + ')';
                        // console.log(query);
                         st.db.query(query, function (err, getResult) {

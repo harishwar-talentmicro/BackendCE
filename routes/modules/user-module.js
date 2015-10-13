@@ -2542,7 +2542,8 @@ User.prototype.saveResume = function(req,res,next){
 
 
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            id : ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
@@ -2572,6 +2573,7 @@ User.prototype.saveResume = function(req,res,next){
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
+                                console.log(InsertResult);
                                 if (!err) {
                                     if (InsertResult[0]) {
                                         var async = require('async');
@@ -2656,6 +2658,7 @@ User.prototype.saveResume = function(req,res,next){
                                         });
 
                                         RtnMessage.IsSuccessfull = true;
+                                        RtnMessage.id = InsertResult[0][0].ID;
                                         console.log('FnSaveCVInfo: CV Info Saved successfully');
                                         res.send(RtnMessage);
 

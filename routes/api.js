@@ -169,6 +169,8 @@ router.get('/find_institute',LocationManager.FnFindInstitute);
 router.post('/share_location',LocationManager.FnShareLocation);
 router.get('/locations_map_view',LocationManager.FnGetLocationsofezeid);
 router.post('/send_resume',LocationManager.FnSendResume);
+router.post('/add_selected_job',LocationManager.FnAddtoSelectedJob);
+router.post('/job_location',LocationManager.FnSaveJobLoaction);
 
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);

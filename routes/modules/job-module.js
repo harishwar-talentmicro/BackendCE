@@ -376,7 +376,7 @@ Job.prototype.create = function(req,res,next){
                                                                         var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                             + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                             + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userID)
-                                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0);
+                                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape(0);
                                                                         var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
                                                                         st.db.query(query3, function (err, messageResult) {
                                                                             if (!err) {
@@ -1764,7 +1764,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                                                     var queryParams = st.db.escape(dataResult) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                         + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                         + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
-                                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1);
+                                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1)+ ',' + st.db.escape(0);
                                                                                     var query = 'CALL pComposeMessage(' + queryParams + ')';
                                                                                     //console.log(query);
                                                                                     st.db.query(query, function (err, result) {
@@ -2732,7 +2732,7 @@ Job.prototype.jobNotification = function(req,res,next) {
                                                         var queryParams3 = st.db.escape(mailOptions.html) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                             + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                             + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(ids)
-                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0);
+                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape(0);
                                                         var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
                                                         //console.log(query3);
                                                         st.db.query(query3, function (err, result) {
@@ -2993,5 +2993,225 @@ Job.prototype.findInstitute = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnAddtoSelectedJob
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for add to selected job
+ */
+Job.prototype.addtoSelectedJob = function(req,res,next){
+    var _this = this;
 
+    var token = req.body.token;
+    var cvid = parseInt(req.body.cvid);
+    var jobId = parseInt(req.body.job_id);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!jobId){
+        error['jobId'] = 'Invalid job ID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(cvid)+ ',' + st.db.escape(jobId);
+                        var query = 'CALL pAddcandtoselectedjob(' + queryParams + ')';
+                        st.db.query(query, function (err, insertResult) {
+                            if (!err) {
+                                if (insertResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'SelectedJob Added successfully';
+                                    responseMessage.data = {
+                                        cvid : parseInt(req.body.cvid),
+                                        job_id : parseInt(req.body.job_id)
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnAddtoSelectedJob: SelectedJob Added successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'SelectedJob not Added';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnAddtoSelectedJob:SelectedJob not Added');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnAddtoSelectedJob: error in saving SelectedJob Added :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnAddtoSelectedJob: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnAddtoSelectedJob:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnAddtoSelectedJob ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnSaveJobLocation
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for jsave ob location
+ */
+Job.prototype.saveJobLocation = function(req,res,next){
+    var _this = this;
+
+    var token = req.body.token;
+    var locationTitle = req.body.location_title;
+    var latitude = req.body.latitude;
+    var longitude = req.body.longitude;
+    var country = req.body.country;
+    var maptype = req.body.maptype;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!jobId){
+        error['jobId'] = 'Invalid job ID';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(locationTitle) + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude)
+                            + ',' + st.db.escape(country)+ ',' + st.db.escape(maptype);
+                        var query = 'CALL psavejoblocation(' + queryParams + ')';
+                        st.db.query(query, function (err, insertResult) {
+                            if (!err) {
+                                if (insertResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Job Location saved successfully';
+                                    responseMessage.data = {
+                                        locationTitle : req.body.location_title,
+                                        latitude : req.body.latitude,
+                                        longitude : req.body.longitude,
+                                        country : req.body.country,
+                                        maptype : req.body.maptype
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveJobLoaction: Job Location saved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Job Location not saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveJobLoaction:Job Location not saved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveJobLoaction: error in saving JobLocation  :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveJobLoaction: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveJobLoaction:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveJobLoaction ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 module.exports = Job;

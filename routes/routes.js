@@ -198,6 +198,8 @@ exports.FnViewApplicantList = jobModule.viewApplicantList;
 exports.FnViewJobDetails = jobModule.viewJobDetails;
 exports.FnJobNotification = jobModule.jobNotification;
 exports.FnFindInstitute = jobModule.findInstitute;
+exports.FnAddtoSelectedJob = jobModule.addtoSelectedJob;
+exports.FnSaveJobLoaction = jobModule.saveJobLoaction;
 
 //Messagebox module
 var Messagebox = require('./modules/messagebox-module.js');
