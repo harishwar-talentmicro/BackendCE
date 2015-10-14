@@ -306,7 +306,8 @@ Search.prototype.searchKeyword = function(req,res,next){
 
                                     res.json({
                                         totalcount: SearchResult[0][0].totalcount,
-                                        Result: SearchResult[1]
+                                        Result: SearchResult[1],
+                                        isLoggedOut : 0
                                     });
                                     console.log('FnSearchByKeywords:  tmaster:Search Found');
                                 }
@@ -316,12 +317,12 @@ Search.prototype.searchKeyword = function(req,res,next){
                                 }
                             }
                             else {
-                                res.json(null);
+                                res.json({totalcount : 0, Result : [], isLoggedOut: 0,error : 'No search found'});
                                 console.log('FnSearchByKeywords:  tmaster: no search found');
                             }
                         }
                         else {
-                            res.json(null);
+                            res.json({totalcount : 0, Result : [], isLoggedOut: 0,error : 'No search found'});
                             console.log('FnSearchByKeywords:  tmaster: no search found');
                         }
                     }
