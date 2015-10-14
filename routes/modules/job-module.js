@@ -994,8 +994,9 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source) + ',' + st.db.escape(token);
 
                 var query = 'CALL pGetjobseekers(' + queryParams + ')';
+                console.log(query);
                 st.db.query(query, function (err, getResult) {
-                    //console.log(getResult);
+                    console.log(getResult);
                     //console.log(getResult[0]);
                     if (!err) {
                         if (getResult) {

@@ -311,7 +311,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                     console.log('FnSearchByKeywords:  tmaster:Search Found');
                                 }
                                 else {
-                                    res.json({totalcount : 0, Result : [], message: SearchResult[0][0].isLoggedIn,error : 'No search found'});
+                                    res.json({totalcount : 0, Result : [], isLoggedOut: 1,error : 'No search found'});
                                     console.log('FnSearchByKeywords: tmaster: no search found');
                                 }
                             }

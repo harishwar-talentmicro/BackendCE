@@ -3355,7 +3355,8 @@ User.prototype.uploadDoc = function(req,res,next) {
         };
 
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            id : ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
@@ -3383,15 +3384,24 @@ User.prototype.uploadDoc = function(req,res,next) {
                                 var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64'))
                                     + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType)
                                     + ',' + st.db.escape(cvid) + ',' + st.db.escape(isinternal);
-                                console.log(query);
+                                //console.log(query);
                                 st.db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
                                     if (!err) {
                                         //    console.log(InsertResult);
-                                        if (InsertResult.affectedRows > 0) {
-                                            RtnMessage.IsSuccessfull = true;
-                                            console.log('FnUploadDocument: Document Saved successfully');
-                                            res.send(RtnMessage);
-                                            deleteTempFile();
+                                        if (InsertResult) {
+
+                                            if (tRefType == 7){
+                                                RtnMessage.IsSuccessfull = true;
+                                                RtnMessage.id = InsertResult[0][0].id;
+                                                res.send(RtnMessage);
+                                                deleteTempFile();
+                                            }
+                                            else {
+                                                RtnMessage.IsSuccessfull = true;
+                                                console.log('FnUploadDocument: Document Saved successfully');
+                                                res.send(RtnMessage);
+                                                deleteTempFile();
+                                            }
                                         }
                                         else {
                                             console.log('FnUploadDocument: Document not inserted');
