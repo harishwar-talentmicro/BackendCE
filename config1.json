@@ -1,27 +1,13 @@
 {
   "NG_URLS": [
-    "/login",
-    "/logout",
-    "/register",
-    "/dashboard",
-    "/about",
-    "/pricing",
-    "/contact",
-    "/profile",
-    "/404.html"
+
   ],
   "CONSTANT": {
-    "TOKEN_EXPIRY": 3000,
     "PASSWORD_LINK_EXPIRY": 86400,
-    "DOMAIN": "example.net:3000",
-    "SHORT_URL_UPPER_BOUND": 1000000000,
-    "FILE_UPLOAD_DIR": "../public/advertisement/",
-    "STATIC_URL": "/",
-    "DNS_RECORDS_IP": ["0.0.0.0"],
-    "ZONE_TRANSFER_IP": []
+    "STATIC_URL": "/"
   },
   "MAIL": {
-    "APP_NAME": "cuttus",
+    "APP_NAME": "EZEOne",
     "MAIL_USER": "root",
     "MAIL_PASS": "Password",
     "SENDER": "noreply@ezeone.com",
@@ -62,16 +48,6 @@
         "file": "cv.html",
         "subject": "Resume Request"
       },
-      "domain_activation": {
-        "params": [
-          "EMAIL",
-          "FULLNAME",
-          "DOMAIN",
-          "TIME"
-        ],
-        "file": "domain-activation.html",
-        "subject": "Domain Activation"
-      },
       "password_change": {
         "params": [
           "EMAIL",
@@ -95,49 +71,6 @@
         "file": "reset-password.html",
         "subject": "Forgot Password"
       },
-      "domain_deactivation": {
-        "params": [
-          "EMAIL",
-          "FULLNAME",
-          "DOMAIN",
-          "TIME"
-        ],
-        "file": "domain-deactivation.html",
-        "subject": "Domain Deactivation"
-      },
-      "subscription_active": {
-        "params": [
-          "EMAIL",
-          "FULLNAME",
-          "SUBSCRIPTION",
-          "FROM",
-          "TO"
-        ],
-        "file": "subscription-active.html",
-        "subject": "Subscription Active"
-      },
-      "subscription_deactive": {
-        "params": [
-          "EMAIL",
-          "FULLNAME",
-          "SUBSCRIPTION",
-          "FROM",
-          "TO"
-        ],
-        "file": "subscription-deactive.html",
-        "subject": "Subscription Expired"
-      },
-      "subscription_remaining": {
-        "params": [
-          "EMAIL",
-          "FULLNAME",
-          "SUBSCRIPTION",
-          "FROM",
-          "TO"
-        ],
-        "file": "subscription-remaining.html",
-        "subject": "Subscription Alert"
-      },
       "default": {
         "params": ["HTML"],
         "file": "default.html",
@@ -146,52 +79,22 @@
     }
   },
   "DB": {
-    "HOST": "localhost",
-    "PORT": 3306,
-    "USER": "root",
-    "NAME": "dbname",
-    "PASSWORD": "dbpass",
-    "CONNECTION_LIMIT": 80,
-    "TBL_USER": "user",
-    "TBL_OAUTH": "oauth",
-    "TBL_DOMAIN": "domain",
-    "TBL_URL": "url",
-    "TBL_PASS": "password_reset",
-    "TBL_AD": "advertisement",
-    "TBL_AD_IMG": "ad_images",
-    "TBL_DNS": "dns",
-    "TBL_URL_VIEW": "url_views",
-    "TBL_REQUEST": "request",
-    "TBL_REQUEST_TYPE": "request_type",
-    "ERROR": {
-      "DOMAIN_NOT_FOUND": "Domain is not active"
-    }
+
   },
   "OPEN_URL" : {
     "GET" : [
-      "/api/request$",
-      "/api/info/domain",
-      "/api/info/advertisement",
-      "/api/auth/refresh$",
-      "/api/test$",
-      "/api/ad$",
-      "/api/url/[a-zA-Z0-9-]+$"
+
     ],
     "POST" : [
-      "/api/user$",
-      "/api/auth/forgot_password$",
-      "/api/auth$",
-      "/api/url$",
-      "/api/url/multiple$"
+
     ],
     "PUT" : [],
     "DELETE" : [],
     "HEAD" : [],
     "OPTIONS" : [
-      "/[a-zA-Z0-9-_\/]+$"
+
     ]
   },
   "MESSAGE" : {
-    "DOMAIN_ACTIVATION" : "Requesting to activate the domain "
   }
 }
