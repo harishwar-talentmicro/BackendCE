@@ -298,16 +298,26 @@ Search.prototype.searchKeyword = function(req,res,next){
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
-                        //console.log(SearchResult);
+                        console.log('----------------------------------');
+                        console.log(SearchResult);
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
-                                //res.send(SearchResult[0]);
-                                res.json({totalcount:SearchResult[0][0].totalcount,Result:SearchResult[1]});
-                                console.log('FnSearchByKeywords:  tmaster:Search Found');
+                                if (!(SearchResult[0][0].isLoggedIn)) {
+
+                                    res.json({
+                                        totalcount: SearchResult[0][0].totalcount,
+                                        Result: SearchResult[1]
+                                    });
+                                    console.log('FnSearchByKeywords:  tmaster:Search Found');
+                                }
+                                else {
+                                    res.json({totalcount : 0, Result : [], message: SearchResult[0][0].isLoggedIn,error : 'No search found'});
+                                    console.log('FnSearchByKeywords: tmaster: no search found');
+                                }
                             }
                             else {
                                 res.json(null);
-                                console.log('FnSearchByKeywords: tmaster: no search found');
+                                console.log('FnSearchByKeywords:  tmaster: no search found');
                             }
                         }
                         else {

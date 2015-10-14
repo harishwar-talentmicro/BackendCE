@@ -3359,13 +3359,13 @@ User.prototype.uploadDoc = function(req,res,next) {
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        // console.log(req.files);
-        // console.log(req.body);
+
         var Token = req.body.TokenNo;
         var CntType = req.files.file.mimetype;
         var RefFileName = req.files.file.path;
-        //var RefFileName = req.body.Filename;
         var tRefType = req.body.RefType;
+        var cvid = req.body.cvid ? parseInt(req.body.cvid) : 0;
+        var isinternal = req.body.isinternal ? parseInt(req.body.isinternal) : 0;
         //console.log(req.body);
 
         st.validateToken(Token, function (err, Result) {
@@ -3380,8 +3380,10 @@ User.prototype.uploadDoc = function(req,res,next) {
                             }
                             //console.log(Token);
                             fs.readFile(RefFileName, function (err, original_data) {
-                                var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64')) + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType);
-                                //console.log(query);
+                                var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64'))
+                                    + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType)
+                                    + ',' + st.db.escape(cvid) + ',' + st.db.escape(isinternal);
+                                console.log(query);
                                 st.db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
                                     if (!err) {
                                         //    console.log(InsertResult);
