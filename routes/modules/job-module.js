@@ -995,8 +995,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
                 var query = 'CALL pGetjobseekers(' + queryParams + ')';
                 st.db.query(query, function (err, getResult) {
-                    console.log(getResult);
-                    console.log(getResult[0]);
+                    //console.log(getResult);
+                    //console.log(getResult[0]);
                     if (!err) {
                         if (getResult) {
                             if (getResult[0].length > 0) {
