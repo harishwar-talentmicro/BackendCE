@@ -59,6 +59,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     var userIDs = req.body.au;              // Additional User IDs (Comma separted MasterIDs of users) <string>
     var taskDate = req.body.ts;            // Task Date and Time (YYYY-MM-DD HH:mm:ss)
     var ownerId = parseInt(req.body.ow);   // Owner ID (Master ID of the task owner)
+    var nextActionId = (parseInt(req.body.nxid) == NaN) ? 0 : parseInt(req.body.nxid);
 
     var responseMessage = {
         status: false,
@@ -86,6 +87,10 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
         validateStatus *= false;
     }
 
+    if(!nextActionId){
+        error['status'] = 'Invalid task id';
+        validateStatus *= false;
+    }
 
     if(!validateStatus){
         responseMessage.status = false;
@@ -101,7 +106,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id)+ ',' + st.db.escape(transactionId)
                             + ',' + st.db.escape(status) + ',' + st.db.escape(c_particulars) + ',' + st.db.escape(c_amount)
-                            + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId);
+                            + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId) + ',' + st.db.escape(nextActionId);
 
                         var query = 'CALL psavetask(' + queryParams + ')';
 

@@ -3474,6 +3474,8 @@ User.prototype.webLinkRedirect = function(req,res,next) {
      * @todo FnWebLinkRedirect
      */
     var _this = this;
+    var allowedDocs = ['ID','DL','PP','BR','CV','D1','D2'];
+    var allowedDocTypes = {ID : 3, DL : 7, PP : 4,BR : 1 ,CV : 2,D1 : 5,D2 :6};
     if(req.params.id){
         var link = req.params.id;
         var arr = link.split('.');
@@ -3482,6 +3484,46 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 res.redirect('/'+alterEzeoneId(arr[0]) + req.CONFIG.CONSTANT.MAP_REDIRECT_LINK);
 
             }
+
+            else if(allowedDocs.indexOf(arr[1].toUpperCase()) !== -1){
+
+                var SearchQuery = st.db.escape(arr[0]) + ',' + st.db.escape(arr[2]) + ',' + st.db.escape(arr[1]);
+                console.log('CALL  PGetSearchDocuments(' + SearchQuery + ')');
+                st.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
+                    // st.db.query(searchQuery, function (err, SearchResult) {
+                    if (!err) {
+                        if (SearchResult[0] != null) {
+                            if (SearchResult[0].length > 0) {
+                                SearchResult = SearchResult[0];
+                                //console.log(DocumentResult)
+                                var docs = SearchResult[0];
+                                res.setHeader('Content-Type', docs.ContentType);
+                                res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
+                                //res.setHeader('Cache-Control', 'public, max-age=86400000');
+                                res.setHeader('Cache-Control', 'public, max-age=0');
+                                res.writeHead('200', { 'Content-Type': docs.ContentType });
+                                res.end(docs.Docs, 'base64');
+                                console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
+
+                            }
+                            else {
+                                next();
+                            }
+                        }
+                        else {
+                            next();
+                        }
+                    }
+                    else {
+                        console.log(err);
+                        next();
+                    }
+                });
+            }
+
+            /**
+             * @todo write logic for downloading documents such as PP , BR etc.
+             */
 
             else{
                 var lastItem = arr[arr.length - 1];

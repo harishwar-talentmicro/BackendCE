@@ -201,6 +201,7 @@ exports.FnJobNotification = jobModule.jobNotification;
 exports.FnFindInstitute = jobModule.findInstitute;
 exports.FnAddtoSelectedJob = jobModule.addtoSelectedJob;
 exports.FnSaveJobLoaction = jobModule.saveJobLocation;
+exports.getEZEOneIdJobs = jobModule.getEZEOneIdJobs;
 
 //Messagebox module
 var Messagebox = require('./modules/messagebox-module.js');

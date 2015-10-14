@@ -3299,4 +3299,105 @@ Job.prototype.saveJobLocation = function(req,res,next){
         }
     }
 };
+
+/**
+ * Loads jobs based on Business EZEOne ID
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @service-param token <string> Token of logged in user who is searching for jobs for this particular ezeone Id
+ * @service-param lat <float> Latitude
+ * @service-param lng <float> Longitude
+ * @service-param ezeone <string> EzeoneId
+ * @service-param pc <int> Page Count Starting record number (default 0)
+ * @service-param ps <int> Number of records per page (default : 10)
+ */
+Job.prototype.getEZEOneIdJobs = function(req,res,next){
+    try {
+
+        var _this = this;
+
+        var token = req.query.token;
+        var latitude = req.query.lat;
+        var longitude = req.query.lng;
+        var ezeoneId = alterEzeoneId(req.query.ezeone);
+
+        var startCount = (parseInt(req.query.pc) !== NaN && parseInt(req.query.pc) > 0) ?  parseInt(req.query.pc) : 0;
+        var recordsPerPage = (parseInt(req.query.ps) !== NaN && parseInt(req.query.ps) > 0 ) ?  parseInt(req.query.ps) : 10;
+
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: null
+        };
+
+        st.validateToken(token, function (err, result) {
+            if (!err) {
+                if (result) {
+                //`psearchjobsbasedonezeid`(IN tLat DECIMAL(18,15),IN tLog DECIMAL(18,15),in tezeid varchar(100) ,in ttoken char(36),in startresultcount int,in Pagesize int )
+                    var queryParams = latitude + ',' + longitude +',' + ezeoneId + ',' + token + ',' + startCount + ',' + recordsPerPage;
+                    var query = 'CALL psearchjobsbasedonezeid(' + queryParams + ')';
+                    st.db.query(query, function (err, searchResult) {
+                        if (!err) {
+                            if (searchResult) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Job Location saved successfully';
+                                responseMessage.data = {
+                                    result : searchResult
+                                };
+                                res.status(200).json(responseMessage);
+                                console.log('getEZEOneIdJobs: Jobs loaded successfully');
+                            }
+                            else {
+                                responseMessage.message = 'No job results not saved';
+                                res.status(200).json(responseMessage);
+                                console.log('getEZEOneIdJobs:Jobs are not there for ezeoneid');
+                            }
+                        }
+                        else {
+                            responseMessage.message = 'An error occured ! Please try again';
+                            responseMessage.error = {
+                                server: 'Internal Server Error'
+                            };
+                            res.status(500).json(responseMessage);
+                            console.log('getEZEOneIdJobs: error in retrieving jobs  :' + err);
+                        }
+
+                    });
+                }
+                else {
+                    responseMessage.message = 'Invalid token';
+                    responseMessage.error = {
+                        token: 'Invalid Token'
+                    };
+                    responseMessage.data = null;
+                    res.status(401).json(responseMessage);
+                    console.log('getEZEOneIdJobs: Invalid token');
+                }
+            }
+            else {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'Error in validating Token';
+                res.status(500).json(responseMessage);
+                console.log('getEZEOneIdJobs:Error in processing Token' + err);
+            }
+        });
+    }
+    catch(ex){
+        console.log('Error : getEZEOneIdJobs ');
+        console.log(ex);
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
 module.exports = Job;
