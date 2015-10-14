@@ -138,7 +138,7 @@ router.post('/job',LocationManager.FnSaveJobs);
 router.get('/job',LocationManager.FnGetJobs);
 router.get('/job_locations',LocationManager.FnGetJobLocations);
 router.get('/job_search',LocationManager.FnSearchJobs);
-router.get('/job_seeker_search',LocationManager.FnJobSeekerSearch);
+router.post('/job_seeker_search',LocationManager.FnJobSeekerSearch);
 router.post('/job_apply',LocationManager.FnApplyJob);
 router.get('/job_applied_list',LocationManager.FnAppliedJobList);
 router.get('/feedback',LocationManager.FnGetFeedback);

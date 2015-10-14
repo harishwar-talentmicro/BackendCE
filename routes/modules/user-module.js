@@ -2417,21 +2417,14 @@ User.prototype.getResume = function(req,res,next){
             st.db.query('CALL pgetCVInfo(' + st.db.escape(id) + ')', function (err, MessagesResult) {
                 if (!err) {
                     if (MessagesResult[0]) {
-                        if (MessagesResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = MessagesResult[0];
-                            responseMessage.skillMatrix = MessagesResult[1];
-                            responseMessage.job_location = MessagesResult[2];
-                            responseMessage.error = null;
-                            responseMessage.message = 'Cv info send successfully';
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetCVInfo: CV Info sent successfully');
-                        }
-                        else {
-                            console.log('FnGetCVInfo: No CV Info  available');
-                            responseMessage.message = 'Cv info not send successfully';
-                            res.json(responseMessage);
-                        }
+                        responseMessage.status = true;
+                        responseMessage.data = MessagesResult[0];
+                        responseMessage.skillMatrix = MessagesResult[1];
+                        responseMessage.job_location = MessagesResult[2];
+                        responseMessage.error = null;
+                        responseMessage.message = 'Cv info send successfully';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetCVInfo: CV Info sent successfully');
                     }
                     else {
                         console.log('FnGetCVInfo: No CV Info  available');
@@ -4522,7 +4515,6 @@ User.prototype.downloadResume = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.message = 'Resume not Downloaded';
-                                    responseMessage.data = insertResult[0][0].message;
                                     res.status(200).json(responseMessage);
                                     console.log('FnDownloadResume:Resume not Downloaded');
                                 }
