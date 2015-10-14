@@ -488,7 +488,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
 
         if(Token){
 
-            var query = st.db.escape(status) + ', ' + st.db.escape(tid) + ',' + st.db.escape(token);
+            var query = st.db.escape(status) + ', ' + st.db.escape(tid) + ',' + st.db.escape(Token);
             console.log(query);
             st.db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
                 if (!err){
