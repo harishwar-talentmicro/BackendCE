@@ -118,15 +118,16 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
                                     responseMessage.error = null;
                                     responseMessage.message = 'TaskManager saved successfully';
                                     responseMessage.data = {
-                                        id :  parseInt(req.body.id),
-                                        s :  parseInt(req.body.s),
+                                        id : insertresult[0][0].id,
+                                        s  : parseInt(req.body.s),
                                         tx : parseInt(req.body.tx),
                                         cp : req.body.cp,
                                         ca : req.body.ca,
                                         au : req.body.au,
                                         ts : req.body.ts,
                                         cd : insertresult[0][0].cd,
-                                        ow : parseInt(req.body.ow)
+                                        ow : parseInt(req.body.ow),
+                                        nxid : parseInt(req.body.nxid)
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveTaskManager: TaskManager saved successfully');
