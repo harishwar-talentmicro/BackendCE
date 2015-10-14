@@ -825,8 +825,10 @@ Job.prototype.searchJobs = function(req,res,next){
             + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
             +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)
             +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue)+',' + st.db.escape(type);
-        //console.log('CALL psearchjobs(' + query + ')');
+        console.log('CALL psearchjobs(' + query + ')');
         st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
+            console.log(getresult);
+
             if (!err) {
                 if (getresult) {
                     if (getresult[0]) {
@@ -901,7 +903,7 @@ Job.prototype.searchJobs = function(req,res,next){
 
 /**
  * @todo FnJobSeekerSearch
- * Method : GET
+ * Method : POST
  * @param req
  * @param res
  * @param next
@@ -910,23 +912,29 @@ Job.prototype.searchJobs = function(req,res,next){
 Job.prototype.searchJobSeekers = function(req,res) {
 
     try {
-        var keyword = req.query.keyword ? req.query.keyword  : '';
-        var jobType = req.query.job_type;
-        var salaryFrom = req.query.salary_from;
-        var salaryTo = req.query.salary_to;
-        var salaryType = req.query.salary_type;
-        var experienceFrom = req.query.experience_from;
-        var experienceTo = req.query.experience_to;
-        var locationIds = req.query.location_ids;
-        var educations = req.query.educations ? req.query.educations : '';
-        var specializationId =  req.query.specialization_id ? req.query.specialization_id : '';
-        var instituteId =  req.query.institute_id ? req.query.institute_id : '';
-        var scoreFrom = req.query.score_from ? req.query.score_from : 0;
-        var scoreTo = req.query.score_to ? req.query.score_to : 0;
-        var pageSize = req.query.page_size ? req.query.page_size : 10;
-        var pageCount = req.query.page_count ? req.query.page_count : 0;
-        var source = parseInt(req.query.source);   // 1-internal, 2-for ezeone cvs
-        var token = req.query.token;
+        var keyword = req.body.keyword ? req.body.keyword : '';
+        var jobType = req.body.job_type;
+        var salaryFrom = req.body.salary_from;
+        var salaryTo = req.body.salary_to;
+        var salaryType = req.body.salary_type;
+        var experienceFrom = req.body.experience_from;
+        var experienceTo = req.body.experience_to;
+        var locationIds = req.body.location_ids;
+        var educations = req.body.educations ? req.body.educations : '';
+        var specializationId = req.body.specialization_id ? req.body.specialization_id : '';
+        var instituteId = req.body.institute_id ? req.body.institute_id : '';
+        var scoreFrom = req.body.score_from ? req.body.score_from : 0;
+        var scoreTo = req.body.score_to ? req.body.score_to : 0;
+        var pageSize = req.body.page_size ? req.body.page_size : 10;
+        var pageCount = req.body.page_count ? req.body.page_count : 0;
+        var source = parseInt(req.body.source);   // 1-internal, 2-for ezeone cvs
+        var token = req.body.token;
+        var jobSkills = req.body.job_skills;
+        jobSkills = JSON.parse(JSON.stringify(jobSkills));
+        var i = 0;
+        if (!jobSkills) {
+            jobSkills = [];
+        }
 
         /**
          * Validations
@@ -940,29 +948,71 @@ Job.prototype.searchJobSeekers = function(req,res) {
             status: false,
             error: {},
             message: '',
-            count : '',
+            count: '',
             data: null
         };
 
-        var queryParams = st.db.escape(keyword) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
-                + ',' + st.db.escape(salaryType) +',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
-                + ',' + st.db.escape(experienceTo)+ ',' + st.db.escape(educations)+ ',' + st.db.escape(specializationId)
-                + ',' + st.db.escape(instituteId)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(scoreTo)
-                + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)+ ',' + st.db.escape(source)+ ',' + st.db.escape(token);
+        var skillMatrix = ' ', m = 0;
 
-        var query = 'CALL pGetjobseekers(' + queryParams + ')';
-            //console.log(query);
-            st.db.query(query, function (err, getResult) {
-                if (!err) {
-                    if (getResult) {
-                        if (getResult[0].length >0 ) {
-                            responseMessage.status = true;
-                            responseMessage.message = 'Job Seeker send successfully';
-                            responseMessage.data = getResult[1];
-                            responseMessage.count = getResult[0][0].count;
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetJobSeeker: Job Seeker send successfully');
+        var job = function (i) {
+            if (m < jobSkills.length) {
+                var jskills = {
+                    skillname: jobSkills[m].skillname,
+                    expertiseLevel: jobSkills[m].expertiseLevel,
+                    exp_from: jobSkills[m].exp_from,
+                    exp_to: jobSkills[m].exp_to,
+                    active_status: jobSkills[m].active_status
+                };
 
+
+                FnSkills(jskills, function (err, idResult) {
+
+                    if (skillMatrix == ' ') {
+
+                        skillMatrix = ' (find_in_set(b.SkillID' + ',' + idResult.SkillID + ') and find_in_set(b.ExpertLevel' + ',' + JSON.stringify(jskills.expertiseLevel) + ' )' +
+                            ' and b.ExpYrs>= ' + jskills.exp_from + ' and b.ExpYrs<= ' + jskills.exp_to + ' and ' +
+                            ' find_in_set(b.SkillStatusID' + ',' + jobSkills[i].active_status + '))';
+                    }
+                    else {
+                        skillMatrix = skillMatrix + ' or' + ' ( find_in_set(b.SkillID' + ',' + idResult.SkillID + ') and find_in_set(b.ExpertLevel' + ',' + JSON.stringify(jskills.expertiseLevel) + ' )' +
+                            ' and b.ExpYrs>= ' + jskills.exp_from + ' and b.ExpYrs<= ' + jskills.exp_to + ' and ' +
+                            ' find_in_set(b.SkillStatusID' + ',' + jobSkills[i].active_status + '))';
+                    }
+                    m = m + 1;
+                    job(m);
+                });
+
+            }
+            else {
+
+                skillMatrix = ' and( ' + skillMatrix + ')';
+
+                var queryParams = st.db.escape(skillMatrix) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
+                    + ',' + st.db.escape(salaryType) + ',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
+                    + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(educations) + ',' + st.db.escape(specializationId)
+                    + ',' + st.db.escape(instituteId) + ',' + st.db.escape(scoreFrom) + ',' + st.db.escape(scoreTo)
+                    + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source) + ',' + st.db.escape(token);
+
+                var query = 'CALL pGetjobseekers(' + queryParams + ')';
+                st.db.query(query, function (err, getResult) {
+                    console.log(getResult);
+                    console.log(getResult[0]);
+                    if (!err) {
+                        if (getResult) {
+                            if (getResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.message = 'Job Seeker send successfully';
+                                responseMessage.count = getResult[0][0].count;
+                                responseMessage.data = getResult[1];
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetJobSeeker: Job Seeker send successfully');
+
+                            }
+                            else {
+                                responseMessage.message = 'Job Seeker not found';
+                                console.log('FnGetJobSeeker: Job Seeker not found');
+                                res.status(200).json(responseMessage);
+                            }
                         }
                         else {
                             responseMessage.message = 'Job Seeker not found';
@@ -971,21 +1021,27 @@ Job.prototype.searchJobSeekers = function(req,res) {
                         }
                     }
                     else {
-                        responseMessage.message = 'Job Seeker not found';
-                        console.log('FnGetJobSeeker: Job Seeker not found');
-                        res.status(200).json(responseMessage);
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'Error getting from Job Seeker';
+                        console.log('FnGetJobSeeker:Error getting from Job Seeker:' + err);
+                        res.status(500).json(responseMessage);
                     }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'Error getting from Job Seeker';
-                    console.log('FnGetJobSeeker:Error getting from Job Seeker:' + err);
-                    res.status(500).json(responseMessage);
-                }
-            });
+                });
+            }
+        };
+
+        if (jobSkills.length) {
+            var m = 0;
+            job(m);
+        }
+        else
+        {
+            console.log('FnGetJobSeeker : Invalid jobSkills Length');
+        }
     }
+
     catch (ex) {
         responseMessage.error = {
             server : 'Internal server error'
@@ -998,6 +1054,39 @@ Job.prototype.searchJobSeekers = function(req,res) {
     }
 
 };
+
+
+function FnSkills(jskills, CallBack) {
+        var _this = this;
+        try {
+            if (jskills) {
+
+                var RtnResponse = {
+                    SkillID: 0
+                };
+                RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
+
+                st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(jskills.skillname), function (err, SkillResult) {
+                    if ((!err)) {
+                        if (SkillResult[0]) {
+                            RtnResponse.SkillID = SkillResult[0].SkillID;
+                            console.log(RtnResponse.SkillID);
+                            CallBack(null, RtnResponse);
+                        }
+                    }
+                });
+            }
+        }
+        catch (ex) {
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            console.log('FnJobSkills error:' + ex.description);
+            console.log(ex);
+        }
+    };
+
+
+
 
 /**
  * @todo FnApplyJob
@@ -3129,10 +3218,6 @@ Job.prototype.saveJobLocation = function(req,res,next){
     var validateStatus = true,error = {};
     if(!token){
         error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
-    if(!jobId){
-        error['jobId'] = 'Invalid job ID';
         validateStatus *= false;
     }
 
