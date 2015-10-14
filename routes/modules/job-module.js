@@ -1039,6 +1039,10 @@ Job.prototype.searchJobSeekers = function(req,res) {
         else
         {
             console.log('FnGetJobSeeker : Invalid jobSkills Length');
+            responseMessage.message = 'Invalid Skills';
+            console.log('FnGetJobSeeker: Invalid Skills');
+            res.status(200).json(responseMessage);
+
         }
     }
 

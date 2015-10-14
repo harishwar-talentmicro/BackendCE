@@ -487,7 +487,7 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
         };
 
         if(Token){
-            
+
             var query = st.db.escape(status) + ', ' + st.db.escape(TID) + ',' + st.db.escape(Token);
 
             console.log(query);
