@@ -464,31 +464,30 @@ Auth.prototype.register = function(req,res,next){
                 // console.log(InsertQuery);
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
-                        // console.log('InsertResult: ' + InsertResult);
+                        //console.log('InsertResult: ');
                         if (InsertResult) {
-                            //  console.log(InsertResult);
+                             //console.log(InsertResult);
                             if(InsertResult[0]){
                                 if (InsertResult[0].length > 0) {
                                     var RegResult = InsertResult[0];
-                                    if(RegResult[0].TID != 0)
-                                    {
-                                        if(IDTypeID == 2)
-                                            RtnMessage.FirstName=CompanyName;
+                                    if(RegResult[0].TID != 0) {
+                                        if (IDTypeID == 2)
+                                            RtnMessage.FirstName = CompanyName;
                                         else
                                             RtnMessage.FirstName = FirstName;
                                         RtnMessage.IsAuthenticate = true;
                                         RtnMessage.Token = TokenNo;
                                         RtnMessage.Type = IDTypeID;
-                                        RtnMessage.Icon = Icon;
                                         RtnMessage.tid = InsertResult[0][0].TID;
                                         RtnMessage.group_id = InsertResult[0][0].group_id;
+
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
                                             //res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
                                                 var fs = require('fs');
                                                 var path = require('path');
-                                                var file = path.join(__dirname,'../../mail/templates/registration.html');
+                                                var file = path.join(__dirname, '../../mail/templates/registration.html');
 
                                                 fs.readFile(file, "utf8", function (err, data) {
                                                     if (err) throw err;
@@ -504,7 +503,14 @@ Auth.prototype.register = function(req,res,next){
                                                     };
                                                     //console.log('Mail Option:' + mailOptions);
                                                     // send mail with defined transport object
-                                                    var post = { MessageType: 8, Priority: 3, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html, SentbyMasterID:RegResult[0].TID };
+                                                    var post = {
+                                                        MessageType: 8,
+                                                        Priority: 3,
+                                                        ToMailID: mailOptions.to,
+                                                        Subject: mailOptions.subject,
+                                                        Body: mailOptions.html,
+                                                        SentbyMasterID: RegResult[0].TID
+                                                    };
                                                     // console.log(post);
                                                     var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
                                                         // Neat!
@@ -515,13 +521,13 @@ Auth.prototype.register = function(req,res,next){
                                                             console.log('FnRegistration: Mail not Saved Successfully' + err);
                                                         }
 
-                                                        var ip =  req.headers['x-forwarded-for'] ||
+                                                        var ip = req.headers['x-forwarded-for'] ||
                                                             req.connection.remoteAddress ||
                                                             req.socket.remoteAddress ||
                                                             req.connection.socket.remoteAddress;
                                                         var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                                                        st.generateToken(ip,userAgent,EZEID,function(err,token) {
+                                                        st.generateToken(ip, userAgent, EZEID, function (err, token) {
                                                             if (err) {
                                                                 console.log('FnRegistration: Token Generation Error' + err);
                                                             }
@@ -541,9 +547,19 @@ Auth.prototype.register = function(req,res,next){
                                             }
                                         }
                                         else {
-                                            console.log('FnRegistration: tmaster: Update operation success');
-                                            console.log(RtnMessage);
-                                            res.send(RtnMessage);
+
+                                            var queryParams = st.db.escape(PIN) + ',' + st.db.escape(EZEID);
+                                            var query = 'CALL pupdateEZEoneKeywords(' + queryParams + ')';
+                                            console.log(query);
+                                            st.db.query(query, function (err, getResult) {
+                                                if (!err) {
+
+                                                    console.log('FnRegistration: tmaster: Update operation success');
+                                                    console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                                    console.log(RtnMessage);
+                                                    res.send(RtnMessage);
+                                                }
+                                            });
                                         }
                                     }
                                     else {

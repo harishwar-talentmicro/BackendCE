@@ -3355,17 +3355,18 @@ User.prototype.uploadDoc = function(req,res,next) {
         };
 
         var RtnMessage = {
-            IsSuccessfull: false
+            IsSuccessfull: false,
+            id : ''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        // console.log(req.files);
-        // console.log(req.body);
+
         var Token = req.body.TokenNo;
         var CntType = req.files.file.mimetype;
         var RefFileName = req.files.file.path;
-        //var RefFileName = req.body.Filename;
         var tRefType = req.body.RefType;
+        var cvid = req.body.cvid ? parseInt(req.body.cvid) : 0;
+        var isinternal = req.body.isinternal ? parseInt(req.body.isinternal) : 0;
         //console.log(req.body);
 
         st.validateToken(Token, function (err, Result) {
@@ -3380,16 +3381,27 @@ User.prototype.uploadDoc = function(req,res,next) {
                             }
                             //console.log(Token);
                             fs.readFile(RefFileName, function (err, original_data) {
-                                var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64')) + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType);
+                                var query = st.db.escape(Token) + ',' + st.db.escape( new Buffer(original_data).toString('base64'))
+                                    + ',' + st.db.escape(fileName) + ',' + st.db.escape(tRefType) + ',' + st.db.escape(CntType)
+                                    + ',' + st.db.escape(cvid) + ',' + st.db.escape(isinternal);
                                 //console.log(query);
                                 st.db.query('CALL pSaveDocsFile(' + query + ')', function (err, InsertResult) {
                                     if (!err) {
                                         //    console.log(InsertResult);
-                                        if (InsertResult.affectedRows > 0) {
-                                            RtnMessage.IsSuccessfull = true;
-                                            console.log('FnUploadDocument: Document Saved successfully');
-                                            res.send(RtnMessage);
-                                            deleteTempFile();
+                                        if (InsertResult) {
+
+                                            if (tRefType == 7){
+                                                RtnMessage.IsSuccessfull = true;
+                                                RtnMessage.id = InsertResult[0][0].id;
+                                                res.send(RtnMessage);
+                                                deleteTempFile();
+                                            }
+                                            else {
+                                                RtnMessage.IsSuccessfull = true;
+                                                console.log('FnUploadDocument: Document Saved successfully');
+                                                res.send(RtnMessage);
+                                                deleteTempFile();
+                                            }
                                         }
                                         else {
                                             console.log('FnUploadDocument: Document not inserted');
