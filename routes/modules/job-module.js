@@ -986,13 +986,16 @@ Job.prototype.searchJobSeekers = function(req,res) {
             else {
                 skillMatrix = ' and( ' + skillMatrix + ')';
                 jobSeeker(skillMatrix);
-                console.log(skillMatrix);
+                console.log('sending skill matrix..');
             }
         };
 
-                var jobSeeker = function() {
+                var jobSeeker = function(jobskills) {
 
-                    skillMatrix = '';
+                    console.log('jobskills...');
+                    console.log(jobskills);
+
+                    skillMatrix = jobskills;
 
                     var queryParams = st.db.escape(skillMatrix) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                         + ',' + st.db.escape(salaryType) + ',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
@@ -1001,6 +1004,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
                         + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source) + ',' + st.db.escape(token);
 
                     var query = 'CALL pGetjobseekers(' + queryParams + ')';
+                    console.log('------------');
                     console.log(query);
                     st.db.query(query, function (err, getResult) {
                         console.log(getResult);
@@ -1047,8 +1051,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
         }
         else
         {
-            var skills = '';
-            jobSeeker();
+            var skillMatrix = '';
+            jobSeeker(skillMatrix);
             console.log('FnGetJobSeeker : skill is empty');
         }
     }
