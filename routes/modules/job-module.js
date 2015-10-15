@@ -3343,6 +3343,7 @@ Job.prototype.getEZEOneIdJobs = function(req,res,next){
                 //`psearchjobsbasedonezeid`(IN tLat DECIMAL(18,15),IN tLog DECIMAL(18,15),in tezeid varchar(100) ,in ttoken char(36),in startresultcount int,in Pagesize int )
                     var queryParams = latitude + ',' + longitude +',' + ezeoneId + ',' + token + ',' + startCount + ',' + recordsPerPage;
                     var query = 'CALL psearchjobsbasedonezeid(' + queryParams + ')';
+                    console.log(query);
                     st.db.query(query, function (err, searchResult) {
                         if (!err) {
                             if (searchResult) {
