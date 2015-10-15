@@ -3338,8 +3338,8 @@ Job.prototype.getEZEOneIdJobs = function(req,res,next){
         var longitude = req.query.lng;
         var ezeoneId = alterEzeoneId(req.query.ezeone);
 
-        var startCount = (parseInt(req.query.pc) !== NaN && parseInt(req.query.pc) > 0) ?  parseInt(req.query.pc) : 0;
-        var recordsPerPage = (parseInt(req.query.ps) !== NaN && parseInt(req.query.ps) > 0 ) ?  parseInt(req.query.ps) : 10;
+        var startCount = ((!isNaN(parseInt(req.query.pc))) && parseInt(req.query.pc) > 0) ?  parseInt(req.query.pc) : 0;
+        var recordsPerPage = ((!isNaN(parseInt(req.query.ps))) && parseInt(req.query.ps) > 0 ) ?  parseInt(req.query.ps) : 10;
 
         var responseMessage = {
             status: false,
@@ -3352,7 +3352,9 @@ Job.prototype.getEZEOneIdJobs = function(req,res,next){
             if (!err) {
                 if (result) {
                 //`psearchjobsbasedonezeid`(IN tLat DECIMAL(18,15),IN tLog DECIMAL(18,15),in tezeid varchar(100) ,in ttoken char(36),in startresultcount int,in Pagesize int )
-                    var queryParams = latitude + ',' + longitude +',' + ezeoneId + ',' + token + ',' + startCount + ',' + recordsPerPage;
+                    var queryParams = st.db.escape(latitude) + ',' + st.db.escape(longitude) +','
+                            + st.db.escape(ezeoneId) + ',' + st.db.escape(token) + ',' + st.db.escape(startCount) +
+                            ',' + st.db.escape(recordsPerPage);
                     var query = 'CALL psearchjobsbasedonezeid(' + queryParams + ')';
                     console.log(query);
                     st.db.query(query, function (err, searchResult) {
