@@ -984,30 +984,43 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
             }
             else {
-
                 skillMatrix = ' and( ' + skillMatrix + ')';
+                jobSeeker(skillMatrix);
+                console.log(skillMatrix);
+            }
+        };
 
-                var queryParams = st.db.escape(skillMatrix) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
-                    + ',' + st.db.escape(salaryType) + ',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
-                    + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(educations) + ',' + st.db.escape(specializationId)
-                    + ',' + st.db.escape(instituteId) + ',' + st.db.escape(scoreFrom) + ',' + st.db.escape(scoreTo)
-                    + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source) + ',' + st.db.escape(token);
+                var jobSeeker = function() {
 
-                var query = 'CALL pGetjobseekers(' + queryParams + ')';
-                console.log(query);
-                st.db.query(query, function (err, getResult) {
-                    console.log(getResult);
-                    //console.log(getResult[0]);
-                    if (!err) {
-                        if (getResult) {
-                            if (getResult[0].length > 0) {
-                                responseMessage.status = true;
-                                responseMessage.message = 'Job Seeker send successfully';
-                                responseMessage.count = getResult[0][0].count;
-                                responseMessage.data = getResult[1];
-                                res.status(200).json(responseMessage);
-                                console.log('FnGetJobSeeker: Job Seeker send successfully');
+                    skillMatrix = '';
 
+                    var queryParams = st.db.escape(skillMatrix) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
+                        + ',' + st.db.escape(salaryType) + ',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
+                        + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(educations) + ',' + st.db.escape(specializationId)
+                        + ',' + st.db.escape(instituteId) + ',' + st.db.escape(scoreFrom) + ',' + st.db.escape(scoreTo)
+                        + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source) + ',' + st.db.escape(token);
+
+                    var query = 'CALL pGetjobseekers(' + queryParams + ')';
+                    console.log(query);
+                    st.db.query(query, function (err, getResult) {
+                        console.log(getResult);
+                        //console.log(getResult[0]);
+                        if (!err) {
+                            if (getResult) {
+                                if (getResult[0].length > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.message = 'Job Seeker send successfully';
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.data = getResult[1];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetJobSeeker: Job Seeker send successfully');
+
+                                }
+                                else {
+                                    responseMessage.message = 'Job Seeker not found';
+                                    console.log('FnGetJobSeeker: Job Seeker not found');
+                                    res.status(200).json(responseMessage);
+                                }
                             }
                             else {
                                 responseMessage.message = 'Job Seeker not found';
@@ -1016,22 +1029,17 @@ Job.prototype.searchJobSeekers = function(req,res) {
                             }
                         }
                         else {
-                            responseMessage.message = 'Job Seeker not found';
-                            console.log('FnGetJobSeeker: Job Seeker not found');
-                            res.status(200).json(responseMessage);
+                            responseMessage.error = {
+                                server: 'Internal Server Error'
+                            };
+                            responseMessage.message = 'Error getting from Job Seeker';
+                            console.log('FnGetJobSeeker:Error getting from Job Seeker:' + err);
+                            res.status(500).json(responseMessage);
                         }
-                    }
-                    else {
-                        responseMessage.error = {
-                            server: 'Internal Server Error'
-                        };
-                        responseMessage.message = 'Error getting from Job Seeker';
-                        console.log('FnGetJobSeeker:Error getting from Job Seeker:' + err);
-                        res.status(500).json(responseMessage);
-                    }
-                });
-            }
-        };
+                    });
+                };
+
+
 
         if (jobSkills.length) {
             var m = 0;
@@ -1039,11 +1047,9 @@ Job.prototype.searchJobSeekers = function(req,res) {
         }
         else
         {
-            console.log('FnGetJobSeeker : Invalid jobSkills Length');
-            responseMessage.message = 'Invalid Skills';
-            console.log('FnGetJobSeeker: Invalid Skills');
-            res.status(200).json(responseMessage);
-
+            var skills = '';
+            jobSeeker();
+            console.log('FnGetJobSeeker : skill is empty');
         }
     }
 
