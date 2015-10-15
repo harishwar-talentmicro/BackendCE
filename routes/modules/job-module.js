@@ -355,7 +355,7 @@ Job.prototype.create = function(req,res,next){
                                         if (results[0][0]) {
                                             for (var i = 0; i < results[0].length; i++) {
                                                 userID = results[0][i].MasterID;
-                                                var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID);
+                                                var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID)+ ',' + st.db.escape(0);
                                                 var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
                                                 st.db.query(query2, function (err, getResult) {
                                                     if (!err) {
@@ -2946,7 +2946,7 @@ Job.prototype.jobNotification = function(req,res,next) {
                                             };
 
 
-                                            var queryParams1 = st.db.escape(ezeid) + ',' + st.db.escape(ids);
+                                            var queryParams1 = st.db.escape(ezeid) + ',' + st.db.escape(ids)+ ',' + st.db.escape(0);
                                             var query1 = 'CALL pSendMsgRequestbyPO(' + queryParams1 + ')';
                                             //console.log(query1);
                                             st.db.query(query1, function (err, getResult) {

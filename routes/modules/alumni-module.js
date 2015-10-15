@@ -4272,7 +4272,7 @@ Alumni.prototype.create = function(req,res,next){
                                             if (results[0][0]) {
                                                 for (var i = 0; i < results[0].length; i++) {
                                                     userID = results[0][i].MasterID;
-                                                    var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID);
+                                                    var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID)+ ',' + st.db.escape(0);
                                                     var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
                                                     st.db.query(query2, function (err, getResult) {
                                                         if (!err) {

@@ -57,6 +57,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var autoJoin  = req.body.auto_join ? req.body.auto_join : 0;
     var tid = req.body.tid ? req.body.tid : 0;
     var restrictReply = req.body.rr;
+    var memberVisible = req.body.member_visible ? parseInt(req.body.member_visible) : 0;
 
     var responseMessage = {
         status: false,
@@ -91,7 +92,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(groupName) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
                             + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(tid)
-                            + ',' + st.db.escape(restrictReply);
+                            + ',' + st.db.escape(restrictReply)+ ',' + st.db.escape(memberVisible);
                         var query = 'CALL pCreateMessageGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {
@@ -1215,8 +1216,8 @@ function FnBussinessChat(params, callback) {
                                 id1 = output;
                             }
 
-                            var queryString = 'call PSendMsgRequestbyPO(' + st.db.escape(params.toids[i]) + ',' + st.db.escape(output) + ')';
-                            //console.log(queryString);
+                            var queryString = 'call PSendMsgRequestbyPO(' + st.db.escape(params.toids[i]) + ',' + st.db.escape(output) + ',' + st.db.escape(params.memberVisible) + ')';
+                            console.log(queryString);
                             st.db.query(queryString, function (err, results) {
                                 console.log('send message request by po');
                                 i = i + 1;
@@ -1244,8 +1245,8 @@ function FnBussinessChat(params, callback) {
                             id1 = params.toids[i];
                         }
 
-                        var queryString1 = 'call PSendMsgRequestbyPO(' + st.db.escape(params.ezeid) + ',' + st.db.escape(params.toids[i]) + ')';
-                        //console.log(queryString1);
+                        var queryString1 = 'call PSendMsgRequestbyPO(' + st.db.escape(params.ezeid) + ',' + st.db.escape(params.toids[i]) + ',' + st.db.escape(params.memberVisible) + ')';
+                        console.log(queryString1);
                         st.db.query(queryString1, function (err, results) {
                             console.log('send message request by po');
                             i = i + 1;
@@ -1295,8 +1296,9 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var b_id='',get_tid,i=0,c=0,toIds,to_ids,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type,msgId,iphoneID,dateTime,prioritys;
     var latitude = '', longitude = '';
     var isBussinessChat = req.body.isBussinessChat ? req.body.isBussinessChat : 0;
-    var ezeid = req.body.ezeid;
+    var ezeid = alterEzeoneId(req.body.ezeid);
     var istask = req.body.istask ? req.body.istask : 0;
+    var memberVisible = req.body.member_visible ? req.body.member_visible : 0;
 
     if(idType){
         id = idType.split(",");
@@ -1343,7 +1345,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 console.log('business..');
                                 var params = {
                                     toids : toIds,
-                                    ezeid : ezeid
+                                    ezeid : ezeid,
+                                    memberVisible : memberVisible
                                 };
 
                                 FnBussinessChat(params, function (err, outputResult) {
@@ -1514,13 +1517,14 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 });
                             };
 
-                        if (isBussinessChat == 1) {
+                        if (isBussinessChat == 1 || memberVisible == 1) {
                             bussinessChat();
                         }
                         else
                         {
                             compose();
                         }
+
                     }
                     else {
                         responseMessage.message = 'Invalid token';
