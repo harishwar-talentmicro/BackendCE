@@ -1756,7 +1756,9 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
     var token = req.body.token;
     var ids = req.body.ids;
     var templateId = req.body.template_id;
+    var jobTitle = req.body.job_title;
     var jobId = req.body.job_id;
+    var mailflag = parseInt(req.body.mailflag);
     var id, i,tid,jobResult,messageContent,link;
 
     if(ids){
@@ -1801,7 +1803,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                         var mailDetails = function(i) {
                             if(i < id.length) {
                                 tid = id[i];
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(tid)+ ',' + st.db.escape(jobId);
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(tid);
                                 var query = 'CALL pGetjobseekersmailDetails(' + queryParams + ')';
                                 //console.log(query);
                                 st.db.query(query, function (err, getResult) {
@@ -1831,6 +1833,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
 
                         var sendJobMessage = function (getResult,tid) {
                             jobResult = getResult;
+                            //console.log(jobResult);
                             i+=1;
                             if(jobResult) {
                                 tid = tid;
@@ -1851,7 +1854,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                         messageContent = messageContent.replace("{FirstName}", jobResult[0][0].FirstName);
                                                         messageContent = messageContent.replace("{LastName}", jobResult[0][0].LastName);
                                                         messageContent = messageContent.replace("{CompanyName}", jobResult[0][0].CompanyName);
-                                                        messageContent = messageContent.replace("{JobTitle}", jobResult[0][0].jobtitle);
+                                                        messageContent = messageContent.replace("{JobTitle}", jobTitle);
 
                                                         data = data.replace("{JobID}", jobId);
                                                         messageContent = messageContent.replace("{link}", data);
@@ -1864,40 +1867,158 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                                         fs.readFile("jobseeker.html", "utf8", function (err, dataResult) {
                                                                             if (!err) {
                                                                                 if (dataResult) {
+                                                                                    //console.log('dataResult......');
+                                                                                    //console.log(dataResult);
+                                                                                    //console.log('dataResult......');
+                                                                                    if (mailflag == 0) {
+                                                                                        console.log('mailflag...0');
+                                                                                        //console.log(jobResult[0][0].EZEID);
 
-                                                                                    var queryParams = st.db.escape(dataResult) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                                        + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(tid)
-                                                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1)+ ',' + st.db.escape(0);
-                                                                                    var query = 'CALL pComposeMessage(' + queryParams + ')';
-                                                                                    //console.log(query);
-                                                                                    st.db.query(query, function (err, result) {
-                                                                                        if (!err) {
-                                                                                            if (result) {
-                                                                                                console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully');
-                                                                                                mailDetails(i);
-                                                                                                fs.unlinkSync('jobseeker.html');
-                                                                                                console.log('successfully deleted html file');
-                                                                                                var query = 'CALL pUpdateMailCountForCV(' + st.db.escape(tid) + ')';
-                                                                                                st.db.query(query, function (err, result) {
-                                                                                                    if (!err) {
-                                                                                                        console.log('FnUpdateMail:UpdateMailCountForCV success');
+                                                                                        if (jobResult[0][0].EZEID) {
+                                                                                            console.log('ezeid is there...');
+
+                                                                                            var queryParams = st.db.escape(dataResult) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                                + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(jobResult[0][0].masterid)
+                                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1) + ',' + st.db.escape(0);
+                                                                                            var query = 'CALL pComposeMessage(' + queryParams + ')';
+                                                                                            console.log(query);
+                                                                                            st.db.query(query, function (err, result) {
+                                                                                                if (!err) {
+                                                                                                    if (result) {
+
+                                                                                                        console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully');
+                                                                                                        mailDetails(i);
+                                                                                                        fs.unlinkSync('jobseeker.html');
+                                                                                                        console.log('successfully deleted html file');
+                                                                                                        var query = 'CALL pUpdateMailCountForCV(' + st.db.escape(tid) + ')';
+                                                                                                        st.db.query(query, function (err, result) {
+                                                                                                            if (!err) {
+                                                                                                                console.log('FnUpdateMail:UpdateMailCountForCV success');
+                                                                                                            }
+                                                                                                            else {
+                                                                                                                console.log(err);
+                                                                                                            }
+                                                                                                        });
                                                                                                     }
                                                                                                     else {
-                                                                                                        console.log(err);
+                                                                                                        console.log('FnSendMessage: Message not Saved Successfully');
+                                                                                                        mailDetails(i);
+                                                                                                    }
+
+                                                                                                }
+                                                                                                else {
+                                                                                                    console.log('FnSendMessage: Message not Saved Successfully');
+                                                                                                    mailDetails(i);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                        else {
+                                                                                            mailDetails(i);
+                                                                                        }
+
+                                                                                    }
+                                                                                    else{
+                                                                                        console.log('mailflag...1');
+                                                                                        console.log(jobResult[0][0].EZEID);
+
+                                                                                        if (jobResult[0][0].EZEID) {
+                                                                                            console.log('ezeid is there');
+                                                                                            var queryParams = st.db.escape(dataResult) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                                                + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(jobResult[0][0].masterid)
+                                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(1) + ',' + st.db.escape(0);
+                                                                                            var query = 'CALL pComposeMessage(' + queryParams + ')';
+                                                                                            //console.log(query);
+                                                                                            st.db.query(query, function (err, result) {
+                                                                                                if (!err) {
+                                                                                                    if (result) {
+                                                                                                        if(jobResult[0][0].AdminEmailID){
+                                                                                                            //console.log(TemplateResult);
+                                                                                                        var mailOptions = {
+                                                                                                            from: 'noreply@ezeone.com',
+                                                                                                            to: jobResult[0][0].AdminEmailID,
+                                                                                                            subject: TemplateResult[0].Subject,
+                                                                                                            html: dataResult
+                                                                                                        };
+
+                                                                                                            //console.log(mailOptions);
+
+                                                                                                        var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                                                                        sendgrid.send(mailOptions, function (error, result) {
+                                                                                                            console.log(error);
+                                                                                                            if (!error) {
+
+                                                                                                                console.log('Mail sent successfully...');
+
+                                                                                                                console.log('FnGetJobSeekersMailDetails: JobSeeker Message Send Successfully');
+                                                                                                                mailDetails(i);
+                                                                                                                fs.unlinkSync('jobseeker.html');
+                                                                                                                console.log('successfully deleted html file');
+                                                                                                                var query = 'CALL pUpdateMailCountForCV(' + st.db.escape(tid) + ')';
+                                                                                                                st.db.query(query, function (err, result) {
+                                                                                                                    if (!err) {
+                                                                                                                        console.log('FnUpdateMail:UpdateMailCountForCV success');
+                                                                                                                    }
+                                                                                                                    else {
+                                                                                                                        console.log(err);
+                                                                                                                    }
+                                                                                                                });
+                                                                                                            }
+                                                                                                            else {
+                                                                                                                console.log('FnSendMessage: Mail not Send Successfully');
+                                                                                                                mailDetails(i);
+                                                                                                            }
+                                                                                                        });
+                                                                                                    }
+                                                                                                        else{
+                                                                                                            console.log('FnSendMessage: Email Id is empty');
+                                                                                                            mailDetails(i);
+                                                                                                        }
+                                                                                                    }
+                                                                                                    else {
+                                                                                                        console.log('FnSendMessage: Message not Saved Successfully');
+                                                                                                        mailDetails(i);
+                                                                                                    }
+
+                                                                                                }
+                                                                                                else {
+                                                                                                    console.log('FnSendMessage: Message not Saved Successfully');
+                                                                                                    mailDetails(i);
+                                                                                                }
+                                                                                            });
+                                                                                        }
+                                                                                        else{
+                                                                                            console.log('ezeid is empty');
+                                                                                            if(jobResult[0][0].AdminEmailID){
+
+                                                                                                var mailOptions = {
+                                                                                                    from: 'noreply@ezeone.com',
+                                                                                                    to: jobResult[0][0].AdminEmailID,
+                                                                                                    subject: TemplateResult[0].Subject,
+                                                                                                    html: dataResult
+                                                                                                };
+                                                                                                //console.log(mailOptions);
+
+                                                                                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                                                                sendgrid.send(mailOptions, function (error, result) {
+                                                                                                    console.log(error);
+                                                                                                    if (!error) {
+                                                                                                        console.log('Mail sent successfully...');
+                                                                                                        mailDetails(i);
+                                                                                                        fs.unlinkSync('jobseeker.html');
+                                                                                                    }
+                                                                                                    else {
+                                                                                                        console.log('Mail not sent successfully...');
+                                                                                                        mailDetails(i);
                                                                                                     }
                                                                                                 });
                                                                                             }
-                                                                                            else {
-                                                                                                console.log('FnSendMessage: Message not Saved Successfully');
+                                                                                            else{
                                                                                                 mailDetails(i);
                                                                                             }
                                                                                         }
-                                                                                        else {
-                                                                                            console.log('FnSendMailer: Message not Saved Successfully');
-                                                                                            mailDetails(i);
-                                                                                        }
-                                                                                    });
+                                                                                    }
                                                                                 }
                                                                                 else {
                                                                                     console.log('FnGetJobSeekersMailDetails: HtmlFile not loaded');
