@@ -954,7 +954,8 @@ Location.prototype.validateEZEOne = function(req,res,next){
         status: false,
         error: {},
         message: '',
-        data: null
+        data: null,
+        isBussinessUser : ''
     };
 
     var validateStatus = true, error = {};
@@ -984,6 +985,7 @@ Location.prototype.validateEZEOne = function(req,res,next){
             var query = 'CALL pvalidateEZEOne(' + queryParams + ')';
             //console.log(query);
             st.db.query(query, function (err, getResult) {
+                console.log(getResult);
                 if (!err) {
                     if (getResult) {
                         if (getResult[0]) {
@@ -992,12 +994,14 @@ Location.prototype.validateEZEOne = function(req,res,next){
                                 responseMessage.error = null;
                                 responseMessage.message = 'EZEoneID is available';
                                 responseMessage.data = getResult[0][0].masterid;
+                                responseMessage.isBussinessUser = getResult[0][0].isBussinessUser;
                                 res.status(200).json(responseMessage);
                                 console.log('FnValidateEZEOne: EZEoneID is available');
                             }
                             else {
                                 responseMessage.message = 'EZEoneID is not available';
                                 responseMessage.data = getResult[0][0].masterid;
+                                responseMessage.isBussinessUser = getResult[0][0].isBussinessUser;
                                 res.status(200).json(responseMessage);
                                 console.log('FnValidateEZEOne:EZEoneID is not available');
                             }
@@ -1005,6 +1009,7 @@ Location.prototype.validateEZEOne = function(req,res,next){
                         else {
                             responseMessage.message = 'EZEoneID is not available';
                             responseMessage.data = getResult[0][0].masterid;
+                            responseMessage.isBussinessUser = getResult[0][0].isBussinessUser;
                             res.status(200).json(responseMessage);
                             console.log('FnValidateEZEOne:EZEoneID is not available');
                         }
