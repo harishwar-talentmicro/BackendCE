@@ -3363,8 +3363,10 @@ Job.prototype.getEZEOneIdJobs = function(req,res,next){
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Job Location saved successfully';
+                                console.log(searchResult[0]);
                                 responseMessage.data = {
-                                    result : searchResult
+                                    total_count : searchResult[0][0].count,
+                                    result : searchResult[1]
                                 };
                                 res.status(200).json(responseMessage);
                                 console.log('getEZEOneIdJobs: Jobs loaded successfully');
