@@ -298,8 +298,8 @@ Search.prototype.searchKeyword = function(req,res,next){
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
-                        console.log('----------------------------------');
-                        console.log(SearchResult);
+                        //console.log('----------------------------------');
+                        //console.log(SearchResult);
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
                                 if (!(SearchResult[0][0].isLoggedIn)) {
