@@ -58,7 +58,7 @@ catch(ex){
 //});
 
 var path = require('path');
-var file = path.join(__dirname,'../../config1.json');
+var file = path.join(__dirname,'../../ezeone-config.json');
 
 var EJSCONFIG = JSON.parse(fs.readFileSync(file));
 console.log(EJSCONFIG);
