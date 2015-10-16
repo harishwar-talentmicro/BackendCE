@@ -173,6 +173,7 @@ router.post('/add_selected_job',LocationManager.FnAddtoSelectedJob);
 router.post('/job_location',LocationManager.FnSaveJobLoaction);
 router.get('/download_resume',LocationManager.FnDownloadResume);
 router.get('/ezeone_jobs',LocationManager.getEZEOneIdJobs);
+router.get('/navigation',LocationManager.FnNavigateSearch);
 
 //MessageBox module methods
 router.post('/create_group',LocationManager.FnCreateMessageGroup);

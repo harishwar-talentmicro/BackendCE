@@ -1275,4 +1275,112 @@ Search.prototype.searchBusListing = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnNavigateSearch
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description search jobs of a person
+ */
+Search.prototype.navigateSearch = function(req,res,next){
+    var _this = this;
+    try {
+
+        var token = req.query.token;
+        var latitude = req.query.lat ? req.query.lat : 0;
+        var longitude = req.query.lng ? req.query.lng : 0;
+        var keywords = req.query.k ? req.query.k : '';
+
+
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: []
+        };
+
+        st.validateToken(token, function (err, result) {
+            if (!err) {
+                if (result) {
+
+                    var queryParams = st.db.escape(keywords) + ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude);
+
+                    var query = 'CALL Pnavigatesearch(' + queryParams + ')';
+                    console.log(query);
+
+                    st.db.query(query, function (err, getresult) {
+                        //console.log(getresult);
+                        if (!err) {
+                            if (getresult) {
+                                if (getresult[0]) {
+                                    if (getresult[0][0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Search result loaded successfully';
+                                        responseMessage.data = getresult[0][0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnNavigateSearch: Search result loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Search result not found';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnNavigateSearch: Search result not found');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Search result not found';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnNavigateSearch: Search result not found');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'Search result not found';
+                                res.status(200).json(responseMessage);
+                                console.log('FnNavigateSearch:Search result not found');
+                            }
+                        }
+                        else {
+                            responseMessage.message = 'An error occured ! Please try again';
+                            responseMessage.error = {
+                                server: 'Internal server error'
+                            };
+                            res.status(500).json(responseMessage);
+                            console.log('FnNavigateSearch: error in getting navigate search:' + err);
+                        }
+                    });
+                }
+                else {
+                    responseMessage.message = 'Invalid token';
+                    responseMessage.error = {
+                        token: 'invalid token'
+                    };
+                    responseMessage.data = null;
+                    res.status(401).json(responseMessage);
+                    console.log('FnNavigateSearch: Invalid token');
+                }
+            }
+            else {
+                responseMessage.error = {
+                    server: 'Internal server error'
+                };
+                responseMessage.message = 'Error in validating Token';
+                res.status(500).json(responseMessage);
+                console.log('FnNavigateSearch:Error in processing Token' + err);
+            }
+        });
+    }
+    catch(ex){
+        responseMessage.error = {
+            server : 'Internal server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnNavigateSearch:error ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+
 module.exports = Search;

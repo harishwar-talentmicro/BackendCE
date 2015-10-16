@@ -150,6 +150,7 @@ exports.FnGetBannerPicture = searchModule.getBanner;
 exports.FnSearchForTracker = searchModule.searchTracker;
 exports.FnGetSearchDocuments = searchModule.getSearchDoc;
 exports.FnSearchBusListing = searchModule.searchBusListing;
+exports.FnNavigateSearch = searchModule.navigateSearch;
 
 
 //Image module
