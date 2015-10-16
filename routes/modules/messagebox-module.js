@@ -1431,7 +1431,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                             if (groupDetails[0].length > 0) {
                                                                                 if (groupDetails[1]) {
                                                                                     if (groupDetails[1].length > 0) {
-                                                                                        var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type);
+                                                                                        var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type)+ ',' + st.db.escape(token);
                                                                                         var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
                                                                                         console.log(messageQuery1);
                                                                                         st.db.query(messageQuery1, function (err, groupDetails1) {
