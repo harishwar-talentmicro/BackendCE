@@ -436,7 +436,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                     + ',' + st.db.escape(StatusID) + ',' + st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber)
                     + ',' + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(SelectionTypes)+ ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID) + ',' + st.db.escape(CategoryID);
 
-                 //console.log(InsertQuery);
+                //console.log(InsertQuery);
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
                         //console.log('InsertResult....');
@@ -822,7 +822,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
 
 
                         if (req.files.pg_pic) {
-                        console.log('c1...');
+                            console.log('c1...');
                             pagePicture();
                         }
                         else {
@@ -1144,165 +1144,165 @@ function FnCropImage(imageParams, callback){
     //st.validateToken(token, function (err, Result) {
     //    if (!err) {
     //        if (Result != null) {
-                try{
-                    fs.readFile('../bin/'+ imageParams.path,function(err,data){
-                        if(!err){
-                           var bitmap = data;
-                            var gm = require('gm').subClass({ imageMagick: true });
-                            gm(bitmap).size(function (err, size) {
-                                if (!err) {
-                                    // Orientation landscape
-                                    if(size.height < size.width){
-                                        // scale++
-                                        if(size.height < targetHeight || size.width < targetWidth){
-                                            if(targetHeight > targetWidth){
-                                                //console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
-                                                scaleHeight = targetHeight.toString();
-                                                ////
-                                                scaleWidth = (size.width * scaleHeight)/ size.height;
-                                            }
-                                            else{
-                                                //console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
-                                                scaleHeight = targetHeight;
-                                                scaleWidth = (size.width * scaleHeight) / size.height;
-                                            }
-                                        }
-                                        // scale--
-                                        else{
-                                            if(targetHeight > targetWidth){
-                                                //console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
-                                                scaleWidth = targetWidth.toString();
-                                                ////
-                                                scaleHeight = (scaleWidth * size.height)/ size.width;
-                                            }
-                                            else{
-
-                                                //console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
-                                                scaleHeight = targetHeight.toString();
-                                                scaleWidth = (scaleHeight * size.width) / size.height;
-
-                                            }
-                                        }
-                                    }
-
-                                    // Orientation is potrait
-                                    else{
-                                        //scale++
-                                        if(size.height < targetHeight || size.width < targetHeight){
-                                            if(targetHeight > targetWidth){
-                                                console.log('condition false');
-
-                                                scaleHeight = targetHeight.toString();
-                                                scaleWidth = (scaleHeight * size.width)/ size.height;
-                                            }
-                                            else{
-                                                scaleWidth = targetWidth.toString();
-                                                scaleHeight = (scaleWidth * size.height) / size.width;
-                                            }
-                                        }
-                                        else{
-                                            scaleWidth = targetWidth.toString();
-                                            scaleHeight = (scaleWidth * size.height) / size.width;
-                                        }
-                                    }
-
-                                    var dimensions = {
-                                        originalHeight : size.height,
-                                        originalWidth : size.width,
-                                        scaleHeight : scaleHeight,
-                                        scaleWidth : scaleWidth,
-                                        targetHeight : targetHeight,
-                                        targetWidth : targetWidth
-                                    };
-
-                                    console.log(dimensions);
-
-                                    if(scaleFlag && cropFlag){
-                                        console.log('Scale and crop');
-                                        gm(bitmap)
-                                            .resize(scaleWidth,scaleHeight)
-                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                                if(!err){
-                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                                    //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                                    callback(null, picUrl);
-                                                    deleteTempFile();
-                                                    console.log('FnCropImage:Picture cropped successfully...');
-                                                }
-                                                else{
-                                                    //res.status(400).json(respMsg);
-                                                    callback(null, null);
-                                                    deleteTempFile();
-                                                    console.log('FnCropImage:Picture not cropped');
-                                                }
-                                            });
-                                    }
-
-                                    else if(scaleFlag && !cropFlag){
-                                        gm(bitmap)
-                                            .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                                if(!err){
-                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                                    //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                                    callback(null, picUrl);
-                                                    console.log('FnCropImage:Picture cropped successfully');
-                                                    deleteTempFile();
-
-                                                }
-                                                else{
-                                                    //res.status(400).json(respMsg);
-                                                    callback(null, null);
-                                                    deleteTempFile();
-                                                    console.log('FnCropImage:Picture not cropped');
-                                                }
-                                            });
-
-                                    }
-
-                                    else if(!scaleFlag && cropFlag){
-                                        gm(bitmap)
-                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                                if(!err){
-                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                                    //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                                    callback(null, picUrl);
-                                                    console.log('FnCropImage:Picture cropped successfully');
-                                                }
-                                                else{
-                                                    //res.status(400).json(respMsg);
-                                                    callback(null, null);
-                                                    console.log('FnCropImage:Picture not cropped');
-                                                }
-                                            });
-                                        deleteTempFile();
-                                    }
+    try{
+        fs.readFile('../bin/'+ imageParams.path,function(err,data){
+            if(!err){
+                var bitmap = data;
+                var gm = require('gm').subClass({ imageMagick: true });
+                gm(bitmap).size(function (err, size) {
+                    if (!err) {
+                        // Orientation landscape
+                        if(size.height < size.width){
+                            // scale++
+                            if(size.height < targetHeight || size.width < targetWidth){
+                                if(targetHeight > targetWidth){
+                                    //console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
+                                    scaleHeight = targetHeight.toString();
+                                    ////
+                                    scaleWidth = (size.width * scaleHeight)/ size.height;
                                 }
                                 else{
-                                    console.log('FnCropImage : Invalid image file. Unable to find image size :' +err);
-                                    callback(null, null);
+                                    //console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
+                                    scaleHeight = targetHeight;
+                                    scaleWidth = (size.width * scaleHeight) / size.height;
+                                }
+                            }
+                            // scale--
+                            else{
+                                if(targetHeight > targetWidth){
+                                    //console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
+                                    scaleWidth = targetWidth.toString();
+                                    ////
+                                    scaleHeight = (scaleWidth * size.height)/ size.width;
+                                }
+                                else{
+
+                                    //console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                    scaleHeight = targetHeight.toString();
+                                    scaleWidth = (scaleHeight * size.width) / size.height;
 
                                 }
-                            });
+                            }
                         }
-                       else{
-                            callback(null, null);
-                            console.log('FnCropImage : Error in reading file :' +err);
 
-                       }
-                    });
+                        // Orientation is potrait
+                        else{
+                            //scale++
+                            if(size.height < targetHeight || size.width < targetHeight){
+                                if(targetHeight > targetWidth){
+                                    console.log('condition false');
 
-                }
-                catch(ex){
-                    console.log(ex);
-                    callback(null, null);
-                    console.log('FnCropImage : '+ ex.description);
-                    var errorDate = new Date();
-                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                }
-            //}
+                                    scaleHeight = targetHeight.toString();
+                                    scaleWidth = (scaleHeight * size.width)/ size.height;
+                                }
+                                else{
+                                    scaleWidth = targetWidth.toString();
+                                    scaleHeight = (scaleWidth * size.height) / size.width;
+                                }
+                            }
+                            else{
+                                scaleWidth = targetWidth.toString();
+                                scaleHeight = (scaleWidth * size.height) / size.width;
+                            }
+                        }
+
+                        var dimensions = {
+                            originalHeight : size.height,
+                            originalWidth : size.width,
+                            scaleHeight : scaleHeight,
+                            scaleWidth : scaleWidth,
+                            targetHeight : targetHeight,
+                            targetWidth : targetWidth
+                        };
+
+                        console.log(dimensions);
+
+                        if(scaleFlag && cropFlag){
+                            console.log('Scale and crop');
+                            gm(bitmap)
+                                .resize(scaleWidth,scaleHeight)
+                                .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                    if(!err){
+                                        var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                        var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                        //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        callback(null, picUrl);
+                                        deleteTempFile();
+                                        console.log('FnCropImage:Picture cropped successfully...');
+                                    }
+                                    else{
+                                        //res.status(400).json(respMsg);
+                                        callback(null, null);
+                                        deleteTempFile();
+                                        console.log('FnCropImage:Picture not cropped');
+                                    }
+                                });
+                        }
+
+                        else if(scaleFlag && !cropFlag){
+                            gm(bitmap)
+                                .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                    if(!err){
+                                        var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                        var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                        //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        callback(null, picUrl);
+                                        console.log('FnCropImage:Picture cropped successfully');
+                                        deleteTempFile();
+
+                                    }
+                                    else{
+                                        //res.status(400).json(respMsg);
+                                        callback(null, null);
+                                        deleteTempFile();
+                                        console.log('FnCropImage:Picture not cropped');
+                                    }
+                                });
+
+                        }
+
+                        else if(!scaleFlag && cropFlag){
+                            gm(bitmap)
+                                .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
+                                    if(!err){
+                                        var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                        var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                        //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
+                                        callback(null, picUrl);
+                                        console.log('FnCropImage:Picture cropped successfully');
+                                    }
+                                    else{
+                                        //res.status(400).json(respMsg);
+                                        callback(null, null);
+                                        console.log('FnCropImage:Picture not cropped');
+                                    }
+                                });
+                            deleteTempFile();
+                        }
+                    }
+                    else{
+                        console.log('FnCropImage : Invalid image file. Unable to find image size :' +err);
+                        callback(null, null);
+
+                    }
+                });
+            }
+            else{
+                callback(null, null);
+                console.log('FnCropImage : Error in reading file :' +err);
+
+            }
+        });
+
+    }
+    catch(ex){
+        console.log(ex);
+        callback(null, null);
+        console.log('FnCropImage : '+ ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+    //}
     //        else{
     //            respMsg.message = 'Please login to continue';
     //            respMsg.error = {
@@ -1362,64 +1362,57 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-                        var query = st.db.escape(code);
-                        console.log('CALL pGetAlumniContent(' + query + ')');
-                        st.db.query('CALL pGetAlumniContent(' + query + ')', function (err, getResult) {
-                            //console.log(getResult);
-                            if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Alumni content loaded successfully';
-                                        responseMessage.data = getResult[0];
+            var query = st.db.escape(code);
+            console.log('CALL pGetAlumniContent(' + query + ')');
+            st.db.query('CALL pGetAlumniContent(' + query + ')', function (err, getResult) {
+                //console.log(getResult);
+                if (!err) {
+                    if (getResult[0]) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Alumni content loaded successfully';
+                        responseMessage.data = getResult[0];
 
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniContent: Alumni content loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Alumni content not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniContent: Alumni content not loaded');
-                                    }
-                                }
-                                else {
-                                    responseMessage.message = 'Alumni content not loaded';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetAlumniContent: Alumni content not loaded');
-                                }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured in query ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnGetAlumniContent: error in getting alumni content :' + err);
-                            }
-
-                        });
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetAlumniContent: Alumni content loaded successfully');
                     }
-        //            else {
-        //                responseMessage.message = 'Invalid token';
-        //                responseMessage.error = {
-        //                    token: 'Invalid Token'
-        //                };
-        //                responseMessage.data = null;
-        //                res.status(401).json(responseMessage);
-        //                console.log('FnGetAlumniContent: Invalid token');
-        //            }
-        //        }
-        //        else {
-        //            responseMessage.error = {
-        //                server: 'Internal Server Error'
-        //            };
-        //            responseMessage.message = 'Error in validating Token';
-        //            res.status(500).json(responseMessage);
-        //            console.log('FnGetAlumniContent:Error in processing Token' + err);
-        //        }
-        //    });
-        //}
+                    else {
+                        responseMessage.message = 'Alumni content not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetAlumniContent: Alumni content not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetAlumniContent: error in getting alumni content :' + err);
+                }
+
+            });
+        }
+            //            else {
+            //                responseMessage.message = 'Invalid token';
+            //                responseMessage.error = {
+            //                    token: 'Invalid Token'
+            //                };
+            //                responseMessage.data = null;
+            //                res.status(401).json(responseMessage);
+            //                console.log('FnGetAlumniContent: Invalid token');
+            //            }
+            //        }
+            //        else {
+            //            responseMessage.error = {
+            //                server: 'Internal Server Error'
+            //            };
+            //            responseMessage.message = 'Error in validating Token';
+            //            res.status(500).json(responseMessage);
+            //            console.log('FnGetAlumniContent:Error in processing Token' + err);
+            //        }
+            //    });
+            //}
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -1493,20 +1486,14 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
                             //console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Alumni team loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniTeam: Alumni team loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Alumni team not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniTeam: Alumni team not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Alumni team loaded successfully';
+                                    responseMessage.data = getResult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetAlumniTeam: Alumni team loaded successfully');
                                 }
+
                                 else {
                                     responseMessage.message = 'Alumni team not loaded';
                                     res.status(200).json(responseMessage);
@@ -1937,20 +1924,14 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
                         st.db.query('CALL pGetAlumniTeamDetails(' + query + ')', function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'AlumniTeam Details loaded successfully';
-                                        responseMessage.data = getResult[0][0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'AlumniTeam Details not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniTeamDetails: AlumniTeam Details not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'AlumniTeam Details loaded successfully';
+                                    responseMessage.data = getResult[0][0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
                                 }
+
                                 else {
                                     responseMessage.message = 'AlumniTeam Details not loaded';
                                     res.status(200).json(responseMessage);
@@ -2053,19 +2034,12 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Alumni profile loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniProfile: Alumni profile loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Alumni profile not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniProfile: Alumni profile not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Alumni profile loaded successfully';
+                                    responseMessage.data = getResult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetAlumniProfile: Alumni profile loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Alumni profile not loaded';
@@ -2330,7 +2304,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult[0]) {
-                            if (getResult[0][0].count > 0) {
+                        if (getResult[0][0].count > 0) {
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Data loaded successfully';
@@ -2796,41 +2770,41 @@ Alumni.prototype.saveComments = function(req,res,next){
             //st.validateToken(token, function (err, result) {
             //    if (!err) {
             //        if (result) {
-                        var queryParams = st.db.escape(tenID) + ',' + st.db.escape(profileId)+ ',' + st.db.escape(rating)
-                            + ',' + st.db.escape(comments);
-                        var query = 'CALL pgivecommentsforTEN(' + queryParams + ')';
-                        st.db.query(query, function (err, saveResult) {
-                            if (!err) {
-                                if (saveResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Comments saved successfully';
-                                    responseMessage.data = {
-                                        ten_id : req.body.ten_id,
-                                        profile_id : req.body.profile_id,
-                                        rating : req.body.rating,
-                                        comments : req.body.comments
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveComments: Comments saved successfully');
-                                }
-                                else {
-                                    responseMessage.message = 'No save comments';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveComments: No save comments');
-                                }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured in query ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveComments: error in saving comments:' + err);
-                            }
-
-                        });
+            var queryParams = st.db.escape(tenID) + ',' + st.db.escape(profileId)+ ',' + st.db.escape(rating)
+                + ',' + st.db.escape(comments);
+            var query = 'CALL pgivecommentsforTEN(' + queryParams + ')';
+            st.db.query(query, function (err, saveResult) {
+                if (!err) {
+                    if (saveResult) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Comments saved successfully';
+                        responseMessage.data = {
+                            ten_id : req.body.ten_id,
+                            profile_id : req.body.profile_id,
+                            rating : req.body.rating,
+                            comments : req.body.comments
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveComments: Comments saved successfully');
                     }
+                    else {
+                        responseMessage.message = 'No save comments';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveComments: No save comments');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveComments: error in saving comments:' + err);
+                }
+
+            });
+        }
             //        else {
             //            responseMessage.message = 'Invalid token';
             //            responseMessage.error = {
@@ -2850,7 +2824,7 @@ Alumni.prototype.saveComments = function(req,res,next){
             //        console.log('FnSaveComments:Error in processing Token' + err);
             //    }
             //});
-        //}
+            //}
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -2913,19 +2887,12 @@ Alumni.prototype.getParticipatedEventsId = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult[0]) {
-                        if (getResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Data loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetParticipatedEventsId: Data loaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'Data not loaded';
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetParticipatedEventsId: Data not loaded');
-                        }
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Data loaded successfully';
+                        responseMessage.data = getResult[0];
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetParticipatedEventsId: Data loaded successfully');
                     }
                     else {
                         responseMessage.message = 'Data not loaded';
@@ -3025,20 +2992,15 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Data loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetParticipantsList: Data loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Data not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetParticipantsList: Data not loaded');
-                                    }
+
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Data loaded successfully';
+                                    responseMessage.data = getResult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetParticipantsList: Data loaded successfully');
                                 }
+
                                 else {
                                     responseMessage.message = 'Data not loaded';
                                     res.status(200).json(responseMessage);
@@ -3238,42 +3200,42 @@ Alumni.prototype.getTeamContent = function(req,res,next){
     else {
         try {
             var queryParams = st.db.escape(code);
-                        var query = 'CALL pgetTeamContent(' + queryParams + ')';
+            var query = 'CALL pgetTeamContent(' + queryParams + ')';
 
-                        st.db.query(query, function (err, getResult) {
-                            //console.log(getResult);
-                            if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Team Content loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetTeamContent:Team Content loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Team Content not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetTeamContent: Team Content not loaded');
-                                    }
-                                }
-                                else {
-                                    responseMessage.message = 'Team Content not loaded';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetTeamContent: Team Content not loaded');
-                                }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured in query ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnGetTeamContent: error in getting Team Content :' + err);
-                            }
+            st.db.query(query, function (err, getResult) {
+                //console.log(getResult);
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Team Content loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetTeamContent:Team Content loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Team Content not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetTeamContent: Team Content not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Team Content not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetTeamContent: Team Content not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTeamContent: error in getting Team Content :' + err);
+                }
 
-                        });
+            });
         }
         catch (ex) {
             responseMessage.error = {
@@ -3332,43 +3294,43 @@ Alumni.prototype.getTeamImage = function(req,res,next){
     }
     else {
         try {
-                        var query = st.db.escape(code) + ',' + st.db.escape(type);
+            var query = st.db.escape(code) + ',' + st.db.escape(type);
 
-                        st.db.query('CALL pgetTeamImages(' + query + ')', function (err, getResult) {
-                            //console.log(getResult);
-                            if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Team image loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetTeamImage: Team image loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Team image not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetTeamImage: Team image not loaded');
-                                    }
-                                }
-                                else {
-                                    responseMessage.message = 'Team image not loaded';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetTeamImage: Team image not loaded');
-                                }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured in query ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnGetTeamImage: error in getting Team image :' + err);
-                            }
-
-                        });
+            st.db.query('CALL pgetTeamImages(' + query + ')', function (err, getResult) {
+                //console.log(getResult);
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Team image loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetTeamImage: Team image loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Team image not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetTeamImage: Team image not loaded');
+                        }
                     }
+                    else {
+                        responseMessage.message = 'Team image not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetTeamImage: Team image not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTeamImage: error in getting Team image :' + err);
+                }
+
+            });
+        }
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -3646,13 +3608,13 @@ Alumni.prototype.getClientList = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                        responseMessage.status = true;
-                                        responseMessage.count = getResult[0][0].count;
-                                        responseMessage.data = getResult[1];
-                                        responseMessage.message = 'Client List loaded successfully';
-                                        responseMessage.error = null;
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientList: Client List loaded successfully');
+                                    responseMessage.status = true;
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.data = getResult[1];
+                                    responseMessage.message = 'Client List loaded successfully';
+                                    responseMessage.error = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetClientList: Client List loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Client List not loaded';
