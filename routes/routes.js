@@ -105,7 +105,7 @@ exports.FnGetCompanyDetails = businessManager.getCompanyDetails;
 exports.FnGetEZEOneIDInfo = businessManager.getEZEOneIDInfo;
 exports.FnGetTransAttachment = businessManager.getTransAttachment;
 exports.FnSalesStatistics = businessManager.salesStatistics;
-exports.FnGetClientList = businessManager.getClientList;
+
 
 //Configuration module
 var Configuration = require('./modules/configuration-module.js');
@@ -184,7 +184,6 @@ exports.FnSearchJobs = jobModule.searchJobs;
 exports.FnJobSeekerSearch = jobModule.searchJobSeekers;
 exports.FnApplyJob = jobModule.applyJob;
 exports.FnAppliedJobList = jobModule.appliedJobList;
-exports.FnGetFiltersForJob = jobModule.getFiltersForJob;
 exports.FnGetJobDetails = jobModule.getJobDetails;
 exports.FnJobs = jobModule.jobs;
 exports.FnGetAppliedJob = jobModule.getAppliedJob;
@@ -231,6 +230,7 @@ exports.FnCountOfUnreadMessage = messageBox.countOfUnreadMessage;
 exports.FnViewMessageNew = messageBox.viewMessageNew;
 exports.FnChangeGroupAdmin = messageBox.changeGroupAdmin;
 exports.FnUpdateTaskStatus = messageBox.updateTaskStatus;
+exports.FnGetLastMsgOfGroup = messageBox.getLastMsgOfGroup;
 
 //Alumni module
 var Alumni = require('./modules/alumni-module.js');

@@ -3050,11 +3050,12 @@ try {
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     var Token = req.query.TokenNo;
     var Type = parseInt(req.query.RefType);
+    var cvid = req.query.cvid ? parseInt(req.query.cvid) : 0;
     if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
         st.validateToken(Token, function (err, Result) {
             if (!err) {
                 if (Result != null) {
-                    var query = st.db.escape(Token) + ',' + st.db.escape(Type);
+                    var query = st.db.escape(Token) + ',' + st.db.escape(Type)+ ',' + st.db.escape(cvid);
                     //console.log(query);
                     st.db.query('CALL  pGetDocsFile(' + query + ')', function (err, DocumentResult) {
                         if (!err) {
