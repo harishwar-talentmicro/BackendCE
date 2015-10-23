@@ -244,6 +244,7 @@ router.get('/my_alumni_jobs',LocationManager.FnGetMyAlumniJobs);
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);
 router.post('/techplasma_mail',LocationManager.FnSendMailTechplasma);
+router.post('/fomads_mail',LocationManager.FnSendFomadsFeedbckMail);
 
 //Recruitment module
 router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
