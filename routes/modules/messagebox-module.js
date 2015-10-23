@@ -3558,4 +3558,121 @@ MessageBox.prototype.updateTaskStatus = function(req,res,next){
     }
 };
 
+
+/**
+ * @todo FnGetLastMsgOfGroup
+ * Method : Get
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get last message sof group
+ */
+MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var msgId = parseInt(req.query.id);   // id of message
+    var groupId = parseInt(req.query.gid);
+    var groupType = req.query.group_type;
+
+
+    var responseMessage = {
+        status: false,
+        error: null,
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =  st.db.escape(msgId) + ',' + st.db.escape(groupId)+ ',' + st.db.escape(groupType)
+                            + ',' + st.db.escape(token);
+                        var query = 'CALL pGetlatestmessagesofGroup(' + queryParams + ')';
+                        //console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Message loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetLastMsgOfGroup: Message loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Message not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetLastMsgOfGroup:Message not loaded');
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.message = 'Message not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetLastMsgOfGroup:Message not loaded');
+                                }
+
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetLastMsgOfGroup: error in getting Messages:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetLastMsgOfGroup: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetLastMsgOfGroup:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetLastMsgOfGroup ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 module.exports = MessageBox;

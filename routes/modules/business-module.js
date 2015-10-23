@@ -113,8 +113,6 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
 
                                         //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
                                         RtnMessage.TotalPage = TotalPage;
-                                        RtnMessage.tc = GetResult[0][0].tc;
-                                        RtnMessage.oc = GetResult[0][0].oc;
                                         RtnMessage.Result = GetResult[0];
                                         res.send(RtnMessage);
                                         console.log('FnGetTranscation: Transaction details Send successfully');
