@@ -198,6 +198,9 @@ Auth.prototype.register = function(req,res,next){
         var visibleEmail = req.body.ve ? req.body.ve : 1; // 0-invisible, 1- visible
         var visibleMobile = req.body.vm ? req.body.vm : 1;      // 0-invisible, 1- visible
         var visiblePhone = req.body.vp ? req.body.vp : 1;// 0-invisible, 1- visible
+        var locTitle = req.body.loc_title ? req.body.loc_title : '';
+        var visibleAddress = req.body.va ? parseInt(req.body.va) : 1;// 0-invisible, 1- visible
+
 
         var RtnMessage = {
             Token: '',
@@ -251,7 +254,7 @@ Auth.prototype.register = function(req,res,next){
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress)
                     + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
                     + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
-                    + ',' + st.db.escape(visiblePhone) ;
+                    + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress) ;
 
 
                 //console.log(InsertQuery);
@@ -468,7 +471,7 @@ Auth.prototype.register = function(req,res,next){
                     + ',' + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress)
                     + ',' + st.db.escape(SelectionTypes)+ ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID)
                     + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
-                    + ',' + st.db.escape(visiblePhone);
+                    + ',' + st.db.escape(visiblePhone)+ ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress);
 
                 // console.log(InsertQuery);
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
