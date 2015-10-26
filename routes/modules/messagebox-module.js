@@ -58,6 +58,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var tid = req.body.tid ? req.body.tid : 0;
     var restrictReply = req.body.rr;
     var memberVisible = req.body.member_visible ? parseInt(req.body.member_visible) : 0;
+    var alumniCode = req.body.alumni_code ? req.body.alumni_code : '';
 
     var responseMessage = {
         status: false,
@@ -2593,8 +2594,8 @@ MessageBox.prototype.loadMessages = function(req,res,next){
     var token = req.query.token;
     var id = parseInt(req.query.id); // toId or groupid
     var groupType = parseInt(req.query.group_type);
-    var pageSize = req.query.page_size;
-    var pageCount = req.query.page_count;
+    var pageSize = req.query.page_size ? req.query.page_size : 100;
+    var pageCount = req.query.page_count ? req.query.page_count : 0;
     var istask = req.query.istask ? parseInt(req.query.istask) : 0;
 
 
@@ -2664,7 +2665,12 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             else{
                                                 responseMessage.count=0;
                                             }
-                                            responseMessage.data = getResult[0];
+                                            //responseMessage.data = getResult[0];
+                                            //console.log(getResult[0]);
+                                            responseMessage.data = {
+                                                group_details: [],
+                                                messages: getResult[0]
+                                            };
                                             res.status(200).json(responseMessage);
                                             console.log('FnLoadMessages: Messages loaded successfully');
                                         }
