@@ -4321,6 +4321,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
         status : false,
         message : 'An error occurred ! Please try again',
         data : null,
+        alumni_details : [],
         error : {
             token : 'Invalid token'
         }
@@ -4347,6 +4348,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                             respMsg.message = 'User details loaded successfully';
                                             results[0][0].Password = undefined;
                                             respMsg.data = results[0][0];
+                                            respMsg.alumni_details = results[1];
                                             res.status(200).json(respMsg);
                                         }
                                         else{
@@ -4354,6 +4356,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                             respMsg.error = null;
                                             respMsg.message = 'No such user is available';
                                             respMsg.data = results;
+                                            respMsg.alumni_details = [];
                                             res.status(200).json(respMsg);
                                         }
                                     }
@@ -4362,6 +4365,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                         respMsg.error = null;
                                         respMsg.message = 'No such user is available';
                                         respMsg.data = results;
+                                        respMsg.alumni_details = [];
                                         res.status(200).json(respMsg);
                                     }
 
@@ -4371,6 +4375,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                     respMsg.error = null;
                                     respMsg.message = 'No such user is available';
                                     respMsg.data = results;
+                                    respMsg.alumni_details = [];
                                     res.status(200).json(respMsg);
                                 }
                             }
