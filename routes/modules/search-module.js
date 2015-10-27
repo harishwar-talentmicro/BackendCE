@@ -463,7 +463,6 @@ Search.prototype.searchInformation = function(req,res,next){
                         }
 
                         else {
-                            LocSeqNo = 0;
                             Pin = FindArray[1];
                         }
                         //checking the second condition
@@ -474,12 +473,13 @@ Search.prototype.searchInformation = function(req,res,next){
                     }
                 }
             }
-            var SearchParameter = st.db.escape(Token) + ',' + st.db.escape(WorkingDate) + ',' + st.db.escape(IPAddress) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(LocSeqNo) + ',' + st.db.escape(Pin);
+            var SearchParameter = st.db.escape(Token) + ',' + st.db.escape(WorkingDate) + ',' + st.db.escape(IPAddress)
+                + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Pin);
             console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
             st.db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
                 // st.db.query(searchQuery, function (err, SearchResult) {
                 if (!err) {
-                    console.log(UserInfoResult);
+                    //console.log(UserInfoResult);
                     if (UserInfoResult[0].length > 0) {
                         res.send(UserInfoResult[0]);
                         console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');

@@ -1367,13 +1367,16 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                     + ',' + st.db.escape(istask);
                                 var query = 'CALL pComposeMessage(' + queryParams + ')';
                                 //console.log(query);
+
                                 st.db.query(query, function (err, insertResult) {
+                                    console.log(insertResult);
                                     if (!err) {
                                         if (insertResult) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Message Composed successfully';
                                             responseMessage.data = {
+                                                //id : insertResult[0][0].id,
                                                 message: req.body.message,
                                                 attachmentFilename: req.body.attachment_filename,
                                                 priority: req.body.priority,

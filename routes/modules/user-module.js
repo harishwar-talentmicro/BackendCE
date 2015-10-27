@@ -565,9 +565,9 @@ User.prototype.changePassword = function(req,res,next){
                                             if(oldPassResult[0][0].Password){
                                                 if(comparePassword(OldPassword,oldPassResult[0][0].Password)){
                                                     var ip = req.headers['x-forwarded-for'] ||
-                                                    req.connection.remoteAddress ||
-                                                    req.socket.remoteAddress ||
-                                                    req.connection.socket.remoteAddress;
+                                                        req.connection.remoteAddress ||
+                                                        req.socket.remoteAddress ||
+                                                        req.connection.socket.remoteAddress;
                                                     var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
                                                     var newPassword = hashPassword(NewPassword);
@@ -867,45 +867,45 @@ User.prototype.verifyResetPasswordLink = function(req,res,next){
             var verifyQuery = 'CALL pverifyresetcode('+verifyQueryParams+')';
 
             st.db.query(verifyQuery,function(err,verifyRes){
-               if(err){
-                   console.log('Error in verifyQuery : FnVerifyResetPasswordLink ');
-                   console.log(err);
-                   var errorDate = new Date();
-                   console.log(errorDate.toTimeString() + ' ......... error ...........');
-                   respMsg.error = {server : 'Internal Server Error'};
-                   respMsg.message = 'An error occurred ! Please try again';
-                   res.status(400).json(respMsg);
-               }
-               else{
-                   if(verifyRes){
-                       if(verifyRes[0]){
-                           if(verifyRes[0][0]){
-                               if(verifyRes[0][0].tid){
-                                   respMsg.status = true;
-                                   respMsg.data = {
-                                       tid : verifyRes[0][0].tid,
-                                       reset_otp : ''
-                                   };
-                                   respMsg.message = 'Reset code is valid ! Proceed to reset password';
-                                   respMsg.error = null;
-                                   res.status(200).json(respMsg);
-                               }
-                               else{
-                                   res.status(200).json(respMsg);
-                               }
-                           }
-                           else{
-                               res.status(200).json(respMsg);
-                           }
-                       }
-                       else{
-                           res.status(200).json(respMsg);
-                       }
-                   }
-                   else{
-                       res.status(200).json(respMsg);
-                   }
-               }
+                if(err){
+                    console.log('Error in verifyQuery : FnVerifyResetPasswordLink ');
+                    console.log(err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    respMsg.error = {server : 'Internal Server Error'};
+                    respMsg.message = 'An error occurred ! Please try again';
+                    res.status(400).json(respMsg);
+                }
+                else{
+                    if(verifyRes){
+                        if(verifyRes[0]){
+                            if(verifyRes[0][0]){
+                                if(verifyRes[0][0].tid){
+                                    respMsg.status = true;
+                                    respMsg.data = {
+                                        tid : verifyRes[0][0].tid,
+                                        reset_otp : ''
+                                    };
+                                    respMsg.message = 'Reset code is valid ! Proceed to reset password';
+                                    respMsg.error = null;
+                                    res.status(200).json(respMsg);
+                                }
+                                else{
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                res.status(200).json(respMsg);
+                            }
+                        }
+                        else{
+                            res.status(200).json(respMsg);
+                        }
+                    }
+                    else{
+                        res.status(200).json(respMsg);
+                    }
+                }
 
             });
         }
@@ -1110,7 +1110,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
 
         var Token = req.query.Token;
         var TID = req.query.TID;
-       // console.log(req.query);
+        // console.log(req.query);
         var RtnMessage = {
             Result: [],
             Message: ''
@@ -2276,81 +2276,81 @@ User.prototype.getDocument = function(req,res,next) {
      * @todo FnGetDocument
      */
     var _this = this;
-try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var Token = req.query.TokenNo;
-    var Type = parseInt(req.query.RefType);
-    var cvid = req.query.cvid ? parseInt(req.query.cvid) : 0;
-    if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
-                    var query = st.db.escape(Token) + ',' + st.db.escape(Type)+ ',' + st.db.escape(cvid);
-                    //console.log(query);
-                    st.db.query('CALL  pGetDocsFile(' + query + ')', function (err, DocumentResult) {
-                        if (!err) {
-                            if (DocumentResult[0] != null) {
-                                if (DocumentResult[0].length > 0) {
-                                    DocumentResult = DocumentResult[0];
-                                    var docs = DocumentResult[0];
-                                    // console.log(docs);
-                                    res.setHeader('Content-Type', docs.ContentType);
-                                    res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
-                                    res.setHeader('Cache-Control', 'public, max-age=0');
-                                    res.writeHead('200', { 'Content-Type': docs.ContentType });
-                                    //console.log(docs.Docs);
-                                    res.end(docs.Docs, 'base64');
-                                    console.log('FnGetDocument: Document sent successfully-1');
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.query.TokenNo;
+        var Type = parseInt(req.query.RefType);
+        var cvid = req.query.cvid ? parseInt(req.query.cvid) : 0;
+        if (Token != null && Type.toString() != 'NaN' && Type.toString() != '0') {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = st.db.escape(Token) + ',' + st.db.escape(Type)+ ',' + st.db.escape(cvid);
+                        //console.log(query);
+                        st.db.query('CALL  pGetDocsFile(' + query + ')', function (err, DocumentResult) {
+                            if (!err) {
+                                if (DocumentResult[0] != null) {
+                                    if (DocumentResult[0].length > 0) {
+                                        DocumentResult = DocumentResult[0];
+                                        var docs = DocumentResult[0];
+                                        // console.log(docs);
+                                        res.setHeader('Content-Type', docs.ContentType);
+                                        res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
+                                        res.setHeader('Cache-Control', 'public, max-age=0');
+                                        res.writeHead('200', { 'Content-Type': docs.ContentType });
+                                        //console.log(docs.Docs);
+                                        res.end(docs.Docs, 'base64');
+                                        console.log('FnGetDocument: Document sent successfully-1');
+                                    }
+                                    else {
+                                        console.log('FnGetDocument: No document available');
+                                        res.json(null);
+                                    }
+
                                 }
                                 else {
                                     console.log('FnGetDocument: No document available');
                                     res.json(null);
                                 }
-
                             }
                             else {
-                                console.log('FnGetDocument: No document available');
+                                res.statusCode = 500;
                                 res.json(null);
+                                console.log('FnGetDocument: Error in sending documents: ' + err);
                             }
-                        }
-                        else {
-                            res.statusCode = 500;
-                            res.json(null);
-                            console.log('FnGetDocument: Error in sending documents: ' + err);
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        console.log('FnGetDocument: Invalid Token');
+                        res.statusCode = 401;
+                        res.json(null);
+                    }
                 }
                 else {
-                    console.log('FnGetDocument: Invalid Token');
-                    res.statusCode = 401;
+                    console.log('FnGetDocument: Token error: ' + err);
+                    res.statusCode = 500;
                     res.json(null);
                 }
+            });
+
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetDocument: Token is empty');
             }
-            else {
-                console.log('FnGetDocument: Token error: ' + err);
-                res.statusCode = 500;
-                res.json(null);
+            else if (Type.toString() != 'NaN' || Type.toString() == '0') {
+                console.log('FnGetDocument: Type is empty');
             }
-        });
+            res.statusCode = 400;
+            res.json(null);
+        }
 
     }
-    else {
-        if (Token == null) {
-            console.log('FnGetDocument: Token is empty');
-        }
-        else if (Type.toString() != 'NaN' || Type.toString() == '0') {
-            console.log('FnGetDocument: Type is empty');
-        }
-        res.statusCode = 400;
-        res.json(null);
+    catch (ex) {
+        console.log('FnGetDocument error:' + ex.description);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
-
-}
-catch (ex) {
-    console.log('FnGetDocument error:' + ex.description);
-    var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
-}
 };
 /**
  * Method : POST
@@ -3898,6 +3898,149 @@ User.prototype.downloadResume = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnDownloadResume ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnSaveDocsandUrls
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save docs and urls
+ */
+User.prototype.saveDocsandUrls = function(req,res,next){
+
+    var _this = this;
+    var uuid = require('node-uuid');
+    var request = require('request');
+
+    var token = req.body.token;
+    var type = parseInt(req.body.type);  // 0-image, 1- url
+    var image = req.body.image ? req.body.image : '';
+    var tag = req.body.tag;
+    var pin = req.body.pin ? req.body.pin : 0;
+
+    console.log(req.files);
+    console.log(image);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var uniqueId = uuid.v4();
+                        var randomName = uniqueId + '.' + req.files.image.extension;
+                        console.log(randomName);
+
+                        //upload to cloud storage
+                        request({
+                            url: 'https://www.googleapis.com/upload/storage/v1/b/'+req.CONFIG.CONSTANT.STORAGE_BUCKET+'/o',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': req.files.image.mimetype
+                            },
+                            uploadType : 'multipart',
+                            body: 'hello',
+                            name : randomName
+                        }, function(error, response, body){
+                            if(error) {
+                                console.log('error..');
+                                console.log(error);
+                            } else {
+                                console.log('response..');
+                                console.log(response.statusCode);
+                                console.log(response);
+                                console.log(body);
+                            }
+                        });
+
+                        var queryParams = st.db.escape(token)+ ',' + st.db.escape(type)+ ',' + st.db.escape(randomName)
+                            + ',' + st.db.escape(tag)+ ',' + st.db.escape(pin);
+
+                        var query = 'CALL psavedocsandurls(' + queryParams + ')';
+
+                        st.db.query(query, function (err, insertResult) {
+                            if (!err) {
+                                if (insertResult.affectedRows > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'DocsandUrls Save successfully';
+                                    responseMessage.data = {
+                                        type : parseInt(req.body.type),
+                                        tag : req.body.tag,
+                                        pin : req.body.pin ? req.body.pin : null
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveDocsandUrls: DocsandUrls Save successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'DocsandUrls not Saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveDocsandUrls:DocsandUrls not Saved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveDocsandUrls: error in saving docs and urls:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveDocsandUrls: Invalid token');
+                    }
+                } else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveDocsandUrls:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveDocsandUrls ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

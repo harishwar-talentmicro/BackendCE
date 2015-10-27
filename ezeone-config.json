@@ -8,7 +8,9 @@
     "INDEX_TPL" : "index.ejs",
     "ALUMNI_INDEX_PATH" : "../public-alumni/index.html",
     "MAP_REDIRECT_LINK" : "/map",
-    "STATIC_URL": "/"
+    "STATIC_URL": "/",
+    "STORAGE_BUCKET":"ezeone",
+    "GS_URL":"https://storage.googleapis.com/"
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",

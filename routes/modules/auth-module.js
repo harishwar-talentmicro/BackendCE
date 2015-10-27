@@ -190,9 +190,7 @@ Auth.prototype.register = function(req,res,next){
         if (PIN == '') {
             PIN = null;
         }
-        var TemplateID = parseInt(req.body.TemplateID);
-        if(TemplateID.toString() == 'NaN')
-            TemplateID =0;
+        var TemplateID = req.body.TemplateID ? parseInt(req.body.TemplateID) : 0;
         var isIphone = req.body.device ? parseInt(req.body.device) : 0;
         var deviceToken = req.body.device_token ? req.body.device_token : '';
         var visibleEmail = req.body.ve ? req.body.ve : 1; // 0-invisible, 1- visible
@@ -257,7 +255,7 @@ Auth.prototype.register = function(req,res,next){
                     + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress) ;
 
 
-                //console.log(InsertQuery);
+                console.log(InsertQuery);
 
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
@@ -706,7 +704,7 @@ Auth.prototype.login = function(req,res,next){
             PersonalEZEID:'',
             ReservationDisplayFormat:'',
             mobilenumber:'',
-            ISPrimaryLocAdded:'',
+            isAddressSaved:'',
             isinstitute_admin : '',
             cvid : ''
 
@@ -778,7 +776,7 @@ Auth.prototype.login = function(req,res,next){
                                                 RtnMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
                                                 RtnMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
                                                 RtnMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                                RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
+                                                RtnMessage.isAddressSaved = loginDetails[0].isAddressSaved;
                                                 RtnMessage.group_id = loginDetails[0].group_id;
                                                 RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
                                                 RtnMessage.cvid = loginDetails[0].cvid;

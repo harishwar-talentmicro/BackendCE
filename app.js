@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
+var uuid = require('node-uuid');
 
 
 var compress = require('compression');
@@ -56,7 +57,18 @@ app.all('*',function(req,res,next){
 
 
 
-app.use(multer({ dest: './uploads/'}));
+app.use(multer({
+    dest: './uploads/',
+    limits: {
+        fieldNameSize: 200,
+        files: 1,
+        fields: 1,
+        fileSize : (1024*1024*2)
+    }
+}));
+
+
+
 // Set header to force download
 function setHeaders(res, path) {
     res.setHeader('Content-Disposition', contentDisposition(path))
