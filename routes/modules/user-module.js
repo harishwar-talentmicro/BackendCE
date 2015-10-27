@@ -3906,27 +3906,25 @@ User.prototype.downloadResume = function(req,res,next){
 };
 
 /**
- * @todo FnSaveDocsandUrls
+ * @todo FnSaveStandardTags
  * Method : POST
  * @param req
  * @param res
  * @param next
- * @description api code for save docs and urls
+ * @description api code for save standard tags
  */
-User.prototype.saveDocsandUrls = function(req,res,next){
+User.prototype.saveStandardTags = function(req,res,next){
 
     var _this = this;
     var uuid = require('node-uuid');
     var request = require('request');
 
     var token = req.body.token;
-    var type = parseInt(req.body.type);  // 0-image, 1- url
     var image = req.body.image ? req.body.image : '';
     var tag = req.body.tag;
     var pin = req.body.pin ? req.body.pin : 0;
 
     console.log(req.files);
-    console.log(image);
 
     var responseMessage = {
         status: false,
@@ -3974,34 +3972,274 @@ User.prototype.saveDocsandUrls = function(req,res,next){
                             } else {
                                 console.log('response..');
                                 console.log(response.statusCode);
-                                console.log(response);
                                 console.log(body);
+
+                                var queryParams = st.db.escape(token)+ ',' + st.db.escape(0)+ ',' + st.db.escape(randomName)
+                                    + ',' + st.db.escape(tag)+ ',' + st.db.escape(pin);
+
+                                var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                                console.log(query);
+                                st.db.query(query, function (err, insertResult) {
+                                    if (!err) {
+                                        if (insertResult.affectedRows > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Tags Save successfully';
+                                            responseMessage.data = {
+                                                type : 0,
+                                                tag : req.body.tag,
+                                                pin : req.body.pin ? req.body.pin : 0
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveStandardTags: Tags Save successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Tag not Saved';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveStandardTags:Tag not Saved');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured in query ! Please try again';
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        res.status(500).json(responseMessage);
+                                        console.log('FnSaveStandardTags: error in saving tags:' + err);
+                                    }
+
+                                });
                             }
                         });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveStandardTags: Invalid token');
+                    }
+                } else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveStandardTags:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveStandardTags ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
-                        var queryParams = st.db.escape(token)+ ',' + st.db.escape(type)+ ',' + st.db.escape(randomName)
-                            + ',' + st.db.escape(tag)+ ',' + st.db.escape(pin);
+/**
+ * @todo FnSaveTags
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save tags
+ */
+User.prototype.saveTags = function(req,res,next){
 
-                        var query = 'CALL psavedocsandurls(' + queryParams + ')';
+    var _this = this;
+    var uuid = require('node-uuid');
+    var request = require('request');
 
-                        st.db.query(query, function (err, insertResult) {
+    var token = req.body.token;
+    var type = (parseInt(req.body.type) !== NaN && parseInt(req.body.type)) ?  parseInt(req.body.type) : 0;  // 0-image, 1- url
+    var image = req.body.image ? req.body.image : '';
+    var tag = req.body.tag;
+    var pin = req.body.pin ? req.body.pin : 0;
+
+    console.log(req.files);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var uniqueId = uuid.v4();
+                        var randomName = uniqueId + '.' + req.files.image.extension;
+                        console.log(randomName);
+
+                        //upload to cloud storage
+                        request({
+                            url: 'https://www.googleapis.com/upload/storage/v1/b/'+req.CONFIG.CONSTANT.STORAGE_BUCKET+'/o',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': req.files.image.mimetype
+                            },
+                            uploadType : 'multipart',
+                            body: 'hello',
+                            name : randomName
+                        }, function(error, response, body){
+                            if(error) {
+                                console.log('error..');
+                                console.log(error);
+                            } else {
+                                console.log('response..');
+                                console.log(response.statusCode);
+                                console.log(body);
+
+                                var queryParams = st.db.escape(token)+ ',' + st.db.escape(type)+ ',' + st.db.escape(randomName)
+                                    + ',' + st.db.escape(tag)+ ',' + st.db.escape(pin);
+
+                                var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                                console.log(query);
+                                st.db.query(query, function (err, insertResult) {
+                                    if (!err) {
+                                        if (insertResult.affectedRows > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Tags Save successfully';
+                                            responseMessage.data = {
+                                                type : (parseInt(req.body.type) !== NaN && parseInt(req.body.type)) ?  parseInt(req.body.type) : 0,
+                                                tag : req.body.tag,
+                                                pin : req.body.pin ? req.body.pin : 0
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveTags: Tags Save successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Tag not Saved';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveTags:Tag not Saved');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured in query ! Please try again';
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        res.status(500).json(responseMessage);
+                                        console.log('FnSaveTags: error in saving tags:' + err);
+                                    }
+
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveTags: Invalid token');
+                    }
+                } else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveTags:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveTags ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnGetStandardTags
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for download resume
+ */
+User.prototype.getStandardTags = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token);
+                        var query = 'CALL pgetDocsandurls(' + queryParams + ')';
+                        st.db.query(query, function (err, getResume) {
                             if (!err) {
-                                if (insertResult.affectedRows > 0) {
+                                if (getResume[0]) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'DocsandUrls Save successfully';
-                                    responseMessage.data = {
-                                        type : parseInt(req.body.type),
-                                        tag : req.body.tag,
-                                        pin : req.body.pin ? req.body.pin : null
-                                    };
+                                    responseMessage.message = 'Tags Loaded successfully';
+                                    responseMessage.data = getResume[0];
                                     res.status(200).json(responseMessage);
-                                    console.log('FnSaveDocsandUrls: DocsandUrls Save successfully');
+                                    console.log('FnGetStandardTags: Tags Loaded successfully');
                                 }
                                 else {
-                                    responseMessage.message = 'DocsandUrls not Saved';
+                                    responseMessage.message = 'Tags not Loaded';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnSaveDocsandUrls:DocsandUrls not Saved');
+                                    console.log('FnGetStandardTags:Tags not Loaded');
                                 }
                             }
                             else {
@@ -4010,7 +4248,7 @@ User.prototype.saveDocsandUrls = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnSaveDocsandUrls: error in saving docs and urls:' + err);
+                                console.log('FnGetStandardTags: error in getting tags:' + err);
                             }
 
                         });
@@ -4022,15 +4260,16 @@ User.prototype.saveDocsandUrls = function(req,res,next){
                         };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('FnSaveDocsandUrls: Invalid token');
+                        console.log('FnGetStandardTags: Invalid token');
                     }
-                } else {
+                }
+                else {
                     responseMessage.error = {
                         server: 'Internal Server Error'
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnSaveDocsandUrls:Error in processing Token' + err);
+                    console.log('FnGetStandardTags:Error in processing Token' + err);
                 }
             });
         }
@@ -4040,7 +4279,7 @@ User.prototype.saveDocsandUrls = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveDocsandUrls ' + ex.description);
+            console.log('Error : FnGetStandardTags ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -4048,4 +4287,103 @@ User.prototype.saveDocsandUrls = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetTags
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get tags
+ */
+User.prototype.getTags = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token);
+                        var query = 'CALL pgetAllDocsandurls(' + queryParams + ')';
+                        st.db.query(query, function (err, getResume) {
+                            if (!err) {
+                                if (getResume[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Tags Loaded successfully';
+                                    responseMessage.data = getResume[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTags: Tags Loaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'DocsandUrls not Loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTags:Tags not Loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetTags: error in getting Tags:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetTags: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTags:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetTags ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 module.exports = User;

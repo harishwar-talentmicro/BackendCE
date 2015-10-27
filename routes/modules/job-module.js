@@ -812,7 +812,7 @@ Job.prototype.searchJobs = function(req,res,next){
     var filter = req.query.filter ? req.query.filter : 0;
     var restrictToInstitue = req.query.restrict ? req.query.restrict : 0;
     var type = req.query.type ? parseInt(req.query.type) : 0;  //0-normal job search, 1-Show my institue jobs, 2-for matching jobs of my cv and Default is 0
-    //var companyIds = req.query.company_ids ? req.query.company_ids : '';
+    var toEzeid = req.query.to_ezeone ? alterEzeoneId(req.query.to_ezeone) : '';
 
     var responseMessage = {
         status: false,
@@ -824,10 +824,11 @@ Job.prototype.searchJobs = function(req,res,next){
     var query = st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(proximity)+ ',' + st.db.escape(jobType)
             + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
             +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)
-            +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue)+',' + st.db.escape(type);
+            +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue)+',' + st.db.escape(type)
+            +',' + st.db.escape(toEzeid);
         console.log('CALL psearchjobs(' + query + ')');
         st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
-            console.log(getresult);
+            //console.log(getresult);
 
             if (!err) {
                 if (getresult) {

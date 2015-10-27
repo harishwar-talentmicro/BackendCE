@@ -64,7 +64,6 @@ router.post('/user_details',LocationManager.FnSaveUserDetails);
 router.get('/user_details_new',LocationManager.FnGetUserDetailsNew);
 router.post('/send_resume',LocationManager.FnSendResume);
 router.get('/download_resume',LocationManager.FnDownloadResume);
-router.post('/docs_urls',LocationManager.FnSaveDocsandUrls);
 
 //Audit module methods
 router.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
@@ -323,6 +322,8 @@ router.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
 router.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
 router.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
 
+var version1 = require('./v1Api.js');
+router.use('/v1',version1);
 /**
  * Default error handler
  * Add every API call above this

@@ -56,7 +56,11 @@ exports.FnSaveUserDetails = userModule.saveUserDetails;
 exports.FnGetUserDetailsNew = userModule.getUserDetailsNew;
 exports.FnSendResume = userModule.sendResume;
 exports.FnDownloadResume = userModule.downloadResume;
-exports.FnSaveDocsandUrls = userModule.saveDocsandUrls;
+
+exports.FnSaveStandardTags = userModule.saveStandardTags;
+exports.FnGetStandardTags = userModule.getStandardTags;
+exports.FnSaveTags = userModule.saveTags;
+exports.FnGetTags = userModule.getTags;
 
 //Audit module
 var Audit = require('./modules/audit-module.js');
