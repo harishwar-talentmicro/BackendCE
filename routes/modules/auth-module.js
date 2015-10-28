@@ -204,10 +204,38 @@ Auth.prototype.register = function(req,res,next){
             Token: '',
             IsAuthenticate: false,
             FirstName: '',
+            CompanyName:'',
             Type: 0,
             Icon: '',
             tid:'',
-            group_id:''
+            group_id:'',
+            ezeone_id:'',
+            ezeid:'',
+            Verified: 0,
+            SalesModuleTitle: '',
+            AppointmentModuleTitle: '',
+            HomeDeliveryModuleTitle : '',
+            ServiceModuleTitle: '',
+            CVModuleTitle: '',
+            SalesFormMsg: '',
+            ReservationFormMsg: '',
+            HomeDeliveryFormMsg: '',
+            ServiceFormMsg: '',
+            CVFormMsg: '',
+            SalesItemListType: '',
+            RefreshInterval:'',
+            MasterID: 0,
+            UserModuleRights: '',
+            FreshersAccepted: '',
+            HomeDeliveryItemListType : '',
+            PersonalEZEID:'',
+            ReservationDisplayFormat:'',
+            mobilenumber:'',
+            isAddressSaved:'',
+            isinstitute_admin : '',
+            cvid : '',
+            profile_status:''
+
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         //console.log(OperationType);
@@ -255,7 +283,7 @@ Auth.prototype.register = function(req,res,next){
                     + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress) ;
 
 
-                console.log(InsertQuery);
+                //console.log('CALL pSaveEZEIDData(' + InsertQuery + ')');
 
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
                     if (!err) {
@@ -267,17 +295,51 @@ Auth.prototype.register = function(req,res,next){
                                     var RegResult = InsertResult[0];
                                     if(RegResult[0].TID != 0)
                                     {
-                                        if(IDTypeID == 2)
-                                            RtnMessage.FirstName=CompanyName;
-                                        else
-                                            RtnMessage.FirstName = FirstName;
+                                        //if(IDTypeID == 2)
+                                        //    RtnMessage.FirstName=CompanyName;
+                                        //else
+                                        //    RtnMessage.FirstName = FirstName;
 
                                         RtnMessage.IsAuthenticate = true;
-                                        RtnMessage.Token = TokenNo;
-                                        RtnMessage.Type = IDTypeID;
-                                        RtnMessage.Icon = Icon;
                                         RtnMessage.tid = InsertResult[0][0].TID;
                                         RtnMessage.group_id = InsertResult[0][0].group_id;
+                                        RtnMessage.Token = TokenNo;
+                                        RtnMessage.Icon = Icon;
+                                        RtnMessage.FirstName = InsertResult[0][0].FirstName;
+                                        RtnMessage.CompanyName = InsertResult[0][0].CompanyName;
+                                        RtnMessage.ezeone_id = InsertResult[0][0].EZEID;
+                                        RtnMessage.ezeid = InsertResult[0][0].EZEID;
+                                        RtnMessage.Type = InsertResult[0][0].IDTypeID;
+                                        RtnMessage.Verified = InsertResult[0][0].EZEIDVerifiedID;
+                                        if(InsertResult[0][0].ParentMasterID == 0) {
+                                            RtnMessage.MasterID = InsertResult[0][0].TID;
+                                        }
+                                        else{
+                                            RtnMessage.MasterID = InsertResult[0][0].ParentMasterID;
+                                        }
+                                        RtnMessage.UserModuleRights = InsertResult[0][0].UserModuleRights;
+                                        RtnMessage.SalesModuleTitle = InsertResult[0][0].SalesModuleTitle;
+                                        RtnMessage.AppointmentModuleTitle = InsertResult[0][0].AppointmentModuleTitle;
+                                        RtnMessage.HomeDeliveryModuleTitle = InsertResult[0][0].HomeDeliveryModuleTitle;
+                                        RtnMessage.ServiceModuleTitle = InsertResult[0][0].ServiceModuleTitle;
+                                        RtnMessage.CVModuleTitle = InsertResult[0][0].CVModuleTitle;
+                                        RtnMessage.PersonalEZEID = InsertResult[0][0].PersonalEZEID;
+                                        RtnMessage.SalesFormMsg = InsertResult[0][0].SalesFormMsg;
+                                        RtnMessage.ReservationFormMsg = InsertResult[0][0].ReservationFormMsg;
+                                        RtnMessage.HomeDeliveryFormMsg = InsertResult[0][0].HomeDeliveryFormMsg;
+                                        RtnMessage.ServiceFormMsg = InsertResult[0][0].ServiceFormMsg;
+                                        RtnMessage.CVFormMsg = InsertResult[0][0].CVFormMsg;
+                                        RtnMessage.SalesItemListType = InsertResult[0][0].SalesItemListType;
+                                        RtnMessage.FreshersAccepted = InsertResult[0][0].FreshersAccepted;
+                                        RtnMessage.HomeDeliveryItemListType = InsertResult[0][0].HomeDeliveryItemListType;
+                                        RtnMessage.ReservationDisplayFormat = InsertResult[0][0].ReservationDisplayFormat;
+                                        RtnMessage.mobilenumber = InsertResult[0][0].mobilenumber;
+                                        RtnMessage.isAddressSaved = InsertResult[0][0].isAddressSaved;
+                                        RtnMessage.isinstitute_admin = InsertResult[0][0].isinstituteadmin;
+                                        RtnMessage.cvid = InsertResult[0][0].cvid;
+                                        RtnMessage.profile_status = InsertResult[0][0].ps;
+
+
                                         if (CompanyName == null)
                                             CompanyName='';
                                         if (Operation == 'I') {
@@ -473,6 +535,7 @@ Auth.prototype.register = function(req,res,next){
 
                 // console.log(InsertQuery);
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                    console.log('---------------------------- ');
                     if (!err) {
                         //console.log('InsertResult: ');
                         if (InsertResult) {
@@ -552,7 +615,7 @@ Auth.prototype.register = function(req,res,next){
                                             }
                                             else {
                                                 console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
-                                                console.log(RtnMessage);
+                                                //console.log(RtnMessage);
                                                 res.send(RtnMessage);
                                             }
                                         }
