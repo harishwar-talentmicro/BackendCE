@@ -4199,6 +4199,7 @@ User.prototype.getStandardTags = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
+    var output = [];
 
     var responseMessage = {
         status: false,
@@ -4226,13 +4227,32 @@ User.prototype.getStandardTags = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token);
                         var query = 'CALL pgetDocsandurls(' + queryParams + ')';
-                        st.db.query(query, function (err, getResume) {
+                        st.db.query(query, function (err, getresult) {
                             if (!err) {
-                                if (getResume[0]) {
+                                if (getresult[0]) {
+                                    console.log('----getresult.length-----');
+                                    console.log(getresult[0].length);
+                                    for( var i=0; i < getresult[0].length;i++){
+                                        var result = {
+                                            tid :getresult[0][i].tid,
+                                            imageurl :getresult[0][i].imageurl ,
+                                            pin :getresult[0][i].pin,
+                                            imagepath: getresult[0][i].imagepath,
+                                            tag: getresult[0][i].tag,
+                                            s_url : (getresult[0][i].imagepath) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath) : ''
+
+                                        };
+                                        output.push(result);
+                                    }
+
+                                    console.log('----output.length-----');
+                                    console.log(output.length);
+
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Tags Loaded successfully';
-                                    responseMessage.data = getResume[0];
+                                    responseMessage.data = output;
+
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetStandardTags: Tags Loaded successfully');
                                 }
@@ -4299,6 +4319,7 @@ User.prototype.getTags = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
+    var output = [];
 
     var responseMessage = {
         status: false,
@@ -4326,18 +4347,35 @@ User.prototype.getTags = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token);
                         var query = 'CALL pgetAllDocsandurls(' + queryParams + ')';
-                        st.db.query(query, function (err, getResume) {
+                        st.db.query(query, function (err, getresult) {
                             if (!err) {
-                                if (getResume[0]) {
+                                if (getresult[0]) {
+                                    console.log('----getresult.length-----');
+                                    console.log(getresult[0].length);
+                                    for( var i=0; i < getresult[0].length;i++){
+                                        var result = {
+                                            tid :getresult[0][i].tid,
+                                            imageurl :getresult[0][i].imageurl ,
+                                            pin :getresult[0][i].pin,
+                                            imagepath: getresult[0][i].imagepath,
+                                            tag: getresult[0][i].tag,
+                                            s_url : (getresult[0][i].imagepath) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath) : ''
+
+                                        };
+                                        output.push(result);
+                                    }
+                                    console.log('----output.length-----');
+                                    console.log(output.length);
+
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Tags Loaded successfully';
-                                    responseMessage.data = getResume[0];
+                                    responseMessage.data = output;
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetTags: Tags Loaded successfully');
                                 }
                                 else {
-                                    responseMessage.message = 'DocsandUrls not Loaded';
+                                    responseMessage.message = 'Tags not Loaded';
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetTags:Tags not Loaded');
                                 }

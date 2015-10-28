@@ -1419,7 +1419,8 @@ Job.prototype.jobs = function(req,res,next){
     var status = req.query.status;
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
-    var orderBy = req.query.order_by;  // 1-ascending else descending
+    var orderBy = req.query.order_by;
+    var alumniCode = req.query.a_code ? req.query.a_code : '';// 1-ascending else descending
     var output=[];
     //console.log(req.query);
 
@@ -1450,7 +1451,8 @@ Job.prototype.jobs = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
-                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy);
+                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy)
+                            + ',' + st.db.escape(alumniCode);
 
                         var query = 'CALL pGetJobs(' + queryParams + ')';
                         //console.log(query);
@@ -1468,6 +1470,7 @@ Job.prototype.jobs = function(req,res,next){
                                                 };
                                                 output.push(data);
                                             }
+                                            console.log(output);
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs loaded successfully';
