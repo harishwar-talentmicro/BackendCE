@@ -417,6 +417,7 @@ User.prototype.getUserDetails = function(req,res,next){
                                 if (UserDetailsResult[0]) {
                                     if (UserDetailsResult[0].length > 0) {
                                         // console.log('FnGetUserDetails: Token: ' + Token);
+                                        //console.log(UserDetailsResult);
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
                                         res.send(UserDetailsResult[0]);
                                     }
@@ -3602,7 +3603,6 @@ User.prototype.getUserDetailsNew = function(req,res,next){
         status : false,
         message : 'An error occurred ! Please try again',
         data : null,
-        alumni_details : [],
         error : {
             token : 'Invalid token'
         }
@@ -3629,7 +3629,6 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                             respMsg.message = 'User details loaded successfully';
                                             results[0][0].Password = undefined;
                                             respMsg.data = results[0][0];
-                                            respMsg.alumni_details = results[1];
                                             res.status(200).json(respMsg);
                                         }
                                         else{
@@ -3637,7 +3636,6 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                             respMsg.error = null;
                                             respMsg.message = 'No such user is available';
                                             respMsg.data = results;
-                                            respMsg.alumni_details = [];
                                             res.status(200).json(respMsg);
                                         }
                                     }
@@ -3646,7 +3644,6 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                         respMsg.error = null;
                                         respMsg.message = 'No such user is available';
                                         respMsg.data = results;
-                                        respMsg.alumni_details = [];
                                         res.status(200).json(respMsg);
                                     }
 
@@ -3656,7 +3653,6 @@ User.prototype.getUserDetailsNew = function(req,res,next){
                                     respMsg.error = null;
                                     respMsg.message = 'No such user is available';
                                     respMsg.data = results;
-                                    respMsg.alumni_details = [];
                                     res.status(200).json(respMsg);
                                 }
                             }
@@ -3921,7 +3917,8 @@ User.prototype.saveStandardTags = function(req,res,next){
 
     var token = req.body.token;
     var image = req.body.image ? req.body.image : '';
-    var tag = req.body.tag;
+    var type = 0;   // 0-image, 1-url
+    var tag = req.body.tag ? req.body.tag : 'PIC';
     var pin = req.body.pin ? req.body.pin : 0;
 
     console.log(req.files);
@@ -3959,12 +3956,13 @@ User.prototype.saveStandardTags = function(req,res,next){
                         request({
                             url: 'https://www.googleapis.com/upload/storage/v1/b/'+req.CONFIG.CONSTANT.STORAGE_BUCKET+'/o',
                             method: 'POST',
+                            uploadType : 'multipart',
                             headers: {
                                 'Content-Type': req.files.image.mimetype
                             },
-                            uploadType : 'multipart',
-                            body: 'hello',
-                            name : randomName
+
+                            //body: 'hello',
+                            //name : randomName
                         }, function(error, response, body){
                             if(error) {
                                 console.log('error..');
@@ -3973,8 +3971,9 @@ User.prototype.saveStandardTags = function(req,res,next){
                                 console.log('response..');
                                 console.log(response.statusCode);
                                 console.log(body);
+                                console.log(response);
 
-                                var queryParams = st.db.escape(token)+ ',' + st.db.escape(0)+ ',' + st.db.escape(randomName)
+                                var queryParams = st.db.escape(token)+ ',' + st.db.escape(type)+ ',' + st.db.escape(randomName)
                                     + ',' + st.db.escape(tag)+ ',' + st.db.escape(pin);
 
                                 var query = 'CALL psavedocsandurls(' + queryParams + ')';
@@ -4424,4 +4423,208 @@ User.prototype.getTags = function(req,res,next){
         }
     }
 };
+
+/**
+ * @todo FnGetAlumniUserDetails
+ * @method GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @request-param token* <string>
+ */
+User.prototype.getAlumniUserDetails = function(req,res,next){
+
+    var token = req.query.token;
+
+    var respMsg = {
+        status : false,
+        message : 'An error occurred ! Please try again',
+        data : null,
+        error : {
+            token : 'Invalid token'
+        }
+    };
+
+    if(!token){
+        res.status(401).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+            token : 'Invalid token'
+        }});
+    }
+    else{
+        try{
+            st.validateToken(token,function(err,tokenRes){
+                if(!err){
+                    if(tokenRes){
+                        var queryString = 'CALL pgetalumnisofuser('+st.db.escape(token) + ')';
+                        st.db.query(queryString,function(err,results){
+                            if(!err){
+                                if(results){
+                                    if(results[0]){
+                                        if(results[0][0]){
+                                            respMsg.status = true;
+                                            respMsg.error = null;
+                                            respMsg.message = 'Alumni User details loaded successfully';
+                                            results[0][0].Password = undefined;
+                                            respMsg.data = results[0];
+                                            res.status(200).json(respMsg);
+                                        }
+                                        else{
+                                            respMsg.status = false;
+                                            respMsg.error = null;
+                                            respMsg.message = 'No such Alumni user is available';
+                                            respMsg.data = results;
+                                            res.status(200).json(respMsg);
+                                        }
+                                    }
+                                    else{
+                                        respMsg.status = false;
+                                        respMsg.error = null;
+                                        respMsg.message = 'No such Alumni user is available';
+                                        respMsg.data = results;
+                                        res.status(200).json(respMsg);
+                                    }
+
+                                }
+                                else{
+                                    respMsg.status = false;
+                                    respMsg.error = null;
+                                    respMsg.message = 'No such user is available';
+                                    respMsg.data = results;
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                console.log('FnGetAlumniUserDetails : error');
+                                console.log(err);
+                                res.status(200).json(respMsg);
+                            }
+                        });
+                    }
+                    else{
+                        res.status(401).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                            token : 'Invalid token'
+                        }});
+                    }
+                }
+                else{
+                    console.log('FnGetAlumniUserDetails : error');
+                    console.log(err);
+                    res.status(500).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                        token : 'Invalid token'
+                    }});
+                }
+            });
+        }
+        catch(ex){
+            console.log('Exception - FnGetAlumniUserDetails ');
+            console.log(ex);
+            res.status(500).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                token : 'Invalid token'
+            }});
+        }
+
+    }
+};
+/**
+ * @todo FnSearchAlumni
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for find alumni
+ */
+User.prototype.searchAlumni = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var title = req.query.title ? req.query.title : '';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(title);
+                        var query = 'CALL pFindAlumni(' + queryParams + ')';
+                        st.db.query(query, function (err, getresult) {
+                            if (!err) {
+                                if (getresult[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'AlumniSearch Loaded successfully';
+                                    responseMessage.data = getresult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSearchAlumni: AlumniSearch Loaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'AlumniSearch not Loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSearchAlumni:AlumniSearch not Loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSearchAlumni: error in getting AlumniSearch:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSearchAlumni: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSearchAlumni:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSearchAlumni ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 module.exports = User;

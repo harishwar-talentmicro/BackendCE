@@ -706,7 +706,8 @@ Auth.prototype.login = function(req,res,next){
             mobilenumber:'',
             isAddressSaved:'',
             isinstitute_admin : '',
-            cvid : ''
+            cvid : '',
+            profile_status:''
 
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
@@ -780,6 +781,7 @@ Auth.prototype.login = function(req,res,next){
                                                 RtnMessage.group_id = loginDetails[0].group_id;
                                                 RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
                                                 RtnMessage.cvid = loginDetails[0].cvid;
+                                                RtnMessage.profile_status = loginDetails[0].ps;
 
                                                 res.send(RtnMessage);
                                                 console.log('FnLogin:tmaster: Login success');

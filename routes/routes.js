@@ -61,6 +61,8 @@ exports.FnSaveStandardTags = userModule.saveStandardTags;
 exports.FnGetStandardTags = userModule.getStandardTags;
 exports.FnSaveTags = userModule.saveTags;
 exports.FnGetTags = userModule.getTags;
+exports.FnGetAlumniUserDetails = userModule.getAlumniUserDetails;
+exports.FnSearchAlumni = userModule.searchAlumni;
 
 //Audit module
 var Audit = require('./modules/audit-module.js');
