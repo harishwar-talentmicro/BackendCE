@@ -1808,7 +1808,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(profile) + ',' + st.db.escape(studentID)
                             + ',' + st.db.escape(education) + ',' + st.db.escape(specialization) + ',' + st.db.escape(batch)
-                            + ',' + st.db.escape('sjbit') + ',' + st.db.escape(accesstype);
+                            + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype);
 
                         var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
                         //console.log(query);
