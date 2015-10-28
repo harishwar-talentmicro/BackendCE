@@ -51,6 +51,9 @@ Search.prototype.searchKeyword = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var type = parseInt(req.body.SearchType);
+        if (type == 1){
+            type = 2;
+        }
         var find = req.body.Keywords;
         var token = req.body.Token ? req.body.Token : 2;
         //var CategoryID = req.body.SCategory;

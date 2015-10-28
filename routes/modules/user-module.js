@@ -3414,14 +3414,14 @@ User.prototype.saveUserDetails = function(req,res,next){
     var _this = this;
 
     var token  = req.body.token;
-    var firstName  = req.body.first_name;
-    var lastName = req.body.last_name;
-    var companyName = req.body.company_name;
-    var jobTitle  = req.body.job_title;
-    var gender  = req.body.gender;
+    var firstName  = req.body.first_name ? req.body.first_name : '';
+    var lastName = req.body.last_name ? req.body.last_name : '';
+    var companyName = req.body.company_name ? req.body.company_name : '';
+    var jobTitle  = req.body.job_title ? req.body.job_title : '';
+    var gender  = req.body.gender ? req.body.gender : '';
     var dob  = req.body.dob;
     var companyTagline  = req.body.company_tagline;
-    var email  = req.body.email;
+    var email  = req.body.email ? req.body.email : '';
     var visibleEmail = req.body.ve ? parseInt(req.body.ve) : 1; // 0-invisible, 1- visible
     var visibleMobile = req.body.vm ? parseInt(req.body.vm) : 1;      // 0-invisible, 1- visible
     var visiblePhone = req.body.vp ? parseInt(req.body.vp) : 1;// 0-invisible, 1- visible
@@ -3456,18 +3456,6 @@ User.prototype.saveUserDetails = function(req,res,next){
 
     if(!token){
         error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
-    if(!firstName){
-        error['firstName'] = 'Invalid firstName';
-        validateStatus *= false;
-    }
-    if(!companyName){
-        error['companyName'] = 'Invalid companyName';
-        validateStatus *= false;
-    }
-    if(!email){
-        error['email'] = 'Invalid email';
         validateStatus *= false;
     }
 

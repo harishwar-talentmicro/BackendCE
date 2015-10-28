@@ -1742,11 +1742,12 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var token = req.body.token;
     var profile = req.body.profile;
     var studentID = req.body.student_id;
-    var education = req.body.education;
-    var specialization = req.body.specialization;
+    var education = parseInt(req.body.education);
+    var specialization = parseInt(req.body.specialization);
     var batch = req.body.batch;
     var code = req.body.code;     // college code
     var accesstype = req.body.access_type;  // 0-no relation, 1-is admin, 2-is member
+    var ps;
 
     var responseMessage = {
         status: false,
@@ -1777,18 +1778,18 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
         error['specialization'] = 'Invalid specialization';
         validateStatus *= false;
     }
-    if(!batch){
-        error['batch'] = 'Invalid batch';
-        validateStatus *= false;
-    }
-    if(!code){
-        error['code'] = 'Invalid code';
-        validateStatus *= false;
-    }
+    //if(!batch){
+    //    error['batch'] = 'Invalid batch';
+    //    validateStatus *= false;
+    //}
+    //if(!code){
+    //    error['code'] = 'Invalid code';
+    //    validateStatus *= false;
+    //}
     if(!accesstype){
         accesstype = 0;
     }
-    if(parseInt(code) == NaN){
+    if(parseInt(accesstype) == NaN){
         error['accesstype'] = 'Invalid accesstype';
         validateStatus *= false;
     }
@@ -1807,19 +1808,24 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(profile) + ',' + st.db.escape(studentID)
                             + ',' + st.db.escape(education) + ',' + st.db.escape(specialization) + ',' + st.db.escape(batch)
-                            + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype);
+                            + ',' + st.db.escape('sjbit') + ',' + st.db.escape(accesstype);
 
                         var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
-
+                        //console.log(query);
                         st.db.query(query, function (err, insertresult) {
-                            console.log(insertresult);
+                            //console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Alumni Profile saved successfully';
+                                    if(insertresult[0][0]){
+                                        ps = insertresult[0][0].profilestatus;
+                                    }
+                                    else
+                                    { ps = '';}
                                     responseMessage.data = {
-                                        ezeone_id: req.body.ezeone_id,
+                                        profile_status : ps,
                                         profile: req.body.profile,
                                         student_id: req.body.student_id,
                                         education: req.body.education,
