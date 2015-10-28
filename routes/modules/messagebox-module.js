@@ -1376,7 +1376,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'Message Composed successfully';
                                             responseMessage.data = {
-                                                id : insertResult[0][0].messageids,
+                                                message_id : insertResult[0][0].messageids,
                                                 message: req.body.message,
                                                 attachmentFilename: req.body.attachment_filename,
                                                 priority: req.body.priority,
