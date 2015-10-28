@@ -1369,7 +1369,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 //console.log(query);
 
                                 st.db.query(query, function (err, insertResult) {
-                                    console.log(insertResult);
+                                    //console.log(insertResult);
                                     if (!err) {
                                         if (insertResult) {
                                             responseMessage.status = true;
