@@ -770,7 +770,12 @@ Auth.prototype.login = function(req,res,next){
                                                 RtnMessage.SalesItemListType = loginDetails[0].SalesItemListType;
                                                 RtnMessage.RefreshInterval = loginDetails[0].RefreshInterval;
                                                 RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                                RtnMessage.MasterID = loginDetails[0].ParentMasterID;
+                                                if(loginDetails[0].ParentMasterID == 0) {
+                                                    RtnMessage.MasterID = loginDetails[0].TID;
+                                                }
+                                                else{
+                                                    RtnMessage.MasterID = loginDetails[0].ParentMasterID;
+                                                }
                                                 RtnMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
                                                 RtnMessage.VisibleModules = loginDetails[0].VisibleModules;
                                                 RtnMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
@@ -844,7 +849,12 @@ Auth.prototype.login = function(req,res,next){
                                 RtnMessage.SalesItemListType = loginDetails[0].SalesItemListType;
                                 RtnMessage.RefreshInterval = loginDetails[0].RefreshInterval;
                                 RtnMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                RtnMessage.MasterID = loginDetails[0].ParentMasterID;
+                                if(loginDetails[0].ParentMasterID == 0) {
+                                    RtnMessage.MasterID = loginDetails[0].TID;
+                                }
+                                else{
+                                    RtnMessage.MasterID = loginDetails[0].ParentMasterID;
+                                }
                                 RtnMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
                                 RtnMessage.VisibleModules = loginDetails[0].VisibleModules;
                                 RtnMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
