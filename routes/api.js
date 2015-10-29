@@ -66,6 +66,7 @@ router.post('/send_resume',LocationManager.FnSendResume);
 router.get('/download_resume',LocationManager.FnDownloadResume);
 router.get('/alumni_user_details', LocationManager.FnGetAlumniUserDetails);
 router.get('/search_alumni', LocationManager.FnSearchAlumni);
+router.get('/conveyance_report', LocationManager.FnGetConveyanceReport);
 
 //Audit module methods
 router.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);

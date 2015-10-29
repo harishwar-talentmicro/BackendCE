@@ -193,11 +193,12 @@ Auth.prototype.register = function(req,res,next){
         var TemplateID = req.body.TemplateID ? parseInt(req.body.TemplateID) : 0;
         var isIphone = req.body.device ? parseInt(req.body.device) : 0;
         var deviceToken = req.body.device_token ? req.body.device_token : '';
-        var visibleEmail = req.body.ve ? req.body.ve : 1; // 0-invisible, 1- visible
-        var visibleMobile = req.body.vm ? req.body.vm : 1;      // 0-invisible, 1- visible
-        var visiblePhone = req.body.vp ? req.body.vp : 1;// 0-invisible, 1- visible
+        var visibleEmail = (!isNaN(parseInt(req.body.ve))) ?  parseInt(req.body.ve) : 1;   // 0-invisible, 1- visible
+        var visibleMobile = (!isNaN(parseInt(req.body.vm))) ?  parseInt(req.body.vm) : 1;  // 0-invisible, 1- visible
+        var visiblePhone = (!isNaN(parseInt(req.body.vp))) ?  parseInt(req.body.vp) : 1;   // 0-invisible, 1- visible
+        var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1; // 0-invisible, 1- visible
         var locTitle = req.body.loc_title ? req.body.loc_title : '';
-        var visibleAddress = req.body.va ? parseInt(req.body.va) : 1;// 0-invisible, 1- visible
+        var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
 
 
         var RtnMessage = {
@@ -280,7 +281,8 @@ Auth.prototype.register = function(req,res,next){
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress)
                     + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
                     + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
-                    + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress) ;
+                    + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
+                    + ',' + st.db.escape(statusId);
 
 
                 //console.log('CALL pSaveEZEIDData(' + InsertQuery + ')');
@@ -531,7 +533,8 @@ Auth.prototype.register = function(req,res,next){
                     + ',' + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress)
                     + ',' + st.db.escape(SelectionTypes)+ ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID)
                     + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
-                    + ',' + st.db.escape(visiblePhone)+ ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress);
+                    + ',' + st.db.escape(visiblePhone)+ ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
+                    + ',' + st.db.escape(statusId);;
 
                 // console.log(InsertQuery);
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {

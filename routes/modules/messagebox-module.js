@@ -93,7 +93,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(groupName) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
                             + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(tid)
-                            + ',' + st.db.escape(restrictReply)+ ',' + st.db.escape(memberVisible);
+                            + ',' + st.db.escape(restrictReply)+ ',' + st.db.escape(memberVisible)+ ',' + st.db.escape(alumniCode);
                         var query = 'CALL pCreateMessageGroup(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertResult) {

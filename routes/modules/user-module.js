@@ -2685,25 +2685,37 @@ User.prototype.uploadDoc = function(req,res,next) {
     }
 };
 
-var FnGetRedirectLink = function(ezeid,urlSeqNumber,redirectCallback){
-    var Insertquery = st.db.escape(ezeid) + ',' + st.db.escape(urlSeqNumber);
-    st.db.query('CALL pRedirectWebLink(' + Insertquery + ')', function (err, results) {
-        if(err){
-            console.log(err);
-            redirectCallback(null);
-        }
-        else{
-            if(results.length > 0){
-                if(results[0].length > 0){
-                    redirectCallback(results[0][0].URL);
+var FnGetRedirectLink = function(ezeid,tag,redirectCallback) {
+
+    console.log('--------------------');
+    console.log('Call Get Weblink Url....');
+    console.log('--------------------');
+    var query = 'select tid from tmaster where ezeid=' + st.db.escape(ezeid);
+    st.db.query(query, function (err, result) {
+        if (!err) {
+            console.log(result);
+
+            var query1 = 'SELECT tid,imageurl,pin,imagefilename as URL,tag FROM t_docsandurls WHERE masterid=' + st.db.escape(result[0].tid) + ' AND tag=' + st.db.escape(tag) + ' AND imageurl=1';
+            console.log(query1);
+            st.db.query(query1, function (err, results) {
+                if (!err) {
+                    if (results.length > 0) {
+                        console.log(results);
+                        redirectCallback(results[0].URL);
+                    }
+                    else {
+                        redirectCallback(null);
+                    }
                 }
-                else{
+                else {
+                    console.log(err);
                     redirectCallback(null);
                 }
-            }
-            else{
-                redirectCallback(null);
-            }
+            });
+        }
+        else {
+            console.log(err);
+            redirectCallback(null);
         }
     });
 };
@@ -2718,37 +2730,64 @@ User.prototype.webLinkRedirect = function(req,res,next) {
     /**
      * @todo FnWebLinkRedirect
      */
+
+
     var _this = this;
-    var allowedDocs = ['ID','DL','PP','BR','CV','D1','D2'];
+    var ezeid,tag, pin,output=[];
+
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    var allowedDocs = ['ID','DL','PASSPORT','BROCHURE','CV','D1','D2'];
     var allowedDocTypes = {ID : 3, DL : 7, PP : 4,BR : 1 ,CV : 2,D1 : 5,D2 :6};
     if(req.params.id){
         var link = req.params.id;
         var arr = link.split('.');
+
+        console.log(arr);
+
+        ezeid = arr[0];
+        tag = arr[1].toUpperCase();
+        if(arr[2]) {
+            pin = arr[2];
+        }
+        else
+        { pin = null ; }
+
         if(arr.length > 1){
             if(arr[1].toUpperCase() == 'MAP'){
                 res.redirect('/'+alterEzeoneId(arr[0]) + req.CONFIG.CONSTANT.MAP_REDIRECT_LINK);
 
             }
 
-            else if(allowedDocs.indexOf(arr[1].toUpperCase()) !== -1){
+            else if(allowedDocs.indexOf(arr[1].toUpperCase()) !== -1) {
 
-                var SearchQuery = st.db.escape(arr[0]) + ',' + st.db.escape(arr[2]) + ',' + st.db.escape(arr[1]);
-                console.log('CALL  PGetSearchDocuments(' + SearchQuery + ')');
-                st.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
-                    // st.db.query(searchQuery, function (err, SearchResult) {
+                console.log('--------------------');
+                console.log('Document Loading....');
+                console.log('--------------------');
+
+                var query = st.db.escape(ezeid) + ',' + st.db.escape(pin) + ',' + st.db.escape(tag);
+                console.log('CALL  PGetSearchDocuments(' + query + ')');
+                st.db.query('CALL  PGetSearchDocuments(' + query + ')', function (err, results) {
+
                     if (!err) {
-                        if (SearchResult[0] != null) {
-                            if (SearchResult[0].length > 0) {
-                                SearchResult = SearchResult[0];
-                                //console.log(DocumentResult)
-                                var docs = SearchResult[0];
-                                res.setHeader('Content-Type', docs.ContentType);
-                                res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
-                                //res.setHeader('Cache-Control', 'public, max-age=86400000');
-                                res.setHeader('Cache-Control', 'public, max-age=0');
-                                res.writeHead('200', { 'Content-Type': docs.ContentType });
-                                res.end(docs.Docs, 'base64');
-                                console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
+                        if (results) {
+                            if (results[0]) {
+                                console.log('----results.length-----');
+                                console.log(results[0].length);
+                                console.log(results);
+
+                                var s_url = (results[0][0].path) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : '';
+
+                                respMsg.status = true;
+                                respMsg.data = {s_url: s_url};
+                                respMsg.message = 'docs loaded successfully';
+                                respMsg.error = null;
+                                console.log(respMsg);
 
                             }
                             else {
@@ -2766,52 +2805,36 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 });
             }
 
-            /**
-             * @todo write logic for downloading documents such as PP , BR etc.
-             */
+            else {
 
-            else{
-                var lastItem = arr[arr.length - 1];
+                console.log('--------------');
+                console.log('URL Link Page');
+                console.log('---------------');
 
-                arr.splice(arr.length - 1,1);
+                var urlBreaker = tag.split('');
+                if (urlBreaker.length > 1 && urlBreaker.length < 4) {
+                    if (urlBreaker[0] === 'U') {
 
-                var ezeid = alterEzeoneId(arr.join('.'));
+                        FnGetRedirectLink(ezeid, tag, function (url) {
 
-                var urlBreaker = lastItem.split('');
-                if(urlBreaker.length > 1 && urlBreaker.length < 4){
-                    if(urlBreaker[0] === 'U'){
-                        urlBreaker.splice(0,1);
-                        var urlSeqNumber = parseInt(urlBreaker.join(''));
-                        if(!isNaN(urlSeqNumber)){
-                            if(urlSeqNumber > 0 && urlSeqNumber < 100){
-                                FnGetRedirectLink(ezeid,urlSeqNumber,function(url){
-
-                                    if(url){
-                                        res.redirect(url);
-                                    }
-                                    else{
-
-                                        next();
-                                    }
-                                });
+                            if (url) {
+                                console.log('Redirecting......');
+                                res.redirect(url);
                             }
-                            else{
+                            else {
+
                                 next();
                             }
-                        }
-                        else{
-                            next();
-                        }
+                        });
                     }
-                    else{
+                    else {
                         next();
                     }
                 }
-                else{
+                else {
                     next();
                 }
             }
-
         }
         else{
             next();
@@ -3422,18 +3445,18 @@ User.prototype.saveUserDetails = function(req,res,next){
     var dob  = req.body.dob;
     var companyTagline  = req.body.company_tagline;
     var email  = req.body.email ? req.body.email : '';
-    var visibleEmail = req.body.ve ? parseInt(req.body.ve) : 1; // 0-invisible, 1- visible
-    var visibleMobile = req.body.vm ? parseInt(req.body.vm) : 1;      // 0-invisible, 1- visible
-    var visiblePhone = req.body.vp ? parseInt(req.body.vp) : 1;// 0-invisible, 1- visible
-    var visibleAddress = req.body.va ? parseInt(req.body.va) : 1;// 0-invisible, 1- visible
+    var visibleEmail = (!isNaN(parseInt(req.body.ve))) ?  parseInt(req.body.ve) : 1; // 0-invisible, 1- visible
+    var visibleMobile = (!isNaN(parseInt(req.body.vm))) ?  parseInt(req.body.vm) : 1;     // 0-invisible, 1- visible
+    var visiblePhone = (!isNaN(parseInt(req.body.vp))) ?  parseInt(req.body.vp) : 1;// 0-invisible, 1- visible
+    var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1;;// 0-invisible, 1- visible
     var locTitle = req.body.loc_title ? req.body.loc_title : '';
     var latitude = req.body.lat ? req.body.lat : '';
     var longitude = req.body.lng ? req.body.lng : '';
     var address1 = req.body.address_line1 ? req.body.address_line1 : '';
     var address2 = req.body.address_line2 ? req.body.address_line2 : '';
     var city = req.body.city ? req.body.city : '';
-    var stateId = req.body.state_id ? parseInt(req.body.state_id) : 0;
-    var countryId = req.body.country_id ? parseInt(req.body.country_id) : 0;
+    var stateId = (!isNaN(parseInt(req.body.state_id))) ?  parseInt(req.body.state_id) : 0;
+    var countryId = (!isNaN(parseInt(req.body.country_id))) ? parseInt(req.body.country_id) : 0;
     var postalCode = req.body.postal_code ? req.body.postal_code : '';
     var phone = req.body.ph ? req.body.ph : '';
     var mobile = req.body.mn ? req.body.mn : '';
@@ -3441,8 +3464,9 @@ User.prototype.saveUserDetails = function(req,res,next){
     var isdPhone = req.body.isd_phone ? req.body.isd_phone : '';
     var isdMobile = req.body.isd_mobile ? req.body.isd_mobile : '';
     var parkingStatus = req.body.parking_status ? req.body.parking_status : '';
-    var templateId = req.body.template_id ? parseInt(req.body.template_id) : '';
-    var pin = req.body.pin ? parseInt(req.body.pin) : null;
+    var templateId = (!isNaN(parseInt(req.body.template_id))) ? parseInt(req.body.template_id) : '';
+    var pin = (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null;
+    var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
 
 
     var responseMessage = {
@@ -3479,7 +3503,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(countryId)+ ',' + st.db.escape(postalCode)+ ',' + st.db.escape(phone)
                             + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
                             + ',' + st.db.escape(isdMobile)+ ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
-                            + ',' + st.db.escape(pin);
+                            + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, insertResult) {
@@ -4047,10 +4071,10 @@ User.prototype.saveTags = function(req,res,next){
     var request = require('request');
 
     var token = req.body.token;
-    var type = (parseInt(req.body.type) !== NaN && parseInt(req.body.type)) ?  parseInt(req.body.type) : 0;  // 0-image, 1- url
+    var type = (!isNaN(parseInt(req.body.type)))  ?  parseInt(req.body.type) : 0;  // 0-image, 1- url
     var image = req.body.image ? req.body.image : '';
     var tag = req.body.tag;
-    var pin = req.body.pin ? req.body.pin : 0;
+    var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : 0;
 
     console.log(req.files);
 
@@ -4608,6 +4632,109 @@ User.prototype.searchAlumni = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnSearchAlumni ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetConveyanceReport
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get conveyance report
+ */
+User.prototype.getConveyanceReport = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var startDate = req.query.s_date;
+    var endDate = req.query.e_date;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(startDate)+ ',' + st.db.escape(endDate);
+                        var query = 'CALL pgetConveyanceReport(' + queryParams + ')';
+                        st.db.query(query, function (err, getresult) {
+                            if (!err) {
+                                if (getresult[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Reports Loaded successfully';
+                                    responseMessage.data = getresult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetConveyanceReport: Reports Loaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Reports not Loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetConveyanceReport:Reports not Loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetConveyanceReport: error in getting Reports:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetConveyanceReport: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetConveyanceReport:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetConveyanceReport ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
