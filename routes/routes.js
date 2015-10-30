@@ -342,6 +342,7 @@ exports.FnUpdateUserProfileAP = userModuleAP.updateUserProfileAP;
 exports.FnSaveAPEZEID = userModuleAP.saveAPEZEID;
 exports.FnUpdateRedFlagAP = userModuleAP.updateRedFlagAP;
 exports.FnUpdateEZEIDAP = userModuleAP.updateEZEIDAP;
+exports.FnSavePaidBannersAp = userModuleAP.savePaidBannersAp;
 
 var Image_AP = require('./ap-modules/image-module-ap.js');
 var imageModuleAP = new Image_AP(db,stdLib);

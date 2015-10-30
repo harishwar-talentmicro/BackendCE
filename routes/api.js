@@ -310,6 +310,7 @@ router.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
 router.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP);
 router.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
 router.post('/crop_imageAP',LocationManager.FnCropImageAP);
+router.post('/add_banners_ap', LocationManager.FnSavePaidBannersAp);
 
 
 //EZEID VAS

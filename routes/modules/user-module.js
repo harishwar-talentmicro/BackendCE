@@ -3930,10 +3930,11 @@ User.prototype.saveStandardTags = function(req,res,next){
     var token = req.body.token;
     var image = req.body.image ? req.body.image : '';
     var type = 0;   // 0-image, 1-url
-    var tag = req.body.tag ? req.body.tag : 'PIC';
-    var pin = req.body.pin ? req.body.pin : 0;
+    var docTag = req.body.tag;
+    var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : null;
+    var randomName,mimetype;
 
-    console.log(req.files);
+    //console.log(req.body);
 
     var responseMessage = {
         status: false,
@@ -3960,33 +3961,46 @@ User.prototype.saveStandardTags = function(req,res,next){
                 if (!err) {
                     if (result) {
 
-                        var uniqueId = uuid.v4();
-                        var randomName = uniqueId + '.' + req.files.image.extension;
-                        console.log(randomName);
+                        if (req.files.image) {
+
+                            var uniqueId = uuid.v4();
+                            randomName = uniqueId + '.' + req.files.image.extension;
+                            mimetype = req.files.image.mimetype;
+                            console.log(randomName);
+                        }
+                        else {
+                            randomName = '';
+                            mimetype = '';
+                        }
 
                         //upload to cloud storage
-                        request({
-                            url: 'https://www.googleapis.com/upload/storage/v1/b/'+req.CONFIG.CONSTANT.STORAGE_BUCKET+'/o',
-                            method: 'POST',
-                            uploadType : 'multipart',
-                            headers: {
-                                'Content-Type': req.files.image.mimetype
-                            },
 
-                            //body: 'hello',
-                            //name : randomName
-                        }, function(error, response, body){
-                            if(error) {
+
+                        /**
+                         * @todo write a code for doc/image has upload to cloud storage
+                         */
+
+
+                        request({
+                            url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': mimetype
+                            },
+                            uploadType: 'multipart',
+                            body: 'hello',
+                            name: randomName
+                        }, function (error, response, body) {
+                            if (error) {
                                 console.log('error..');
                                 console.log(error);
                             } else {
                                 console.log('response..');
                                 console.log(response.statusCode);
                                 console.log(body);
-                                console.log(response);
 
-                                var queryParams = st.db.escape(token)+ ',' + st.db.escape(type)+ ',' + st.db.escape(randomName)
-                                    + ',' + st.db.escape(tag)+ ',' + st.db.escape(pin);
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
+                                    + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin);
 
                                 var query = 'CALL psavedocsandurls(' + queryParams + ')';
                                 console.log(query);
@@ -3997,9 +4011,9 @@ User.prototype.saveStandardTags = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'Tags Save successfully';
                                             responseMessage.data = {
-                                                type : 0,
-                                                tag : req.body.tag,
-                                                pin : req.body.pin ? req.body.pin : 0
+                                                type: 0,
+                                                tag: req.body.tag,
+                                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnSaveStandardTags: Tags Save successfully');
@@ -4023,6 +4037,7 @@ User.prototype.saveStandardTags = function(req,res,next){
                             }
                         });
                     }
+
                     else {
                         responseMessage.message = 'Invalid token';
                         responseMessage.error = {
@@ -4067,16 +4082,18 @@ User.prototype.saveStandardTags = function(req,res,next){
 User.prototype.saveTags = function(req,res,next){
 
     var _this = this;
-    var uuid = require('node-uuid');
-    var request = require('request');
 
     var token = req.body.token;
     var type = (!isNaN(parseInt(req.body.type)))  ?  parseInt(req.body.type) : 0;  // 0-image, 1- url
     var image = req.body.image ? req.body.image : '';
     var tag = req.body.tag;
-    var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : 0;
+    var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : null;
+    var randomName,mimetype;
 
-    console.log(req.files);
+    //console.log('Tag : '+req.body.tag);
+
+    var uuid = require('node-uuid');
+    var request = require('request');
 
     var responseMessage = {
         status: false,
@@ -4103,22 +4120,36 @@ User.prototype.saveTags = function(req,res,next){
                 if (!err) {
                     if (result) {
 
-                        var uniqueId = uuid.v4();
-                        var randomName = uniqueId + '.' + req.files.image.extension;
-                        console.log(randomName);
+                        if (req.files.image) {
+
+                            var uniqueId = uuid.v4();
+                            randomName = uniqueId + '.' + req.files.image.extension;
+                            mimetype = req.files.image.mimetype;
+                            console.log(randomName);
+                        }
+                        else {
+                            randomName = '';
+                            mimetype = '';
+                        }
 
                         //upload to cloud storage
+
+
+                        /**
+                         * @todo write a code for doc/image has upload to cloud storage
+                         */
+
                         request({
-                            url: 'https://www.googleapis.com/upload/storage/v1/b/'+req.CONFIG.CONSTANT.STORAGE_BUCKET+'/o',
+                            url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
                             method: 'POST',
                             headers: {
-                                'Content-Type': req.files.image.mimetype
+                                'Content-Type': mimetype
                             },
-                            uploadType : 'multipart',
+                            uploadType: 'multipart',
                             body: 'hello',
-                            name : randomName
-                        }, function(error, response, body){
-                            if(error) {
+                            name: randomName
+                        }, function (error, response, body) {
+                            if (error) {
                                 console.log('error..');
                                 console.log(error);
                             } else {
@@ -4126,8 +4157,8 @@ User.prototype.saveTags = function(req,res,next){
                                 console.log(response.statusCode);
                                 console.log(body);
 
-                                var queryParams = st.db.escape(token)+ ',' + st.db.escape(type)+ ',' + st.db.escape(randomName)
-                                    + ',' + st.db.escape(tag)+ ',' + st.db.escape(pin);
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
+                                    + ',' + st.db.escape(tag) + ',' + st.db.escape(pin);
 
                                 var query = 'CALL psavedocsandurls(' + queryParams + ')';
                                 console.log(query);
@@ -4138,9 +4169,9 @@ User.prototype.saveTags = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'Tags Save successfully';
                                             responseMessage.data = {
-                                                type : (parseInt(req.body.type) !== NaN && parseInt(req.body.type)) ?  parseInt(req.body.type) : 0,
-                                                tag : req.body.tag,
-                                                pin : req.body.pin ? req.body.pin : 0
+                                                type: (parseInt(req.body.type) !== NaN && parseInt(req.body.type)) ? parseInt(req.body.type) : 0,
+                                                tag: req.body.tag,
+                                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnSaveTags: Tags Save successfully');
@@ -4330,6 +4361,9 @@ User.prototype.getTags = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
+    var startCount = ((!isNaN(parseInt(req.query.pc))) && parseInt(req.query.pc) > 0) ?  parseInt(req.query.pc) : 0;
+    var recordsPerPage = ((!isNaN(parseInt(req.query.ps))) && parseInt(req.query.ps) > 0 ) ?  parseInt(req.query.ps) : 10;
+
     var output = [];
 
     var responseMessage = {
@@ -4356,7 +4390,7 @@ User.prototype.getTags = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(startCount)+ ',' + st.db.escape(recordsPerPage);
                         var query = 'CALL pgetAllDocsandurls(' + queryParams + ')';
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
@@ -4653,7 +4687,18 @@ User.prototype.getConveyanceReport = function(req,res,next){
     var token = req.query.token;
     var startDate = req.query.s_date;
     var endDate = req.query.e_date;
+    var pdfcontent='',data1;
 
+    var path = require('path');
+
+    console.log('----Date------');
+    var sDate = startDate.split('-');
+    sDate = sDate[2] + '-' + sDate[1]+ '-' + sDate[0];
+    console.log(sDate);
+    var eDate = endDate.split('-');
+    eDate = eDate[2] + '-' + eDate[1]+ '-' + eDate[0];
+    console.log(eDate);
+    console.log('---------------');
 
     var responseMessage = {
         status: false,
@@ -4682,14 +4727,139 @@ User.prototype.getConveyanceReport = function(req,res,next){
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(startDate)+ ',' + st.db.escape(endDate);
                         var query = 'CALL pgetConveyanceReport(' + queryParams + ')';
                         st.db.query(query, function (err, getresult) {
+                            //console.log(getresult[0]);
                             if (!err) {
                                 if (getresult[0]) {
+
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Reports Loaded successfully';
                                     responseMessage.data = getresult[0];
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetConveyanceReport: Reports Loaded successfully');
+
+                                    //making pdf doc for conveyance report
+
+                                    var pdf = require('html-pdf');
+                                    var options = {size: 'A3'};
+
+                                    var loopFunction = function (i, header) {
+
+                                        if (i < getresult[0].length) {
+                                            console.log('loop function..');
+                                            var file = path.join(__dirname, '../../mail/templates/report.html');
+
+                                            fs.readFile(file, "utf8", function (err, data) {
+
+                                                if (header) {
+                                                    data1 = header;
+                                                    //console.log(data1);
+                                                }
+                                                else {
+                                                    data1 = '';
+                                                }
+
+                                                data = data.replace("[sl.no]", i + 1);
+                                                data = data.replace("[Date]", getresult[0][i].taskdatetime);
+                                                data = data.replace("[Task]", getresult[0][i].ActionTitle);
+                                                data = data.replace("[Particulars]", getresult[0][i].particulars);
+                                                data = data.replace("[Client]", getresult[0][i].clientname);
+                                                data = data.replace("[Contact]", getresult[0][i].contactname);
+                                                data = data.replace("[Amount]", getresult[0][i].amount);
+                                                data = data.replace("[CreatedBy]", getresult[0][i].createduser);
+
+                                                var users = (getresult[0][i].additionalusers).split(',');
+
+                                                var addusers='';
+                                                if (users.length) {
+                                                    for (var j = 0; j < users.length; j++) {
+
+                                                        addusers = users[j] + ', ' + addusers;
+
+                                                    }
+                                                }
+                                                else{
+                                                    addusers = getresult[0][i].additionalusers;
+                                                }
+                                                data = data.replace("[AddtionalUsers]", addusers);
+
+
+                                                fs.writeFile('./conveyance_report/conveyanceReport.html', data, function (err) {
+                                                    if (!err) {
+                                                        fs.exists('./conveyance_report/conveyanceReport.html', function (exists) {
+                                                            if (exists) {
+                                                                fs.readFile('./conveyance_report/conveyanceReport.html', "utf8", function (err, dataResult) {
+                                                                    if (!err) {
+                                                                        if (dataResult) {
+
+                                                                            if (data1) {
+                                                                                pdfcontent = data1;
+                                                                                pdfcontent += dataResult;
+                                                                            }
+                                                                            else {
+                                                                                pdfcontent += dataResult;
+                                                                            }
+
+                                                                            i = i + 1;
+                                                                            loopFunction(i);
+
+                                                                        }
+                                                                        else {
+                                                                            console.log('dataContent is not loaded');
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log(err);
+                                                                        console.log('Error in file reading');
+                                                                    }
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('file doesnt exists');
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        console.log(err);
+                                                        console.log('Error in file writting');
+                                                    }
+                                                });
+                                            });
+                                        }
+                                        else {
+                                            //fs.unlinkSync('./conveyance_report/conveyanceReport.html');
+                                            fs.writeFile('./conveyance_report/conveyanceReport1.html', pdfcontent, function (err) {
+                                                if (!err) {
+                                                    generatePdf(pdfcontent);
+                                                }
+                                            });
+                                        }
+                                    };
+
+                                    var generatePdf = function(pdfContent) {
+
+                                        pdf.create(pdfcontent, options).toFile('./conveyance_report/conveyance-report.pdf', function (err, res) {
+                                            if (err) return console.log(err);
+                                            console.log('pdf converted successfully');
+                                        });
+                                    };
+
+                                    if (getresult[0].length > 0) {
+                                        console.log('call loop function..');
+                                        var i = 0;
+                                        var file = path.join(__dirname, '../../mail/templates/report_header.html');
+
+                                        fs.readFile(file, "utf8", function (err, header) {
+
+                                            header = header.replace("[StartDate]", sDate);
+                                            header = header.replace("[EndDate]", eDate);
+                                            header = header.replace("[ezeone]", '@SGOWRI2');
+
+                                            loopFunction(i, header);
+                                        });
+                                    }
+
+
                                 }
                                 else {
                                     responseMessage.message = 'Reports not Loaded';

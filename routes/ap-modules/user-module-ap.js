@@ -563,4 +563,162 @@ User_AP.prototype.updateEZEIDAP = function(req,res,next){
     }
 };
 
+
+/**
+ * @todo FnSavePaidBannersAp
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save banners ap
+ */
+User_AP.prototype.savePaidBannersAp = function(req,res,next){
+
+    var _this = this;
+
+    var token = req.body.token;
+    var masterid = req.body.master_id;
+    var apID = req.body.ap_id;
+    var apUserid = req.body.apuser_id;
+    var image = req.body.image;
+    var tag = req.body.tag;
+    var id = (!isNaN(parseInt(req.body.id))) ?  parseInt(req.body.id) : 0;
+    var randomName,mimetype;
+
+
+
+
+    var uuid = require('node-uuid');
+    var request = require('request');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        if (req.files.image) {
+
+                            var uniqueId = uuid.v4();
+                            randomName = uniqueId + '.' + req.files.image.extension;
+                            mimetype = req.files.image.mimetype;
+                            console.log(randomName);
+                        }
+                        else {
+                            randomName = '';
+                            mimetype = '';
+                        }
+
+                        //upload to cloud storage
+                        request({
+                            url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': mimetype
+                            },
+                            uploadType: 'multipart',
+                            body: 'hello',
+                            name: randomName
+                        }, function (error, response, body) {
+                            if (error) {
+                                console.log('error..');
+                                console.log(error);
+                            } else {
+                                console.log('response..');
+                                console.log(response.statusCode);
+                                console.log(body);
+
+                                var queryParams = st.db.escape(masterid) + ',' + st.db.escape(apID) + ',' + st.db.escape(apUserid)
+                                    + ',' + st.db.escape(randomName) + ',' + st.db.escape(tag) + ',' + st.db.escape(id);
+
+                                var query = 'CALL psavepaidbannersAP(' + queryParams + ')';
+                                console.log(query);
+                                st.db.query(query, function (err, insertResult) {
+                                    if (!err) {
+                                        if (insertResult.affectedRows > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Banners Saved successfully';
+                                            responseMessage.data = {
+                                                master_id : req.body.master_id,
+                                                ap_id : req.body.ap_id,
+                                                apuser_id : req.body.apuser_id,
+                                                tag : req.body.tag,
+                                                id : (!isNaN(parseInt(req.body.id))) ?  parseInt(req.body.id) : 0
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSavePaidBannersAp: Banners Saved successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Banners not Saved';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSavePaidBannersAp:Banners not Saved');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured in query ! Please try again';
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        res.status(500).json(responseMessage);
+                                        console.log('FnSavePaidBannersAp: error in saving Banners:' + err);
+                                    }
+
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSavePaidBannersAp: Invalid token');
+                    }
+                } else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSavePaidBannersAp:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSavePaidBannersAp ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 module.exports = User_AP;
