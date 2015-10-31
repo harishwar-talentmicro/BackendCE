@@ -3981,61 +3981,62 @@ User.prototype.saveStandardTags = function(req,res,next){
                          */
 
 
-                        request({
-                            url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': mimetype
-                            },
-                            uploadType: 'multipart',
-                            body: 'hello',
-                            name: randomName
-                        }, function (error, response, body) {
-                            if (error) {
-                                console.log('error..');
-                                console.log(error);
-                            } else {
-                                console.log('response..');
-                                console.log(response.statusCode);
-                                console.log(body);
+                        //request({
+                        //    url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
+                        //    method: 'POST',
+                        //    headers: {
+                        //        'Content-Type': mimetype
+                        //    },
+                        //    uploadType: 'multipart',
+                        //    body: 'hello',
+                        //    name: randomName
+                        //}, function (error, response, body) {
+                        //    if (error) {
+                        //        console.log('error..');
+                        //        console.log(error);
+                        //    } else {
+                        //        console.log('response..');
+                        //        console.log(response.statusCode);
+                        //        console.log(body);
+                        //    }
+                        //});
 
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
-                                    + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
+                            + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin);
 
-                                var query = 'CALL psavedocsandurls(' + queryParams + ')';
-                                console.log(query);
-                                st.db.query(query, function (err, insertResult) {
-                                    if (!err) {
-                                        if (insertResult.affectedRows > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Tags Save successfully';
-                                            responseMessage.data = {
-                                                type: 0,
-                                                tag: req.body.tag,
-                                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
-                                            };
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveStandardTags: Tags Save successfully');
-                                        }
-                                        else {
-                                            responseMessage.message = 'Tag not Saved';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveStandardTags:Tag not Saved');
-                                        }
-                                    }
-                                    else {
-                                        responseMessage.message = 'An error occured in query ! Please try again';
-                                        responseMessage.error = {
-                                            server: 'Internal Server Error'
-                                        };
-                                        res.status(500).json(responseMessage);
-                                        console.log('FnSaveStandardTags: error in saving tags:' + err);
-                                    }
-
-                                });
+                        var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, insertResult) {
+                            if (!err) {
+                                if (insertResult.affectedRows > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Tags Save successfully';
+                                    responseMessage.data = {
+                                        type: 0,
+                                        tag: req.body.tag,
+                                        pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveStandardTags: Tags Save successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Tag not Saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveStandardTags:Tag not Saved');
+                                }
                             }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveStandardTags: error in saving tags:' + err);
+                            }
+
                         });
+
                     }
 
                     else {
@@ -4139,60 +4140,61 @@ User.prototype.saveTags = function(req,res,next){
                          * @todo write a code for doc/image has upload to cloud storage
                          */
 
-                        request({
-                            url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': mimetype
-                            },
-                            uploadType: 'multipart',
-                            body: 'hello',
-                            name: randomName
-                        }, function (error, response, body) {
-                            if (error) {
-                                console.log('error..');
-                                console.log(error);
-                            } else {
-                                console.log('response..');
-                                console.log(response.statusCode);
-                                console.log(body);
+                        //request({
+                        //    url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
+                        //    method: 'POST',
+                        //    headers: {
+                        //        'Content-Type': mimetype
+                        //    },
+                        //    uploadType: 'multipart',
+                        //    body: 'hello',
+                        //    name: randomName
+                        //}, function (error, response, body) {
+                        //    if (error) {
+                        //        console.log('error..');
+                        //        console.log(error);
+                        //    } else {
+                        //        console.log('response..');
+                        //        console.log(response.statusCode);
+                        //        console.log(body);
+                        //    }
+                        //});
 
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
-                                    + ',' + st.db.escape(tag) + ',' + st.db.escape(pin);
 
-                                var query = 'CALL psavedocsandurls(' + queryParams + ')';
-                                console.log(query);
-                                st.db.query(query, function (err, insertResult) {
-                                    if (!err) {
-                                        if (insertResult.affectedRows > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Tags Save successfully';
-                                            responseMessage.data = {
-                                                type: (parseInt(req.body.type) !== NaN && parseInt(req.body.type)) ? parseInt(req.body.type) : 0,
-                                                tag: req.body.tag,
-                                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
-                                            };
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveTags: Tags Save successfully');
-                                        }
-                                        else {
-                                            responseMessage.message = 'Tag not Saved';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveTags:Tag not Saved');
-                                        }
-                                    }
-                                    else {
-                                        responseMessage.message = 'An error occured in query ! Please try again';
-                                        responseMessage.error = {
-                                            server: 'Internal Server Error'
-                                        };
-                                        res.status(500).json(responseMessage);
-                                        console.log('FnSaveTags: error in saving tags:' + err);
-                                    }
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
+                            + ',' + st.db.escape(tag) + ',' + st.db.escape(pin);
 
-                                });
+                        var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, insertResult) {
+                            if (!err) {
+                                if (insertResult.affectedRows > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Tags Save successfully';
+                                    responseMessage.data = {
+                                        type: (parseInt(req.body.type) !== NaN && parseInt(req.body.type)) ? parseInt(req.body.type) : 0,
+                                        tag: req.body.tag,
+                                        pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTags: Tags Save successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Tag not Saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTags:Tag not Saved');
+                                }
                             }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveTags: error in saving tags:' + err);
+                            }
+
                         });
                     }
                     else {
