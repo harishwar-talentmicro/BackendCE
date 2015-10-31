@@ -583,9 +583,9 @@ User_AP.prototype.savePaidBannersAp = function(req,res,next){
     var image = req.body.image;
     var tag = req.body.tag;
     var id = (!isNaN(parseInt(req.body.id))) ?  parseInt(req.body.id) : 0;
+    var height = req.body.height;
+    var width = req.body.width;
     var randomName,mimetype;
-
-
 
 
     var uuid = require('node-uuid');
