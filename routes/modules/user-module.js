@@ -4001,8 +4001,12 @@ User.prototype.saveStandardTags = function(req,res,next){
                         //    }
                         //});
 
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
-                            + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin);
+                        /**
+                         * @todo OriginalFileName will be originalFileName of the uploaded file
+                         */
+
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                            + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
                         var query = 'CALL psavedocsandurls(' + queryParams + ')';
                         console.log(query);
@@ -4160,9 +4164,15 @@ User.prototype.saveTags = function(req,res,next){
                         //    }
                         //});
 
+                        /**
+                         * @todo Add original file name in place of filename and
+                         * in case of url this fileName will be empty only pass the randomName as URL
+                         */
 
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
-                            + ',' + st.db.escape(tag) + ',' + st.db.escape(pin);
+                            //var imageFileName = original file name of the image;
+
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(fileName)
+                            + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + st.db.escape(randomName);
 
                         var query = 'CALL psavedocsandurls(' + queryParams + ')';
                         console.log(query);
@@ -4277,15 +4287,15 @@ User.prototype.getStandardTags = function(req,res,next){
                                     console.log('----getresult.length-----');
                                     console.log(getresult[0].length);
                                     for( var i=0; i < getresult[0].length;i++){
-                                        var result = {
-                                            tid :getresult[0][i].tid,
-                                            imageurl :getresult[0][i].imageurl ,
-                                            pin :getresult[0][i].pin,
-                                            imagepath: getresult[0][i].imagepath,
-                                            tag: getresult[0][i].tag,
-                                            s_url : (getresult[0][i].imagepath) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath) : ''
-
-                                        };
+                                        var result = {};
+                                        result.tid = getresult[0][i].tid;
+                                        result.imageurl = getresult[0][i].imageurl;
+                                        result.pin = getresult[0][i].pin;
+                                        result.imagepath = getresult[0][i].imagepath;
+                                        result.tag = getresult[0][i].tag;
+                                        result.s_url = (getresult[0][i].imageurl) ?
+                                            getresult[0][i].imagepath :
+                                        req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath;
                                         output.push(result);
                                     }
 
@@ -4396,19 +4406,21 @@ User.prototype.getTags = function(req,res,next){
                         var query = 'CALL pgetAllDocsandurls(' + queryParams + ')';
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
+                                console.log(getresult);
                                 if (getresult[0]) {
                                     console.log('----getresult.length-----');
                                     console.log(getresult[0].length);
                                     for( var i=0; i < getresult[0].length;i++){
-                                        var result = {
-                                            tid :getresult[0][i].tid,
-                                            imageurl :getresult[0][i].imageurl ,
-                                            pin :getresult[0][i].pin,
-                                            imagepath: getresult[0][i].imagepath,
-                                            tag: getresult[0][i].tag,
-                                            s_url : (getresult[0][i].imagepath) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath) : ''
+                                        var result = {};
+                                        result.tid = getresult[0][i].tid;
+                                        result.imageurl = getresult[0][i].imageurl;
+                                        result.pin = getresult[0][i].pin;
+                                        result.imagepath = getresult[0][i].imagepath;
+                                        result.tag = getresult[0][i].tag;
+                                        result.s_url = (getresult[0][i].imageurl) ?
+                                            getresult[0][i].imagepath :
+                                        req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath;
 
-                                        };
                                         output.push(result);
                                     }
                                     console.log('----output.length-----');
