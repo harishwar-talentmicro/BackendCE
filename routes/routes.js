@@ -91,6 +91,8 @@ exports.FnLocationDetails = locationModule.getLocationDetails;
 exports.FnShareLocation = locationModule.shareLocation;
 exports.FnValidateEZEOne = locationModule.validateEZEOne;
 exports.FnGetLocationsofezeid = locationModule.getLocationsofezeid;
+exports.FnGetLoc = locationModule.getLoc;
+exports.FnSaveLocation = locationModule.saveLocation;
 
 //BusinessManager module
 var BusinessManager = require('./modules/business-module.js');

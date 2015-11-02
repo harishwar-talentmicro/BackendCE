@@ -299,7 +299,7 @@ Location.prototype.deleteLocation = function(req,res,next) {
                         //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
                         st.db.query(query, function (err, DeleteResult) {
                             if (!err) {
-                               //console.log('DeleteQuery: ' + DeleteResult);
+                                //console.log('DeleteQuery: ' + DeleteResult);
                                 if (DeleteResult.affectedRows > 0) {
                                     RtnMessage.IsDeleted = true;
                                     res.send(RtnMessage);
@@ -668,7 +668,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
             var queryParams = st.db.escape(token) +',' + st.db.escape(ezeoneId) + ',' +
                 st.db.escape(locationSequence) +',' + st.db.escape(pin);
-           // console.log(queryParams);
+            // console.log(queryParams);
             st.db.query('CALL pSearchInfnPic('+queryParams+')',function(err,result){
                 if(err){
                     respMsg.status = false;
@@ -763,13 +763,13 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
 /**
  * @todo FnShareLocation
- * Method : Get
+ * Method : post
  * @param req
  * @param res
  * @param next
  * @description api code for get share location
  */
- Location.prototype.shareLocation = function(req,res,next){
+Location.prototype.shareLocation = function(req,res,next){
     var _this = this;
     var fs = require("fs");
 
@@ -818,7 +818,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ','  + st.db.escape(locationTitle)+ ','  + st.db.escape(latitude)
-                        + ','  + st.db.escape(longitude)+ ','  + st.db.escape(ezeone_id);
+                            + ','  + st.db.escape(longitude)+ ','  + st.db.escape(ezeone_id);
                         var query = 'CALL psharelocation(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -860,7 +860,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
                                                             iphoneId = iphoneID;
                                                             messageId = 0;
                                                             masterid = '';
-                                                           // console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
+                                                            // console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
                                                             notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
 
                                                         }
@@ -1143,6 +1143,207 @@ Location.prototype.getLocationsofezeid = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetLoc
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get location
+ */
+Location.prototype.getLoc = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var functionId = req.query.fid;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+
+            var queryParams = st.db.escape(functionId) ;
+            var query = 'CALL pgetLOC(' + queryParams + ')';
+            //console.log(query);
+            st.db.query(query, function (err, getResult) {
+                console.log(getResult);
+                if (!err) {
+                    if (getResult) {
+                        if (getResult[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Location loaded sucessfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetLoc: Location loaded sucessfully');
+                        }
+                        else {
+                            responseMessage.message = 'Location is not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetLoc:Location is not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Location is not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetLoc:Location is not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetLoc: error in getting Location :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetLoc ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnSaveLocation
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get save location
+ */
+Location.prototype.saveLocation = function(req,res,next){
+    var _this = this;
+    var fs = require("fs");
+
+    var token = req.body.token;
+    var functionId = req.body.fid;
+    var locationTitle = req.body.loc_title;
+    var locationGuide = req.body.loc_guide;
+    var docTitle = req.body.doc_title;
+    var docFilename = req.body.doc_filename;
+    var id = req.body.id;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(functionId) + ','  + st.db.escape(locationTitle)+ ','  + st.db.escape(locationGuide)
+                            + ','  + st.db.escape(docTitle)+ ','  + st.db.escape(docFilename)+ ','  + st.db.escape(id);
+                        var query = 'CALL pSaveLOC(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'location Saved successfully';
+                                    responseMessage.data = {
+                                        fid : req.body.fid,
+                                        loc_title : req.body.loc_title,
+                                        loc_guide : req.body.loc_guide,
+                                        doc_title : req.body.doc_title,
+                                        doc_filename : req.body.doc_filename,
+                                        id : req.body.id
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveLocation: location Saved  successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'location not Saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveLocation:location not Saved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveLocation: error in saving location:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveLocation: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveLocation:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnSaveLocation ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = Location;

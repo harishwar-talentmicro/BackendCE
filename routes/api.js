@@ -79,7 +79,6 @@ router.post('/ewtTemplateDetails',LocationManager.FnSaveMailTemplate);
 router.get('/ewtTemplateList',LocationManager.FnGetTemplateList);
 router.get('/ewtTemplateDetails',LocationManager.FnGetTemplateDetails);
 router.post('/ewtSendBulkMailer',LocationManager.FnSendBulkMailer);
-router.post('/share_location',LocationManager.FnShareLocation);
 
 //Location module methods
 router.get('/ewtGetSecondaryLoc', LocationManager.FnGetSecondaryLocation);
@@ -91,6 +90,9 @@ router.get('/location_image',LocationManager.FnGetLocationPicture);
 router.get('/location_details',LocationManager.FnLocationDetails);
 router.get('/validate_ezeone', LocationManager.FnValidateEZEOne);
 router.get('/locations_map_view',LocationManager.FnGetLocationsofezeid);
+router.post('/share_location',LocationManager.FnShareLocation);
+router.get('/location',LocationManager.FnGetLoc);
+router.post('/location',LocationManager.FnSaveLocation);
 
 //BusinessManager module methods
 router.get('/ewtGetTranscation',LocationManager.FnGetTransaction);
