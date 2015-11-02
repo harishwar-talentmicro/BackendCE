@@ -291,7 +291,8 @@ Job.prototype.create = function(req,res,next){
                                 expTo: skillMatrix1[m].exp_to,
                                 active_status: skillMatrix1[m].active_status,
                                 jobId: jobID,
-                                tid: skillMatrix1[m].tid
+                                tid: skillMatrix1[m].tid,
+                                type : skillMatrix1[m].type
                             };
                             FnSaveSkills(skills, function (err, Result) {
                                 if (!err) {
@@ -303,13 +304,14 @@ Job.prototype.create = function(req,res,next){
                                             expFrom: skills.expFrom,
                                             expTo: skills.expTo,
                                             skillstatusid: skills.active_status,
-                                            jobid: skills.jobId
+                                            jobid: skills.jobId,
+                                            type : skills.type
                                         };
 
                                         var queryParams = st.db.escape(SkillItems.jobid) + ',' + st.db.escape(SkillItems.skillID)
                                             + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
                                             + ',' + st.db.escape(SkillItems.skillstatusid) + ',' + st.db.escape(SkillItems.expertlevel)
-                                            + ',' + st.db.escape(parseInt(skills.tid));
+                                            + ',' + st.db.escape(parseInt(skills.tid))+ ',' + st.db.escape(SkillItems.type);
                                         var query = 'CALL pSaveJobSkill(' + queryParams + ')';
                                         st.db.query(query, function (err, result) {
                                             if (!err) {
