@@ -67,6 +67,8 @@ router.get('/download_resume',LocationManager.FnDownloadResume);
 router.get('/alumni_user_details', LocationManager.FnGetAlumniUserDetails);
 router.get('/search_alumni', LocationManager.FnSearchAlumni);
 router.get('/conveyance_report', LocationManager.FnGetConveyanceReport);
+router.get('/industry_type_list',LocationManager.FnGetindustryType);
+router.get('/industry_category',LocationManager.FnGetindustrycategory);
 
 //Audit module methods
 router.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);

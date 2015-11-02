@@ -1646,13 +1646,18 @@ User.prototype.getResume = function(req,res,next){
         };
 
         if (id) {
-            st.db.query('CALL pgetCVInfo(' + st.db.escape(id) + ')', function (err, MessagesResult) {
+            var queryParams = st.db.escape(id);
+            var query = 'CALL pgetCVInfo(' + st.db.escape(id) + ')';
+            console.log(query);
+            st.db.query(query, function (err, MessagesResult) {
                 if (!err) {
                     if (MessagesResult[0]) {
                         responseMessage.status = true;
                         responseMessage.data = MessagesResult[0];
                         responseMessage.skillMatrix = MessagesResult[1];
                         responseMessage.job_location = MessagesResult[2];
+                        responseMessage.core_skills = MessagesResult[3];
+                        responseMessage.line_of_career = MessagesResult[4];
                         responseMessage.error = null;
                         responseMessage.message = 'Cv info send successfully';
                         res.status(200).json(responseMessage);
@@ -3932,7 +3937,7 @@ User.prototype.saveStandardTags = function(req,res,next){
     var type = 0;   // 0-image, 1-url
     var docTag = req.body.tag;
     var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : null;
-    var randomName,mimetype;
+    var randomName;
 
     //console.log(req.body);
 
@@ -4129,11 +4134,11 @@ User.prototype.saveTags = function(req,res,next){
     var token = req.body.token;
     var type = (!isNaN(parseInt(req.body.type)))  ?  parseInt(req.body.type) : 0;  // 0-image, 1- url
     var image = req.body.image ? req.body.image : '';
-    var tag = req.body.tag;
+    var link = req.body.link ? req.body.link : '';
+    var tag = req.body.tag ? req.body.tag : 'PIC';
     var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : null;
-    var randomName,mimetype;
-
-    //console.log('Tag : '+req.body.tag);
+    var tileBannerURL = req.body.tb_url ? req.body.tb_url : '';
+    var randomName;
 
     var uuid = require('node-uuid');
     var request = require('request');
@@ -4164,70 +4169,132 @@ User.prototype.saveTags = function(req,res,next){
                     if (result) {
 
                         var originalFileName = '';
+
                         if (req.files.image) {
 
+                            console.log('saving image..');
                             var uniqueId = uuid.v4();
                             randomName = uniqueId + '.' + req.files.image.extension;
-                            originalFileName =  req.files.image.name;
+                            originalFileName = req.files.image.name;
+
+
+                            //upload to cloud storage
+
+                            var gcloud = require('gcloud');
+                            var fs = require('fs');
+
+
+                            var gcs = gcloud.storage({
+                                projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                                keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                            });
+
+                            // Reference an existing bucket.
+                            var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                            // Upload a local file to a new file to be created in your bucket.
+                            var localReadStream = fs.createReadStream(req.files.image.path);
+                            var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                            localReadStream.pipe(remoteWriteStream);
+
+
+                            remoteWriteStream.on('finish', function () {
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                                    + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+
+                                var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                                console.log(query);
+                                st.db.query(query, function (err, insertResult) {
+                                    if (!err) {
+                                        if (insertResult.affectedRows > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Tags Save successfully';
+                                            responseMessage.data = {
+                                                type: type,
+                                                tag: tag,
+                                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveTags: Tags Save successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Tag not Saved';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveTags:Tag not Saved');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured in query ! Please try again';
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        res.status(500).json(responseMessage);
+                                        console.log('FnSaveTags: error in saving tags:' + err);
+                                    }
+
+                                });
+                            });
+
+                            remoteWriteStream.on('error', function () {
+                                responseMessage.message = 'An error occurred';
+                                responseMessage.error = {
+                                    server: 'Internal Server error'
+                                };
+                                responseMessage.data = null;
+                                res.status(400).json(responseMessage);
+                                console.log('FnSaveTags: Image upload error to google cloud');
+
+                            });
+
                         }
 
-                        if(parseInt(req.body.type) && (!isNaN(req.body.type))){
+                        else if (parseInt(req.body.type) && (!isNaN(req.body.type))) {
+
+                            console.log('saving link..');
                             randomName = req.body.link;
-                        }
-                        else{
-                            /**
-                             * @todo Send error response here
-                             */
-                        }
 
-                        //upload to cloud storage
+                            var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                                + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
-                        //upload to cloud storage
-
-
-                        /**
-                         * @todo write a code for doc/image has upload to cloud storage
-                         */
-
-
-
-                            //var imageFileName = original file name of the image;
-
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                            + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
-
-                        var query = 'CALL psavedocsandurls(' + queryParams + ')';
-                        console.log(query);
-                        st.db.query(query, function (err, insertResult) {
-                            if (!err) {
-                                if (insertResult.affectedRows > 0) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Tags Save successfully';
-                                    responseMessage.data = {
-                                        type: (parseInt(req.body.type) !== NaN && parseInt(req.body.type)) ? parseInt(req.body.type) : 0,
-                                        tag: req.body.tag,
-                                        pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveTags: Tags Save successfully');
+                            var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, insertResult) {
+                                if (!err) {
+                                    if (insertResult.affectedRows > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Tags Save successfully';
+                                        responseMessage.data = {
+                                            type: type,
+                                            tag: tag,
+                                            pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveTags: Tags Save successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Tag not Saved';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveTags:Tag not Saved');
+                                    }
                                 }
                                 else {
-                                    responseMessage.message = 'Tag not Saved';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveTags:Tag not Saved');
+                                    responseMessage.message = 'An error occured in query ! Please try again';
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnSaveTags: error in saving tags:' + err);
                                 }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured in query ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveTags: error in saving tags:' + err);
-                            }
 
-                        });
+                            });
+                        }
+                        else {
+                            responseMessage.error = error;
+                            responseMessage.message = 'Please check uploading file';
+                            res.status(200).json(responseMessage);
+                        }
                     }
                     else {
                         responseMessage.message = 'Invalid token';
@@ -4261,6 +4328,7 @@ User.prototype.saveTags = function(req,res,next){
         }
     }
 };
+
 
 
 /**
@@ -4303,11 +4371,11 @@ User.prototype.getStandardTags = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token);
                         var query = 'CALL pgetDocsandurls(' + queryParams + ')';
+                        console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
                                 if (getresult[0]) {
-                                    console.log('----getresult.length-----');
-                                    console.log(getresult[0].length);
+
                                     for( var i=0; i < getresult[0].length;i++){
                                         var result = {};
                                         result.tid = getresult[0][i].tid;
@@ -4320,9 +4388,6 @@ User.prototype.getStandardTags = function(req,res,next){
                                         req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath;
                                         output.push(result);
                                     }
-
-                                    console.log('----output.length-----');
-                                    console.log(output.length);
 
                                     responseMessage.status = true;
                                     responseMessage.error = null;
@@ -4426,6 +4491,7 @@ User.prototype.getTags = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(startCount)+ ',' + st.db.escape(recordsPerPage);
                         var query = 'CALL pgetAllDocsandurls(' + queryParams + ')';
+                        console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
                                 console.log(getresult);
@@ -4947,5 +5013,179 @@ User.prototype.getConveyanceReport = function(req,res,next){
         }
     }
 };
+
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getindustryType = function(req,res,next) {
+    /**
+     * @todo FnGetindustryType
+     */
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMsg = {
+        status: false,
+        data: [],
+        message: 'Unable to load skills ! Please try again',
+        error: {
+            server: 'An internal server error'
+        }
+    };
+
+
+    var validateStatus = true, error = {};
+
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if (!validateStatus) {
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors';
+        res.status(400).json(responseMsg);
+        console.log(responseMsg);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        st.db.query('CALL pGetindustryType()', function (err, result) {
+                            if (!err) {
+                                responseMsg.status = true;
+                                responseMsg.message = 'industryType loaded successfully';
+                                responseMsg.error = null;
+                                responseMsg.data = result[0];
+                                res.status(200).json(responseMsg);
+                            }
+                            else {
+                                console.log('Error : FnGetindustryType ');
+                                res.status(200).json(responseMsg);
+                            }
+                        });
+                    }
+                    else {
+                        responseMsg.message = 'Invalid token';
+                        responseMsg.error = {
+                            token: 'invalid token'
+                        };
+                        responseMsg.data = null;
+                        res.status(401).json(responseMsg);
+                        console.log('FnGetindustryType: Invalid token');
+                    }
+                }
+                else {
+                    responseMsg.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMsg.message = 'Error in validating Token';
+                    res.status(500).json(responseMsg);
+                    console.log('FnGetindustryType:Error in processing Token' + err);
+                }
+            });
+        }
+
+        catch (ex) {
+            res.status(500).json(responseMsg);
+            console.log('Error : FnGetindustryType ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetindustrycategory
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get industry category
+ */
+User.prototype.getindustrycategory = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var industryId = req.query.iid;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+
+            var queryParams = st.db.escape(industryId) ;
+            var query = 'CALL Pgetindustrycategory(' + queryParams + ')';
+            //console.log(query);
+            st.db.query(query, function (err, getResult) {
+                console.log(getResult);
+                if (!err) {
+                    if (getResult) {
+                        if (getResult[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Industry Category loaded sucessfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetindustrycategory: Industry Category loaded sucessfully');
+                        }
+                        else {
+                            responseMessage.message = 'Industry Category is not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetindustrycategory:Industry Category is not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Industry Category is not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetindustrycategory:Industry Category is not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetindustrycategory: error in getting Industry Category :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetindustrycategory ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 module.exports = User;
