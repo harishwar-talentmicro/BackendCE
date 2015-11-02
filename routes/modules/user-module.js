@@ -1751,8 +1751,6 @@ User.prototype.saveResume = function(req,res,next){
         var salarytype = req.body.salary_type ? req.body.salary_type : 0;
         var expectedSalarytype = req.body.exp_salary_type ? req.body.exp_salary_type : 0;
 
-        var coreSkillMatrix = req.body.coreSkills;
-        coreSkillMatrix= JSON.parse(JSON.stringify(coreSkillMatrix));
         var locMatrix = req.body.locMatrix;
         locMatrix= JSON.parse(JSON.stringify(locMatrix));
         var pgEducationid = req.body.pg_educationid;
@@ -1915,152 +1913,118 @@ User.prototype.saveResume = function(req,res,next){
                                             count = count -1;
                                             var tid = locDetails.tid;
                                             var locSkills = {
-                                                skillname: locDetails.skillname,
                                                 expertiseLevel: locDetails.expertiseLevel,
                                                 exp: locDetails.exp,
-                                                active_status: locDetails.active_status,
                                                 cvid: InsertResult[0][0].ID,
                                                 tid: locDetails.tid,
                                                 fid : locDetails.fid,
                                                 careerId : locDetails.career_id
                                             };
-                                            FnSaveSkills(locSkills, function (err, Result) {
-                                                if (!err) {
-                                                    if (Result) {
-                                                        resultvalue = Result.SkillID;
-                                                        var locSkillItems = {
-                                                            skillID: resultvalue,
-                                                            expertlevel: locSkills.expertiseLevel,
-                                                            expyrs: locSkills.exp,
-                                                            skillstatusid: locSkills.active_status,
-                                                            cvid: locSkills.cvid
-                                                        };
 
-                                                        if (parseInt(locSkills.tid) != 0) {
+                                            if (parseInt(locSkills.tid) != 0) {
 
-                                                            var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
-                                                                    + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkillItems.expertlevel)
-                                                                    + ',' +st.db.escape(locSkillItems.expyrs) + ',' +st.db.escape(locSkillItems.cvid)
-                                                                ;
+                                                var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
+                                                        + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkills.expertlevel)
+                                                        + ',' +st.db.escape(locSkills.expyrs) + ',' +st.db.escape(locSkills.cvid)
+                                                    ;
 
-                                                            var query = 'CALL psavecvLOC(' + queryParams + ')';
-                                                            st.db.query(query, function (err, result) {
-                                                                if (!err) {
-                                                                    if (result) {
-                                                                        if (result.affectedRows > 0) {
-                                                                            console.log('FnupdateSkill: skill matrix Updated successfully');
-                                                                        }
-                                                                        else {
-                                                                            console.log('FnupdateSkill:  skill matrix not updated');
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                        console.log('FnupdateSkill:  skill matrix not updated')
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    console.log('FnupdateSkill: error in saving  skill matrix:' + err);
-                                                                }
-                                                            });
+                                                var query = 'CALL psavecvLOC(' + queryParams + ')';
+                                                st.db.query(query, function (err, result) {
+                                                    if (!err) {
+                                                        if (result) {
+                                                            if (result.affectedRows > 0) {
+                                                                console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnupdateSkill:  skill matrix not updated');
+                                                            }
                                                         }
                                                         else {
-                                                            var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
-                                                                    + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkillItems.expertlevel)
-                                                                    + ',' +st.db.escape(locSkillItems.expyrs) + ',' +st.db.escape(locSkillItems.cvid)
-                                                                ;
-
-                                                            var query = 'CALL psavecvLOC(' + queryParams + ')';
-                                                            st.db.query(query, function (err, result) {
-                                                                if (!err) {
-                                                                    if (result) {
-                                                                        if (result.affectedRows > 0) {
-                                                                            console.log('FnSaveCv: skill matrix saved successfully');
-                                                                        }
-                                                                        else {
-                                                                            console.log('FnSaveCv: skill matrix not saved');
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                        console.log('FnSaveCv: skill matrix not saved');
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    console.log('FnSaveCv: error in saving skill matrix' + err);
-                                                                }
-                                                            });
-
+                                                            console.log('FnupdateSkill:  skill matrix not updated')
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnSaveMessage: Mail not Sent Successfully');
-                                                        //res.send(RtnMessage);
+                                                        console.log('FnupdateSkill: error in saving  skill matrix:' + err);
                                                     }
-                                                }
-                                                else {
-                                                    console.log('FnSaveMessage:Error in sending mails' + err);
-                                                    //res.send(RtnMessage);
-                                                }
-                                            });
+                                                });
+                                            }
+                                            else {
+                                                var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
+                                                        + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkills.expertlevel)
+                                                        + ',' +st.db.escape(locSkills.expyrs) + ',' +st.db.escape(locSkills.cvid)
+                                                    ;
+
+                                                var query = 'CALL psavecvLOC(' + queryParams + ')';
+                                                st.db.query(query, function (err, result) {
+                                                    if (!err) {
+                                                        if (result) {
+                                                            if (result.affectedRows > 0) {
+                                                                console.log('FnSaveCv: skill matrix saved successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnSaveCv: skill matrix not saved');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnSaveCv: skill matrix not saved');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveCv: error in saving skill matrix' + err);
+                                                    }
+                                                });
+
+                                            }
+
                                         });
-
-                                        RtnMessage.IsSuccessfull = true;
-                                        RtnMessage.id = InsertResult[0][0].ID;
-                                        console.log('FnSaveCVInfo: CV Info Saved successfully');
-                                        res.send(RtnMessage);
-
                                     }
-                                    else {
-                                        res.send(RtnMessage);
-                                        res.statusCode = 500;
-                                        console.log('FnSaveCVInfo: CVinfo not saved');
-                                    }
+
+                                    RtnMessage.IsSuccessfull = true;
+                                    RtnMessage.id = InsertResult[0][0].ID;
+                                    console.log('FnSaveCVInfo: CV Info Saved successfully');
+                                    res.send(RtnMessage);
 
                                 }
                                 else {
                                     res.send(RtnMessage);
                                     res.statusCode = 500;
-                                    console.log('FnSaveCVInfo: Error in saving CV Info  : ' + err);
+                                    console.log('FnSaveCVInfo: CVinfo not saved');
                                 }
-                            });
+                        });
+                    };
+
+                    var insertLocations = function(locationDetails){
+                        var list = {
+                            location_title: locationDetails.location_title,
+                            latitude: locationDetails.latitude,
+                            longitude: locationDetails.longitude,
+                            country: locationDetails.country,
+                            maptype : locationDetails.maptype
                         };
+                        var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
+                            + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
 
-                        var insertLocations = function(locationDetails){
-                            var list = {
-                                location_title: locationDetails.location_title,
-                                latitude: locationDetails.latitude,
-                                longitude: locationDetails.longitude,
-                                country: locationDetails.country,
-                                maptype : locationDetails.maptype
-                            };
-                            var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
+                        //console.log(queryParams);
 
-                            //console.log(queryParams);
+                        st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
 
-                            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                            if(err){
+                                console.log('Error in saving psavejoblocation');
+                                console.log(err);
+                            }
+                            else{
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
 
-                                if(err){
-                                    console.log('Error in saving psavejoblocation');
-                                    console.log(err);
-                                }
-                                else{
-                                    if (results) {
-                                        if (results[0]) {
-                                            if (results[0][0]) {
-
-                                                //console.log(results[0][0].id);
-                                                location_id += results[0][0].id + ',';
-                                                locCount +=1;
-                                                if(locCount < locationsList.length){
-                                                    insertLocations(locationsList[locCount]);
-                                                }
-                                                else{
-                                                    saveResumeDetails();
-                                                }
+                                            //console.log(results[0][0].id);
+                                            location_id += results[0][0].id + ',';
+                                            locCount +=1;
+                                            if(locCount < locationsList.length){
+                                                insertLocations(locationsList[locCount]);
                                             }
-                                            else {
-                                                console.log('FnSaveJobLocation:results no found');
-                                                res.status(200).json(RtnMessage);
+                                            else{
+                                                saveResumeDetails();
                                             }
                                         }
                                         else {
@@ -2073,54 +2037,59 @@ User.prototype.saveResume = function(req,res,next){
                                         res.status(200).json(RtnMessage);
                                     }
                                 }
-
-                            });
-                        };
-
-                        if(locationsList){
-                            if(locationsList.length > 0){
-                                insertLocations(locationDetails);
+                                else {
+                                    console.log('FnSaveJobLocation:results no found');
+                                    res.status(200).json(RtnMessage);
+                                }
                             }
-                            else{
-                                location_id = '';
-                                saveResumeDetails();
 
-                            }
+                        });
+                    };
+
+                    if(locationsList){
+                        if(locationsList.length > 0){
+                            insertLocations(locationDetails);
                         }
-
                         else{
                             location_id = '';
                             saveResumeDetails();
+
                         }
                     }
-                    else {
-                        console.log('FnSaveCVInfo: Invalid Token');
-                        res.statusCode = 401;
-                        res.send(RtnMessage);
+
+                    else{
+                        location_id = '';
+                        saveResumeDetails();
                     }
                 }
                 else {
-                    console.log('FnSaveCVInfo: Token error: ' + err);
-                    res.statusCode = 500;
+                    console.log('FnSaveCVInfo: Invalid Token');
+                    res.statusCode = 401;
                     res.send(RtnMessage);
                 }
-            });
-
-        }
+            }
         else {
-            console.log('FnSaveCVInfo: Token is empty');
-            res.statusCode = 400;
-            res.send(RtnMessage);
-        }
+                console.log('FnSaveCVInfo: Token error: ' + err);
+                res.statusCode = 500;
+                res.send(RtnMessage);
+            }
+        });
 
     }
-    catch (ex) {
-        var errorDate = new Date();
-        console.log(ex);
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnSaveCVInfo error:' + ex.description);
-
+    else {
+        console.log('FnSaveCVInfo: Token is empty');
+        res.statusCode = 400;
+        res.send(RtnMessage);
     }
+
+}
+catch (ex) {
+    var errorDate = new Date();
+    console.log(ex);
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
+    console.log('FnSaveCVInfo error:' + ex.description);
+
+}
 };
 
 function FnSaveSkills(skill, CallBack) {
@@ -4053,11 +4022,22 @@ User.prototype.saveStandardTags = function(req,res,next){
     var token = req.body.token;
     var image = req.body.image ? req.body.image : '';
     var type = 0;   // 0-image, 1-url
-    var docTag = req.body.tag;
+    var tag = req.body.tag ? req.body.tag : 0;
     var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : null;
-    var randomName;
+    var randomName,tagType,imageBuffer;
 
-    //console.log(req.body);
+    if (tag == 0){
+        tagType = 0;
+    }
+    else if(tag == 'PIC')
+    {
+        tagType = 2;
+    }
+    else{
+        tagType = 1;
+    }
+
+
 
     var responseMessage = {
         status: false,
@@ -4087,92 +4067,142 @@ User.prototype.saveStandardTags = function(req,res,next){
 
                         if (req.files.image) {
 
+
                             var uniqueId = uuid.v4();
                             randomName = uniqueId + '.' + req.files.image.extension;
                             originalFileName = req.files.image.name;
 
+                            if (tagType == 0) {
 
-                            //upload to cloud storage
+                                console.log('croping tile banner...');
 
-                            var gcloud = require('gcloud');
-                            var fs = require('fs');
+                                var imageParams = {
+                                    path: req.files.image.path,
+                                    type: req.files.image.extension,
+                                    width: '288',
+                                    height: '36',
+                                    scale: '',
+                                    crop: ''
+                                };
+
+                                FnCropImage(imageParams, function (err, bufferData) {
+                                    if (bufferData) {
+
+                                        imageBuffer = bufferData;
+                                        uploadtoServer(imageBuffer);
+                                    }
+                                });
+                            }
+                            else if (tagType == 1) {
+                                console.log('croping info banners...');
+                                var imageParams = {
+                                    path: req.files.image.path,
+                                    type: req.files.image.extension,
+                                    width: '315',
+                                    height: '155',
+                                    scale: '',
+                                    crop: ''
+                                };
+                                //console.log(imageParams);
+                                FnCropImage(imageParams, function (err, bufferData) {
+
+                                    if (bufferData) {
+
+                                        imageBuffer = bufferData;
+                                    }
+                                });
+
+                            }
+
+                            var uploadtoServer = function (imageBuffer) {
+                                //upload to cloud storage
+                                console.log(imageBuffer);
+                                var gcloud = require('gcloud');
+                                var fs = require('fs');
 
 
-                            var gcs = gcloud.storage({
-                                projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
-                                keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
-                            });
+                                var gcs = gcloud.storage({
+                                    projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                                    keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                                });
 
-                            // Reference an existing bucket.
-                            var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+                                // Reference an existing bucket.
+                                var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
 
-                            bucket.acl.default.add({
-                                entity: 'allUsers',
-                                role: gcs.acl.READER_ROLE
-                            }, function(err, aclObject) {});
+                                bucket.acl.default.add({
+                                    entity: 'allUsers',
+                                    role: gcs.acl.READER_ROLE
+                                }, function (err, aclObject) {
+                                });
 
-                            // Upload a local file to a new file to be created in your bucket.
-                            var localReadStream = fs.createReadStream(req.files.image.path);
-                            var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                            localReadStream.pipe(remoteWriteStream);
+                                // Upload a local file to a new file to be created in your bucket
+
+                                var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                                var BufferStream = require('bufferstream');
+                                var bufferStream = new BufferStream(imageBuffer);
+                                bufferStream.pipe(remoteWriteStream);
+
+                                //var localReadStream = fs.createReadStream(req.files.image.path);
+                                //localReadStream.pipe(remoteWriteStream);
 
 
-                            remoteWriteStream.on('finish', function () {
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                    + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                remoteWriteStream.on('finish', function () {
+                                    var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                                        + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
-                                var query = 'CALL psavedocsandurls(' + queryParams + ')';
-                                console.log(query);
-                                st.db.query(query, function (err, insertResult) {
-                                    if (!err) {
-                                        if (insertResult.affectedRows > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Tags Save successfully';
-                                            responseMessage.data = {
-                                                type: 0,
-                                                tag: req.body.tag,
-                                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
-                                            };
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveStandardTags: Tags Save successfully');
+                                    var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                                    console.log(query);
+                                    st.db.query(query, function (err, insertResult) {
+                                        if (!err) {
+                                            if (insertResult.affectedRows > 0) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Tags Save successfully';
+                                                responseMessage.data = {
+                                                    type: 0,
+                                                    tag: req.body.tag,
+                                                    pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSaveStandardTags: Tags Save successfully');
+                                            }
+                                            else {
+                                                responseMessage.message = 'Tag not Saved';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSaveStandardTags:Tag not Saved');
+                                            }
                                         }
                                         else {
-                                            responseMessage.message = 'Tag not Saved';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveStandardTags:Tag not Saved');
+                                            responseMessage.message = 'An error occured in query ! Please try again';
+                                            responseMessage.error = {
+                                                server: 'Internal Server Error'
+                                            };
+                                            res.status(500).json(responseMessage);
+                                            console.log('FnSaveStandardTags: error in saving tags:' + err);
                                         }
-                                    }
-                                    else {
-                                        responseMessage.message = 'An error occured in query ! Please try again';
-                                        responseMessage.error = {
-                                            server: 'Internal Server Error'
-                                        };
-                                        res.status(500).json(responseMessage);
-                                        console.log('FnSaveStandardTags: error in saving tags:' + err);
-                                    }
+
+                                    });
+                                });
+
+                                remoteWriteStream.on('error', function () {
+                                    responseMessage.message = 'An error occurred';
+                                    responseMessage.error = {
+                                        server: 'Internal Server error'
+                                    };
+                                    responseMessage.data = null;
+                                    res.status(400).json(responseMessage);
+                                    console.log('FnSaveStandardTags: Image upload error to google cloud');
 
                                 });
-                            });
 
-                            remoteWriteStream.on('error', function () {
-                                responseMessage.message = 'An error occurred';
-                                responseMessage.error = {
-                                    server: 'Internal Server error'
-                                };
-                                responseMessage.data = null;
-                                res.status(400).json(responseMessage);
-                                console.log('FnSaveStandardTags: Image upload error to google cloud');
-
-                            });
-
+                            };
                         }
 
                         else if (parseInt(req.body.type) && (!isNaN(req.body.type))) {
                             randomName = req.body.link;
 
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
                             var query = 'CALL psavedocsandurls(' + queryParams + ')';
                             console.log(query);
@@ -4256,6 +4286,8 @@ function FnCropImage(imageParams, callback){
      */
     var _this = this;
 
+    console.log('image croping...');
+
     var fs = require('fs');
     var deleteTempFile = function(){
         fs.unlink('../bin/'+imageParams.path);
@@ -4283,6 +4315,8 @@ function FnCropImage(imageParams, callback){
     var scaleFlag = (imageParams.scale) ? imageParams.scale : true;
     var outputType = (allowedTypes.indexOf(imageParams.type) == -1) ? 'png' : imageParams.type;
 
+
+
     if(!(targetHeight && targetWidth)){
         respMsg.message = 'Invalid target dimensions';
         respMsg.error = {
@@ -4297,23 +4331,25 @@ function FnCropImage(imageParams, callback){
 
     try{
         fs.readFile('../bin/'+ imageParams.path,function(err,data){
+
             if(!err){
                 var bitmap = data;
                 var gm = require('gm').subClass({ imageMagick: true });
                 gm(bitmap).size(function (err, size) {
                     if (!err) {
                         // Orientation landscape
+
                         if(size.height < size.width){
                             // scale++
                             if(size.height < targetHeight || size.width < targetWidth){
                                 if(targetHeight > targetWidth){
-                                    //console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
+                                    console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
                                     scaleHeight = targetHeight.toString();
                                     ////
                                     scaleWidth = (size.width * scaleHeight)/ size.height;
                                 }
                                 else{
-                                    //console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
+                                    console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
                                     scaleHeight = targetHeight;
                                     scaleWidth = (size.width * scaleHeight) / size.height;
                                 }
@@ -4321,14 +4357,14 @@ function FnCropImage(imageParams, callback){
                             // scale--
                             else{
                                 if(targetHeight > targetWidth){
-                                    //console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
+                                    console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
                                     scaleWidth = targetWidth.toString();
                                     ////
                                     scaleHeight = (scaleWidth * size.height)/ size.width;
                                 }
                                 else{
 
-                                    //console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                    console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
                                     scaleHeight = targetHeight.toString();
                                     scaleWidth = (scaleHeight * size.width) / size.height;
 
@@ -4376,8 +4412,9 @@ function FnCropImage(imageParams, callback){
                                     if(!err){
                                         var cdataUrl = new Buffer(croppedBuff).toString('base64');
                                         var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                        var bufferData = croppedBuff;
                                         //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        callback(null, picUrl);
+                                        callback(null, bufferData);
                                         deleteTempFile();
                                         console.log('FnCropImage:Picture cropped successfully...');
                                     }
@@ -4396,8 +4433,9 @@ function FnCropImage(imageParams, callback){
                                     if(!err){
                                         var cdataUrl = new Buffer(croppedBuff).toString('base64');
                                         var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                        var bufferData = croppedBuff;
                                         //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        callback(null, picUrl);
+                                        callback(null, bufferData);
                                         console.log('FnCropImage:Picture cropped successfully');
                                         deleteTempFile();
 
@@ -4417,8 +4455,9 @@ function FnCropImage(imageParams, callback){
                                     if(!err){
                                         var cdataUrl = new Buffer(croppedBuff).toString('base64');
                                         var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
+                                        var bufferData = croppedBuff;
                                         //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        callback(null, picUrl);
+                                        callback(null, bufferData);
                                         console.log('FnCropImage:Picture cropped successfully');
                                     }
                                     else{
