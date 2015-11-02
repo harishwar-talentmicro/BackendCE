@@ -1709,10 +1709,7 @@ User.prototype.saveResume = function(req,res,next){
         // In tFunctionID Int,In tRoleID Int, In tKeySkills varchar(250), In tCVDoc longtext, In tCVDocFile varchar(250), In iStatus int, In tPin varchar(15), In tToken varchar(15)
         var ids = req.body.skillsTid;
         var FunctionID = req.body.FunctionID;
-        //var RoleID = req.body.RoleID ? req.body.RoleID : 0;
         var KeySkills = req.body.KeySkills;
-        //  var CVDoc = req.body.CVDoc;
-        // var CVDocFile = req.body.CVDocFile;
         var Status = parseInt(req.body.Status);
         var Pin = req.body.Pin;
         var Token = req.body.TokenNo;
@@ -1752,21 +1749,28 @@ User.prototype.saveResume = function(req,res,next){
         var email = req.body.eid;
         var mobile = req.body.mn;
         var tid = req.body.tid;
+        var salarytype = req.body.salary_type ? req.body.salary_type : 0;
+        var expectedSalarytype = req.body.exp_salary_type ? req.body.exp_salary_type : 0;
 
+        var coreSkillMatrix = req.body.coreSkills;
+        coreSkillMatrix= JSON.parse(JSON.stringify(coreSkillMatrix));
+        var locMatrix = req.body.locMatrix;
+        locMatrix= JSON.parse(JSON.stringify(locMatrix));
+        var pgEducationid = req.body.pg_educationid;
+        var pgSpecializationid = req.body.pg_educationid;
+        var pgYearofpassing = req.body.pg_yearofpassing;
+        var pgAggregatescore = req.body.pg_aggregatescore;
 
         if(typeof(locationsList) == "string"){
             locationsList = JSON.parse(locationsList);
         }
 
-        //console.log(locationsList);
 
         if(!locationsList){
             locationsList = [];
         }
 
-        /**
-         * Data Conversions
-         */
+
         salary = (parseFloat(salary) !== NaN && salary > 0) ? parseFloat(salary) : 0;
         noticePeriod = (parseInt(noticePeriod) !== NaN && parseInt(noticePeriod) > 0) ? parseInt(noticePeriod) : 0;
 
@@ -1799,7 +1803,10 @@ User.prototype.saveResume = function(req,res,next){
                                 + ',' + st.db.escape(educationID) + ',' + st.db.escape(specializationID) + ',' + st.db.escape(yearOfPassing)
                                 + ','+ st.db.escape(aggregateScore)+ ','+ st.db.escape(institueTitle) +',' + st.db.escape(expectedSalary)
                                 + ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName) +',' + st.db.escape(email)
-                                +',' + st.db.escape(mobile)+',' + st.db.escape(tid);
+                                +',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
+                                +',' + st.db.escape(expectedSalarytype)+',' + st.db.escape(pgEducationid)
+                                +',' + st.db.escape(pgSpecializationid)+',' + st.db.escape(pgYearofpassing)
+                                +',' + st.db.escape(pgAggregatescore);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
@@ -1834,7 +1841,14 @@ User.prototype.saveResume = function(req,res,next){
                                                         };
 
                                                         if (parseInt(skills.tid) != 0) {
-                                                            var query = st.db.query('UPDATE tskills set ? WHERE TID = ? ',[SkillItems,tid], function (err, result) {
+
+                                                            var queryParams = st.db.escape(skills.tid) + ',' +st.db.escape(SkillItems.skillID)
+                                                                + ',' +st.db.escape(SkillItems.expertlevel) + ',' +st.db.escape(SkillItems.expyrs)
+                                                                + ',' +st.db.escape(SkillItems.skillstatusid) + ',' +st.db.escape(SkillItems.cvid)
+                                                                + ',' +st.db.escape(functionId)+ ',' +st.db.escape(0);
+
+                                                            var query = 'CALL pSaveCVSkills(' + queryParams + ')';;
+                                                            st.db.query(query, function (err, result) {
                                                                 if (!err) {
                                                                     if (result) {
                                                                         if (result.affectedRows > 0) {
@@ -1854,7 +1868,202 @@ User.prototype.saveResume = function(req,res,next){
                                                             });
                                                         }
                                                         else {
-                                                            var query = st.db.query('INSERT INTO tskills  SET ?', SkillItems , function (err, result) {
+                                                            var queryParams = st.db.escape(skills.tid) + ',' +st.db.escape(SkillItems.skillID)
+                                                                + ',' +st.db.escape(SkillItems.expertlevel) + ',' +st.db.escape(SkillItems.expyrs)
+                                                                + ',' +st.db.escape(SkillItems.skillstatusid) + ',' +st.db.escape(SkillItems.cvid)
+                                                                + ',' +st.db.escape(functionId)+ ',' +st.db.escape(0);
+
+                                                            var query = 'CALL pSaveCVSkills(' + queryParams + ')';
+                                                            st.db.query(query, function (err, result) {
+                                                                if (!err) {
+                                                                    if (result) {
+                                                                        if (result.affectedRows > 0) {
+                                                                            console.log('FnSaveCv: skill matrix saved successfully');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnSaveCv: skill matrix not saved');
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSaveCv: skill matrix not saved');
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('FnSaveCv: error in saving skill matrix' + err);
+                                                                }
+                                                            });
+
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveMessage: Mail not Sent Successfully');
+                                                        //res.send(RtnMessage);
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnSaveMessage:Error in sending mails' + err);
+                                                    //res.send(RtnMessage);
+                                                }
+                                            });
+                                        });
+
+                                        //core skills
+
+                                        async.each(coreSkillMatrix, function iterator(coreSkillDetails,callback) {
+
+                                            count = count -1;
+                                            var tid = coreSkillDetails.tid;
+                                            var coreskills = {
+                                                skillname: coreSkillDetails.skillname,
+                                                expertiseLevel: coreSkillDetails.expertiseLevel,
+                                                exp: coreSkillDetails.exp,
+                                                active_status: coreSkillDetails.active_status,
+                                                cvid: InsertResult[0][0].ID,
+                                                tid: coreSkillDetails.tid,
+                                                fid : coreSkillDetails.fid
+                                            };
+                                            FnSaveSkills(coreskills, function (err, Result) {
+                                                if (!err) {
+                                                    if (Result) {
+                                                        resultvalue = Result.SkillID;
+                                                        var coreSkillItems = {
+                                                            skillID: resultvalue,
+                                                            expertlevel: coreskills.expertiseLevel,
+                                                            expyrs: coreskills.exp,
+                                                            skillstatusid: coreskills.active_status,
+                                                            cvid: coreskills.cvid
+                                                        };
+
+                                                        if (parseInt(coreskills.tid) != 0) {
+
+                                                            var queryParams = st.db.escape(coreskills.tid) + ',' +st.db.escape(coreSkillItems.skillID)
+                                                                + ',' +st.db.escape(coreSkillItems.expertlevel) + ',' +st.db.escape(coreSkillItems.expyrs)
+                                                                + ',' +st.db.escape(coreSkillItems.skillstatusid) + ',' +st.db.escape(coreSkillItems.cvid)
+                                                                + ',' +st.db.escape(coreskills.fid)+ ',' +st.db.escape(1);
+
+                                                            var query = 'CALL pSaveCVSkills(' + queryParams + ')';;
+                                                            st.db.query(query, function (err, result) {
+                                                                if (!err) {
+                                                                    if (result) {
+                                                                        if (result.affectedRows > 0) {
+                                                                            console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnupdateSkill:  skill matrix not updated');
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnupdateSkill:  skill matrix not updated')
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('FnupdateSkill: error in saving  skill matrix:' + err);
+                                                                }
+                                                            });
+                                                        }
+                                                        else {
+                                                            var queryParams = st.db.escape(coreskills.tid) + ',' +st.db.escape(coreSkillItems.skillID)
+                                                                + ',' +st.db.escape(coreSkillItems.expertlevel) + ',' +st.db.escape(coreSkillItems.expyrs)
+                                                                + ',' +st.db.escape(coreSkillItems.skillstatusid) + ',' +st.db.escape(coreSkillItems.cvid)
+                                                                + ',' +st.db.escape(coreskills.fid)+ ',' +st.db.escape(1);
+
+                                                            var query = 'CALL pSaveCVSkills(' + queryParams + ')';
+                                                            st.db.query(query, function (err, result) {
+                                                                if (!err) {
+                                                                    if (result) {
+                                                                        if (result.affectedRows > 0) {
+                                                                            console.log('FnSaveCv: skill matrix saved successfully');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnSaveCv: skill matrix not saved');
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSaveCv: skill matrix not saved');
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('FnSaveCv: error in saving skill matrix' + err);
+                                                                }
+                                                            });
+
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveMessage: Mail not Sent Successfully');
+                                                        //res.send(RtnMessage);
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnSaveMessage:Error in sending mails' + err);
+                                                    //res.send(RtnMessage);
+                                                }
+                                            });
+                                        });
+
+                                        //line of career skill matrix
+
+                                        async.each(locMatrix, function iterator(locDetails,callback) {
+
+                                            count = count -1;
+                                            var tid = locDetails.tid;
+                                            var locSkills = {
+                                                skillname: locDetails.skillname,
+                                                expertiseLevel: locDetails.expertiseLevel,
+                                                exp: locDetails.exp,
+                                                active_status: locDetails.active_status,
+                                                cvid: InsertResult[0][0].ID,
+                                                tid: locDetails.tid,
+                                                fid : locDetails.fid,
+                                                careerId : locDetails.career_id
+                                            };
+                                            FnSaveSkills(locSkills, function (err, Result) {
+                                                if (!err) {
+                                                    if (Result) {
+                                                        resultvalue = Result.SkillID;
+                                                        var locSkillItems = {
+                                                            skillID: resultvalue,
+                                                            expertlevel: locSkills.expertiseLevel,
+                                                            expyrs: locSkills.exp,
+                                                            skillstatusid: locSkills.active_status,
+                                                            cvid: locSkills.cvid
+                                                        };
+
+                                                        if (parseInt(locSkills.tid) != 0) {
+
+                                                            var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
+                                                                    + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkillItems.expertlevel)
+                                                                    + ',' +st.db.escape(locSkillItems.expyrs) + ',' +st.db.escape(locSkillItems.cvid)
+                                                                ;
+
+                                                            var query = 'CALL psavecvLOC(' + queryParams + ')';
+                                                            st.db.query(query, function (err, result) {
+                                                                if (!err) {
+                                                                    if (result) {
+                                                                        if (result.affectedRows > 0) {
+                                                                            console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnupdateSkill:  skill matrix not updated');
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnupdateSkill:  skill matrix not updated')
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('FnupdateSkill: error in saving  skill matrix:' + err);
+                                                                }
+                                                            });
+                                                        }
+                                                        else {
+                                                            var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
+                                                                    + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkillItems.expertlevel)
+                                                                    + ',' +st.db.escape(locSkillItems.expyrs) + ',' +st.db.escape(locSkillItems.cvid)
+                                                                ;
+
+                                                            var query = 'CALL psavecvLOC(' + queryParams + ')';
+                                                            st.db.query(query, function (err, result) {
                                                                 if (!err) {
                                                                     if (result) {
                                                                         if (result.affectedRows > 0) {
@@ -1891,7 +2100,6 @@ User.prototype.saveResume = function(req,res,next){
                                         RtnMessage.id = InsertResult[0][0].ID;
                                         console.log('FnSaveCVInfo: CV Info Saved successfully');
                                         res.send(RtnMessage);
-
 
                                     }
                                     else {
@@ -3973,7 +4181,7 @@ User.prototype.saveStandardTags = function(req,res,next){
 
                             var uniqueId = uuid.v4();
                             randomName = uniqueId + '.' + req.files.image.extension;
-                            originalFileName =  req.files.image.name;
+                            originalFileName = req.files.image.name;
 
 
                             //upload to cloud storage
@@ -3990,13 +4198,18 @@ User.prototype.saveStandardTags = function(req,res,next){
                             // Reference an existing bucket.
                             var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
 
+                            bucket.acl.default.add({
+                                entity: 'allUsers',
+                                role: gcs.acl.READER_ROLE
+                            }, function(err, aclObject) {});
+
                             // Upload a local file to a new file to be created in your bucket.
                             var localReadStream = fs.createReadStream(req.files.image.path);
                             var remoteWriteStream = bucket.file(randomName).createWriteStream();
                             localReadStream.pipe(remoteWriteStream);
 
 
-                            remoteWriteStream.on('finish',function(){
+                            remoteWriteStream.on('finish', function () {
                                 var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
                                     + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
@@ -4034,7 +4247,7 @@ User.prototype.saveStandardTags = function(req,res,next){
                                 });
                             });
 
-                            remoteWriteStream.on('error',function(){
+                            remoteWriteStream.on('error', function () {
                                 responseMessage.message = 'An error occurred';
                                 responseMessage.error = {
                                     server: 'Internal Server error'
@@ -4047,7 +4260,7 @@ User.prototype.saveStandardTags = function(req,res,next){
 
                         }
 
-                        if(parseInt(req.body.type) && (!isNaN(req.body.type))){
+                        else if (parseInt(req.body.type) && (!isNaN(req.body.type))) {
                             randomName = req.body.link;
 
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
@@ -4085,6 +4298,12 @@ User.prototype.saveStandardTags = function(req,res,next){
                                 }
 
                             });
+                        }
+
+                        else {
+                            responseMessage.error = error;
+                            responseMessage.message = 'Please check uploading file';
+                            res.status(200).json(responseMessage);
                         }
 
                     }
@@ -4194,6 +4413,11 @@ User.prototype.saveTags = function(req,res,next){
 
                             // Reference an existing bucket.
                             var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                            bucket.acl.default.add({
+                                entity: 'allUsers',
+                                role: gcs.acl.READER_ROLE
+                            }, function(err, aclObject) {});
 
                             // Upload a local file to a new file to be created in your bucket.
                             var localReadStream = fs.createReadStream(req.files.image.path);

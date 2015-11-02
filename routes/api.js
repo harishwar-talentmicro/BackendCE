@@ -93,8 +93,8 @@ router.get('/location_details',LocationManager.FnLocationDetails);
 router.get('/validate_ezeone', LocationManager.FnValidateEZEOne);
 router.get('/locations_map_view',LocationManager.FnGetLocationsofezeid);
 router.post('/share_location',LocationManager.FnShareLocation);
-router.get('/location',LocationManager.FnGetLoc);
-router.post('/location',LocationManager.FnSaveLocation);
+router.get('/loc',LocationManager.FnGetLoc);
+router.post('/loc',LocationManager.FnSaveLocation);
 router.post('/location_for_employer',LocationManager.FnSaveLocationforEmployers);
 
 //BusinessManager module methods
