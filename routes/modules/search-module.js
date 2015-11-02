@@ -65,6 +65,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         var Rating = (req.body.Rating) ? req.body.Rating : '';
         var HomeDelivery = (req.body.HomeDelivery) ? req.body.HomeDelivery : 0;
         var CurrentDate = req.body.CurrentDate;
+        var count = 0;
 
         if(CurrentDate != null)
             CurrentDate = new Date(CurrentDate);
@@ -302,25 +303,45 @@ Search.prototype.searchKeyword = function(req,res,next){
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         //console.log('----------------------------------');
-                        //console.log(SearchResult);
+                        console.log(SearchResult);
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
                                 if (!(SearchResult[0][0].isLoggedIn)) {
 
+                                    if (SearchResult[1]) {
+                                        for (var i = 0; i < SearchResult[1].length; i++) {
+                                            if (SearchResult[2].tilebanner = '') {
+                                                if (SearchResult[2].length != count) {
+                                                    SearchResult[1].tilebanner = SearchResult[2][count].tilebanner;
+                                                    count += 1;
+                                                }
+                                                else {
+                                                    console.log('FnSearchByKeywords:  tmaster: no search found');
+                                                }
+                                            }
+                                            else {
+                                                console.log('FnSearchByKeywords:  tmaster: no search found');
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnSearchByKeywords:  tmaster: no search found');
+                                    }
+
                                     res.json({
                                         totalcount: SearchResult[0][0].totalcount,
                                         Result: SearchResult[1],
-                                        isLoggedOut : 0
+                                        isLoggedOut: 0
                                     });
                                     console.log('FnSearchByKeywords:  tmaster:Search Found');
                                 }
                                 else {
-                                    res.json({totalcount : 0, Result : [], isLoggedOut: 1,error : 'No search found'});
+                                    res.json({totalcount: 0, Result: [], isLoggedOut: 1, error: 'No search found'});
                                     console.log('FnSearchByKeywords: tmaster: no search found');
                                 }
                             }
                             else {
-                                res.json({totalcount : 0, Result : [], isLoggedOut: 0,error : 'No search found'});
+                                res.json({totalcount: 0, Result: [], isLoggedOut: 0, error: 'No search found'});
                                 console.log('FnSearchByKeywords:  tmaster: no search found');
                             }
                         }
@@ -799,100 +820,100 @@ Search.prototype.getBanner = function(req,res,next){
      * @todo FnGetBannerPicture
      */
     var _this = this;
-try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var SeqNo = parseInt(req.query.SeqNo);
-    var StateTitle = req.query.StateTitle;
-    var Ezeid = alterEzeoneId(req.query.Ezeid);
-    var LocID = req.query.LocID;
-    // var TokenNo = req.query.Token;
+    try{
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var SeqNo = parseInt(req.query.SeqNo);
+        var StateTitle = req.query.StateTitle;
+        var Ezeid = alterEzeoneId(req.query.Ezeid);
+        var LocID = req.query.LocID;
+        // var TokenNo = req.query.Token;
 
-    var RtnMessage = {
-        Picture: ''
-    };
-    RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-    Ezeid = Ezeid.split(',').pop();
-    if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
-        var Query = st.db.escape(Ezeid) + ',' + st.db.escape(SeqNo) + ',' + st.db.escape(0);
-        //console.log(InsertQuery);
-        st.db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
-            if (!err) {
-                //console.log(InsertResult);
-                if (BannerResult != null) {
-                    if (BannerResult[0].length > 0) {
-                        var Picture = BannerResult[0];
-                        console.log('FnGetBannerPicture: Banner picture sent successfully');
-                        res.setHeader('Cache-Control', 'public, max-age=150000');
-                        console.log('FnGetBannerPicture: Banner picture sent successfully');
-                        RtnMessage.Picture = Picture[0].Picture;
-                        res.send(RtnMessage);
+        var RtnMessage = {
+            Picture: ''
+        };
+        RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        Ezeid = Ezeid.split(',').pop();
+        if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
+            var Query = st.db.escape(Ezeid) + ',' + st.db.escape(SeqNo) + ',' + st.db.escape(0);
+            //console.log(InsertQuery);
+            st.db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
+                if (!err) {
+                    //console.log(InsertResult);
+                    if (BannerResult != null) {
+                        if (BannerResult[0].length > 0) {
+                            var Picture = BannerResult[0];
+                            console.log('FnGetBannerPicture: Banner picture sent successfully');
+                            res.setHeader('Cache-Control', 'public, max-age=150000');
+                            console.log('FnGetBannerPicture: Banner picture sent successfully');
+                            RtnMessage.Picture = Picture[0].Picture;
+                            res.send(RtnMessage);
+                        }
+                        else {
+                            var fs = require('fs');
+                            //  var path = path + StateTitle+'.jpg' ;
+                            fs.exists(path + StateTitle + '.jpg', function (exists) {
+                                console.log(exists)
+                                if (exists) {
+                                    var bitmap = fs.readFileSync(path + StateTitle + '.jpg');
+                                    // convert binary data to base64 encoded string
+                                    RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                    res.send(RtnMessage);
+                                    console.log('FnGetBannerPicture: State Banner sent successfully');
+                                }
+                                else {
+                                    // path ='D:\\Mail\\Default.jpg';
+                                    fs.exists(path + StateTitle + '.jpg', function (exists) {
+                                        console.log(exists)
+                                        if (exists) {
+
+                                            var bitmap = fs.readFileSync(path + 'Default.jpg');
+                                            // convert binary data to base64 encoded string
+                                            RtnMessage.Picture = new Buffer(bitmap).toString('base64');
+                                            res.send(RtnMessage);
+                                            console.log('FnGetBannerPicture: Default Banner sent successfully');
+                                        }
+                                        else {
+                                            res.json(null);
+                                            console.log('FnGetBannerPicture: Default Banner not available');
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                     else {
-                        var fs = require('fs');
-                        //  var path = path + StateTitle+'.jpg' ;
-                        fs.exists(path + StateTitle + '.jpg', function (exists) {
-                            console.log(exists)
-                            if (exists) {
-                                var bitmap = fs.readFileSync(path + StateTitle + '.jpg');
-                                // convert binary data to base64 encoded string
-                                RtnMessage.Picture = new Buffer(bitmap).toString('base64');
-                                res.send(RtnMessage);
-                                console.log('FnGetBannerPicture: State Banner sent successfully');
-                            }
-                            else {
-                                // path ='D:\\Mail\\Default.jpg';
-                                fs.exists(path + StateTitle + '.jpg', function (exists) {
-                                    console.log(exists)
-                                    if (exists) {
-
-                                        var bitmap = fs.readFileSync(path + 'Default.jpg');
-                                        // convert binary data to base64 encoded string
-                                        RtnMessage.Picture = new Buffer(bitmap).toString('base64');
-                                        res.send(RtnMessage);
-                                        console.log('FnGetBannerPicture: Default Banner sent successfully');
-                                    }
-                                    else {
-                                        res.json(null);
-                                        console.log('FnGetBannerPicture: Default Banner not available');
-                                    }
-                                });
-                            }
-                        });
+                        res.json(null);
+                        console.log('FnGetBannerPicture:tmaster: Registration Failed');
                     }
                 }
                 else {
+                    res.statusCode = 500;
                     res.json(null);
-                    console.log('FnGetBannerPicture:tmaster: Registration Failed');
+                    console.log('FnGetBannerPicture:tmaster:' + err);
                 }
+            });
+        }
+        else {
+            if (SeqNo.toString() == 'NaN') {
+                console.log('FnGetBannerPicture: SeqNo is empty');
             }
-            else {
-                res.statusCode = 500;
-                res.json(null);
-                console.log('FnGetBannerPicture:tmaster:' + err);
+            else if(Ezeid == null) {
+                console.log('FnGetBannerPicture: Ezeid is empty');
             }
-        });
-    }
-    else {
-        if (SeqNo.toString() == 'NaN') {
-            console.log('FnGetBannerPicture: SeqNo is empty');
+            else if(LocID == null) {
+                console.log('FnGetBannerPicture: LocID is empty');
+            }
+            res.statusCode=400;
+            res.json(null);
         }
-        else if(Ezeid == null) {
-            console.log('FnGetBannerPicture: Ezeid is empty');
-        }
-        else if(LocID == null) {
-            console.log('FnGetBannerPicture: LocID is empty');
-        }
-        res.statusCode=400;
-        res.json(null);
-    }
 
-}
-catch (ex) {
-    console.log('FnGetBannerPicture error:' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-}
+    }
+    catch (ex) {
+        console.log('FnGetBannerPicture error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
 };
 
 /**
@@ -906,40 +927,45 @@ Search.prototype.searchTracker = function(req,res,next){
      * @todo FnSearchForTracker
      */
     var _this = this;
-try {
+    try {
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    var Token = req.body.Token;
-    var Keyword = req.body.Keyword;
-    var Latitude = req.body.Latitude;
-    var Longitude = req.body.Longitude;
-    var Proximity = req.body.Proximity ? req.body.Proximity : 1;
-    var currentDateTime = req.body.CurrentDate ? req.body.CurrentDate : '';
-    var currentDateTime = req.body.CurrentDate;
-    var trackerFlag = (parseInt(req.body.Flag) !== NaN && parseInt(req.body.Flag) > 0) ? parseInt(req.body.Flag) : 0;
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var Token = req.body.Token;
+        var Keyword = req.body.Keyword;
+        var Latitude = req.body.Latitude;
+        var Longitude = req.body.Longitude;
+        var Proximity = req.body.Proximity ? req.body.Proximity : 1;
+        var currentDateTime = req.body.CurrentDate ? req.body.CurrentDate : '';
+        var currentDateTime = req.body.CurrentDate;
+        var trackerFlag = (parseInt(req.body.Flag) !== NaN && parseInt(req.body.Flag) > 0) ? parseInt(req.body.Flag) : 0;
 
 
-    if (Token != null && Keyword != null && Latitude != null && Longitude != null && currentDateTime) {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
-                    var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' +
-                        st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+
-                        ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag);
-                    console.log('CALL pTrackerSearch(' + query + ')');
-                    st.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
-                        console.log(GetResult);
-                        if (!err) {
-                            if (GetResult) {
-                                if (GetResult[0]) {
-                                    if (GetResult[0].length > 0) {
-                                        console.log('FnSearchForTracker: Search result sent successfully');
-                                        var responseMessage = {
-                                            totalcount : GetResult[0].length,
-                                            result: GetResult[0]
-                                        };
-                                        res.status(200).json(responseMessage);
+        if (Token != null && Keyword != null && Latitude != null && Longitude != null && currentDateTime) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' +
+                            st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+
+                            ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag);
+                        console.log('CALL pTrackerSearch(' + query + ')');
+                        st.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
+                            console.log(GetResult);
+                            if (!err) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
+                                        if (GetResult[0].length > 0) {
+                                            console.log('FnSearchForTracker: Search result sent successfully');
+                                            var responseMessage = {
+                                                totalcount : GetResult[0].length,
+                                                result: GetResult[0]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            console.log('FnSearchForTracker:No Search found');
+                                            res.json(null);
+                                        }
                                     }
                                     else {
                                         console.log('FnSearchForTracker:No Search found');
@@ -952,58 +978,53 @@ try {
                                 }
                             }
                             else {
-                                console.log('FnSearchForTracker:No Search found');
+
+                                console.log('FnSearchForTracker: error in getting search result' + err);
+                                res.statusCode = 500;
                                 res.json(null);
                             }
-                        }
-                        else {
-
-                            console.log('FnSearchForTracker: error in getting search result' + err);
-                            res.statusCode = 500;
-                            res.json(null);
-                        }
-                    });
-                }
-                else {
-                    res.statusCode = 401;
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.json(null);
+                        console.log('FnSearchForTracker: Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
                     res.json(null);
-                    console.log('FnSearchForTracker: Invalid Token');
+                    console.log('FnSearchForTracker: Error in validating token:  ' + err);
                 }
-            } else {
-                res.statusCode = 500;
-                res.json(null);
-                console.log('FnSearchForTracker: Error in validating token:  ' + err);
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnSearchForTracker: Token is empty');
             }
-        });
+            else if (Keyword == null) {
+                console.log('FnSearchForTracker: Keyword is empty');
+            }
+            else if (Latitude == null) {
+                console.log('FnSearchForTracker: Latitude is empty');
+            }
+            else if (Longitude == null) {
+                console.log('FnSearchForTracker: Longitude is empty');
+            }
+            else if (Proximity == null) {
+                console.log('FnSearchForTracker: Proximity is empty');
+            }
+            else if (currentDateTime == null) {
+                console.log('FnSearchForTracker: currentDateTime is empty');
+            }
+            res.statusCode=400;
+            res.json(null);
+        }
     }
-    else {
-        if (Token == null) {
-            console.log('FnSearchForTracker: Token is empty');
-        }
-        else if (Keyword == null) {
-            console.log('FnSearchForTracker: Keyword is empty');
-        }
-        else if (Latitude == null) {
-            console.log('FnSearchForTracker: Latitude is empty');
-        }
-        else if (Longitude == null) {
-            console.log('FnSearchForTracker: Longitude is empty');
-        }
-        else if (Proximity == null) {
-            console.log('FnSearchForTracker: Proximity is empty');
-        }
-        else if (currentDateTime == null) {
-            console.log('FnSearchForTracker: currentDateTime is empty');
-        }
-        res.statusCode=400;
-        res.json(null);
+    catch (ex) {
+        console.log('FnSearchForTracker error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
-}
-catch (ex) {
-    console.log('FnSearchForTracker error:' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-}
 };
 
 /**
@@ -1019,165 +1040,165 @@ Search.prototype.getSearchDoc = function(req,res,next){
     var _this = this;
 
     try {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var find = alterEzeoneId(req.query.Keywords);
-    var token = req.query.Token;
+        var token = req.query.Token;
         var tid;
-    //console.log(token);
-    if (token != null && find != null && token != '' && find != '') {
-        st.validateToken(token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
+        //console.log(token);
+        if (token != null && find != null && token != '' && find != '') {
+            st.validateToken(token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
 
-                    var EZEID, Pin = null;
-                    var DocType = '';
-                    var FindArray = find.split('.');
-                    var type ='';
+                        var EZEID, Pin = null;
+                        var DocType = '';
+                        var FindArray = find.split('.');
+                        var type ='';
 
-                    //console.log('findarray: ' + FindArray.length);
-                    if (FindArray.length > 0) {
-                        EZEID = FindArray[0];
-                        //checking the fisrt condition
-                        if (FindArray.length > 1) {
-                            if (FindArray[1] != '') {
-                                if (FindArray[1].toUpperCase() == 'ID') {
-                                    //console.log('ID');
-                                    DocType = 'ID';
-                                    type = 3;
+                        //console.log('findarray: ' + FindArray.length);
+                        if (FindArray.length > 0) {
+                            EZEID = FindArray[0];
+                            //checking the fisrt condition
+                            if (FindArray.length > 1) {
+                                if (FindArray[1] != '') {
+                                    if (FindArray[1].toUpperCase() == 'ID') {
+                                        //console.log('ID');
+                                        DocType = 'ID';
+                                        type = 3;
+                                    }
+                                    else if (FindArray[1].toUpperCase() == 'DL') {
+                                        //console.log('DL');
+                                        DocType = 'DL';
+                                        type = 7;
+                                    }
+                                    else if (FindArray[1].toUpperCase() == 'PP') {
+                                        //console.log('PP');
+                                        DocType = 'PP';
+                                        type = 4;
+                                    }
+                                    else if (FindArray[1].toUpperCase() == 'BR') {
+                                        //console.log('BR');
+                                        DocType = 'BR';
+                                        type = 1;
+                                    }
+                                    else if (FindArray[1].toUpperCase() == 'CV') {
+                                        //console.log('CV');
+                                        DocType = 'CV';
+                                        type = 2;
+                                    }
+                                    else if (FindArray[1].toUpperCase() == 'D1') {
+                                        //console.log('D1');
+                                        DocType = 'D1';
+                                        type = 5;
+                                    }
+                                    else if (FindArray[1].toUpperCase() == 'D2') {
+                                        //console.log('D2');
+                                        DocType = 'D2';
+                                        type = 6;
+                                    }
+                                    else {
+                                        Pin = FindArray[1];
+                                    }
+                                    //checking the second condition
+                                    if (typeof FindArray[2] != 'undefined') {
+                                        Pin = FindArray[2];
+                                    }
+                                    //checking the final condition
                                 }
-                                else if (FindArray[1].toUpperCase() == 'DL') {
-                                    //console.log('DL');
-                                    DocType = 'DL';
-                                    type = 7;
-                                }
-                                else if (FindArray[1].toUpperCase() == 'PP') {
-                                    //console.log('PP');
-                                    DocType = 'PP';
-                                    type = 4;
-                                }
-                                else if (FindArray[1].toUpperCase() == 'BR') {
-                                    //console.log('BR');
-                                    DocType = 'BR';
-                                    type = 1;
-                                }
-                                else if (FindArray[1].toUpperCase() == 'CV') {
-                                    //console.log('CV');
-                                    DocType = 'CV';
-                                    type = 2;
-                                }
-                                else if (FindArray[1].toUpperCase() == 'D1') {
-                                    //console.log('D1');
-                                    DocType = 'D1';
-                                    type = 5;
-                                }
-                                else if (FindArray[1].toUpperCase() == 'D2') {
-                                    //console.log('D2');
-                                    DocType = 'D2';
-                                    type = 6;
-                                }
-                                else {
-                                    Pin = FindArray[1];
-                                }
-                                //checking the second condition
-                                if (typeof FindArray[2] != 'undefined') {
-                                    Pin = FindArray[2];
-                                }
-                                //checking the final condition
                             }
                         }
-                    }
-                    var SearchQuery = st.db.escape(EZEID) + ',' + st.db.escape(Pin) + ',' + st.db.escape(DocType);
-                    console.log('CALL  PGetSearchDocuments(' + SearchQuery + ')');
-                    st.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
-                        // st.db.query(searchQuery, function (err, SearchResult) {
-                        if (!err) {
-                            if (SearchResult[0] != null) {
-                                if (SearchResult[0].length > 0) {
-                                    SearchResult = SearchResult[0];
-                                    //console.log(DocumentResult)
-                                    var docs = SearchResult[0];
-                                    res.setHeader('Content-Type', docs.ContentType);
-                                    res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
-                                    //res.setHeader('Cache-Control', 'public, max-age=86400000');
-                                    res.setHeader('Cache-Control', 'public, max-age=0');
-                                    res.writeHead('200', { 'Content-Type': docs.ContentType });
-                                    res.end(docs.Docs, 'base64');
-                                    console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
+                        var SearchQuery = st.db.escape(EZEID) + ',' + st.db.escape(Pin) + ',' + st.db.escape(DocType);
+                        console.log('CALL  PGetSearchDocuments(' + SearchQuery + ')');
+                        st.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
+                            // st.db.query(searchQuery, function (err, SearchResult) {
+                            if (!err) {
+                                if (SearchResult[0] != null) {
+                                    if (SearchResult[0].length > 0) {
+                                        SearchResult = SearchResult[0];
+                                        //console.log(DocumentResult)
+                                        var docs = SearchResult[0];
+                                        res.setHeader('Content-Type', docs.ContentType);
+                                        res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
+                                        //res.setHeader('Cache-Control', 'public, max-age=86400000');
+                                        res.setHeader('Cache-Control', 'public, max-age=0');
+                                        res.writeHead('200', { 'Content-Type': docs.ContentType });
+                                        res.end(docs.Docs, 'base64');
+                                        console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
 
 
-                                    var getQuery = 'select masterid as TID from tloginout where Token='+st.db.escape(token);
-                                    st.db.query(getQuery, function (err, getResult) {
-                                        if(!err){
-                                            tid = getResult[0].TID;
-                                            console.log(tid);
-                                        }
-                                        var query = st.db.escape(tid) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(req.ip) + ',' + st.db.escape(type);
-                                        console.log('CALL pCreateAccessHistory(' + query + ')');
-
-                                        st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                        var getQuery = 'select masterid as TID from tloginout where Token='+st.db.escape(token);
+                                        st.db.query(getQuery, function (err, getResult) {
                                             if(!err){
-                                                console.log('FnSearchByKeywords:Access history is created');
+                                                tid = getResult[0].TID;
+                                                console.log(tid);
                                             }
-                                            else {
-                                                console.log('FnSearchByKeywords: tmaster: ' + err);
-                                            }
+                                            var query = st.db.escape(tid) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(req.ip) + ',' + st.db.escape(type);
+                                            console.log('CALL pCreateAccessHistory(' + query + ')');
+
+                                            st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                if(!err){
+                                                    console.log('FnSearchByKeywords:Access history is created');
+                                                }
+                                                else {
+                                                    console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                }
+                                            });
                                         });
-                                    });
+                                    }
+                                    else {
+                                        res.json(null);
+
+
+                                        console.log('FnGetSearchDocuments: tmaster: no search found');
+                                    }
                                 }
                                 else {
                                     res.json(null);
-
-
                                     console.log('FnGetSearchDocuments: tmaster: no search found');
                                 }
+
                             }
                             else {
+                                res.statusCode = 500;
                                 res.json(null);
-                                console.log('FnGetSearchDocuments: tmaster: no search found');
+                                console.log('FnGetSearchDocuments: tmaster: ' + err);
                             }
-
-                        }
-                        else {
-                            res.statusCode = 500;
-                            res.json(null);
-                            console.log('FnGetSearchDocuments: tmaster: ' + err);
-                        }
-                    });
+                        });
 
 
+                    }
+                    else {
+                        console.log('FnGetSearchDocuments: Invalid token');
+                        res.statusCode = 401;
+                        res.json(null);
+                    }
                 }
                 else {
-                    console.log('FnGetSearchDocuments: Invalid token');
-                    res.statusCode = 401;
+                    console.log('FnGetSearchDocuments: ' + err);
+                    res.statusCode = 500;
                     res.json(null);
                 }
+            });
+        }
+        else {
+            if (token == null) {
+                console.log('FnGetSearchDocuments: token is empty');
             }
-            else {
-                console.log('FnGetSearchDocuments: ' + err);
-                res.statusCode = 500;
-                res.json(null);
+            else if (find == null) {
+                console.log('FnGetSearchDocuments: find is empty');
             }
-        });
+            res.statusCode = 400;
+            res.json(null);
+
+        }
     }
-    else {
-        if (token == null) {
-            console.log('FnGetSearchDocuments: token is empty');
-        }
-        else if (find == null) {
-            console.log('FnGetSearchDocuments: find is empty');
-        }
-        res.statusCode = 400;
-        res.json(null);
+    catch (ex) {
+        console.log('FnGetSearchDocuments error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
 
     }
-}
-catch (ex) {
-    console.log('FnGetSearchDocuments error:' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-
-}
 };
 
 /**
