@@ -3472,6 +3472,8 @@ User.prototype.saveUserDetails = function(req,res,next){
     var templateId = (!isNaN(parseInt(req.body.template_id))) ? parseInt(req.body.template_id) : '';
     var pin = (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null;
     var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
+    var functionId = (!isNaN(parseInt(req.body.fid))) ? parseInt(req.body.fid) : 0;
+    var categoryId = (!isNaN(parseInt(req.body.cid))) ? parseInt(req.body.cid) : 0;
 
 
     var responseMessage = {
@@ -3508,7 +3510,8 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(countryId)+ ',' + st.db.escape(postalCode)+ ',' + st.db.escape(phone)
                             + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
                             + ',' + st.db.escape(isdMobile)+ ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
-                            + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId);
+                            + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId)+ ',' + st.db.escape(functionId)
+                            + ',' + st.db.escape(categoryId);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, insertResult) {
