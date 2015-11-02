@@ -93,6 +93,7 @@ exports.FnValidateEZEOne = locationModule.validateEZEOne;
 exports.FnGetLocationsofezeid = locationModule.getLocationsofezeid;
 exports.FnGetLoc = locationModule.getLoc;
 exports.FnSaveLocation = locationModule.saveLocation;
+exports.FnSaveLocationforEmployers = locationModule.saveLocationforEmployers;
 
 //BusinessManager module
 var BusinessManager = require('./modules/business-module.js');
