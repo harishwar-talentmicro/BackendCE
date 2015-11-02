@@ -303,24 +303,33 @@ Search.prototype.searchKeyword = function(req,res,next){
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
                         //console.log('----------------------------------');
-                        console.log(SearchResult);
+                        console.log(SearchResult[2]);
+                        console.log(SearchResult[1]);
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
                                 if (!(SearchResult[0][0].isLoggedIn)) {
 
                                     if (SearchResult[1]) {
                                         for (var i = 0; i < SearchResult[1].length; i++) {
-                                            if (SearchResult[2].tilebanner = '') {
+
+                                            console.log('-----------for loop--------');
+                                            
+
+                                            if (SearchResult[1][i].tilebanner == '') {
+                                                console.log('-----------if loop--------');
                                                 if (SearchResult[2].length != count) {
-                                                    SearchResult[1].tilebanner = SearchResult[2][count].tilebanner;
+                                                    console.log(SearchResult[2].length);
+                                                    console.log(SearchResult[2][0].tilebanner);
+                                                    SearchResult[1][i].tilebanner = SearchResult[2][count].tilebanner;
+                                                    console.log(SearchResult[1].tilebanner);
                                                     count += 1;
                                                 }
                                                 else {
-                                                    console.log('FnSearchByKeywords:  tmaster: no search found');
+                                                    console.log('FnSearchByKeywords:  tmaster: no search found..1');
                                                 }
                                             }
                                             else {
-                                                console.log('FnSearchByKeywords:  tmaster: no search found');
+                                                console.log('FnSearchByKeywords:  tmaster: no search found..2');
                                             }
                                         }
                                     }
