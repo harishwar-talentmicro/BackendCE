@@ -1,10 +1,9 @@
 
 {
-  "NG_URLS": [
-
-  ],
   "CONSTANT" : {
     "INDEX_PATH" : "../public/index.html",
+    "GOOGLE_KEYFILE_PATH" : "../ezeid100.json",
+    "GOOGLE_PROJECT_ID" : "ezeid100",
     "INDEX_TPL" : "index.ejs",
     "ALUMNI_INDEX_PATH" : "../public-alumni/index.html",
     "MAP_REDIRECT_LINK" : "/map",

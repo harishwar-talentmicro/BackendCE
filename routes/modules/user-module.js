@@ -3960,82 +3960,124 @@ User.prototype.saveStandardTags = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-
+                        var originalFileName = '';
                         if (req.files.image) {
 
                             var uniqueId = uuid.v4();
                             randomName = uniqueId + '.' + req.files.image.extension;
-                            mimetype = req.files.image.mimetype;
-                            console.log(randomName);
+                            originalFileName =  req.files.image.name;
+
+
+                            //upload to cloud storage
+
+                            var gcloud = require('gcloud');
+                            var fs = require('fs');
+
+
+                            var gcs = gcloud.storage({
+                                projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                                keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                            });
+
+                            // Reference an existing bucket.
+                            var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                            // Upload a local file to a new file to be created in your bucket.
+                            var localReadStream = fs.createReadStream(req.files.image.path);
+                            var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                            localReadStream.pipe(remoteWriteStream);
+
+
+                            remoteWriteStream.on('finish',function(){
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                                    + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+
+                                var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                                console.log(query);
+                                st.db.query(query, function (err, insertResult) {
+                                    if (!err) {
+                                        if (insertResult.affectedRows > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Tags Save successfully';
+                                            responseMessage.data = {
+                                                type: 0,
+                                                tag: req.body.tag,
+                                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveStandardTags: Tags Save successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Tag not Saved';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveStandardTags:Tag not Saved');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured in query ! Please try again';
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        res.status(500).json(responseMessage);
+                                        console.log('FnSaveStandardTags: error in saving tags:' + err);
+                                    }
+
+                                });
+                            });
+
+                            remoteWriteStream.on('error',function(){
+                                responseMessage.message = 'An error occurred';
+                                responseMessage.error = {
+                                    server: 'Internal Server error'
+                                };
+                                responseMessage.data = null;
+                                res.status(400).json(responseMessage);
+                                console.log('FnSaveStandardTags: Image upload error to google cloud');
+
+                            });
+
                         }
-                        else {
-                            randomName = '';
-                            mimetype = '';
-                        }
 
-                        //upload to cloud storage
+                        if(parseInt(req.body.type) && (!isNaN(req.body.type))){
+                            randomName = req.body.link;
 
+                            var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                                + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
-                        /**
-                         * @todo write a code for doc/image has upload to cloud storage
-                         */
-
-
-                        //request({
-                        //    url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
-                        //    method: 'POST',
-                        //    headers: {
-                        //        'Content-Type': mimetype
-                        //    },
-                        //    uploadType: 'multipart',
-                        //    body: 'hello',
-                        //    name: randomName
-                        //}, function (error, response, body) {
-                        //    if (error) {
-                        //        console.log('error..');
-                        //        console.log(error);
-                        //    } else {
-                        //        console.log('response..');
-                        //        console.log(response.statusCode);
-                        //        console.log(body);
-                        //    }
-                        //});
-
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
-                            + ',' + st.db.escape(docTag) + ',' + st.db.escape(pin);
-
-                        var query = 'CALL psavedocsandurls(' + queryParams + ')';
-                        console.log(query);
-                        st.db.query(query, function (err, insertResult) {
-                            if (!err) {
-                                if (insertResult.affectedRows > 0) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Tags Save successfully';
-                                    responseMessage.data = {
-                                        type: 0,
-                                        tag: req.body.tag,
-                                        pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveStandardTags: Tags Save successfully');
+                            var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, insertResult) {
+                                if (!err) {
+                                    if (insertResult.affectedRows > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Tags Save successfully';
+                                        responseMessage.data = {
+                                            type: 0,
+                                            tag: req.body.tag,
+                                            pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveStandardTags: Tags Save successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Tag not Saved';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveStandardTags:Tag not Saved');
+                                    }
                                 }
                                 else {
-                                    responseMessage.message = 'Tag not Saved';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveStandardTags:Tag not Saved');
+                                    responseMessage.message = 'An error occured in query ! Please try again';
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnSaveStandardTags: error in saving tags:' + err);
                                 }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured in query ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveStandardTags: error in saving tags:' + err);
-                            }
 
-                        });
+                            });
+                        }
 
                     }
 
@@ -4121,17 +4163,24 @@ User.prototype.saveTags = function(req,res,next){
                 if (!err) {
                     if (result) {
 
+                        var originalFileName = '';
                         if (req.files.image) {
 
                             var uniqueId = uuid.v4();
                             randomName = uniqueId + '.' + req.files.image.extension;
-                            mimetype = req.files.image.mimetype;
-                            console.log(randomName);
+                            originalFileName =  req.files.image.name;
                         }
-                        else {
-                            randomName = '';
-                            mimetype = '';
+
+                        if(parseInt(req.body.type) && (!isNaN(req.body.type))){
+                            randomName = req.body.link;
                         }
+                        else{
+                            /**
+                             * @todo Send error response here
+                             */
+                        }
+
+                        //upload to cloud storage
 
                         //upload to cloud storage
 
@@ -4140,29 +4189,12 @@ User.prototype.saveTags = function(req,res,next){
                          * @todo write a code for doc/image has upload to cloud storage
                          */
 
-                        //request({
-                        //    url: 'https://www.googleapis.com/upload/storage/v1/b/' + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/o',
-                        //    method: 'POST',
-                        //    headers: {
-                        //        'Content-Type': mimetype
-                        //    },
-                        //    uploadType: 'multipart',
-                        //    body: 'hello',
-                        //    name: randomName
-                        //}, function (error, response, body) {
-                        //    if (error) {
-                        //        console.log('error..');
-                        //        console.log(error);
-                        //    } else {
-                        //        console.log('response..');
-                        //        console.log(response.statusCode);
-                        //        console.log(body);
-                        //    }
-                        //});
 
 
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(randomName)
-                            + ',' + st.db.escape(tag) + ',' + st.db.escape(pin);
+                            //var imageFileName = original file name of the image;
+
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                            + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
                         var query = 'CALL psavedocsandurls(' + queryParams + ')';
                         console.log(query);
@@ -4277,15 +4309,15 @@ User.prototype.getStandardTags = function(req,res,next){
                                     console.log('----getresult.length-----');
                                     console.log(getresult[0].length);
                                     for( var i=0; i < getresult[0].length;i++){
-                                        var result = {
-                                            tid :getresult[0][i].tid,
-                                            imageurl :getresult[0][i].imageurl ,
-                                            pin :getresult[0][i].pin,
-                                            imagepath: getresult[0][i].imagepath,
-                                            tag: getresult[0][i].tag,
-                                            s_url : (getresult[0][i].imagepath) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath) : ''
-
-                                        };
+                                        var result = {};
+                                        result.tid = getresult[0][i].tid;
+                                        result.imageurl = getresult[0][i].imageurl;
+                                        result.pin = getresult[0][i].pin;
+                                        result.imagepath = getresult[0][i].imagepath;
+                                        result.tag = getresult[0][i].tag;
+                                        result.s_url = (getresult[0][i].imageurl) ?
+                                            getresult[0][i].imagepath :
+                                        req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath;
                                         output.push(result);
                                     }
 
@@ -4396,19 +4428,21 @@ User.prototype.getTags = function(req,res,next){
                         var query = 'CALL pgetAllDocsandurls(' + queryParams + ')';
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
+                                console.log(getresult);
                                 if (getresult[0]) {
                                     console.log('----getresult.length-----');
                                     console.log(getresult[0].length);
                                     for( var i=0; i < getresult[0].length;i++){
-                                        var result = {
-                                            tid :getresult[0][i].tid,
-                                            imageurl :getresult[0][i].imageurl ,
-                                            pin :getresult[0][i].pin,
-                                            imagepath: getresult[0][i].imagepath,
-                                            tag: getresult[0][i].tag,
-                                            s_url : (getresult[0][i].imagepath) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath) : ''
+                                        var result = {};
+                                        result.tid = getresult[0][i].tid;
+                                        result.imageurl = getresult[0][i].imageurl;
+                                        result.pin = getresult[0][i].pin;
+                                        result.imagepath = getresult[0][i].imagepath;
+                                        result.tag = getresult[0][i].tag;
+                                        result.s_url = (getresult[0][i].imageurl) ?
+                                            getresult[0][i].imagepath :
+                                        req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].imagepath;
 
-                                        };
                                         output.push(result);
                                     }
                                     console.log('----output.length-----');
