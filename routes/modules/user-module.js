@@ -1732,6 +1732,7 @@ User.prototype.getResume = function(req,res,next){
                         responseMessage.skillMatrix = MessagesResult[1];
                         responseMessage.job_location = MessagesResult[2];
                         responseMessage.line_of_career = MessagesResult[3];
+                        responseMessage.education = MessagesResult[4];
                         responseMessage.error = null;
                         responseMessage.message = 'Cv info send successfully';
                         res.status(200).json(responseMessage);
@@ -1812,10 +1813,10 @@ User.prototype.saveResume = function(req,res,next){
         var locationsList = req.body.job_location;
         var categoryID = req.body.category_id ? req.body.category_id : 0;
         var instituteID = req.body.institute_id ? req.body.institute_id : 0;
-        var educationID = req.body.education_id ? req.body.education_id : 0;
-        var specializationID = req.body.specialization_id ? req.body.specialization_id :0;
-        var yearOfPassing = req.body.year_of_passing;
-        var aggregateScore = req.body.aggregate_score;
+        //var educationID = req.body.education_id ? req.body.education_id : 0;
+        //var specializationID = req.body.specialization_id ? req.body.specialization_id :0;
+        //var yearOfPassing = req.body.year_of_passing;
+        //var aggregateScore = req.body.aggregate_score;
         var institueTitle = req.body.institute_title ? req.body.institute_title : '';
         var expectedSalary = (parseFloat(req.body.exp_salary) !== NaN) ? parseFloat(req.body.exp_salary) : 0.00;
         var firstName = req.body.fn;
@@ -1828,10 +1829,8 @@ User.prototype.saveResume = function(req,res,next){
 
         var locMatrix = req.body.locMatrix;
         locMatrix= JSON.parse(JSON.stringify(locMatrix));
-        var pgEducationid = req.body.pg_educationid;
-        var pgSpecializationid = req.body.pg_specializationid;
-        var pgYearofpassing = req.body.pg_yearofpassing;
-        var pgAggregatescore = req.body.pg_aggregatescore;
+        var educations = req.body.educations;
+        educations= JSON.parse(JSON.stringify(educations));
 
         if(typeof(locationsList) == "string"){
             locationsList = JSON.parse(locationsList);
@@ -1872,13 +1871,10 @@ User.prototype.saveResume = function(req,res,next){
                                 + ',' + st.db.escape(Token) + ',' + st.db.escape(ids)+ ','+ st.db.escape(salary) + ',' + st.db.escape(noticePeriod)
                                 + ',' + st.db.escape(experience) + ','+ st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle)
                                 + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID) + ',' + st.db.escape(instituteID)
-                                + ',' + st.db.escape(educationID) + ',' + st.db.escape(specializationID) + ',' + st.db.escape(yearOfPassing)
-                                + ','+ st.db.escape(aggregateScore)+ ','+ st.db.escape(institueTitle) +',' + st.db.escape(expectedSalary)
+                                + ','+ st.db.escape(institueTitle) +',' + st.db.escape(expectedSalary)
                                 + ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName) +',' + st.db.escape(email)
                                 +',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
-                                +',' + st.db.escape(expectedSalarytype)+',' + st.db.escape(pgEducationid)
-                                +',' + st.db.escape(pgSpecializationid)+',' + st.db.escape(pgYearofpassing)
-                                +',' + st.db.escape(pgAggregatescore);
+                                +',' + st.db.escape(expectedSalarytype);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
@@ -1887,6 +1883,7 @@ User.prototype.saveResume = function(req,res,next){
                                     if (InsertResult[0]) {
                                         var async = require('async');
                                         var count = skillMatrix1.length;
+
                                         //console.log(count);
                                         async.each(skillMatrix1, function iterator(skillDetails,callback) {
 
@@ -1982,7 +1979,6 @@ User.prototype.saveResume = function(req,res,next){
                                         });
 
                                         //line of career skill matrix
-
                                         async.each(locMatrix, function iterator(locDetails,callback) {
 
                                             count = count -1;
@@ -2052,6 +2048,78 @@ User.prototype.saveResume = function(req,res,next){
                                             }
 
                                         });
+
+                                        //educations
+                                        async.each(educations, function iterator(eduDetails,callback) {
+
+                                            count = count -1;
+                                            var tid = eduDetails.tid;
+                                            var educationData = {
+
+                                                cvid: InsertResult[0][0].ID,
+                                                eduId :eduDetails.edu_id,
+                                                spcId : eduDetails.spc_id,
+                                                score:eduDetails.score,
+                                                yearofpassing:eduDetails.yp,
+                                                tid: eduDetails.tid,
+                                                level : eduDetails.expertiseLevel   // 0-ug, 1-pg
+                                            };
+
+                                            if (parseInt(educationData.tid) != 0) {
+
+                                                var queryParams = st.db.escape(educationData.tid) + ',' +
+                                                    st.db.escape(educationData.cvid) + ',' +st.db.escape(educationData.eduId)
+                                                    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.score)
+                                                    + ',' +st.db.escape(educationData.yearofpassing)+ ',' +st.db.escape(educationData.level);
+
+                                                var query = 'CALL psavecveducation(' + queryParams + ')';
+                                                st.db.query(query, function (err, result) {
+                                                    if (!err) {
+                                                        if (result) {
+                                                            if (result.affectedRows > 0) {
+                                                                console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnupdateSkill:  skill matrix not updated');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnupdateSkill:  skill matrix not updated')
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnupdateSkill: error in saving  skill matrix:' + err);
+                                                    }
+                                                });
+                                            }
+                                            else {
+                                                var queryParams = st.db.escape(educationData.tid) + ',' + st.db.escape(educationData.cvid) + ',' +st.db.escape(educationData.eduId)
+                                                    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.score)
+                                                    + ',' +st.db.escape(educationData.yearofpassing)+ ',' +st.db.escape(educationData.level);
+
+                                                var query = 'CALL psavecveducation(' + queryParams + ')';
+                                                st.db.query(query, function (err, result) {
+                                                    if (!err) {
+                                                        if (result) {
+                                                            if (result.affectedRows > 0) {
+                                                                console.log('FnSaveCv: skill matrix saved successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnSaveCv: skill matrix not saved');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnSaveCv: skill matrix not saved');
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSaveCv: error in saving skill matrix' + err);
+                                                    }
+                                                });
+
+                                            }
+
+                                        });
                                     }
 
                                     RtnMessage.IsSuccessfull = true;
@@ -2065,41 +2133,46 @@ User.prototype.saveResume = function(req,res,next){
                                     res.statusCode = 500;
                                     console.log('FnSaveCVInfo: CVinfo not saved');
                                 }
-                        });
-                    };
-
-                    var insertLocations = function(locationDetails){
-                        var list = {
-                            location_title: locationDetails.location_title,
-                            latitude: locationDetails.latitude,
-                            longitude: locationDetails.longitude,
-                            country: locationDetails.country,
-                            maptype : locationDetails.maptype
+                            });
                         };
-                        var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                            + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
 
-                        //console.log(queryParams);
+                        var insertLocations = function(locationDetails){
+                            var list = {
+                                location_title: locationDetails.location_title,
+                                latitude: locationDetails.latitude,
+                                longitude: locationDetails.longitude,
+                                country: locationDetails.country,
+                                maptype : locationDetails.maptype
+                            };
+                            var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
+                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
 
-                        st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                            //console.log(queryParams);
 
-                            if(err){
-                                console.log('Error in saving psavejoblocation');
-                                console.log(err);
-                            }
-                            else{
-                                if (results) {
-                                    if (results[0]) {
-                                        if (results[0][0]) {
+                            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
 
-                                            //console.log(results[0][0].id);
-                                            location_id += results[0][0].id + ',';
-                                            locCount +=1;
-                                            if(locCount < locationsList.length){
-                                                insertLocations(locationsList[locCount]);
+                                if(err){
+                                    console.log('Error in saving psavejoblocation');
+                                    console.log(err);
+                                }
+                                else{
+                                    if (results) {
+                                        if (results[0]) {
+                                            if (results[0][0]) {
+
+                                                //console.log(results[0][0].id);
+                                                location_id += results[0][0].id + ',';
+                                                locCount +=1;
+                                                if(locCount < locationsList.length){
+                                                    insertLocations(locationsList[locCount]);
+                                                }
+                                                else{
+                                                    saveResumeDetails();
+                                                }
                                             }
-                                            else{
-                                                saveResumeDetails();
+                                            else {
+                                                console.log('FnSaveJobLocation:results no found');
+                                                res.status(200).json(RtnMessage);
                                             }
                                         }
                                         else {
@@ -2112,59 +2185,54 @@ User.prototype.saveResume = function(req,res,next){
                                         res.status(200).json(RtnMessage);
                                     }
                                 }
-                                else {
-                                    console.log('FnSaveJobLocation:results no found');
-                                    res.status(200).json(RtnMessage);
-                                }
+
+                            });
+                        };
+
+                        if(locationsList){
+                            if(locationsList.length > 0){
+                                insertLocations(locationDetails);
                             }
+                            else{
+                                location_id = '';
+                                saveResumeDetails();
 
-                        });
-                    };
-
-                    if(locationsList){
-                        if(locationsList.length > 0){
-                            insertLocations(locationDetails);
+                            }
                         }
+
                         else{
                             location_id = '';
                             saveResumeDetails();
-
                         }
                     }
-
-                    else{
-                        location_id = '';
-                        saveResumeDetails();
+                    else {
+                        console.log('FnSaveCVInfo: Invalid Token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
                     }
                 }
                 else {
-                    console.log('FnSaveCVInfo: Invalid Token');
-                    res.statusCode = 401;
+                    console.log('FnSaveCVInfo: Token error: ' + err);
+                    res.statusCode = 500;
                     res.send(RtnMessage);
                 }
-            }
+            });
+
+        }
         else {
-                console.log('FnSaveCVInfo: Token error: ' + err);
-                res.statusCode = 500;
-                res.send(RtnMessage);
-            }
-        });
+            console.log('FnSaveCVInfo: Token is empty');
+            res.statusCode = 400;
+            res.send(RtnMessage);
+        }
 
     }
-    else {
-        console.log('FnSaveCVInfo: Token is empty');
-        res.statusCode = 400;
-        res.send(RtnMessage);
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(ex);
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log('FnSaveCVInfo error:' + ex.description);
+
     }
-
-}
-catch (ex) {
-    var errorDate = new Date();
-    console.log(ex);
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-    console.log('FnSaveCVInfo error:' + ex.description);
-
-}
 };
 
 function FnSaveSkills(skill, CallBack) {
@@ -4091,23 +4159,24 @@ User.prototype.downloadResume = function(req,res,next){
 User.prototype.saveStandardTags = function(req,res,next){
 
     var _this = this;
+
     var uuid = require('node-uuid');
     var request = require('request');
 
-    console.log(req.body.tag);
     var token = req.body.token;
-    var image = req.body.image ? req.body.image : '';
+    var image = req.body.image;
     var type = 0;   // 0-image, 1-url
-    var tag = (req.body.tag) ? req.body.tag : 0;
+    var tag = req.body.tag;
     var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : null;
     var randomName,tagType,imageBuffer;
 
+    console.log(tag);
+    console.log(req.body.tag);
+
+
+
     if (tag == 0){
         tagType = 0;
-    }
-    else if(tag == 'PIC')
-    {
-        tagType = 2;
     }
     else{
         tagType = 1;
@@ -4193,6 +4262,7 @@ User.prototype.saveStandardTags = function(req,res,next){
 
                             var uploadtoServer = function (imageBuffer) {
                                 //upload to cloud storage
+                                console.log('uploading to cloud server...');
                                 console.log(imageBuffer);
                                 var gcloud = require('gcloud');
                                 var fs = require('fs');
@@ -4224,7 +4294,7 @@ User.prototype.saveStandardTags = function(req,res,next){
 
                                 remoteWriteStream.on('finish', function () {
                                     var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                        + ',' + st.db.escape(tag.toString().toUpperCase()) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                        + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
                                     var query = 'CALL psavedocsandurls(' + queryParams + ')';
                                     console.log(query);
@@ -4236,7 +4306,7 @@ User.prototype.saveStandardTags = function(req,res,next){
                                                 responseMessage.message = 'Tags Save successfully';
                                                 responseMessage.data = {
                                                     type: 0,
-                                                    tag: req.body.tag,
+                                                    tag: tag,
                                                     pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
                                                 };
                                                 res.status(200).json(responseMessage);
@@ -4291,7 +4361,7 @@ User.prototype.saveStandardTags = function(req,res,next){
                                         responseMessage.message = 'Tags Save successfully';
                                         responseMessage.data = {
                                             type: 0,
-                                            tag: req.body.tag,
+                                            tag: tag,
                                             pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
                                         };
                                         res.status(200).json(responseMessage);

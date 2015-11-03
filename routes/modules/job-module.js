@@ -367,7 +367,7 @@ Job.prototype.create = function(req,res,next){
 
                                     jobid: jobID,
                                     eduId :eduDetails.edu_id,
-                                    spcId : eduDetails.s_id,
+                                    spcId : eduDetails.spc_id,
                                     scoreFrom:eduDetails.score_from,
                                     scoreTo:eduDetails.score_to,
                                     tid: eduDetails.tid,
@@ -402,10 +402,10 @@ Job.prototype.create = function(req,res,next){
                                     });
                                 }
                                 else {
-                                    var queryParams = st.db.escape(locSkills.jobid) + ',' +st.db.escape(locSkills.fid)
-                                        + ',' +st.db.escape(locSkills.expFrom) + ',' +st.db.escape(locSkills.expTo)
-                                        + ',' +st.db.escape(locSkills.expertlevel)+ ',' +st.db.escape(locSkills.careerId)
-                                        + ',' +st.db.escape(locSkills.tid);
+                                    var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
+                                        + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
+                                        + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level)
+                                        + ',' +st.db.escape(educationData.tid);
 
                                     var query = 'CALL pSaveJobLOC(' + queryParams + ')';
                                     st.db.query(query, function (err, result) {
