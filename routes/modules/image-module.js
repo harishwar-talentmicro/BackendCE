@@ -49,7 +49,7 @@ Image.prototype.cropImage = function(req,res,next){
 
     var fs = require('fs');
 
-    console.log(req.files.image.path);
+    //console.log(req.files.image.path);
     var deleteTempFile = function(){
         fs.unlink('../bin/'+req.files.image.path);
     };
@@ -64,18 +64,24 @@ Image.prototype.cropImage = function(req,res,next){
         }
     };
 
+
+    //res.json(req.body);
+    //
+    //return;
+
     var allowedTypes = ['jpg','png'];
 
-    var  targetHeight = (req.body.required_height) ? (!isNaN(parseInt(req.body.required_height)) ? parseInt(req.body.required_height) : 0 ) : 0  ,
-        targetWidth = (req.body.required_width) ? (!isNaN(parseInt(req.body.required_width)) ? parseInt(req.body.required_width) : 0 ) : 0  ;
+    var  targetHeight = (req.query.required_height) ? (!isNaN(parseInt(req.query.required_height)) ? parseInt(req.query.required_height) : 0 ) : 0  ;
+
+    var   targetWidth = (req.query.required_width) ? (!isNaN(parseInt(req.query.required_width)) ? parseInt(req.query.required_width) : 0 ) : 0  ;
 
 
     var scaleHeight = null,scaleWidth = null;
 
-    var cropFlag = (req.body.crop) ? req.body.crop : true;
-    var scaleFlag = (req.body.scale) ? req.body.scale : true;
-    var token = (req.body.Token && req.body.Token !==2 ) ? req.body.Token : '';
-    var outputType = (allowedTypes.indexOf(req.body.output_type) == -1) ? 'png' : req.body.output_type;
+    var cropFlag = (req.query.crop) ? req.query.crop : true;
+    var scaleFlag = (req.query.scale) ? req.query.scale : true;
+    var token = (req.query.Token && req.body.Token !==2 ) ? req.query.Token : '';
+    var outputType = (allowedTypes.indexOf(req.query.output_type) == -1) ? 'png' : req.query.output_type;
 
     if(!(targetHeight && targetWidth)){
         respMsg.message = 'Invalid target dimensions';

@@ -316,8 +316,9 @@ Search.prototype.searchKeyword = function(req,res,next){
 
                                                 if (SearchResult[2].length != count) {
 
-                                                    SearchResult[1][i].tilebanner = SearchResult[2][count].tilebanner;
+                                                    SearchResult[1][i].tilebanner = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + SearchResult[2][count].tilebanner;
                                                     SearchResult[1][i].tbURL = SearchResult[2][count].tbURL;
+                                                    //SearchResult[1][i].s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + SearchResult[1][i].tilebanner;
 
                                                     count += 1;
                                                 }
@@ -460,14 +461,17 @@ Search.prototype.searchInformation = function(req,res,next){
         var ezeTerm = alterEzeoneId(req.query.ezeTerm);
         var CurrentDate = req.query.CurrentDate;
         var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
-        console.log(IPAddress);
+        var latitude = req.query.lat ? req.query.lat : 0;
+        var longitude = req.query.lng ? req.query.lng : 0;
+        var output = [];
+
         var WorkingDate
         var moment = require('moment');
         if(CurrentDate != null)
             var WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
         else
             var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
-        //console.log(WorkingDate);
+
 
         if (ezeTerm) {
             var LocSeqNo = 0;
@@ -495,14 +499,49 @@ Search.prototype.searchInformation = function(req,res,next){
                 }
             }
             var SearchParameter = st.db.escape(Token) + ',' + st.db.escape(WorkingDate) + ',' + st.db.escape(IPAddress)
-                + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Pin);
+                + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Pin)+ ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude);
             console.log('CALL pSearchInformationNew(' + SearchParameter + ')');
             st.db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
                 // st.db.query(searchQuery, function (err, SearchResult) {
                 if (!err) {
-                    //console.log(UserInfoResult);
+
+                    console.log(UserInfoResult[1]);
+                    console.log(UserInfoResult[1][0].type);
+                    console.log(UserInfoResult[1][0].InfoBannerFile1);
+
+
                     if (UserInfoResult[0].length > 0) {
-                        res.send(UserInfoResult[0]);
+
+                        if (UserInfoResult[1][0].type == 0) {
+
+                            for (var i = 0; i < UserInfoResult[1].length; i++) {
+
+                                console.log('for loop..type..0');
+
+                                var result = {};
+                                result.s_url1 = (UserInfoResult[1][0].pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].pic) : '';
+                                result.s_url2 = (UserInfoResult[1][0].InfoBannerFile1) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile1) : '';
+                                result.s_url3 = (UserInfoResult[1][0].InfoBannerFile2) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile2) : '';
+                                result.s_url4 = (UserInfoResult[1][0].InfoBannerFile3) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile3) : '';
+                                result.s_url5 = (UserInfoResult[1][0].InfoBannerFile4) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile4) : '';
+                                result.s_url6 = (UserInfoResult[1][0].InfoBannerFile5) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile5) : '';
+
+                                output.push(result);
+                            }
+                        }
+                        else {
+                            console.log('for loop..type..2');
+                            for (var i = 0; i < UserInfoResult[1].length; i++) {
+                                var result = {};
+
+                                result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][i].path;
+                                output.push(result);
+                            }
+                            console.log(output);
+                        }
+
+
+                        res.json({result :UserInfoResult[0][0],banners:output});
                         console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                     }
                     else {

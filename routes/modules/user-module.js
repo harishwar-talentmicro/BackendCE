@@ -4161,19 +4161,13 @@ User.prototype.saveStandardTags = function(req,res,next){
     var _this = this;
 
     var uuid = require('node-uuid');
-    var request = require('request');
-
-    var token = req.body.token;
+    var token = req.query.token;
     var image = req.body.image;
     var type = 0;   // 0-image, 1-url
-    var tag = req.body.tag;
-    var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : null;
+    //var tag = req.query.tag;
+    var tag = (!isNaN(parseInt(req.query.tag))) ?  parseInt(req.query.tag) : 'PIC';
+    var pin = (!isNaN(parseInt(req.query.pin))) ?  parseInt(req.query.pin) : null;
     var randomName,tagType,imageBuffer;
-
-    console.log(tag);
-    console.log(req.body.tag);
-
-
 
     if (tag == 0){
         tagType = 0;
@@ -4181,8 +4175,6 @@ User.prototype.saveStandardTags = function(req,res,next){
     else{
         tagType = 1;
     }
-
-
 
     var responseMessage = {
         status: false,
@@ -4226,8 +4218,8 @@ User.prototype.saveStandardTags = function(req,res,next){
                                     type: req.files.image.extension,
                                     width: '288',
                                     height: '36',
-                                    scale: '',
-                                    crop: ''
+                                    scale: true,
+                                    crop: true
                                 };
 
                                 FnCropImage(imageParams, function (err, bufferData) {
@@ -4243,10 +4235,10 @@ User.prototype.saveStandardTags = function(req,res,next){
                                 var imageParams = {
                                     path: req.files.image.path,
                                     type: req.files.image.extension,
-                                    width: '293',
-                                    height: '880',
-                                    scale: 1,
-                                    crop: 1
+                                    width: '880',
+                                    height: '293',
+                                    scale: true,
+                                    crop: true
                                 };
                                 //console.log(imageParams);
                                 FnCropImage(imageParams, function (err, bufferData) {
@@ -4425,7 +4417,6 @@ User.prototype.saveStandardTags = function(req,res,next){
         }
     }
 };
-
 
 function FnCropImage(imageParams, callback){
     /**
@@ -5023,7 +5014,7 @@ User.prototype.getTags = function(req,res,next){
                         console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
-                                console.log(getresult);
+                                //console.log(getresult);
                                 if (getresult[0]) {
 
                                     for( var i=0; i < getresult[0].length;i++){

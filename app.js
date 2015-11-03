@@ -18,7 +18,15 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
 var alumni = require('./routes/alumni.js');
-
+app.use(multer({
+    dest: './uploads/',
+    limits: {
+        fieldNameSize: 200,
+        files: 1,
+        fields: 1,
+        fileSize : (1024*1024*2)
+    }
+}));
 app.use(compress());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -26,7 +34,7 @@ app.use(cors());
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false,type : '*/x-www-form-urlencoded' }));
 app.use(cookieParser());
 var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 
@@ -57,15 +65,7 @@ app.all('*',function(req,res,next){
 
 
 
-app.use(multer({
-    dest: './uploads/',
-    limits: {
-        fieldNameSize: 200,
-        files: 1,
-        fields: 1,
-        fileSize : (1024*1024*2)
-    }
-}));
+
 
 
 
