@@ -302,7 +302,9 @@ Search.prototype.searchKeyword = function(req,res,next){
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
-                        //console.log('----------------------------------');
+                        console.log('----------------------------------');
+                        console.log(SearchResult[1]);
+                        console.log(SearchResult[2]);
 
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
@@ -322,6 +324,10 @@ Search.prototype.searchKeyword = function(req,res,next){
 
                                                     count += 1;
                                                 }
+                                            }
+                                            else{
+                                                SearchResult[1][i].tilebanner=req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + SearchResult[1][i].tilebanner;
+
                                             }
                                         }
                                     }
@@ -505,44 +511,49 @@ Search.prototype.searchInformation = function(req,res,next){
                 // st.db.query(searchQuery, function (err, SearchResult) {
                 if (!err) {
 
-                    console.log(UserInfoResult[1]);
-                    console.log(UserInfoResult[1][0].type);
-                    console.log(UserInfoResult[1][0].InfoBannerFile1);
-
-
                     if (UserInfoResult[0].length > 0) {
 
-                        if (UserInfoResult[1][0].type == 0) {
+                        UserInfoResult[0][0].dealbanner = (UserInfoResult[0][0].dealbanner) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[0][0].dealbanner) : '';
+                        console.log(UserInfoResult[1]);
 
-                            for (var i = 0; i < UserInfoResult[1].length; i++) {
+                        if(UserInfoResult[1].length) {
+                            if (UserInfoResult[1][0].type == 0) {
 
-                                console.log('for loop..type..0');
+                                for (var i = 0; i < UserInfoResult[1].length; i++) {
 
-                                var result = {};
-                                result.s_url1 = (UserInfoResult[1][0].pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].pic) : '';
-                                result.s_url2 = (UserInfoResult[1][0].InfoBannerFile1) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile1) : '';
-                                result.s_url3 = (UserInfoResult[1][0].InfoBannerFile2) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile2) : '';
-                                result.s_url4 = (UserInfoResult[1][0].InfoBannerFile3) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile3) : '';
-                                result.s_url5 = (UserInfoResult[1][0].InfoBannerFile4) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile4) : '';
-                                result.s_url6 = (UserInfoResult[1][0].InfoBannerFile5) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile5) : '';
+                                    console.log('for loop..type..0');
 
-                                output.push(result);
+                                    var result = {};
+                                    result.s_url1 = (UserInfoResult[1][0].pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].pic) : '';
+                                    result.s_url2 = (UserInfoResult[1][0].InfoBannerFile1) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile1) : '';
+                                    result.s_url3 = (UserInfoResult[1][0].InfoBannerFile2) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile2) : '';
+                                    result.s_url4 = (UserInfoResult[1][0].InfoBannerFile3) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile3) : '';
+                                    result.s_url5 = (UserInfoResult[1][0].InfoBannerFile4) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile4) : '';
+                                    result.s_url6 = (UserInfoResult[1][0].InfoBannerFile5) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile5) : '';
+
+                                    output.push(result);
+                                }
                             }
-                        }
-                        else {
-                            console.log('for loop..type..2');
-                            for (var i = 0; i < UserInfoResult[1].length; i++) {
-                                var result = {};
+                            else {
+                                console.log('for loop..type..2');
+                                for (var i = 0; i < UserInfoResult[1].length; i++) {
+                                    var result = {};
 
-                                result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][i].path;
-                                output.push(result);
+                                    result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][i].path;
+                                    output.push(result);
+                                }
+                                console.log(output);
                             }
-                            console.log(output);
+
+
+                            res.json({result: UserInfoResult[0][0], banners: output});
+                            console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                         }
-
-
-                        res.json({result :UserInfoResult[0][0],banners:output});
-                        console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
+                        else
+                        {
+                            res.json({result :UserInfoResult[0][0],banners:output});
+                            console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
+                        }
                     }
                     else {
                         res.send('null');

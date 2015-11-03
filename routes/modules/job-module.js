@@ -224,9 +224,8 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
-                                + ',' + st.db.escape(categoryID)+ ',' + st.db.escape(educationID)+ ',' + st.db.escape(specializationID)
-                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(scoreFrom)+ ',' + st.db.escape(skillIds)
-                                + ',' + st.db.escape(scoreTo)+ ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
+                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(skillIds)
+                                + ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
                                 + ',' + st.db.escape(isconfidential) + ',' + st.db.escape(alumnicode);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
