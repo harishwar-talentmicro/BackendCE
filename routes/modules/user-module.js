@@ -12,6 +12,81 @@
  *  7. Country, State and City List Fetching
  *
  */
+
+var stream = require( "stream" );
+var chalk = require( "chalk" );
+var util = require( "util" );
+var fileSystem = require( "fs" );
+
+
+
+// I turn the given source Buffer into a Readable stream.
+function BufferStream( source ) {
+
+    if ( ! Buffer.isBuffer( source ) ) {
+
+        throw( new Error( "Source must be a buffer." ) );
+
+    }
+
+    // Super constructor.
+    stream.Readable.call( this );
+
+    this._source = source;
+
+    // I keep track of which portion of the source buffer is currently being pushed
+    // onto the internal stream buffer during read actions.
+    this._offset = 0;
+    this._length = source.length;
+
+    // When the stream has ended, try to clean up the memory references.
+    this.on( "end", this._destroy );
+
+}
+
+util.inherits( BufferStream, stream.Readable );
+
+
+// I attempt to clean up variable references once the stream has been ended.
+// --
+// NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
+// usage since my Node.js apps will (eventually) never restart.
+BufferStream.prototype._destroy = function() {
+
+    this._source = null;
+    this._offset = null;
+    this._length = null;
+
+};
+
+
+// I read chunks from the source buffer into the underlying stream buffer.
+// --
+// NOTE: We can assume the size value will always be available since we are not
+// altering the readable state options when initializing the Readable stream.
+BufferStream.prototype._read = function( size ) {
+
+    // If we haven't reached the end of the source buffer, push the next chunk onto
+    // the internal stream buffer.
+    if ( this._offset < this._length ) {
+
+        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
+
+        this._offset += size;
+
+    }
+
+    // If we've consumed the entire source buffer, close the readable stream.
+    if ( this._offset >= this._length ) {
+
+        this.push( null );
+
+    }
+
+};
+
+
+
 "use strict";
 
 var path ='D:\\EZEIDBanner\\';
@@ -4019,10 +4094,11 @@ User.prototype.saveStandardTags = function(req,res,next){
     var uuid = require('node-uuid');
     var request = require('request');
 
+    console.log(req.body.tag);
     var token = req.body.token;
     var image = req.body.image ? req.body.image : '';
     var type = 0;   // 0-image, 1-url
-    var tag = req.body.tag ? req.body.tag : 0;
+    var tag = (req.body.tag) ? req.body.tag : 0;
     var pin = (!isNaN(parseInt(req.body.pin))) ?  parseInt(req.body.pin) : null;
     var randomName,tagType,imageBuffer;
 
@@ -4098,10 +4174,10 @@ User.prototype.saveStandardTags = function(req,res,next){
                                 var imageParams = {
                                     path: req.files.image.path,
                                     type: req.files.image.extension,
-                                    width: '315',
-                                    height: '155',
-                                    scale: '',
-                                    crop: ''
+                                    width: '293',
+                                    height: '880',
+                                    scale: 1,
+                                    crop: 1
                                 };
                                 //console.log(imageParams);
                                 FnCropImage(imageParams, function (err, bufferData) {
@@ -4109,6 +4185,7 @@ User.prototype.saveStandardTags = function(req,res,next){
                                     if (bufferData) {
 
                                         imageBuffer = bufferData;
+                                        uploadtoServer(imageBuffer);
                                     }
                                 });
 
@@ -4138,7 +4215,6 @@ User.prototype.saveStandardTags = function(req,res,next){
                                 // Upload a local file to a new file to be created in your bucket
 
                                 var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                                var BufferStream = require('bufferstream');
                                 var bufferStream = new BufferStream(imageBuffer);
                                 bufferStream.pipe(remoteWriteStream);
 
@@ -4148,7 +4224,7 @@ User.prototype.saveStandardTags = function(req,res,next){
 
                                 remoteWriteStream.on('finish', function () {
                                     var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                        + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                        + ',' + st.db.escape(tag.toString().toUpperCase()) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
 
                                     var query = 'CALL psavedocsandurls(' + queryParams + ')';
                                     console.log(query);
@@ -4202,7 +4278,8 @@ User.prototype.saveStandardTags = function(req,res,next){
                             randomName = req.body.link;
 
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                + ',' + st.db.escape(tag.toString().toUpperCase()) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+
 
                             var query = 'CALL psavedocsandurls(' + queryParams + ')';
                             console.log(query);
