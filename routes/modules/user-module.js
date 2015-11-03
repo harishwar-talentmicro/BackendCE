@@ -1708,14 +1708,16 @@ User.prototype.getResume = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var id = req.query.id;
+        var id = parseInt(req.query.id);
         //var ownerId = req.query.owner_id;   // id=masterid when ownerid=0 and id=jobid when ownerid!=0
 
         var responseMessage = {
             status: false,
             data: null,
-            skillMatrix : null,
-            job_location : null,
+            skillMatrix : '',
+            job_location : '',
+            line_of_career : '',
+            education : '',
             error:{},
             message:''
         };
@@ -1728,6 +1730,8 @@ User.prototype.getResume = function(req,res,next){
                 if (!err) {
                     if (MessagesResult[0]) {
                         responseMessage.status = true;
+                        MessagesResult[0][0].CVDocpath = (MessagesResult[0][0].CVDocpath) ?
+                            (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + MessagesResult[0][0].CVDocpath) : '' ;
                         responseMessage.data = MessagesResult[0];
                         responseMessage.skillMatrix = MessagesResult[1];
                         responseMessage.job_location = MessagesResult[2];
@@ -2329,6 +2333,7 @@ User.prototype.getSkills = function(req,res,next){
     try{
         var query = 'CALL PGetSkills(' + st.db.escape(functionId) + ',' + st.db.escape(type) + ')';
         st.db.query(query,function(err,result){
+            console.log(result);
             if(err){
                 console.log('Error : FnPGetSkills ');
                 res.status(400).json(responseMsg);
