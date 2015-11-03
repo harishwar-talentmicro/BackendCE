@@ -2954,7 +2954,8 @@ Job.prototype.viewJobDetails = function(req,res,next){
                                             result: getResult[0],
                                             location : getResult[1],
                                             skill:getResult[2],
-                                            line_of_career : getResult[3]
+                                            line_of_career : getResult[3],
+                                            educations : getResult[4]
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnViewJobDetails: Job Details loaded successfully');
