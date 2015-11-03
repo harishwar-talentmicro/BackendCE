@@ -1996,8 +1996,8 @@ User.prototype.saveResume = function(req,res,next){
                                             if (parseInt(locSkills.tid) != 0) {
 
                                                 var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
-                                                        + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkills.expertlevel)
-                                                        + ',' +st.db.escape(locSkills.expyrs) + ',' +st.db.escape(locSkills.cvid)
+                                                        + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkills.expertiseLevel)
+                                                        + ',' +st.db.escape(locSkills.exp) + ',' +st.db.escape(locSkills.cvid)
                                                     ;
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
@@ -2023,8 +2023,8 @@ User.prototype.saveResume = function(req,res,next){
                                             }
                                             else {
                                                 var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
-                                                        + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkills.expertlevel)
-                                                        + ',' +st.db.escape(locSkills.expyrs) + ',' +st.db.escape(locSkills.cvid)
+                                                        + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkills.expertiseLevel)
+                                                        + ',' +st.db.escape(locSkills.exp) + ',' +st.db.escape(locSkills.cvid)
                                                     ;
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
@@ -2076,6 +2076,7 @@ User.prototype.saveResume = function(req,res,next){
                                                     + ',' +st.db.escape(educationData.yearofpassing)+ ',' +st.db.escape(educationData.level);
 
                                                 var query = 'CALL psavecveducation(' + queryParams + ')';
+                                                console.log(query);
                                                 st.db.query(query, function (err, result) {
                                                     if (!err) {
                                                         if (result) {
@@ -2245,27 +2246,25 @@ function FnSaveSkills(skill, CallBack) {
         //below query to check token exists for the users or not.
         if (skill != null) {
             //var Query = 'select Token from tmaster';
-            //70084b50d3c43822fbef
+            //70084b50d3c43822fbe
             var RtnResponse = {
                 SkillID: 0
             };
             RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
 
-            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname), function (err, SkillResult) {
+            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) + ' and type='+st.db.escape(skill.type), function (err, SkillResult) {
                 if ((!err)) {
                     if (SkillResult[0]) {
-                        //console.log(SkillResult);
-                        //console.log('Skill value:' + SkillResult[0].SkillID);
-                        //console.log('Skill exists');
+
                         RtnResponse.SkillID = SkillResult[0].SkillID;
-                        //console.log(RtnResponse.SkillID);
+
                         CallBack(null, RtnResponse);
                     }
                     else {
-                        st.db.query('insert into mskill (SkillTitle) values (' + st.db.escape(skill.skillname) + ')', function (err, skillInsertResult) {
+                        st.db.query('insert into mskill (SkillTitle,type) values (' + st.db.escape(skill.skillname) + ',' + st.db.escape(skill.type) + ')', function (err, skillInsertResult) {
                             if (!err) {
                                 if (skillInsertResult.affectedRows > 0) {
-                                    st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, SkillMaxResult) {
+                                    st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname) + ' and type='+ st.db.escape(skill.type), function (err, SkillMaxResult) {
                                         if (!err) {
                                             if (SkillMaxResult[0]) {
                                                 //console.log('New Skill');
