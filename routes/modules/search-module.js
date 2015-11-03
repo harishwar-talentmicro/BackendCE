@@ -302,9 +302,9 @@ Search.prototype.searchKeyword = function(req,res,next){
                 //var link = 'CALL pSearchResult(' + InsertQuery + ')';
                 st.db.query('CALL pSearchResultNew(' + InsertQuery + ')', function (err, SearchResult) {
                     if (!err) {
-                        console.log('----------------------------------');
-                        console.log(SearchResult[1]);
-                        console.log(SearchResult[2]);
+                        //console.log('----------------------------------');
+                        //console.log(SearchResult[1]);
+                        //console.log(SearchResult[2]);
 
                         if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
@@ -514,7 +514,7 @@ Search.prototype.searchInformation = function(req,res,next){
                     if (UserInfoResult[0].length > 0) {
 
                         UserInfoResult[0][0].dealbanner = (UserInfoResult[0][0].dealbanner) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[0][0].dealbanner) : '';
-                        console.log(UserInfoResult[1]);
+                        //console.log(UserInfoResult[1]);
 
                         if(UserInfoResult[1].length) {
                             if (UserInfoResult[1][0].type == 0) {

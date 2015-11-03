@@ -1817,10 +1817,6 @@ User.prototype.saveResume = function(req,res,next){
         var locationsList = req.body.job_location;
         var categoryID = req.body.category_id ? req.body.category_id : 0;
         var instituteID = req.body.institute_id ? req.body.institute_id : 0;
-        //var educationID = req.body.education_id ? req.body.education_id : 0;
-        //var specializationID = req.body.specialization_id ? req.body.specialization_id :0;
-        //var yearOfPassing = req.body.year_of_passing;
-        //var aggregateScore = req.body.aggregate_score;
         var institueTitle = req.body.institute_title ? req.body.institute_title : '';
         var expectedSalary = (parseFloat(req.body.exp_salary) !== NaN) ? parseFloat(req.body.exp_salary) : 0.00;
         var firstName = req.body.fn;
@@ -1927,18 +1923,18 @@ User.prototype.saveResume = function(req,res,next){
                                                                 if (!err) {
                                                                     if (result) {
                                                                         if (result.affectedRows > 0) {
-                                                                            console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                                            console.log('FnupdateSkill: skillMatrix1: skill matrix Updated successfully');
                                                                         }
                                                                         else {
-                                                                            console.log('FnupdateSkill:  skill matrix not updated');
+                                                                            console.log('FnupdateSkill: skillMatrix1: skill matrix not updated');
                                                                         }
                                                                     }
                                                                     else {
-                                                                        console.log('FnupdateSkill:  skill matrix not updated')
+                                                                        console.log('FnupdateSkill:  skillMatrix1:skill matrix not updated')
                                                                     }
                                                                 }
                                                                 else {
-                                                                    console.log('FnupdateSkill: error in saving  skill matrix:' + err);
+                                                                    console.log('FnupdateSkill: skillMatrix1:error in saving  skill matrix:' + err);
                                                                 }
                                                             });
                                                         }
@@ -1953,30 +1949,30 @@ User.prototype.saveResume = function(req,res,next){
                                                                 if (!err) {
                                                                     if (result) {
                                                                         if (result.affectedRows > 0) {
-                                                                            console.log('FnSaveCv: skill matrix saved successfully');
+                                                                            console.log('FnSaveCv: skillMatrix1:skill matrix saved successfully');
                                                                         }
                                                                         else {
-                                                                            console.log('FnSaveCv: skill matrix not saved');
+                                                                            console.log('FnSaveCv: skillMatrix1:skill matrix not saved');
                                                                         }
                                                                     }
                                                                     else {
-                                                                        console.log('FnSaveCv: skill matrix not saved');
+                                                                        console.log('FnSaveCv:skillMatrix1: skill matrix not saved');
                                                                     }
                                                                 }
                                                                 else {
-                                                                    console.log('FnSaveCv: error in saving skill matrix' + err);
+                                                                    console.log('FnSaveCv: skillMatrix1:error in saving skill matrix' + err);
                                                                 }
                                                             });
 
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnSaveMessage: Mail not Sent Successfully');
+                                                        console.log('FnSaveMessage:skillMatrix1: Mail not Sent Successfully');
                                                         //res.send(RtnMessage);
                                                     }
                                                 }
                                                 else {
-                                                    console.log('FnSaveMessage:Error in sending mails' + err);
+                                                    console.log('FnSaveMessage:skillMatrix1:Error in sending mails' + err);
                                                     //res.send(RtnMessage);
                                                 }
                                             });
@@ -1985,6 +1981,7 @@ User.prototype.saveResume = function(req,res,next){
                                         //line of career skill matrix
                                         async.each(locMatrix, function iterator(locDetails,callback) {
 
+                                            console.log('----LOC Matrix----');
                                             count = count -1;
                                             var tid = locDetails.tid;
                                             var locSkills = {
@@ -2004,22 +2001,23 @@ User.prototype.saveResume = function(req,res,next){
                                                     ;
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
+                                                console.log(query);
                                                 st.db.query(query, function (err, result) {
                                                     if (!err) {
                                                         if (result) {
                                                             if (result.affectedRows > 0) {
-                                                                console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                                console.log('FnupdateSkill: locMatrix:skill matrix Updated successfully');
                                                             }
                                                             else {
-                                                                console.log('FnupdateSkill:  skill matrix not updated');
+                                                                console.log('FnupdateSkill: locMatrix: skill matrix not updated');
                                                             }
                                                         }
                                                         else {
-                                                            console.log('FnupdateSkill:  skill matrix not updated')
+                                                            console.log('FnupdateSkill:  locMatrix:skill matrix not updated')
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnupdateSkill: error in saving  skill matrix:' + err);
+                                                        console.log('FnupdateSkill: locMatrix:error in saving  skill matrix:' + err);
                                                     }
                                                 });
                                             }
@@ -2030,22 +2028,23 @@ User.prototype.saveResume = function(req,res,next){
                                                     ;
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
+                                                console.log(query);
                                                 st.db.query(query, function (err, result) {
                                                     if (!err) {
                                                         if (result) {
                                                             if (result.affectedRows > 0) {
-                                                                console.log('FnSaveCv: skill matrix saved successfully');
+                                                                console.log('FnSaveCv: locMatrix:skill matrix saved successfully');
                                                             }
                                                             else {
-                                                                console.log('FnSaveCv: skill matrix not saved');
+                                                                console.log('FnSaveCv: locMatrix:skill matrix not saved');
                                                             }
                                                         }
                                                         else {
-                                                            console.log('FnSaveCv: skill matrix not saved');
+                                                            console.log('FnSaveCv: locMatrix:skill matrix not saved');
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnSaveCv: error in saving skill matrix' + err);
+                                                        console.log('FnSaveCv: locMatrix:error in saving skill matrix' + err);
                                                     }
                                                 });
 
@@ -2081,18 +2080,18 @@ User.prototype.saveResume = function(req,res,next){
                                                     if (!err) {
                                                         if (result) {
                                                             if (result.affectedRows > 0) {
-                                                                console.log('FnupdateSkill: skill matrix Updated successfully');
+                                                                console.log('FnupdateSkill: educations:skill matrix Updated successfully');
                                                             }
                                                             else {
-                                                                console.log('FnupdateSkill:  skill matrix not updated');
+                                                                console.log('FnupdateSkill:educations:  skill matrix not updated');
                                                             }
                                                         }
                                                         else {
-                                                            console.log('FnupdateSkill:  skill matrix not updated')
+                                                            console.log('FnupdateSkill: educations: skill matrix not updated')
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnupdateSkill: error in saving  skill matrix:' + err);
+                                                        console.log('FnupdateSkill: educations: error in saving  skill matrix:' + err);
                                                     }
                                                 });
                                             }
@@ -2106,18 +2105,18 @@ User.prototype.saveResume = function(req,res,next){
                                                     if (!err) {
                                                         if (result) {
                                                             if (result.affectedRows > 0) {
-                                                                console.log('FnSaveCv: skill matrix saved successfully');
+                                                                console.log('FnSaveCv:educations: skill matrix saved successfully');
                                                             }
                                                             else {
-                                                                console.log('FnSaveCv: skill matrix not saved');
+                                                                console.log('FnSaveCv:educations: skill matrix not saved');
                                                             }
                                                         }
                                                         else {
-                                                            console.log('FnSaveCv: skill matrix not saved');
+                                                            console.log('FnSaveCv:educations: skill matrix not saved');
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnSaveCv: error in saving skill matrix' + err);
+                                                        console.log('FnSaveCv: educations:error in saving skill matrix' + err);
                                                     }
                                                 });
 
