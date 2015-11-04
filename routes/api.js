@@ -64,8 +64,6 @@ router.post('/user_details',LocationManager.FnSaveUserDetails);
 router.get('/user_details_new',LocationManager.FnGetUserDetailsNew);
 router.post('/send_resume',LocationManager.FnSendResume);
 router.get('/download_resume',LocationManager.FnDownloadResume);
-router.get('/alumni_user_details', LocationManager.FnGetAlumniUserDetails);
-router.get('/search_alumni', LocationManager.FnSearchAlumni);
 router.get('/conveyance_report', LocationManager.FnGetConveyanceReport);
 router.get('/industry_type_list',LocationManager.FnGetindustryType);
 router.get('/industry_category',LocationManager.FnGetindustrycategory);
@@ -269,6 +267,10 @@ router.post('/job_approve',LocationManager.FnApproveAlumniJobs);
 router.get('/search_alumni_ten',LocationManager.FnSearchAlumniTEN);
 router.get('/search_alumni_job',LocationManager.FnSearchAlumniTEN);
 router.get('/my_alumni_jobs',LocationManager.FnGetMyAlumniJobs);
+router.get('/alumni_user_details', LocationManager.FnGetAlumniUserDetails);
+router.get('/search_alumni', LocationManager.FnSearchAlumni);
+router.put('/leave_alumni', LocationManager.FnLeaveAlumni);
+
 
 //Gingerbite module
 router.post('/chef_mail',LocationManager.FnSendMailGingerbite);

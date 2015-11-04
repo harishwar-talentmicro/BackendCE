@@ -60,8 +60,6 @@ exports.FnSaveStandardTags = userModule.saveStandardTags;
 exports.FnGetStandardTags = userModule.getStandardTags;
 exports.FnSaveTags = userModule.saveTags;
 exports.FnGetTags = userModule.getTags;
-exports.FnGetAlumniUserDetails = userModule.getAlumniUserDetails;
-exports.FnSearchAlumni = userModule.searchAlumni;
 exports.FnGetConveyanceReport = userModule.getConveyanceReport;
 exports.FnGetindustryType = userModule.getindustryType;
 exports.FnGetindustrycategory = userModule.getindustrycategory;
@@ -281,6 +279,9 @@ exports.FnApproveAlumniJobs = alumniModule.approveAlumniJobs;
 exports.FnSearchAlumniTEN = alumniModule.searchAlumniTEN;
 exports.FnSearchAlumniJobs = alumniModule.searchAlumniJobs;
 exports.FnGetMyAlumniJobs = alumniModule.getMyAlumniJobs;
+exports.FnGetAlumniUserDetails = alumniModule.getAlumniUserDetails;
+exports.FnSearchAlumni = alumniModule.searchAlumni;
+exports.FnLeaveAlumni = alumniModule.leaveAlumni;
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');

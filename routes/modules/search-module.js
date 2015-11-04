@@ -517,22 +517,32 @@ Search.prototype.searchInformation = function(req,res,next){
                         //console.log(UserInfoResult[1]);
 
                         if(UserInfoResult[1].length) {
+
                             if (UserInfoResult[1][0].type == 0) {
 
                                 for (var i = 0; i < UserInfoResult[1].length; i++) {
 
                                     console.log('for loop..type..0');
-
                                     var result = {};
+
                                     result.s_url1 = (UserInfoResult[1][0].pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].pic) : '';
                                     result.s_url2 = (UserInfoResult[1][0].InfoBannerFile1) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile1) : '';
                                     result.s_url3 = (UserInfoResult[1][0].InfoBannerFile2) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile2) : '';
                                     result.s_url4 = (UserInfoResult[1][0].InfoBannerFile3) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile3) : '';
                                     result.s_url5 = (UserInfoResult[1][0].InfoBannerFile4) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile4) : '';
                                     result.s_url6 = (UserInfoResult[1][0].InfoBannerFile5) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile5) : '';
-
                                     output.push(result);
                                 }
+
+                                var finalResult = {"banners":[
+                                    {"s_url":output[0].s_url1},
+                                    {"s_url":output[0].s_url2},
+                                    {"s_url":output[0].s_url3},
+                                    {"s_url":output[0].s_url4},
+                                    {"s_url":output[0].s_url5},
+                                    {"s_url":output[0].s_url6}]};
+                                output = finalResult.banners;
+
                             }
                             else {
                                 console.log('for loop..type..2');
@@ -542,7 +552,6 @@ Search.prototype.searchInformation = function(req,res,next){
                                     result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][i].path;
                                     output.push(result);
                                 }
-                                console.log(output);
                             }
 
 

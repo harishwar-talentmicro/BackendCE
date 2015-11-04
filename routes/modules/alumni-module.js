@@ -5063,7 +5063,6 @@ Alumni.prototype.searchAlumniJobs = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetMyAlumniJobs
  * Method : GET
@@ -5177,6 +5176,307 @@ Alumni.prototype.getMyAlumniJobs = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetAlumniUserDetails
+ * @method GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @request-param token* <string>
+ */
+Alumni.prototype.getAlumniUserDetails = function(req,res,next){
+
+    var token = req.query.token;
+
+    var respMsg = {
+        status : false,
+        message : 'An error occurred ! Please try again',
+        data : null,
+        error : {
+            token : 'Invalid token'
+        }
+    };
+
+    if(!token){
+        res.status(401).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+            token : 'Invalid token'
+        }});
+    }
+    else{
+        try{
+            st.validateToken(token,function(err,tokenRes){
+                if(!err){
+                    if(tokenRes){
+                        var queryString = 'CALL pgetalumnisofuser('+st.db.escape(token) + ')';
+                        st.db.query(queryString,function(err,results){
+                            if(!err){
+                                if(results){
+                                    if(results[0]){
+                                        if(results[0][0]){
+                                            respMsg.status = true;
+                                            respMsg.error = null;
+                                            respMsg.message = 'Alumni User details loaded successfully';
+                                            results[0][0].Password = undefined;
+                                            respMsg.data = results[0];
+                                            res.status(200).json(respMsg);
+                                        }
+                                        else{
+                                            respMsg.status = false;
+                                            respMsg.error = null;
+                                            respMsg.message = 'No such Alumni user is available';
+                                            res.status(200).json(respMsg);
+                                        }
+                                    }
+                                    else{
+                                        respMsg.status = false;
+                                        respMsg.error = null;
+                                        respMsg.message = 'No such Alumni user is available';
+                                        res.status(200).json(respMsg);
+                                    }
+
+                                }
+                                else{
+                                    respMsg.status = false;
+                                    respMsg.error = null;
+                                    respMsg.message = 'No such user is available';
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                console.log('FnGetAlumniUserDetails : error');
+                                console.log(err);
+                                res.status(200).json(respMsg);
+                            }
+                        });
+                    }
+                    else{
+                        res.status(401).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                            token : 'Invalid token'
+                        }});
+                    }
+                }
+                else{
+                    console.log('FnGetAlumniUserDetails : error');
+                    console.log(err);
+                    res.status(500).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                        token : 'Invalid token'
+                    }});
+                }
+            });
+        }
+        catch(ex){
+            console.log('Exception - FnGetAlumniUserDetails ');
+            console.log(ex);
+            res.status(500).json({ status : false, data : null, message : 'Unauthorized ! Please login to continue',error : {
+                token : 'Invalid token'
+            }});
+        }
+
+    }
+};
+
+/**
+ * @todo FnSearchAlumni
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for search alumni
+ */
+Alumni.prototype.searchAlumni = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var title = req.query.title ? req.query.title : '';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(title)+','+st.db.escape(token);
+                        var query = 'CALL pFindAlumni(' + queryParams + ')';
+                        st.db.query(query, function (err, getresult) {
+                            if (!err) {
+                                if (getresult[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'AlumniSearch Loaded successfully';
+                                    responseMessage.data = getresult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSearchAlumni: AlumniSearch Loaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'AlumniSearch not Loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSearchAlumni:AlumniSearch not Loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSearchAlumni: error in getting AlumniSearch:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSearchAlumni: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSearchAlumni:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSearchAlumni ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnLeaveAlumni
+ * Method : PUT
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for leave alumni
+ */
+Alumni.prototype.leaveAlumni = function(req,res,next){
+    var _this = this;
+
+    var token = req.body.token;
+    var alumniId = req.body.aid;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(alumniId)+','+st.db.escape(token);
+                        var query = 'CALL pLeaveAlumni(' + queryParams + ')';
+                        st.db.query(query, function (err, getresult) {
+                            if (!err) {
+                                if (getresult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Alumni leaved successfully';
+                                    responseMessage.data = getresult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnLeaveAlumni: Alumni leaved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Alumni not leaved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnLeaveAlumni:Alumni not leaved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnLeaveAlumni: error in getting AlumniLeave:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnLeaveAlumni: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnLeaveAlumni:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnLeaveAlumni ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = Alumni;
