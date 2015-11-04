@@ -1885,9 +1885,9 @@ User.prototype.saveResume = function(req,res,next){
                                         var count = skillMatrix1.length;
 
                                         //console.log(count);
-                                        async.each(skillMatrix1, function iterator(skillDetails,callback) {
+                                        async.each(skillMatrix1, function iterator(skillDetails, callback) {
 
-                                            count = count -1;
+                                            count = count - 1;
                                             var tid = skillDetails.tid;
                                             var skills = {
                                                 skillname: skillDetails.skillname,
@@ -1896,8 +1896,8 @@ User.prototype.saveResume = function(req,res,next){
                                                 active_status: skillDetails.active_status,
                                                 cvid: InsertResult[0][0].ID,
                                                 tid: skillDetails.tid,
-                                                fid : skillDetails.fid,
-                                                type : skillDetails.type
+                                                fid: skillDetails.fid,
+                                                type: skillDetails.type
                                             };
                                             FnSaveSkills(skills, function (err, Result) {
                                                 if (!err) {
@@ -1913,12 +1913,12 @@ User.prototype.saveResume = function(req,res,next){
 
                                                         if (parseInt(skills.tid) != 0) {
 
-                                                            var queryParams = st.db.escape(skills.tid) + ',' +st.db.escape(SkillItems.skillID)
-                                                                + ',' +st.db.escape(SkillItems.expertlevel) + ',' +st.db.escape(SkillItems.expyrs)
-                                                                + ',' +st.db.escape(SkillItems.skillstatusid) + ',' +st.db.escape(SkillItems.cvid)
-                                                                + ',' +st.db.escape(skills.fid)+ ',' +st.db.escape(skills.type);
+                                                            var queryParams = st.db.escape(skills.tid) + ',' + st.db.escape(SkillItems.skillID)
+                                                                + ',' + st.db.escape(SkillItems.expertlevel) + ',' + st.db.escape(SkillItems.expyrs)
+                                                                + ',' + st.db.escape(SkillItems.skillstatusid) + ',' + st.db.escape(SkillItems.cvid)
+                                                                + ',' + st.db.escape(skills.fid) + ',' + st.db.escape(skills.type);
 
-                                                            var query = 'CALL pSaveCVSkills(' + queryParams + ')';;
+                                                            var query = 'CALL pSaveCVSkills(' + queryParams + ')';
                                                             st.db.query(query, function (err, result) {
                                                                 if (!err) {
                                                                     if (result) {
@@ -1939,10 +1939,10 @@ User.prototype.saveResume = function(req,res,next){
                                                             });
                                                         }
                                                         else {
-                                                            var queryParams = st.db.escape(skills.tid) + ',' +st.db.escape(SkillItems.skillID)
-                                                                + ',' +st.db.escape(SkillItems.expertlevel) + ',' +st.db.escape(SkillItems.expyrs)
-                                                                + ',' +st.db.escape(SkillItems.skillstatusid) + ',' +st.db.escape(SkillItems.cvid)
-                                                                + ',' +st.db.escape(skills.fid)+ ',' +st.db.escape(skills.type);
+                                                            var queryParams = st.db.escape(skills.tid) + ',' + st.db.escape(SkillItems.skillID)
+                                                                + ',' + st.db.escape(SkillItems.expertlevel) + ',' + st.db.escape(SkillItems.expyrs)
+                                                                + ',' + st.db.escape(SkillItems.skillstatusid) + ',' + st.db.escape(SkillItems.cvid)
+                                                                + ',' + st.db.escape(skills.fid) + ',' + st.db.escape(skills.type);
 
                                                             var query = 'CALL pSaveCVSkills(' + queryParams + ')';
                                                             st.db.query(query, function (err, result) {
@@ -1979,24 +1979,22 @@ User.prototype.saveResume = function(req,res,next){
                                         });
 
                                         //line of career skill matrix
-                                        if(locMatrix.length) {
+                                        if (locMatrix.length) {
                                             async.each(locMatrix, function iterator(locDetails, callback) {
 
                                                 console.log('----LOC Matrix----');
                                                 count = count - 1;
-                                                var tid = locDetails.tid;
                                                 var locSkills = {
                                                     expertiseLevel: locDetails.expertiseLevel,
                                                     exp: locDetails.exp,
                                                     cvid: InsertResult[0][0].ID,
-                                                    tid: locDetails.tid,
                                                     fid: locDetails.fid,
                                                     careerId: locDetails.career_id
                                                 };
 
 
-                                                var queryParams = st.db.escape(locSkills.tid) + ',' + st.db.escape(locSkills.fid)
-                                                        + ',' + st.db.escape(locSkills.careerId) + ',' + st.db.escape(locSkills.expertiseLevel)
+                                                var queryParams = st.db.escape(locSkills.fid)+ ',' + st.db.escape(locSkills.careerId)
+                                                        + ',' + st.db.escape(locSkills.expertiseLevel)
                                                         + ',' + st.db.escape(locSkills.exp) + ',' + st.db.escape(locSkills.cvid)
                                                     ;
 
@@ -2020,13 +2018,11 @@ User.prototype.saveResume = function(req,res,next){
                                                         console.log('FnupdateSkill: locMatrix:error in saving  skill matrix:' + err);
                                                     }
                                                 });
-
-
                                             });
                                         }
 
                                         //educations
-                                        if(educations.length) {
+                                        if (educations.length) {
                                             async.each(educations, function iterator(eduDetails, callback) {
 
                                                 count = count - 1;
@@ -2038,12 +2034,10 @@ User.prototype.saveResume = function(req,res,next){
                                                     spcId: eduDetails.spc_id,
                                                     score: eduDetails.score,
                                                     yearofpassing: eduDetails.yp,
-                                                    tid: eduDetails.tid,
                                                     level: eduDetails.expertiseLevel   // 0-ug, 1-pg
                                                 };
 
-                                                var queryParams = st.db.escape(educationData.tid) + ',' +
-                                                    st.db.escape(educationData.cvid) + ',' + st.db.escape(educationData.eduId)
+                                                var queryParams = st.db.escape(educationData.cvid) + ',' + st.db.escape(educationData.eduId)
                                                     + ',' + st.db.escape(educationData.spcId) + ',' + st.db.escape(educationData.score)
                                                     + ',' + st.db.escape(educationData.yearofpassing) + ',' + st.db.escape(educationData.level);
 
@@ -2198,7 +2192,7 @@ function FnSaveSkills(skill, CallBack) {
             };
             RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
 
-            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) + ' and type='+st.db.escape(skill.type), function (err, SkillResult) {
+            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) + ' and type='+st.db.escape(skill.type)+ ' and functionid='+st.db.escape(skill.fid), function (err, SkillResult) {
                 if ((!err)) {
                     if (SkillResult[0]) {
 
@@ -2207,7 +2201,7 @@ function FnSaveSkills(skill, CallBack) {
                         CallBack(null, RtnResponse);
                     }
                     else {
-                        st.db.query('insert into mskill (SkillTitle,type) values (' + st.db.escape(skill.skillname) + ',' + st.db.escape(skill.type) + ')', function (err, skillInsertResult) {
+                        st.db.query('insert into mskill (SkillTitle,type,functionid) values (' + st.db.escape(skill.skillname) + ',' + st.db.escape(skill.type) + ',' + st.db.escape(skill.fid) + ')', function (err, skillInsertResult) {
                             if (!err) {
                                 if (skillInsertResult.affectedRows > 0) {
                                     st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname) + ' and type='+ st.db.escape(skill.type), function (err, SkillMaxResult) {
