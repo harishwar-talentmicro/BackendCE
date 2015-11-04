@@ -1979,25 +1979,25 @@ User.prototype.saveResume = function(req,res,next){
                                         });
 
                                         //line of career skill matrix
-                                        async.each(locMatrix, function iterator(locDetails,callback) {
+                                        if(locMatrix.length) {
+                                            async.each(locMatrix, function iterator(locDetails, callback) {
 
-                                            console.log('----LOC Matrix----');
-                                            count = count -1;
-                                            var tid = locDetails.tid;
-                                            var locSkills = {
-                                                expertiseLevel: locDetails.expertiseLevel,
-                                                exp: locDetails.exp,
-                                                cvid: InsertResult[0][0].ID,
-                                                tid: locDetails.tid,
-                                                fid : locDetails.fid,
-                                                careerId : locDetails.career_id
-                                            };
+                                                console.log('----LOC Matrix----');
+                                                count = count - 1;
+                                                var tid = locDetails.tid;
+                                                var locSkills = {
+                                                    expertiseLevel: locDetails.expertiseLevel,
+                                                    exp: locDetails.exp,
+                                                    cvid: InsertResult[0][0].ID,
+                                                    tid: locDetails.tid,
+                                                    fid: locDetails.fid,
+                                                    careerId: locDetails.career_id
+                                                };
 
-                                            if (parseInt(locSkills.tid) != 0) {
 
-                                                var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
-                                                        + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkills.expertiseLevel)
-                                                        + ',' +st.db.escape(locSkills.exp) + ',' +st.db.escape(locSkills.cvid)
+                                                var queryParams = st.db.escape(locSkills.tid) + ',' + st.db.escape(locSkills.fid)
+                                                        + ',' + st.db.escape(locSkills.careerId) + ',' + st.db.escape(locSkills.expertiseLevel)
+                                                        + ',' + st.db.escape(locSkills.exp) + ',' + st.db.escape(locSkills.cvid)
                                                     ;
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
@@ -2020,60 +2020,32 @@ User.prototype.saveResume = function(req,res,next){
                                                         console.log('FnupdateSkill: locMatrix:error in saving  skill matrix:' + err);
                                                     }
                                                 });
-                                            }
-                                            else {
-                                                var queryParams = st.db.escape(locSkills.tid) + ',' +st.db.escape(locSkills.fid)
-                                                        + ',' +st.db.escape(locSkills.careerId) + ',' +st.db.escape(locSkills.expertiseLevel)
-                                                        + ',' +st.db.escape(locSkills.exp) + ',' +st.db.escape(locSkills.cvid)
-                                                    ;
 
-                                                var query = 'CALL psavecvLOC(' + queryParams + ')';
-                                                console.log(query);
-                                                st.db.query(query, function (err, result) {
-                                                    if (!err) {
-                                                        if (result) {
-                                                            if (result.affectedRows > 0) {
-                                                                console.log('FnSaveCv: locMatrix:skill matrix saved successfully');
-                                                            }
-                                                            else {
-                                                                console.log('FnSaveCv: locMatrix:skill matrix not saved');
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnSaveCv: locMatrix:skill matrix not saved');
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log('FnSaveCv: locMatrix:error in saving skill matrix' + err);
-                                                    }
-                                                });
 
-                                            }
-
-                                        });
+                                            });
+                                        }
 
                                         //educations
-                                        async.each(educations, function iterator(eduDetails,callback) {
+                                        if(educations.length) {
+                                            async.each(educations, function iterator(eduDetails, callback) {
 
-                                            count = count -1;
-                                            var tid = eduDetails.tid;
-                                            var educationData = {
+                                                count = count - 1;
+                                                var tid = eduDetails.tid;
+                                                var educationData = {
 
-                                                cvid: InsertResult[0][0].ID,
-                                                eduId :eduDetails.edu_id,
-                                                spcId : eduDetails.spc_id,
-                                                score:eduDetails.score,
-                                                yearofpassing:eduDetails.yp,
-                                                tid: eduDetails.tid,
-                                                level : eduDetails.expertiseLevel   // 0-ug, 1-pg
-                                            };
-
-                                            if (parseInt(educationData.tid) != 0) {
+                                                    cvid: InsertResult[0][0].ID,
+                                                    eduId: eduDetails.edu_id,
+                                                    spcId: eduDetails.spc_id,
+                                                    score: eduDetails.score,
+                                                    yearofpassing: eduDetails.yp,
+                                                    tid: eduDetails.tid,
+                                                    level: eduDetails.expertiseLevel   // 0-ug, 1-pg
+                                                };
 
                                                 var queryParams = st.db.escape(educationData.tid) + ',' +
-                                                    st.db.escape(educationData.cvid) + ',' +st.db.escape(educationData.eduId)
-                                                    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.score)
-                                                    + ',' +st.db.escape(educationData.yearofpassing)+ ',' +st.db.escape(educationData.level);
+                                                    st.db.escape(educationData.cvid) + ',' + st.db.escape(educationData.eduId)
+                                                    + ',' + st.db.escape(educationData.spcId) + ',' + st.db.escape(educationData.score)
+                                                    + ',' + st.db.escape(educationData.yearofpassing) + ',' + st.db.escape(educationData.level);
 
                                                 var query = 'CALL psavecveducation(' + queryParams + ')';
                                                 console.log(query);
@@ -2095,35 +2067,9 @@ User.prototype.saveResume = function(req,res,next){
                                                         console.log('FnupdateSkill: educations: error in saving  skill matrix:' + err);
                                                     }
                                                 });
-                                            }
-                                            else {
-                                                var queryParams = st.db.escape(educationData.tid) + ',' + st.db.escape(educationData.cvid) + ',' +st.db.escape(educationData.eduId)
-                                                    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.score)
-                                                    + ',' +st.db.escape(educationData.yearofpassing)+ ',' +st.db.escape(educationData.level);
 
-                                                var query = 'CALL psavecveducation(' + queryParams + ')';
-                                                st.db.query(query, function (err, result) {
-                                                    if (!err) {
-                                                        if (result) {
-                                                            if (result.affectedRows > 0) {
-                                                                console.log('FnSaveCv:educations: skill matrix saved successfully');
-                                                            }
-                                                            else {
-                                                                console.log('FnSaveCv:educations: skill matrix not saved');
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnSaveCv:educations: skill matrix not saved');
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log('FnSaveCv: educations:error in saving skill matrix' + err);
-                                                    }
-                                                });
-
-                                            }
-
-                                        });
+                                            });
+                                        }
                                     }
 
                                     RtnMessage.IsSuccessfull = true;
@@ -3942,6 +3888,7 @@ User.prototype.getUserDetailsNew = function(req,res,next){
 
     }
 };
+
 /**
  * @todo FnSendResume
  * Method : POST
@@ -5195,7 +5142,6 @@ User.prototype.getTags = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetConveyanceReport
  * Method : GET
@@ -5434,7 +5380,6 @@ User.prototype.getConveyanceReport = function(req,res,next){
         }
     }
 };
-
 
 /**
  * Method : GET
