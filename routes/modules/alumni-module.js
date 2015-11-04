@@ -1811,7 +1811,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                             + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype);
 
                         var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
-                        //console.log(query);
+                        console.log(query);
                         st.db.query(query, function (err, insertresult) {
                             //console.log(insertresult);
                             if (!err) {
@@ -5188,6 +5188,7 @@ Alumni.prototype.getMyAlumniJobs = function(req,res,next){
 Alumni.prototype.getAlumniUserDetails = function(req,res,next){
 
     var token = req.query.token;
+    var output = [];
 
     var respMsg = {
         status : false,
@@ -5213,20 +5214,23 @@ Alumni.prototype.getAlumniUserDetails = function(req,res,next){
                             if(!err){
                                 if(results){
                                     if(results[0]){
-                                        if(results[0][0]){
-                                            respMsg.status = true;
-                                            respMsg.error = null;
-                                            respMsg.message = 'Alumni User details loaded successfully';
-                                            results[0][0].Password = undefined;
-                                            respMsg.data = results[0];
-                                            res.status(200).json(respMsg);
+                                        for( var i=0; i < results[0].length;i++){
+                                            var result = {};
+                                            result.logoimage = '';
+                                            result.page1title = results[0][i].page1title;
+                                            result.AlumniID = results[0][i].AlumniID;
+                                            result.alumnicode = results[0][i].alumnicode;
+                                            result.profilestatus = results[0][i].profilestatus;
+                                            result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + '8c40eb14-5f97-4240-a0aa-3771c336dc38.png';
+                                            output.push(result);
                                         }
-                                        else{
-                                            respMsg.status = false;
-                                            respMsg.error = null;
-                                            respMsg.message = 'No such Alumni user is available';
-                                            res.status(200).json(respMsg);
-                                        }
+
+                                        respMsg.status = true;
+                                        respMsg.error = null;
+                                        respMsg.message = 'Alumni User details loaded successfully';
+                                        respMsg.data = output;
+                                        res.status(200).json(respMsg);
+
                                     }
                                     else{
                                         respMsg.status = false;
@@ -5390,6 +5394,7 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
 
     var token = req.body.token;
     var alumniId = req.body.aid;
+    var status = req.body.status
 
     var responseMessage = {
         status: false,
@@ -5415,7 +5420,7 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(alumniId)+','+st.db.escape(token);
+                        var queryParams = st.db.escape(alumniId)+','+st.db.escape(token)+','+st.db.escape(status);
                         var query = 'CALL pLeaveAlumni(' + queryParams + ')';
                         st.db.query(query, function (err, getresult) {
                             if (!err) {

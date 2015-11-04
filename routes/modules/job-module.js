@@ -54,6 +54,8 @@ Job.prototype.create = function(req,res,next){
     var _this = this;
     var fs = require("fs");
 
+    console.log('save jobs...');
+
     var token = req.body.token;
     var tid = req.body.tid;
     var ezeone_id = alterEzeoneId(req.body.ezeone_id);
@@ -85,7 +87,7 @@ Job.prototype.create = function(req,res,next){
     if (!skillMatrix1){
         skillMatrix1=[];
     }
-    var skillIds = req.body.skill_ids ? req.body.skill_ids : '';
+
     var jobID,m= 0,jobtype,masterid='',gid,receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,userID;
 
     var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
@@ -94,7 +96,7 @@ Job.prototype.create = function(req,res,next){
     var alumnicode = req.body.acode;    // alumni code
     var locMatrix = req.body.locMatrix;
     locMatrix= JSON.parse(JSON.stringify(locMatrix));
-    var educations = req.body.jobEducations;
+    var educations = req.body.jobEducation;
     educations= JSON.parse(JSON.stringify(educations));
 
 
@@ -215,6 +217,7 @@ Job.prototype.create = function(req,res,next){
                         var locCount = 0;
                         var locationDetails = locationsList[locCount];
                         location_id = location_id.substr(0,location_id.length - 1);
+
                         var createJobPosting = function(){
                             var query = st.db.escape(tid) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(job_code)
                                 + ',' + st.db.escape(job_title) + ',' + st.db.escape(exp_from) + ',' + st.db.escape(exp_to)
@@ -222,8 +225,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
-                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(skillIds)
-                                + ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
+                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
                                 + ',' + st.db.escape(isconfidential) + ',' + st.db.escape(alumnicode);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
@@ -253,17 +255,105 @@ Job.prototype.create = function(req,res,next){
                                             mobileNo: mobileNo,
                                             location_id: location_id,
                                             categoryID: categoryID,
-                                            educationID: educationID,
-                                            specializationID: specializationID,
                                             instituteID: instituteID,
-                                            score_from: scoreFrom,
-                                            score_to: scoreTo,
                                             cid : cid,
                                             ctid : conatctId,
                                             isconfi : isconfidential,
                                             acode : alumnicode
                                         };
                                         res.status(200).json(responseMessage);
+
+
+                                        if(locMatrix.length) {
+
+                                            async.each(locMatrix, function iterator(locDetails, callback) {
+
+                                                count = count - 1;
+
+                                                var locSkills = {
+                                                    expertiseLevel: locDetails.expertiseLevel,
+                                                    jobid: insertresult[0][0].jobid,
+                                                    expFrom: locDetails.exp_from,
+                                                    expTo: locDetails.exp_to,
+                                                    fid: locDetails.fid,
+                                                    careerId: locDetails.career_id
+                                                };
+
+                                                var queryParams = st.db.escape(locSkills.jobid) + ',' + st.db.escape(locSkills.fid)
+                                                    + ',' + st.db.escape(locSkills.expFrom) + ',' + st.db.escape(locSkills.expTo)
+                                                    + ',' + st.db.escape(locSkills.expertiseLevel) + ',' + st.db.escape(locSkills.careerId);
+
+                                                var query = 'CALL pSaveJobLOC(' + queryParams + ')';
+                                                console.log(query);
+                                                st.db.query(query, function (err, result) {
+                                                    if (!err) {
+                                                        if (result) {
+                                                            if (result.affectedRows > 0) {
+                                                                console.log('FnupdateSkill: locMatrix: skill matrix Updated successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnupdateSkill: locMatrix: skill matrix not updated');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnupdateSkill: locMatrix: skill matrix not updated')
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnupdateSkill: locMatrix ; error in saving  skill matrix:' + err);
+                                                    }
+                                                });
+                                            });
+                                        }
+                                        else
+                                        {locMatrix=''}
+
+                                        if(educations.length) {
+                                            async.each(educations, function iterator(eduDetails,callback) {
+
+                                                count = count -1;
+
+                                                var educationData = {
+
+                                                    jobid: insertresult[0][0].jobid,
+                                                    eduId :eduDetails.edu_id,
+                                                    spcId : eduDetails.spc_id,
+                                                    scoreFrom:eduDetails.score_from,
+                                                    scoreTo:eduDetails.score_to,
+                                                    level : eduDetails.expertiseLevel   // 0-ug, 1-pg
+                                                };
+
+
+
+                                                var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
+                                                    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
+                                                    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level);
+
+                                                var query = 'CALL psavejobeducation(' + queryParams + ')';
+                                                console.log(query);
+                                                st.db.query(query, function (err, result) {
+                                                    if (!err) {
+                                                        if (result) {
+                                                            if (result.affectedRows > 0) {
+                                                                console.log('FnupdateSkill:educations: skill matrix Updated successfully');
+                                                            }
+                                                            else {
+                                                                console.log('FnupdateSkill: educations: skill matrix not updated');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnupdateSkill:  educations:skill matrix not updated')
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnupdateSkill: educations:error in saving  skill matrix:' + err);
+                                                    }
+                                                });
+                                            });
+                                        }
+                                        else
+                                        {educations=''}
+
                                         matrix(insertresult[0][0].jobid);
                                         console.log('FnSaveJobs: Jobs save successfully');
                                     }
@@ -284,86 +374,6 @@ Job.prototype.create = function(req,res,next){
                         var matrix = function(jobId_Result){
                             jobID = jobId_Result;
                             var count = skillMatrix1.length;
-
-                            async.each(locMatrix, function iterator(locDetails,callback) {
-
-                                count = count -1;
-
-                                var locSkills = {
-                                    expertiseLevel: locDetails.expertiseLevel,
-                                    jobid: jobID,
-                                    expFrom:locDetails.exp_from,
-                                    expTo:locDetails.exp_to,
-                                    tid: locDetails.tid,
-                                    fid : locDetails.fid,
-                                    careerId : locDetails.career_id
-                                };
-
-                                var queryParams = st.db.escape(locSkills.jobid) + ',' +st.db.escape(locSkills.fid)
-                                    + ',' +st.db.escape(locSkills.expFrom) + ',' +st.db.escape(locSkills.expTo)
-                                    + ',' +st.db.escape(locSkills.expertlevel)+ ',' +st.db.escape(locSkills.careerId);
-
-                                var query = 'CALL pSaveJobLOC(' + queryParams + ')';
-                                st.db.query(query, function (err, result) {
-                                    if (!err) {
-                                        if (result) {
-                                            if (result.affectedRows > 0) {
-                                                console.log('FnupdateSkill: skill matrix Updated successfully');
-                                            }
-                                            else {
-                                                console.log('FnupdateSkill:  skill matrix not updated');
-                                            }
-                                        }
-                                        else {
-                                            console.log('FnupdateSkill:  skill matrix not updated')
-                                        }
-                                    }
-                                    else {
-                                        console.log('FnupdateSkill: error in saving  skill matrix:' + err);
-                                    }
-                                });
-                            });
-
-                            async.each(educations, function iterator(eduDetails,callback) {
-
-                                count = count -1;
-
-                                var educationData = {
-
-                                    jobid: jobID,
-                                    eduId :eduDetails.edu_id,
-                                    spcId : eduDetails.spc_id,
-                                    scoreFrom:eduDetails.score_from,
-                                    scoreTo:eduDetails.score_to,
-                                    level : eduDetails.expertiseLevel   // 0-ug, 1-pg
-                                };
-
-
-
-                                var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
-                                    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
-                                    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level);
-
-                                var query = 'CALL psavejobeducation(' + queryParams + ')';
-                                st.db.query(query, function (err, result) {
-                                    if (!err) {
-                                        if (result) {
-                                            if (result.affectedRows > 0) {
-                                                console.log('FnupdateSkill: skill matrix Updated successfully');
-                                            }
-                                            else {
-                                                console.log('FnupdateSkill:  skill matrix not updated');
-                                            }
-                                        }
-                                        else {
-                                            console.log('FnupdateSkill:  skill matrix not updated')
-                                        }
-                                    }
-                                    else {
-                                        console.log('FnupdateSkill: error in saving  skill matrix:' + err);
-                                    }
-                                });
-                            });
 
                             if(m < skillMatrix1.length) {
                                 var skills = {
@@ -387,14 +397,17 @@ Job.prototype.create = function(req,res,next){
                                                 expTo: skills.expTo,
                                                 skillstatusid: skills.active_status,
                                                 jobid: skills.jobId,
-                                                type : skills.type
+                                                type : skills.type,
+                                                fid:skills.fid
                                             };
 
                                             var queryParams = st.db.escape(SkillItems.jobid) + ',' + st.db.escape(SkillItems.skillID)
                                                 + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
                                                 + ',' + st.db.escape(SkillItems.skillstatusid) + ',' + st.db.escape(SkillItems.expertlevel)
-                                                + ',' + st.db.escape(parseInt(skills.fid))+ ',' + st.db.escape(SkillItems.type);
+                                                + ',' + st.db.escape(parseInt(SkillItems.fid))+ ',' + st.db.escape(SkillItems.type);
                                             var query = 'CALL pSaveJobSkill(' + queryParams + ')';
+
+                                            console.log(query);
                                             st.db.query(query, function (err, result) {
                                                 if (!err) {
                                                     console.log('FnupdateSkill: skill matrix Updated successfully');
@@ -424,14 +437,16 @@ Job.prototype.create = function(req,res,next){
                             }
                         };
 
+
+
+
                         //send push notification
                         var postNotification = function (jobID) {
                             var queryParams1 = st.db.escape(jobID) + ',' + st.db.escape(location_id)
-                                + ',' + st.db.escape(req.body.education_id) + ',' + st.db.escape(req.body.specialization_id)
                                 + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to)
                                 + ',' + st.db.escape(req.body.salaryFrom)+ ',' + st.db.escape(req.body.salaryTo)
                                 + ',' + st.db.escape(req.body.salaryType);
-                            //console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
+                            console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
                             st.db.query('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')', function (err, results) {
                                 if (!err) {
                                     if (results) {

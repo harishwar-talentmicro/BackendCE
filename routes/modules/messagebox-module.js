@@ -1300,6 +1300,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var ezeid = alterEzeoneId(req.body.ezeid);
     var istask = req.body.istask ? req.body.istask : 0;
     var memberVisible = req.body.member_visible ? req.body.member_visible : 0;
+    var randomName,originalFileName;
 
     if(idType){
         id = idType.split(",");
@@ -1360,6 +1361,13 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 });
                             };
                             var compose = function() {
+
+                                //var uniqueId = uuid.v4();
+                                //randomName = uniqueId + '.' + req.files.image.extension;
+                                //originalFileName = req.files.image.name;
+
+
+
                                 var queryParams = st.db.escape(message) + ',' + st.db.escape(attachment) + ',' + st.db.escape(attachmentFilename)
                                     + ',' + st.db.escape(priority) + ',' + st.db.escape(targetDate) + ',' + st.db.escape(expiryDate)
                                     + ',' + st.db.escape(token) + ',' + st.db.escape(previousMessageID) + ',' + st.db.escape(toID)
@@ -1455,7 +1463,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                                                                     messageType = id_type;
                                                                                                     operationType = 0;
                                                                                                     iphoneId = iphoneID;
-                                                                                                    messageId = msgId;
+                                                                                                    messageId = insertResult[0][0].messageids;
                                                                                                     masterid = groupDetails[0][0].AdminID;
                                                                                                     prioritys = priority;
                                                                                                     var a_name = attachmentFilename;
