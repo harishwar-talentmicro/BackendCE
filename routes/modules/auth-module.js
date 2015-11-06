@@ -398,8 +398,14 @@ Auth.prototype.register = function(req,res,next){
 
                                                 fs.readFile(file, "utf8", function (err, data) {
                                                     if (err) throw err;
-                                                    data = data.replace("[Firstname]", FirstName);
-                                                    data = data.replace("[Lastname]", LastName);
+                                                    if(FirstName && LastName) {
+                                                        var name = FirstName + ' ' + LastName;
+                                                    }
+                                                    else
+                                                    {
+                                                        var name= FirstName;
+                                                    }
+                                                    data = data.replace("[name]", name);
                                                     data = data.replace("[EZEOneID]", EZEID);
                                                     var mailOptions = {
                                                         from: 'noreply@ezeone.com',
@@ -463,7 +469,7 @@ Auth.prototype.register = function(req,res,next){
                                                     //console.log(RtnMessage);
                                                     //res.send(RtnMessage);
                                                 }
-                                            });
+                                            });fn
                                             console.log(RtnMessage);
                                             res.send(RtnMessage);
                                         }
