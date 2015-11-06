@@ -2324,8 +2324,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                             attachment: req.body.attachment,
                                             code: req.body.code,
                                             a_title: req.body.a_title,
-                                            a_type: req.body.a_type,
-                                            s_url: url
+                                            a_type: req.body.a_type
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveTENMaster: Data saved successfully');
