@@ -64,6 +64,8 @@ exports.FnGetConveyanceReport = userModule.getConveyanceReport;
 exports.FnGetindustryType = userModule.getindustryType;
 exports.FnGetindustrycategory = userModule.getindustrycategory;
 exports.FnTestTags = userModule.testTags;
+exports.FnTestTagsDocs = userModule.testTagsDocs;
+
 
 //Audit module
 var Audit = require('./modules/audit-module.js');

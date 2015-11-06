@@ -2923,14 +2923,17 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
     var allowedDocs = ['ID','DL','PASSPORT','BROCHURE','CV','D1','D2'];
     var allowedDocTypes = {ID : 3, DL : 7, PP : 4,BR : 1 ,CV : 2,D1 : 5,D2 :6};
-    if(req.params.id){
+    if(req.params.id) {
         var link = req.params.id;
         var arr = link.split('.');
 
         console.log(arr);
 
         ezeid = arr[0];
-        tag = arr[1].toUpperCase();
+        if (arr[1]) {
+
+            tag = arr[1].toUpperCase();
+        }
         if(arr[2]) {
             pin = arr[2];
         }
@@ -4112,7 +4115,6 @@ User.prototype.saveStandardTags = function(req,res,next){
     var token = req.query.token;
     var image = req.body.image;
     var type = 0;   // 0-image, 1-url
-    //var tag = req.query.tag;
     var tag = (!isNaN(parseInt(req.query.tag))) ?  parseInt(req.query.tag) : 'PIC';
     var pin = (!isNaN(parseInt(req.query.pin))) ?  parseInt(req.query.pin) : null;
     var randomName,tagType,imageBuffer;
@@ -4247,7 +4249,8 @@ User.prototype.saveStandardTags = function(req,res,next){
                                                 responseMessage.data = {
                                                     type: 0,
                                                     tag: tag,
-                                                    pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null
+                                                    pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
+                                                    s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
                                                 };
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnSaveStandardTags: Tags Save successfully');
@@ -5451,8 +5454,6 @@ User.prototype.getindustrycategory = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
-
 
     try {
 
@@ -5506,7 +5507,6 @@ User.prototype.getindustrycategory = function(req,res,next){
 
 };
 
-
 /**
  * @todo FnTestTags
  * Method : POST
@@ -5521,10 +5521,14 @@ User.prototype.testTags = function(req,res,next) {
 
     var uuid = require('node-uuid');
 
-    var randomName, originalFileName, imageBuffer;
+    var randomName;
 
     try{
-        var query = "SELECT dealbanner,tid FROM tmaster WHERE dealbanner IS NOT NULL AND dealbanner!='' ";
+        //var query = "SELECT dealbanner,tid FROM tmaster WHERE dealbanner IS NOT NULL AND dealbanner!='' "
+        //var query = "select picture,tid from tbannerpics";
+        //var query = "select image as picture,tid from t_docsandurls_new limit 1750,250";
+        //var query = "select image as picture,tid,imagefilename from t_docsandurls_new_228";
+        var query = "select tid,url as picture from test_tmaster";
 
         st.db.query(query, function (err, result) {
 
@@ -5537,17 +5541,18 @@ User.prototype.testTags = function(req,res,next) {
 
             var uploadFile = function(i) {
 
-                if (i < 3) {
+                if (i < result.length) {
 
-
-                    var filetype = (result[i].dealbanner).split(';base64');
+                    //result[i].dealbanner
+                    //result[i].picture
+                    var filetype = (result[i].picture).split(';base64');
                     var type = filetype[0].split('/');
                     console.log(type);
-                    var base64Data = result[i].dealbanner;
+                    var base64Data = result[i].picture;
                     var tid = result[i].tid;
                     console.log(tid);
 
-                    var bufferData = new Buffer(base64Data, 'base64');
+                    var bufferData = new Buffer(base64Data.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''),  'base64');
                     console.log(bufferData);
 
                     var uniqueId = uuid.v4();
@@ -5556,75 +5561,79 @@ User.prototype.testTags = function(req,res,next) {
                     if (bufferData) {
 
                         console.log('uploading to cloud server...');
-                        uploadtoServer(bufferData,tid,randomName);
-                    }
-                }
-                else{res.send('success');}
-            };
 
-            var uploadtoServer = function(bufferData,tid,randomName){
-                    var gcloud = require('gcloud');
-                    var fs = require('fs');
+                        var gcloud = require('gcloud');
+
+                        var fs = require('fs');
 
 
-                    var gcs = gcloud.storage({
-                        projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
-                        keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
-                    });
-
-                    // Reference an existing bucket.
-                    var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
-
-                    bucket.acl.default.add({
-                        entity: 'allUsers',
-                        role: gcs.acl.READER_ROLE
-                    }, function (err, aclObject) {
-                    });
-
-                    // Upload a local file to a new file to be created in your bucket
-
-                    var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                    var bufferStream = new BufferStream(bufferData);
-                    bufferStream.pipe(remoteWriteStream);
-
-                    //var localReadStream = fs.createReadStream(req.files.image.path);
-                    //localReadStream.pipe(remoteWriteStream);
-
-
-                    remoteWriteStream.on('finish', function () {
-                        console.log('uploaded sucessfully');
-                        var query = 'UPDATE tmaster SET dealbanner='+st.db.escape(randomName) +' WHERE tid='+ tid;
-                        st.db.query(query, function (err, result) {
-                            if (!err) {
-                                console.log('file updated to database');
-                                var url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName ;
-                                console.log(url);
-                                i = i+1;
-                                uploadFile(i);
-
-                            }
-                            else {
-                                console.log('file not updated to database');
-
-                            }
+                        var gcs = gcloud.storage({
+                            projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                            keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
                         });
 
-                    });
+                        // Reference an existing bucket.
+                        var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
 
-                    remoteWriteStream.on('error', function () {
-                        console.log('file not uploaded');
+                        bucket.acl.default.add({
+                            entity: 'allUsers',
+                            role: gcs.acl.READER_ROLE
+                        }, function (err, aclObject) {
+                        });
 
-                    });
+                        // Upload a local file to a new file to be created in your bucket
 
-                };
+                        var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                        var bufferStream = new BufferStream(bufferData);
+                        bufferStream.pipe(remoteWriteStream);
+
+
+                        remoteWriteStream.on('finish', function () {
+                            console.log('uploaded sucessfully');
+                            //var query = 'UPDATE tmaster SET dealbanner=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
+                            //var query = 'insert into test(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )';
+                            //var query = 'insert into test_t_docsandurls_new(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )'
+                            var query = 'UPDATE test_tmaster SET url=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
+                            //console.log(query);
+                            st.db.query(query, function (err, result) {
+                                if (!err) {
+                                    console.log('file updated to database');
+                                    var url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
+                                    console.log(url);
+                                    i = i + 1;
+                                    uploadFile(i);
+
+                                }
+                                else {
+                                    console.log('file not updated to database');
+
+                                }
+                            });
+
+                        });
+
+                        remoteWriteStream.on('error', function () {
+                            console.log('file not uploaded');
+
+                        });
+                    }
+                }
+                else{
+                    res.statusCode = 200;
+                    var RtnMessage = 'success';
+                    res.send(RtnMessage);
+                }
+            };
+
+
 
             if(tid){
                 console.log('tid....');
-                var i=2;
-                uploadFile(i)
+                var i=0;
+                uploadFile(i);
             }
 
-            });
+        });
     }
 
     catch (ex) {
@@ -5640,6 +5649,163 @@ User.prototype.testTags = function(req,res,next) {
     }
 
 };
+
+/**
+ * @todo FnTestTagsDocs
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save standard tags
+ */
+User.prototype.testTagsDocs = function(req,res,next) {
+
+    var _this = this;
+
+    var uuid = require('node-uuid');
+
+    var randomName,type,filetype;
+
+    try{
+        //var query = "SELECT dealbanner,tid FROM tmaster WHERE dealbanner IS NOT NULL AND dealbanner!='' "
+        //var query = "select picture,tid from tbannerpics";
+        //var query = "select image as picture,tid from t_docsandurls_new limit 1750,250";
+        //var query = "select image as picture,tid,imagefilename from t_docsandurls_new_228 limit 225,10";
+        //var query = "select cvdoc as picture,tid,filename as imagefilename from tcv_tdumnp";
+        var query = "select tid,url as picture from test_tmaster";
+
+        st.db.query(query, function (err, result) {
+
+            console.log('------------');
+            //console.log(result);
+            console.log(result.length);
+
+
+            var tid = req.body.tid;
+
+            var uploadFile = function(i) {
+
+                if (i < result.length) {
+
+                    console.log(result[i].imagefilename);
+
+                    if(result[i].imagefilename){
+                        filetype = (result[i].imagefilename).split('.');
+                        type = filetype[1];
+                    }
+                    else {
+
+                        type = 'jpg';
+                    }
+                    console.log(type);
+                    var base64Data = result[i].picture;
+                    var tid = result[i].tid;
+                    console.log(tid);
+
+                    var bufferData = new Buffer(base64Data.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''),  'base64');
+                    console.log(bufferData);
+
+                    var uniqueId = uuid.v4();
+                    randomName = uniqueId + '.' + type;
+
+                    if (bufferData) {
+
+                        console.log('uploading to cloud server...');
+
+                        var gcloud = require('gcloud');
+
+                        var fs = require('fs');
+
+
+                        var gcs = gcloud.storage({
+                            projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                            keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                        });
+
+                        // Reference an existing bucket.
+                        var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                        bucket.acl.default.add({
+                            entity: 'allUsers',
+                            role: gcs.acl.READER_ROLE
+                        }, function (err, aclObject) {
+                        });
+
+                        // Upload a local file to a new file to be created in your bucket
+
+                        var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                        var bufferStream = new BufferStream(bufferData);
+                        bufferStream.pipe(remoteWriteStream);
+
+                        //var localReadStream = fs.createReadStream(bufferData);
+                        //var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                        //localReadStream.pipe(remoteWriteStream);
+
+
+                        remoteWriteStream.on('finish', function () {
+                            console.log('uploaded sucessfully');
+                            //var query = 'UPDATE tmaster SET dealbanner=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
+                            //var query = 'insert into test(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )';
+                            //var query = 'insert into test_t_docsandurls_new(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )'
+                            var query = 'insert into test_t_docsandurls_new_228(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )'
+                            //var query = 'insert into test_tcv_tdumnp(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )';
+                            console.log(query);
+                            st.db.query(query, function (err, result) {
+                                if (!err) {
+                                    console.log('file updated to database');
+                                    var url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
+                                    console.log(url);
+                                    i = i + 1;
+                                    uploadFile(i);
+
+                                }
+                                else {
+                                    console.log('file not updated to database');
+
+                                }
+                            });
+
+                        });
+
+                        remoteWriteStream.on('error', function () {
+                            console.log('file not uploaded');
+
+                        });
+                    }
+                }
+                else{
+                    res.statusCode = 200;
+                    var RtnMessage = 'success';
+                    res.send(RtnMessage);
+                }
+            };
+
+
+
+            if(tid){
+                console.log('tid....');
+                var i=0;
+                uploadFile(i);
+            }
+
+        });
+    }
+
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
+        console.log('Error : FnSaveStandardTags ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+
+};
+
+
 
 
 module.exports = User;
