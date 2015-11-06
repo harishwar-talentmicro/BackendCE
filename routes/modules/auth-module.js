@@ -348,6 +348,21 @@ Auth.prototype.register = function(req,res,next){
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
 
+                                            var queryParams = st.db.escape(PIN) + ',' + st.db.escape(EZEID)+ ',' + st.db.escape('');
+                                            var query = 'CALL pupdateEZEoneKeywords(' + queryParams + ')';
+                                            console.log('------');
+                                            console.log(query);
+                                            console.log(query);
+                                            st.db.query(query, function (err, getResult) {
+                                                if (!err) {
+
+                                                    console.log('FnRegistration: tmaster: Update operation success');
+                                                    console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                                    //console.log(RtnMessage);
+                                                    //res.send(RtnMessage);
+                                                }
+                                            });
+
                                             /**
                                              * Creating queue for the user dynamically on rabbit server
                                              *
@@ -435,6 +450,20 @@ Auth.prototype.register = function(req,res,next){
                                         }
                                         else {
                                             console.log('FnRegistration: tmaster: Update operation success');
+                                            var queryParams = st.db.escape(PIN) + ',' + st.db.escape(EZEID)+ ',' + st.db.escape('');
+                                            var query = 'CALL pupdateEZEoneKeywords(' + queryParams + ')';
+                                            console.log('------');
+                                            console.log(query);
+                                            console.log(query);
+                                            st.db.query(query, function (err, getResult) {
+                                                if (!err) {
+
+                                                    console.log('FnRegistration: tmaster: Update operation success');
+                                                    console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                                    //console.log(RtnMessage);
+                                                    //res.send(RtnMessage);
+                                                }
+                                            });
                                             console.log(RtnMessage);
                                             res.send(RtnMessage);
                                         }
@@ -560,6 +589,20 @@ Auth.prototype.register = function(req,res,next){
 
                                         if (Operation == 'I') {
                                             console.log('FnRegistration:tmaster: Registration success');
+                                            var queryParams = st.db.escape(PIN) + ',' + st.db.escape(EZEID)+ ',' + st.db.escape('');
+                                            var query = 'CALL pupdateEZEoneKeywords(' + queryParams + ')';
+                                            console.log('------');
+                                            console.log(query);
+                                            console.log(query);
+                                            st.db.query(query, function (err, getResult) {
+                                                if (!err) {
+
+                                                    console.log('FnRegistration: tmaster: Update operation success');
+                                                    console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                                    //console.log(RtnMessage);
+                                                    //res.send(RtnMessage);
+                                                }
+                                            });
                                             //res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
                                                 var fs = require('fs');
@@ -598,6 +641,8 @@ Auth.prototype.register = function(req,res,next){
                                                             console.log('FnRegistration: Mail not Saved Successfully' + err);
                                                         }
 
+
+
                                                         var ip = req.headers['x-forwarded-for'] ||
                                                             req.connection.remoteAddress ||
                                                             req.socket.remoteAddress ||
@@ -623,9 +668,8 @@ Auth.prototype.register = function(req,res,next){
                                                 res.send(RtnMessage);
                                             }
                                         }
-                                        else {
-
-                                            var queryParams = st.db.escape(PIN) + ',' + st.db.escape(EZEID);
+                                        else{
+                                            var queryParams = st.db.escape(PIN) + ',' + st.db.escape(EZEID)+ ',' + st.db.escape('');
                                             var query = 'CALL pupdateEZEoneKeywords(' + queryParams + ')';
                                             console.log(query);
                                             st.db.query(query, function (err, getResult) {
@@ -633,8 +677,8 @@ Auth.prototype.register = function(req,res,next){
 
                                                     console.log('FnRegistration: tmaster: Update operation success');
                                                     console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
-                                                    console.log(RtnMessage);
-                                                    res.send(RtnMessage);
+                                                    //console.log(RtnMessage);
+                                                    //res.send(RtnMessage);
                                                 }
                                             });
                                         }

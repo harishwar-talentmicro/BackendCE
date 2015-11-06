@@ -4,7 +4,82 @@
  *  @title Alumni module
  *  @description Handles functions related to alumni profile and events
  */
+var stream = require( "stream" );
+var chalk = require( "chalk" );
+var util = require( "util" );
+// I turn the given source Buffer into a Readable stream.
+function BufferStream( source ) {
+
+    if ( ! Buffer.isBuffer( source ) ) {
+
+        throw( new Error( "Source must be a buffer." ) );
+
+    }
+
+    // Super constructor.
+    stream.Readable.call( this );
+
+    this._source = source;
+
+    // I keep track of which portion of the source buffer is currently being pushed
+    // onto the internal stream buffer during read actions.
+    this._offset = 0;
+    this._length = source.length;
+
+    // When the stream has ended, try to clean up the memory references.
+    this.on( "end", this._destroy );
+
+}
+
+util.inherits( BufferStream, stream.Readable );
+
+
+// I attempt to clean up variable references once the stream has been ended.
+// --
+// NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
+// usage since my Node.js apps will (eventually) never restart.
+BufferStream.prototype._destroy = function() {
+
+    this._source = null;
+    this._offset = null;
+    this._length = null;
+
+};
+
+
+// I read chunks from the source buffer into the underlying stream buffer.
+// --
+// NOTE: We can assume the size value will always be available since we are not
+// altering the readable state options when initializing the Readable stream.
+BufferStream.prototype._read = function( size ) {
+
+    // If we haven't reached the end of the source buffer, push the next chunk onto
+    // the internal stream buffer.
+    if ( this._offset < this._length ) {
+
+        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
+
+        this._offset += size;
+
+    }
+
+    // If we've consumed the entire source buffer, close the readable stream.
+    if ( this._offset >= this._length ) {
+
+        this.push( null );
+
+    }
+
+};
+
+
+
+
 "use strict";
+
+
+
+var uuid = require('node-uuid');
 var nodemailer = require("nodemailer");
 
 var path ='D:\\EZEIDBanner\\';
@@ -620,7 +695,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var facultySubtitle = req.body.f_subtitle;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var page_pic,logo_pic;
+    var randomName,randomName1,page_pic,logo_pic;
 
     var responseMessage = {
         status: false,
@@ -640,10 +715,6 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    //if(!picture){
-    //    error['picture'] = 'Invalid page picture';
-    //    validateStatus *= false;
-    //}
     if(!title){
         error['title'] = 'Invalid page title';
         validateStatus *= false;
@@ -756,8 +827,56 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                 }
                             });
                         };
+                        /*FnCropImage(imageParams, function (err, imageBuffer) {
+
+                         if (imageBuffer) {
+
+                         console.log('uploading to cloud server...');
+                         var filetype = (req.files.pg_pic).split(';base64');
+                         var type = filetype[0].split('/');
+                         var uniqueId = uuid.v4();
+                         randomName = uniqueId + '.' + type[1];
+
+                         var gcloud = require('gcloud');
+
+                         var fs = require('fs');
+
+
+                         var gcs = gcloud.storage({
+                         projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                         keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                         });
+
+                         // Reference an existing bucket.
+                         var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                         bucket.acl.default.add({
+                         entity: 'allUsers',
+                         role: gcs.acl.READER_ROLE
+                         }, function (err, aclObject) {
+                         });
+
+                         // Upload a local file to a new file to be created in your bucket
+
+                         var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                         var bufferStream = new BufferStream(imageBuffer);
+                         bufferStream.pipe(remoteWriteStream);
+
+
+                         remoteWriteStream.on('finish', function () {
+
+                         saveContent(randomName);
+                         });
+                         remoteWriteStream.on('error', function () {
+                         console.log('file not uploaded');
+
+                         });
+                         }
+                         });*/
+
 
                         var saveContent = function(params) {
+
                             var queryParams = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
                                 + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
                                 + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
@@ -2109,7 +2228,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var _this = this;
 
     var token = req.body.token;
-    var tid = req.body.tid;      // while saving time 0 else id of user
+    var tid = req.body.tid ? req.body.tid : 0;      // while saving time 0 else id of user
     var title = req.body.title;
     var description = req.body.description;
     var startDate = req.body.s_date;
@@ -2124,6 +2243,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var capacity = req.body.capacity ? req.body.capacity : 0;
     var attachmenttitle = req.body.a_title ? req.body.a_title : '';
     var attachmenttype = req.body.a_type ? req.body.a_type : '';
+    var randomName,filetype,type,url;
 
 
     var responseMessage = {
@@ -2172,53 +2292,169 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                 if (!err) {
                     if (result) {
 
-                        var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
-                            + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
-                            + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
-                            + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(attachment)
-                            + ',' + st.db.escape(code) + ',' + st.db.escape(capacity)+ ',' + st.db.escape(attachmenttitle)
-                            + ',' + st.db.escape(attachmenttype);
-                        var query = 'CALL pSaveTENMaster(' + queryParams + ')';
+                        if (req.files.attachment) {
 
-                        st.db.query(query, function (err, insertresult) {
-                            if (!err) {
-                                if (insertresult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Data saved successfully';
-                                    responseMessage.data = {
-                                        token: req.body.token,
-                                        tid: req.body.tid,
-                                        title: req.body.title,
-                                        description: req.body.description,
-                                        s_date: req.body.s_date,
-                                        e_date: req.body.e_date,
-                                        status: req.body.status,
-                                        reg_lastdate: req.body.reg_lastdate,
-                                        type: req.body.type,
-                                        ezeone_id: req.body.ezeone_id,
-                                        note: req.body.note,
-                                        venue_id: req.body.venue_id,
-                                        attachment: req.body.attachment,
-                                        code: req.body.code,
-                                        a_title: req.body.a_title,
-                                        a_type: req.body.a_type
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveTENMaster: Data saved successfully');
+                            filetype = attachmenttitle.split('.');
+                            type = filetype[1];
+
+                            console.log('saving attachment..');
+                            var uniqueId = uuid.v4();
+                            randomName = uniqueId + '.' + type;
+
+                            console.log('uploading to cloud server...');
+
+                            var bufferData = new Buffer((req.files.attachment).replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');
+
+                            var gcloud = require('gcloud');
+                            var fs = require('fs');
+
+
+                            var gcs = gcloud.storage({
+                                projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                                keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                            });
+
+                            // Reference an existing bucket.
+                            var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                            bucket.acl.default.add({
+                                entity: 'allUsers',
+                                role: gcs.acl.READER_ROLE
+                            }, function (err, aclObject) {
+                            });
+
+                            // Upload a local file to a new file to be created in your bucket.
+
+                            console.log('remote to write attachement...');
+                            var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                            var bufferStream = new BufferStream(bufferData);
+                            bufferStream.pipe(remoteWriteStream);
+
+                            url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
+
+                            remoteWriteStream.on('finish', function () {
+                                console.log('uploaded sucessfully');
+                                console.log(randomName);
+                                console.log(url);
+                                var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
+                                    + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
+                                    + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
+                                    + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(randomName)
+                                    + ',' + st.db.escape(code) + ',' + st.db.escape(capacity) + ',' + st.db.escape(attachmenttitle)
+                                    + ',' + st.db.escape(attachmenttype);
+                                var query = 'CALL pSaveTENMaster(' + queryParams + ')';
+
+                                console.log(query);
+
+                                st.db.query(query, function (err, insertresult) {
+                                    if (!err) {
+                                        if (insertresult) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Data saved successfully';
+                                            responseMessage.data = {
+                                                token: req.body.token,
+                                                tid: req.body.tid,
+                                                title: req.body.title,
+                                                description: req.body.description,
+                                                s_date: req.body.s_date,
+                                                e_date: req.body.e_date,
+                                                status: req.body.status,
+                                                reg_lastdate: req.body.reg_lastdate,
+                                                type: req.body.type,
+                                                ezeone_id: req.body.ezeone_id,
+                                                note: req.body.note,
+                                                venue_id: req.body.venue_id,
+                                                attachment: req.body.attachment,
+                                                code: req.body.code,
+                                                a_title: req.body.a_title,
+                                                a_type: req.body.a_type,
+                                                s_url: url
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveTENMaster: Data saved successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'No save Data';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveTENMaster:No save Data');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured ! Please try again';
+                                        res.status(500).json(responseMessage);
+                                        console.log('FnSaveTENMaster: error in saving tenmaster data:' + err);
+                                    }
+                                });
+                            });
+
+                            remoteWriteStream.on('error', function () {
+                                console.log('file not uploaded');
+                                responseMessage.message = 'An error occurred';
+                                responseMessage.error = {
+                                    server: 'Cloud Server error'
+                                };
+                                responseMessage.data = null;
+                                res.status(400).json(responseMessage);
+                                console.log('FnSaveStandardTags: Image upload error to google cloud');
+
+                            });
+                        }
+                        else {
+                            randomName = '';
+                            url = '';
+                            console.log('randomName is empty');
+                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
+                                + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
+                                + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
+                                + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(randomName)
+                                + ',' + st.db.escape(code) + ',' + st.db.escape(capacity) + ',' + st.db.escape(attachmenttitle)
+                                + ',' + st.db.escape(attachmenttype);
+                            var query = 'CALL pSaveTENMaster(' + queryParams + ')';
+
+                            console.log(query);
+
+                            st.db.query(query, function (err, insertresult) {
+                                if (!err) {
+                                    if (insertresult) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Data saved successfully';
+                                        responseMessage.data = {
+                                            token: req.body.token,
+                                            tid: req.body.tid,
+                                            title: req.body.title,
+                                            description: req.body.description,
+                                            s_date: req.body.s_date,
+                                            e_date: req.body.e_date,
+                                            status: req.body.status,
+                                            reg_lastdate: req.body.reg_lastdate,
+                                            type: req.body.type,
+                                            ezeone_id: req.body.ezeone_id,
+                                            note: req.body.note,
+                                            venue_id: req.body.venue_id,
+                                            attachment: req.body.attachment,
+                                            code: req.body.code,
+                                            a_title: req.body.a_title,
+                                            a_type: req.body.a_type,
+                                            s_url: url
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveTENMaster: Data saved successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'No save Data';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveTENMaster:No save Data');
+                                    }
                                 }
                                 else {
-                                    responseMessage.message = 'No save Data';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveTENMaster:No save Data');
+                                    responseMessage.message = 'An error occured ! Please try again';
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnSaveTENMaster: error in saving tenmaster data:' + err);
                                 }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                res.status(500).json(responseMessage);
-                                console.log('FnSaveTENMaster: error in saving tenmaster data:' + err);
-                            }
-                        });
+                            });
+                        }
                     }
                     else {
                         responseMessage.message = 'Invalid token';
@@ -2270,6 +2506,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
     var status = parseInt(req.query.status);
     var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
     var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;
+    var output =[];
 
     var responseMessage = {
         status: false,
@@ -2311,11 +2548,46 @@ Alumni.prototype.getTENDetails = function(req,res,next){
                 if (!err) {
                     if (getResult[0]) {
                         if (getResult[0][0].count > 0) {
+
+                            //console.log(getResult[1]);
+                            for( var i=0; i < getResult[1].length;i++){
+                                var result = {};
+                                result.tid = getResult[1][i].tid;
+                                result.title = getResult[1][i].title;
+                                result.description = getResult[1][i].description;
+                                result.s_date = getResult[1][i].s_date;
+                                result.e_date = getResult[1][i].e_date;
+                                result.reg_lastdate = getResult[1][i].reg_lastdate;
+                                result.type = getResult[1][i].type;
+                                result.note = getResult[1][i].note;
+                                result.venue_id = getResult[1][i].venue_id;
+                                result.Approveddate = getResult[1][i].Approveddate;
+                                result.approveduser = getResult[1][i].approveduser;
+                                result.capacity = getResult[1][i].capacity;
+                                result.a_title = getResult[1][i].a_title;
+                                result.a_type = getResult[1][i].a_type;
+                                result.status = getResult[1][i].status;
+                                result.createddate = getResult[1][i].createddate;
+                                result.ezeone = getResult[1][i].ezeone;
+                                result.name = getResult[1][i].name;
+                                result.tnpa = getResult[1][i].tnpa;
+                                result.ps = getResult[1][i].ps;
+                                result.Latitude = getResult[1][i].Latitude;
+                                result.Longitude = getResult[1][i].Longitude;
+                                result.AL1 = getResult[1][i].AL1;
+                                result.AL2 = getResult[1][i].AL2;
+                                result.s_url = (getResult[1][i].url) ?
+                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][i].url) : '';
+
+                                output.push(result);
+                            }
+                            //console.log(output);
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Data loaded successfully';
                             responseMessage.count = getResult[0][0].count;
-                            responseMessage.data = getResult[1];
+
+                            responseMessage.data = output;
                             res.status(200).json(responseMessage);
                             console.log('FnGetTENDetails: Data loaded successfully');
                         }
@@ -5216,11 +5488,14 @@ Alumni.prototype.getAlumniUserDetails = function(req,res,next){
                                     if(results[0]){
                                         for( var i=0; i < results[0].length;i++){
                                             var result = {};
+                                            console.log(results[0][i].profileid);
                                             result.logoimage = '';
                                             result.page1title = results[0][i].page1title;
                                             result.AlumniID = results[0][i].AlumniID;
                                             result.alumnicode = results[0][i].alumnicode;
                                             result.profilestatus = results[0][i].profilestatus;
+                                            result.profile_id = results[0][i].profileid;
+
                                             result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + '8c40eb14-5f97-4240-a0aa-3771c336dc38.png';
                                             output.push(result);
                                         }

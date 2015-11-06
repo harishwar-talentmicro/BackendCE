@@ -2973,6 +2973,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
                             }
                             else {
+
                                 next();
                             }
                         }
@@ -3010,7 +3011,10 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                         });
                     }
                     else {
-                        next();
+                        console.log('document-not-found');
+                        var reload = 'https://www.ezeone.com/document-not-found';
+                        res.redirect(reload);
+                        //next();
                     }
                 }
                 else {
@@ -3647,7 +3651,7 @@ User.prototype.saveUserDetails = function(req,res,next){
     var isdMobile = req.body.isd_mobile ? req.body.isd_mobile : '';
     var parkingStatus = req.body.parking_status ? req.body.parking_status : '';
     var templateId = (!isNaN(parseInt(req.body.template_id))) ? parseInt(req.body.template_id) : '';
-    var pin = (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null;
+    var pin = req.body.pin ? req.body.pin : null;
     var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
     var functionId = (!isNaN(parseInt(req.body.fid))) ? parseInt(req.body.fid) : 0;
     var categoryId = (!isNaN(parseInt(req.body.cid))) ? parseInt(req.body.cid) : 0;
@@ -3733,6 +3737,18 @@ User.prototype.saveUserDetails = function(req,res,next){
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveUserDetails: UserDetails save successfully');
+
+                                    var queryParams1 = st.db.escape(pin) + ',' + st.db.escape('')+ ',' + st.db.escape(token);
+                                    var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
+                                    console.log(query1);
+                                    st.db.query(query1, function (err, getResult) {
+                                        if (!err) {
+                                            console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                        }
+                                        else{
+                                            console.log('FnUpdateEZEoneKeywords: Keywords Not Updated');
+                                        }
+                                    });
                                 }
                                 else {
                                     responseMessage.message = 'UserDetails is not saved';
@@ -5524,11 +5540,12 @@ User.prototype.testTags = function(req,res,next) {
     var randomName;
 
     try{
-        //var query = "SELECT dealbanner,tid FROM tmaster WHERE dealbanner IS NOT NULL AND dealbanner!='' "
-        //var query = "select picture,tid from tbannerpics";
+        //var query = "SELECT dealbanner as picture,tid FROM tmaster WHERE dealbanner IS NOT NULL AND dealbanner!='' "
+        //var query = "select picture,tid,seqno,masterid from tbannerpics limit 0,5";
         //var query = "select image as picture,tid from t_docsandurls_new limit 1750,250";
         //var query = "select image as picture,tid,imagefilename from t_docsandurls_new_228";
-        var query = "select tid,url as picture from test_tmaster";
+        //var query = "select tid,url as picture from test_tmaster";
+
 
         st.db.query(query, function (err, result) {
 
@@ -5591,9 +5608,9 @@ User.prototype.testTags = function(req,res,next) {
                         remoteWriteStream.on('finish', function () {
                             console.log('uploaded sucessfully');
                             //var query = 'UPDATE tmaster SET dealbanner=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
-                            //var query = 'insert into test(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )';
+                            var query = 'insert into t_docsandurls (image,imageurl,tag) values (' + st.db.escape(randomName) + ',' + 0 + ',' + result[i].seqno + ')';
                             //var query = 'insert into test_t_docsandurls_new(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )'
-                            var query = 'UPDATE test_tmaster SET url=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
+                            //var query = 'UPDATE test_tmaster SET url=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
                             //console.log(query);
                             st.db.query(query, function (err, result) {
                                 if (!err) {
@@ -5672,7 +5689,8 @@ User.prototype.testTagsDocs = function(req,res,next) {
         //var query = "select image as picture,tid from t_docsandurls_new limit 1750,250";
         //var query = "select image as picture,tid,imagefilename from t_docsandurls_new_228 limit 225,10";
         //var query = "select cvdoc as picture,tid,filename as imagefilename from tcv_tdumnp";
-        var query = "select tid,url as picture from test_tmaster";
+        //var query = "select tid,url as picture from test_tmaster";
+        var query = "SELECT tid,attachment as picture,attachmenttitle as imagefilename FROM ten_master WHERE attachment IS NOT NULL AND attachment!=''"
 
         st.db.query(query, function (err, result) {
 
@@ -5747,8 +5765,9 @@ User.prototype.testTagsDocs = function(req,res,next) {
                             //var query = 'UPDATE tmaster SET dealbanner=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
                             //var query = 'insert into test(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )';
                             //var query = 'insert into test_t_docsandurls_new(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )'
-                            var query = 'insert into test_t_docsandurls_new_228(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )'
+                            //var query = 'insert into test_t_docsandurls_new_228(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )'
                             //var query = 'insert into test_tcv_tdumnp(id,url) values( '+ tid + ',' + st.db.escape(randomName) + ' )';
+                            var query = 'UPDATE ten_master SET url=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
                             console.log(query);
                             st.db.query(query, function (err, result) {
                                 if (!err) {
