@@ -3011,10 +3011,10 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                         });
                     }
                     else {
-                        console.log('document-not-found');
-                        var reload = 'https://www.ezeone.com/document-not-found';
-                        res.redirect(reload);
-                        //next();
+                        //console.log('document-not-found');
+                        //var reload = 'https://www.ezeone.com/document-not-found';
+                        //res.redirect(reload);
+                        next();
                     }
                 }
                 else {
