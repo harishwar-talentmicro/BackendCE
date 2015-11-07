@@ -3655,6 +3655,7 @@ User.prototype.saveUserDetails = function(req,res,next){
     var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
     var functionId = (!isNaN(parseInt(req.body.fid))) ? parseInt(req.body.fid) : 0;
     var categoryId = (!isNaN(parseInt(req.body.cid))) ? parseInt(req.body.cid) : 0;
+    var businessKeywords = (req.body.keywords) ? req.body.keywords : '';
 
 
     var responseMessage = {
@@ -3692,7 +3693,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
                             + ',' + st.db.escape(isdMobile)+ ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                             + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId)+ ',' + st.db.escape(functionId)
-                            + ',' + st.db.escape(categoryId);
+                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, insertResult) {
