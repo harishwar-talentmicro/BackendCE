@@ -3028,8 +3028,8 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                      * This is a document saved on google cloud ! Creating dynamic google storage bucket link
                                      * and redirecting the user to there
                                      */
-                                    var s_url = (results[0][0].path) ?
-                                        (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : '';
+                                    var s_url = (results[0].path) ?
+                                        (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0].path) : 'https://www.ezeone.com';
                                         res.redirect(s_url);
 
                                 }
