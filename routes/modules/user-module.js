@@ -3000,7 +3000,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
             }
 
-            else if(allowedDocs.indexOf(arr[1].toUpperCase()) !== -1) {
+            else {
 
                 console.log('--------------------');
                 console.log('Document Loading....');
@@ -3017,13 +3017,29 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                 console.log(results[0].length);
                                 console.log(results);
 
-                                var s_url = (results[0][0].path) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : '';
+                                /**
+                                 * This is a weblink redirect to this weblink
+                                 */
+                                if(results[0].type){
+                                    res.redirect(results[0].path);
+                                }
+                                else{
+                                    /**
+                                     * This is a document saved on google cloud ! Creating dynamic google storage bucket link
+                                     * and redirecting the user to there
+                                     */
+                                    var s_url = (results[0][0].path) ?
+                                        (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : '';
+                                        res.redirect(s_url);
 
-                                respMsg.status = true;
-                                respMsg.data = {s_url: s_url};
-                                respMsg.message = 'docs loaded successfully';
-                                respMsg.error = null;
-                                console.log(respMsg);
+                                }
+
+
+                                //respMsg.status = true;
+                                //respMsg.data = {s_url: s_url};
+                                //respMsg.message = 'docs loaded successfully';
+                                //respMsg.error = null;
+                                //console.log(respMsg);
 
                             }
                             else {
@@ -3042,39 +3058,39 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 });
             }
 
-            else {
-
-                console.log('--------------');
-                console.log('URL Link Page');
-                console.log('---------------');
-
-                var urlBreaker = tag.split('');
-                if (urlBreaker.length > 1 && urlBreaker.length < 4) {
-                    if (urlBreaker[0] === 'U') {
-
-                        FnGetRedirectLink(ezeid, tag, function (url) {
-
-                            if (url) {
-                                console.log('Redirecting......');
-                                res.redirect(url);
-                            }
-                            else {
-
-                                next();
-                            }
-                        });
-                    }
-                    else {
-                        //console.log('document-not-found');
-                        //var reload = 'https://www.ezeone.com/document-not-found';
-                        //res.redirect(reload);
-                        next();
-                    }
-                }
-                else {
-                    next();
-                }
-            }
+            //else {
+            //
+            //    console.log('--------------');
+            //    console.log('URL Link Page');
+            //    console.log('---------------');
+            //
+            //    var urlBreaker = tag.split('');
+            //    if (urlBreaker.length > 1 && urlBreaker.length < 4) {
+            //        if (urlBreaker[0] === 'U') {
+            //
+            //            FnGetRedirectLink(ezeid, tag, function (url) {
+            //
+            //                if (url) {
+            //                    console.log('Redirecting......');
+            //                    res.redirect(url);
+            //                }
+            //                else {
+            //
+            //                    next();
+            //                }
+            //            });
+            //        }
+            //        else {
+            //            //console.log('document-not-found');
+            //            //var reload = 'https://www.ezeone.com/document-not-found';
+            //            //res.redirect(reload);
+            //            next();
+            //        }
+            //    }
+            //    else {
+            //        next();
+            //    }
+            //}
         }
         else{
             next();
