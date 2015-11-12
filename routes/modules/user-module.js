@@ -2709,37 +2709,34 @@ User.prototype.getFunctions = function(req,res,next) {
      * @todo FnGetFunctions
      */
     var _this = this;
+    var type = req.query.type ? req.query.type : 0;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var LangID = parseInt(req.query.LangID);
-        if (LangID.toString != 'NaN') {
-            var Query = 'select FunctionID, FunctionName  from mfunctiontype where LangID=' + st.db.escape(LangID) + ' order by FunctionName';
-            st.db.query(Query, function (err, FunctionRoleMapResult) {
-                if (!err) {
-                    if (FunctionRoleMapResult.length > 0) {
-                        res.send(FunctionRoleMapResult);
-                        console.log('FnGetFunctions: mfunctiontype: Functions sent successfully');
-                    }
-                    else {
-                        res.json(null);
-                        res.statusCode = 500;
-                        console.log('FnGetFunctions: mfunctiontype: No function  found');
-                    }
+
+
+        var query = 'Call pgetfunctiontype (' + st.db.escape(type) + ')';
+
+        st.db.query(query, function (err, FunctionRoleMapResult) {
+            if (!err) {
+                if (FunctionRoleMapResult.length > 0) {
+                    res.send(FunctionRoleMapResult[0]);
+                    console.log('FnGetFunctions: mfunctiontype: Functions sent successfully');
                 }
                 else {
-
                     res.json(null);
-                    console.log('FnGetFunctions: mfunctiontype: ' + err);
+                    res.statusCode = 500;
+                    console.log('FnGetFunctions: mfunctiontype: No function  found');
                 }
-            });
-        }
-        else {
-            console.log('FnGetFunctions: LangId is empty');
-            res.statusCode = 400;
-            res.json(null);
-        }
+            }
+            else {
+
+                res.json(null);
+                console.log('FnGetFunctions: mfunctiontype: ' + err);
+            }
+        });
 
     }
     catch (ex) {
@@ -3655,7 +3652,7 @@ User.prototype.saveUserDetails = function(req,res,next){
     var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
     var functionId = (!isNaN(parseInt(req.body.fid))) ? parseInt(req.body.fid) : 0;
     var categoryId = (!isNaN(parseInt(req.body.cid))) ? parseInt(req.body.cid) : 0;
-
+    var keywords = req.body.keywords ? req.body.keywords : '';
 
     var responseMessage = {
         status: false,
@@ -3692,7 +3689,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
                             + ',' + st.db.escape(isdMobile)+ ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                             + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId)+ ',' + st.db.escape(functionId)
-                            + ',' + st.db.escape(categoryId);
+                            + ',' + st.db.escape(categoryId)+ ',' + st.db.escape(keywords);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, insertResult) {
@@ -3732,7 +3729,8 @@ User.prototype.saveUserDetails = function(req,res,next){
                                         isd_mobile : req.body.isd_mobile ? req.body.isd_mobile : '',
                                         parking_status : req.body.parking_status ? req.body.parking_status : '',
                                         template_id : req.body.template_id ? parseInt(req.body.template_id) : '',
-                                        pin : req.body.pin ? parseInt(req.body.pin) : null
+                                        pin : req.body.pin ? parseInt(req.body.pin) : null,
+                                        keywords : req.body.keywords ? parseInt(req.body.keywords) : ''
 
                                     };
                                     res.status(200).json(responseMessage);

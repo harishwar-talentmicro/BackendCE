@@ -1385,6 +1385,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             responseMessage.message = 'Message Composed successfully';
                                             responseMessage.data = {
                                                 message_id : insertResult[0][0].messageids,
+                                                message_userid : insertResult[0][1].mesguserid,
                                                 message: req.body.message,
                                                 attachmentFilename: req.body.attachment_filename,
                                                 priority: req.body.priority,
@@ -1785,7 +1786,11 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
     var messageID  = req.body.message_id;
     var status  = req.body.status;
     var token  = req.body.token;
-    var isMessage = req.body.ismessage_open ? req.body.ismessage_open : 0;
+    console.log('-----------------------');
+    console.log(req.body.group_type);
+    var isMessage = req.body.group_type ? req.body.group_type : 0;
+    var isdeleteall=req.body.isdelete_allmsg ? req.body.isdelete_allmsg : 0;
+    var toid=req.body.toid ? req.body.toid : 0;
 
     var responseMessage = {
         status: false,
@@ -1820,10 +1825,10 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status)+ ',' + st.db.escape(token)
-                            + ',' + st.db.escape(isMessage);
+                            + ',' + st.db.escape(isMessage)+ ',' + st.db.escape(isdeleteall)+ ',' + st.db.escape(toid);
 
                         var query = 'CALL PchangeMessageActivity(' + queryParams + ')';
-                        //console.log(query);
+                        console.log(query);
                         st.db.query(query, function (err, updateResult) {
                             if (!err) {
                                 if (updateResult) {

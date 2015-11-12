@@ -199,7 +199,8 @@ Auth.prototype.register = function(req,res,next){
         var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1; // 0-invisible, 1- visible
         var locTitle = req.body.loc_title ? req.body.loc_title : '';
         var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
-        var apUserid = (!isNaN(parseInt(req.body.ap_userid))) ?  parseInt(req.body.ap_userid) : 1;
+        var apUserid = (!isNaN(parseInt(req.body.ap_userid))) ?  parseInt(req.body.ap_userid) : 0;
+        var keywords = req.body.keywords ? req.body.keywords : '';
 
 
         var RtnMessage = {
@@ -283,7 +284,7 @@ Auth.prototype.register = function(req,res,next){
                     + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
                     + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                     + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid);
+                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid)+ ',' + st.db.escape(keywords);
 
 
                 //console.log('CALL pSaveEZEIDData(' + InsertQuery + ')');
@@ -570,7 +571,7 @@ Auth.prototype.register = function(req,res,next){
                     + ',' + st.db.escape(SelectionTypes)+ ',' + st.db.escape(ParkingStatus) + ',' + st.db.escape(TemplateID)
                     + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                     + ',' + st.db.escape(visiblePhone)+ ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid);
+                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid)+ ',' + st.db.escape(keywords);
 
                 // console.log(InsertQuery);
                 st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {

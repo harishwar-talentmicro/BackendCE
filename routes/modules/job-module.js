@@ -72,11 +72,14 @@ Job.prototype.create = function(req,res,next){
     var jobType = req.body.jobType;
     var status = req.body.status;
     var contactName = req.body.contactName;
-    var email_id = req.body.email_id;
-    var mobileNo = req.body.mobileNo;
+    var email_id =req.body.email_id ? req.body.email_id : '';
+    var mobileNo =req.body.mobileNo ? req.body.mobileNo : '';
     var locationsList = req.body.locationsList;
     var categoryID = req.body.category_id;
     var instituteID = (req.body.institute_id) ? req.body.institute_id : '';
+    console.log('-----------------------');
+    console.log(email_id);
+
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
@@ -180,17 +183,14 @@ Job.prototype.create = function(req,res,next){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
-    if(!contactName){
-        responseMessage.error['contactName'] = 'Invalid contactName';
-        validateStatus *= false;
-    }
+   // if(!contactName){
+     //   responseMessage.error['contactName'] = 'Invalid contactName';
+      //  validateStatus *= false;
+   // }
     if(!locationsList){
         locationsList = [];
     }
-    if(!(email_id || mobileNo)){
-        error['email_id OR  MobileNo'] = 'Invalid email_id or mobileNo';
-        validateStatus *= false;
-    }
+
 
     if(parseInt(cid) == NaN){
         error['cid'] = 'Invalid client id';
@@ -201,7 +201,7 @@ Job.prototype.create = function(req,res,next){
         error['conatctId'] = 'Invalid conatctId';
         validateStatus *= false;
     }
-
+    validateStatus = true;
     if(!validateStatus){
         responseMessage.status = false;
         responseMessage.message = 'Please check the errors below';
