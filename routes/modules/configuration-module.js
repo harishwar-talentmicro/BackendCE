@@ -145,6 +145,42 @@ Configuration.prototype.save = function(req,res,next){
 
                             });
                         }
+
+                        else{
+                            var query = st.db.escape(Token) + ',' + st.db.escape(SalesTitle) + ',' + st.db.escape(ReservationTitle)
+                                + ',' + st.db.escape(HomeDeliveryTitle) + ',' + st.db.escape(ServiceTitle)
+                                + ',' + st.db.escape(ResumeTitle) + ',' + st.db.escape(VisibleModules)
+                                + ',' + st.db.escape(SalesItemListType) + ',' + st.db.escape(HomeDeliveryItemListType)
+                                + ',' + st.db.escape(ResumeKeyword) + ',' + st.db.escape(Category)
+                                + ',' + st.db.escape(Keyword) + ',' + st.db.escape(ReservationDisplayFormat)
+                                + ',' + st.db.escape(DataRefreshInterval) + ',' + st.db.escape(SalesFormMsg)
+                                + ',' + st.db.escape(ReservationFormMsg) + ',' + st.db.escape(HomeDeliveryFormMsg)
+                                + ',' + st.db.escape(ServiceFormMsg) + ',' + st.db.escape(ResumeFormMsg)
+                                + ',' + st.db.escape(FreshersAccepted) + ',' + st.db.escape(SalesURL) + ',' + st.db.escape(ReservationURL)
+                                + ',' + st.db.escape(HomeDeliveryURL) + ',' + st.db.escape(ServiceURL) + ',' + st.db.escape(ResumeURL)
+                                + ',' + st.db.escape(deal_enable) + ',' + st.db.escape('') + ',' + st.db.escape(deal_title)
+                                + ',' + st.db.escape(deal_desc);
+
+                            st.db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
+                                if (!err) {
+                                    if (InsertResult.affectedRows > 0) {
+                                        RtnMessage.IsSuccessfull = true;
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveConfig:  Config details save successfully');
+                                    }
+                                    else {
+                                        console.log('FnSaveConfig:No Save Config details');
+                                        res.send(RtnMessage);
+                                    }
+                                }
+
+                                else {
+                                    console.log('FnSaveConfig: error in saving Config details' + err);
+                                    res.statusCode = 500;
+                                    res.send(RtnMessage);
+                                }
+                            });
+                        }
                     }
                     else {
                         console.log('FnSaveConfig: Invalid token');
