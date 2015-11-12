@@ -2980,7 +2980,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
         console.log(arr);
 
-        ezeid = arr[0];
+        ezeid = alterEzeoneId(arr[0]);
         if (arr[1]) {
 
             tag = arr[1].toUpperCase();
@@ -3017,17 +3017,20 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                 /**
                                  * This is a weblink redirect to this weblink
                                  */
-                                if(results[0].type){
-                                    res.redirect(results[0].path);
+                                if(results[0][0].type){
+                                    res.redirect(results[0][0].path);
                                 }
                                 else{
                                     /**
                                      * This is a document saved on google cloud ! Creating dynamic google storage bucket link
                                      * and redirecting the user to there
                                      */
-                                    var s_url = (results[0].path) ?
-                                        (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0].path) : 'https://www.ezeone.com';
-                                        res.redirect(s_url);
+                                    var s_url = (results[0][0].path) ?
+                                        (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : 'https://www.ezeone.com';
+                                    console.log('redirecting url..');
+                                    console.log(s_url);
+                                    res.redirect(s_url);
+
 
                                 }
 
@@ -4207,9 +4210,14 @@ User.prototype.saveStandardTags = function(req,res,next){
     if (tag == 0){
         tagType = 0;
     }
-    else{
+    else if(tag == 'PIC') {
+        tagType = 2;
+    }
+    else {
         tagType = 1;
     }
+
+
 
     var responseMessage = {
         status: false,
@@ -4286,173 +4294,227 @@ User.prototype.saveStandardTags = function(req,res,next){
                                 });
 
                             }
-
-                            var uploadtoServer = function (imageBuffer) {
-                                //upload to cloud storage
-                                console.log('uploading to cloud server...');
-                                console.log(imageBuffer);
-                                var gcloud = require('gcloud');
-                                var fs = require('fs');
-
-
-                                var gcs = gcloud.storage({
-                                    projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
-                                    keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
-                                });
-
-                                // Reference an existing bucket.
-                                var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
-
-                                bucket.acl.default.add({
-                                    entity: 'allUsers',
-                                    role: gcs.acl.READER_ROLE
-                                }, function (err, aclObject) {
-                                });
-
-                                // Upload a local file to a new file to be created in your bucket
-
-                                var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                                var bufferStream = new BufferStream(imageBuffer);
-                                bufferStream.pipe(remoteWriteStream);
-
-                                //var localReadStream = fs.createReadStream(req.files.image.path);
-                                //localReadStream.pipe(remoteWriteStream);
-
-
-                                remoteWriteStream.on('finish', function () {
-                                    var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                        + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
-
-                                    var query = 'CALL psavedocsandurls(' + queryParams + ')';
-                                    console.log(query);
-                                    st.db.query(query, function (err, insertResult) {
-                                        if (!err) {
-                                            if (insertResult.affectedRows > 0) {
-                                                responseMessage.status = true;
-                                                responseMessage.error = null;
-                                                responseMessage.message = 'Tags Save successfully';
-                                                responseMessage.data = {
-                                                    type: 0,
-                                                    tag: tag,
-                                                    pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
-                                                    s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                            else if (tagType == 2) {
+                                console.log('croping profile picture...');
+                                var query = "SELECT IDTypeID as idtype FROM tmaster WHERE TID=ifnull((SELECT masterid FROM tloginout WHERE token=" + st.db.escape(token)+'),0)';
+                                console.log(query);
+                                st.db.query(query, function (err, idResult) {
+                                    if (!err) {
+                                        if (idResult) {
+                                            if (idResult[0].idtype == 1) {
+                                                console.log('individual user');
+                                                var imageParams = {
+                                                    path: req.files.image.path,
+                                                    type: req.files.image.extension,
+                                                    width: '200',
+                                                    height: '200',
+                                                    scale: true,
+                                                    crop: true
                                                 };
-                                                res.status(200).json(responseMessage);
-                                                console.log('FnSaveStandardTags: Tags Save successfully');
+                                                //console.log(imageParams);
+                                                FnCropImage(imageParams, function (err, bufferData) {
+
+                                                    if (bufferData) {
+
+                                                        imageBuffer = bufferData;
+                                                        uploadtoServer(imageBuffer);
+                                                    }
+                                                });
                                             }
-                                            else {
-                                                responseMessage.message = 'Tag not Saved';
-                                                res.status(200).json(responseMessage);
-                                                console.log('FnSaveStandardTags:Tag not Saved');
+                                            else{
+                                                console.log('business user');
+                                                var imageParams = {
+                                                    path: req.files.image.path,
+                                                    type: req.files.image.extension,
+                                                    width: '880',
+                                                    height: '293',
+                                                    scale: true,
+                                                    crop: true
+                                                };
+                                                //console.log(imageParams);
+                                                FnCropImage(imageParams, function (err, bufferData) {
+
+                                                    if (bufferData) {
+
+                                                        imageBuffer = bufferData;
+                                                        uploadtoServer(imageBuffer);
+                                                    }
+                                                });
                                             }
                                         }
-                                        else {
-                                            responseMessage.message = 'An error occured in query ! Please try again';
-                                            responseMessage.error = {
-                                                server: 'Internal Server Error'
-                                            };
-                                            res.status(500).json(responseMessage);
-                                            console.log('FnSaveStandardTags: error in saving tags:' + err);
-                                        }
-
-                                    });
-                                });
-
-                                remoteWriteStream.on('error', function () {
-                                    responseMessage.message = 'An error occurred';
-                                    responseMessage.error = {
-                                        server: 'Internal Server error'
-                                    };
-                                    responseMessage.data = null;
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnSaveStandardTags: Image upload error to google cloud');
-
-                                });
-
-                            };
-                        }
-
-                        else if (parseInt(req.body.type) && (!isNaN(req.body.type))) {
-                            randomName = req.body.link;
-
-                            var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                + ',' + st.db.escape(tag.toString().toUpperCase()) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
-
-
-                            var query = 'CALL psavedocsandurls(' + queryParams + ')';
-                            console.log(query);
-                            st.db.query(query, function (err, insertResult) {
-                                if (!err) {
-                                    if (insertResult.affectedRows > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Tags Save successfully';
-                                        responseMessage.data = {
-                                            type: 0,
-                                            tag: tag,
-                                            pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
-                                            s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveStandardTags: Tags Save successfully');
                                     }
                                     else {
-                                        responseMessage.message = 'Tag not Saved';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveStandardTags:Tag not Saved');
+                                        console.log('FnSaveStandardTags:error' + err);
                                     }
+                                });
+                            }
+
+                var uploadtoServer = function (imageBuffer) {
+                    //upload to cloud storage
+                    console.log('uploading to cloud server...');
+                    console.log(imageBuffer);
+                    var gcloud = require('gcloud');
+                    var fs = require('fs');
+
+
+                    var gcs = gcloud.storage({
+                        projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                        keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                    });
+
+                    // Reference an existing bucket.
+                    var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                    bucket.acl.default.add({
+                        entity: 'allUsers',
+                        role: gcs.acl.READER_ROLE
+                    }, function (err, aclObject) {
+                    });
+
+                    // Upload a local file to a new file to be created in your bucket
+
+                    var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                    var bufferStream = new BufferStream(imageBuffer);
+                    bufferStream.pipe(remoteWriteStream);
+
+                    //var localReadStream = fs.createReadStream(req.files.image.path);
+                    //localReadStream.pipe(remoteWriteStream);
+
+
+                    remoteWriteStream.on('finish', function () {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                            + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+
+                        var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, insertResult) {
+                            if (!err) {
+                                if (insertResult.affectedRows > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Tags Save successfully';
+                                    responseMessage.data = {
+                                        type: 0,
+                                        tag: tag,
+                                        pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
+                                        s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveStandardTags: Tags Save successfully');
                                 }
                                 else {
-                                    responseMessage.message = 'An error occured in query ! Please try again';
-                                    responseMessage.error = {
-                                        server: 'Internal Server Error'
-                                    };
-                                    res.status(500).json(responseMessage);
-                                    console.log('FnSaveStandardTags: error in saving tags:' + err);
+                                    responseMessage.message = 'Tag not Saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveStandardTags:Tag not Saved');
                                 }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveStandardTags: error in saving tags:' + err);
+                            }
 
-                            });
-                        }
+                        });
+                    });
 
-                        else {
-                            responseMessage.error = error;
-                            responseMessage.message = 'Please check uploading file';
-                            res.status(200).json(responseMessage);
-                        }
-
-                    }
-
-                    else {
-                        responseMessage.message = 'Invalid token';
+                    remoteWriteStream.on('error', function () {
+                        responseMessage.message = 'An error occurred';
                         responseMessage.error = {
-                            token: 'Invalid Token'
+                            server: 'Internal Server error'
                         };
                         responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('FnSaveStandardTags: Invalid token');
+                        res.status(400).json(responseMessage);
+                        console.log('FnSaveStandardTags: Image upload error to google cloud');
+
+                    });
+
+                };
+            }
+
+        else if (parseInt(req.body.type) && (!isNaN(req.body.type))) {
+                randomName = req.body.link;
+
+                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                    + ',' + st.db.escape(tag.toString().toUpperCase()) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+
+
+                var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                console.log(query);
+                st.db.query(query, function (err, insertResult) {
+                    if (!err) {
+                        if (insertResult.affectedRows > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Tags Save successfully';
+                            responseMessage.data = {
+                                type: 0,
+                                tag: tag,
+                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
+                                s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                            };
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveStandardTags: Tags Save successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Tag not Saved';
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveStandardTags:Tag not Saved');
+                        }
                     }
-                } else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('FnSaveStandardTags:Error in processing Token' + err);
-                }
-            });
+                    else {
+                        responseMessage.message = 'An error occured in query ! Please try again';
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        res.status(500).json(responseMessage);
+                        console.log('FnSaveStandardTags: error in saving tags:' + err);
+                    }
+
+                });
+            }
+
+            else {
+                responseMessage.error = error;
+                responseMessage.message = 'Please check uploading file';
+                res.status(200).json(responseMessage);
+            }
+
         }
-        catch (ex) {
+
+    else {
+            responseMessage.message = 'Invalid token';
             responseMessage.error = {
-                server: 'Internal Server Error'
+                token: 'Invalid Token'
             };
-            responseMessage.message = 'An error occurred !';
-            res.status(400).json(responseMessage);
-            console.log('Error : FnSaveStandardTags ' + ex.description);
-            console.log(ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            responseMessage.data = null;
+            res.status(401).json(responseMessage);
+            console.log('FnSaveStandardTags: Invalid token');
         }
+    } else {
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'Error in validating Token';
+        res.status(500).json(responseMessage);
+        console.log('FnSaveStandardTags:Error in processing Token' + err);
     }
+});
+}
+catch (ex) {
+    responseMessage.error = {
+        server: 'Internal Server Error'
+    };
+    responseMessage.message = 'An error occurred !';
+    res.status(400).json(responseMessage);
+    console.log('Error : FnSaveStandardTags ' + ex.description);
+    console.log(ex);
+    var errorDate = new Date();
+    console.log(errorDate.toTimeString() + ' ......... error ...........');
+}
+}
 };
 
 function FnCropImage(imageParams, callback){
@@ -4670,7 +4732,7 @@ function FnCropImage(imageParams, callback){
 };
 
 /**
- * @todo Fn`
+ * @todo FnsaveTags`
  * Method : POST
  * @param req
  * @param res
@@ -4777,7 +4839,12 @@ User.prototype.saveTags = function(req,res,next){
                                         if(tQResults.affectedRows){
                                             respMsg.status = true;
                                             respMsg.message = 'Tag saved successfully';
-                                            respMsg.data = {};
+                                            respMsg.data = {
+                                                type: type,
+                                                tag: tag,
+                                                pin: pin,
+                                                s_url : link
+                                            };
                                             respMsg.error = null;
                                             res.status(200).json(respMsg);
                                         }
@@ -4822,7 +4889,12 @@ User.prototype.saveTags = function(req,res,next){
                                                 if(tQResults.affectedRows){
                                                     respMsg.status = true;
                                                     respMsg.message = 'Tag saved successfully';
-                                                    respMsg.data = {};
+                                                    respMsg.data = {
+                                                        type: type,
+                                                        tag: tag,
+                                                        pin: pin,
+                                                        s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + uniqueFileName
+                                                    };
                                                     respMsg.error = null;
                                                     res.status(200).json(respMsg);
                                                 }
@@ -5126,18 +5198,15 @@ User.prototype.getConveyanceReport = function(req,res,next){
     var token = req.query.token;
     var startDate = req.query.s_date;
     var endDate = req.query.e_date;
-    var pdfcontent='',data1;
+    var pdfcontent='',data1,total=0;
 
     var path = require('path');
 
-    console.log('----Date------');
     var sDate = startDate.split('-');
     sDate = sDate[2] + '-' + sDate[1]+ '-' + sDate[0];
-    console.log(sDate);
     var eDate = endDate.split('-');
     eDate = eDate[2] + '-' + eDate[1]+ '-' + eDate[0];
-    console.log(eDate);
-    console.log('---------------');
+
 
     var responseMessage = {
         status: false,
@@ -5187,7 +5256,7 @@ User.prototype.getConveyanceReport = function(req,res,next){
 
                                         if (i < getresult[0].length) {
                                             console.log('loop function..');
-                                            var file = path.join(__dirname, '../../mail/templates/report.html');
+                                            var file = path.join(__dirname, '../../mail/templates/report_new.html');
 
                                             fs.readFile(file, "utf8", function (err, data) {
 
@@ -5201,10 +5270,29 @@ User.prototype.getConveyanceReport = function(req,res,next){
 
                                                 data = data.replace("[sl.no]", i + 1);
                                                 data = data.replace("[Date]", getresult[0][i].taskdatetime);
-                                                data = data.replace("[Task]", getresult[0][i].ActionTitle);
+                                                if(getresult[0][i].ActionTitle != ' ') {
+                                                    data = data.replace("[Task]", getresult[0][i].ActionTitle);
+                                                }
+                                                else{
+                                                    data = data.replace("[Task]",'-');
+                                                }
+
                                                 data = data.replace("[Particulars]", getresult[0][i].particulars);
-                                                data = data.replace("[Client]", getresult[0][i].clientname);
-                                                data = data.replace("[Contact]", getresult[0][i].contactname);
+
+                                                if(getresult[0][i].clientname) {
+                                                    data = data.replace("[Client]", getresult[0][i].clientname);
+                                                }
+                                                else
+                                                {
+                                                    data = data.replace("[Client]", '-');
+                                                }
+                                                if(getresult[0][i].contactname) {
+                                                    data = data.replace("[Contact]", getresult[0][i].contactname);
+                                                }
+                                                else
+                                                {
+                                                    data = data.replace("[Contact]",'-');
+                                                }
                                                 data = data.replace("[Amount]", getresult[0][i].amount);
                                                 data = data.replace("[CreatedBy]", getresult[0][i].createduser);
 
@@ -5222,6 +5310,9 @@ User.prototype.getConveyanceReport = function(req,res,next){
                                                     addusers = getresult[0][i].additionalusers;
                                                 }
                                                 data = data.replace("[AddtionalUsers]", addusers);
+
+                                                total = total + getresult[0][i].amount;
+                                                data = data.replace("[total]", total);
 
 
                                                 fs.writeFile('./conveyance_report/conveyanceReport.html', data, function (err) {
@@ -5270,7 +5361,20 @@ User.prototype.getConveyanceReport = function(req,res,next){
                                             //fs.unlinkSync('./conveyance_report/conveyanceReport.html');
                                             fs.writeFile('./conveyance_report/conveyanceReport1.html', pdfcontent, function (err) {
                                                 if (!err) {
-                                                    generatePdf(pdfcontent);
+                                                    var files = path.join(__dirname, '../../mail/templates/report_total.html');
+                                                    fs.readFile(files, "utf8", function (err, totalResult) {
+                                                        if (!err) {
+
+                                                            totalResult = totalResult.replace("[total]", total);
+
+                                                            pdfcontent += totalResult;
+                                                            generatePdf(pdfcontent);
+                                                        }
+                                                        else
+                                                        {
+                                                            console.log('file reading error:'+err);
+                                                        }
+                                                    });
                                                 }
                                             });
                                         }
@@ -5572,7 +5676,7 @@ User.prototype.testTags = function(req,res,next) {
  * @param next
  * @description api code for save standard tags
 
-User.prototype.testTagsDocs = function(req,res,next) {
+ User.prototype.testTagsDocs = function(req,res,next) {
 
     var _this = this;
 
@@ -5720,7 +5824,7 @@ User.prototype.testTagsDocs = function(req,res,next) {
     }
 
 };
-*/
+ */
 
 
 
