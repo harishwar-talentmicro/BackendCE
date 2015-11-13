@@ -63,8 +63,8 @@ exports.FnGetTags = userModule.getTags;
 exports.FnGetConveyanceReport = userModule.getConveyanceReport;
 exports.FnGetindustryType = userModule.getindustryType;
 exports.FnGetindustrycategory = userModule.getindustrycategory;
-exports.FnTestTags = userModule.testTags;
-exports.FnTestTagsDocs = userModule.testTagsDocs;
+//exports.FnTestTags = userModule.testTags;
+exports.FnDeleteTag = userModule.deleteTag;
 
 
 //Audit module

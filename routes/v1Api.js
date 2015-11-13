@@ -13,6 +13,7 @@ router.get('/st_tag',LocationManager.FnGetStandardTags);
 
 router.post('/tag',LocationManager.FnSaveTags);
 router.get('/tag',LocationManager.FnGetTags);
+router.delete('/tag',LocationManager.FnDeleteTag);
 
 router.all('*',function(req,res,next){
     res.status(404).json({ status : false, error : { api : 'API'}, message : 'Not found'});
