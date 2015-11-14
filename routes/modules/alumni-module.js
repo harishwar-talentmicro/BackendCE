@@ -695,7 +695,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var facultySubtitle = req.body.f_subtitle;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var randomName,randomName1,page_pic,logo_pic;
+    var randomName,logo_name,page_pic,logo_pic,url='',logo_url='';
 
     var responseMessage = {
         status: false,
@@ -817,71 +817,26 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                 crop: ''
                             };
                             //console.log(imageParams);
-                            FnCropImage(imageParams, function (err, pictureResult) {
+                                FnCropImage(imageParams, function (err, pictureResult) {
 
-                                if (pictureResult) {
-                                    var params = {
-                                        page_pic: pictureResult
-                                    };
-                                    saveContent(params);
-                                }
-                            });
-                        };
-                        /*FnCropImage(imageParams, function (err, imageBuffer) {
-
-                         if (imageBuffer) {
-
-                         console.log('uploading to cloud server...');
-                         var filetype = (req.files.pg_pic).split(';base64');
-                         var type = filetype[0].split('/');
-                         var uniqueId = uuid.v4();
-                         randomName = uniqueId + '.' + type[1];
-
-                         var gcloud = require('gcloud');
-
-                         var fs = require('fs');
+                                    if (pictureResult) {
+                                        var params = {
+                                            page_pic: pictureResult
+                                        };
+                                        saveContent(params);
+                                    }
+                                });
+                            };
 
 
-                         var gcs = gcloud.storage({
-                         projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
-                         keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
-                         });
 
-                         // Reference an existing bucket.
-                         var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+                        var saveContent = function(randomName,url) {
 
-                         bucket.acl.default.add({
-                         entity: 'allUsers',
-                         role: gcs.acl.READER_ROLE
-                         }, function (err, aclObject) {
-                         });
-
-                         // Upload a local file to a new file to be created in your bucket
-
-                         var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                         var bufferStream = new BufferStream(imageBuffer);
-                         bufferStream.pipe(remoteWriteStream);
-
-
-                         remoteWriteStream.on('finish', function () {
-
-                         saveContent(randomName);
-                         });
-                         remoteWriteStream.on('error', function () {
-                         console.log('file not uploaded');
-
-                         });
-                         }
-                         });*/
-
-
-                        var saveContent = function(params) {
-
-                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
+                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(randomName) + ',' + st.db.escape(title)
                                 + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
                                 + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
                                 + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
-                                + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(req.body.logo)
+                                + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(req.body.log)
                                 + ',' + st.db.escape(logoTitle) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(mentorTitle)
                                 + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
                                 + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
@@ -920,7 +875,9 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                             f_title: req.body.f_title,
                                             f_subtitle: req.body.f_subtitle,
                                             height: height,
-                                            width: width
+                                            width: width,
+                                            pg_pic_url : url,
+                                            logo_url : logo_url
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveAlumniContent: Alumni Content saved successfully');
@@ -945,11 +902,9 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                             pagePicture();
                         }
                         else {
-                            console.log('c2...');
-                            var params = {
-                                page_pic: req.body.pg_pic
-                            };
-                            saveContent(params);
+                            randomName = '';
+                            url = '';
+                            saveContent(randomName,url);
                         }
 
                     }
@@ -1345,7 +1300,7 @@ function FnCropImage(imageParams, callback){
                                         var cdataUrl = new Buffer(croppedBuff).toString('base64');
                                         var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
                                         //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        callback(null, picUrl);
+                                        callback(null, croppedBuff);
                                         deleteTempFile();
                                         console.log('FnCropImage:Picture cropped successfully...');
                                     }
@@ -1365,7 +1320,7 @@ function FnCropImage(imageParams, callback){
                                         var cdataUrl = new Buffer(croppedBuff).toString('base64');
                                         var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
                                         //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        callback(null, picUrl);
+                                        callback(null, croppedBuff);
                                         console.log('FnCropImage:Picture cropped successfully');
                                         deleteTempFile();
 
@@ -1387,7 +1342,7 @@ function FnCropImage(imageParams, callback){
                                         var cdataUrl = new Buffer(croppedBuff).toString('base64');
                                         var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
                                         //res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                        callback(null, picUrl);
+                                        callback(null, croppedBuff);
                                         console.log('FnCropImage:Picture cropped successfully');
                                     }
                                     else{
@@ -2243,7 +2198,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var capacity = req.body.capacity ? req.body.capacity : 0;
     var attachmenttitle = req.body.a_title ? req.body.a_title : '';
     var attachmenttype = req.body.a_type ? req.body.a_type : '';
-    //var randomName,filetype,type,url;
+    var randomName,filetype,url,bufferData;
 
 
     var responseMessage = {
@@ -2292,10 +2247,68 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                 if (!err) {
                     if (result) {
 
+                        var uploadToCloud = function(){
+
+                            filetype = attachmenttitle.split('.');
+                            var uniqueId = uuid.v4();
+                            randomName = uniqueId + '.' + filetype[1];
+
+                            bufferData = new Buffer((req.body.attachment).replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''),  'base64');
+
+                            if (bufferData) {
+
+                                console.log('uploading to cloud server...');
+
+                                var gcloud = require('gcloud');
+
+                                var fs = require('fs');
+
+
+                                var gcs = gcloud.storage({
+                                    projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                                    keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                                });
+
+                                // Reference an existing bucket.
+                                var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                                bucket.acl.default.add({
+                                    entity: 'allUsers',
+                                    role: gcs.acl.READER_ROLE
+                                }, function (err, aclObject) {
+                                });
+
+                                // Upload a local file to a new file to be created in your bucket
+
+                                var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                                var bufferStream = new BufferStream(bufferData);
+                                bufferStream.pipe(remoteWriteStream);
+
+                                remoteWriteStream.on('finish', function () {
+                                    console.log('file uploaded to cloud');
+                                    url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
+                                    saveTenmaster(randomName, url);
+                                });
+                                remoteWriteStream.on('error', function () {
+                                    responseMessage.message = 'An error occurred';
+                                    responseMessage.error = {
+                                        server: 'cloud Server error'
+                                    };
+                                    responseMessage.data = null;
+                                    res.status(400).json(responseMessage);
+                                    console.log('FnSaveTENMaster: file upload error in cloud');
+
+                                });
+                            }
+
+                        };
+
+                        var saveTenmaster = function(randomName,url) {
+
                             var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
                                 + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
                                 + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
-                                + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(attachment)
+                                + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(randomName)
                                 + ',' + st.db.escape(code) + ',' + st.db.escape(capacity) + ',' + st.db.escape(attachmenttitle)
                                 + ',' + st.db.escape(attachmenttype);
                             var query = 'CALL pSaveTENMaster(' + queryParams + ')';
@@ -2321,10 +2334,10 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                             ezeone_id: req.body.ezeone_id,
                                             note: req.body.note,
                                             venue_id: req.body.venue_id,
-                                            attachment: req.body.attachment,
                                             code: req.body.code,
                                             a_title: req.body.a_title,
-                                            a_type: req.body.a_type
+                                            a_type: req.body.a_type,
+                                            s_url : url
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveTENMaster: Data saved successfully');
@@ -2341,7 +2354,21 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                     console.log('FnSaveTENMaster: error in saving tenmaster data:' + err);
                                 }
                             });
+
+
+                        };
+
+                        if(req.body.attachment){
+
+                            uploadToCloud();
                         }
+                        else
+                        {
+                            randomName = '';
+                            url='';
+                            saveTenmaster(randomName,url);
+                        }
+                    }
 
                     else {
                         responseMessage.message = 'Invalid token';
@@ -2463,8 +2490,8 @@ Alumni.prototype.getTENDetails = function(req,res,next){
                                 result.Longitude = getResult[1][i].Longitude;
                                 result.AL1 = getResult[1][i].AL1;
                                 result.AL2 = getResult[1][i].AL2;
-                                result.s_url = (getResult[1][i].url) ?
-                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][i].url) : '';
+                                result.s_url = (getResult[1][i].attachment) ?
+                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][i].attachment) : '';
 
                                 output.push(result);
                             }
