@@ -830,9 +830,9 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
 
 
 
-                        var saveContent = function(randomName,url) {
+                        var saveContent = function(params) {
 
-                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(randomName) + ',' + st.db.escape(title)
+                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
                                 + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
                                 + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
                                 + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
