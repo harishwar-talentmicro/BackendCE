@@ -695,7 +695,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var facultySubtitle = req.body.f_subtitle;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var randomName,logo_name,page_pic,logo_pic,url='',logo_url='';
+    var page_pic,logo_pic;
 
     var responseMessage = {
         status: false,
@@ -715,6 +715,10 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
+    //if(!picture){
+    //    error['picture'] = 'Invalid page picture';
+    //    validateStatus *= false;
+    //}
     if(!title){
         error['title'] = 'Invalid page title';
         validateStatus *= false;
@@ -817,26 +821,23 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                 crop: ''
                             };
                             //console.log(imageParams);
-                                FnCropImage(imageParams, function (err, pictureResult) {
+                            FnCropImage(imageParams, function (err, pictureResult) {
 
-                                    if (pictureResult) {
-                                        var params = {
-                                            page_pic: pictureResult
-                                        };
-                                        saveContent(params);
-                                    }
-                                });
-                            };
-
-
+                                if (pictureResult) {
+                                    var params = {
+                                        page_pic: pictureResult
+                                    };
+                                    saveContent(params);
+                                }
+                            });
+                        };
 
                         var saveContent = function(params) {
-
                             var queryParams = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
                                 + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
                                 + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
                                 + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
-                                + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(req.body.log)
+                                + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(req.body.logo)
                                 + ',' + st.db.escape(logoTitle) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(mentorTitle)
                                 + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
                                 + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
@@ -875,9 +876,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                             f_title: req.body.f_title,
                                             f_subtitle: req.body.f_subtitle,
                                             height: height,
-                                            width: width,
-                                            pg_pic_url : url,
-                                            logo_url : logo_url
+                                            width: width
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveAlumniContent: Alumni Content saved successfully');
@@ -902,6 +901,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                             pagePicture();
                         }
                         else {
+                            console.log('c2...');
                             var params = {
                                 page_pic: req.body.pg_pic
                             };
