@@ -902,9 +902,10 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                             pagePicture();
                         }
                         else {
-                            randomName = '';
-                            url = '';
-                            saveContent(randomName,url);
+                            var params = {
+                                page_pic: req.body.pg_pic
+                            };
+                            saveContent(params);
                         }
 
                     }
