@@ -610,7 +610,7 @@ Auth.prototype.register = function(req,res,next){
                                                     //res.send(RtnMessage);
                                                 }
                                             });
-                                            res.send(RtnMessage);
+                                        //    res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
                                                 var fs = require('fs');
                                                 var path = require('path');
@@ -693,26 +693,26 @@ Auth.prototype.register = function(req,res,next){
                                     else {
                                         console.log(RtnMessage);
                                         res.send(RtnMessage);
-                                        console.log('FnRegistration:tmaster: Registration Failed');
+                                        console.log('FnRegistration:tmaster: Registration Failed..1');
                                     }
                                 }
                                 else{
                                     console.log(RtnMessage);
                                     res.send(RtnMessage);
-                                    console.log('FnRegistration:tmaster: Registration Failed');
+                                    console.log('FnRegistration:tmaster: Registration Failed..2');
                                 }
                             }
 
                             else{
                                 console.log(RtnMessage);
                                 res.send(RtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed');
+                                console.log('FnRegistration:tmaster: Registration Failed..3');
                             }
                         }
                         else{
                             console.log(RtnMessage);
                             res.send(RtnMessage);
-                            console.log('FnRegistration:tmaster: Registration Failed');
+                            console.log('FnRegistration:tmaster: Registration Failed..4');
                         }
                     }
                     else {
