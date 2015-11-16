@@ -68,6 +68,7 @@ router.get('/conveyance_report', LocationManager.FnGetConveyanceReport);
 router.get('/industry_type_list',LocationManager.FnGetindustryType);
 router.get('/industry_category',LocationManager.FnGetindustrycategory);
 //router.post('/test_tag',LocationManager.FnTestTags);
+router.post('/save_pictures',LocationManager.FnSavePictures);
 
 
 //Audit module methods
@@ -96,6 +97,7 @@ router.post('/share_location',LocationManager.FnShareLocation);
 router.get('/loc',LocationManager.FnGetLoc);
 router.post('/loc',LocationManager.FnSaveLocation);
 router.post('/location_for_employer',LocationManager.FnSaveLocationforEmployers);
+
 
 //BusinessManager module methods
 router.get('/ewtGetTranscation',LocationManager.FnGetTransaction);

@@ -13,6 +13,7 @@
  *
  */
 
+var uuid = require('node-uuid');
 var stream = require( "stream" );
 var chalk = require( "chalk" );
 var util = require( "util" );
@@ -546,7 +547,10 @@ User.prototype.getUserDetails = function(req,res,next){
                                 if (UserDetailsResult[0]) {
                                     if (UserDetailsResult[0].length > 0) {
                                         // console.log('FnGetUserDetails: Token: ' + Token);
-                                        //console.log(UserDetailsResult);
+                                        //console.log(UserDetailsResult[0]);
+
+                                        UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
+                                            (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
                                         res.send(UserDetailsResult[0]);
                                     }
@@ -4199,7 +4203,7 @@ User.prototype.saveStandardTags = function(req,res,next){
 
     var _this = this;
 
-    var uuid = require('node-uuid');
+
     var token = req.query.token;
     var image = req.body.image;
     var type = 0;   // 0-image, 1-url
@@ -5672,6 +5676,268 @@ User.prototype.deleteTag = function(req,res,next) {
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
+
+
+/**
+ * @todo FnSavePictures
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get save pictures
+ */
+User.prototype.savePictures = function(req,res,next) {
+    var _this = this;
+    var fs = require("fs");
+
+    // params order
+    //flag,token,tag,type,pin,link,tid
+    var params = req.body.params;
+    var flag,token, tagType,type,pin,link,tid,randomName = '', originalFileName = '', imageBuffer, tags, spQuery;
+    params = params.split(',');
+    console.log('----------params--------');
+    console.log(params);
+
+    flag = params[0]; // 1-send token,2-send tid
+    token = params[1];
+    tagType = params[2] ? params[2] : 'PIC';
+    type = params[3] ? params[3] : 0;   // 0 - image, 1-url
+    pin = params[4] ? params[4] : null;
+    link = params[5] ? params[5] : '';
+    tid = params[6] ? params[6] : 0;
+
+
+    if (tagType == 0) {
+        tags = 0;
+    }
+    else if (tagType == 'PIC') {
+        tags = 2;
+    }
+    else {
+        tags = 1;
+    }
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if (flag == 1) {
+        if (!token) {
+            error['token'] = 'Invalid token';
+            validateStatus *= false;
+        }
+    }
+    else {
+        if (!tid) {
+            error['tid'] = 'Invalid tid';
+            validateStatus *= false;
+        }
+    }
+
+
+    if (!validateStatus) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            if (token) {
+                st.validateToken(token, function (err, result) {
+                    if (!err) {
+                        if (result) {
+                            console.log('token is valid');
+                            token = token;
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('FnSavePictures: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal server error'
+                        };
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('FnSavePictures:Error in processing Token' + err);
+                    }
+                });
+            }
+            else {
+                tid = tid;
+            }
+
+            if(type == 0) {
+
+                if (req.files.image) {
+
+                    var uniqueId = uuid.v4();
+                    var filetype = (req.files.image.extension) ? req.files.image.extension : 'jpg';
+                    randomName = uniqueId + '.' + filetype ;
+                    originalFileName = req.files.image.name;
+
+
+                    //upload to cloud storage
+                    console.log('uploading to cloud server...');
+
+                    var gcloud = require('gcloud');
+                    var fs = require('fs');
+
+                    var gcs = gcloud.storage({
+                        projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                        keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                    });
+
+                    // Reference an existing bucket.
+                    var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                    bucket.acl.default.add({
+                        entity: 'allUsers',
+                        role: gcs.acl.READER_ROLE
+                    }, function (err, aclObject) {
+                    });
+
+                    // Upload a local file to a new file to be created in your bucket
+
+                    var localReadStream = fs.createReadStream(req.files.image.path);
+                    var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                    localReadStream.pipe(remoteWriteStream);
+                    remoteWriteStream.on('finish', function () {
+                        if (token) {
+                            var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                                + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                            spQuery = 'CALL psavedocsandurls(' + queryParams + ')';
+                        }
+                        else {
+                            var queryParams = st.db.escape(parseInt(tid)) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                                + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+
+                            spQuery = 'CALL psavedocsandurlsAP(' + queryParams + ')';
+                        }
+
+                        console.log(spQuery);
+                        st.db.query(spQuery, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Image Saved successfully';
+                                    responseMessage.data = {
+                                        type: type,
+                                        tag: tagType,
+                                        pin: (!isNaN(parseInt(pin))) ? parseInt(pin) : null,
+                                        s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSavePictures: Image Saved  successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Image not Saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSavePictures:Image not Saved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSavePictures: error in saving image:' + err);
+                            }
+                        });
+                    });
+                    remoteWriteStream.on('error', function () {
+                        responseMessage.message = 'An error occurred';
+                        responseMessage.error = {
+                            server: 'Cloud Server error'
+                        };
+                        responseMessage.data = null;
+                        res.status(400).json(responseMessage);
+                        console.log('FnSavePictures: Image upload error to google cloud');
+
+                    });
+
+
+                }
+                else {
+                    responseMessage.message = 'An error occurred';
+                    responseMessage.error = 'Invalid image files';
+                    responseMessage.data = null;
+                    res.status(400).json(responseMessage);
+                    console.log('FnSavePictures: Image not accessing');
+
+                }
+            }
+            else {
+
+                randomName = (req.body.link) ? req.body.link : '';
+
+                var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
+                    + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+
+
+                var query = 'CALL psavedocsandurls(' + queryParams + ')';
+                console.log(query);
+                st.db.query(query, function (err, insertResult) {
+                    if (!err) {
+                        if (insertResult.affectedRows > 0) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Link Save successfully';
+                            responseMessage.data = {
+                                type: type,
+                                tag: tagType,
+                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
+                                s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                            };
+                            res.status(200).json(responseMessage);
+                            console.log('FnSavePictures: Link Save successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Link not Saved';
+                            res.status(200).json(responseMessage);
+                            console.log('FnSavePictures:Link not Saved');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'An error occured in query ! Please try again';
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        res.status(500).json(responseMessage);
+                        console.log('FnSavePictures: error in saving link:' + err);
+                    }
+
+                });
+            }
+
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnSavePictures ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 
 /**
