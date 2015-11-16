@@ -471,7 +471,7 @@ Auth.prototype.register = function(req,res,next){
                                                     //console.log(RtnMessage);
                                                     //res.send(RtnMessage);
                                                 }
-                                            });fn
+                                            });
                                             console.log(RtnMessage);
                                             res.send(RtnMessage);
                                         }
@@ -601,7 +601,6 @@ Auth.prototype.register = function(req,res,next){
                                             var query = 'CALL pupdateEZEoneKeywords(' + queryParams + ')';
                                             console.log('------');
                                             console.log(query);
-                                            console.log(query);
                                             st.db.query(query, function (err, getResult) {
                                                 if (!err) {
 
@@ -611,7 +610,7 @@ Auth.prototype.register = function(req,res,next){
                                                     //res.send(RtnMessage);
                                                 }
                                             });
-                                            //res.send(RtnMessage);
+                                            res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
                                                 var fs = require('fs');
                                                 var path = require('path');
@@ -686,7 +685,7 @@ Auth.prototype.register = function(req,res,next){
                                                     console.log('FnRegistration: tmaster: Update operation success');
                                                     console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
                                                     //console.log(RtnMessage);
-                                                    //res.send(RtnMessage);
+                                                    res.send(RtnMessage);
                                                 }
                                             });
                                         }
