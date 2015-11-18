@@ -906,7 +906,7 @@ Auth.prototype.login = function(req,res,next){
                                                 RtnMessage.cvid = loginDetails[0].cvid;
                                                 RtnMessage.profile_status = loginDetails[0].ps;
 
-                                                res.send(RtnMessage);
+
                                                 console.log('FnLogin:tmaster: Login success');
                                                 if (isIphone == 1) {
                                                     var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
@@ -922,6 +922,21 @@ Auth.prototype.login = function(req,res,next){
                                                         }
                                                     });
                                                 }
+                                                else{
+                                                    var queryParams = st.db.escape(UserName) + ',' + st.db.escape('');
+                                                    var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                                    //console.log(query);
+                                                    st.db.query(query, function (err, result) {
+                                                        if (!err) {
+                                                            //console.log(result);
+                                                            console.log('FnLogin:Other Deviceid save successfully');
+                                                        }
+                                                        else {
+                                                            console.log(err);
+                                                        }
+                                                    });
+                                                }
+                                                res.send(RtnMessage);
                                             }
                                             else {
 
@@ -983,7 +998,6 @@ Auth.prototype.login = function(req,res,next){
                                 RtnMessage.group_id = loginDetails[0].group_id;
                                 RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
 
-                                res.send(RtnMessage);
                                 console.log('FnLogin:tmaster: Login success');
                                 if (isIphone == 1) {
                                     var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
@@ -999,6 +1013,21 @@ Auth.prototype.login = function(req,res,next){
                                         }
                                     });
                                 }
+                                else{
+                                    var queryParams = st.db.escape(UserName) + ',' + st.db.escape('');
+                                    var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                    //console.log(query);
+                                    st.db.query(query, function (err, result) {
+                                        if (!err) {
+                                            //console.log(result);
+                                            console.log('FnLogin:Other Deviceid save successfully');
+                                        }
+                                        else {
+                                            console.log(err);
+                                        }
+                                    });
+                                }
+                                res.send(RtnMessage);
                             }
                         }
                         else{

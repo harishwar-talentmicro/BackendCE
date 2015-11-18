@@ -146,7 +146,7 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
         console.log('original message buffer size : '+bufsize);
         console.log(typeof(bufsize));
         if (bufsize > 1024){
-            var buf = new buffer(1024);
+            var buf = new Buffer(1024);
             buf.write(msgStr);
             var stringMessage = buf.toString('utf8');
             var stringbufsize = Buffer.byteLength(stringMessage);
