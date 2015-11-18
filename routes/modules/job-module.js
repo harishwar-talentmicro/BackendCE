@@ -101,6 +101,7 @@ Job.prototype.create = function(req,res,next){
     locMatrix= JSON.parse(JSON.stringify(locMatrix));
     var educations = req.body.jobEducation;
     educations= JSON.parse(JSON.stringify(educations));
+    var iphoneID='';
 
 
     if (jobType == 0){
@@ -183,25 +184,21 @@ Job.prototype.create = function(req,res,next){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
-   // if(!contactName){
-     //   responseMessage.error['contactName'] = 'Invalid contactName';
-      //  validateStatus *= false;
-   // }
     if(!locationsList){
         locationsList = [];
     }
-
-
     if(parseInt(cid) == NaN){
         error['cid'] = 'Invalid client id';
         validateStatus *= false;
     }
-
     if(parseInt(conatctId) == NaN){
         error['conatctId'] = 'Invalid conatctId';
         validateStatus *= false;
     }
-    validateStatus = true;
+    if(!instituteID){
+        instituteID = '';
+    }
+
     if(!validateStatus){
         responseMessage.status = false;
         responseMessage.message = 'Please check the errors below';
@@ -263,7 +260,6 @@ Job.prototype.create = function(req,res,next){
                                         };
                                         res.status(200).json(responseMessage);
 
-
                                         if(locMatrix.length) {
 
                                             async.each(locMatrix, function iterator(locDetails, callback) {
@@ -306,7 +302,9 @@ Job.prototype.create = function(req,res,next){
                                             });
                                         }
                                         else
-                                        {locMatrix=''}
+                                        {
+                                            locMatrix='';
+                                        }
 
                                         if(educations.length) {
                                             async.each(educations, function iterator(eduDetails,callback) {
@@ -352,7 +350,7 @@ Job.prototype.create = function(req,res,next){
                                             });
                                         }
                                         else
-                                        {educations=''}
+                                        {educations='';}
 
                                         matrix(insertresult[0][0].jobid);
                                         console.log('FnSaveJobs: Jobs save successfully');
@@ -431,17 +429,13 @@ Job.prototype.create = function(req,res,next){
                                 });
                             }
                             else {
-                                if( parseInt(req.body.tid) == 0) {
-                                    postNotification(jobID);
-                                }
+                                postNotification(jobID);
                             }
                         };
 
-
-
-
                         //send push notification
                         var postNotification = function (jobID) {
+                            console.log('job post notification...');
                             var queryParams1 = st.db.escape(jobID) + ',' + st.db.escape(location_id)
                                 + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to)
                                 + ',' + st.db.escape(req.body.salaryFrom)+ ',' + st.db.escape(req.body.salaryTo)
@@ -452,6 +446,7 @@ Job.prototype.create = function(req,res,next){
                                     if (results) {
                                         if (results[0]) {
                                             if (results[0][0]) {
+                                                console.log(results[0]);
                                                 for (var i = 0; i < results[0].length; i++) {
                                                     userID = results[0][i].MasterID;
                                                     var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID)+ ',' + st.db.escape(0);
@@ -485,18 +480,32 @@ Job.prototype.create = function(req,res,next){
                                                                                         st.db.query(query4, function (err, getDetails) {
                                                                                             if (getDetails) {
                                                                                                 if (getDetails[0]) {
-                                                                                                    receiverId = getDetails[0].tid;
-                                                                                                    senderTitle = ezeone_id;
-                                                                                                    groupTitle = ezeone_id;
-                                                                                                    groupId = companyResult[0].tid;
-                                                                                                    messageText = data;
-                                                                                                    messageType = 1;
-                                                                                                    operationType = 0;
-                                                                                                    iphoneId = null;
-                                                                                                    messageId = 0;
-                                                                                                    masterid = '';
-                                                                                                    //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+
+                                                                                                    var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userID;
+                                                                                                    console.log(queryParameters);
+                                                                                                    st.db.query(queryParameters, function (err, iosResult) {
+                                                                                                        if (iosResult) {
+                                                                                                            iphoneID = iosResult[0].iphoneID;
+                                                                                                        }
+                                                                                                        else {
+                                                                                                            iphoneID = '';
+                                                                                                        }
+                                                                                                        receiverId = getDetails[0].tid;
+                                                                                                        senderTitle = ezeone_id;
+                                                                                                        groupTitle = ezeone_id;
+                                                                                                        groupId = companyResult[0].tid;
+                                                                                                        messageText = data;
+                                                                                                        messageType = 8;
+                                                                                                        operationType = 0;
+                                                                                                        iphoneId = iphoneID;
+                                                                                                        messageId = 0;
+                                                                                                        masterid = '';
+                                                                                                        var latitude = '', longitude = '',prioritys ='', dateTime = '';
+                                                                                                        var msgUserid = '', a_name = '';
+                                                                                                        var jid = jobID;
+                                                                                                        //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude, prioritys, dateTime, a_name, msgUserid,jid);
+                                                                                                    });
                                                                                                 }
                                                                                                 else {
                                                                                                     console.log('FnjobNotification:user details not loaded');
@@ -652,7 +661,7 @@ function FnSaveSkills(skill, CallBack) {
             };
             RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
 
-            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname), function (err, SkillResult) {
+            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) +' and functionid='+st.db.escape(skill.fid), function (err, SkillResult) {
                 if ((!err)) {
                     if (SkillResult[0]) {
                         //console.log(SkillResult);
@@ -663,7 +672,7 @@ function FnSaveSkills(skill, CallBack) {
                         CallBack(null, RtnResponse);
                     }
                     else {
-                        st.db.query('insert into mskill (SkillTitle) values (' + st.db.escape(skill.skillname) + ')', function (err, skillInsertResult) {
+                        st.db.query('insert into mskill (SkillTitle,functionid) values (' + st.db.escape(skill.skillname) + ',' + st.db.escape(skill.fid) +')', function (err, skillInsertResult) {
                             if (!err) {
                                 if (skillInsertResult.affectedRows > 0) {
                                     st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, SkillMaxResult) {

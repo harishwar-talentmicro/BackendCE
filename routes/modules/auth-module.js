@@ -922,20 +922,6 @@ Auth.prototype.login = function(req,res,next){
                                                         }
                                                     });
                                                 }
-                                                else{
-                                                    var queryParams = st.db.escape(UserName) + ',' + st.db.escape('');
-                                                    var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                                    //console.log(query);
-                                                    st.db.query(query, function (err, result) {
-                                                        if (!err) {
-                                                            //console.log(result);
-                                                            console.log('FnLogin:Other Deviceid save successfully');
-                                                        }
-                                                        else {
-                                                            console.log(err);
-                                                        }
-                                                    });
-                                                }
                                                 res.send(RtnMessage);
                                             }
                                             else {
@@ -1007,20 +993,6 @@ Auth.prototype.login = function(req,res,next){
                                         if (!err) {
                                             //console.log(result);
                                             console.log('FnLogin:IphoneDevice save successfully');
-                                        }
-                                        else {
-                                            console.log(err);
-                                        }
-                                    });
-                                }
-                                else{
-                                    var queryParams = st.db.escape(UserName) + ',' + st.db.escape('');
-                                    var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
-                                    //console.log(query);
-                                    st.db.query(query, function (err, result) {
-                                        if (!err) {
-                                            //console.log(result);
-                                            console.log('FnLogin:Other Deviceid save successfully');
                                         }
                                         else {
                                             console.log(err);
