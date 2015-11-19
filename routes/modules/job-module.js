@@ -1494,6 +1494,8 @@ Job.prototype.getJobDetails = function(req,res,next){
     var _this = this;
     var token = req.query.token;
     var jobId = req.query.job_id;
+    var latitude = req.query.lat ? req.query.lat : '';
+    var longitude = req.query.lng ? req.query.lng : '';
 
     var responseMessage = {
         status: false,
@@ -1519,7 +1521,8 @@ Job.prototype.getJobDetails = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(jobId) + ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(jobId) + ',' + st.db.escape(token)+ ',' + st.db.escape(latitude)
+                            + ',' + st.db.escape(longitude);
                         var query = 'CALL pgetjobDetails(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
