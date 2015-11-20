@@ -1032,7 +1032,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var instituteId = req.body.institute_id ? req.body.institute_id : '';
         var pageSize = req.body.page_size ? req.body.page_size : 10;
         var pageCount = req.body.page_count ? req.body.page_count : 0;
-        var source = parseInt(req.body.source);   // 1-internal, 2-for ezeone cvs
+        var source = req.body.source;   // 1-internal, 2-for ezeone cvs
         var token = req.body.token;
         var jobSkills = req.body.job_skills;
         jobSkills = JSON.parse(JSON.stringify(jobSkills));
@@ -1040,7 +1040,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
         educations = JSON.parse(JSON.stringify(educations));
         var locMatrix = req.body.locMatrix;
         locMatrix = JSON.parse(JSON.stringify(locMatrix));
-
+console.log(locationIds);
         var i = 0;
         if (!jobSkills) {
             jobSkills = [];

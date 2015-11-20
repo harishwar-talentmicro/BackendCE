@@ -3737,6 +3737,7 @@ User.prototype.saveUserDetails = function(req,res,next){
     var functionId = (!isNaN(parseInt(req.body.fid))) ? parseInt(req.body.fid) : 0;
     var categoryId = (!isNaN(parseInt(req.body.cid))) ? parseInt(req.body.cid) : 0;
     var businessKeywords = (req.body.keywords) ? req.body.keywords : '';
+    var aboutCompany = (req.body.about_company) ? req.body.about_company : '';
 
 
     var responseMessage = {
@@ -3774,7 +3775,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(mobile)+ ',' + st.db.escape(website)+ ',' + st.db.escape(isdPhone)
                             + ',' + st.db.escape(isdMobile)+ ',' + st.db.escape(parkingStatus)+ ',' + st.db.escape(templateId)
                             + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId)+ ',' + st.db.escape(functionId)
-                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords);
+                            + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords)+ ',' + st.db.escape(aboutCompany);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, insertResult) {
@@ -3815,7 +3816,8 @@ User.prototype.saveUserDetails = function(req,res,next){
                                         parking_status : req.body.parking_status ? req.body.parking_status : '',
                                         template_id : req.body.template_id ? parseInt(req.body.template_id) : '',
                                         pin : req.body.pin ? parseInt(req.body.pin) : null,
-                                        keywords : req.body.keywords ? parseInt(req.body.keywords) : ''
+                                        keywords : req.body.keywords ? req.body.keywords : '',
+                                        about_company : req.body.about_company ? parseInt(req.body.about_company) : ''
 
                                     };
                                     res.status(200).json(responseMessage);
