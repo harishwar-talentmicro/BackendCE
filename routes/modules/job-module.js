@@ -1111,8 +1111,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     count = count - 1;
 
                     var eduSkills = {
-                        education: eduDetails.eid,
-                        spc: eduDetails.sid,
+                        education: eduDetails.edu_id,
+                        spc: eduDetails.spc_id,
                         score_from: eduDetails.score_from,
                         score_to: eduDetails.score_to
 
@@ -1148,7 +1148,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
                     var locSkills = {
                         fid: locDetails.fid,
-                        locIds: locDetails.locIds,
+                        locIds: locDetails.career_id,
                         exp_from: locDetails.exp_from,
                         exp_to: locDetails.exp_to,
                         level: locDetails.expertiseLevel
