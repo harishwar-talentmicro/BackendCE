@@ -3817,7 +3817,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                                         template_id : req.body.template_id ? parseInt(req.body.template_id) : '',
                                         pin : req.body.pin ? parseInt(req.body.pin) : null,
                                         keywords : req.body.keywords ? req.body.keywords : '',
-                                        about_company : req.body.about_company ? parseInt(req.body.about_company) : ''
+                                        about_company : req.body.about_company ? req.body.about_company : ''
 
                                     };
                                     res.status(200).json(responseMessage);
