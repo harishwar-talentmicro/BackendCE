@@ -2981,6 +2981,7 @@ MessageBox.prototype.getMessageAttachment = function(req,res,next){
 
     var token = req.query.token;
     var tid = parseInt(req.query.tid); // tid of message id
+    var isMessageid = req.query.isMsgid ? parseInt(req.query.isMsgid) : 0;
 
     var responseMessage = {
         status: false,
@@ -3010,7 +3011,7 @@ MessageBox.prototype.getMessageAttachment = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =  st.db.escape(tid);
+                        var queryParams =  st.db.escape(tid)+ ',' + st.db.escape(isMessageid);
                         var query = 'CALL pGetMessageAttachment(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
