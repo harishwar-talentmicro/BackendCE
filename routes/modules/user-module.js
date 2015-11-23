@@ -5987,35 +5987,43 @@ User.prototype.profilePicForEzeid = function(req,res,next){
             var query = 'Select EZEID,TID from tmaster where EZEID=' + st.db.escape(ezeid);
             st.db.query(query, function (err, EzediExitsResult) {
                 if (!err) {
-                    if (EzediExitsResult.length > 0) {
-                        var query1 = "select ifnull((SELECT image FROM t_docsandurls where masterid=" + EzediExitsResult[0].TID + " AND tag='PIC' LIMIT 0,1),'') as picture from tmaster where tid=" + EzediExitsResult[0].TID;
-                        st.db.query(query1, function (err, imageResult) {
-                            if (!err) {
-                                if (imageResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Profile Picture loaded successfully';
-                                    imageResult[0].picture = (imageResult[0].picture) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imageResult[0].picture) : '';
-                                    responseMessage.data = { s_url : imageResult[0].picture};
+                    if (EzediExitsResult[0]) {
+                        if (EzediExitsResult[0].length > 0) {
+                            var query1 = "select ifnull((SELECT image FROM t_docsandurls where masterid=" + EzediExitsResult[0].TID + " AND tag='PIC' LIMIT 0,1),'') as picture from tmaster where tid=" + EzediExitsResult[0].TID;
+                            st.db.query(query1, function (err, imageResult) {
+                                if (!err) {
+                                    if (imageResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Profile Picture loaded successfully';
+                                        imageResult[0].picture = (imageResult[0].picture) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imageResult[0].picture) : '';
+                                        responseMessage.data = {s_url: imageResult[0].picture};
 
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnProfilePicForEzeid: Profile Picture loaded successfully');
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnProfilePicForEzeid: Profile Picture loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Profile Picture not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnProfilePicForEzeid: Profile Picture not loaded');
+                                    }
                                 }
                                 else {
-                                    responseMessage.message = 'Profile Picture not loaded';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnProfilePicForEzeid: Profile Picture not loaded');
+                                    responseMessage.message = 'An error occured in query ! Please try again';
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnProfilePicForEzeid: error in getting Profile Picture :' + err);
                                 }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured in query ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnProfilePicForEzeid: error in getting Profile Picture :' + err);
-                            }
-                        });
+                            });
+                        }
+
+                        else {
+                            responseMessage.message = 'ezeid is not valid';
+                            res.status(200).json(responseMessage);
+                            console.log('FnProfilePicForEzeid: ezeid is not valid');
+                        }
                     }
                     else {
                         responseMessage.message = 'ezeid is not valid';
