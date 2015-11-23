@@ -66,6 +66,7 @@ exports.FnGetindustrycategory = userModule.getindustrycategory;
 //exports.FnTestTags = userModule.testTags;
 exports.FnDeleteTag = userModule.deleteTag;
 exports.FnSavePictures = userModule.savePictures;
+exports.FnProfilePicForEzeid = userModule.profilePicForEzeid;
 
 
 //Audit module

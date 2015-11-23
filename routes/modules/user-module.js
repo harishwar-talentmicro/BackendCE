@@ -5947,6 +5947,106 @@ User.prototype.savePictures = function(req,res,next) {
     }
 };
 
+/**
+ * @todo FnProfilePicForEzeid
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get Profile Pic For Ezeid
+ */
+User.prototype.profilePicForEzeid = function(req,res,next){
+
+    var _this = this;
+
+    var ezeid = alterEzeoneId(req.query.ezeid);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: {s_url:''}
+    };
+
+    var validateStatus = true,error = {};
+
+
+    if(!ezeid){
+        error['ezeid'] = 'Invalid ezeid';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+
+            var query = 'Select EZEID,TID from tmaster where EZEID=' + st.db.escape(ezeid);
+            st.db.query(query, function (err, EzediExitsResult) {
+                if (!err) {
+                    if (EzediExitsResult.length > 0) {
+                        var query1 = "select ifnull((SELECT image FROM t_docsandurls where masterid=" + EzediExitsResult[0].TID + " AND tag='PIC' LIMIT 0,1),'') as picture from tmaster where tid=" + EzediExitsResult[0].TID;
+                        st.db.query(query1, function (err, imageResult) {
+                            if (!err) {
+                                if (imageResult[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Profile Picture loaded successfully';
+                                    imageResult[0].picture = (imageResult[0].picture) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imageResult[0].picture) : '';
+                                    responseMessage.data = { s_url : imageResult[0].picture};
+
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnProfilePicForEzeid: Profile Picture loaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Profile Picture not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnProfilePicForEzeid: Profile Picture not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnProfilePicForEzeid: error in getting Profile Picture :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'ezeid is not valid';
+                        res.status(200).json(responseMessage);
+                        console.log('FnProfilePicForEzeid: ezeid is not valid');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnProfilePicForEzeid: error in getting ezeid :' + err);
+                }
+
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnProfilePicForEzeid ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 /**

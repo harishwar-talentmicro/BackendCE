@@ -69,6 +69,7 @@ router.get('/industry_type_list',LocationManager.FnGetindustryType);
 router.get('/industry_category',LocationManager.FnGetindustrycategory);
 //router.post('/test_tag',LocationManager.FnTestTags);
 router.post('/save_pictures',LocationManager.FnSavePictures);
+router.get('/pic_for_ezeid',LocationManager.FnProfilePicForEzeid);
 
 
 //Audit module methods
