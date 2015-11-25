@@ -58,7 +58,7 @@ Configuration.prototype.save = function(req,res,next){
         var HomeDeliveryItemListType = req.body.HomeDeliveryItemListType;
         var ResumeKeyword = req.body.ResumeKeyword;
         var Category = req.body.Category;
-        var Keyword = req.body.Keyword;
+       // var Keyword = req.body.Keyword;
         var ReservationDisplayFormat = req.body.ReservationDisplayFormat;
         var DataRefreshInterval = req.body.DataRefreshInterval;
         var SalesFormMsg = req.body.SalesFormMsg;
@@ -108,7 +108,7 @@ Configuration.prototype.save = function(req,res,next){
                                     + ',' + st.db.escape(ResumeTitle) + ',' + st.db.escape(VisibleModules)
                                     + ',' + st.db.escape(SalesItemListType) + ',' + st.db.escape(HomeDeliveryItemListType)
                                     + ',' + st.db.escape(ResumeKeyword) + ',' + st.db.escape(Category)
-                                    + ',' + st.db.escape(Keyword) + ',' + st.db.escape(ReservationDisplayFormat)
+                                    + ',' + st.db.escape(ReservationDisplayFormat)
                                     + ',' + st.db.escape(DataRefreshInterval) + ',' + st.db.escape(SalesFormMsg)
                                     + ',' + st.db.escape(ReservationFormMsg) + ',' + st.db.escape(HomeDeliveryFormMsg)
                                     + ',' + st.db.escape(ServiceFormMsg) + ',' + st.db.escape(ResumeFormMsg)
@@ -152,7 +152,7 @@ Configuration.prototype.save = function(req,res,next){
                                 + ',' + st.db.escape(ResumeTitle) + ',' + st.db.escape(VisibleModules)
                                 + ',' + st.db.escape(SalesItemListType) + ',' + st.db.escape(HomeDeliveryItemListType)
                                 + ',' + st.db.escape(ResumeKeyword) + ',' + st.db.escape(Category)
-                                + ',' + st.db.escape(Keyword) + ',' + st.db.escape(ReservationDisplayFormat)
+                                + ',' + st.db.escape(ReservationDisplayFormat)
                                 + ',' + st.db.escape(DataRefreshInterval) + ',' + st.db.escape(SalesFormMsg)
                                 + ',' + st.db.escape(ReservationFormMsg) + ',' + st.db.escape(HomeDeliveryFormMsg)
                                 + ',' + st.db.escape(ServiceFormMsg) + ',' + st.db.escape(ResumeFormMsg)
