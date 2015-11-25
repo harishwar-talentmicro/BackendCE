@@ -9,6 +9,94 @@
 "use strict";
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
+var uuid = require('node-uuid');
+var gcloud = require('gcloud');
+
+var appConfig = require('../../ezeone-config.json');
+
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
+
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+
+
+var stream = require( "stream" );
+var chalk = require( "chalk" );
+var util = require( "util" );
+// I turn the given source Buffer into a Readable stream.
+function BufferStream( source ) {
+
+    if ( ! Buffer.isBuffer( source ) ) {
+
+        throw( new Error( "Source must be a buffer." ) );
+
+    }
+
+    // Super constructor.
+    stream.Readable.call( this );
+
+    this._source = source;
+
+    // I keep track of which portion of the source buffer is currently being pushed
+    // onto the internal stream buffer during read actions.
+    this._offset = 0;
+    this._length = source.length;
+
+    // When the stream has ended, try to clean up the memory references.
+    this.on( "end", this._destroy );
+
+}
+
+util.inherits( BufferStream, stream.Readable );
+
+
+// I attempt to clean up variable references once the stream has been ended.
+// --
+// NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
+// usage since my Node.js apps will (eventually) never restart.
+BufferStream.prototype._destroy = function() {
+
+    this._source = null;
+    this._offset = null;
+    this._length = null;
+
+};
+
+
+// I read chunks from the source buffer into the underlying stream buffer.
+// --
+// NOTE: We can assume the size value will always be available since we are not
+// altering the readable state options when initializing the Readable stream.
+BufferStream.prototype._read = function( size ) {
+
+    // If we haven't reached the end of the source buffer, push the next chunk onto
+    // the internal stream buffer.
+    if ( this._offset < this._length ) {
+
+        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
+
+        this._offset += size;
+
+    }
+
+    // If we've consumed the entire source buffer, close the readable stream.
+    if ( this._offset >= this._length ) {
+
+        this.push( null );
+
+    }
+
+};
+
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -82,23 +170,28 @@ Configuration.prototype.save = function(req,res,next){
             IsSuccessfull: false
         };
 
-        if (Token != null && Keyword != null && Category != null) {
+        if (Token != null && Category != null) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
 
-                        if(req.files.deal_banner) {
+                        if(req.body.deal_banner) {
                             var uniqueId = uuid.v4();
-                            randomName = uniqueId + '.' + req.files.extension;
+                            var fileType = (req.body.deal_banner).split(';base64');
+                            var type = fileType[0].split('/');
+                            randomName = uniqueId + '.' + type[1];
+                            var s_url =req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
+                            console.log(s_url);
 
+                            var bufferData = new Buffer((req.body.deal_banner).replace(/^data:(image|'+mimeType+')\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');
 
                             var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                            //var bufferStream = new BufferStream(bufferData);
-                            //bufferStream.pipe(remoteWriteStream);
+                            var bufferStream = new BufferStream(bufferData);
+                            bufferStream.pipe(remoteWriteStream);
 
-                            var localReadStream = fs.createReadStream(req.files.deal_banner.path);
-                            localReadStream.pipe(remoteWriteStream);
+                            //var localReadStream = fs.createReadStream(req.files.deal_banner.path);
+                            //localReadStream.pipe(remoteWriteStream);
 
 
                             remoteWriteStream.on('finish', function () {
@@ -116,6 +209,7 @@ Configuration.prototype.save = function(req,res,next){
                                     + ',' + st.db.escape(HomeDeliveryURL) + ',' + st.db.escape(ServiceURL) + ',' + st.db.escape(ResumeURL)
                                     + ',' + st.db.escape(deal_enable) + ',' + st.db.escape(randomName) + ',' + st.db.escape(deal_title)
                                     + ',' + st.db.escape(deal_desc);
+                                console.log(query);
 
                                 st.db.query('CALL pSaveConfig(' + query + ')', function (err, InsertResult) {
                                     if (!err) {
@@ -141,7 +235,7 @@ Configuration.prototype.save = function(req,res,next){
                             remoteWriteStream.on('error', function () {
                                 res.statusCode = 400;
                                 res.send(RtnMessage);
-                                console.log('FnSaveTags: Image upload error to google cloud');
+                                console.log('FnSaveConfig: deal banner upload error to google cloud');
 
                             });
                         }
@@ -205,9 +299,7 @@ Configuration.prototype.save = function(req,res,next){
             else if (Category == null) {
                 console.log('FnSaveConfig: Category is empty');
             }
-            else if (Keyword == null) {
-                console.log('FnSaveConfig: Keyword is empty');
-            }
+
 
             res.statusCode=400;
             res.send(RtnMessage);
@@ -249,6 +341,8 @@ Configuration.prototype.get = function(req,res,next){
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetConfig: Details Send successfully');
+                                        GetResult[0][0].dealbanner= (GetResult[0][0].dealbanner) ?
+                                            (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + GetResult[0][0].dealbanner) : '';
                                         res.send(GetResult[0]);
                                     }
                                     else {
