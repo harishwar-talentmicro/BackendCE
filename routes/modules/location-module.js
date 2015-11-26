@@ -1231,14 +1231,14 @@ Location.prototype.getLoc = function(req,res,next){
 };
 
 /**
- * @todo FnSaveLocation
+ * @todo FnSaveLoc
  * Method : post
  * @param req
  * @param res
  * @param next
  * @description api code for get save location
  */
-Location.prototype.saveLocation = function(req,res,next){
+Location.prototype.saveLoc = function(req,res,next){
     var _this = this;
     var fs = require("fs");
 

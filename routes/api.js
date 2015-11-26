@@ -8,338 +8,412 @@
 
 var express = require('express');
 var router = express.Router();
-var LocationManager = require('../routes/routes.js');
+
+
+var DbHelper = require('./../helpers/DatabaseHandler'),
+    db = DbHelper.getDBContext();
+
+var StdLib = require('./modules/std-lib.js');
+var stdLib = new StdLib(db);
 
 
 /**
  * Services for MQTT Messaging Server Interface
  */
-router.get('/ms_auth/user',LocationManager.FnMSAuthUser);
-router.get('/ms_auth/vhost',LocationManager.FnMSAuthVHost);
-router.get('/ms_auth/resource',LocationManager.FnMSAuthResource);
+var Notification = require('./modules/notification/notification-master.js');
+var notification = new Notification(db,stdLib);
+router.get('/ms_auth/user',notification.authUser);
+router.get('/ms_auth/vhost',notification.authVHost);
+router.get('/ms_auth/resource',notification.authResource);
 
-//this part is for passenger
+
+//EZEID Methods
 //Auth module methods
-router.post('/ewSavePrimaryEZEData', LocationManager.FnRegistration);
-router.post('/ewLogin', LocationManager.FnLogin);
-router.get('/ewLogout', LocationManager.FnLogout);
-router.get('/pass_reset_code',LocationManager.FnVerifyResetPasswordLink);
-router.post('/verify_secret_code',LocationManager.FnVerifySecretCode);
+
+var Auth = require('./modules/auth-module.js');
+var authModule = new Auth(db,stdLib);
+router.post('/ewSavePrimaryEZEData', authModule.register);
+router.post('/ewLogin', authModule.login);
+router.get('/ewLogout', authModule.logout);
+router.get('/pass_reset_code',authModule.verifyResetCode);
+router.post('/verify_secret_code',authModule.verifySecretCode);
 
 //User module methods
-router.get('/ewmGetCountry', LocationManager.FnGetCountry);
-router.get('/ewmGetState', LocationManager.FnGetState);
-router.get('/ewmGetCity', LocationManager.FnGetCity);
-router.get('/ewtGetUserDetails', LocationManager.FnGetUserDetails);
-router.get('/ewGetEZEID', LocationManager.FnCheckEzeid);
-router.post('/ewtChangePassword', LocationManager.FnChangePassword);
-router.post('/ewtForgetPassword', LocationManager.FnForgetPassword);
-router.get('/ewtDecryptPassword', LocationManager.FnDecryptPassword);
-router.get('/ewtCompanyProfile', LocationManager.FnGetCompanyProfile);
-router.post('/ewtCompanyProfile', LocationManager.FnSaveCompanyProfile);
-router.get('/ewtWebLink',LocationManager.FnGetWebLink);
-router.post('/ewtWebLink',LocationManager.FnSaveWebLink);
-router.delete('/ewtwebLink',LocationManager.FnDeleteWebLink);
-router.get('/ewtEZEIDPrimaryDetails',LocationManager.FnEZEIDPrimaryDetails);
-router.post('/ewtSaveCVInfo', LocationManager.FnSaveCVInfo);
-router.get('/ewtGetCVInfo', LocationManager.FnGetCVInfo);
-router.get('/skill_list',LocationManager.FnPGetSkills);
-router.get('/ewtGetDocPin', LocationManager.FnGetDocPin);
-router.get('/ewtGetDoc', LocationManager.FnGetDoc);
-router.get('/ewtGetDocument', LocationManager.FnGetDocument);
-router.post('/ewtUpdateDocPin', LocationManager.FnUpdateDocPin);
-router.post('/ewtSaveDoc', LocationManager.FnSaveDoc);
-router.get('/ewmGetFunctions', LocationManager.FnGetFunctions);
-router.get('/ewtGetLoginDetails',LocationManager.FnGetLoginDetails);
-router.post('/ewtUploadDoc', LocationManager.FnUploadDocument);
-router.get('/ewmGetMTitle', LocationManager.FnGetMTitle);
-router.post('/ewtUpdateProfilePicture', LocationManager.FnUpdateProfilePicture);
-router.get('/ewtGetLoginCheck', LocationManager.FnGetLoginCheck);
-router.get('/ewmGetProxmity', LocationManager.FnGetProxmity);
-router.get('/institutes',LocationManager.FnGetInstitutes);
-router.get('/educations',LocationManager.FnGetEducations);
-router.get('/specialization',LocationManager.FnGetSpecialization);
-router.get('/verify_institute',LocationManager.FnGetVerifiedInstitutes);
-router.post('/user_details',LocationManager.FnSaveUserDetails);
-router.get('/user_details_new',LocationManager.FnGetUserDetailsNew);
-router.post('/send_resume',LocationManager.FnSendResume);
-router.get('/download_resume',LocationManager.FnDownloadResume);
-router.get('/conveyance_report', LocationManager.FnGetConveyanceReport);
-router.get('/industry_type_list',LocationManager.FnGetindustryType);
-router.get('/industry_category',LocationManager.FnGetindustrycategory);
-//router.post('/test_tag',LocationManager.FnTestTags);
-router.post('/save_pictures',LocationManager.FnSavePictures);
-router.get('/pic_for_ezeid',LocationManager.FnProfilePicForEzeid);
+var User = require('./modules/user-module.js');
+var userModule = new User(db,stdLib);
+router.get('/ewmGetCountry', userModule.getCountry);
+router.get('/ewmGetState', userModule.getState);
+router.get('/ewmGetCity', userModule.getCity);
+router.get('/ewtGetUserDetails', userModule.getUserDetails);
+router.get('/ewGetEZEID', userModule.checkEzeid);
+router.post('/ewtChangePassword', userModule.changePassword);
+router.post('/ewtForgetPassword', userModule.forgetPassword);
+router.get('/ewtDecryptPassword', userModule.decryptPassword);
+router.get('/ewtCompanyProfile', userModule.getCompanyProfile);
+router.post('/ewtCompanyProfile', userModule.saveCompanyProfile);
+router.get('/ewtWebLink',userModule.getWebLink);
+router.post('/ewtWebLink',userModule.saveWebLink);
+router.delete('/ewtwebLink',userModule.deleteWebLink);
+router.get('/ewtEZEIDPrimaryDetails',userModule.getEzeidDetails);
+router.post('/ewtSaveCVInfo', userModule.saveResume);
+router.get('/ewtGetCVInfo', userModule.getResume);
+router.get('/skill_list',userModule.getSkills);
+router.get('/ewtGetDocPin', userModule.getDocPin);
+router.get('/ewtGetDoc', userModule.getDoc);
+router.get('/ewtGetDocument', userModule.getDocument);
+router.post('/ewtUpdateDocPin', userModule.updateDocPin);
+router.post('/ewtSaveDoc', userModule.saveDoc);
+router.get('/ewmGetFunctions', userModule.getFunctions);
+router.get('/ewtGetLoginDetails',userModule.getLoginDetails);
+router.post('/ewtUploadDoc', userModule.uploadDoc);
+router.get('/ewmGetMTitle', userModule.getMTitle);
+router.post('/ewtUpdateProfilePicture', userModule.updateProfilePicture);
+router.get('/ewtGetLoginCheck', userModule.getLoginCheck);
+router.get('/ewmGetProxmity', userModule.getProxmity);
+router.get('/institutes',userModule.getInstitutes);
+router.get('/educations',userModule.getEducations);
+router.get('/specialization',userModule.getSpecialization);
+router.get('/verify_institute',userModule.getVerifiedInstitutes);
+router.post('/user_details',userModule.saveUserDetails);
+router.get('/user_details_new',userModule.getUserDetailsNew);
+router.post('/send_resume',userModule.sendResume);
+router.get('/download_resume',userModule.downloadResume);
+router.post('/v1/st_tag',userModule.saveStandardTags);
+router.get('/v1/st_tag',userModule.getStandardTags);
+router.post('/v1/tag',userModule.saveTags);
+router.get('/v1/tag',userModule.getTags);
+router.delete('/v1/tag',userModule.deleteTag);
+router.get('/conveyance_report', userModule.getConveyanceReport);
+router.get('/industry_type_list',userModule.getindustryType);
+router.get('/industry_category',userModule.getindustrycategory);
+//router.post('/test_tag',userModule.FnTestTags);
+router.post('/save_pictures',userModule.savePictures);
+router.get('/pic_for_ezeid',userModule.profilePicForEzeid);
 
 
 //Audit module methods
-router.get('/ewtGetAccessHistory', LocationManager.FnGetAccessHistory);
-router.post('/ewtSaveWhiteBlackList', LocationManager.FnSaveWhiteBlackList);
-router.get('/ewtGetWhiteBlackList', LocationManager.FnGetWhiteBlackList);
-router.post('/ewtDeleteWhiteBlackList', LocationManager.FnDeleteWhiteBlackList);
-router.get('/ewtGetWhiteListCount', LocationManager.FnGetWhiteListCount);
-router.get('/ewmGetRelationType', LocationManager.FnGetRelationType);
-router.post('/ewtTemplateDetails',LocationManager.FnSaveMailTemplate);
-router.get('/ewtTemplateList',LocationManager.FnGetTemplateList);
-router.get('/ewtTemplateDetails',LocationManager.FnGetTemplateDetails);
-router.post('/ewtSendBulkMailer',LocationManager.FnSendBulkMailer);
+var Audit = require('./modules/audit-module.js');
+var auditModule = new Audit(db,stdLib);
+router.get('/ewtGetAccessHistory', auditModule.getAccessHistory);
+router.post('/ewtSaveWhiteBlackList', auditModule.saveList);
+router.get('/ewtGetWhiteBlackList', auditModule.getList);
+router.post('/ewtDeleteWhiteBlackList', auditModule.deleteList);
+router.get('/ewtGetWhiteListCount', auditModule.getListCount);
+router.get('/ewmGetRelationType', auditModule.getRelation);
+router.post('/ewtTemplateDetails',auditModule.saveMailTemplate);
+router.get('/ewtTemplateList',auditModule.getMailTemplate);
+router.get('/ewtTemplateDetails',auditModule.getTemplateDetails);
+router.post('/ewtSendBulkMailer',auditModule.sendBulkMailer);
 
 //Location module methods
-router.get('/ewtGetSecondaryLoc', LocationManager.FnGetSecondaryLocation);
-router.post('/ewmAddLocation', LocationManager.FnAddLocation);
-router.post('/ewDeleteLocation', LocationManager.FnDeleteLocation);
-router.get('/ewtGetLocationListForEZEID', LocationManager.FnGetLocationListForEZEID);
-router.get('/ewtGetLocationList',LocationManager.FnGetLocationList);
-router.get('/location_image',LocationManager.FnGetLocationPicture);
-router.get('/location_details',LocationManager.FnLocationDetails);
-router.get('/validate_ezeone', LocationManager.FnValidateEZEOne);
-router.get('/locations_map_view',LocationManager.FnGetLocationsofezeid);
-router.post('/share_location',LocationManager.FnShareLocation);
-router.get('/loc',LocationManager.FnGetLoc);
-router.post('/loc',LocationManager.FnSaveLocation);
-router.post('/location_for_employer',LocationManager.FnSaveLocationforEmployers);
+var Location = require('./modules/location-module.js');
+var locationModule = new Location(db,stdLib);
+router.get('/ewtGetSecondaryLoc', locationModule.getAll);
+router.post('/ewmAddLocation', locationModule.save);
+router.post('/ewDeleteLocation', locationModule.deleteLocation);
+router.get('/ewtGetLocationListForEZEID', locationModule.getAllForEzeid);
+router.get('/ewtGetLocationList',locationModule.getLoactionList);
+router.get('/location_image',locationModule.getLocationPicture);
+router.get('/location_details',locationModule.getLocationDetails);
+router.post('/share_location',locationModule.shareLocation);
+router.get('/validate_ezeone', locationModule.validateEZEOne);
+router.get('/locations_map_view',locationModule.getLocationsofezeid);
+router.get('/loc',locationModule.getLoc);
+router.post('/loc',locationModule.saveLoc);
+router.post('/location_for_employer',locationModule.saveLocationforEmployers);
 
 
 //BusinessManager module methods
-router.get('/ewtGetTranscation',LocationManager.FnGetTransaction);
-router.post('/ewtSaveTranscation',LocationManager.FnSaveTransaction);
-router.put('/update_transaction',LocationManager.FnUpdateTransaction);
-router.get('/ewtGetTranscationItems',LocationManager.FnGetTransactionItems);
-router.post('/ewtSaveTranscationItems',LocationManager.FnSaveTransactionItems);
-router.get('/get_outbox_messages',LocationManager.FnGetOutboxMessages);
-router.get('/transaction_autocomplete',LocationManager.FnGetTransAutoComplete);
-router.get('/ewtGetItemListForEZEID',LocationManager.FnGetItemListForEZEID);
-router.delete('/ewtDeleteTranscation',LocationManager.FnDeleteTransaction);
-router.get('/ewtItemList',LocationManager.FnItemList);
-router.get('/ewtItemDetails',LocationManager.FnItemDetails);
-router.get('/ewtGetUserwiseFolderList',LocationManager.FnGetUserwiseFolderList);
-router.post('/ewtUpdateBussinessListing', LocationManager.FnUpdateBussinessListing);
-router.get('/company_details',LocationManager.FnGetCompanyDetails);
-router.get('/ezeoneid',LocationManager.FnGetEZEOneIDInfo);
-router.get('/transaction_attachment',LocationManager.FnGetTransAttachment);
-router.get('/sales_statistics',LocationManager.FnSalesStatistics);
+var BusinessManager = require('./modules/business-module.js');
+var businessManager = new BusinessManager(db,stdLib);
+router.get('/ewtGetTranscation',businessManager.getTransactions);
+router.post('/ewtSaveTranscation',businessManager.saveTransaction);
+router.put('/update_transaction',businessManager.updateTransaction);
+router.get('/ewtGetTranscationItems',businessManager.getTransactionItems);
+router.post('/ewtSaveTranscationItems',businessManager.saveTransactionItems);
+router.get('/get_outbox_messages',businessManager.getOutboxTransactions);
+router.get('/transaction_autocomplete',businessManager.getTransAutoComplete);
+router.get('/ewtGetItemListForEZEID',businessManager.getItemListForEZEID);
+router.delete('/ewtDeleteTranscation',businessManager.deleteTransaction);
+router.get('/ewtItemList',businessManager.itemList);
+router.get('/ewtItemDetails',businessManager.itemDetails);
+router.get('/ewtGetUserwiseFolderList',businessManager.getUserwiseFolderList);
+router.post('/ewtUpdateBussinessListing', businessManager.updateBussinessList);
+router.get('/company_details',businessManager.getCompanyDetails);
+router.get('/ezeoneid',businessManager.getEZEOneIDInfo);
+router.get('/transaction_attachment',businessManager.getTransAttachment);
+router.get('/sales_statistics',businessManager.salesStatistics);
 
 //Configuration module methods
-router.post('/ewtConfig',LocationManager.FnSaveConfig);
-router.get('/ewtConfig',LocationManager.FnGetConfig);
-router.get('/ewmGetCategory', LocationManager.FnGetCategory);
-router.get('/ewtGetStatusType',LocationManager.FnGetStatusType);
-router.get('/ewmStatusType',LocationManager.FnStatusType);
-router.post('/ewmSaveStatusType',LocationManager.FnSaveStatusType);
-router.get('/ewtGetActionType',LocationManager.FnGetActionType);
-router.post('/ewmSaveActionType',LocationManager.FnSaveActionType);
-router.get('/ewtGetItemList',LocationManager.FnGetItemList);
-router.post('/ewtSaveItem',LocationManager.FnSaveItem);
-router.get('/ewtGetFolderList',LocationManager.FnGetFolderList);
-router.post('/ewmSaveFolderRules',LocationManager.FnSaveFolderRules);
-router.post('/ewtCreateSubUser',LocationManager.FnCreateSubUser);
-router.get('/ewtGetSubUserList',LocationManager.FnGetSubUserList);
-router.get('/reservation_resource',LocationManager.FnGetReservationResource);
-router.post('/reservation_resource',LocationManager.FnSaveReservationResource);
-router.put('/reservation_resource',LocationManager.FnUpdateReservationResource);
-router.post('/reservation_service',LocationManager.FnSaveReservationService);
-router.put('/reservation_service',LocationManager.FnUpdateReservationService);
-router.get('/reservation_service',LocationManager.FnGetReservationService);
-router.get('/reservation_resource_service_map',LocationManager.FnGetReservResourceServiceMap);
-router.post('/reservation_resource_service_map',LocationManager.FnSaveReservResourceServiceMap);
-router.post('/ewtWorkingHours',LocationManager.FnSaveWorkingHours);
-router.get('/ewtWorkingHours',LocationManager.FnGetWorkingHours);
-router.delete('/ewtWorkingHours',LocationManager.FnDeleteWorkingHours);
-router.post('/ewtHolidayList',LocationManager.FnSaveHolidayCalendar);
-router.get('/ewtHolidayList',LocationManager.FnGetHolidayList);
-router.delete('/ewtHolidayList',LocationManager.FnDeleteHolidayList);
-router.get('/get_workinghours_details',LocationManager.FnWorkingHoursDetails);
+var Configuration = require('./modules/configuration-module.js');
+var configurationModule = new Configuration(db,stdLib);
+router.post('/ewtConfig',configurationModule.save);
+router.get('/ewtConfig',configurationModule.get);
+router.get('/ewmGetCategory', configurationModule.getBusinessCategories);
+router.get('/ewtGetStatusType',configurationModule.getStatusTypes);
+router.get('/ewmStatusType',configurationModule.StatusTypes);
+router.post('/ewmSaveStatusType',configurationModule.saveStatusType);
+router.get('/ewtGetActionType',configurationModule.getActionTypes);
+router.post('/ewmSaveActionType',configurationModule.saveActionType);
+router.get('/ewtGetItemList',configurationModule.getItems);
+router.post('/ewtSaveItem',configurationModule.saveItems);
+router.get('/ewtGetFolderList',configurationModule.getFolders);
+router.post('/ewmSaveFolderRules',configurationModule.saveFolder);
+router.post('/ewtCreateSubUser',configurationModule.createSubuser);
+router.get('/ewtGetSubUserList',configurationModule.getSubusers);
+router.get('/reservation_resource',configurationModule.getReservationResources);
+router.post('/reservation_resource',configurationModule.saveReservationResource);
+router.put('/reservation_resource',configurationModule.updateReservationResource);
+router.post('/reservation_service',configurationModule.saveReservationService);
+router.put('/reservation_service',configurationModule.updateReservationService);
+router.get('/reservation_service',configurationModule.getReservationServices);
+router.get('/reservation_resource_service_map',configurationModule.getResourceServiceMaps);
+router.post('/reservation_resource_service_map',configurationModule.saveResourceServiceMap);
+router.post('/ewtWorkingHours',configurationModule.saveWorkingHoursTemplate);
+router.get('/ewtWorkingHours',configurationModule.getWorkingHoursTemplates);
+router.delete('/ewtWorkingHours',configurationModule.deleteWorkingHours);
+router.post('/ewtHolidayList',configurationModule.saveHoliday);
+router.get('/ewtHolidayList',configurationModule.getHolidays);
+router.delete('/ewtHolidayList',configurationModule.deleteHoliday);
+router.get('/get_workinghours_details',configurationModule.getWorkingHoursDetails);
 
 //Search module methods
-router.post('/ewSearchByKeywords', LocationManager.FnSearchByKeywords);
-router.get('/ewtGetSearchInformationNew', LocationManager.FnGetSearchInformationNew);
-router.get('/ewtGetSearchDocuments', LocationManager.FnGetSearchDocuments);
-router.get('/ewtGetBannerPicture', LocationManager.FnGetBannerPicture);
-router.post('/ewtSearchForTracker', LocationManager.FnSearchForTracker);
-router.get('/ewtGetWorkingHrsHolidayList',LocationManager.FnGetWorkingHrsHolidayList);
-router.get('/navigation',LocationManager.FnNavigateSearch);
+var Search = require('./modules/search-module.js');
+var searchModule = new Search(db,stdLib);
+router.post('/ewSearchByKeywords', searchModule.searchKeyword);
+router.get('/ewtGetSearchInformationNew', searchModule.searchInformation);
+router.get('/ewtGetSearchDocuments', searchModule.getSearchDoc);
+router.get('/ewtGetBannerPicture', searchModule.getBanner);
+router.post('/ewtSearchForTracker', searchModule.searchTracker);
+router.get('/ewtGetWorkingHrsHolidayList',searchModule.getWorkingHrsHolidayList);
+router.get('/navigation',searchModule.navigateSearch);
 
 //Mail Module methods
-router.post('/ewtSendMail', LocationManager.FnSendMail);
+var Mail = require('./modules/mail-module.js');
+var mailModule = new Mail(db,stdLib);
+router.post('/ewtSendMail', mailModule.sendMail);
 
 //Image module methods
-router.post('/crop_image',LocationManager.FnCropImage);
-router.get('/image_url',LocationManager.FnImageURL);
-router.get('/ezeone_image',LocationManager.FnGetPictureOfEzeid);
-router.get('/profile_image',LocationManager.FnProfileImageURL);
+var Image = require('./modules/image-module.js');
+var imageModule = new Image(db,stdLib);
+router.post('/crop_image',imageModule.cropImage);
+router.get('/image_url',imageModule.imageURL);
+router.get('/ezeone_image',imageModule.getPictureOfEzeid);
+router.get('/profile_image',imageModule.profileImageURL);
 
 //Reservation module methods
-router.post('/reservation_transaction',LocationManager.FnSaveReservTransaction);
-router.get('/reservation_transaction',LocationManager.FnGetReservTask);
-router.get('/reservation_maped_services',LocationManager.FnGetMapedServices);
-router.get('/reservation_trans_details',LocationManager.FnGetResTransDetails);
-router.put('/reservation_transaction',LocationManager.FnChangeReservationStatus);
-router.get('/get_workinghours_list',LocationManager.FnGetworkinghoursList);
-router.post('/feedback',LocationManager.FnSaveFeedback);
-router.get('/feedback',LocationManager.FnGetFeedback);
-router.get('/resource_image',LocationManager.FnResourcePicture);
+var Reservation = require('./modules/reservation-module.js');
+var reservationModule = new Reservation(db,stdLib);
+router.post('/reservation_transaction',reservationModule.SaveReservTrans);
+router.get('/reservation_transaction',reservationModule.getReservTrans);
+router.get('/reservation_maped_services',reservationModule.getMapedServices);
+router.get('/reservation_trans_details',reservationModule.getTransDetails);
+router.put('/reservation_transaction',reservationModule.changeReservStatus);
+router.get('/get_workinghours_list',reservationModule.getworkinghoursList);
+router.post('/feedback',reservationModule.saveFeedback);
+router.get('/feedback',reservationModule.getFeedback);
+router.get('/resource_image',reservationModule.getResourcePicture);
 
 //Job module methods
-router.post('/job',LocationManager.FnSaveJobs);
-router.get('/job',LocationManager.FnGetJobs);
-router.get('/job_locations',LocationManager.FnGetJobLocations);
-router.get('/job_search',LocationManager.FnSearchJobs);
-router.post('/job_seeker_search',LocationManager.FnJobSeekerSearch);
-router.post('/job_apply',LocationManager.FnApplyJob);
-router.get('/job_applied_list',LocationManager.FnAppliedJobList);
-router.get('/job_details',LocationManager.FnGetJobDetails);
-router.get('/jobs',LocationManager.FnJobs);
-router.get('/applied_job',LocationManager.FnGetAppliedJob);
-router.get('/job_country',LocationManager.FnGetJobcountry);
-router.get('/job_city',LocationManager.FnGetjobcity);
-router.post('/jobseeker_message',LocationManager.FnJobSeekersMessage);
-router.get('/jobs_list',LocationManager.FnGetListOfJobs);
-router.put('/refresh_job',LocationManager.FnJobRefresh);
-router.get('/job_match',LocationManager.FnJobsMatch);
-router.get('/job_myinstitute',LocationManager.FnJobsMyInstitute);
-router.get('/notify_student',LocationManager.FnNotifyRelevantStudent);
-router.get('/applicant_list',LocationManager.FnViewApplicantList);
-router.get('/view_job_details',LocationManager.FnViewJobDetails);
-router.post('/job_notification',LocationManager.FnJobNotification);
-router.get('/find_institute',LocationManager.FnFindInstitute);
-router.post('/add_selected_job',LocationManager.FnAddtoSelectedJob);
-router.post('/job_location',LocationManager.FnSaveJobLoaction);
-router.get('/ezeone_jobs',LocationManager.getEZEOneIdJobs);
+var Job = require('./modules/job-module.js');
+var jobModule = new Job(db,stdLib);
+router.post('/job',jobModule.create);
+router.get('/job',jobModule.getAll);
+router.get('/job_locations',jobModule.getJobLocations);
+router.get('/job_search',jobModule.searchJobs);
+router.post('/job_seeker_search',jobModule.searchJobSeekers);
+router.post('/job_apply',jobModule.applyJob);
+router.get('/job_applied_list',jobModule.appliedJobList);
+router.get('/job_details',jobModule.getJobDetails);
+router.get('/jobs',jobModule.jobs);
+router.get('/applied_job',jobModule.getAppliedJob);
+router.get('/job_country',jobModule.getJobcountry);
+router.get('/job_city',jobModule.getjobcity);
+router.post('/jobseeker_message',jobModule.jobSeekersMessage);
+router.get('/jobs_list',jobModule.getListOfJobs);
+router.put('/refresh_job',jobModule.jobRefresh);
+router.get('/job_match',jobModule.jobsMatch);
+router.get('/job_myinstitute',jobModule.jobsMyInstitute);
+router.get('/notify_student',jobModule.notifyRelevantStudent);
+router.get('/applicant_list',jobModule.viewApplicantList);
+router.get('/view_job_details',jobModule.viewJobDetails);
+router.post('/job_notification',jobModule.jobNotification);
+router.get('/find_institute',jobModule.findInstitute);
+router.post('/add_selected_job',jobModule.addtoSelectedJob);
+router.post('/job_location',jobModule.saveJobLocation);
+router.get('/ezeone_jobs',jobModule.getEZEOneIdJobs);
 
 //MessageBox module methods
-router.post('/create_group',LocationManager.FnCreateMessageGroup);
-router.get('/validate_groupname',LocationManager.FnValidateGroupName);
-router.put('/user_status',LocationManager.FnUpdateUserStatus);
-router.put('/user_relationship',LocationManager.FnUpdateUserRelationship);
-router.delete('/group',LocationManager.FnDeleteGroup);
-router.post('/message_request',LocationManager.FnSendMessageRequest);
-router.post('/compose_message',LocationManager.FnComposeMessage);
-router.get('/members_list',LocationManager.FnGetMembersList);
-router.get('/messagebox',LocationManager.FnLoadMessageBox);
-router.put('/message_activity',LocationManager.FnChangeMessageActivity);
-router.get('/outbox_messages',LocationManager.FnLoadOutBoxMessages);
-router.get('/suggestion_list',LocationManager.FnGetSuggestionList);
-router.post('/group_members',LocationManager.FnAddGroupMembers);
-router.get('/pending_request',LocationManager.FnGetPendingRequest);
-router.get('/group_list',LocationManager.FnGetGroupList);
-router.get('/load_group_message',LocationManager.FnLoadMessages);
-router.get('/validate_group_member',LocationManager.FnValidateGroupMember);
-router.get('/message_full_view',LocationManager.FnViewMessage);
-router.get('/message_attachment',LocationManager.FnGetMessageAttachment);
-router.get('/group_info',LocationManager.FnGetGroupInfo);
-router.get('/unread_message_count',LocationManager.FnCountOfUnreadMessage);
-router.get('/message_fullview_new',LocationManager.FnViewMessageNew);
-router.put('/change_group_admin',LocationManager.FnChangeGroupAdmin);
-router.put('/change_task_status',LocationManager.FnUpdateTaskStatus);
-router.get('/chat',LocationManager.FnGetLastMsgOfGroup);
+var Messagebox = require('./modules/messagebox-module.js');
+var messageBox = new Messagebox(db,stdLib);
+router.post('/create_group',messageBox.createMessageGroup);
+router.get('/validate_groupname',messageBox.validateGroupName);
+router.put('/user_status',messageBox.updateUserStatus);
+router.put('/user_relationship',messageBox.updateUserRelationship);
+router.delete('/group',messageBox.deleteGroup);
+router.post('/message_request',messageBox.sendMessageRequest);
+router.post('/compose_message',messageBox.composeMessage);
+router.get('/members_list',messageBox.getMembersList);
+router.get('/messagebox',messageBox.loadMessageBox);
+router.put('/message_activity',messageBox.changeMessageActivity);
+router.get('/outbox_messages',messageBox.loadOutBoxMessages);
+router.get('/suggestion_list',messageBox.getSuggestionList);
+router.post('/group_members',messageBox.addGroupMembers);
+router.get('/pending_request',messageBox.getPendingRequest);
+router.get('/group_list',messageBox.getGroupList);
+router.get('/load_group_message',messageBox.loadMessages);
+router.get('/validate_group_member',messageBox.validateGroupMember);
+router.get('/message_full_view',messageBox.viewMessage);
+router.get('/message_attachment',messageBox.getMessageAttachment);
+router.get('/group_info',messageBox.getGroupInfo);
+router.get('/unread_message_count',messageBox.countOfUnreadMessage);
+router.get('/message_fullview_new',messageBox.viewMessageNew);
+router.put('/change_group_admin',messageBox.changeGroupAdmin);
+router.put('/change_task_status',messageBox.updateTaskStatus);
+router.get('/chat',messageBox.getLastMsgOfGroup);
 
 //Planner module
-router.get('/tasks',LocationManager.FnGetAllTask);
-router.get('/ewtGetTransaction',LocationManager.FnGetTrans);
+var Planner = require('./modules/planner-module.js');
+var plannerModule = new Planner(db,stdLib);
+router.get('/tasks',plannerModule.getAllTask);
+router.get('/ewtGetTransaction',plannerModule.getTrans);
 
 //Alumni module
-router.post('/alumni_content',LocationManager.FnSaveAlumniContent);
-router.post('/alumni_team',LocationManager.FnSaveAlumniTeam);
-router.get('/alumni_content',LocationManager.FnGetAlumniContent);
-router.get('/alumni_team',LocationManager.FnGetAlumniTeam);
-router.delete('/alumni_team',LocationManager.FnDeleteAlumniTeam);
-router.get('/cover_image',LocationManager.FnGetAlumniContentImage);
-router.post('/alumni_profile',LocationManager.FnSaveAlumniProfile);
-router.get('/alumniteam_details',LocationManager.FnGetAlumniTeamDetails);
-router.get('/alumni_profile',LocationManager.FnGetAlumniProfile);
-router.post('/alumni_signup',LocationManager.FnRegistrationAlumni);
-router.post('/ten_details',LocationManager.FnSaveTENMaster);
-router.get('/ten_details',LocationManager.FnGetTENDetails);
-router.get('/profile_status',LocationManager.FnGetProfileStatus);
-router.post('/join_event',LocationManager.FnSaveTENUsers);
-router.post('/ten_approve',LocationManager.FnApproveTEN);
-router.post('/ten_comments',LocationManager.FnSaveComments);
-router.get('/participated_eventsId',LocationManager.FnGetParticipatedEventsId);
-router.get('/ten_approval_list',LocationManager.FnGetAlumniApprovalList);
-router.get('/team_content',LocationManager.FnGetTeamContent);
-router.get('/team_image',LocationManager.FnGetTeamImage);
-router.get('/ten_attachment',LocationManager.FnGetTENAttachment);
-router.post('/ten_venue',LocationManager.FnSaveTENVenue);
-router.get('/participants_list',LocationManager.FnGetParticipantsList);
+var Alumni = require('./modules/alumni-module.js');
+var alumniModule = new Alumni(db,stdLib);
+router.post('/alumni_content',alumniModule.saveAlumniContent);
+router.post('/alumni_team',alumniModule.saveAlumniTeam);
+router.get('/alumni_content',alumniModule.getAlumniContent);
+router.get('/alumni_team',alumniModule.getAlumniTeam);
+router.delete('/alumni_team',alumniModule.deleteAlumniTeam);
+router.get('/cover_image',alumniModule.getAlumniContentImage);
+router.post('/alumni_profile',alumniModule.saveAlumniProfile);
+router.get('/alumniteam_details',alumniModule.getAlumniTeamDetails);
+router.get('/alumni_profile',alumniModule.getAlumniProfile);
+router.post('/alumni_signup',alumniModule.registerAlumni);
+router.post('/ten_details',alumniModule.saveTENMaster);
+router.get('/ten_details',alumniModule.getTENDetails);
+router.get('/profile_status',alumniModule.getProfileStatus);
+router.post('/join_event',alumniModule.saveTENUsers);
+router.post('/ten_approve',alumniModule.approveTEN);
+router.post('/ten_comments',alumniModule.saveComments);
+router.get('/participated_eventsId',alumniModule.getParticipatedEventsId);
+router.get('/ten_approval_list',alumniModule.getAlumniApprovalList);
+router.get('/team_content',alumniModule.getTeamContent);
+router.get('/team_image',alumniModule.getTeamImage);
+router.get('/ten_attachment',alumniModule.getTENAttachment);
+router.post('/ten_venue',alumniModule.saveTENVenue);
+router.get('/participants_list',alumniModule.getParticipantsList);
+router.get('/job_approval_list',alumniModule.getAlumniJobApprovalList);
+router.post('/job_approve',alumniModule.approveAlumniJobs);
+router.get('/search_alumni_ten',alumniModule.searchAlumniTEN);
+router.get('/search_alumni_job',alumniModule.searchAlumniTEN);
+router.get('/my_alumni_jobs',alumniModule.getMyAlumniJobs);
+router.get('/alumni_user_details', alumniModule.getAlumniUserDetails);
+router.get('/search_alumni', alumniModule.searchAlumni);
+router.put('/leave_alumni', alumniModule.leaveAlumni);
 //new url's
-router.get('/client_list',LocationManager.FnClientList);
-router.get('/contact_list',LocationManager.FnClientContacts);
-router.get('/job_list',LocationManager.FnGetJobList);
-router.post('/add_job',LocationManager.FnCreateJobs);
-router.get('/view_job',LocationManager.FnViewJob);
-router.get('/job_approval_list',LocationManager.FnGetAlumniJobApprovalList);
-router.post('/job_approve',LocationManager.FnApproveAlumniJobs);
-router.get('/search_alumni_ten',LocationManager.FnSearchAlumniTEN);
-router.get('/search_alumni_job',LocationManager.FnSearchAlumniTEN);
-router.get('/my_alumni_jobs',LocationManager.FnGetMyAlumniJobs);
-router.get('/alumni_user_details', LocationManager.FnGetAlumniUserDetails);
-router.get('/search_alumni', LocationManager.FnSearchAlumni);
-router.put('/leave_alumni', LocationManager.FnLeaveAlumni);
-
-
-//Gingerbite module
-router.post('/chef_mail',LocationManager.FnSendMailGingerbite);
-router.post('/techplasma_mail',LocationManager.FnSendMailTechplasma);
-router.post('/fomads_mail',LocationManager.FnSendFomadsFeedbckMail);
+router.get('/client_list',alumniModule.getClientList);
+router.get('/contact_list',alumniModule.getClientContacts);
+router.get('/job_list',alumniModule.getAll);
+router.post('/add_job',alumniModule.create);
+router.get('/view_job',alumniModule.viewJobDetails);
 
 //Recruitment module
-router.get('/recruitment_masters',LocationManager.FnGetRecruitmentMasters);
-router.get('/sales_masters',LocationManager.FnGetSalesMasters);
+var Recruitment = require('./modules/recruitment-module.js');
+var recruitmentModule = new Recruitment(db,stdLib);
+router.get('/recruitment_masters',recruitmentModule.getRecruitmentMasters);
+router.get('/sales_masters',recruitmentModule.getSalesMasters);
+
+//Gingerbite module
+var Gingerbite = require('./modules/gingerbite-module.js');
+var gingerModule = new Gingerbite(db,stdLib);
+router.post('/chef_mail',gingerModule.sendMailGingerbite);
+router.post('/techplasma_mail',gingerModule.sendMailTechplasma);
+router.post('/fomads_mail',gingerModule.sendFeedbackMailFomads);
+
 
 //Contact Manager Module
-router.get('/client',LocationManager.FnGetClientList);
-router.get('/contact',LocationManager.FnGetClientContacts);
-router.post('/client',LocationManager.FnSaveClient);
-router.post('/contact',LocationManager.FnSaveClientContact);
+var ContactManager = require('./modules/contact-manager-module.js');
+var contactManager = new ContactManager(db,stdLib);
+router.get('/client',contactManager.getClientList);
+router.get('/contact',contactManager.getClientContacts);
+router.post('/client',contactManager.saveClient);
+router.post('/contact',contactManager.saveClientContact);
 
 //Task Manager Module
-router.post('/task_manager/task',LocationManager.FnSaveTaskManager);
-router.get('/task_manager/task',LocationManager.FnGetTasks);
+var TaskManager = require('./modules/task-manager-module.js');
+var taskManager = new TaskManager(db,stdLib);
+router.post('/task_manager/task',taskManager.saveTaskManager);
+router.get('/task_manager/task',taskManager.getTasks);
 
 
+//EZEIDAP Methods
+//Auth-ModuleAP
+var Auth_AP = require('./ap-modules/auth-module-ap.js');
+var authModuleAP = new Auth_AP(db,stdLib);
+router.post('/ewLoginAP', authModuleAP.loginAP);
+router.get('/ewLogoutAP', authModuleAP.logoutAP);
+router.post('/ewtForgetPasswordAP', authModuleAP.forgetPasswordAP);
+router.post('/ewtChangePasswordAP', authModuleAP.changePasswordAP);
 
-//below service are for EZEIDAP
-router.post('/ewLoginAP', LocationManager.FnLoginAP);
-router.get('/ewLogoutAP', LocationManager.FnLogoutAP);
-router.get('/ewGetUserDetailsAP', LocationManager.FnGetUserDetailsAP);
-router.post('/ewUpdateUserProfileAP', LocationManager.FnUpdateUserProfileAP);
-router.post('/ewtForgetPasswordAP', LocationManager.FnForgetPasswordAP);
-router.post('/ewtChangePasswordAP', LocationManager.FnChangePasswordAP);
-router.post('/ewtSaveEZEIDDataAP', LocationManager.FnSaveAPEZEID);
-router.post('/ewtSaveEZEIDPictureAP', LocationManager.FnSaveAPEZEIDPicture);
-router.get('/ewtGetEstateDataAP', LocationManager.FnGetRealStateDataAP);
-router.get('/ewtGetEZEIDPictureAP', LocationManager.FnGetAPEZEIDPicture);
-router.post('/ewtSaveBannerPictureAP', LocationManager.FnSaveBannerPictureAP);
-router.get('/ewtGetBannerPictureAP', LocationManager.FnGetBannerPictureAP);
-router.get('/ewtGetAllBannerPicsAP', LocationManager.FnGetAllBannerPicsAP);
-router.get('/ewtGetSecondaryLocListAP',LocationManager.FnGetSecondaryLocationListAP);
-router.get('/ewtGetSecondaryLocAP',LocationManager.FnGetSecondaryLocationAP);
-router.post('/ewtUpdateSecondaryLocationAP', LocationManager.FnUpdateSecondaryLocationAP);
-router.post('/ewtUpdateIdCardPrintAP', LocationManager.FnUpdateIdCardPrintAP);
-router.get('/ewtGetIdCardPrintAP',LocationManager.FnGetIdCardPrintAP);
-router.post('/ewtSearchRealEstateAP', LocationManager.FnSearchRealEstateAP);
-router.post('/ewtUpdateRedFlagAP',LocationManager.FnUpdateRedFlagAP);
-router.post('/ewtUpdateEZEIDAP', LocationManager.FnUpdateEZEIDAP);
-router.post('/ewtDeleteBannerPicAP', LocationManager.FnDeleteBannerPictureAP);
-router.post('/crop_imageAP',LocationManager.FnCropImageAP);
-router.post('/add_banners_ap', LocationManager.FnSavePaidBannersAp);
+//User-ModuleAP
+var User_AP = require('./ap-modules/user-module-ap.js');
+var userModuleAP = new User_AP(db,stdLib);
+router.get('/ewGetUserDetailsAP', userModuleAP.getUserDetailsAP);
+router.post('/ewUpdateUserProfileAP', userModuleAP.updateUserProfileAP);
+router.post('/ewtSaveEZEIDDataAP', userModuleAP.saveAPEZEID);
+router.post('/ewtUpdateRedFlagAP',userModuleAP.updateRedFlagAP);
+router.post('/ewtUpdateEZEIDAP', userModuleAP.updateEZEIDAP);
+router.post('/add_banners_ap', userModuleAP.savePaidBannersAp);
+
+//Image-ModuleAP
+var Image_AP = require('./ap-modules/image-module-ap.js');
+var imageModuleAP = new Image_AP(db,stdLib);
+router.post('/ewtSaveEZEIDPictureAP', imageModuleAP.saveAPEZEIDPicture);
+router.get('/ewtGetEZEIDPictureAP', imageModuleAP.getAPEZEIDPicture);
+router.post('/ewtSaveBannerPictureAP', imageModuleAP.saveBannerPictureAP);
+router.get('/ewtGetBannerPictureAP', imageModuleAP.getBannerPictureAP);
+router.get('/ewtGetAllBannerPicsAP', imageModuleAP.getAllBannerPicsAP);
+router.post('/ewtDeleteBannerPicAP', imageModuleAP.deleteBannerPictureAP);
+router.post('/crop_imageAP',imageModuleAP.cropImageAP);
+
+//Location-ModuleAP
+var Location_AP = require('./ap-modules/location-module-ap.js');
+var locationModuleAP = new Location_AP(db,stdLib);
+router.get('/ewtGetSecondaryLocListAP',locationModuleAP.getSecondaryLocationListAP);
+router.get('/ewtGetSecondaryLocAP',locationModuleAP.getSecondaryLocationAP);
+router.post('/ewtUpdateSecondaryLocationAP', locationModuleAP.updateSecondaryLocationAP);
+
+//RealEsate-ModuleAP
+var RealEstate_AP = require('./ap-modules/real-estate-ap.js');
+var realEstateAP = new RealEstate_AP(db,stdLib);
+router.get('/ewtGetEstateDataAP', realEstateAP.getRealStateDataAP);
+router.post('/ewtSearchRealEstateAP', realEstateAP.searchRealEstateAP);
+
+
+//IDCard-ModuleAP
+var IDCard_AP = require('./ap-modules/idcard-module-ap.js');
+var idcardAP = new IDCard_AP(db,stdLib);
+router.post('/ewtUpdateIdCardPrintAP', idcardAP.updateIdCardPrintAP);
+router.get('/ewtGetIdCardPrintAP',idcardAP.getIdCardPrintAP);
 
 
 //EZEID VAS
-router.get('/ewtLoginVES',LocationManager.FnLoginVES);
-router.post('/ewtSaveContactVES',LocationManager.FnSaveContactVES);
-router.get('/ewtGetAllContactsVES',LocationManager.FnGetAllContactsVES);
-router.get('/ewmGetDepartmentVES',LocationManager.FnGetDepartmentVES);
-router.get('/ewtGetContactVES',LocationManager.FnGetContactVES);
-router.get('/ewtSearchContactsVES',LocationManager.FnSearchContactsVES);
-router.get('/ewtCheckPasswordVES',LocationManager.FnCheckPasswordVES);
-router.get('/ewtGetGatesVES',LocationManager.FnGetGatesVES);
-router.post('/ewtSaveDepartmentsVES',LocationManager.FnSaveDepartmentsVES);
-router.post('/ewtSaveGatesVES',LocationManager.FnSaveGatesVES);
-router.post('/ewtSaveCitysVES',LocationManager.FnSaveCitysVES);
+var VES = require('./ves-modules/ves-module.js');
+var vesModule= new VES(db,stdLib);
+router.get('/ewtLoginVES',vesModule.loginVES);
+router.post('/ewtSaveContactVES',vesModule.saveContactVES);
+router.get('/ewtGetAllContactsVES',vesModule.getAllContactsVES);
+router.get('/ewmGetDepartmentVES',vesModule.getDepartmentVES);
+router.get('/ewtGetContactVES',vesModule.getContactVES);
+router.get('/ewtSearchContactsVES',vesModule.searchContactsVES);
+router.get('/ewtCheckPasswordVES',vesModule.checkPasswordVES);
+router.get('/ewtGetGatesVES',vesModule.getGatesVES);
+router.post('/ewtSaveDepartmentsVES',vesModule.saveDepartmentsVES);
+router.post('/ewtSaveGatesVES',vesModule.saveGatesVES);
+router.post('/ewtSaveCitysVES',vesModule.saveCitysVES);
 
-var version1 = require('./v1Api.js');
-router.use('/v1',version1);
 /**
  * Default error handler
  * Add every API call above this
