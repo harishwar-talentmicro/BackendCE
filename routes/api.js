@@ -29,7 +29,6 @@ router.get('/ms_auth/resource',notification.authResource);
 
 //EZEID Methods
 //Auth module methods
-
 var Auth = require('./modules/auth-module.js');
 var authModule = new Auth(db,stdLib);
 router.post('/ewSavePrimaryEZEData', authModule.register);
@@ -78,16 +77,9 @@ router.post('/user_details',userModule.saveUserDetails);
 router.get('/user_details_new',userModule.getUserDetailsNew);
 router.post('/send_resume',userModule.sendResume);
 router.get('/download_resume',userModule.downloadResume);
-router.post('/v1/st_tag',userModule.saveStandardTags);
-router.get('/v1/st_tag',userModule.getStandardTags);
-router.post('/v1/tag',userModule.saveTags);
-router.get('/v1/tag',userModule.getTags);
-router.delete('/v1/tag',userModule.deleteTag);
 router.get('/conveyance_report', userModule.getConveyanceReport);
 router.get('/industry_type_list',userModule.getindustryType);
 router.get('/industry_category',userModule.getindustrycategory);
-//router.post('/test_tag',userModule.FnTestTags);
-router.post('/save_pictures',userModule.savePictures);
 router.get('/pic_for_ezeid',userModule.profilePicForEzeid);
 
 
@@ -346,6 +338,16 @@ var TaskManager = require('./modules/task-manager-module.js');
 var taskManager = new TaskManager(db,stdLib);
 router.post('/task_manager/task',taskManager.saveTaskManager);
 router.get('/task_manager/task',taskManager.getTasks);
+
+//Tag Module (save tag of docs, urls, pics and banner pics)
+var Tag = require('./modules/tag-module.js');
+var tagModule = new Tag(db,stdLib);
+router.post('/v1/st_tag',tagModule.saveStandardTags);
+router.get('/v1/st_tag',tagModule.getStandardTags);
+router.post('/v1/tag',tagModule.saveTags);
+router.get('/v1/tag',tagModule.getTags);
+router.delete('/v1/tag',tagModule.deleteTag);
+router.post('/save_pictures',tagModule.savePictures);
 
 
 //EZEIDAP Methods
