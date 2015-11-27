@@ -160,6 +160,14 @@ msgNotification.prototype.sendNotification= function(MsgContent, CallBack) {
                             }
                         });
                     }
+                    else{
+                        console.log('FnComposeMessage:Error getting from gid');
+                        CallBack(null, null);
+                    }
+                }
+                else{
+                    console.log('FnComposeMessage:Error getting from groupname');
+                    CallBack(null, null);
                 }
             };
         if (MsgContent) {
