@@ -185,6 +185,10 @@ var Mail = require('./modules/mail-module.js');
 var mailModule = new Mail(db,stdLib);
 router.post('/ewtSendMail', mailModule.sendMail);
 
+//Message Notification Module methods
+var MessageNotification = require('./modules/message-notification-module.js');
+var msgNotification = new MessageNotification(db,stdLib);
+
 //Image module methods
 var Image = require('./modules/image-module.js');
 var imageModule = new Image(db,stdLib);
