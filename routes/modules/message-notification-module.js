@@ -45,8 +45,7 @@ msgNotification.prototype.sendNotification= function(MsgContent, CallBack) {
 
         };
 
-        if (MsgContent) {
-            ////msg content
+        //msg content
             //{ message_id: 2976,
             //    message_userid: null,
             //    message: '<p>hi</p>',
@@ -58,19 +57,16 @@ msgNotification.prototype.sendNotification= function(MsgContent, CallBack) {
             //    mimeType: '',
             //    ezeid: '@SGOWRI2' }
             id = MsgContent.idType.split(",");
-                    console.log('msgid:'+MsgContent.message_id);
-                    for (var c = 0; c < id.length; c++) {
-                        id_type = parseInt(id[c]);
-                        if (MsgContent.toID.length > 1) {
-                            var toIDS = MsgContent.toID;
-                            to_ids = toIDS.split(",");
-                        }
-                        else {
-                            to_ids = [];
-                            to_ids.push(MsgContent.toID);
-                        }
-                        gid = parseInt(to_ids[c]);
-                        console.log('group id:'+gid);
+            to_ids = MsgContent.toID.split(",");
+            console.log('msgid:' + MsgContent.message_id);
+
+            var loopFunction = function (c) {
+                if (c < id.length) {
+                    id_type = parseInt(id[c]);
+                    gid = parseInt(to_ids[c]);
+
+                    console.log('group id:' + gid);
+                    if (gid) {
                         var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + gid;
                         //console.log(queryParameters);
                         st.db.query(queryParameters, function (err, iosResult) {
@@ -120,13 +116,15 @@ msgNotification.prototype.sendNotification= function(MsgContent, CallBack) {
                                                                     var t = now.toUTCString();
                                                                     var datetime = t.split(',');
                                                                     datetime = datetime[1];
-                                                                    var latitude='', longitude = '';
+                                                                    var latitude = '', longitude = '';
                                                                     //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                     //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
                                                                     RtnMessage.status = true;
                                                                     CallBack(null, RtnMessage);
                                                                 }
+                                                                c = c+1;
+                                                                loopFunction(c);
                                                             }
                                                             else {
                                                                 console.log('FnComposeMessage:Error getting from groupname');
@@ -163,6 +161,11 @@ msgNotification.prototype.sendNotification= function(MsgContent, CallBack) {
                         });
                     }
                 }
+            };
+        if (MsgContent) {
+            var c = 0;
+            loopFunction(c);
+        }
                 else {
                     console.log('FnSendMsgNotification: Message Content not loaded');
                     CallBack(null, null);
