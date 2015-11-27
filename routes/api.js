@@ -237,7 +237,6 @@ router.post('/job_notification',jobModule.jobNotification);
 router.get('/find_institute',jobModule.findInstitute);
 router.post('/add_selected_job',jobModule.addtoSelectedJob);
 router.post('/job_location',jobModule.saveJobLocation);
-router.get('/ezeone_jobs',jobModule.getEZEOneIdJobs);
 
 //MessageBox module methods
 var Messagebox = require('./modules/messagebox-module.js');
