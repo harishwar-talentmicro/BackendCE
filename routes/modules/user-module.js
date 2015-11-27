@@ -1741,8 +1741,8 @@ User.prototype.saveResume = function(req,res,next){
         var jobType = req.body.job_type;
         var locationsList = req.body.job_location;
         var categoryID = req.body.category_id ? req.body.category_id : 0;
-        var instituteID = req.body.institute_id ? req.body.institute_id : 0;
-        var institueTitle = req.body.institute_title ? req.body.institute_title : '';
+        //var instituteID = req.body.institute_id ? req.body.institute_id : 0;
+        //var institueTitle = req.body.institute_title ? req.body.institute_title : '';
         var expectedSalary = (parseFloat(req.body.exp_salary) !== NaN) ? parseFloat(req.body.exp_salary) : 0.00;
         var firstName = req.body.fn;
         var lastName = req.body.ln;
@@ -1795,10 +1795,9 @@ User.prototype.saveResume = function(req,res,next){
                             var queryParams = st.db.escape(FunctionID) + ',' + st.db.escape(Status) + ',' + st.db.escape(Pin)
                                 + ',' + st.db.escape(Token) + ',' + st.db.escape(ids)+ ','+ st.db.escape(salary) + ',' + st.db.escape(noticePeriod)
                                 + ',' + st.db.escape(experience) + ','+ st.db.escape(currentEmployeer) + ',' + st.db.escape(currentJobTitle)
-                                + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID) + ',' + st.db.escape(instituteID)
-                                + ','+ st.db.escape(institueTitle) +',' + st.db.escape(expectedSalary)
-                                + ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName) +',' + st.db.escape(email)
-                                +',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
+                                + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID)
+                                +',' + st.db.escape(expectedSalary)+ ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName)
+                                +',' + st.db.escape(email)+',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
                                 +',' + st.db.escape(expectedSalarytype);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
