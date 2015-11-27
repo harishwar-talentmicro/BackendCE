@@ -76,9 +76,6 @@ Job.prototype.create = function(req,res,next){
     var mobileNo =req.body.mobileNo ? req.body.mobileNo : '';
     var locationsList = req.body.locationsList;
     var categoryID = req.body.category_id;
-    var instituteID = (req.body.institute_id) ? req.body.institute_id : '';
-    console.log('-----------------------');
-    console.log(email_id);
 
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
@@ -91,7 +88,8 @@ Job.prototype.create = function(req,res,next){
         skillMatrix1=[];
     }
 
-    var jobID,m= 0,jobtype,masterid='',gid,receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,userID;
+    var jobID,m= 0,jobtype,masterid='',gid,receiverId,toid=[],senderTitle,groupTitle,groupId,messageText;
+    var messageType,operationType,iphoneId,messageId,userID;
 
     var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
     var conatctId = req.body.ctid ? parseInt(req.body.ctid) : 0;     // contact id
@@ -195,9 +193,7 @@ Job.prototype.create = function(req,res,next){
         error['conatctId'] = 'Invalid conatctId';
         validateStatus *= false;
     }
-    if(!instituteID){
-        instituteID = '';
-    }
+
 
     if(!validateStatus){
         responseMessage.status = false;
@@ -222,7 +218,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
                                 + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
-                                + ',' + st.db.escape(instituteID)+ ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
+                                + ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
                                 + ',' + st.db.escape(isconfidential) + ',' + st.db.escape(alumnicode);
                             console.log('CALL pSaveJobs(' + query + ')');
                             st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
@@ -252,7 +248,6 @@ Job.prototype.create = function(req,res,next){
                                             mobileNo: mobileNo,
                                             location_id: location_id,
                                             categoryID: categoryID,
-                                            instituteID: instituteID,
                                             cid : cid,
                                             ctid : conatctId,
                                             isconfi : isconfidential,
@@ -318,14 +313,16 @@ Job.prototype.create = function(req,res,next){
                                                     spcId : eduDetails.spc_id,
                                                     scoreFrom:eduDetails.score_from,
                                                     scoreTo:eduDetails.score_to,
-                                                    level : eduDetails.expertiseLevel   // 0-ug, 1-pg
+                                                    level : eduDetails.expertiseLevel,   // 0-ug, 1-pg
+                                                    instituteId : eduDetails.institute_id
                                                 };
 
 
 
                                                 var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
                                                     + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
-                                                    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level);
+                                                    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level)
+                                                    + ',' +st.db.escape(educationData.instituteId);
 
                                                 var query = 'CALL psavejobeducation(' + queryParams + ')';
                                                 console.log(query);

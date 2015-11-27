@@ -13,137 +13,9 @@
  *
  */
 
-var uuid = require('node-uuid');
-var stream = require( "stream" );
-var chalk = require( "chalk" );
-var util = require( "util" );
-var fileSystem = require( "fs" );
-
-
-var gcloud = require('gcloud');
 var fs = require('fs');
 var path = require('path');
 
-var appConfig = require('../../ezeone-config.json');
-
-var gcs = gcloud.storage({
-    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
-    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
-});
-
-// Reference an existing bucket.
-var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
-
-bucket.acl.default.add({
-    entity: 'allUsers',
-    role: gcs.acl.READER_ROLE
-}, function (err, aclObject) {
-});
-
-
-
-// I turn the given source Buffer into a Readable stream.
-function BufferStream( source ) {
-
-    if ( ! Buffer.isBuffer( source ) ) {
-
-        throw( new Error( "Source must be a buffer." ) );
-
-    }
-
-    // Super constructor.
-    stream.Readable.call( this );
-
-    this._source = source;
-
-    // I keep track of which portion of the source buffer is currently being pushed
-    // onto the internal stream buffer during read actions.
-    this._offset = 0;
-    this._length = source.length;
-
-    // When the stream has ended, try to clean up the memory references.
-    this.on( "end", this._destroy );
-
-}
-
-util.inherits( BufferStream, stream.Readable );
-
-
-// I attempt to clean up variable references once the stream has been ended.
-// --
-// NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
-// usage since my Node.js apps will (eventually) never restart.
-BufferStream.prototype._destroy = function() {
-
-    this._source = null;
-    this._offset = null;
-    this._length = null;
-
-};
-
-
-// I read chunks from the source buffer into the underlying stream buffer.
-// --
-// NOTE: We can assume the size value will always be available since we are not
-// altering the readable state options when initializing the Readable stream.
-BufferStream.prototype._read = function( size ) {
-
-    // If we haven't reached the end of the source buffer, push the next chunk onto
-    // the internal stream buffer.
-    if ( this._offset < this._length ) {
-
-        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
-
-        this._offset += size;
-
-    }
-
-    // If we've consumed the entire source buffer, close the readable stream.
-    if ( this._offset >= this._length ) {
-
-        this.push( null );
-
-    }
-
-};
-
-
-var uploadDocumentToCloud = function(uniqueName,readStream,callback){
-    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
-    readStream.pipe(remoteWriteStream);
-
-    remoteWriteStream.on('finish', function(){
-        if(callback){
-            if(typeof(callback)== 'function'){
-                callback(null);
-            }
-            else{
-                console.log('callback is required for uploadDocumentToCloud');
-            }
-        }
-        else{
-            console.log('callback is required for uploadDocumentToCloud');
-        }
-    });
-
-    remoteWriteStream.on('error', function(err){
-        if(callback){
-            if(typeof(callback)== 'function'){
-                console.log(err);
-                callback(err);
-            }
-            else{
-                console.log('callback is required for uploadDocumentToCloud');
-            }
-        }
-        else{
-            console.log('callback is required for uploadDocumentToCloud');
-        }
-    });
-};
-
-
-var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
@@ -167,8 +39,8 @@ function FnEncryptPassword(Password) {
             algorithm = 'aes-256-ctr',
             key = 'ezeid@123';
 
-        var cipher = crypto.createCipher(algorithm, key)
-        var crypted = cipher.update(Password, 'utf8', 'hex')
+        var cipher = crypto.createCipher(algorithm, key);
+        var crypted = cipher.update(Password, 'utf8', 'hex');
         crypted += cipher.final('hex');
         return crypted;
     }
@@ -231,8 +103,8 @@ function FnDecrypt(EncryptPassword){
         var crypto = require('crypto'),
             algorithm = 'aes-256-ctr',
             password = 'ezeid@123';
-        var decipher = crypto.createDecipher(algorithm,password)
-        var dec = decipher.update(EncryptPassword,'hex','utf8')
+        var decipher = crypto.createDecipher(algorithm,password);
+        var dec = decipher.update(EncryptPassword,'hex','utf8');
         dec += decipher.final('utf8');
         return dec;
     }
@@ -264,18 +136,16 @@ User.prototype.getLoginDetails = function(req,res,next){
      * @todo FnGetLoginDetails
      */
     var _this = this;
-
     try {
-
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.query.Token;
 
-        if (Token != null) {
+        if (Token) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
 
                         st.db.query('CALL pLoginDetails(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
@@ -413,8 +283,6 @@ User.prototype.getState = function(req,res,next){
                         st.db.query(Query, function (err, CountryResult) {
                             if (!err) {
                                 if (CountryResult.length) {
-                                    // console.log(CountryResult);
-                                    //  console.log(CountryResult[0].ISDCode);
                                     res.setHeader('ISDCode', CountryResult[0].ISDCode);
                                     res.send(StateResult);
                                     console.log('FnGetState: mcountry: State sent successfully');
@@ -545,8 +413,6 @@ User.prototype.getUserDetails = function(req,res,next){
                             if (!err) {
                                 if (UserDetailsResult[0]) {
                                     if (UserDetailsResult[0].length > 0) {
-                                        // console.log('FnGetUserDetails: Token: ' + Token);
-                                        //console.log(UserDetailsResult[0]);
 
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
@@ -619,9 +485,11 @@ User.prototype.checkEzeid = function(req,res,next){
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if (EZEID != null && EZEID != '') {
             var Query = 'Select EZEID from tmaster where EZEID=' + st.db.escape(EZEID);
-            st.db.query(Query, function (err, EzediExitsResult) {
+            //var Query = 'CALL pcheckEzeid(' + st.db.escape(EZEID) + ')';
+            st.db.query(Query, function (err, EzeidExitsResult) {
+                console.log(EzeidExitsResult);
                 if (!err) {
-                    if (EzediExitsResult.length > 0) {
+                    if (EzeidExitsResult.length > 0) {
                         RtnMessage.IsIdAvailable = false;
                         res.send(RtnMessage);
                         console.log('FnCheckEzeid: tmaster: EzeId exists');
@@ -629,7 +497,7 @@ User.prototype.checkEzeid = function(req,res,next){
                     else {
                         RtnMessage.IsIdAvailable = true;
                         res.send(RtnMessage);
-                        console.log('FnCheckEzeid: tmaster:  EzeId not available');
+                        console.log('FnCheckEzeid: tmaster:  EzeId available');
                     }
                 }
                 else {
@@ -2091,12 +1959,14 @@ User.prototype.saveResume = function(req,res,next){
                                                     spcId: eduDetails.spc_id,
                                                     score: eduDetails.score,
                                                     yearofpassing: eduDetails.yp,
-                                                    level: eduDetails.expertiseLevel   // 0-ug, 1-pg
+                                                    level: eduDetails.expertiseLevel, // 0-ug, 1-pg
+                                                    instituteId : eduDetails.institute_id
                                                 };
 
                                                 var queryParams = st.db.escape(educationData.cvid) + ',' + st.db.escape(educationData.eduId)
                                                     + ',' + st.db.escape(educationData.spcId) + ',' + st.db.escape(educationData.score)
-                                                    + ',' + st.db.escape(educationData.yearofpassing) + ',' + st.db.escape(educationData.level);
+                                                    + ',' + st.db.escape(educationData.yearofpassing) + ',' + st.db.escape(educationData.level)
+                                                    + ',' + st.db.escape(educationData.instituteId);
 
                                                 var query = 'CALL psavecveducation(' + queryParams + ')';
                                                 console.log(query);
@@ -4217,6 +4087,7 @@ User.prototype.getConveyanceReport = function(req,res,next){
 
     var path = require('path');
 
+
     var sDate = startDate.split('-');
     sDate = sDate[2] + '-' + sDate[1]+ '-' + sDate[0];
     var eDate = endDate.split('-');
@@ -4627,10 +4498,11 @@ User.prototype.profilePicForEzeid = function(req,res,next){
         try {
 
             var query = 'Select EZEID,TID from tmaster where EZEID=' + st.db.escape(ezeid);
+            console.log(query);
             st.db.query(query, function (err, EzediExitsResult) {
                 if (!err) {
-                    if (EzediExitsResult[0]) {
-                        if (EzediExitsResult[0].length > 0) {
+                    if (EzediExitsResult) {
+                        if (EzediExitsResult.length > 0) {
                             var query1 = "select ifnull((SELECT image FROM t_docsandurls where masterid=" + EzediExitsResult[0].TID + " AND tag='PIC' LIMIT 0,1),'') as picture from tmaster where tid=" + EzediExitsResult[0].TID;
                             st.db.query(query1, function (err, imageResult) {
                                 if (!err) {
