@@ -77,6 +77,8 @@ Job.prototype.create = function(req,res,next){
     var locationsList = req.body.locationsList;
     var categoryID = req.body.category_id;
 
+    var instituteIdStr = (req.body.institute_id) ? req.body.institute_id : '';
+
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
@@ -217,7 +219,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(job_description) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                                 + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
-                                + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
+                                + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id) + ','  +st.db.escape(instituteIdStr)
                                 + ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
                                 + ',' + st.db.escape(isconfidential) + ',' + st.db.escape(alumnicode);
                             console.log('CALL pSaveJobs(' + query + ')');
@@ -319,10 +321,16 @@ Job.prototype.create = function(req,res,next){
 
 
 
+                                                //var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
+                                                //    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
+                                                //    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level)
+                                                //    + ',' +st.db.escape(educationData.instituteId);
+
+
                                                 var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
                                                     + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
                                                     + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level)
-                                                    + ',' +st.db.escape(educationData.instituteId);
+                                                    ;
 
                                                 var query = 'CALL psavejobeducation(' + queryParams + ')';
                                                 console.log(query);
@@ -1157,13 +1165,13 @@ console.log(locationIds);
 
                         loc = ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
                             'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
-                            'AND FIND_IN_SET(d.Level,' + locSkills.level + ') ' +
+                            'AND FIND_IN_SET(d.Level,'+'\'' + locSkills.level + '\') ' +
                             'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
                     }
                     else {
                         loc = loc + ' or' + ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
                             'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
-                            'AND FIND_IN_SET(d.Level,' + locSkills.level + ') ' +
+                            'AND FIND_IN_SET(d.Level,'+'\'' + locSkills.level + '\') ' +
                             'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
                     }
 
@@ -1196,20 +1204,39 @@ console.log(locationIds);
                 //console.log(getResult[0]);
                 if (!err) {
                     if (getResult) {
-                        if (getResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.message = 'Job Seeker send successfully';
-                            responseMessage.count = getResult[0][0].count;
-                            responseMessage.data = getResult[1];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetJobSeeker: Job Seeker send successfully');
+
+                        if(getResult[0]){
+                            if (getResult[0].length > 0) {
+
+                                if(getResult[1]){
+                                    if(getResult[1].length){
+                                        for(var ct = 0; ct < getResult[0].length; ct++){
+                                            getResult[1][ct].surl = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/';
+                                        }
+                                    }
+                                }
+
+
+                                responseMessage.status = true;
+                                responseMessage.message = 'Job Seeker send successfully';
+                                responseMessage.count = getResult[0][0].count;
+                                responseMessage.data = getResult[1];
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetJobSeeker: Job Seeker send successfully');
+                            }
+                            else {
+                                responseMessage.message = 'Job Seeker not found';
+                                console.log('FnGetJobSeeker: Job Seeker not found');
+                                res.status(200).json(responseMessage);
+                            }
 
                         }
-                        else {
+                        else{
                             responseMessage.message = 'Job Seeker not found';
                             console.log('FnGetJobSeeker: Job Seeker not found');
                             res.status(200).json(responseMessage);
                         }
+
                     }
                     else {
                         responseMessage.message = 'Job Seeker not found';
