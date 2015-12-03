@@ -54,7 +54,6 @@ Job.prototype.create = function(req,res,next){
     var _this = this;
     var fs = require("fs");
 
-    console.log('save jobs...');
 
     var token = req.body.token;
     var tid = req.body.tid;
@@ -1037,7 +1036,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
         educations = JSON.parse(JSON.stringify(educations));
         var locMatrix = req.body.locMatrix;
         locMatrix = JSON.parse(JSON.stringify(locMatrix));
-console.log(locationIds);
+        
         var i = 0;
         if (!jobSkills) {
             jobSkills = [];
@@ -1189,10 +1188,10 @@ console.log(locationIds);
                 + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(lineofcarrer);
 
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
-            console.log('------------');
+            //console.log('------------');
             console.log(query);
             st.db.query(query, function (err, getResult) {
-                console.log(getResult);
+                //console.log(getResult);
                 //console.log(getResult[0]);
                 if (!err) {
                     if (getResult) {
@@ -1658,7 +1657,7 @@ Job.prototype.jobs = function(req,res,next){
                                                 };
                                                 output.push(data);
                                             }
-                                            console.log(output);
+                                            //console.log(output);
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs loaded successfully';
@@ -1722,7 +1721,7 @@ Job.prototype.jobs = function(req,res,next){
             responseMessage.error = {
                 server : 'Internal server error'
             };
-            responseMessage.message = 'An error occured !'
+            responseMessage.message = 'An error occured !';
             console.log('FnJobs:error ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');

@@ -2197,7 +2197,7 @@ User.prototype.getSkills = function(req,res,next){
     try{
         var query = 'CALL PGetSkills(' + st.db.escape(functionId) + ',' + st.db.escape(type) + ')';
         st.db.query(query,function(err,result){
-            console.log(result);
+           // console.log(result);
             if(err){
                 console.log('Error : FnPGetSkills ');
                 res.status(400).json(responseMsg);
@@ -3693,7 +3693,7 @@ User.prototype.saveUserDetails = function(req,res,next){
 
                                     var queryParams1 = st.db.escape(pin) + ',' + st.db.escape('')+ ',' + st.db.escape(token);
                                     var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
-                                    console.log(query1);
+                                    //console.log(query1);
                                     st.db.query(query1, function (err, getResult) {
                                         if (!err) {
                                             console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
@@ -4412,7 +4412,7 @@ User.prototype.getindustrycategory = function(req,res,next){
         var query = 'CALL Pgetindustrycategory(' + queryParams + ')';
         //console.log(query);
         st.db.query(query, function (err, getResult) {
-            console.log(getResult);
+            //console.log(getResult);
             if (!err) {
                 if (getResult) {
                     if (getResult[0]) {
