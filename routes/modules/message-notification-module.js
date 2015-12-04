@@ -94,7 +94,7 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                                                         if (groupDetails1) {
                                                             for (var i = 0; i < groupDetails[1].length; i++) {
                                                                 receiverId = groupDetails[1][i].tid;
-                                                                senderTitle = groupDetails[0][0].groupname;
+                                                                senderTitle = groupDetails1[0][0].groupname;
                                                                 if (id_type == 0) {
                                                                     groupId = groupDetails1[0][0].groupid;
                                                                     groupTitle = groupDetails1[0][0].groupname;

@@ -42,10 +42,14 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
     if(!groupTitle){
         groupTitle = "";
     }
-    if(parseInt(groupId) == NaN || parseInt(groupId) < 1){
-        validationStatus = false;
-        error.groupId = "Error parameter 3  :  \" "+groupId + "\"";
-    }
+
+    /**
+     * Commenting this to support SOS
+     */
+    //if(parseInt(groupId) == NaN || parseInt(groupId) < 1){
+    //    validationStatus = false;
+    //    error.groupId = "Error parameter 3  :  \" "+groupId + "\"";
+    //}
     if(!message){
         validationStatus = false;
         error.message = "Error parameter 4  :  \""+message + "\"";
@@ -110,14 +114,16 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
         };
         console.log(messagePayload);
         console.log('Actual receiver Id : '+receiverId);
-        _notificationMqtt.publish(receiverId,messagePayload);
+        if(receiverId){
+            _notificationMqtt.publish(receiverId,messagePayload);
+        }
+
 
 
         /**
          * If IPhone ID is there for this user then send notification to his iphone id also
          */
         if(iphoneId){
-
             _apnsNotification.sendAppleNS(iphoneId,messagePayload);
         }
     }

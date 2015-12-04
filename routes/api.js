@@ -237,6 +237,11 @@ router.post('/job_notification',jobModule.jobNotification);
 router.get('/find_institute',jobModule.findInstitute);
 router.post('/add_selected_job',jobModule.addtoSelectedJob);
 router.post('/job_location',jobModule.saveJobLocation);
+router.post('/loc_map',jobModule.saveLocMap);
+router.get('/loc_map',jobModule.getLocMap);
+router.get('/loc_details/employer',jobModule.loadLocDetailsEmployer);
+router.get('/loc_details/trainer',jobModule.loadLocDetailsTrainer);
+router.get('/loc_details/syllabus',jobModule.loadLocDetailsSyllabus);
 
 //MessageBox module methods
 var Messagebox = require('./modules/messagebox-module.js');
@@ -351,6 +356,13 @@ router.post('/v1/tag',tagModule.saveTags);
 router.get('/v1/tag',tagModule.getTags);
 router.delete('/v1/tag',tagModule.deleteTag);
 router.post('/save_pictures',tagModule.savePictures);
+
+//Sos Module
+var Sos = require('./modules/sos-module.js');
+var sosModule = new Sos(db,stdLib);
+router.post('/sos_request',sosModule.saveSos);
+router.post('/sos__post_request',sosModule.postSos);
+router.get('/sos_request',sosModule.loadSosRequest);
 
 
 //EZEIDAP Methods

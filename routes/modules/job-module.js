@@ -76,6 +76,8 @@ Job.prototype.create = function(req,res,next){
     var locationsList = req.body.locationsList;
     var categoryID = req.body.category_id;
 
+    var instituteIdStr = (req.body.institute_id) ? req.body.institute_id : '';
+
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
@@ -216,7 +218,7 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(job_description) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                                 + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
-                                + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
+                                + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id) + ','  +st.db.escape(instituteIdStr)
                                 + ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
                                 + ',' + st.db.escape(isconfidential) + ',' + st.db.escape(alumnicode);
                             console.log('CALL pSaveJobs(' + query + ')');
@@ -318,10 +320,16 @@ Job.prototype.create = function(req,res,next){
 
 
 
+                                                //var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
+                                                //    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
+                                                //    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level)
+                                                //    + ',' +st.db.escape(educationData.instituteId);
+
+
                                                 var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
                                                     + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
                                                     + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level)
-                                                    + ',' +st.db.escape(educationData.instituteId);
+                                                    ;
 
                                                 var query = 'CALL psavejobeducation(' + queryParams + ')';
                                                 console.log(query);
@@ -1156,13 +1164,13 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
                         loc = ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
                             'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
-                            'AND FIND_IN_SET(d.Level,' + locSkills.level + ') ' +
+                            'AND FIND_IN_SET(d.Level,'+'\'' + locSkills.level + '\') ' +
                             'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
                     }
                     else {
                         loc = loc + ' or' + ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
                             'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
-                            'AND FIND_IN_SET(d.Level,' + locSkills.level + ') ' +
+                            'AND FIND_IN_SET(d.Level,'+'\'' + locSkills.level + '\') ' +
                             'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
                     }
 
@@ -1195,20 +1203,44 @@ Job.prototype.searchJobSeekers = function(req,res) {
                 //console.log(getResult[0]);
                 if (!err) {
                     if (getResult) {
-                        if (getResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.message = 'Job Seeker send successfully';
-                            responseMessage.count = getResult[0][0].count;
-                            responseMessage.data = getResult[1];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetJobSeeker: Job Seeker send successfully');
+
+                        if(getResult[0]){
+                            if (getResult[0].length > 0) {
+
+                                if(getResult[1]){
+                                    if(getResult[1].length > 0){
+                                        for(var ct = 0; ct < getResult[1].length; ct++){
+                                            getResult[1][ct].surl = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/';
+                                            console.log(getResult[1][ct]);
+                                        }
+                                    }
+                                }
+                                //console.log('.....................................getresult[[1]..................................');
+                                //console.log(getResult[1]);
+                                //console.log('.......................................................................');
+
+                                responseMessage.status = true;
+                                responseMessage.message = 'Job Seeker send successfully';
+                                responseMessage.count = getResult[0][0].count;
+                                responseMessage.data = getResult[1];
+
+                                console.log(responseMessage);
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetJobSeeker: Job Seeker send successfully');
+                            }
+                            else {
+                                responseMessage.message = 'Job Seeker not found';
+                                console.log('FnGetJobSeeker: Job Seeker not found');
+                                res.status(200).json(responseMessage);
+                            }
 
                         }
-                        else {
+                        else{
                             responseMessage.message = 'Job Seeker not found';
                             console.log('FnGetJobSeeker: Job Seeker not found');
                             res.status(200).json(responseMessage);
                         }
+
                     }
                     else {
                         responseMessage.message = 'Job Seeker not found';
@@ -3628,6 +3660,656 @@ Job.prototype.saveJobLocation = function(req,res,next){
         }
     }
 };
+
+/**
+ * @todo FnSaveLocMap
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @param token (char)
+ * @param type (int)
+ * @param loc_id (int)
+ * @param internship_count (int)
+ * @param freshers_ctc (Decimal)
+ * @param freshers_count (int)
+ * @param lateral_count (int)
+ * @param id (int)
+ * @description api code for save loc map
+ */
+Job.prototype.saveLocMap = function(req,res,next){
+    var _this = this;
+
+    /**
+     * checking input parameters are json or not
+     */
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid ContentType';
+        validateStatus *= false;
+    }
+    else{
+        /**
+         * getting,storing and validating the input parameters from front end
+         */
+        var id = 0;
+        var token = req.body.token;
+
+        if(!token){
+            error['token'] = 'Token is Mandatory';
+            validateStatus *= false;
+        }
+        var locMap = req.body.loc;
+        if(!locMap){
+            locMap = [];
+        }
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var queryParams1 = st.db.escape(req.body.tids) + ',' + st.db.escape(token) + ',' + st.db.escape(req.body.intype);
+                        var query1 = 'CALL pdeletelocmap(' + queryParams1 + ')';
+                        console.log(query1);
+                        st.db.query(query1, function (err, deleteResult) {
+                            if (!err) {
+                                console.log('LocMap Deleted Sucessfully');
+                            }
+                            else {
+                                console.log('error from delete locmap');
+                            }
+                        });
+
+                        if(isJson){
+
+                            for (var i = 0; i < locMap.length; i++) {
+
+                                var locDetails = {
+
+                                    fid: locMap[i].fid,
+                                    locId: locMap[i].career_id,
+                                    tid: locMap[i].tid,
+                                    internshipCount: locMap[i].interns_count,
+                                    fresherCtc: locMap[i].fresher_ctc,
+                                    fresherCount: locMap[i].fresher_count,
+                                    lateralCount: locMap[i].lateral_count,
+                                    type: locMap[i].type
+                                };
+                                console.log(locDetails);
+
+
+                                var queryParams = st.db.escape(token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
+                                    + ',' + st.db.escape(locDetails.internshipCount) + ',' + st.db.escape(locDetails.fresherCtc)
+                                    + ',' + st.db.escape(locDetails.fresherCount) + ',' + st.db.escape(locDetails.lateralCount)
+                                    + ',' + st.db.escape(locDetails.tid);
+                                var query = 'CALL pSaveLocMap(' + queryParams + ')';
+                                console.log(query);
+                                st.db.query(query, function (err, insertResult) {
+                                    if (!err) {
+                                        if (insertResult) {
+                                            id = insertResult[0][0].id;
+                                            console.log('FnSaveLocMap: LocMap saved successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'LocMap not saved';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveLocMap:LocMap not saved');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured ! Please try again';
+                                        responseMessage.error = {
+                                            server: 'Internal Server Error'
+                                        };
+                                        res.status(500).json(responseMessage);
+                                        console.log('FnSaveLocMap: error in saving LocMap  :' + err);
+                                    }
+
+                                });
+                            }
+                            responseMessage.status = true;
+                            responseMessage.message = 'LocMap saved successfully';
+                            responseMessage.data = id;
+                            res.status(200).json(responseMessage);
+                            console.log('FnSaveLocMap: LocMap saved successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Invalid Input Content Type';
+                            //res.status(200).json(responseMessage);
+                            console.log('FnSaveLocMap:Invalid Input Content Type');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveLocMap: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveLocMap:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveLocMap ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnGetLocMap
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get loc map
+ */
+Job.prototype.getLocMap = function(req,res,next){
+
+    var _this = this;
+
+    var token = req.query.token;
+    var type = req.query.type;  // (1-employer,2-training)
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =   st.db.escape(token) + ',' + st.db.escape(type);
+                        var query = 'CALL pgetlocmap(' + queryParams + ')';
+                        //console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    if(getResult[0]){
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'LocMap loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetLOCMap: LocMap loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'LocMap not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetLOCMap:LocMap not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'LocMap not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetLOCMap:LocMap not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetLOCMap: error in getting LocMap :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetLOCMap: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetLOCMap:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetLOCMap ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnLoadLocDetailsEmployer
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get loc details
+ */
+Job.prototype.loadLocDetailsEmployer = function(req,res,next){
+
+    var _this = this;
+
+    var token = req.query.token;
+    var locId = req.query.loc_id;
+    var type = 1;      // (1-employer,2-training)
+    var lat = req.query.lat ? req.query.lat : '';
+    var lng = req.query.lng ? req.query.lng : '';
+    var pageSize = req.query.page_size ? req.query.page_size : 100;
+    var pageCount = req.query.page_count ? req.query.page_count : 0;
+    var keyword = req.query.keyword ? req.query.keyword : '';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =   st.db.escape(locId) + ',' + st.db.escape(type)+ ',' + st.db.escape(lat)
+                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)
+                            + ',' + st.db.escape(keyword);
+                        var query = 'CALL pLoadLOCDetails(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if(getResult[0]){
+
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'LocDetails loaded successfully';
+                                        responseMessage.data = {
+                                            count : getResult[0][0].count,
+                                            sic: getResult[0][0].sic,
+                                            sfc: getResult[0][0].sfc,
+                                            slc: getResult[0][0].slc,
+                                            result: getResult[1]
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLoadLocDetails: LocDetails loaded successfully');
+                                    }
+
+                                    else {
+                                        responseMessage.message = 'LocMap not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLoadLocDetails:LocMap not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'LocMap not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnLoadLocDetails:LocMap not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnLoadLocDetails: error in getting LocMap :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnLoadLocDetails: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnLoadLocDetails:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnLoadLocDetails ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnLoadLocDetailsTrainer
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get loc details
+ */
+Job.prototype.loadLocDetailsTrainer = function(req,res,next){
+
+    var _this = this;
+
+    var token = req.query.token;
+    var locId = req.query.loc_id;
+    var type = 2;      // (1-employer,2-training)
+    var lat = req.query.lat ? req.query.lat : '';
+    var lng = req.query.lng ? req.query.lng : '';
+    var pageSize = req.query.page_size ? req.query.page_size : 100;
+    var pageCount = req.query.page_count ? req.query.page_count : 0;
+    var keyword = req.query.keyword ? req.query.keyword : '';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =   st.db.escape(locId) + ',' + st.db.escape(type)+ ',' + st.db.escape(lat)
+                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)
+                            + ',' + st.db.escape(keyword);
+                        var query = 'CALL pLoadLOCDetails(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if(getResult[0]){
+
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'LocDetails loaded successfully';
+                                        responseMessage.data = {
+                                            count : getResult[0][0].count,
+                                            sic: getResult[0][0].sic,
+                                            sfc: getResult[0][0].sfc,
+                                            slc: getResult[0][0].slc,
+                                            result: getResult[1]
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLoadLocDetails: LocDetails loaded successfully');
+                                    }
+
+                                    else {
+                                        responseMessage.message = 'LocMap not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLoadLocDetails:LocMap not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'LocMap not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnLoadLocDetails:LocMap not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnLoadLocDetails: error in getting LocMap :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnLoadLocDetails: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnLoadLocDetails:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnLoadLocDetails ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnLoadLocDetailsSyllabus
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get loc details
+ */
+Job.prototype.loadLocDetailsSyllabus = function(req,res,next){
+
+    var _this = this;
+
+    var token = req.query.token;
+    var locId = req.query.loc_id;
+    var type = 0;      // (1-employer,2-training)
+    var lat = req.query.lat ? req.query.lat : 0.00;
+    var lng = req.query.lng ? req.query.lng : 0.00;
+    var pageSize = req.query.page_size ? req.query.page_size : 100;
+    var pageCount = req.query.page_count ? req.query.page_count : 0;
+    var keyword = req.query.keyword ? req.query.keyword : '';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams =   st.db.escape(locId) + ',' + st.db.escape(type)+ ',' + st.db.escape(lat)
+                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)
+                            + ',' + st.db.escape(keyword);
+                        var query = 'CALL pLoadLOCDetails(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getResult) {
+                            console.log(getResult);
+                            if (!err) {
+                                if (getResult) {
+                                    if(getResult[0]){
+
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'LocDetails loaded successfully';
+                                        getResult[0][0].url = (getResult[0][0].url) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].url) : '';
+                                        responseMessage.data = {url: getResult[0][0].url};
+
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLoadLocDetails: LocDetails loaded successfully');
+                                    }
+
+                                    else {
+                                        responseMessage.message = 'LocMap not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLoadLocDetails:LocMap not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'LocMap not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnLoadLocDetails:LocMap not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnLoadLocDetails: error in getting LocMap :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnLoadLocDetails: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnLoadLocDetails:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnLoadLocDetails ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 
 module.exports = Job;

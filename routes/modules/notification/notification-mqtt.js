@@ -11,7 +11,7 @@
 var fs = require('fs');
 var uuid = require('node-uuid');
 
-var request = require('request');
+//var request = require('request');
 //console.log(__dirname+'../../../ezeone-config.json');
 //var CONFIG = JSON.parse(fs.readFileSync('./ezeone-config.json'));
 
@@ -37,92 +37,63 @@ var connOpt = {
     clientId : 'mqttjs_' + crypto.randomBytes(16).toString('hex')
 };
 
-var mqtt = null;
-var mqttClient = null;
+/*********************************************** AMQP upgraded code **************************************/
+
+var amqp = require('amqp');
+var url = 'amqp://indrajeet:indrajeet@'+CONFIG.MQTT.HOST+':5672/%2f';
+
+
+var connOpt = {
+        host: CONFIG.MQTT.HOST,
+    port: 5672, login: 'indrajeet'
+    , password: 'indrajeet'
+    , connectionTimeout: 10000
+    , authMechanism: 'AMQPLAIN'
+    , vhost: '/'
+    , noDelay: true
+    , ssl: { enabled : false}
+};
+
+var amqpConn = null;
+
+//amqpConn = amqp.createConnection({url: url},  { defaultExchangeName: 'amq.topic' });
+amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
+console.log('.....................................................................');
+console.log(amqpConn);
+console.log('.....................................................................');
+if(amqpConn){
+    amqpConn.on('ready',function(){
+        console.log('Connection established successfully to rabbitmq broker');
+    });
+
+    amqpConn.on('error',function(err){
+        console.log(err);
+        console.log('Connection generated an error event');
+        amqpConn = amqp.createConnection({url: url},  { defaultExchangeName: 'amq.topic' });
+    });
+}
+
+
 
 function NotificationMqtt(){
     try{
-        mqtt = require('mqtt');
-        try{
-            if(!mqttClient){
-                mqttClient = mqtt.connect(brokerUrl,connOpt);
-
-                mqttClient.on('connect',function(){
-                    console.log('MQTT Client connected successfully to broker');
-                });
-            }
-
-
-            mqttClient.on('disconnect',function(){
-                console.log('MQTT Client disconnected from broker ! Trying to connect in 1 second');
-                setTimeout(function(){
-                    try{
-                        mqttClient = mqtt.connect(brokerUrl,connOpt);
-                    }
-                    catch(ex){
-                        console.log(ex);
-                    }
-                },1000);
-
+        if(!amqpConn){
+            amqpConn = amqp.createConnection({url: url},  { defaultExchangeName: 'amq.topic' });
+            amqpConn.on('ready',function(){
+                console.log('Connection established successfully to rabbitmq broker');
             });
 
-        }
-        catch(ex){
-            console.log(ex);
+            amqpConn.on('error',function(){
+                console.log('Connection generated an error event');
+                amqpConn = amqp.createConnection({url: url},  { defaultExchangeName: 'amq.topic' });
+            });
         }
     }
     catch(ex){
-        mqtt = MqttFalse();
-        console.log(ex);
-    }
-
-};
-
-/**
- * Publishes message to a particular topic
- * @param topic (integer)
- * @param messagePayload (JSON object)
- */
-NotificationMqtt.prototype.publish = function(topic,messagePayload){
-    var validationFlag = true;
-    if(!topic){
-        console.log('Topic is not present');
-        validationFlag *= false;
-    }
-    if(typeof(messagePayload) !== 'object'){
-        console.log('Invalid message payload. Must be an object');
-        validationFlag *= false;
-    }
-    if(validationFlag){
-        var uniqueMid = uuid.v4();
-
-        messagePayload._id = Date.now() + '-' + uniqueMid;
-
-        try{
-            this.checkQueue(topic,function(){
-                mqttClient.publish('/'+topic,JSON.stringify(messagePayload),{qos : 1},function(){
-                    console.log('Message published : '+ topic);
-                });
-                console.log('You are publishing to topic:'+'/'+topic);
-            },function(){
-                console.log('Error publishing message to topic : '+topic);
-                console.log(JSON.stringify(messagePayload));
-            });
-        }
-        catch(ex){
-            console.log(ex);
-            console.log('An exception occurred while publish message to topic: '
-                + topic + 'with payload '+JSON.stringify(messagePayload));
-        }
+        console.log('Unable to reach rabbitmq server!');
     }
 };
 
-/**
- * Cut short the message to required byte to reduce the size of payload
- * @param message (string)
- * @param limit (in bytes)
- * @returns truncatedMessage (string)
- */
 NotificationMqtt.prototype.limitMessage = function(message,limit){
     /**
      * @todo Limit message length to respected bytes
@@ -133,8 +104,8 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
         var regExp = new RegExp(regStr,'g');
         return htmlString.replace(regExp, "");
     }
-    
-    
+
+
     function cutMessage(msgStr){
         /**
          * to get size of message and fix it at 1024 byte;
@@ -155,97 +126,65 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
 
         return msgStr;
     };
-    
+
     var withoutHtml =  cutMessage(convertHtmlToText(message));
     return withoutHtml;
-
 };
 
-
-/**
- * Create a message queue for each EZEID when they signup or subuser is created
- * @param topic
- */
-NotificationMqtt.prototype.createQueue = function(topic,callback,failedCallback){
-
-    request({
-        url: CONFIG.MQTT.ADMIN_PROTOCOL+ '://'+CONFIG.MQTT.ADMIN_HOST+ ((CONFIG.MQTT.ADMIN_PORT) ? ':'+ CONFIG.MQTT.ADMIN_PORT : '') +'/api/queues/%2F/'+topic.toString(), //URL to hit
-        method: 'PUT',
-        auth : {
-            'user': CONFIG.MQTT.USERNAME,
-            'pass': CONFIG.MQTT.PASSWORD,
-            'sendImmediately': true
-        },
-        body: {
-            durable : true,
-            autodelete : false
-        },
-        json : true
-    }, function(error, response, body){
-        if(parseInt(response.statusCode) === 204){
-            console.log('Topic created successfully : '+ topic.toString());
-            if(callback){
-                if(typeof(callback) == 'function'){
-                    callback();
-                }
-            }
+NotificationMqtt.prototype.checkQueue = function(topic,callback){
+    amqpConn.queue(
+        topic,
+        { passive : false,durable : true,exclusive : false,autoDelete : false},
+        function(queRef){
+            var exchange = amqpConn.exchange();
+            callback();
         }
-        else{
-            if(failedCallback){
-                if(typeof(failedCallback) == 'function'){
-                    failedCallback();
-                }
-            }
-        }
-    });
-
+    );
 };
 
-/**
- * Callback to be executed after finishing checking queue
- * @param topic
- * @param callback
- */
-NotificationMqtt.prototype.checkQueue = function(topic,callback,failedCallback){
-    var _this = this;
+NotificationMqtt.prototype.publish = function(topic,messagePayload){
 
-    try{
-        request
-            .get(CONFIG.MQTT.ADMIN_PROTOCOL+ '://'+CONFIG.MQTT.ADMIN_HOST+ ((CONFIG.MQTT.ADMIN_PORT) ? ':'+ CONFIG.MQTT.ADMIN_PORT : '')+'/api/queues/%2F/'+topic.toString(),{
-                'auth': {
-                    'user': CONFIG.MQTT.USERNAME,
-                    'pass': CONFIG.MQTT.PASSWORD,
-                    'sendImmediately': true
-                }
-            })
-            .on('response', function(response) {
-                if(parseInt(response.statusCode) === 200){
-                    console.log('Topic :'+topic.toString() + ' exists');
-                    if(callback){
-                        if(typeof(callback) == 'function'){
-                            callback();
-                        }
-                    }
-                }
-                else if(parseInt(response.statusCode) === 404){
-                    _this.createQueue(topic,callback,failedCallback);
-                }
-                else{
-                    if(failedCallback){
-                        if(typeof(failedCallback) == 'function'){
-                            failedCallback();
-                        }
-                    }
-                    console.log('Error connecting to rabbit server at '+Date.now());
-                    console.log('Message delayed for topic: ' + topic.toString());
-                }
+    var validationFlag = true;
+    if(!topic){
+        console.log('Topic is not present');
+        validationFlag *= false;
+    }
+    if(typeof(messagePayload) !== 'object'){
+        console.log('Invalid message payload. Must be an object');
+        validationFlag *= false;
+    }
+    if(validationFlag){
+        var uniqueMid = uuid.v4();
+
+        messagePayload._id = Date.now() + '-' + uniqueMid;
+
+        console.log('RabbitTopic : '+topic);
+        console.log(messagePayload);
+
+        try{
+            this.checkQueue(topic.toString(),function(){
+                //mqttClient.publish('/'+topic,JSON.stringify(messagePayload),{qos : 1},function(){
+                //    console.log('Message published : '+ topic);
+                //});
+                var exchange = amqpConn.exchange();
+                exchange.publish(topic.toString(),
+                    JSON.stringify(messagePayload),
+                    { deliveryMode : 2, mandatory : false, immediate : false},
+                    function(){
+                        console.log('You are publishing to topic:'+'/'+topic);
+                    });
+
+            },function(){
+                console.log('Error publishing message to topic : '+topic);
+                console.log(JSON.stringify(messagePayload));
             });
+        }
+        catch(ex){
+            console.log(ex);
+            console.log('An exception occurred while publish message to topic: '
+                + topic + 'with payload '+JSON.stringify(messagePayload));
+        }
     }
-    catch(ex){
-        console.log('Error in finding queue notification-mqtt.js');
-        console.log(ex);
-    }
-
 };
 
 module.exports = NotificationMqtt;

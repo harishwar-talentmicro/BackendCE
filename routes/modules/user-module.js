@@ -19,6 +19,10 @@ var path = require('path');
 var EZEIDEmail = 'noreply@ezeone.com';
 var moment = require('moment');
 
+var appConfig = require('../../ezeone-config.json');
+
+
+
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -1757,6 +1761,10 @@ User.prototype.saveResume = function(req,res,next){
         var educations = req.body.educations;
         educations= JSON.parse(JSON.stringify(educations));
 
+        var resumeFilePath = (req.body.resume_path) ? req.body.resume_path : '';
+
+        resumeFilePath = resumeFilePath.replace(req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/','');
+
         if(typeof(locationsList) == "string"){
             locationsList = JSON.parse(locationsList);
         }
@@ -1782,6 +1790,14 @@ User.prototype.saveResume = function(req,res,next){
                 if (!err) {
                     if (Result) {
 
+
+                        /** Added by Indrajeet to upload files to google cloud server
+                         *
+                         */
+
+
+
+
                         if (Pin == '') {
                             Pin = null;
                         }
@@ -1798,7 +1814,7 @@ User.prototype.saveResume = function(req,res,next){
                                 + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID)
                                 +',' + st.db.escape(expectedSalary)+ ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName)
                                 +',' + st.db.escape(email)+',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
-                                +',' + st.db.escape(expectedSalarytype);
+                                +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
