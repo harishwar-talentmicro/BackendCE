@@ -1209,18 +1209,23 @@ console.log(locationIds);
                             if (getResult[0].length > 0) {
 
                                 if(getResult[1]){
-                                    if(getResult[1].length){
-                                        for(var ct = 0; ct < getResult[0].length; ct++){
+                                    if(getResult[1].length > 0){
+                                        for(var ct = 0; ct < getResult[1].length; ct++){
                                             getResult[1][ct].surl = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/';
+                                            console.log(getResult[1][ct]);
                                         }
                                     }
                                 }
-
+                                //console.log('.....................................getresult[[1]..................................');
+                                //console.log(getResult[1]);
+                                //console.log('.......................................................................');
 
                                 responseMessage.status = true;
                                 responseMessage.message = 'Job Seeker send successfully';
                                 responseMessage.count = getResult[0][0].count;
                                 responseMessage.data = getResult[1];
+
+                                console.log(responseMessage);
                                 res.status(200).json(responseMessage);
                                 console.log('FnGetJobSeeker: Job Seeker send successfully');
                             }
