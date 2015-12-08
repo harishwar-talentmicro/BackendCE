@@ -54,7 +54,6 @@ Job.prototype.create = function(req,res,next){
     var _this = this;
     var fs = require("fs");
 
-
     var token = req.body.token;
     var tid = req.body.tid;
     var ezeone_id = alterEzeoneId(req.body.ezeone_id);
@@ -257,18 +256,17 @@ Job.prototype.create = function(req,res,next){
                                         res.status(200).json(responseMessage);
 
                                         if(locMatrix.length) {
+                                            for(var i=0; i < locMatrix.length; i++){
+                                                //async.each(locMatrix, function iterator(locDetails, callback) {
 
-                                            async.each(locMatrix, function iterator(locDetails, callback) {
-
-                                                count = count - 1;
 
                                                 var locSkills = {
-                                                    expertiseLevel: locDetails.expertiseLevel,
+                                                    expertiseLevel: locMatrix[i].expertiseLevel,
                                                     jobid: insertresult[0][0].jobid,
-                                                    expFrom: locDetails.exp_from,
-                                                    expTo: locDetails.exp_to,
-                                                    fid: locDetails.fid,
-                                                    careerId: locDetails.career_id
+                                                    expFrom: locMatrix[i].exp_from,
+                                                    expTo: locMatrix[i].exp_to,
+                                                    fid: locMatrix[i].fid,
+                                                    careerId: locMatrix[i].career_id
                                                 };
 
                                                 var queryParams = st.db.escape(locSkills.jobid) + ',' + st.db.escape(locSkills.fid)
@@ -295,7 +293,7 @@ Job.prototype.create = function(req,res,next){
                                                         console.log('FnupdateSkill: locMatrix ; error in saving  skill matrix:' + err);
                                                     }
                                                 });
-                                            });
+                                            }
                                         }
                                         else
                                         {
@@ -303,33 +301,23 @@ Job.prototype.create = function(req,res,next){
                                         }
 
                                         if(educations.length) {
-                                            async.each(educations, function iterator(eduDetails,callback) {
 
-                                                count = count -1;
+                                            for(var j=0; j < educations.length; j++){
+                                                //async.each(educations, function iterator(eduDetails,callback) {
 
                                                 var educationData = {
 
                                                     jobid: insertresult[0][0].jobid,
-                                                    eduId :eduDetails.edu_id,
-                                                    spcId : eduDetails.spc_id,
-                                                    scoreFrom:eduDetails.score_from,
-                                                    scoreTo:eduDetails.score_to,
-                                                    level : eduDetails.expertiseLevel,   // 0-ug, 1-pg
-                                                    instituteId : eduDetails.institute_id
+                                                    eduId :educations[j].edu_id,
+                                                    spcId : educations[j].spc_id,
+                                                    scoreFrom:educations[j].score_from,
+                                                    scoreTo:educations[j].score_to,
+                                                    level : educations[j].expertiseLevel   // 0-ug, 1-pg
                                                 };
-
-
-
-                                                //var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
-                                                //    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
-                                                //    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level)
-                                                //    + ',' +st.db.escape(educationData.instituteId);
-
 
                                                 var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
                                                     + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
-                                                    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level)
-                                                    ;
+                                                    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level);
 
                                                 var query = 'CALL psavejobeducation(' + queryParams + ')';
                                                 console.log(query);
@@ -351,10 +339,12 @@ Job.prototype.create = function(req,res,next){
                                                         console.log('FnupdateSkill: educations:error in saving  skill matrix:' + err);
                                                     }
                                                 });
-                                            });
+                                            }
                                         }
                                         else
-                                        {educations='';}
+                                        {
+                                            educations='';
+                                        }
 
                                         matrix(insertresult[0][0].jobid);
                                         console.log('FnSaveJobs: Jobs save successfully');
@@ -652,6 +642,7 @@ Job.prototype.create = function(req,res,next){
         }
     }
 };
+
 function FnSaveSkills(skill, CallBack) {
     var _this = this;
     try {
@@ -1044,7 +1035,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
         educations = JSON.parse(JSON.stringify(educations));
         var locMatrix = req.body.locMatrix;
         locMatrix = JSON.parse(JSON.stringify(locMatrix));
-        
+
         var i = 0;
         if (!jobSkills) {
             jobSkills = [];
@@ -3990,35 +3981,47 @@ Job.prototype.loadLocDetailsEmployer = function(req,res,next){
                         var query = 'CALL pLoadLOCDetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
+
                             if (!err) {
                                 if (getResult) {
                                     if(getResult[0]){
+                                        if(getResult[0][0].message != -2){
 
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'LocDetails loaded successfully';
-                                        responseMessage.data = {
-                                            count : getResult[0][0].count,
-                                            sic: getResult[0][0].sic,
-                                            sfc: getResult[0][0].sfc,
-                                            slc: getResult[0][0].slc,
-                                            result: getResult[1]
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnLoadLocDetails: LocDetails loaded successfully');
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Employer LocDetails loaded successfully';
+                                            responseMessage.data = {
+                                                count : getResult[0][0].count,
+                                                sic: getResult[0][0].sic,
+                                                sfc: getResult[0][0].sfc,
+                                                slc: getResult[0][0].slc,
+                                                result: getResult[1]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnLoadLocDetails: Employer LocDetails loaded successfully');
+                                        }
+                                        else{
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Employer LocDetails loaded successfully';
+                                            responseMessage.data = {
+                                                result: getResult[0]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnLoadLocDetails: Employer LocDetails loaded successfully');
+                                        }
                                     }
 
                                     else {
-                                        responseMessage.message = 'LocMap not loaded';
+                                        responseMessage.message = 'Employer LocDetails not loaded';
                                         res.status(200).json(responseMessage);
-                                        console.log('FnLoadLocDetails:LocMap not loaded');
+                                        console.log('FnLoadLocDetails:Employer LocDetails not loaded');
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'LocMap not loaded';
+                                    responseMessage.message = 'Employer LocDetails not loaded';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnLoadLocDetails:LocMap not loaded');
+                                    console.log('FnLoadLocDetails:Employer LocDetails not loaded');
                                 }
                             }
                             else {
@@ -4027,7 +4030,7 @@ Job.prototype.loadLocDetailsEmployer = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnLoadLocDetails: error in getting LocMap :' + err);
+                                console.log('FnLoadLocDetails: error in getting Employer LocDetails :' + err);
                             }
                         });
                     }
@@ -4119,31 +4122,41 @@ Job.prototype.loadLocDetailsTrainer = function(req,res,next){
                             if (!err) {
                                 if (getResult) {
                                     if(getResult[0]){
-
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'LocDetails loaded successfully';
-                                        responseMessage.data = {
-                                            count : getResult[0][0].count,
-                                            sic: getResult[0][0].sic,
-                                            sfc: getResult[0][0].sfc,
-                                            slc: getResult[0][0].slc,
-                                            result: getResult[1]
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnLoadLocDetails: LocDetails loaded successfully');
+                                        if(getResult[0][0].message != -2){
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Trainer LocDetails loaded successfully';
+                                            responseMessage.data = {
+                                                count : getResult[0][0].count,
+                                                sic: getResult[0][0].sic,
+                                                sfc: getResult[0][0].sfc,
+                                                slc: getResult[0][0].slc,
+                                                result: getResult[1]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnLoadLocDetails: Trainer LocDetails loaded successfully');
+                                        }
+                                        else{
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Trainer LocDetails loaded successfully';
+                                            responseMessage.data = {
+                                                result: getResult[0]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnLoadLocDetails:Trainer LocDetails loaded successfully');
+                                        }
                                     }
-
                                     else {
-                                        responseMessage.message = 'LocMap not loaded';
+                                        responseMessage.message = 'Trainer LocDetails not loaded';
                                         res.status(200).json(responseMessage);
-                                        console.log('FnLoadLocDetails:LocMap not loaded');
+                                        console.log('FnLoadLocDetails:Trainer LocDetails not loaded');
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'LocMap not loaded';
+                                    responseMessage.message = 'Trainer LocDetails not loaded';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnLoadLocDetails:LocMap not loaded');
+                                    console.log('FnLoadLocDetails:Trainer LocDetails not loaded');
                                 }
                             }
                             else {
@@ -4152,7 +4165,7 @@ Job.prototype.loadLocDetailsTrainer = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnLoadLocDetails: error in getting LocMap :' + err);
+                                console.log('FnLoadLocDetails: error in getting Trainer LocDetails :' + err);
                             }
                         });
                     }
@@ -4244,27 +4257,35 @@ Job.prototype.loadLocDetailsSyllabus = function(req,res,next){
                             if (!err) {
                                 if (getResult) {
                                     if(getResult[0]){
+                                        if(getResult[0][0].message != -2){
 
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'LocDetails loaded successfully';
-                                        getResult[0][0].url = (getResult[0][0].url) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].url) : '';
-                                        responseMessage.data = {url: getResult[0][0].url};
-
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnLoadLocDetails: LocDetails loaded successfully');
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Syllabus LocDetails loaded successfully';
+                                            getResult[0][0].url = (getResult[0][0].url) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].url) : '';
+                                            responseMessage.data = {url: getResult[0][0].url};
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnLoadLocDetails: Syllabus LocDetails loaded successfully');
+                                        }
+                                        else{
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Syllabus LocDetails loaded successfully';
+                                            responseMessage.data = getResult[0][0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnLoadLocDetails: Syllabus LocDetails loaded successfully');}
                                     }
 
                                     else {
-                                        responseMessage.message = 'LocMap not loaded';
+                                        responseMessage.message = 'Syllabus LocDetails not loaded';
                                         res.status(200).json(responseMessage);
-                                        console.log('FnLoadLocDetails:LocMap not loaded');
+                                        console.log('FnLoadLocDetails:Syllabus LocDetails not loaded');
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'LocMap not loaded';
+                                    responseMessage.message = 'Syllabus LocDetails not loaded';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnLoadLocDetails:LocMap not loaded');
+                                    console.log('FnLoadLocDetails:Syllabus LocDetails not loaded');
                                 }
                             }
                             else {
@@ -4273,7 +4294,7 @@ Job.prototype.loadLocDetailsSyllabus = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnLoadLocDetails: error in getting LocMap :' + err);
+                                console.log('FnLoadLocDetails: error in getting Syllabus LocDetails :' + err);
                             }
                         });
                     }
