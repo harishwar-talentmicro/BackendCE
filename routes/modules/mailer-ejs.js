@@ -110,10 +110,10 @@ HussMailer.prototype.sendMail = function(mailContent, CallBack){
     var parameters = {
         EMAIL : mailContent.email,
         FULLNAME : mailContent.fullname,
-        EZEOne : mailContent.toEzeid,
+        EZEOne : mailContent.ezeid, // from ezeid
         STATUS : mailContent.status,
         MESSAGE : message,
-        EZEOneID : mailContent.ezeid,
+        EZEOneID : mailContent.toEzeid, // to ezeid
         FUNCTION : mailContent.function,
         KEYSKILLS : mailContent.keyskills,
         URL : mailContent.url

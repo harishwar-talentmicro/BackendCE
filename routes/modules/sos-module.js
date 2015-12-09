@@ -41,7 +41,6 @@ function Sos(db,stdLib){
  */
 Sos.prototype.saveSos = function(req,res,next) {
 
-
     var _this = this;
 
     var ezeid = req.body.ezeid ? alterEzeoneId(req.body.ezeid) : '';
@@ -66,8 +65,8 @@ Sos.prototype.saveSos = function(req,res,next) {
     try {
 
         var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(b1)+ ',' + st.db.escape(b2)
-            + ',' + st.db.escape(b3)+ ',' + st.db.escape(b4)+ ',' + st.db.escape(b5)+ ',' + st.db.escape(latitude)
-            + ',' + st.db.escape(longitude)+ ',' + st.db.escape(deviceId);
+            + ',' + st.db.escape(b3)+ ',' + st.db.escape(b4)+ ',' + st.db.escape(b5)+ ',' + st.db.escape(deviceId)
+            + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude);
 
         var query = 'CALL pSaveSOSrequest(' + queryParams + ')';
         console.log(query);
@@ -84,44 +83,44 @@ Sos.prototype.saveSos = function(req,res,next) {
                     /**
                      * send push notification for sos request
                      */
-                    var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where MasterId=' + insertResult[0].masterid;
-                    //console.log(queryParameters);
-                    st.db.query(queryParameters, function (err, iosResult) {
-                        if (iosResult) {
-                            iphoneID = iosResult[0].iphoneID;
-                        }
-                        else {
-                            iphoneID = '';
-                        }
+                    for (var i = 0; i < insertResult[0].length; i++) {
+                        var queryParameters = 'select EZEID,tid,IPhoneDeviceID as iphoneID from tmaster where tid=' + insertResult[0][i].masterid;
+                        console.log(queryParameters);
+                        st.db.query(queryParameters, function (err, iosResult) {
+                            console.log(iosResult);
+                            if (iosResult) {
+                                iphoneID = iosResult[0].iphoneID;
+                            }
+                            else {
+                                iphoneID = '';
+                            }
+                            console.log(iosResult[0].tid);
+                            var queryParams2 = 'select tid,GroupName from tmgroups where AdminID=' + iosResult[0].tid +' and grouptype=1';
+                            console.log(queryParams2);
+                            st.db.query(queryParams2, function (err, userDetails) {
+                                console.log(userDetails);
 
-                        var queryParams2 = 'select tid,GroupName from tmgroups where AdminId=' + insertResult[0].masterid;
-                        console.log(queryParams2);
-                        st.db.query(queryParams2, function (err, userDetails) {
-                            console.log(userDetails);
+                                if (userDetails) {
+                                    if (userDetails[0]) {
 
-                            if (userDetails) {
-                                if (userDetails[0]) {
-
-                                    for (var i = 0; i < userDetails[0].length; i++) {
                                         var receiverId = userDetails[0].tid;
                                         var senderTitle = '';
                                         var groupId = '';
-                                        var groupTitle = userDetails[0][0].groupname;
-                                        var messageText = '';
+                                        var groupTitle = userDetails[0].GroupName;
+                                        var messageText = 'thsrgasgstga';
                                         var messageType = 10;
                                         var operationType = 0;
                                         var iphoneId = iphoneID;
                                         var messageId = '', msgUserid = '', masterid = '', prioritys = '';
                                         var a_name = '', dateTime = '', latitude = '', longitude = '';
-
+                                        //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
                                         notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
                                     }
                                 }
-                            }
+                            });
 
                         });
-
-                    });
+                    }
                 }
                 else {
                     responseMessage.message = 'Sos not saved';
@@ -170,6 +169,7 @@ Sos.prototype.postSos = function(req,res,next) {
     var latitude = req.body.lat;
     var longitude = req.body.lng;
     var deviceId = req.body.device_id;
+    var iphoneID='';
 
 
     var responseMessage = {
@@ -194,36 +194,47 @@ Sos.prototype.postSos = function(req,res,next) {
                     res.status(200).json(responseMessage);
                     console.log('FnPostSosRequest: Sos Posted successfully');
 
-                    /**
-                     * send push notification for sos request
-                     */
-                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(MsgContent.token);
-                    var messageQuery1 = 'CALL (' + queryParams1 + ')';
-                    console.log(messageQuery1);
-                    st.db.query(messageQuery1, function (err, groupDetails1) {
-                        if (groupDetails1) {
-                            for (var i = 0; i < groupDetails[1].length; i++) {
-                                var receiverId = '';
-                                var senderTitle = '';
-                                var groupId = groupDetails1[0][0].groupid;
-                                var groupTitle = groupDetails1[0][0].groupname;
-                                var messageText = MsgContent.message;
-                                var messageType = id_type;
-                                var operationType = 0;
-                                var iphoneId = iphoneID;
-                                var messageId = MsgContent.message_id;
-                                var msgUserid = MsgContent.message_userid;
-                                var masterid = groupDetails[0][0].AdminID;
-                                var prioritys = MsgContent.priority;
-                                var a_name = MsgContent.attachmentFilename;
-                                var datetime = '', latitude = '', longitude = '';
-                                //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
-                            }
-                        }
-                    });
-
+                    ///**
+                    // * send push notification for sos request
+                    // */
+                    //var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where MasterId=' + insertResult[0].masterid;
+                    ////console.log(queryParameters);
+                    //st.db.query(queryParameters, function (err, iosResult) {
+                    //    if (iosResult) {
+                    //        iphoneID = iosResult[0].iphoneID;
+                    //    }
+                    //    else {
+                    //        iphoneID = '';
+                    //    }
+                    //
+                    //    var queryParams2 = 'select tid,GroupName from tmgroups where AdminId=' + insertResult[0].masterid;
+                    //    console.log(queryParams2);
+                    //    st.db.query(queryParams2, function (err, userDetails) {
+                    //        console.log(userDetails);
+                    //
+                    //        if (userDetails) {
+                    //            if (userDetails[0]) {
+                    //
+                    //                for (var i = 0; i < userDetails[0].length; i++) {
+                    //                    var receiverId = userDetails[0].tid;
+                    //                    var senderTitle = '';
+                    //                    var groupId = '';
+                    //                    var groupTitle = userDetails[0][0].groupname;
+                    //                    var messageText = '';
+                    //                    var messageType = 10;
+                    //                    var operationType = 0;
+                    //                    var iphoneId = iphoneID;
+                    //                    var messageId = '', msgUserid = '', masterid = '', prioritys = '';
+                    //                    var a_name = '', dateTime = '', latitude = '', longitude = '';
+                    //
+                    //                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                    //                }
+                    //            }
+                    //        }
+                    //
+                    //    });
+                    //
+                    //});
                 }
                 else {
                     responseMessage.message = 'Sos not Posted';
@@ -264,10 +275,9 @@ Sos.prototype.postSos = function(req,res,next) {
  */
 Sos.prototype.loadSosRequest = function(req,res,next) {
 
-
     var _this = this;
 
-    var msaterId = req.body.master_id;
+    var masterId = req.query.master_id;
 
     var responseMessage = {
         status: false,
@@ -278,9 +288,11 @@ Sos.prototype.loadSosRequest = function(req,res,next) {
 
     try {
 
-        var queryParams = st.db.escape(msaterId);
+        var queryParams = st.db.escape(masterId);
         var query = 'CALL pLoadSOSrequests(' + queryParams + ')';
+        console.log(query);
         st.db.query(query, function (err, getResult) {
+            console.log(getResult);
             if (!err) {
                 if (getResult) {
                     if (getResult[0]) {
@@ -310,6 +322,243 @@ Sos.prototype.loadSosRequest = function(req,res,next) {
                 };
                 res.status(500).json(responseMessage);
                 console.log('FnLoadSosRequest: error in saving Sos  :' + err);
+            }
+
+        });
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
+        console.log('Error : FnLoadSosRequest ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
+/**
+ * @todo FnUpdateSosRequest
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save sos
+ */
+Sos.prototype.updateSosRequest = function(req,res,next) {
+
+    var _this = this;
+
+    var id = req.body.id;    // tid
+    var token = req.body.token;
+    var iphoneID='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try {
+
+        var queryParams = st.db.escape(id) + ',' + st.db.escape(token);
+
+        var query = 'CALL pUpdateSOSstatus(' + queryParams + ')';
+        console.log(query);
+        st.db.query(query, function (err, updateResult) {
+            console.log(updateResult);
+            if (!err) {
+                if (updateResult) {
+                    responseMessage.status = true;
+                    responseMessage.error = null;
+                    responseMessage.message = 'SosRequest update successfully';
+                    res.status(200).json(responseMessage);
+                    console.log('FnUpdateSosRequest: SosRequest update successfully');
+
+                    /**
+                     * send push notification for sos request
+                     */
+
+                    var receiverId = updateResult[0][0].deviceid;
+                    var senderTitle = '';
+                    var groupId = '';
+                    var contact = updateResult[0][0].contactnu +','+ updateResult[0][0].name;
+                    var groupTitle = contact;
+                    var messageText = 'accepted by ';
+                    var messageType = 11;
+                    var operationType = 0;
+                    var iphoneId = iphoneID;
+                    var messageId = '', msgUserid = '', masterid = '', prioritys = '';
+                    var a_name = '', dateTime = '', latitude = '', longitude = '';
+
+                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                }
+                else {
+                    responseMessage.message = 'SosRequest not update';
+                    res.status(200).json(responseMessage);
+                    console.log('FnUpdateSosRequest:SosRequest not update');
+                }
+            }
+            else {
+                responseMessage.message = 'An error occured ! Please try again';
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                res.status(500).json(responseMessage);
+                console.log('FnUpdateSosRequest: error in saving SosRequest update  :' + err);
+            }
+
+        });
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
+        console.log('Error : FnUpdateSosRequest ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
+/**
+ * @todo FnSaveSosServiceProvider
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save sos
+ */
+Sos.prototype.saveSosServiceProvider = function(req,res,next) {
+
+    var _this = this;
+
+    var token = req.body.token;
+    var latitude = req.body.lat;
+    var longitude = req.body.lng;
+    var proximity = req.body.proximity;
+    var mobile = req.body.mobile;
+    var b1 = req.body.b1 ? req.body.b1 : 0;   // 0-unselect 1-select
+    var b2 = req.body.b2 ? req.body.b2 : 0;
+    var b3 = req.body.b3 ? req.body.b3 : 0;
+    var b4 = req.body.b4 ? req.body.b4 : 0;
+    var b5 = req.body.b5 ? req.body.b5 : 0;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try {
+
+        var queryParams = st.db.escape(token) + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude)
+            + ',' + st.db.escape(proximity)+ ',' + st.db.escape(mobile)+ ',' + st.db.escape(b1)+ ',' + st.db.escape(b2)
+            + ',' + st.db.escape(b3)+ ',' + st.db.escape(b4)+ ',' + st.db.escape(b5);
+
+        var query = 'CALL psaveSOSserviceprovider(' + queryParams + ')';
+        console.log(query);
+        st.db.query(query, function (err, insertResult) {
+            console.log(insertResult);
+            if (!err) {
+                if (insertResult) {
+                    responseMessage.status = true;
+                    responseMessage.error = null;
+                    responseMessage.message = 'Sos Service Provider saved successfully';
+                    res.status(200).json(responseMessage);
+                    console.log('FnSaveSosServiceProvider: Sos saved successfully');
+
+                }
+                else {
+                    responseMessage.message = 'Sos Service Provider not saved';
+                    res.status(200).json(responseMessage);
+                    console.log('FnSaveSosServiceProvider:Sos not saved');
+                }
+            }
+            else {
+                responseMessage.message = 'An error occured ! Please try again';
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                res.status(500).json(responseMessage);
+                console.log('FnSaveSosServiceProvider: error in saving Sos Service Provider  :' + err);
+            }
+
+        });
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
+        console.log('Error : FnSaveSosServiceProvider ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
+/**
+ * @todo FnGetSosServiceProvider
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for load sos
+ */
+Sos.prototype.getSosServiceProvider = function(req,res,next) {
+
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try {
+
+        var queryParams = st.db.escape(token);
+        var query = 'CALL pGetSOSserviceprovider(' + queryParams + ')';
+        console.log(query);
+        st.db.query(query, function (err, getResult) {
+            console.log(getResult);
+            if (!err) {
+                if (getResult) {
+                    if (getResult[0]) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.data = getResult[0];
+                        responseMessage.message = 'Sos Service Provider loaded successfully';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetSosServiceProvider: Sos Service Provider loaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'Sos Service Provider not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetSosServiceProvider:Sos Service Provider not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'Sos Service Provider not loaded';
+                    res.status(200).json(responseMessage);
+                    console.log('FnGetSosServiceProvider:Sos Service Provider not loaded');
+                }
+            }
+            else {
+                responseMessage.message = 'An error occured ! Please try again';
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                res.status(500).json(responseMessage);
+                console.log('FnGetSosServiceProvider: error in saving Sos Service Provider  :' + err);
             }
 
         });

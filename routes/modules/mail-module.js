@@ -201,7 +201,9 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
             var i = 1,name,LocID,verified, messageType = MessageContent.messageType;
             if (messageType == 0) {
                 console.log('-----SALES MAIL MODULE-----');
-                var query1 = 'select EZEID,FirstName,ifnull(LastName,"") as LastName,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(MessageContent.ezeid);
+                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(MessageContent.ezeid);
+                //console.log(query1);
+
                 st.db.query(query1, function (err, getResult) {
                     if (getResult) {
                         if (getResult[0]) {
@@ -209,31 +211,31 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                 console.log('individual user of sales....');
                                 if (getResult[0].EZEIDVerifiedID == 1) {
                                     verified = 'Not Verified';
-                                    console.log('FnSalesMail: not verified')
+                                    //console.log('FnSalesMail: not verified')
                                 }
                                 else {
                                     verified = 'Verified';
-                                    console.log('FnSalesMail: Verified');
+                                    //console.log('FnSalesMail: Verified');
                                 }
 
-                                name = getResult[0].FirstName + ' ' + getResult[0].LastName;
-                                console.log(name);
+                                var mail_query = 'Select EZEID,SalesMailID,CompanyName,FirstName,ifnull(LastName,"") as LastName from tmaster where EZEID=' +st.db.escape(MessageContent.toEzeid);
 
-                                var mail_query = 'Select EZEID,ifnull(EMailID,"") as EMailID from tlocations where MasterID=' + getResult[0].TID;
-
-                                console.log(mail_query);
+                                //console.log(mail_query);
 
                                 st.db.query(mail_query, function (err, get_result) {
                                     console.log(get_result);
                                     if (get_result) {
                                         if (get_result[0]) {
-                                            if (get_result[0].EMailID) {
+                                            if (get_result[0].SalesMailID) {
+
+                                                name = get_result[0].FirstName + ' ' + get_result[0].LastName;
+                                                //console.log(name);
 
                                                 var mailContent = {
                                                     type : 'sales',
                                                     fullname : name,
-                                                    email : get_result[0].EMailID,
-                                                    toEmail : get_result[0].EMailID,
+                                                    email : get_result[0].SalesMailID,
+                                                    toEmail : get_result[0].SalesMailID,
                                                     status : verified,
                                                     toEzeid: MessageContent.toEzeid,
                                                     ezeid: getResult[0].EZEID,
@@ -250,7 +252,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                             MessageType: MessageContent.messageType,
                                                             Priority: 3,
                                                             ToMailID: mailResult.to,
-                                                            Subject: mailResult.subject,
+                                                            Subject: 'Sales Enquiry',
                                                             Body: mailResult.html,
                                                             SentStatus: 1
                                                         };
@@ -303,7 +305,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
 
                                 name = getResult[0].FirstName + ' ' + getResult[0].LastName;
 
-                                var mail_query = 'Select EZEID,SalesMailID from tmaster where EZEID=' +st.db.escape(MessageContent.ezeid);
+                                var mail_query = 'Select EZEID,SalesMailID,CompanyName,FirstName,ifnull(LastName,"") as LastName from tmaster where EZEID=' +st.db.escape(MessageContent.toEzeid);
                                 st.db.query(mail_query, function (err, get_result) {
                                     console.log(mail_query);
                                     console.log(get_result);

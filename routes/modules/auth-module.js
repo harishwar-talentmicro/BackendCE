@@ -906,7 +906,6 @@ Auth.prototype.login = function(req,res,next){
                                                 RtnMessage.cvid = loginDetails[0].cvid;
                                                 RtnMessage.profile_status = loginDetails[0].ps;
 
-
                                                 console.log('FnLogin:tmaster: Login success');
                                                 if (isIphone == 1) {
                                                     var queryParams = st.db.escape(UserName) + ',' + st.db.escape(deviceToken);
