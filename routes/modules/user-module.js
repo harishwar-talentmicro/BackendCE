@@ -1920,16 +1920,17 @@ User.prototype.saveResume = function(req,res,next){
 
                                         //line of career skill matrix
                                         if (locMatrix.length) {
-                                            async.each(locMatrix, function iterator(locDetails, callback) {
+                                            for(var k=0; k < locMatrix.length; k++){
+                                                //async.each(locMatrix, function iterator(locDetails, callback) {
 
                                                 console.log('----LOC Matrix----');
                                                 count = count - 1;
                                                 var locSkills = {
-                                                    expertiseLevel: locDetails.expertiseLevel,
-                                                    exp: locDetails.exp,
+                                                    expertiseLevel: locMatrix[k].expertiseLevel,
+                                                    exp: locMatrix[k].exp,
                                                     cvid: InsertResult[0][0].ID,
-                                                    fid: locDetails.fid,
-                                                    careerId: locDetails.career_id
+                                                    fid: locMatrix[k].fid,
+                                                    careerId: locMatrix[k].career_id
                                                 };
 
 
@@ -1958,24 +1959,23 @@ User.prototype.saveResume = function(req,res,next){
                                                         console.log('FnupdateSkill: locMatrix:error in saving  skill matrix:' + err);
                                                     }
                                                 });
-                                            });
+                                            }
                                         }
 
                                         //educations
                                         if (educations.length) {
-                                            async.each(educations, function iterator(eduDetails, callback) {
+                                            for(var j=0; j < educations.length; j++){
+                                                //async.each(educations, function iterator(eduDetails, callback) {
 
-                                                count = count - 1;
-                                                var tid = eduDetails.tid;
                                                 var educationData = {
 
                                                     cvid: InsertResult[0][0].ID,
-                                                    eduId: eduDetails.edu_id,
-                                                    spcId: eduDetails.spc_id,
-                                                    score: eduDetails.score,
-                                                    yearofpassing: eduDetails.yp,
-                                                    level: eduDetails.expertiseLevel, // 0-ug, 1-pg
-                                                    instituteId : eduDetails.institute_id
+                                                    eduId: educations[j].edu_id,
+                                                    spcId: educations[j].spc_id,
+                                                    score: educations[j].score,
+                                                    yearofpassing: educations[j].yp,
+                                                    level: educations[j].expertiseLevel, // 0-ug, 1-pg
+                                                    instituteId : educations[j].institute_id
                                                 };
 
                                                 var queryParams = st.db.escape(educationData.cvid) + ',' + st.db.escape(educationData.eduId)
@@ -2004,7 +2004,7 @@ User.prototype.saveResume = function(req,res,next){
                                                     }
                                                 });
 
-                                            });
+                                            }
                                         }
                                     }
 
@@ -2213,7 +2213,7 @@ User.prototype.getSkills = function(req,res,next){
     try{
         var query = 'CALL PGetSkills(' + st.db.escape(functionId) + ',' + st.db.escape(type) + ')';
         st.db.query(query,function(err,result){
-           // console.log(result);
+            // console.log(result);
             if(err){
                 console.log('Error : FnPGetSkills ');
                 res.status(400).json(responseMsg);

@@ -441,6 +441,27 @@ Job.prototype.create = function(req,res,next){
                                         if (results[0]) {
                                             if (results[0][0]) {
                                                 console.log(results[0]);
+
+                                                var mIds = ' ';
+
+                                                for(var c=0; c < results[0].length; c++){
+                                                    var mIds = results[0][c].MasterID + ',' + mIds;
+                                                }
+                                                console.log(mIds);
+
+                                                var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
+
+                                                var jobQuery = 'CALL psavejobnotification(' + jobqueryParameters + ')';
+                                                console.log(jobQuery);
+                                                st.db.query(jobQuery, function (err, queryResult) {
+                                                    if (!err) {
+                                                        console.log('no error in psavejobnotification');
+                                                    }
+                                                    else {
+                                                        console.log('error in psavejobnotification');
+                                                    }
+                                                });
+
                                                 for (var i = 0; i < results[0].length; i++) {
                                                     userID = results[0][i].MasterID;
                                                     var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID)+ ',' + st.db.escape(0);
@@ -1064,7 +1085,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var job = function (m) {
 
             if (m < jobSkills.length) {
-                
+
                 var jskills = {
                     skillname: jobSkills[m].skillname,
                     expertiseLevel: jobSkills[m].expertiseLevel,
@@ -1106,7 +1127,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             //educations
             if (educations.length) {
                 for(var j=0; j < educations.length; j++){
-                //async.each(educations, function iterator(eduDetails, callback) {
+                    //async.each(educations, function iterator(eduDetails, callback) {
 
                     count = count - 1;
 
@@ -1143,7 +1164,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             //line of carrer
             if (locMatrix.length) {
                 for(var k=0; k < locMatrix.length; k++){
-                //async.each(locMatrix, function iterator(locDetails, callback) {
+                    //async.each(locMatrix, function iterator(locDetails, callback) {
 
                     count = count - 1;
 
