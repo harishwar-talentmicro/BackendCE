@@ -4212,12 +4212,6 @@ Job.prototype.loadLocDetailsSyllabus = function(req,res,next){
 
     var token = req.query.token;
     var locId = req.query.loc_id;
-    var type = 0;      // (1-employer,2-training)
-    var lat = req.query.lat ? req.query.lat : 0.00;
-    var lng = req.query.lng ? req.query.lng : 0.00;
-    var pageSize = req.query.page_size ? req.query.page_size : 100;
-    var pageCount = req.query.page_count ? req.query.page_count : 0;
-    var keyword = req.query.keyword ? req.query.keyword : '';
 
     var responseMessage = {
         status: false,
@@ -4243,9 +4237,9 @@ Job.prototype.loadLocDetailsSyllabus = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(locId) + ',' + st.db.escape(type)+ ',' + st.db.escape(lat)
-                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)
-                            + ',' + st.db.escape(keyword);
+                        var queryParams =   st.db.escape(locId) + ',' + st.db.escape(0)+ ',' + st.db.escape(0.00)
+                            + ',' + st.db.escape(0.00)+ ',' + st.db.escape(0)+ ',' + st.db.escape(0)
+                            + ',' + st.db.escape('');
                         var query = 'CALL pLoadLOCDetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {

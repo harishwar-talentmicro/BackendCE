@@ -1936,8 +1936,8 @@ User.prototype.saveResume = function(req,res,next){
 
                                                 var queryParams = st.db.escape(locSkills.fid)+ ',' + st.db.escape(locSkills.careerId)
                                                         + ',' + st.db.escape(locSkills.expertiseLevel)
-                                                        + ',' + st.db.escape(locSkills.exp) + ',' + st.db.escape(locSkills.cvid)
-                                                    ;
+                                                        + ',' + st.db.escape(locSkills.exp) + ',' + st.db.escape(locSkills.cvid);
+
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
                                                 console.log(query);
