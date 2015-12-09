@@ -825,8 +825,7 @@ Auth.prototype.login = function(req,res,next){
             isAddressSaved:'',
             isinstitute_admin : '',
             cvid : '',
-            profile_status:'',
-            isSOSManager:''
+            profile_status:''
 
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
@@ -906,8 +905,6 @@ Auth.prototype.login = function(req,res,next){
                                                 RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
                                                 RtnMessage.cvid = loginDetails[0].cvid;
                                                 RtnMessage.profile_status = loginDetails[0].ps;
-                                                RtnMessage.isSOSManager = loginDetails[0].isSOSManager;
-
 
                                                 console.log('FnLogin:tmaster: Login success');
                                                 if (isIphone == 1) {
@@ -985,7 +982,6 @@ Auth.prototype.login = function(req,res,next){
                                 RtnMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
                                 RtnMessage.group_id = loginDetails[0].group_id;
                                 RtnMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                RtnMessage.isSOSManager = loginDetails[0].isSOSManager;
 
                                 console.log('FnLogin:tmaster: Login success');
                                 if (isIphone == 1) {

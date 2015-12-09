@@ -365,7 +365,7 @@ router.post('/sos_post_request',sosModule.postSos);
 router.get('/sos_request',sosModule.loadSosRequest);
 router.post('/sos_update_request',sosModule.updateSosRequest);
 router.post('/sos_service_provider',sosModule.saveSosServiceProvider);
-router.get('/sos_service_request',sosModule.getSosServiceProvider);
+router.get('/sos_service_provider',sosModule.getSosServiceProvider);
 
 
 //EZEIDAP Methods

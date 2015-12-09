@@ -88,7 +88,7 @@ Job.prototype.create = function(req,res,next){
         skillMatrix1=[];
     }
 
-    var jobID,m= 0,jobtype,masterid='',gid,receiverId,toid=[],senderTitle,groupTitle,groupId,messageText;
+    var jobID,m= 0,jobtype,receiverId,senderTitle,groupTitle,groupId,messageText;
     var messageType,operationType,iphoneId,messageId,userID;
 
     var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
@@ -493,9 +493,8 @@ Job.prototype.create = function(req,res,next){
                                                                                                         operationType = 0;
                                                                                                         iphoneId = iphoneID;
                                                                                                         messageId = 0;
-                                                                                                        masterid = '';
-                                                                                                        var latitude = '', longitude = '',prioritys ='', dateTime = '';
-                                                                                                        var msgUserid = '', a_name = '';
+                                                                                                        var masterid = 0,latitude = '', longitude = '',prioritys ='', dateTime = '';
+                                                                                                        var msgUserid = 0, a_name = '';
                                                                                                         var jid = jobID;
                                                                                                         //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                         notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude, prioritys, dateTime, a_name, msgUserid,jid);
@@ -1015,6 +1014,8 @@ Job.prototype.searchJobs = function(req,res,next){
  */
 Job.prototype.searchJobSeekers = function(req,res) {
 
+    console.log('----------job seeker search-----');
+
     try {
         var keyword = req.body.keyword ? req.body.keyword : '';
         var jobType = req.body.job_type;
@@ -1057,21 +1058,24 @@ Job.prototype.searchJobSeekers = function(req,res) {
             data: null
         };
 
-        var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ', jobSkillMatrix = ' ';
+        var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
 
 
-        var job = function (i) {
+        var job = function (m) {
+
             if (m < jobSkills.length) {
+                
                 var jskills = {
                     skillname: jobSkills[m].skillname,
                     expertiseLevel: jobSkills[m].expertiseLevel,
                     exp_from: jobSkills[m].exp_from,
                     exp_to: jobSkills[m].exp_to,
-                    active_status: jobSkills[m].active_status
+                    active_status: jobSkills[m].active_status,
+                    fid : jobSkills[m].fid,
+                    type : jobSkills[m].type
                 };
 
-
-                FnSkills(jskills, function (err, idResult) {
+                FnSaveSkills(jskills, function (err, idResult) {
 
                     if (skillMatrix == ' ') {
 
@@ -1101,15 +1105,16 @@ Job.prototype.searchJobSeekers = function(req,res) {
             var skillArray = skillMatrix;
             //educations
             if (educations.length) {
-                async.each(educations, function iterator(eduDetails, callback) {
+                for(var j=0; j < educations.length; j++){
+                //async.each(educations, function iterator(eduDetails, callback) {
 
                     count = count - 1;
 
                     var eduSkills = {
-                        education: eduDetails.edu_id,
-                        spc: eduDetails.spc_id,
-                        score_from: eduDetails.score_from,
-                        score_to: eduDetails.score_to
+                        education: educations[j].edu_id,
+                        spc: educations[j].spc_id,
+                        score_from: educations[j].score_from,
+                        score_to: educations[j].score_to
 
                     };
 
@@ -1125,7 +1130,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
                             'AND c.Score>=' + eduSkills.score_from + ' AND c.Score<=' + eduSkills.score_to + ')';
                     }
 
-                });
+                }
 
                 if (eduMatrix != ' ') {
                     educationMatrix = ' and ( ' + eduMatrix + ')';
@@ -1137,16 +1142,17 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
             //line of carrer
             if (locMatrix.length) {
-                async.each(locMatrix, function iterator(locDetails, callback) {
+                for(var k=0; k < locMatrix.length; k++){
+                //async.each(locMatrix, function iterator(locDetails, callback) {
 
                     count = count - 1;
 
                     var locSkills = {
-                        fid: locDetails.fid,
-                        locIds: locDetails.career_id,
-                        exp_from: locDetails.exp_from,
-                        exp_to: locDetails.exp_to,
-                        level: locDetails.expertiseLevel
+                        fid: locMatrix[k].fid,
+                        locIds: locMatrix[k].career_id,
+                        exp_from: locMatrix[k].exp_from,
+                        exp_to: locMatrix[k].exp_to,
+                        level: locMatrix[k].expertiseLevel
 
                     };
 
@@ -1165,7 +1171,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
                             'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
                     }
 
-                });
+                }
 
                 if (loc != ' ') {
                     lineofcarrer = ' and ( ' + loc + ')';
@@ -1251,9 +1257,10 @@ Job.prototype.searchJobSeekers = function(req,res) {
         };
 
 
-        if (jobSkills.length) {
+        if (jobSkills) {
             var m = 0;
             job(m);
+
         }
         else
         {
@@ -1276,38 +1283,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
     }
 
 };
-
-function FnSkills(jskills, CallBack) {
-    var _this = this;
-    try {
-        if (jskills) {
-
-            var RtnResponse = {
-                SkillID: 0
-            };
-            RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
-
-            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(jskills.skillname), function (err, SkillResult) {
-                if ((!err)) {
-                    if (SkillResult[0]) {
-                        RtnResponse.SkillID = SkillResult[0].SkillID;
-                        //console.log(RtnResponse.SkillID);
-                        CallBack(null, RtnResponse);
-                    }
-                }
-            });
-        }
-    }
-    catch (ex) {
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log('FnJobSkills error:' + ex.description);
-        console.log(ex);
-    }
-};
-
-
-
 
 /**
  * @todo FnApplyJob
