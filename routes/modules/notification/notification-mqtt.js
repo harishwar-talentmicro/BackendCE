@@ -142,6 +142,19 @@ NotificationMqtt.prototype.checkQueue = function(topic,callback){
     );
 };
 
+NotificationMqtt.prototype.createQueue = function(topic,callback){
+    amqpConn.queue(
+        topic,
+        { passive : false,durable : true,exclusive : false,autoDelete : false},
+        function(queRef){
+            var exchange = amqpConn.exchange();
+            if(callback){
+                callback();
+            }
+        }
+    );
+};
+
 NotificationMqtt.prototype.publish = function(topic,messagePayload){
 
     var validationFlag = true;
