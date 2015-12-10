@@ -117,10 +117,10 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                                                                 var t = now.toUTCString();
                                                                 var datetime = t.split(',');
                                                                 datetime = datetime[1];
-                                                                var latitude = '', longitude = '';
+                                                                var latitude = 0.00, longitude = 0.00,jobId=0;
                                                                 //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                 //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid,a_url);
+                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid,jobId,a_url);
                                                                 RtnMessage.status = true;
                                                                 callBack(null, RtnMessage);
                                                             }
