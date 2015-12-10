@@ -1318,6 +1318,7 @@ Job.prototype.applyJob = function(req,res,next){
 
     var token = req.body.token;
     var jobId = req.body.job_id;
+    var status = (!isNaN(parseInt(req.body.status))) ?  parseInt(req.body.status) : 3;   // 1-accepted, 2-reject, 3-applied
 
     var responseMessage = {
         status: false,
@@ -1346,7 +1347,7 @@ Job.prototype.applyJob = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(jobId) + ',' + st.db.escape(token);
+                        var query = st.db.escape(jobId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status);
                         //console.log('CALL pApplyjob(' + query + ')');
                         st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
                             if (!err) {
