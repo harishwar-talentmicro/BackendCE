@@ -3713,7 +3713,7 @@ Job.prototype.saveLocMap = function(req,res,next){
                 if (!err) {
                     if (result) {
 
-                        var queryParams1 = st.db.escape(req.body.tids) + ',' + st.db.escape(token) + ',' + st.db.escape(req.body.intype);
+                        var queryParams1 = st.db.escape(req.body.tids) + ',' + st.db.escape(token) + ',' + st.db.escape(req.body.type);
                         var query1 = 'CALL pdeletelocmap(' + queryParams1 + ')';
                         console.log(query1);
                         st.db.query(query1, function (err, deleteResult) {
