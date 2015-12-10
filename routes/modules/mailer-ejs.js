@@ -100,24 +100,39 @@ HussMailer.prototype.sendMail = function(mailContent, CallBack){
     console.log('-----HUSS MAILER OF EJS-----');
 
     var _this = this;
-
-    //console.log(mailContent);
-
+    console.log(mailContent);
     var type = (mailContent.type) ? mailContent.type : '';
     var subject = '';
     var receiverEmail = mailContent.toEmail;
+    var name = mailContent.fullname ? mailContent.fullname : '';
     var message = mailContent.message ? mailContent.message : '';
-    var parameters = {
-        EMAIL : mailContent.email,
-        FULLNAME : mailContent.fullname,
-        EZEOne : mailContent.ezeid, // from ezeid
-        STATUS : mailContent.status,
-        MESSAGE : message,
-        EZEOneID : mailContent.toEzeid, // to ezeid
-        FUNCTION : mailContent.function,
-        KEYSKILLS : mailContent.keyskills,
-        URL : mailContent.url
-    };
+    var email = (mailContent.email) ? (mailContent.email) : '';
+    var status = (mailContent.status) ? (mailContent.status) : '';
+    var ezeid = (mailContent.ezeid) ? (mailContent.ezeid) : '';
+    var toEzeid = (mailContent.toEzeid) ? (mailContent.toEzeid) : '';
+    var functions = (mailContent.function) ? (mailContent.function) : '';
+    var keyskills = (mailContent.keyskills) ? (mailContent.keyskills) : '';
+    var url = (mailContent.url) ? (mailContent.url) : '';
+
+    if (mailContent.type == 'sales') {
+        var parameters = {
+            EMAIL: email,
+            FULLNAME: name,
+            EZEOne: ezeid, // from ezeid
+            STATUS: status,
+            MESSAGE: message,
+            EZEOneID: toEzeid, // to ezeid
+            FUNCTION: functions,
+            KEYSKILLS: keyskills,
+            URL: url
+        };
+    }
+    else if (mailContent.type == 'register') {
+        var parameters = {
+            FULLNAME: name,
+            EZEOneID: ezeid
+        };
+    }
 
     /**
      * @todo
@@ -140,6 +155,8 @@ HussMailer.prototype.sendMail = function(mailContent, CallBack){
 
     if(template){
         if(template.params){
+
+
             var vFlag = true;
             var vErrors = [];
             for(var i=0; i < template.params.length; i++){

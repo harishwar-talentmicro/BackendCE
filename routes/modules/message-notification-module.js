@@ -111,15 +111,16 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                                                                 msgUserid = MsgContent.message_userid;
                                                                 masterid = groupDetails[0][0].AdminID;
                                                                 prioritys = MsgContent.priority;
+                                                                var a_url = MsgContent.attachment;
                                                                 var a_name = MsgContent.attachmentFilename;
                                                                 var now = new Date();
                                                                 var t = now.toUTCString();
                                                                 var datetime = t.split(',');
                                                                 datetime = datetime[1];
-                                                                var latitude = '', longitude = '';
+                                                                var latitude = 0.00, longitude = 0.00,jobId=0;
                                                                 //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                 //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid,jobId,a_url);
                                                                 RtnMessage.status = true;
                                                                 callBack(null, RtnMessage);
                                                             }

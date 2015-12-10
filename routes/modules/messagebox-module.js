@@ -1183,7 +1183,45 @@ function FnBussinessChat(params, callback) {
 
     }
 };
+var uploadDocumentToCloud = function(uniqueName,bufferData,callback){
 
+
+    console.log('uploading to cloud...');
+    var a_url, randomName, output;
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    var bufferStream = new BufferStream(bufferData);
+    bufferStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function(){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                callback(null);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function(err){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                console.log(err);
+                callback(err);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+};
 /**
  * @todo FnComposeMessage
  * Method : POST
@@ -1276,7 +1314,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                         };
                         var compose = function() {
 
-                            /*if (req.body.attachment) {
+                            if (req.body.attachment) {
 
                                 var uniqueId = uuid.v4();
                                 var filetype = (req.body.attachment_filename).split('.');
@@ -1303,9 +1341,9 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                             }
                         };
 
-                        var composeMessage = function(randomName) {*/
+                        var composeMessage = function(randomName) {
 
-                            var queryParams = st.db.escape(message) + ',' + st.db.escape(attachment) + ',' + st.db.escape(attachmentFilename)
+                            var queryParams = st.db.escape(message) + ',' + st.db.escape(randomName) + ',' + st.db.escape(attachmentFilename)
                                 + ',' + st.db.escape(priority) + ',' + st.db.escape(targetDate) + ',' + st.db.escape(expiryDate)
                                 + ',' + st.db.escape(token) + ',' + st.db.escape(previousMessageID) + ',' + st.db.escape(toID)
                                 + ',' + st.db.escape(idType) + ',' + st.db.escape(mimeType) + ',' + st.db.escape(isJobseeker)
@@ -1332,8 +1370,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             token: req.body.token,
                                             previousMessageID: req.body.previous_messageID,
                                             toID: req.body.to_id,
-                                            idType: req.body.id_type
-                                            //s_url: (randomName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName) : ''
+                                            idType: req.body.id_type,
+                                            s_url: (randomName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName) : ''
 
                                         };
                                         res.status(200).json(responseMessage);
@@ -1345,7 +1383,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             message_id: insertResult[0][0].messageids,
                                             message_userid: insertResult[0][0].mesguserid,
                                             message  : req.body.message ? req.body.message : '',
-                                            attachment  : req.body.attachment ? req.body.attachment : '',
+                                            attachment  : (randomName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName) : '',
                                             attachmentFilename  : req.body.attachment_filename ? req.body.attachment_filename : '',
                                             token : req.body.token,
                                             toID : req.body.to_id,
@@ -2512,6 +2550,9 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Messages loaded successfully';
+                                            for(var ct = 0; ct < getResult[1].length; ct++){
+                                                getResult[1][ct].Attachment = (getResult[1][ct].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].Attachment) :'';
+                                            }
                                             responseMessage.data = {
                                                 group_details: getResult[0],
                                                 messages: getResult[1]
@@ -2538,6 +2579,9 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             }
                                             //responseMessage.data = getResult[0];
                                             //console.log(getResult[0]);
+                                            for(var ct = 0; ct < getResult[0].length; ct++){
+                                                getResult[0][ct].Attachment = (getResult[0][ct].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][ct].Attachment) :'';
+                                            }
                                             responseMessage.data = {
                                                 group_details: [],
                                                 messages: getResult[0]
@@ -2786,6 +2830,7 @@ MessageBox.prototype.getMessageAttachment = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Message attachement loaded successfully';
+                                            getResult[0][0].Attachment = (getResult[0][0].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].Attachment) :'';
                                             responseMessage.data = getResult[0][0];
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetMessageAttachment: Message attachement loaded successfully');
@@ -3484,22 +3529,33 @@ MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
                         var query = 'CALL pGetlatestmessagesofGroup(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
+                            //console.log(getResult);
+                            //console.log(getResult[0].length);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Message loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetLastMsgOfGroup: Message loaded successfully');
+                                        if (getResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Message loaded successfully';
+                                            for (var i = 0; i < getResult[0].length; i++) {
+                                                getResult[0][i].Attachment = (getResult[0][i].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].Attachment) :'';
+                                            }
+                                            responseMessage.data = getResult[0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetLastMsgOfGroup: Message loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Message not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetLastMsgOfGroup:Message not loaded');
+                                        }
                                     }
                                     else {
-                                        responseMessage.message = 'Message not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetLastMsgOfGroup:Message not loaded');
-                                    }
+                                            responseMessage.message = 'Message not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetLastMsgOfGroup:Message not loaded');
+                                        }
 
                                 }
                                 else {
