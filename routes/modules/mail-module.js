@@ -754,4 +754,61 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
     }
 };
 
+Mail.prototype.sendRegMail= function(mailContent, CallBack) {
+    var _this = this;
+
+    console.log('-----REGISTERATION MAIL MODULE-----');
+    try {
+
+        if (mailContent) {
+            var RtnMessage = {
+                status: false
+            };
+            var fs = require('fs');
+            hussMailer.sendMail(mailContent, function (err, mailResult) {
+                if (!err) {
+
+                    if (mailResult) {
+                        console.log(mailResult);
+
+                        var post = {
+                            MessageType: 8,
+                            Priority: 3,
+                            ToMailID: mailResult.to,
+                            Subject: mailResult.subject,
+                            Body: mailResult.html,
+                            SentStatus: 1
+                        };
+
+                        var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, mailboxResult) {
+
+                            if (!err) {
+                                console.log('FnMessageMail: Mail send Successfully');
+                                RtnMessage.status = true;
+                                CallBack(null, RtnMessage);
+
+                            }
+                            else {
+                                console.log('FnMessageMail: Mail not send');
+                                CallBack(null, RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnSendMail: error getting from mailResult ');
+                        CallBack(null, RtnMessage);
+                    }
+                }
+            });
+        }
+    }
+    catch (ex) {
+        console.log('OTP FnMessageMail Catch error:' + ex.description);
+        CallBack(null, null);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
 module.exports = Mail;

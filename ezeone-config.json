@@ -36,11 +36,11 @@
     "TEMPLATES": {
       "register": {
         "params": [
-          "EMAIL",
-          "FULLNAME"
+          "FULLNAME",
+          "EZEOneID"
         ],
-        "file": "ejsmail.html",
-        "subject": "Registeration"
+        "file": "registration.html",
+        "subject": "Welcome to EZEOneID"
       },
       "sales": {
         "params": [

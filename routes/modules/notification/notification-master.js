@@ -30,8 +30,8 @@ function Notification(db,stdLib){
  * @param latitude (latitude of location)
  * @param longitude (longitude of location)
 _ */
-Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,
-                                          messageType,operationType,iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobID){
+Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId,
+                                          messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl){
 
     console.log('It is coming to publish block of Notification');
     var validationStatus = true;
@@ -65,13 +65,13 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
         error.operationType = "Error parameter 5 : \""+messageType + "\"";
     }
     if(!masterId){
-        masterId = "";
+        masterId = 0;
     }
     if(!latitude){
-        latitude = "";
+        latitude = 0.00;
     }
     if(!longitude){
-        longitude = "";
+        longitude = 0.00;
     }
     if(!priority){
         priority = "";
@@ -83,10 +83,13 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
         a_name = "";
     }
     if(!msgUserid){
-        msgUserid = "";
+        msgUserid = 0;
     }
-    if(!jobID){
-        jobID = "";
+    if(!jobId){
+        jobId = 0;
+    }
+    if(!aUrl){
+        aUrl = '';
     }
 
 
@@ -110,7 +113,8 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             date_time : dateTime,
             a_filename : a_name,
             msgUserid : msgUserid,
-            job_id : jobID
+            job_id : jobId,
+            a_url : aUrl
         };
         console.log(messagePayload);
         console.log('Actual receiver Id : '+receiverId);

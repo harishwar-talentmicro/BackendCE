@@ -1383,7 +1383,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             message_id: insertResult[0][0].messageids,
                                             message_userid: insertResult[0][0].mesguserid,
                                             message  : req.body.message ? req.body.message : '',
-                                            attachment  : req.body.attachment ? req.body.attachment : '',
+                                            attachment  : (randomName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName) : '',
                                             attachmentFilename  : req.body.attachment_filename ? req.body.attachment_filename : '',
                                             token : req.body.token,
                                             toID : req.body.to_id,
@@ -2550,6 +2550,9 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Messages loaded successfully';
+                                            for(var ct = 0; ct < getResult[1].length; ct++){
+                                                getResult[1][ct].Attachment = (getResult[1][ct].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].Attachment) :'';
+                                            }
                                             responseMessage.data = {
                                                 group_details: getResult[0],
                                                 messages: getResult[1]
@@ -2576,6 +2579,9 @@ MessageBox.prototype.loadMessages = function(req,res,next){
                                             }
                                             //responseMessage.data = getResult[0];
                                             //console.log(getResult[0]);
+                                            for(var ct = 0; ct < getResult[0].length; ct++){
+                                                getResult[0][ct].Attachment = (getResult[0][ct].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][ct].Attachment) :'';
+                                            }
                                             responseMessage.data = {
                                                 group_details: [],
                                                 messages: getResult[0]

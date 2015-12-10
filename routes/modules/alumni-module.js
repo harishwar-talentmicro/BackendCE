@@ -103,12 +103,16 @@ var NotificationMqtt = require('./notification/notification-mqtt.js');
 var notificationMqtt = new NotificationMqtt();
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notificationQmManager = null;
+var mailModule = require('./mail-module.js');
+var mail = null;
+
 
 var st = null;
 function Alumni(db,stdLib){
     if(stdLib){
         st = stdLib;
         notificationQmManager = new NotificationQueryManager(db,st);
+        mail = new mailModule(db,stdLib);
     }
 }
 
@@ -380,56 +384,62 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                                 });
                                             }
                                             if (EMailID != '' && EMailID != null) {
-                                                var fs = require('fs');
-                                                var path = require('path');
-                                                var file = path.join(__dirname,'../../mail/templates/registration.html');
 
-                                                fs.readFile(file, "utf8", function (err, data) {
+                                                if (FirstName && LastName) {
+                                                    var name = FirstName + ' ' + LastName;
+                                                }
+                                                else {
+                                                    var name = FirstName;
+                                                }
 
-                                                    if (err) throw err;
-                                                    data = data.replace("[Firstname]", FirstName);
-                                                    data = data.replace("[Lastname]", LastName);
-                                                    data = data.replace("[EZEOneID]", EZEID);
-                                                    var mailOptions = {
-                                                        from: 'noreply@ezeone.com',
-                                                        to: EMailID,
-                                                        subject: 'Welcome to EZEOneID',
-                                                        html: data // html body
-                                                    };
-                                                    //console.log('Mail Option:' + mailOptions);
-                                                    // send mail with defined transport object
-                                                    var post = { MessageType: 8, Priority: 3,ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html,SentbyMasterID:RegResult[0].TID };
-                                                    // console.log(post);
-                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                        // Neat!
-                                                        if (!err) {
-                                                            console.log('FnRegistration: Mail saved Successfully');
+                                                var mailContent = {
+                                                    type: 'register',
+                                                    fullname: name,
+                                                    ezeid: EZEID,
+                                                    toEmail: EMailID
+
+                                                };
+
+                                                mail.sendRegMail(mailContent, function (err, statusResult) {
+                                                    if (!err) {
+                                                        if (statusResult) {
+                                                            if (statusResult.status == true) {
+                                                                console.log('FnSendMail: Mail Sent Successfully');
+                                                                //res.send(RtnMessage);
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail: Mail not Sent...1');
+                                                                //res.send(RtnMessage);
+                                                            }
                                                         }
                                                         else {
-                                                            console.log('FnRegistration: Mail not Saved Successfully' + err);
-
+                                                            console.log('FnSendMail: Mail not Sent..2');
+                                                            //res.send(RtnMessage);
                                                         }
-                                                        if (Operation == 'I') {
-                                                            var ip =  req.headers['x-forwarded-for'] ||
-                                                                req.connection.remoteAddress ||
-                                                                req.socket.remoteAddress ||
-                                                                req.connection.socket.remoteAddress;
-                                                            var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-
-                                                            st.generateToken(ip,userAgent,EZEID,function(err,token){
-                                                                if(err){
-                                                                    console.log('FnRegistrationAlumni: Token Generation Error' + err);
-                                                                }
-                                                                else{
-                                                                    RtnMessage.Token = token;
-                                                                }
-                                                                res.send(RtnMessage);
-                                                            });
-                                                        }
-
-
-                                                    });
+                                                    }
+                                                    else {
+                                                        console.log('FnSendMail:Error in sending mails' + err);
+                                                        //res.send(RtnMessage);
+                                                    }
                                                 });
+
+                                                if (Operation == 'I') {
+                                                    var ip = req.headers['x-forwarded-for'] ||
+                                                        req.connection.remoteAddress ||
+                                                        req.socket.remoteAddress ||
+                                                        req.connection.socket.remoteAddress;
+                                                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                                                    st.generateToken(ip, userAgent, EZEID, function (err, token) {
+                                                        if (err) {
+                                                            console.log('FnRegistrationAlumni: Token Generation Error' + err);
+                                                        }
+                                                        else {
+                                                            RtnMessage.Token = token;
+                                                        }
+                                                        res.send(RtnMessage);
+                                                    });
+                                                }
                                             }
                                             else {
                                                 console.log('FnRegistrationAlumni: tmaster: registration success but email is empty so mail not sent');
@@ -552,52 +562,58 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                             console.log('FnRegistrationAlumni:tmaster: Registration success');
                                             //res.send(RtnMessage);
                                             if (EMailID != '' || EMailID != null) {
-                                                var fs = require('fs');
-                                                var path = require('path');
-                                                var file = path.join(__dirname,'../../mail/templates/registration.html');
+                                                if (FirstName && LastName) {
+                                                    var name = FirstName + ' ' + LastName;
+                                                }
+                                                else {
+                                                    var name = FirstName;
+                                                }
 
-                                                fs.readFile(file, "utf8", function (err, data) {
-                                                    if (err) throw err;
-                                                    data = data.replace("[Firstname]", FirstName);
-                                                    data = data.replace("[Lastname]", LastName);
-                                                    data = data.replace("[EZEOneID]", EZEID);
+                                                var mailContent = {
+                                                    type: 'register',
+                                                    fullname: name,
+                                                    ezeid: EZEID,
+                                                    toEmail: EMailID
 
-                                                    var mailOptions = {
-                                                        from: 'noreply@ezeone.com',
-                                                        to: EMailID,
-                                                        subject: 'Welcome to EZEOneID',
-                                                        html: data // html body
-                                                    };
-                                                    //console.log('Mail Option:' + mailOptions);
-                                                    // send mail with defined transport object
-                                                    var post = { MessageType: 8, Priority: 3, ToMailID: mailOptions.to, Subject: mailOptions.subject, Body: mailOptions.html, SentbyMasterID:RegResult[0].TID };
-                                                    // console.log(post);
-                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                        // Neat!
-                                                        if (!err) {
-                                                            console.log('FnRegistrationAlumni: Mail saved Successfully');
-                                                        }
-                                                        else {
-                                                            console.log('FnRegistrationAlumni: Mail not Saved Successfully' + err);
-                                                        }
+                                                };
 
-                                                        var ip =  req.headers['x-forwarded-for'] ||
-                                                            req.connection.remoteAddress ||
-                                                            req.socket.remoteAddress ||
-                                                            req.connection.socket.remoteAddress;
-                                                        var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-
-                                                        st.generateToken(ip,userAgent,EZEID,function(err,token) {
-                                                            if (err) {
-                                                                console.log('FnRegistrationAlumni: Token Generation Error' + err);
+                                                mail.sendRegMail(mailContent, function (err, statusResult) {
+                                                    if (!err) {
+                                                        if (statusResult) {
+                                                            if (statusResult.status == true) {
+                                                                console.log('FnSendMail: Mail Sent Successfully');
+                                                                //res.send(RtnMessage);
                                                             }
                                                             else {
-                                                                RtnMessage.Token = token;
+                                                                console.log('FnSendMail: Mail not Sent...1');
+                                                                //res.send(RtnMessage);
                                                             }
-                                                            res.send(RtnMessage);
-                                                        });
+                                                        }
+                                                        else {
+                                                            console.log('FnSendMail: Mail not Sent..2');
+                                                            //res.send(RtnMessage);
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSendMail:Error in sending mails' + err);
+                                                        //res.send(RtnMessage);
+                                                    }
+                                                });
 
-                                                    });
+                                                var ip =  req.headers['x-forwarded-for'] ||
+                                                    req.connection.remoteAddress ||
+                                                    req.socket.remoteAddress ||
+                                                    req.connection.socket.remoteAddress;
+                                                var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                                                st.generateToken(ip,userAgent,EZEID,function(err,token) {
+                                                    if (err) {
+                                                        console.log('FnRegistrationAlumni: Token Generation Error' + err);
+                                                    }
+                                                    else {
+                                                        RtnMessage.Token = token;
+                                                    }
+                                                    res.send(RtnMessage);
                                                 });
                                             }
                                             else {
