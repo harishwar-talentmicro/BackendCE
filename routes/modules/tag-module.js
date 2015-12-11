@@ -961,7 +961,7 @@ Tag.prototype.getStandardTags = function(req,res,next){
                                         result.tag = getresult[0][i].tag;
                                         result.imagefilename = getresult[0][i].imagefilename;
                                         result.s_url = (getresult[0][i].imageurl) ?
-                                            getresult[0][i].path :
+                                            getresult[0][i].imagefilename :
                                         req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].path;
                                         output.push(result);
                                     }
