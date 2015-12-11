@@ -104,15 +104,21 @@ Sos.prototype.saveSos = function(req,res,next) {
                                     if (userDetails[0]) {
 
                                         var receiverId = userDetails[0].tid;
-                                        var senderTitle = '';
+                                        var senderTitle = {
+                                            b1 : req.body.b1 ? req.body.b1 : 0,
+                                            b2 : req.body.b2 ? req.body.b2 : 0,
+                                            b3 : req.body.b3 ? req.body.b3 : 0,
+                                            b4 : req.body.b4 ? req.body.b4 : 0,
+                                            b5 : req.body.b5 ? req.body.b5 : 0
+                                        };
                                         var groupId = '';
                                         var groupTitle = userDetails[0].GroupName;
-                                        var messageText = 'thsrgasgstga';
+                                        var messageText = 'sos request';
                                         var messageType = 10;
                                         var operationType = 0;
                                         var iphoneId = iphoneID;
                                         var messageId = '', msgUserid = '', masterid = '', prioritys = '';
-                                        var a_name = '', dateTime = '', latitude = '', longitude = '';
+                                        var a_name = '', dateTime = '', latitude = req.body.lat, longitude = req.body.lng;
                                         //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
                                         notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
                                     }
@@ -193,48 +199,6 @@ Sos.prototype.postSos = function(req,res,next) {
                     responseMessage.message = 'Sos Posted successfully';
                     res.status(200).json(responseMessage);
                     console.log('FnPostSosRequest: Sos Posted successfully');
-
-                    ///**
-                    // * send push notification for sos request
-                    // */
-                    //var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where MasterId=' + insertResult[0].masterid;
-                    ////console.log(queryParameters);
-                    //st.db.query(queryParameters, function (err, iosResult) {
-                    //    if (iosResult) {
-                    //        iphoneID = iosResult[0].iphoneID;
-                    //    }
-                    //    else {
-                    //        iphoneID = '';
-                    //    }
-                    //
-                    //    var queryParams2 = 'select tid,GroupName from tmgroups where AdminId=' + insertResult[0].masterid;
-                    //    console.log(queryParams2);
-                    //    st.db.query(queryParams2, function (err, userDetails) {
-                    //        console.log(userDetails);
-                    //
-                    //        if (userDetails) {
-                    //            if (userDetails[0]) {
-                    //
-                    //                for (var i = 0; i < userDetails[0].length; i++) {
-                    //                    var receiverId = userDetails[0].tid;
-                    //                    var senderTitle = '';
-                    //                    var groupId = '';
-                    //                    var groupTitle = userDetails[0][0].groupname;
-                    //                    var messageText = '';
-                    //                    var messageType = 10;
-                    //                    var operationType = 0;
-                    //                    var iphoneId = iphoneID;
-                    //                    var messageId = '', msgUserid = '', masterid = '', prioritys = '';
-                    //                    var a_name = '', dateTime = '', latitude = '', longitude = '';
-                    //
-                    //                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
-                    //                }
-                    //            }
-                    //        }
-                    //
-                    //    });
-                    //
-                    //});
                 }
                 else {
                     responseMessage.message = 'Sos not Posted';
@@ -292,7 +256,7 @@ Sos.prototype.loadSosRequest = function(req,res,next) {
         var query = 'CALL pLoadSOSrequests(' + queryParams + ')';
         console.log(query);
         st.db.query(query, function (err, getResult) {
-            console.log(getResult);
+            //console.log(getResult);
             if (!err) {
                 if (getResult) {
                     if (getResult[0]) {
@@ -368,7 +332,7 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
         var query = 'CALL pUpdateSOSstatus(' + queryParams + ')';
         console.log(query);
         st.db.query(query, function (err, updateResult) {
-            console.log(updateResult);
+            //console.log(updateResult);
             if (!err) {
                 if (updateResult) {
                     responseMessage.status = true;
@@ -463,7 +427,7 @@ Sos.prototype.saveSosServiceProvider = function(req,res,next) {
         var query = 'CALL psaveSOSserviceprovider(' + queryParams + ')';
         console.log(query);
         st.db.query(query, function (err, insertResult) {
-            console.log(insertResult);
+            //console.log(insertResult);
             if (!err) {
                 if (insertResult) {
                     responseMessage.status = true;
@@ -529,7 +493,7 @@ Sos.prototype.getSosServiceProvider = function(req,res,next) {
         var query = 'CALL pGetSOSserviceprovider(' + queryParams + ')';
         console.log(query);
         st.db.query(query, function (err, getResult) {
-            console.log(getResult);
+            //console.log(getResult);
             if (!err) {
                 if (getResult) {
                     if (getResult[0]) {

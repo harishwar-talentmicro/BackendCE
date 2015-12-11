@@ -271,6 +271,7 @@ router.get('/message_fullview_new',messageBox.viewMessageNew);
 router.put('/change_group_admin',messageBox.changeGroupAdmin);
 router.put('/change_task_status',messageBox.updateTaskStatus);
 router.get('/chat',messageBox.getLastMsgOfGroup);
+router.post('/forward_message',messageBox.forwardMessage);
 
 //Planner module
 var Planner = require('./modules/planner-module.js');
@@ -282,6 +283,7 @@ router.get('/ewtGetTransaction',plannerModule.getTrans);
 var Alumni = require('./modules/alumni-module.js');
 var alumniModule = new Alumni(db,stdLib);
 router.post('/alumni_content',alumniModule.saveAlumniContent);
+router.post('/alumni_profile_pic',alumniModule.saveAlumniProfilePic);
 router.post('/alumni_team',alumniModule.saveAlumniTeam);
 router.get('/alumni_content',alumniModule.getAlumniContent);
 router.get('/alumni_team',alumniModule.getAlumniTeam);
@@ -318,6 +320,7 @@ router.get('/contact_list',alumniModule.getClientContacts);
 router.get('/job_list',alumniModule.getAll);
 router.post('/add_job',alumniModule.create);
 router.get('/view_job',alumniModule.viewJobDetails);
+router.post('/test', alumniModule.testUrl);
 
 //Recruitment module
 var Recruitment = require('./modules/recruitment-module.js');

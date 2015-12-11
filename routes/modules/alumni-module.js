@@ -4,6 +4,8 @@
  *  @title Alumni module
  *  @description Handles functions related to alumni profile and events
  */
+
+
 var stream = require( "stream" );
 var chalk = require( "chalk" );
 var util = require( "util" );
@@ -97,6 +99,14 @@ function alterEzeoneId(ezeoneId){
         }
     }
     return alteredEzeoneId;
+}
+
+
+function isURl(str, callback) {
+
+    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    //return regexp.test(s);
+    callback(null, regexp.test(str));
 }
 
 var NotificationMqtt = require('./notification/notification-mqtt.js');
@@ -686,6 +696,127 @@ Alumni.prototype.registerAlumni = function(req,res,next){
     }
 };
 
+
+
+/**
+ * @todo FnSaveAlumniProfilePic
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save alumni profile pic
+ */
+Alumni.prototype.saveAlumniProfilePic = function(req,res,next) {
+
+    var _this = this;
+    var picture = req.body.pg_pic;
+    var pictureType = req.body.pg_picType;
+    var randomName, url;
+
+    var gcloud = require('gcloud');
+    var gcs = gcloud.storage({
+        projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+        keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+    });
+
+// Reference an existing bucket.
+    var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+    bucket.acl.default.add({
+        entity: 'allUsers',
+        role: gcs.acl.READER_ROLE
+    }, function (err, aclObject) {
+    });
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var error = {}, validateStatus = true;
+
+    try {
+
+        if(req.files) {
+            console.log('coming....');
+            console.log(req.files.pg_pic);
+
+        var imageParams = {
+            path: req.files.pg_pic.path,
+            type: pictureType,
+            width: 1200,
+            height: 600,
+            scale: '',
+            crop: ''
+        };
+        //console.log(imageParams);
+        FnCropImage(imageParams, function (err, imageBuffer) {
+
+            if (imageBuffer) {
+
+                console.log('uploading to cloud server...');
+
+                var uniqueId = uuid.v4();
+                randomName = uniqueId + '.' + req.files.pg_pic.extension;
+
+                // Upload a local file to a new file to be created in your bucket
+
+                var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                var bufferStream = new BufferStream(imageBuffer);
+                bufferStream.pipe(remoteWriteStream);
+
+
+                remoteWriteStream.on('finish', function () {
+                    console.log('file is uploaded to cloud');
+                    url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
+                    responseMessage.message = 'page pic save success';
+                    responseMessage.status = true;
+                    responseMessage.data = randomName;
+                    res.status(200).json(responseMessage);
+
+                });
+
+                remoteWriteStream.on('error', function () {
+                    responseMessage.message = 'An error occurred';
+                    responseMessage.error = {
+                        server: 'Cloud Server error'
+                    };
+                    responseMessage.data = null;
+                    res.status(400).json(responseMessage);
+                    console.log('FnSaveAlumniContent: Image upload error in cloud');
+
+                });
+            }
+        });
+
+    }
+        else{
+            console.log('save url...');
+            var pic = ((picture).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+            pic = pic[2];
+            console.log(pic);
+            responseMessage.message = 'page pic is updated';
+            responseMessage.status = true;
+            responseMessage.data = pic;
+            res.status(200).json(responseMessage);
+            console.log('pic is updating');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveAlumniProfilePic:error ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+
 /**
  * @todo FnSaveAlumniContent
  * Method : POST
@@ -726,7 +857,22 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var facultySubtitle = req.body.f_subtitle;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var page_pic,logo_pic;
+    var randomName,url,logo_name,logo_url;
+
+    var gcloud = require('gcloud');
+    var gcs = gcloud.storage({
+        projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+        keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+    });
+
+// Reference an existing bucket.
+    var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+    bucket.acl.default.add({
+        entity: 'allUsers',
+        role: gcs.acl.READER_ROLE
+    }, function (err, aclObject) {
+    });
 
     var responseMessage = {
         status: false,
@@ -746,10 +892,6 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    //if(!picture){
-    //    error['picture'] = 'Invalid page picture';
-    //    validateStatus *= false;
-    //}
     if(!title){
         error['title'] = 'Invalid page title';
         validateStatus *= false;
@@ -841,103 +983,143 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                 if (!err) {
                     if (result) {
 
-                        var pagePicture = function () {
-
-                            var imageParams = {
-                                path: req.files.pg_pic.path,
-                                type: pictureType,
-                                width: width,
-                                height: height,
-                                scale: '',
-                                crop: ''
-                            };
-                            //console.log(imageParams);
-                            FnCropImage(imageParams, function (err, pictureResult) {
-
-                                if (pictureResult) {
-                                    var params = {
-                                        page_pic: pictureResult
-                                    };
-                                    saveContent(params);
-                                }
-                            });
+                        var pagePicture = function (pgPic) {
+                            randomName= pgPic;
+                            saveContent(randomName);
                         };
 
-                        var saveContent = function(params) {
-                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(params.page_pic) + ',' + st.db.escape(title)
-                                + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
-                                + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
-                                + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
-                                + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(req.body.logo)
-                                + ',' + st.db.escape(logoTitle) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(mentorTitle)
-                                + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
-                                + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
-                                + ',' + st.db.escape(pictureType);
+                        var saveContent = function (randomName) {
 
-                            var query = 'CALL pSaveAlumniContent(' + queryParams + ')';
-                            //console.log(query);
-                            st.db.query(query, function (err, insertresult) {
-                                if (!err) {
-                                    if (insertresult) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Alumni Content saved successfully';
-                                        responseMessage.data = {
-                                            tid: req.body.tid,
-                                            pg_picName: req.body.pg_picName,
-                                            pg_picType: req.body.pg_picType,
-                                            pg_title: req.body.pg_title,
-                                            pg_subtitle: req.body.pg_subtitle,
-                                            footerL1: req.body.footerL1,
-                                            footerL2: req.body.footerL2,
-                                            idea_title: req.body.idea_title,
-                                            idea_text: req.body.idea_text,
-                                            purpose_title: req.body.purpose_title,
-                                            purpose_text: req.body.purpose_text,
-                                            team_title: req.body.team_title,
-                                            team_subtitle: req.body.team_subtitle,
-                                            m_footer1: req.body.m_footer1,
-                                            m_footer2: req.body.m_footer2,
-                                            l_name: req.body.l_name,
-                                            l_type: req.body.l_type,
-                                            logo_title: req.body.logo_title,
-                                            alumni_id: req.body.alumni_id,
-                                            m_title: req.body.m_title,
-                                            m_subtitle: req.body.m_subtitle,
-                                            f_title: req.body.f_title,
-                                            f_subtitle: req.body.f_subtitle,
-                                            height: height,
-                                            width: width
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveAlumniContent: Alumni Content saved successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'No save Alumni Content';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveAlumniContent:No save Alumni Content');
-                                    }
+                            console.log('---randomName---');
+                            console.log(randomName);
+
+                            console.log('save content....');
+                            console.log(req.body.logo);
+
+                            if (logo) {
+                                logo = logo;
+                            }
+                            else {
+                                logo = '';
+                            }
+
+                            isURl(logo, function (err, str) {
+                                console.log('----isurl---');
+                                console.log(str);
+                                if (str == false) {
+
+                                    var uniqueId = uuid.v4();
+                                    var type = logoType.split('/');
+                                    logo_name = uniqueId + '.' + type[1];
+                                    console.log(logo_name);
+
+                                    var bufferData = new Buffer((logo).replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');
+
+                                    // Upload a local file to a new file to be created in your bucket
+
+                                    var remoteWriteStream = bucket.file(logo_name).createWriteStream();
+                                    var bufferStream = new BufferStream(bufferData);
+                                    bufferStream.pipe(remoteWriteStream);
+
+                                    //var localReadStream = fs.createReadStream(req.files.logo.path);
+                                    //localReadStream.pipe(remoteWriteStream);
+
+                                    remoteWriteStream.on('finish', function () {
+                                        console.log('file is uploaded to cloud');
+                                        logo_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + logo_name;
+                                    });
+                                    remoteWriteStream.on('error', function () {
+                                        logo_name = '';
+                                        console.log('FnSaveAlumniContent: logo upload error in cloud');
+
+                                    });
                                 }
                                 else {
-                                    responseMessage.message = 'An error occured ! Please try again';
-                                    res.status(500).json(responseMessage);
-                                    console.log('FnSaveAlumniContent: error in saving Alumni Content:' + err);
+
+                                    //https://storage.googleapis.com/ezeone/d65285bd-fb2f-4fc7-a214-a4fbc38b26be.jpg
+                                    console.log('save url...');
+                                    logo_name = ((logo).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+                                    logo_name = logo_name[2];
+                                    console.log(logo_name);
                                 }
+                                var queryParams = st.db.escape(tid) + ',' + st.db.escape(randomName) + ',' + st.db.escape(title)
+                                    + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
+                                    + ',' + st.db.escape(ideaTitle) + ',' + st.db.escape(ideaText) + ',' + st.db.escape(purposeTitle)
+                                    + ',' + st.db.escape(purposeText) + ',' + st.db.escape(teamTitle) + ',' + st.db.escape(teamSubtitle)
+                                    + ',' + st.db.escape(mainFooter1) + ',' + st.db.escape(mainFooter2) + ',' + st.db.escape(logo_name)
+                                    + ',' + st.db.escape(logoTitle) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(mentorTitle)
+                                    + ',' + st.db.escape(mentorSubtitle) + ',' + st.db.escape(facultyTitle) + ',' + st.db.escape(facultySubtitle)
+                                    + ',' + st.db.escape(logoName) + ',' + st.db.escape(logoType) + ',' + st.db.escape(pictureTitle)
+                                    + ',' + st.db.escape(pictureType);
+
+                                var query = 'CALL pSaveAlumniContent(' + queryParams + ')';
+                                console.log(query);
+                                st.db.query(query, function (err, insertresult) {
+                                    if (!err) {
+                                        if (insertresult) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Alumni Content saved successfully';
+                                            responseMessage.data = {
+                                                tid: req.body.tid,
+                                                pg_picName: req.body.pg_picName,
+                                                pg_picType: req.body.pg_picType,
+                                                pg_title: req.body.pg_title,
+                                                pg_subtitle: req.body.pg_subtitle,
+                                                footerL1: req.body.footerL1,
+                                                footerL2: req.body.footerL2,
+                                                idea_title: req.body.idea_title,
+                                                idea_text: req.body.idea_text,
+                                                purpose_title: req.body.purpose_title,
+                                                purpose_text: req.body.purpose_text,
+                                                team_title: req.body.team_title,
+                                                team_subtitle: req.body.team_subtitle,
+                                                m_footer1: req.body.m_footer1,
+                                                m_footer2: req.body.m_footer2,
+                                                l_name: req.body.l_name,
+                                                l_type: req.body.l_type,
+                                                logo_title: req.body.logo_title,
+                                                alumni_id: req.body.alumni_id,
+                                                m_title: req.body.m_title,
+                                                m_subtitle: req.body.m_subtitle,
+                                                f_title: req.body.f_title,
+                                                f_subtitle: req.body.f_subtitle,
+                                                height: height,
+                                                width: width,
+                                                pg_pic: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName,
+                                                logo_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + logo_name
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveAlumniContent: Alumni Content saved successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'No save Alumni Content';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveAlumniContent:No save Alumni Content');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured ! Please try again';
+                                        res.status(500).json(responseMessage);
+                                        console.log('FnSaveAlumniContent: error in saving Alumni Content:' + err);
+                                    }
+                                });
+
                             });
                         };
 
-
-                        if (req.files.pg_pic) {
+                        if (req.body.pg_pic) {
                             console.log('c1...');
-                            pagePicture();
+                            console.log(req.body.pg_pic);
+                            var pgPic = req.body.pg_pic;
+                            pagePicture(pgPic);
                         }
                         else {
                             console.log('c2...');
-                            var params = {
-                                page_pic: req.body.pg_pic
-                            };
-                            saveContent(params);
+                            randomName = '';
+                            saveContent(randomName);
                         }
+
 
                     }
                     else {
@@ -988,7 +1170,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var tid = req.body.tid;      // while saving time 0 else id of user
     var picture = req.body.picture;
     var pictureTitle = req.body.p_title;
-    var pictureType = req.body.p_type;
+    var pictureType = req.body.pg_picType;  // pg_picType
     var jobTitle = req.body.job_title;
     var company = req.body.company;
     var profile = req.body.profile;
@@ -999,7 +1181,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var username = req.body.username;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var image;
+    var image,randomName,url;
 
 
 
@@ -1075,39 +1257,17 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                 if (!err) {
                     if (result) {
 
-                        var teamPicture = function () {
+                        var saveTeam = function (randomName) {
 
-                            var imageParams = {
-                                path: req.files.picture.path,
-                                //path1 : req.files.picture[1].path,
-                                type: pictureType,
-                                width: width,
-                                height: height,
-                                scale: '',
-                                crop: ''
-                            };
-
-                            FnCropImage(imageParams, function (err, imageResult) {
-                                if (imageResult) {
-                                    image = {
-                                        pic: imageResult
-                                    };
-                                    saveTeam(image);
-                                }
-                                else {
-                                    console.log('No image cropped');
-                                }
-                            });
-                        };
-
-                        var saveTeam = function (image) {
-                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(image.pic) + ',' + st.db.escape(jobTitle)
+                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(randomName) + ',' + st.db.escape(jobTitle)
                                 + ',' + st.db.escape(company) + ',' + st.db.escape(profile) + ',' + st.db.escape(seqNo)
                                 + ',' + st.db.escape(type) + ',' + st.db.escape(alumniId) + ',' + st.db.escape(alumniRole)
                                 + ',' + st.db.escape(pictureTitle) + ',' + st.db.escape(pictureType) + ',' + st.db.escape(username)
                                 + ',' + st.db.escape(token);
 
                             var query = 'CALL pSaveAlumniTeam(' + queryParams + ')';
+
+                            console.log(query);
 
                             st.db.query(query, function (err, insertresult) {
                                 if (!err) {
@@ -1129,7 +1289,8 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                             alumni_role: req.body.alumni_role,
                                             username: req.body.username,
                                             height: height,
-                                            width: width
+                                            width: width,
+                                            picture : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveAlumniTeam: Alumni Team saved successfully');
@@ -1147,14 +1308,22 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                 }
                             });
                         };
-                        if (req.files.picture) {
-                            teamPicture();
-                        }
-                        else {
-                            image = {
-                                pic: req.body.picture
-                            };
-                            saveTeam(image);
+                        if (req.body.picture) {
+
+                            var pic = req.body.picture;
+
+                            isURl(pic, function (err, str) {
+                                console.log('----isurl---');
+                                console.log(str);
+                                if (str == true) {
+                                    randomName = ((req.body.picture).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+                                    randomName = randomName[2];
+                                }
+                                else {
+                                    randomName = pic;
+                                }
+                                saveTeam(randomName);
+                            });
                         }
                     }
                     else {
@@ -1477,8 +1646,8 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Alumni content loaded successfully';
+                        getResult[0][0].logo = (getResult[0][0].logo) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].logo):'';
                         responseMessage.data = getResult[0];
-
                         res.status(200).json(responseMessage);
                         console.log('FnGetAlumniContent: Alumni content loaded successfully');
                     }
@@ -1795,11 +1964,13 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
             var query = st.db.escape(code);
             console.log('CALL pGetAlumniContentImage(' + query + ')');
             st.db.query('CALL pGetAlumniContentImage(' + query + ')', function (err, getResult) {
+                console.log(getResult[0]);
                 if (!err) {
                     if (getResult[0]) {
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Cover Image loaded successfully';
+                        getResult[0][0].pg_pic = (getResult[0][0].pg_pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].pg_pic):'';
                         responseMessage.data = getResult[0][0];
                         res.status(200).json(responseMessage);
                         console.log('FnGetAlumniContentImage: Cover Image loaded successfully');
@@ -3525,6 +3696,11 @@ Alumni.prototype.getTeamImage = function(req,res,next){
                 if (!err) {
                     if (getResult[0]) {
                         if (getResult[0].length > 0) {
+
+                            for( var i=0; i < getResult[0].length;i++){
+                                getResult[0][i].picture = (getResult[0][i].picture) ?
+                                req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].picture : '';
+                            }
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Team image loaded successfully';
@@ -5702,6 +5878,149 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
+};
+/**
+ * @todo FnTestTagsDocs
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for save standard tags
+ */
+Alumni.prototype.testUrl = function(req,res,next) {
+
+    var _this = this;
+
+    var uuid = require('node-uuid');
+
+    var randomName,type,filetype;
+
+    try{
+
+        var query = "SELECT tid,attachment as picture,attachmenttitle as imagefilename FROM ten_master WHERE attachment!='' OR attachment is NOT null";
+
+        st.db.query(query, function (err, result) {
+
+            console.log('------------');
+            //console.log(result);
+            console.log(result.length);
+
+
+            var tid = req.body.tid;
+
+            var uploadFile = function(i) {
+
+                if (i < result.length) {
+
+                    console.log(result[i].imagefilename);
+
+                    if(result[i].imagefilename){
+                        filetype = (result[i].imagefilename).split('.');
+                        type = filetype[1];
+                    }
+                    else {
+
+                        type = 'jpg';
+                    }
+                    console.log(type);
+                    var base64Data = result[i].picture;
+                    var tid = result[i].tid;
+                    console.log(tid);
+
+                    var bufferData = new Buffer(base64Data.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''),  'base64');
+                    console.log(bufferData);
+
+                    var uniqueId = uuid.v4();
+                    randomName = uniqueId + '.' + type;
+
+                    if (bufferData) {
+
+                        console.log('uploading to cloud server...');
+
+                        var gcloud = require('gcloud');
+
+                        var fs = require('fs');
+
+
+                        var gcs = gcloud.storage({
+                            projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
+                            keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+                        });
+
+                        // Reference an existing bucket.
+                        var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
+
+                        bucket.acl.default.add({
+                            entity: 'allUsers',
+                            role: gcs.acl.READER_ROLE
+                        }, function (err, aclObject) {
+                        });
+
+                        // Upload a local file to a new file to be created in your bucket
+
+                        var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                        var bufferStream = new BufferStream(bufferData);
+                        bufferStream.pipe(remoteWriteStream);
+
+
+                        remoteWriteStream.on('finish', function () {
+                            console.log('uploaded sucessfully');
+                            var query = 'UPDATE ten_master SET attachment=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
+
+                            console.log(query);
+                            st.db.query(query, function (err, result) {
+                                if (!err) {
+                                    console.log('file updated to database');
+                                    var url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
+                                    console.log(url);
+                                    i = i + 1;
+                                    uploadFile(i);
+
+                                }
+                                else {
+                                    console.log('file not updated to database');
+
+                                }
+                            });
+
+                        });
+
+                        remoteWriteStream.on('error', function () {
+                            console.log('file not uploaded');
+
+                        });
+                    }
+                }
+                else{
+                    res.statusCode = 200;
+                    var RtnMessage = 'success';
+                    res.send(RtnMessage);
+                }
+            };
+
+
+
+            if(tid){
+                console.log('tid....');
+                var i=0;
+                uploadFile(i);
+            }
+
+        });
+    }
+
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
+        console.log('Error : FnSaveStandardTags ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+
 };
 
 

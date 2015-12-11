@@ -128,7 +128,7 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                                                             loopFunction(c);
                                                         }
                                                         else {
-                                                            console.log('FnComposeMessage:Error getting from groupname');
+                                                            console.log('FnComposeMessage:Error getting from groupname1');
                                                             callBack(null, null);
                                                         }
                                                     });
@@ -166,11 +166,8 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                     callBack(null, null);
                 }
             }
-            else{
-                console.log('FnComposeMessage:Error getting from groupname');
-                callBack(null, null);
-            }
         };
+
         if (MsgContent) {
             var c = 0;
             loopFunction(c);
@@ -382,4 +379,146 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
+
+msgNotification.prototype.sendForwardNotification = function(MsgContent, callBack) {
+    var _this = this;
+
+    console.log('-----Send Nofication of Forward Message-----');
+    var to_ids,id,id_type,gid,iphoneID;
+    var receiverId,senderTitle,groupId,groupTitle,messageText,messageType,masterid,messageId;
+    try {
+
+        var RtnMessage = {
+            status: false
+
+        };
+
+        id = MsgContent.idType.split(",");
+        to_ids = MsgContent.toID.split(",");
+
+
+        var loopFunction = function (c) {
+            if (c < id.length) {
+                id_type = parseInt(id[c]);
+                gid = parseInt(to_ids[c]);
+
+                console.log('group id:' + gid);
+                if (gid) {
+                    var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + gid;
+                    //console.log(queryParameters);
+                    st.db.query(queryParameters, function (err, iosResult) {
+                        if (iosResult) {
+                            if (iosResult[0]) {
+                                iphoneID = iosResult[0].iphoneID;
+                            }
+                            else {
+                                iphoneID = '';
+                            }
+                            //console.log(iphoneID);
+                            var queryParams = st.db.escape(MsgContent.token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
+                            var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
+                            //console.log(messageQuery);
+                            st.db.query(messageQuery, function (err, groupDetails) {
+                                if (groupDetails) {
+                                    if (groupDetails[0]) {
+                                        if (groupDetails[0].length > 0) {
+                                            if (groupDetails[1]) {
+                                                if (groupDetails[1].length > 0) {
+                                                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(MsgContent.token);
+                                                    var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
+                                                    console.log(messageQuery1);
+                                                    st.db.query(messageQuery1, function (err, groupDetails1) {
+                                                        if (groupDetails1) {
+                                                            for (var i = 0; i < groupDetails[1].length; i++) {
+                                                                receiverId = groupDetails[1][i].tid;
+                                                                senderTitle = groupDetails[0][0].groupname;
+                                                                if (id_type == 0) {
+                                                                    groupId = groupDetails1[0][0].groupid;
+                                                                    groupTitle = groupDetails1[0][0].groupname;
+                                                                }
+                                                                else {
+                                                                    groupId = groupDetails[0][0].tid;
+                                                                    groupTitle = groupDetails[0][0].groupname;
+                                                                }
+                                                                messageText = 'Forward Message';
+                                                                messageType = id_type;
+                                                                messageId = MsgContent.message_id;
+                                                                masterid = groupDetails[0][0].AdminID;
+                                                                var iphoneId = iphoneID;
+                                                                var now = new Date();
+                                                                var t = now.toUTCString();
+                                                                var dateTime = t.split(',');
+                                                                dateTime = dateTime[1];
+                                                                var latitude = 0.00, longitude = 0.00,jobId=0;
+                                                                var a_name='',a_url = '',operationType = 0,msgUserid = 0,prioritys=1;
+                                                                //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid,jobId,a_url);
+                                                                RtnMessage.status = true;
+                                                                callBack(null, RtnMessage);
+                                                            }
+                                                            c = c+1;
+                                                            loopFunction(c);
+                                                        }
+                                                        else {
+                                                            console.log('FnForwardMessage:Error getting from groupname1');
+                                                            callBack(null, null);
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    console.log('FnForwardMessage:Error getting from groupdetails1');
+                                                    callBack(null, null);
+                                                }
+                                            }
+                                            else {
+                                                console.log('FnForwardMessage:Error getting from groupdetails2');
+                                                callBack(null, null);
+                                            }
+                                        }
+                                        else {
+                                            console.log('FnForwardMessage:Error getting from groupdetails3');
+                                            callBack(null, null);
+                                        }
+                                    }
+                                    else {
+                                        console.log('FnForwardMessage:Error getting from groupdetails4');
+                                        callBack(null, null);
+                                    }
+                                }
+                                else {
+                                    console.log('FnForwardMessage:Error getting from groupdetails5');
+                                    callBack(null, null);
+                                }
+                            });
+                        }
+                    });
+                }
+                else{
+                    console.log('FnForwardMessage:Error getting from gid');
+                    callBack(null, null);
+                }
+            }
+        };
+
+        if (MsgContent) {
+            var c = 0;
+            loopFunction(c);
+        }
+        else {
+            console.log('FnSendForwardMsgNotification: Forward Message Content not loaded');
+            callBack(null, null);
+        }
+
+    }
+    catch (ex) {
+        console.log(' FnSendForwardMsgNotification : Catch error:' + ex.description);
+        callBack(null, null);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
+
 module.exports = msgNotification;

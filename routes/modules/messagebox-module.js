@@ -3609,4 +3609,155 @@ MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
 };
 
 
+/**
+ * @todo FnForwardMessage
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for compose message
+ */
+MessageBox.prototype.forwardMessage = function(req,res,next){
+
+    var _this = this;
+
+    var token = req.body.token;
+    var messageId  = req.body.msg_id;
+    var toId = req.body.to_id;                              // comma separated id of toID
+    var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
+    var id,toIds;
+
+    if(idType){
+        id = idType.split(",");
+    }
+    if(toId){
+        toIds = toId.split(",");
+    }
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!toId){
+        error['toId'] = 'Invalid toId';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+
+                        var queryParams = st.db.escape(messageId) + ',' + st.db.escape(toId) + ',' + st.db.escape(idType);
+                        var query = 'CALL pforwardmessage(' + queryParams + ')';
+
+                        console.log(query);
+
+                        st.db.query(query, function (err, insertResult) {
+                            //console.log(insertResult);
+                            if (!err) {
+                                if (insertResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Message Composed successfully';
+                                    responseMessage.data = {
+                                        message_id: req.body.msg_id,
+                                        toId: req.body.to_id,
+                                        idType: req.body.id_type
+
+                                    };
+                                    res.status(200).json(responseMessage);
+
+                                    /**
+                                     * send notification of forward message
+                                     */
+                                    var MsgContent = {
+                                        token : req.body.token,
+                                        message_id: req.body.msg_id,
+                                        toId: req.body.to_id,
+                                        idType: req.body.id_type
+                                    };
+
+                                    msgNotification.sendForwardNotification(MsgContent, function (err, statusResult) {
+                                        console.log(statusResult);
+                                        if (!err) {
+                                            if (statusResult) {
+                                                console.log('Forward Message Notification send successfully');
+                                            }
+                                            else {
+                                                console.log('Forward Message Notification not send');
+                                            }
+                                        }
+                                        else {
+                                            console.log('Error in sending forward message notification');
+                                        }
+                                    });
+                                }
+                                else {
+                                    responseMessage.message = 'Message not Composed';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnForwardMessage:Message not Composed');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnForwardMessage: error in composing Message :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnForwardMessage: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnForwardMessage:Error in validating Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnForwardMessage ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 module.exports = MessageBox;
