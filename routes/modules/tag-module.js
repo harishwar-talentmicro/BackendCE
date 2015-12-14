@@ -99,6 +99,7 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
     readStream.pipe(remoteWriteStream);
 
     remoteWriteStream.on('finish', function(){
+        console.log('done');
         if(callback){
             if(typeof(callback)== 'function'){
                 callback(null);
@@ -1500,6 +1501,68 @@ Tag.prototype.savePictures = function(req,res,next) {
     }
 };
 
+//var i = 0;
+//
+//
+//var DbHelper = require('./../../helpers/DatabaseHandler'),
+//    db = DbHelper.getDBContext();
+//
+//
+//
+//function saveAlumniPictureToCloud(){
+//    var query = "SELECT tid, picture as page1pic,picturetitle as page1picfilename,picturetype as page1pictype FROM alumni_team";
+//    //SELECT picture,picturetitle,picturetype FROM alumni_team;
+//
+//    db.query(query,function(err,results){
+//        if(!err){
+//            if(results){
+//                if(results.length){
+//
+//                    var updatePic =  function (records){
+//                        var bufferData = new Buffer(records[i].page1pic.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''),  'base64');
+//                        console.log('calling updatePic');
+//                        //console.log(records[i]);
+//                        //console.log(bufferData);
+//                        var bufferStream = new BufferStream(bufferData);
+//
+//                        var format = records[i].page1pictype.replace('image/','');
+//                        var fileName = uuid.v4()+'.'+ format;
+//                        console.log(fileName);
+//                        uploadDocumentToCloud(fileName, bufferStream,function(){
+//                            console.log('uploadDocumentToCloudCallback');
+//                            var updateQuery = "UPDATE alumni_team set picture= " + st.db.escape(fileName) + " WHERE tid= "+ records[i].tid;
+//                            db.query(updateQuery,function(err,result){
+//                                if(!err){
+//                                    i = i+1;
+//                                    console.log('record updated');
+//                                    //console.log(records[i]);
+//                                    if(i < records.length){
+//                                        updatePic(records);
+//                                    }
+//                                    else{
+//                                        console.log('all done');
+//                                    }
+//                                }
+//                                else{
+//                                    console.log(err);
+//                                }
+//                            });
+//
+//                        });
+//                    }
+//
+//                    updatePic(results);
+//                }
+//            }
+//        }
+//        else{
+//            console.log(err);
+//        }
+//    });
+//};
+//
+//
+//saveAlumniPictureToCloud();
 
 module.exports = Tag;
 
