@@ -5897,7 +5897,8 @@ Alumni.prototype.testUrl = function(req,res,next) {
 
     try{
 
-        var query = "SELECT tid,attachment as picture,attachmenttitle as imagefilename FROM ten_master WHERE attachment!='' OR attachment is NOT null";
+        //var query = "SELECT tid,attachment as picture,attachmenttitle as imagefilename FROM ten_master WHERE attachment!='' OR attachment is NOT null";
+        var query = "SELECT tid, page1pic as picture ,page1picfilename as imagefilename FROM alumni_content";
 
         st.db.query(query, function (err, result) {
 
@@ -5965,7 +5966,7 @@ Alumni.prototype.testUrl = function(req,res,next) {
 
                         remoteWriteStream.on('finish', function () {
                             console.log('uploaded sucessfully');
-                            var query = 'UPDATE ten_master SET attachment=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
+                            var query = 'UPDATE alumni_content SET page1pic=' + st.db.escape(randomName) + ' WHERE tid=' + tid;
 
                             console.log(query);
                             st.db.query(query, function (err, result) {

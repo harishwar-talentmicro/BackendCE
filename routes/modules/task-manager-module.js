@@ -190,7 +190,6 @@ TaskManager.prototype.getTasks = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var transactionId = parseInt(req.query.tx);   // Transaction id
     var startDate = req.query.st;
     var endDate = req.query.et;
     var responseMessage = {
@@ -217,10 +216,8 @@ TaskManager.prototype.getTasks = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(transactionId) + ',' + st.db.escape(startDate)+ ',' + st.db.escape(endDate)
-                            + ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(startDate)+ ',' + st.db.escape(endDate) + ',' + st.db.escape(token);
                         var query = 'CALL pGetTasks(' + queryParams + ')';
-
                         console.log(query);
 
                         st.db.query(query, function (err, getResult) {
