@@ -3054,6 +3054,235 @@ catch (ex) {
 }
 };
 
+
+/**
+ * @todo FnSaveInstituteGroup
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @param token (char)
+ * @param id (int)
+ * @param title (varchar(150)
+ * @param institute_id (varchar(150))
+ * @description api code for save Institute Group
+ */
+Configuration.prototype.saveInstituteGroup = function(req,res,next){
+    /**
+     * checking input parameters are json or not
+     */
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else{
+        /**
+         * storing and validating the input parameters
+         */
+
+        if(!(req.body.token)){
+            error['token'] = 'Token is Mandatory';
+            validateStatus *= false;
+        }
+
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+
+                        var queryParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.id) + ',' + st.db.escape(req.body.title)
+                            + ',' + st.db.escape(req.body.institute_id);
+                        var query = 'CALL psaveinstitutegroup(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, result) {
+                            if (!err) {
+                                if (result) {
+                                    responseMessage.status = true;
+                                    responseMessage.message = 'Institute Group saved successfully';
+                                    responseMessage.data = {
+                                        id:req.body.id,
+                                        institute_id:req.body.institute_id,
+                                        title:req.body.title
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveInstituteGroup: Institute Group saved successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Institute Group not save';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveInstituteGroup:Institute Group not save');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveInstituteGroup: error in saving Institute Group  :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveInstituteGroup: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveInstituteGroup:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveInstituteGroup ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetInstituteGroup
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @param token (char)
+ * @description api code for get Institute Group
+ */
+Configuration.prototype.getInstituteGroup = function(req,res,next){
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!(req.query.token)){
+            error['token'] = 'Token is Mandatory';
+            validateStatus *= false;
+        }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+
+                        var queryParams = st.db.escape(req.query.token);
+                        var query = 'CALL pgetinstituegroups(' + queryParams + ')';
+                        console.log(query);
+
+                        st.db.query(query, function (err, groupResult) {
+                            if (!err) {
+                                if (groupResult) {
+                                    if (groupResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.message = 'Institute Group Loaded successfully';
+                                        responseMessage.data = groupResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveInstituteGroup: Institute Group Loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Institute Group not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveInstituteGroup:Institute Group not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Institute Group not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveInstituteGroup:Institute Group not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveInstituteGroup: error in loading Institute Group  :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveInstituteGroup: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveInstituteGroup:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveInstituteGroup ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+
 module.exports = Configuration;
 
 

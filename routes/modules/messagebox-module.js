@@ -106,8 +106,7 @@ var EZEIDEmail = 'noreply@ezeone.com';
 // attachment upload to cloud server
 var uploadDocumentToCloud = function(uniqueName,bufferData,callback){
 
-    console.log('uploading to cloud...');
-    var a_url, randomName, output;
+    console.log('uploading to cloud');
     var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
     var bufferStream = new BufferStream(bufferData);
     bufferStream.pipe(remoteWriteStream);
@@ -1246,8 +1245,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var mimeType = (req.body.mime_type) ? req.body.mime_type : '';
     var isJobseeker = req.body.isJobseeker ? req.body.isJobseeker : 0;
-    var b_id='',get_tid,i=0,c=0,toIds,to_ids,to_Ids,masterid,receiverId,gid,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,id,id_type,msgId,iphoneID,dateTime,prioritys,msgUserid;
-    var latitude = '', longitude = '';
+    var toIds= 0;
     var isBussinessChat = req.body.isBussinessChat ? req.body.isBussinessChat : 0;
     var ezeid = alterEzeoneId(req.body.ezeid);
     var istask = req.body.istask ? req.body.istask : 0;
@@ -1379,7 +1377,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                         /**
                                          * @todo add code for push notification like this
                                          */
-                                        var MsgContent = {
+                                        var msgContent = {
                                             message_id: insertResult[0][0].messageids,
                                             message_userid: insertResult[0][0].mesguserid,
                                             message  : req.body.message ? req.body.message : '',
@@ -1393,7 +1391,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             ezeid : alterEzeoneId(req.body.ezeid)
                                         };
 
-                                        msgNotification.sendNotification(MsgContent, function (err, statusResult) {
+                                        msgNotification.sendNotification(msgContent, function (err, statusResult) {
                                             console.log(statusResult);
                                             if(!err) {
                                                 if (statusResult) {
@@ -3527,35 +3525,30 @@ MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
                         var queryParams =  st.db.escape(msgId) + ',' + st.db.escape(groupId)+ ',' + st.db.escape(groupType)
                             + ',' + st.db.escape(token);
                         var query = 'CALL pGetlatestmessagesofGroup(' + queryParams + ')';
-                        //console.log(query);
+                        console.log(query);
                         st.db.query(query, function (err, getResult) {
                             //console.log(getResult);
                             //console.log(getResult[0].length);
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
-                                        if (getResult[0].length > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Message loaded successfully';
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Message loaded successfully';
+                                        if(getResult[0].length > 0) {
                                             for (var i = 0; i < getResult[0].length; i++) {
-                                                getResult[0][i].Attachment = (getResult[0][i].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].Attachment) :'';
+                                                getResult[0][i].Attachment = (getResult[0][i].Attachment) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].Attachment) : '';
                                             }
-                                            responseMessage.data = getResult[0];
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetLastMsgOfGroup: Message loaded successfully');
                                         }
-                                        else {
-                                            responseMessage.message = 'Message not loaded';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetLastMsgOfGroup:Message not loaded');
-                                        }
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetLastMsgOfGroup: Message loaded successfully');
                                     }
                                     else {
-                                            responseMessage.message = 'Message not loaded';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetLastMsgOfGroup:Message not loaded');
-                                        }
+                                        responseMessage.message = 'Message not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetLastMsgOfGroup:Message not loaded');
+                                    }
 
                                 }
                                 else {
@@ -3627,13 +3620,6 @@ MessageBox.prototype.forwardMessage = function(req,res,next){
     var idType = req.body.id_type ? req.body.id_type : ''; // comma seperated values(0 - Group Message, 1 - Individual Message)
     var id,toIds;
 
-    if(idType){
-        id = idType.split(",");
-    }
-    if(toId){
-        toIds = toId.split(",");
-    }
-
     var responseMessage = {
         status: false,
         error: {},
@@ -3676,7 +3662,7 @@ MessageBox.prototype.forwardMessage = function(req,res,next){
                                 if (insertResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
-                                    responseMessage.message = 'Message Composed successfully';
+                                    responseMessage.message = 'forwardMessage send successfully';
                                     responseMessage.data = {
                                         message_id: req.body.msg_id,
                                         toId: req.body.to_id,
@@ -3688,14 +3674,14 @@ MessageBox.prototype.forwardMessage = function(req,res,next){
                                     /**
                                      * send notification of forward message
                                      */
-                                    var MsgContent = {
+                                    var msgContent = {
                                         token : req.body.token,
                                         message_id: req.body.msg_id,
                                         toId: req.body.to_id,
                                         idType: req.body.id_type
                                     };
 
-                                    msgNotification.sendForwardNotification(MsgContent, function (err, statusResult) {
+                                    msgNotification.sendForwardNotification(msgContent, function (err, statusResult) {
                                         console.log(statusResult);
                                         if (!err) {
                                             if (statusResult) {
@@ -3711,9 +3697,9 @@ MessageBox.prototype.forwardMessage = function(req,res,next){
                                     });
                                 }
                                 else {
-                                    responseMessage.message = 'Message not Composed';
+                                    responseMessage.message = 'Message not send';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnForwardMessage:Message not Composed');
+                                    console.log('FnForwardMessage:Message not send');
                                 }
                             }
                             else {
@@ -3722,7 +3708,7 @@ MessageBox.prototype.forwardMessage = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnForwardMessage: error in composing Message :' + err);
+                                console.log('FnForwardMessage: error in forwarding Message :' + err);
                             }
                         });
                     }

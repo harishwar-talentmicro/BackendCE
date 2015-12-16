@@ -217,7 +217,8 @@ TaskManager.prototype.getTasks = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(transactionId) + ',' + st.db.escape(startDate)+ ',' + st.db.escape(endDate);
+                        var queryParams = st.db.escape(transactionId) + ',' + st.db.escape(startDate)+ ',' + st.db.escape(endDate)
+                            + ',' + st.db.escape(token);
                         var query = 'CALL pGetTasks(' + queryParams + ')';
 
                         console.log(query);

@@ -9,6 +9,7 @@
 "use strict";
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -73,7 +74,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
                         console.log('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ')');
                         st.db.query('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ')', function (err, AccessHistoryResult) {
                             if (!err) {
-                                   console.log(AccessHistoryResult);
+                                console.log(AccessHistoryResult);
                                 if (AccessHistoryResult[0]) {
                                     if (AccessHistoryResult[0].length > 0) {
                                         responseMessage.status = true;
@@ -887,20 +888,23 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                                                     mailOptions.html = mailOptions.html.replace("[LastName]", GetResult[0].LastName);
                                                                     mailOptions.html = mailOptions.html.replace("[CompanyName]", GetResult[0].CompanyName);
 
-                                                                    //console.log(mailOptions.html);
-                                                                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+
                                                                     var email = new sendgrid.Email();
-                                                                    email.from = mailOptions.from;
+                                                                    email.from = mailOptions.replyto;
                                                                     email.to = mailOptions.to;
                                                                     email.subject = mailOptions.subject;
                                                                     email.html = mailOptions.html;
 
+
+                                                                    console.log('send grid......');
+
                                                                     sendgrid.send(email, function (err, result) {
+                                                                        console.log(err);
                                                                         if (!err) {
                                                                             var post = {
                                                                                 MessageType: 9,
                                                                                 Priority: 5,
-                                                                                ToMailID: GetResult[i].SalesMailID,
+                                                                                ToMailID: mailOptions.to,
                                                                                 Subject: mailOptions.subject,
                                                                                 Body: mailOptions.html,
                                                                                 Replyto: mailOptions.replyto,
@@ -1005,7 +1009,6 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                             var query = st.db.escape(Token);
                             console.log('CALL pSendMailerDetails(' + query + ')');
                             st.db.query('CALL pSendMailerDetails(' + query + ')', function (err, Result) {
-
                                 if (!err) {
                                     if (Result.length > 0) {
                                         var output = Result[0];
@@ -1068,51 +1071,76 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                                         fs.exists('./TempMapLocationFile/'+OutputFileName+'.pdf', function (exists) {
 
                                             if (exists) {
-                                                var bufferPdfDoc = fs.readFileSync('./TempMapLocationFile/'+OutputFileName+'.pdf');
+                                                var bufferPdfDoc = fs.readFileSync('./TempMapLocationFile/' + OutputFileName + '.pdf');
                                                 console.log(bufferPdfDoc);
                                                 // convert binary data to base64 encoded string
                                                 var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
                                                 //console.log(Base64PdfData);
                                                 //fs.writeFileSync('base64.txt', Base64PdfData);
-                                                fs.unlinkSync('TempMapLocationFile/'+OutputFileName+'.pdf');
-                                                console.log('successfully deleted TempMapLocationFile/'+OutputFileName+'.pdf');
+                                                //fs.unlinkSync('TempMapLocationFile/' + OutputFileName + '.pdf');
+                                                var file = 'TempMapLocationFile/' + OutputFileName + '.pdf';
+                                                console.log('successfully deleted TempMapLocationFile/' + OutputFileName + '.pdf');
 
                                                 var mailOptions = {
-                                                    To: ToMailID,
+                                                    from : 'noreply@ezeone.com',
+                                                    to: ToMailID,
                                                     subject: 'Route Map',
                                                     html: data, // html body
                                                     Attachment: Base64PdfData,
-                                                    AttachmentFileName: OutputFileName+'.pdf'
+                                                    AttachmentFileName: OutputFileName + '.pdf'
                                                 };
 
-                                                var post = {
-                                                    MessageType: 10,
-                                                    Priority: 5,
-                                                    ToMailID: mailOptions.To,
-                                                    Subject: mailOptions.subject,
-                                                    Body: mailOptions.html,
-                                                    Attachment: mailOptions.Attachment,
-                                                    AttachmentFileName: mailOptions.AttachmentFileName
-                                                };
+                                                var email = new sendgrid.Email();
+                                                email.from = mailOptions.from;
+                                                email.to = mailOptions.to;
+                                                email.subject = mailOptions.subject;
+                                                email.html = mailOptions.html;
+                                                email.addFile({
+                                                    filename: mailOptions.AttachmentFileName,
+                                                    content:  mailOptions.Attachment
+                                                });
+                                                //email.files(file);
 
-                                                console.log(post);
-                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                    // Neat!
+                                                sendgrid.send(email, function (err, result) {
+                                                    console.log(err);
+
                                                     if (!err) {
-                                                        //console.log(result);
-                                                        console.log('FnSendBulkMailer: Mail saved Successfully');
+
+                                                        console.log('FnSendBulkMailer: Map send Successfully');
                                                         RtnResponse.IsSent = true;
                                                         res.send(RtnResponse);
+
+                                                        var post = {
+                                                            MessageType: 10,
+                                                            Priority: 5,
+                                                            ToMailID: mailOptions.to,
+                                                            Subject: mailOptions.subject,
+                                                            Body: mailOptions.html,
+                                                            Attachment: mailOptions.Attachment,
+                                                            AttachmentFileName: mailOptions.AttachmentFileName
+                                                        };
+
+                                                        var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                            // Neat!
+                                                            if (!err) {
+                                                                //console.log(result);
+                                                                console.log('FnSendBulkMailer: Mail saved Successfully');
+                                                                //RtnResponse.IsSent = true;
+                                                                //res.send(RtnResponse);
+                                                            }
+                                                            else {
+                                                                console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                                res.send(RtnResponse);
+                                                            }
+                                                        });
                                                     }
-                                                    else {
+                                                    else{
                                                         console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                        RtnResponse.IsSent = false;
                                                         res.send(RtnResponse);
+
                                                     }
                                                 });
-
-                                                console.log('FnSendBulkMailer:Mail details sent for processing');
-
-
                                             }
                                             else {
                                                 res.json(null);

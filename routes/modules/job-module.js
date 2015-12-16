@@ -56,12 +56,12 @@ Job.prototype.create = function(req,res,next){
 
     var token = req.body.token;
     var tid = req.body.tid;
-    var ezeone_id = alterEzeoneId(req.body.ezeone_id);
-    var job_code = req.body.job_code;
-    var job_title = req.body.job_title;
-    var exp_from = req.body.exp_from ? req.body.exp_from : 0;
-    var exp_to = req.body.exp_to ? req.body.exp_to : 0;
-    var job_description = req.body.job_description;
+    var ezeoneId = alterEzeoneId(req.body.ezeone_id);
+    var jobCode = req.body.job_code;
+    var jobTitle = req.body.job_title;
+    var expFrom = req.body.exp_from ? req.body.exp_from : 0;
+    var expTo = req.body.exp_to ? req.body.exp_to : 0;
+    var jobDescription = req.body.job_description;
     var salaryFrom = req.body.salaryFrom;
     var salaryTo = req.body.salaryTo;
     var salaryType = req.body.salaryType;
@@ -70,18 +70,15 @@ Job.prototype.create = function(req,res,next){
     var jobType = req.body.jobType;
     var status = req.body.status;
     var contactName = req.body.contactName;
-    var email_id =req.body.email_id ? req.body.email_id : '';
+    var email =req.body.email_id ? req.body.email_id : '';
     var mobileNo =req.body.mobileNo ? req.body.mobileNo : '';
     var locationsList = req.body.locationsList;
-    var categoryID = req.body.category_id;
-
     var instituteIdStr = (req.body.institute_id) ? req.body.institute_id : '';
 
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
-    var location_id = '',count;
-    var resultvalue = '';
+    var location_id = 0, resultvalue = '';
     var skillMatrix1 = req.body.skillMatrix;
     skillMatrix1= JSON.parse(JSON.stringify(skillMatrix1));
     if (!skillMatrix1){
@@ -89,12 +86,12 @@ Job.prototype.create = function(req,res,next){
     }
 
     var jobID,m= 0,jobtype,receiverId,senderTitle,groupTitle,groupId,messageText;
-    var messageType,operationType,iphoneId,messageId,userID;
+    var messageType,operationType,iphoneId,userId;
 
     var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
     var conatctId = req.body.ctid ? parseInt(req.body.ctid) : 0;     // contact id
     var isconfidential = req.body.isconfi ? parseInt(req.body.isconfi) : 0;
-    var alumnicode = req.body.acode;    // alumni code
+    var alumniCode = req.body.acode;    // alumni code
     var locMatrix = req.body.locMatrix;
     locMatrix= JSON.parse(JSON.stringify(locMatrix));
     var educations = req.body.jobEducation;
@@ -145,20 +142,20 @@ Job.prototype.create = function(req,res,next){
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    if(!ezeone_id){
-        error['ezeone_id'] = 'Invalid ezeone_id';
+    if(!ezeoneId){
+        error['ezeoneId'] = 'Invalid ezeoneId';
         validateStatus *= false;
     }
-    if(!job_code){
-        error['job_code'] = 'Invalid job_code';
+    if(!jobCode){
+        error['jobCode'] = 'Invalid jobCode';
         validateStatus *= false;
     }
-    if(!job_title){
-        error['job_title'] = 'Invalid job_title';
+    if(!jobTitle){
+        error['jobTitle'] = 'Invalid jobTitle';
         validateStatus *= false;
     }
-    if(!job_description){
-        error['job_description'] = 'Invalid job_description';
+    if(!jobDescription){
+        error['jobDescription'] = 'Invalid jobDescription';
         validateStatus *= false;
     }
     if(!salaryFrom && !salaryTo){
@@ -212,30 +209,30 @@ Job.prototype.create = function(req,res,next){
                         location_id = location_id.substr(0,location_id.length - 1);
 
                         var createJobPosting = function(){
-                            var query = st.db.escape(tid) + ',' + st.db.escape(ezeone_id) + ',' + st.db.escape(job_code)
-                                + ',' + st.db.escape(job_title) + ',' + st.db.escape(exp_from) + ',' + st.db.escape(exp_to)
-                                + ',' + st.db.escape(job_description) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
+                            var query = st.db.escape(tid) + ',' + st.db.escape(ezeoneId) + ',' + st.db.escape(jobCode)
+                                + ',' + st.db.escape(jobTitle) + ',' + st.db.escape(expFrom) + ',' + st.db.escape(expTo)
+                                + ',' + st.db.escape(jobDescription) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
                                 + ',' + st.db.escape(salaryType) + ',' + st.db.escape(keySkills) + ',' + st.db.escape(openings)
                                 + ',' + st.db.escape(jobType) + ',' + st.db.escape(status) + ',' + st.db.escape(contactName)
-                                + ',' + st.db.escape(email_id) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id) + ','  +st.db.escape(instituteIdStr)
-                                + ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
-                                + ',' + st.db.escape(isconfidential) + ',' + st.db.escape(alumnicode);
+                                + ',' + st.db.escape(email) + ',' + st.db.escape(mobileNo) + ',' + st.db.escape(location_id)
+                                + ','  +st.db.escape(instituteIdStr)+ ',' + st.db.escape(cid)+ ',' + st.db.escape(conatctId)
+                                + ',' + st.db.escape(isconfidential) + ',' + st.db.escape(alumniCode);
                             console.log('CALL pSaveJobs(' + query + ')');
-                            st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertresult) {
+                            st.db.query('CALL pSaveJobs(' + query + ')', function (err, insertResult) {
                                 if (!err) {
-                                    if (insertresult) {
+                                    if (insertResult) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Jobs save successfully';
                                         responseMessage.data = {
                                             token: token,
                                             tid: tid,
-                                            ezeone_id: ezeone_id,
-                                            job_code: job_code,
-                                            job_title: job_title,
-                                            exp_from: exp_from,
-                                            exp_to: exp_to,
-                                            job_description: job_description,
+                                            ezeoneId: ezeoneId,
+                                            job_code: jobCode,
+                                            job_title: jobTitle,
+                                            exp_from: expFrom,
+                                            exp_to: expTo,
+                                            job_description: jobDescription,
                                             salaryFrom: salaryFrom,
                                             salaryTo: salaryTo,
                                             salaryType: salaryType,
@@ -244,14 +241,13 @@ Job.prototype.create = function(req,res,next){
                                             jobType: jobType,
                                             status: status,
                                             contactName: contactName,
-                                            email_id: email_id,
+                                            email_id: email,
                                             mobileNo: mobileNo,
                                             location_id: location_id,
-                                            categoryID: categoryID,
                                             cid : cid,
                                             ctid : conatctId,
                                             isconfi : isconfidential,
-                                            acode : alumnicode
+                                            acode : alumniCode
                                         };
                                         res.status(200).json(responseMessage);
 
@@ -262,14 +258,14 @@ Job.prototype.create = function(req,res,next){
 
                                                 var locSkills = {
                                                     expertiseLevel: locMatrix[i].expertiseLevel,
-                                                    jobid: insertresult[0][0].jobid,
+                                                    jobId: insertResult[0][0].jobid,
                                                     expFrom: locMatrix[i].exp_from,
                                                     expTo: locMatrix[i].exp_to,
                                                     fid: locMatrix[i].fid,
                                                     careerId: locMatrix[i].career_id
                                                 };
 
-                                                var queryParams = st.db.escape(locSkills.jobid) + ',' + st.db.escape(locSkills.fid)
+                                                var queryParams = st.db.escape(locSkills.jobId) + ',' + st.db.escape(locSkills.fid)
                                                     + ',' + st.db.escape(locSkills.expFrom) + ',' + st.db.escape(locSkills.expTo)
                                                     + ',' + st.db.escape(locSkills.expertiseLevel) + ',' + st.db.escape(locSkills.careerId);
 
@@ -307,7 +303,7 @@ Job.prototype.create = function(req,res,next){
 
                                                 var educationData = {
 
-                                                    jobid: insertresult[0][0].jobid,
+                                                    jobId: insertResult[0][0].jobid,
                                                     eduId :educations[j].edu_id,
                                                     spcId : educations[j].spc_id,
                                                     scoreFrom:educations[j].score_from,
@@ -315,7 +311,7 @@ Job.prototype.create = function(req,res,next){
                                                     level : educations[j].expertiseLevel   // 0-ug, 1-pg
                                                 };
 
-                                                var queryParams = st.db.escape(educationData.jobid) + ',' +st.db.escape(educationData.eduId)
+                                                var queryParams = st.db.escape(educationData.jobId) + ',' +st.db.escape(educationData.eduId)
                                                     + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
                                                     + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level);
 
@@ -346,7 +342,7 @@ Job.prototype.create = function(req,res,next){
                                             educations='';
                                         }
 
-                                        matrix(insertresult[0][0].jobid);
+                                        matrix(insertResult[0][0].jobid);
                                         console.log('FnSaveJobs: Jobs save successfully');
                                     }
                                     else {
@@ -383,19 +379,19 @@ Job.prototype.create = function(req,res,next){
                                         if (Result) {
                                             resultvalue = Result.SkillID;
                                             var SkillItems = {
-                                                skillID: resultvalue,
+                                                skillId: resultvalue,
                                                 expertlevel: skills.expertiseLevel,
                                                 expFrom: skills.expFrom,
                                                 expTo: skills.expTo,
-                                                skillstatusid: skills.active_status,
-                                                jobid: skills.jobId,
+                                                skillStatusId: skills.active_status,
+                                                jobId: skills.jobId,
                                                 type : skills.type,
                                                 fid:skills.fid
                                             };
 
-                                            var queryParams = st.db.escape(SkillItems.jobid) + ',' + st.db.escape(SkillItems.skillID)
+                                            var queryParams = st.db.escape(SkillItems.jobId) + ',' + st.db.escape(SkillItems.skillId)
                                                 + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
-                                                + ',' + st.db.escape(SkillItems.skillstatusid) + ',' + st.db.escape(SkillItems.expertlevel)
+                                                + ',' + st.db.escape(SkillItems.skillStatusId) + ',' + st.db.escape(SkillItems.expertlevel)
                                                 + ',' + st.db.escape(parseInt(SkillItems.fid))+ ',' + st.db.escape(SkillItems.type);
                                             var query = 'CALL pSaveJobSkill(' + queryParams + ')';
 
@@ -463,8 +459,8 @@ Job.prototype.create = function(req,res,next){
                                                 });
 
                                                 for (var i = 0; i < results[0].length; i++) {
-                                                    userID = results[0][i].MasterID;
-                                                    var queryParams2 = st.db.escape(ezeone_id) + ',' + st.db.escape(userID)+ ',' + st.db.escape(0);
+                                                    userId = results[0][i].MasterID;
+                                                    var queryParams2 = st.db.escape(ezeoneId) + ',' + st.db.escape(userId)+ ',' + st.db.escape(0);
                                                     var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
                                                     st.db.query(query2, function (err, getResult) {
                                                         if (!err) {
@@ -474,29 +470,29 @@ Job.prototype.create = function(req,res,next){
                                                                 var file = path.join(__dirname,'../../mail/templates/job_post.html');
 
                                                                 fs.readFile(file, "utf8", function (err, data) {
-                                                                    var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeone_id);
+                                                                    var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeoneId);
                                                                     st.db.query(name, function (err, companyResult) {
                                                                         if (companyResult) {
                                                                             data = data.replace("[JobType]", jobtype);
-                                                                            data = data.replace("[JobTitle]", job_title);
-                                                                            data = data.replace("[JobCode]", job_code);
+                                                                            data = data.replace("[JobTitle]", jobTitle);
+                                                                            data = data.replace("[JobCode]", jobCode);
                                                                             data = data.replace("[CompanyName]", companyResult[0].CompanyName);
 
                                                                             var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                 + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                                + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userID)
+                                                                                + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId)
                                                                                 + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape(0);
                                                                             var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
                                                                             st.db.query(query3, function (err, messageResult) {
                                                                                 if (!err) {
                                                                                     if (messageResult) {
                                                                                         console.log('FnComposeMessage:Message Composed successfully');
-                                                                                        var query4 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
+                                                                                        var query4 = 'select tid from tmgroups where GroupType=1 and adminID=' + userId;
                                                                                         st.db.query(query4, function (err, getDetails) {
                                                                                             if (getDetails) {
                                                                                                 if (getDetails[0]) {
 
-                                                                                                    var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userID;
+                                                                                                    var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userId;
                                                                                                     console.log(queryParameters);
                                                                                                     st.db.query(queryParameters, function (err, iosResult) {
                                                                                                         if (iosResult) {
@@ -506,15 +502,14 @@ Job.prototype.create = function(req,res,next){
                                                                                                             iphoneID = '';
                                                                                                         }
                                                                                                         receiverId = getDetails[0].tid;
-                                                                                                        senderTitle = ezeone_id;
-                                                                                                        groupTitle = ezeone_id;
+                                                                                                        senderTitle = ezeoneId;
+                                                                                                        groupTitle = ezeoneId;
                                                                                                         groupId = companyResult[0].tid;
                                                                                                         messageText = data;
                                                                                                         messageType = 8;
                                                                                                         operationType = 0;
                                                                                                         iphoneId = iphoneID;
-                                                                                                        messageId = 0;
-                                                                                                        var masterid = 0,latitude = '', longitude = '',prioritys ='', dateTime = '';
+                                                                                                        var messageId = 0,masterid = 0,latitude = 0.00, longitude = 0.00,prioritys =1, dateTime = '';
                                                                                                         var msgUserid = 0, a_name = '';
                                                                                                         var jid = jobID;
                                                                                                         //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
@@ -663,61 +658,60 @@ Job.prototype.create = function(req,res,next){
     }
 };
 
-function FnSaveSkills(skill, CallBack) {
+function FnSaveSkills(skill, callBack) {
     var _this = this;
     try {
 
         //below query to check token exists for the users or not.
         if (skill != null) {
-            //var Query = 'select Token from tmaster';
-            //70084b50d3c43822fbef
-            var RtnResponse = {
+
+            var responseMessage = {
                 SkillID: 0
             };
-            RtnResponse = JSON.parse(JSON.stringify((RtnResponse)));
+            responseMessage = JSON.parse(JSON.stringify((responseMessage)));
 
-            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) +' and functionid='+st.db.escape(skill.fid), function (err, SkillResult) {
+            st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) +' and functionid='+st.db.escape(skill.fid), function (err, skillResult) {
                 if ((!err)) {
-                    if (SkillResult[0]) {
-                        //console.log(SkillResult);
-                        //console.log('Skill value:' + SkillResult[0].SkillID);
+                    if (skillResult[0]) {
+                        //console.log(skillResult);
+                        //console.log('Skill value:' + skillResult[0].SkillID);
                         //console.log('Skill exists');
-                        RtnResponse.SkillID = SkillResult[0].SkillID;
-                        //console.log(RtnResponse.SkillID);
-                        CallBack(null, RtnResponse);
+                        responseMessage.SkillID = skillResult[0].SkillID;
+                        //console.log(responseMessage.SkillID);
+                        callBack(null, responseMessage);
                     }
                     else {
                         st.db.query('insert into mskill (SkillTitle,functionid) values (' + st.db.escape(skill.skillname) + ',' + st.db.escape(skill.fid) +')', function (err, skillInsertResult) {
                             if (!err) {
                                 if (skillInsertResult.affectedRows > 0) {
-                                    st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, SkillMaxResult) {
+                                    st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname), function (err, skillMaxResult) {
                                         if (!err) {
-                                            if (SkillMaxResult[0]) {
+                                            if (skillMaxResult[0]) {
                                                 //console.log('New Skill');
-                                                RtnResponse.SkillID = SkillMaxResult[0].SkillID;
-                                                CallBack(null, RtnResponse);
+                                                responseMessage.SkillID = skillMaxResult[0].SkillID;
+                                                callBack(null, responseMessage);
                                             }
                                             else {
-                                                CallBack(null, null);
+                                                callBack(null, null);
                                             }
                                         }
                                         else {
-                                            CallBack(null, null);
+                                            callBack(null, null);
                                         }
                                     });
                                 }
                                 else {
-                                    CallBack(null, null);
+                                    callBack(null, null);
                                 }
                             }
                             else {
-                                CallBack(null, null);
+                                callBack(null, null);
                             }
                         });
                     }
                 }
                 else {
-                    CallBack(null, null);
+                    callBack(null, null);
                 }
             });
         }
@@ -742,15 +736,13 @@ function FnSaveSkills(skill, CallBack) {
 Job.prototype.getAll = function(req,res,next){
     var _this = this;
 
-    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var ezeid = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
     var keywordsForSearch = req.query.keywordsForSearch ? req.query.keywordsForSearch : '';
     var status = req.query.status ? req.query.status : '';
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
     var orderBy = req.query.order_by;  // 1-ascending else descending
-    //console.log(req.query);
-    var final_result=[],loc_result = [],get_result=[],get_result1,tid, location_result={},jobids,job_location;
     var alumniCode = req.query.a_code ? req.query.a_code : '';
 
     var responseMessage = {
@@ -760,8 +752,8 @@ Job.prototype.getAll = function(req,res,next){
         data: null
     };
     var validateStatus = true, error = {};
-    if(!ezeone_id){
-        error['ezeone_id'] = 'Invalid ezeone_id';
+    if(!ezeid){
+        error['ezeid'] = 'Invalid ezeid';
         validateStatus *= false;
     }
     if(!token){
@@ -779,7 +771,7 @@ Job.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
+                        var query = st.db.escape(ezeid) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
                             + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy)
                             + ',' + st.db.escape(alumniCode);
                         console.log('CALL pGetJobs(' + query + ')');
@@ -950,31 +942,31 @@ Job.prototype.searchJobs = function(req,res,next){
             +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue)+',' + st.db.escape(type)
             +',' + st.db.escape(toEzeid);
         console.log('CALL psearchjobs(' + query + ')');
-        st.db.query('CALL psearchjobs(' + query + ')', function (err, getresult) {
-            //console.log(getresult);
+        st.db.query('CALL psearchjobs(' + query + ')', function (err, getResult) {
+            //console.log(getResult);
 
             if (!err) {
-                if (getresult) {
-                    if (getresult[0]) {
-                        if (getresult[0][0]) {
-                            if (getresult[1].length > 0) {
+                if (getResult) {
+                    if (getResult[0]) {
+                        if (getResult[0][0]) {
+                            if (getResult[1].length > 0) {
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Jobs Search result loaded successfully';
                                 if (filter == 0) {
                                     responseMessage.data = {
-                                        total_count: getresult[0][0].count,
-                                        result: getresult[1],
-                                        job_location: getresult[2],
-                                        salary: getresult[3],
-                                        category: getresult[4],
-                                        company_details: getresult[5]
+                                        total_count: getResult[0][0].count,
+                                        result: getResult[1],
+                                        job_location: getResult[2],
+                                        salary: getResult[3],
+                                        category: getResult[4],
+                                        company_details: getResult[5]
                                     };
                                 }
                                 else {
                                     responseMessage.data = {
-                                        total_count: getresult[0][0].count,
-                                        result: getresult[1]
+                                        total_count: getResult[0][0].count,
+                                        result: getResult[1]
                                     };
                                 }
                                 res.status(200).json(responseMessage);
@@ -1035,8 +1027,6 @@ Job.prototype.searchJobs = function(req,res,next){
  */
 Job.prototype.searchJobSeekers = function(req,res) {
 
-    console.log('----------job seeker search-----');
-
     try {
         var keyword = req.body.keyword ? req.body.keyword : '';
         var jobType = req.body.job_type;
@@ -1057,8 +1047,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
         educations = JSON.parse(JSON.stringify(educations));
         var locMatrix = req.body.locMatrix;
         locMatrix = JSON.parse(JSON.stringify(locMatrix));
+        var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
 
-        var i = 0;
         if (!jobSkills) {
             jobSkills = [];
         }
@@ -1078,9 +1068,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
             count: '',
             data: null
         };
-
-        var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
-
 
         var job = function (m) {
 
@@ -1115,9 +1102,17 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
             }
             else {
-                skillMatrix = ' and( ' + skillMatrix + ')';
-                next(skillMatrix);
-                console.log('sending skill matrix..');
+                if (skillMatrix != ' ') {
+                    skillMatrix = ' and ( ' + skillMatrix + ')';
+                    next(skillMatrix);
+                    console.log('sending skill matrix..');
+                }
+
+                else {
+                    skillMatrix = ' ';
+                    next(skillMatrix);
+                    console.log('skill matrix is empty..');
+                }
             }
         };
 
@@ -1219,6 +1214,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             st.db.query(query, function (err, getResult) {
                 //console.log(getResult);
                 //console.log(getResult[0]);
+                //console.log(getResult[1]);
                 if (!err) {
                     if (getResult) {
 
@@ -1228,14 +1224,12 @@ Job.prototype.searchJobSeekers = function(req,res) {
                                 if(getResult[1]){
                                     if(getResult[1].length > 0){
                                         for(var ct = 0; ct < getResult[1].length; ct++){
-                                            getResult[1][ct].surl = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/';
-                                            console.log(getResult[1][ct]);
+                                            getResult[1][ct].surl = (getResult[1][ct].resumeurl) ?
+                                                (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].resumeurl) : '';
+                                            //console.log(getResult[1][ct]);
                                         }
                                     }
                                 }
-                                //console.log('.....................................getresult[[1]..................................');
-                                //console.log(getResult[1]);
-                                //console.log('.......................................................................');
 
                                 responseMessage.status = true;
                                 responseMessage.message = 'Job Seeker send successfully';
@@ -1408,7 +1402,7 @@ Job.prototype.applyJob = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !'
+            responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnApplyJob ' + ex.description);
             var errorDate = new Date();
@@ -1969,7 +1963,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
     var templateId = req.body.template_id;
     var jobTitle = req.body.job_title;
     var jobId = req.body.job_id;
-    var mailflag = parseInt(req.body.mailflag);
+    var mailFlag = parseInt(req.body.mailflag);
     var id, i,tid,jobResult,messageContent,link;
 
     if(ids){
@@ -2078,16 +2072,8 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
                                                                         fs.readFile("jobseeker.html", "utf8", function (err, dataResult) {
                                                                             if (!err) {
                                                                                 if (dataResult) {
-                                                                                    //console.log('dataResult......');
-                                                                                    //console.log(dataResult);
-                                                                                    //console.log('dataResult......');
-                                                                                    if (mailflag == 0) {
-                                                                                        console.log('mailflag...0');
-                                                                                        //console.log(jobResult[0][0].EZEID);
-
+                                                                                    if (mailFlag == 0) {
                                                                                         if (jobResult[0][0].EZEID) {
-                                                                                            console.log('ezeid is there...');
-
                                                                                             var queryParams = st.db.escape(dataResult) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                                 + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                                 + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(jobResult[0][0].masterid)
@@ -2130,11 +2116,7 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
 
                                                                                     }
                                                                                     else{
-                                                                                        console.log('mailflag...1');
-                                                                                        console.log(jobResult[0][0].EZEID);
-
                                                                                         if (jobResult[0][0].EZEID) {
-                                                                                            console.log('ezeid is there');
                                                                                             var queryParams = st.db.escape(dataResult) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                                 + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                                                 + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(jobResult[0][0].masterid)
@@ -3090,8 +3072,8 @@ Job.prototype.jobNotification = function(req,res,next) {
     var ids = req.body.ids;    // tid of student ids
     var templateId = req.body.template_id;
     var jobId = req.body.job_id;
-    var id, i, types='',idType,gid, jobResult, link;
-    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
+    var id, i, types='',gid;
+    var masterid='',receiverId,senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
 
     //console.log(req.body);
 
@@ -3691,13 +3673,13 @@ Job.prototype.saveLocMap = function(req,res,next){
          * getting,storing and validating the input parameters from front end
          */
         var id = 0;
-        var token = req.body.token;
+        var locMap = req.body.loc;
 
-        if(!token){
+        if(!(req.body.token)){
             error['token'] = 'Token is Mandatory';
             validateStatus *= false;
         }
-        var locMap = req.body.loc;
+
         if(!locMap){
             locMap = [];
         }
@@ -3710,11 +3692,11 @@ Job.prototype.saveLocMap = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(req.body.token, function (err, result) {
                 if (!err) {
                     if (result) {
 
-                        var queryParams1 = st.db.escape(req.body.tids) + ',' + st.db.escape(token) + ',' + st.db.escape(req.body.type);
+                        var queryParams1 = st.db.escape(req.body.tids) + ',' + st.db.escape(req.body.token) + ',' + st.db.escape(req.body.type);
                         var query1 = 'CALL pdeletelocmap(' + queryParams1 + ')';
                         console.log(query1);
                         st.db.query(query1, function (err, deleteResult) {

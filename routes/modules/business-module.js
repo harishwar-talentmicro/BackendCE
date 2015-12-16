@@ -360,18 +360,18 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                                         res.send(RtnMessage);
                                         console.log('FnSaveTranscation: Transaction details save successfully');
 
-                                        var MessageContent = {
+                                        var messageContent = {
                                             token : req.body.Token,
-                                            LocID : LocID,
+                                            LocId : LocID,
                                             messageType: parseInt(req.body.FunctionType),
                                             message: MessageText,
                                             ezeid : EZEID,
                                             toEzeid :ToEZEID
                                         };
-                                        mail.fnMessageMail(MessageContent, function (err, statusResult) {
-                                            console.log('Save Trans............');
-                                            console.log(statusResult);
 
+                                        /*sending sales enquiry mail*/
+                                        mail.fnMessageMail(messageContent, function (err, statusResult) {
+                                            console.log(statusResult);
                                             if (!err) {
                                                 if (Result) {
                                                     if (statusResult.status == true) {

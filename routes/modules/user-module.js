@@ -2024,18 +2024,19 @@ User.prototype.saveResume = function(req,res,next){
 
                         var insertLocations = function(locationDetails){
                             var list = {
-                                location_title: locationDetails.location_title,
-                                latitude: locationDetails.latitude,
-                                longitude: locationDetails.longitude,
+                                locationTitle: locationDetails.location_title,
+                                lat: locationDetails.latitude,
+                                lng: locationDetails.longitude,
                                 country: locationDetails.country,
-                                maptype : locationDetails.maptype
+                                mapType : locationDetails.maptype
                             };
-                            var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
+                            var queryParams = st.db.escape(list.locationTitle) + ',' + st.db.escape(list.lat)
+                                + ',' + st.db.escape(list.lng) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.mapType);
 
-                            //console.log(queryParams);
+                            var query = 'CALL psavejoblocation(' + queryParams + ')';
+                            console.log(query);
 
-                            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                            st.db.query(query, function (err, results) {
 
                                 if(err){
                                     console.log('Error in saving psavejoblocation');

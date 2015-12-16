@@ -36,23 +36,23 @@
     "TEMPLATES": {
       "register": {
         "params": [
-          "FULLNAME",
-          "EZEOneID"
+          "fullName",
+          "ezeoneId"
         ],
         "file": "registration.html",
         "subject": "Welcome to EZEOneID"
       },
       "sales": {
         "params": [
-          "EMAIL",
-          "FULLNAME",
-          "EZEOne",
-          "STATUS",
-          "MESSAGE",
-          "EZEOneID"
+          "email",
+          "fullName",
+          "ezeone",
+          "status",
+          "message",
+          "ezeoneId"
         ],
         "file": "salesNew.html",
-        "subject": "Sales"
+        "subject": "Sales Enquiry"
       },
       "cv": {
         "params": [

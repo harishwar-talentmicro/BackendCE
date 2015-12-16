@@ -186,22 +186,22 @@ function FnSendMailEzeid(MailContent, CallBack) {
     }
 };
 
-Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
+Mail.prototype.fnMessageMail= function(messageContent, callBack) {
     var _this = this;
 
     console.log('-----MAIL MODULE-----');
     try {
 
-        if (MessageContent) {
-            var RtnMessage = {
+        if (messageContent) {
+            var responseMessage = {
                 status: false
             };
-            // token, LocID, messageType, message, ezeid, toEzeid, itemsList
+            // token, locId, messageType, message, ezeid, toEzeid, itemsList
             var fs = require('fs');
-            var i = 1,name,LocID,verified, messageType = MessageContent.messageType;
+            var i = 1,name,locId=0,verified, messageType = messageContent.messageType;
             if (messageType == 0) {
                 console.log('-----SALES MAIL MODULE-----');
-                var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(MessageContent.ezeid);
+                var query1 = 'select EZEID,EZEIDVerifiedID as verifiedId,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(messageContent.ezeid);
                 //console.log(query1);
 
                 st.db.query(query1, function (err, getResult) {
@@ -209,7 +209,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                         if (getResult[0]) {
                             if (getResult[0].id == 1) {
                                 console.log('individual user of sales....');
-                                if (getResult[0].EZEIDVerifiedID == 1) {
+                                if (getResult[0].verifiedId == 1) {
                                     verified = 'Not Verified';
                                     //console.log('FnSalesMail: not verified')
                                 }
@@ -218,7 +218,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                     //console.log('FnSalesMail: Verified');
                                 }
 
-                                var mail_query = 'Select EZEID,SalesMailID,CompanyName,FirstName,ifnull(LastName,"") as LastName from tmaster where EZEID=' +st.db.escape(MessageContent.toEzeid);
+                                var mail_query = 'Select EZEID,SalesMailID as salesEmail,CompanyName,FirstName as fn,ifnull(LastName,"") as ln from tmaster where EZEID=' +st.db.escape(messageContent.toEzeid);
 
                                 //console.log(mail_query);
 
@@ -226,20 +226,20 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                     console.log(get_result);
                                     if (get_result) {
                                         if (get_result[0]) {
-                                            if (get_result[0].SalesMailID) {
+                                            if (get_result[0].salesEmail) {
 
-                                                name = get_result[0].FirstName + ' ' + get_result[0].LastName;
+                                                name = get_result[0].fn + ' ' + get_result[0].ln;
                                                 //console.log(name);
 
                                                 var mailContent = {
                                                     type : 'sales',
                                                     fullname : name,
-                                                    email : get_result[0].SalesMailID,
-                                                    toEmail : get_result[0].SalesMailID,
+                                                    email : get_result[0].salesEmail,
+                                                    toEmail : get_result[0].salesEmail,
                                                     status : verified,
-                                                    toEzeid: MessageContent.toEzeid,
+                                                    toEzeid: messageContent.toEzeid,
                                                     ezeid: getResult[0].EZEID,
-                                                    message : MessageContent.message
+                                                    message : messageContent.message
 
                                                 };
 
@@ -249,7 +249,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                     if (mailResult) {
 
                                                         var post = {
-                                                            MessageType: MessageContent.messageType,
+                                                            MessageType: messageContent.messageType,
                                                             Priority: 3,
                                                             ToMailID: mailResult.to,
                                                             Subject: 'Sales Enquiry',
@@ -260,41 +260,41 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                         var mailboxQuery = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, mailboxResult) {
                                                             if (!err) {
                                                                 console.log('FnMessageMail: MailContent saved Successfully....1');
-                                                                RtnMessage.status = true;
-                                                                CallBack(null, RtnMessage);
+                                                                responseMessage.status = true;
+                                                                callBack(null, responseMessage);
                                                             }
                                                             else {
                                                                 console.log('FnMessageMail: MailContent not Saved Successfully');
-                                                                CallBack(null, RtnMessage);
+                                                                callBack(null, responseMessage);
 
                                                             }
                                                         });
                                                     }
                                                     else {
                                                         console.log('FnSendMail:error getting from mailResult');
-                                                        CallBack(null, RtnMessage);
+                                                        callBack(null, responseMessage);
                                                     }
                                                 });
                                             }
                                             else {
                                                 console.log('FnSendMail: error getting from EmailID ');
-                                                CallBack(null, RtnMessage);
+                                                callBack(null, responseMessage);
                                             }
                                         }
                                         else {
                                             console.log('FnSendMail: error getting from EmailID ');
-                                            CallBack(null, RtnMessage);
+                                            callBack(null, responseMessage);
                                         }
                                     }
                                     else {
                                         console.log('FnSendMail: error getting from EmailID ');
-                                        CallBack(null, RtnMessage);
+                                        callBack(null, responseMessage);
                                     }
                                 });
                             }
                             else {
                                 console.log('business user of sales....');
-                                if (getResult[0].EZEIDVerifiedID == 1) {
+                                if (getResult[0].verifiedId == 1) {
                                     verified = 'Not Verified';
                                     console.log('FnSalesMail: not verified');
                                 }
@@ -303,26 +303,26 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                     console.log('FnSalesMail:verified');
                                 }
 
-                                name = getResult[0].FirstName + ' ' + getResult[0].LastName;
+                                name = getResult[0].fn + ' ' + getResult[0].ln;
 
-                                var mail_query = 'Select EZEID,SalesMailID,CompanyName,FirstName,ifnull(LastName,"") as LastName from tmaster where EZEID=' +st.db.escape(MessageContent.toEzeid);
+                                var mail_query = 'Select EZEID,SalesMailID as salesEmail,CompanyName,FirstName as fn,ifnull(LastName,"") as ln from tmaster where EZEID=' +st.db.escape(messageContent.toEzeid);
                                 st.db.query(mail_query, function (err, get_result) {
                                     console.log(mail_query);
                                     console.log(get_result);
 
                                     if (get_result) {
                                         if (get_result[0]) {
-                                            if (get_result[0].SalesMailID) {
+                                            if (get_result[0].salesEmail) {
 
                                                 var mailContent = {
                                                     type : 'sales',
                                                     fullname : name,
-                                                    email : get_result[0].SalesMailID,
-                                                    toEmail : get_result[0].SalesMailID,
+                                                    email : get_result[0].salesEmail,
+                                                    toEmail : get_result[0].salesEmail,
                                                     status : verified,
-                                                    toEzeid: MessageContent.toEzeid,
+                                                    toEzeid: messageContent.toEzeid,
                                                     ezeid: getResult[0].EZEID,
-                                                    message : MessageContent.message
+                                                    message : messageContent.message
 
                                                 };
 
@@ -331,7 +331,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                     //console.log(mailResult);
                                                     if (mailResult) {
                                                         var post = {
-                                                            MessageType: MessageContent.messageType,
+                                                            MessageType: messageContent.messageType,
                                                             Priority: 3,
                                                             ToMailID: mailResult.to,
                                                             Subject: mailResult.subject,
@@ -343,47 +343,47 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                             // Neat!
                                                             if (!err) {
                                                                 console.log('FnMessageMail: Mail saved Successfully....1');
-                                                                RtnMessage.status = true;
-                                                                CallBack(null, RtnMessage);
+                                                                responseMessage.status = true;
+                                                                callBack(null, responseMessage);
 
                                                             }
                                                             else {
                                                                 console.log('FnMessageMail: Mail not Saved Successfully');
-                                                                CallBack(null, RtnMessage);
+                                                                callBack(null, responseMessage);
                                                             }
                                                         });
                                                     }
                                                     else {
                                                         console.log('FnSendMail: error getting from mailResult ');
-                                                        CallBack(null, RtnMessage);
+                                                        callBack(null, responseMessage);
                                                     }
                                                 });
                                             }
                                             else {
                                                 console.log('FnSendMail: error getting from EmailID ');
-                                                CallBack(null, RtnMessage);
+                                                callBack(null, responseMessage);
                                             }
                                         }
                                         else {
                                             console.log('FnSendMail: error getting from EmailID ');
-                                            CallBack(null, RtnMessage);
+                                            callBack(null, responseMessage);
                                         }
                                     }
                                     else {
                                         console.log('FnSendMail: error getting from EmailID ');
-                                        CallBack(null, RtnMessage);
+                                        callBack(null, responseMessage);
                                     }
                                 });
                             }
                         }
                         else {
                             console.log('FnSendMail: Error : User Details not found');
-                            CallBack(null, RtnMessage);
+                            callBack(null, responseMessage);
                         }
                     }
                     else {
                         console.log('FnSendMail: Error : User Details not found');
-                        CallBack(null, RtnMessage);
+                        callBack(null, responseMessage);
                     }
                 });
             }
@@ -393,11 +393,11 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
              var file = path.join(__dirname,'../../mail/templates/homedelivery.html');
 
              fs.readFile(file, "utf8", function (err, data) {
-             var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(EZEID);
+             var query1 = 'select EZEID,EZEIDVerifiedID as verifiedId,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(EZEID);
              st.db.query(query1, function (err, getResult) {
 
              if (getResult[0].id == 1) {
-             if (getResult[0].EZEIDVerifiedID == 1) {
+             if (getResult[0].verifiedId == 1) {
              verified = 'Not Verified';
              }
              else {
@@ -451,7 +451,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
              });
              }
              else {
-             if (getResult[0].EZEIDVerifiedID == 1) {
+             if (getResult[0].verifiedId == 1) {
              verified = 'Not Verified';
              }
              else {
@@ -513,11 +513,11 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
              var file = path.join(__dirname,'../../mail/templates/ServiceMail.html');
 
              fs.readFile(file, "utf8", function (err, data) {
-             var query1 = 'select EZEID,EZEIDVerifiedID,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(EZEID);
+             var query1 = 'select EZEID,EZEIDVerifiedID as verifiedId,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(EZEID);
              st.db.query(query1, function (err, getResult) {
 
              if (getResult[0].id == 1) {
-             if (getResult[0].EZEIDVerifiedID == 1) {
+             if (getResult[0].verifiedId == 1) {
              verified = 'Not Verified';
              }
              else {
@@ -571,7 +571,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
              });
              }
              else {
-             if (getResult[0].EZEIDVerifiedID == 1) {
+             if (getResult[0].verifiedId == 1) {
              verified = 'Not Verified';
              }
              else {
@@ -630,11 +630,11 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
             else if (messageType == 4) {
                 console.log('-----RESUME(CV) MAIL MODULE-----');
                 var url='';
-                var query = 'select TID from tlocations where EZEID=' + st.db.escape(MessageContent.toEzeid);
+                var query = 'select TID from tlocations where EZEID=' + st.db.escape(messageContent.toEzeid);
                 st.db.query(query, function (err, getResult) {
                     if (getResult[0]) {
-                        LocID = getResult[0].TID;
-                        var query = st.db.escape(MessageContent.token) + ',' + st.db.escape(LocID) + ',' + st.db.escape(MessageContent.messageType);
+                        locId = getResult[0].TID;
+                        var query = st.db.escape(messageContent.token) + ',' + st.db.escape(locId) + ',' + st.db.escape(messageContent.messageType);
                         console.log('CALL PgetMailSendingDetails(' + query + ')');
                         st.db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, resumeDetails) {
                             //console.log(resumeDetails);
@@ -658,12 +658,12 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                 email: resumeDetails[0][0].MailID,   // from mail id
                                                 toEmail: resumeDetails[0][0].ToMailID,
                                                 status: 'Not Verified',
-                                                toEzeid: MessageContent.toEzeid,
+                                                toEzeid: messageContent.toEzeid,
                                                 ezeid: resumeDetails[0][0].EZEID,
                                                 function : resumeDetails[0][0].Function,
                                                 keyskills :resumeDetails[0][0].KeySkills,
                                                 url: url,
-                                                message: MessageContent.message
+                                                message: messageContent.message
                                             };
 
                                             //console.log(mailContent);
@@ -674,7 +674,7 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                 if (mailResult) {
 
                                                     var post = {
-                                                        MessageType: MessageContent.messageType,
+                                                        MessageType: messageContent.messageType,
                                                         Priority: 3,
                                                         ToMailID: mailResult.to,
                                                         Subject: mailResult.subject,
@@ -685,49 +685,49 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
                                                     var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, mailboxResult) {
                                                         if (!err) {
                                                             console.log('FnMessageMail: Mail saved Successfully....5');
-                                                            RtnMessage.status = true;
-                                                            CallBack(null, RtnMessage);
+                                                            responseMessage.status = true;
+                                                            callBack(null, responseMessage);
                                                         }
                                                         else {
                                                             console.log('FnMessageMail: Mail not Saved Successfully');
-                                                            CallBack(null, RtnMessage);
+                                                            callBack(null, responseMessage);
                                                         }
                                                     });
                                                 }
                                                 else {
                                                     console.log('FnMessageMail: Mail Result not found');
-                                                    CallBack(null, RtnMessage);
+                                                    callBack(null, responseMessage);
                                                 }
                                             });
                                         }
                                         else {
                                             console.log('FnMessageMail: ToMailId not found');
-                                            CallBack(null, RtnMessage);
+                                            callBack(null, responseMessage);
 
                                         }
                                     }
                                     else {
                                         console.log('FnMessageMail: Resume Details not found');
-                                        CallBack(null, RtnMessage);
+                                        callBack(null, responseMessage);
 
                                     }
                                 }
                                 else {
                                     console.log('FnMessageMail: Resume Details not found');
-                                    CallBack(null, RtnMessage);
+                                    callBack(null, responseMessage);
 
                                 }
                             }
                             else {
                                 console.log('FnMessageMail: Resume Details not found : ' +err);
-                                CallBack(null, RtnMessage);
+                                callBack(null, responseMessage);
 
                             }
                         });
                     }
                     else {
                         console.log('FnMessage:LocID is not found');
-                        CallBack(null, RtnMessage);
+                        callBack(null, responseMessage);
                     }
                 });
             }
@@ -735,33 +735,33 @@ Mail.prototype.fnMessageMail= function(MessageContent, CallBack) {
             else
             {
                 console.log('FnMessageMail: FunctionType is not matched');
-                CallBack(null, RtnMessage);
+                callBack(null, responseMessage);
             }
         }
         else {
-            console.log('FnMessageMail: MessageContent  is empty');
-            CallBack(null, RtnMessage);
+            console.log('FnMessageMail: messageContent  is empty');
+            callBack(null, responseMessage);
         }
     }
 
 
     catch (ex) {
         console.log('OTP FnMessageMail Catch error:' + ex.description);
-        CallBack(null, null);
+        callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
-Mail.prototype.sendRegMail= function(mailContent, CallBack) {
+Mail.prototype.sendRegMail= function(mailContent, callBack) {
     var _this = this;
 
     console.log('-----REGISTERATION MAIL MODULE-----');
     try {
 
         if (mailContent) {
-            var RtnMessage = {
+            var responseMessage = {
                 status: false
             };
             var fs = require('fs');
@@ -784,19 +784,19 @@ Mail.prototype.sendRegMail= function(mailContent, CallBack) {
 
                             if (!err) {
                                 console.log('FnMessageMail: Mail send Successfully');
-                                RtnMessage.status = true;
-                                CallBack(null, RtnMessage);
+                                responseMessage.status = true;
+                                callBack(null, responseMessage);
 
                             }
                             else {
                                 console.log('FnMessageMail: Mail not send');
-                                CallBack(null, RtnMessage);
+                                callBack(null, responseMessage);
                             }
                         });
                     }
                     else {
                         console.log('FnSendMail: error getting from mailResult ');
-                        CallBack(null, RtnMessage);
+                        callBack(null, responseMessage);
                     }
                 }
             });
@@ -804,7 +804,7 @@ Mail.prototype.sendRegMail= function(mailContent, CallBack) {
     }
     catch (ex) {
         console.log('OTP FnMessageMail Catch error:' + ex.description);
-        CallBack(null, null);
+        callBack(null, null);
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');

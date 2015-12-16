@@ -168,6 +168,8 @@ router.post('/ewtHolidayList',configurationModule.saveHoliday);
 router.get('/ewtHolidayList',configurationModule.getHolidays);
 router.delete('/ewtHolidayList',configurationModule.deleteHoliday);
 router.get('/get_workinghours_details',configurationModule.getWorkingHoursDetails);
+router.post('/institute_group',configurationModule.saveInstituteGroup);
+router.get('/institute_group',configurationModule.getInstituteGroup);
 
 //Search module methods
 var Search = require('./modules/search-module.js');

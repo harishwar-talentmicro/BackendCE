@@ -32,15 +32,15 @@ function msgNotification(db,stdLib){
     }
 };
 
-msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
+msgNotification.prototype.sendNotification= function(msgContent, callBack) {
     var _this = this;
 
     console.log('-----Send Nofication of Compose Message-----');
     var to_ids,masterid,receiverId,gid,senderTitle,groupTitle,groupId;
-    var messageText,messageType,operationType,iphoneId,messageId,id,id_type,iphoneID,dateTime,prioritys,msgUserid;
+    var messageText,messageType,operationType,iphoneId,messageId,id,id_type,dateTime,prioritys,msgUserid;
     try {
 
-        var RtnMessage = {
+        var responseMessage = {
             status: false
 
         };
@@ -56,9 +56,9 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
         //    idType: '1',
         //    mimeType: '',
         //    ezeid: '@SGOWRI2' }
-        id = MsgContent.idType.split(",");
-        to_ids = MsgContent.toID.split(",");
-        console.log('msgid:' + MsgContent.message_id);
+        id = msgContent.idType.split(",");
+        to_ids = msgContent.toID.split(",");
+        console.log('msgid:' + msgContent.message_id);
 
         var loopFunction = function (c) {
             if (c < id.length) {
@@ -72,13 +72,13 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                     st.db.query(queryParameters, function (err, iosResult) {
                         if (iosResult) {
                             if (iosResult[0]) {
-                                iphoneID = iosResult[0].iphoneID;
+                                iphoneId = iosResult[0].iphoneID;
                             }
                             else {
-                                iphoneID = '';
+                                iphoneId = '';
                             }
-                            //console.log(iphoneID);
-                            var queryParams = st.db.escape(MsgContent.token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
+                            //console.log(iphoneId);
+                            var queryParams = st.db.escape(msgContent.token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
                             var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
                             //console.log(messageQuery);
                             st.db.query(messageQuery, function (err, groupDetails) {
@@ -87,7 +87,7 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                                         if (groupDetails[0].length > 0) {
                                             if (groupDetails[1]) {
                                                 if (groupDetails[1].length > 0) {
-                                                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(MsgContent.token);
+                                                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(msgContent.token);
                                                     var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
                                                     console.log(messageQuery1);
                                                     st.db.query(messageQuery1, function (err, groupDetails1) {
@@ -103,16 +103,16 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                                                                     groupId = groupDetails[0][0].tid;
                                                                     groupTitle = groupDetails[0][0].groupname;
                                                                 }
-                                                                messageText = MsgContent.message;
+                                                                messageText = msgContent.message;
                                                                 messageType = id_type;
                                                                 operationType = 0;
-                                                                iphoneId = iphoneID;
-                                                                messageId = MsgContent.message_id;
-                                                                msgUserid = MsgContent.message_userid;
+                                                                iphoneId = iphoneId;
+                                                                messageId = msgContent.message_id;
+                                                                msgUserid = msgContent.message_userid;
                                                                 masterid = groupDetails[0][0].AdminID;
-                                                                prioritys = MsgContent.priority;
-                                                                var a_url = MsgContent.attachment;
-                                                                var a_name = MsgContent.attachmentFilename;
+                                                                prioritys = msgContent.priority;
+                                                                var a_url = msgContent.attachment;
+                                                                var a_name = msgContent.attachmentFilename;
                                                                 var now = new Date();
                                                                 var t = now.toUTCString();
                                                                 var datetime = t.split(',');
@@ -121,8 +121,8 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
                                                                 //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                 //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                 notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid,jobId,a_url);
-                                                                RtnMessage.status = true;
-                                                                callBack(null, RtnMessage);
+                                                                responseMessage.status = true;
+                                                                callBack(null, responseMessage);
                                                             }
                                                             c = c+1;
                                                             loopFunction(c);
@@ -168,7 +168,7 @@ msgNotification.prototype.sendNotification= function(MsgContent, callBack) {
             }
         };
 
-        if (MsgContent) {
+        if (msgContent) {
             var c = 0;
             loopFunction(c);
         }
@@ -193,10 +193,10 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
 
     console.log('-----Send Nofication of Update Status-----');
     var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupID,messageText,messageType;
-    var operationType,iphoneID,iphoneId,messageId;
+    var operationType,iphoneId,messageId;
     try {
 
-        var RtnMessage = {
+        var responseMessage = {
             status: false
 
         };
@@ -223,7 +223,7 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                         var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + getDetails[0].AdminID;
                                         st.db.query(queryParameters, function (err, iosResult) {
                                             if (iosResult) {
-                                                iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                                iphoneId = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                                                 var getQuery2 = 'select EZEID from tmaster where tid=' + details.masterId;
                                                 st.db.query(getQuery2, function (err, memberDetails) {
                                                     if (memberDetails) {
@@ -237,15 +237,15 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                                                 messageText = 'has accepted your request ';
                                                                 messageType = 3;
                                                                 operationType = 0;
-                                                                iphoneId = iphoneID;
+                                                                iphoneId = iphoneId;
                                                                 messageId = 0;
                                                                 masterid = '';
                                                                 var latitude = '', longitude = '',prioritys='';
                                                                 var dateTime='',a_name='',msgUserid='';
                                                                 //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                 notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
-                                                                RtnMessage.status = true;
-                                                                callBack(null, RtnMessage);
+                                                                responseMessage.status = true;
+                                                                callBack(null, responseMessage);
                                                             }
                                                             else {
                                                                 // Group type 0
@@ -255,7 +255,7 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                                                     var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + getDetails[0].AdminID;
                                                                     st.db.query(queryParameters, function (err, iosResult) {
                                                                         if (iosResult) {
-                                                                            iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                                                            iphoneId = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                                                                             var query3 = 'select tid, GroupName from tmgroups where grouptype=1 and adminid =' + getDetails[0].AdminID;
                                                                             st.db.query(query3, function (err, groupDetails) {
                                                                                 if (groupDetails) {
@@ -267,15 +267,15 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                                                                         messageText = 'has accepted your request ';
                                                                                         messageType = 3;
                                                                                         operationType = 0;
-                                                                                        iphoneId = iphoneID;
+                                                                                        iphoneId = iphoneId;
                                                                                         messageId = 0;
                                                                                         masterid = '';
                                                                                         var latitude = '', longitude = '',prioritys='';
                                                                                         var dateTime='',a_name='',msgUserid='';
                                                                                         //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                         notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
-                                                                                        RtnMessage.status = true;
-                                                                                        callBack(null, RtnMessage);
+                                                                                        responseMessage.status = true;
+                                                                                        callBack(null, responseMessage);
                                                                                     }
                                                                                     else {
                                                                                         console.log('FnUpdateUserStatus:Error getting from groupDetails');
@@ -295,11 +295,11 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                                                     var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + details.masterId;
                                                                     st.db.query(queryParameters, function (err, iosResult) {
                                                                         if (iosResult) {
-                                                                            iphoneID = iosResult[0].iphoneID;
+                                                                            iphoneId = iosResult[0].iphoneID;
                                                                         }
                                                                         else
                                                                         {
-                                                                            iphoneID = '';
+                                                                            iphoneId = '';
                                                                         }
                                                                         var query3 = 'select tid, GroupName from tmgroups where grouptype=1 and adminid =' + details.masterId;
                                                                         st.db.query(query3, function (err, groupDetails) {
@@ -312,15 +312,15 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                                                                     messageText = 'has accepted your request ';
                                                                                     messageType = 3;
                                                                                     operationType = 0;
-                                                                                    iphoneId = iphoneID;
+                                                                                    iphoneId = iphoneId;
                                                                                     messageId = 0;
                                                                                     masterid = '';
                                                                                     var latitude = '', longitude = '',prioritys='';
                                                                                     var dateTime='',a_name='',msgUserid='';
                                                                                     //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
-                                                                                    RtnMessage.status = true;
-                                                                                    callBack(null, RtnMessage);
+                                                                                    responseMessage.status = true;
+                                                                                    callBack(null, responseMessage);
                                                                                 }
                                                                                 else {
                                                                                     console.log('FnUpdateUserStatus:Error getting from groupDetails');
@@ -380,27 +380,27 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
     }
 };
 
-msgNotification.prototype.sendForwardNotification = function(MsgContent, callBack) {
+msgNotification.prototype.sendForwardNotification = function(msgContent, callBack) {
     var _this = this;
 
     console.log('-----Send Nofication of Forward Message-----');
-    var to_ids,id,id_type,gid,iphoneID;
+    var id,id_type,gid,iphoneId,idTypeArray,toIdArray;
     var receiverId,senderTitle,groupId,groupTitle,messageText,messageType,masterid,messageId;
     try {
 
-        var RtnMessage = {
+        var responseMessage = {
             status: false
 
         };
 
-        id = MsgContent.idType.split(",");
-        to_ids = MsgContent.toID.split(",");
+         idTypeArray = JSON.parse("[" + msgContent.idType + "]");
+         toIdArray = JSON.parse("[" + msgContent.toId + "]");
 
 
         var loopFunction = function (c) {
-            if (c < id.length) {
-                id_type = parseInt(id[c]);
-                gid = parseInt(to_ids[c]);
+            if (c < idTypeArray.length) {
+                id_type = parseInt(idTypeArray[c]);
+                gid = parseInt(toIdArray[c]);
 
                 console.log('group id:' + gid);
                 if (gid) {
@@ -409,13 +409,13 @@ msgNotification.prototype.sendForwardNotification = function(MsgContent, callBac
                     st.db.query(queryParameters, function (err, iosResult) {
                         if (iosResult) {
                             if (iosResult[0]) {
-                                iphoneID = iosResult[0].iphoneID;
+                                iphoneId = iosResult[0].iphoneID;
                             }
                             else {
-                                iphoneID = '';
+                                iphoneId = '';
                             }
-                            //console.log(iphoneID);
-                            var queryParams = st.db.escape(MsgContent.token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
+                            //console.log(iphoneId);
+                            var queryParams = st.db.escape(msgContent.token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
                             var messageQuery = 'CALL PgetGroupDetails(' + queryParams + ')';
                             //console.log(messageQuery);
                             st.db.query(messageQuery, function (err, groupDetails) {
@@ -424,7 +424,7 @@ msgNotification.prototype.sendForwardNotification = function(MsgContent, callBac
                                         if (groupDetails[0].length > 0) {
                                             if (groupDetails[1]) {
                                                 if (groupDetails[1].length > 0) {
-                                                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(MsgContent.token);
+                                                    var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(msgContent.token);
                                                     var messageQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
                                                     console.log(messageQuery1);
                                                     st.db.query(messageQuery1, function (err, groupDetails1) {
@@ -442,20 +442,20 @@ msgNotification.prototype.sendForwardNotification = function(MsgContent, callBac
                                                                 }
                                                                 messageText = 'Forward Message';
                                                                 messageType = id_type;
-                                                                messageId = MsgContent.message_id;
+                                                                messageId = msgContent.message_id;
                                                                 masterid = groupDetails[0][0].AdminID;
-                                                                var iphoneId = iphoneID;
+                                                                iphoneId = iphoneId;
                                                                 var now = new Date();
                                                                 var t = now.toUTCString();
                                                                 var dateTime = t.split(',');
                                                                 dateTime = dateTime[1];
                                                                 var latitude = 0.00, longitude = 0.00,jobId=0;
-                                                                var a_name='',a_url = '',operationType = 0,msgUserid = 0,prioritys=1;
+                                                                var aName='',aUrl = '',operationType = 0,msgUserid = 0,prioritys=1;
                                                                 //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                 //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid,jobId,a_url);
-                                                                RtnMessage.status = true;
-                                                                callBack(null, RtnMessage);
+                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, aName, msgUserid,jobId,aUrl);
+                                                                responseMessage.status = true;
+                                                                callBack(null, responseMessage);
                                                             }
                                                             c = c+1;
                                                             loopFunction(c);
@@ -501,7 +501,7 @@ msgNotification.prototype.sendForwardNotification = function(MsgContent, callBac
             }
         };
 
-        if (MsgContent) {
+        if (msgContent) {
             var c = 0;
             loopFunction(c);
         }

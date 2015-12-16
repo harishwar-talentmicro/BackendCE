@@ -95,7 +95,7 @@ HussMailer.prototype.renderTemplate = function(mailType,params){
     return ejs.render(fileContent,params);
 };
 
-HussMailer.prototype.sendMail = function(mailContent, CallBack){
+HussMailer.prototype.sendMail = function(mailContent, callBack){
 
     console.log('-----HUSS MAILER OF EJS-----');
 
@@ -112,25 +112,23 @@ HussMailer.prototype.sendMail = function(mailContent, CallBack){
     var toEzeid = (mailContent.toEzeid) ? (mailContent.toEzeid) : '';
     var functions = (mailContent.function) ? (mailContent.function) : '';
     var keyskills = (mailContent.keyskills) ? (mailContent.keyskills) : '';
-    var url = (mailContent.url) ? (mailContent.url) : '';
 
     if (mailContent.type == 'sales') {
         var parameters = {
-            EMAIL: email,
-            FULLNAME: name,
-            EZEOne: ezeid, // from ezeid
-            STATUS: status,
-            MESSAGE: message,
-            EZEOneID: toEzeid, // to ezeid
-            FUNCTION: functions,
-            KEYSKILLS: keyskills,
-            URL: url
+            email: email,
+            fullName: name,
+            ezeone: ezeid, // from ezeid
+            status: status,
+            message: message,
+            ezeoneId: toEzeid, // to ezeid
+            function: functions,
+            keySkills: keyskills
         };
     }
     else if (mailContent.type == 'register') {
         var parameters = {
-            FULLNAME: name,
-            EZEOneID: ezeid
+            fullName: name,
+            ezeoneId: ezeid
         };
     }
 
@@ -186,19 +184,16 @@ HussMailer.prototype.sendMail = function(mailContent, CallBack){
                     };
 
                     var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                    //var transporter = nodemailer.createTransport();
-                    //transporter.sendMail(mailOptions,function(error,info){
                     sendgrid.send(mailOptions, function (error, result) {
                         if(error){
                             console.log('Error in sending mail');
                             console.log(error);
-                            CallBack(null, null);
+                            callBack(null, null);
 
                         }
                         else{
                             console.log('Mail sent successfully...');
-                            //console.log(info);
-                            CallBack(null, mailOptions);
+                            callBack(null, mailOptions);
                         }
                     });
 
