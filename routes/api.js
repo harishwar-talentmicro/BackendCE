@@ -138,7 +138,6 @@ router.get('/transaction_attachment',businessManager.getTransAttachment);
 router.get('/sales_statistics',businessManager.salesStatistics);
 router.post('/sales_request',businessManager.sendSalesRequest);
 router.post('/ewtSaveTranscation',businessManager.sendSalesRequest);
-router.post('/sales_transaction',businessManager.saveSalesTransaction);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');

@@ -78,7 +78,7 @@ Job.prototype.create = function(req,res,next){
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
-    var location_id = 0, resultvalue = '';
+    var location_id = '', resultvalue = '';
     var skillMatrix1 = req.body.skillMatrix;
     skillMatrix1= JSON.parse(JSON.stringify(skillMatrix1));
     if (!skillMatrix1){
@@ -91,7 +91,7 @@ Job.prototype.create = function(req,res,next){
     var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
     var conatctId = req.body.ctid ? parseInt(req.body.ctid) : 0;     // contact id
     var isconfidential = req.body.isconfi ? parseInt(req.body.isconfi) : 0;
-    var alumniCode = req.body.acode;    // alumni code
+    var alumniCode = req.body.acode ? req.body.acode : '';    // alumni code
     var locMatrix = req.body.locMatrix;
     locMatrix= JSON.parse(JSON.stringify(locMatrix));
     var educations = req.body.jobEducation;
@@ -247,7 +247,8 @@ Job.prototype.create = function(req,res,next){
                                             cid : cid,
                                             ctid : conatctId,
                                             isconfi : isconfidential,
-                                            acode : alumniCode
+                                            acode : alumniCode,
+                                            institute_id : req.body.institute_id
                                         };
                                         res.status(200).json(responseMessage);
 
@@ -291,8 +292,7 @@ Job.prototype.create = function(req,res,next){
                                                 });
                                             }
                                         }
-                                        else
-                                        {
+                                        else{
                                             locMatrix='';
                                         }
 
@@ -337,8 +337,7 @@ Job.prototype.create = function(req,res,next){
                                                 });
                                             }
                                         }
-                                        else
-                                        {
+                                        else {
                                             educations='';
                                         }
 
@@ -744,6 +743,10 @@ Job.prototype.getAll = function(req,res,next){
     var pageCount = req.query.page_count;
     var orderBy = req.query.order_by;  // 1-ascending else descending
     var alumniCode = req.query.a_code ? req.query.a_code : '';
+    //var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
+    //var clientQuery = req.query.clq ? req.query.clq : '';
+    //var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
+    //var contactQuery = req.query.ctq ? req.query.ctq : '';
 
     var responseMessage = {
         status: false,
@@ -851,6 +854,8 @@ Job.prototype.getAll = function(req,res,next){
         }
     }
 };
+
+
 
 /**
  * @todo FnGetJobLocations
@@ -1027,49 +1032,60 @@ Job.prototype.searchJobs = function(req,res,next){
  */
 Job.prototype.searchJobSeekers = function(req,res) {
 
+
+    var keyword = req.body.keyword ? req.body.keyword : '';
+    var jobType = req.body.job_type;
+    var salaryFrom = req.body.salary_from;
+    var salaryTo = req.body.salary_to;
+    var salaryType = req.body.salary_type;
+    var experienceFrom = req.body.experience_from;
+    var experienceTo = req.body.experience_to;
+    var instituteId = req.body.institute_id ? req.body.institute_id : '';
+    var pageSize = req.body.page_size ? req.body.page_size : 10;
+    var pageCount = req.body.page_count ? req.body.page_count : 0;
+    var source = req.body.source;   // 1-internal, 2-for ezeone cvs
+    var token = req.body.token;
+    var jobSkills = req.body.job_skills;
+    jobSkills = JSON.parse(JSON.stringify(jobSkills));
+    var educations = req.body.jobEducations;
+    educations = JSON.parse(JSON.stringify(educations));
+    var locMatrix = req.body.locMatrix;
+    locMatrix = JSON.parse(JSON.stringify(locMatrix));
+    var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
+    var locationsList = req.body.locationsList;
+    if(typeof(locationsList) == "string") {
+        locationsList = JSON.parse(locationsList);
+    }
+    var location_id='',locCount= 0,locationIds;
+
+    if (!jobSkills) {
+        jobSkills = [];
+    }
+
+    /**
+     * Validations
+     */
+    salaryFrom = (parseFloat(salaryFrom) !== NaN && parseFloat(salaryFrom) > 0) ? parseFloat(salaryFrom) : 0;
+    salaryTo = (parseFloat(salaryTo) !== NaN && parseFloat(salaryTo) > 0) ? parseFloat(salaryTo) : 0;
+    salaryType = (parseInt(salaryType) !== NaN && parseInt(salaryType) > 0) ? parseInt(salaryType) : 1;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        count: '',
+        data: null
+    };
     try {
-        var keyword = req.body.keyword ? req.body.keyword : '';
-        var jobType = req.body.job_type;
-        var salaryFrom = req.body.salary_from;
-        var salaryTo = req.body.salary_to;
-        var salaryType = req.body.salary_type;
-        var experienceFrom = req.body.experience_from;
-        var experienceTo = req.body.experience_to;
-        var locationIds = req.body.location_ids;
-        var instituteId = req.body.institute_id ? req.body.institute_id : '';
-        var pageSize = req.body.page_size ? req.body.page_size : 10;
-        var pageCount = req.body.page_count ? req.body.page_count : 0;
-        var source = req.body.source;   // 1-internal, 2-for ezeone cvs
-        var token = req.body.token;
-        var jobSkills = req.body.job_skills;
-        jobSkills = JSON.parse(JSON.stringify(jobSkills));
-        var educations = req.body.jobEducations;
-        educations = JSON.parse(JSON.stringify(educations));
-        var locMatrix = req.body.locMatrix;
-        locMatrix = JSON.parse(JSON.stringify(locMatrix));
-        var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
 
-        if (!jobSkills) {
-            jobSkills = [];
-        }
+        var locationDetails = locationsList[locCount];
 
-        /**
-         * Validations
-         */
-        salaryFrom = (parseFloat(salaryFrom) !== NaN && parseFloat(salaryFrom) > 0) ? parseFloat(salaryFrom) : 0;
-        salaryTo = (parseFloat(salaryTo) !== NaN && parseFloat(salaryTo) > 0) ? parseFloat(salaryTo) : 0;
-        salaryType = (parseInt(salaryType) !== NaN && parseInt(salaryType) > 0) ? parseInt(salaryType) : 1;
+        var job = function (m,locationIds) {
 
-
-        var responseMessage = {
-            status: false,
-            error: {},
-            message: '',
-            count: '',
-            data: null
-        };
-
-        var job = function (m) {
+            console.log('locationIds...2');
+            var ids = locationIds;
+            console.log(ids);
 
             if (m < jobSkills.length) {
 
@@ -1097,28 +1113,31 @@ Job.prototype.searchJobSeekers = function(req,res) {
                             ' find_in_set(b.SkillStatusID' + ',' + jskills.active_status + '))';
                     }
                     m = m + 1;
-                    job(m);
+                    job(m,ids);
                 });
 
             }
             else {
                 if (skillMatrix != ' ') {
                     skillMatrix = ' and ( ' + skillMatrix + ')';
-                    next(skillMatrix);
+                    next(skillMatrix,ids);
                     console.log('sending skill matrix..');
                 }
 
                 else {
-                    skillMatrix = ' ';
-                    next(skillMatrix);
+                    skillMatrix = '';
+                    next(skillMatrix,ids);
                     console.log('skill matrix is empty..');
                 }
             }
         };
 
-
-        var next = function (skillMatrix) {
+        var next = function (skillMatrix,locationIds) {
             var skillArray = skillMatrix;
+            var locIds = locationIds;
+
+            console.log('locationIds...3');
+            console.log(locIds);
             //educations
             if (educations.length) {
                 for(var j=0; j < educations.length; j++){
@@ -1197,24 +1216,22 @@ Job.prototype.searchJobSeekers = function(req,res) {
                 lineofcarrer = '';
             }
 
-            jobSeeker(skillArray, educationMatrix, lineofcarrer);
+            jobSeeker(skillArray, educationMatrix, lineofcarrer,locIds);
         };
 
-        var jobSeeker = function (skillArray, educationMatrix, lineofcarrer) {
+        var jobSeeker = function (skillArray, educationMatrix, lineofcarrer,locIds) {
 
-            var queryParams = st.db.escape(skillArray) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
-                + ',' + st.db.escape(salaryType) + ',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
-                + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId) + ',' + st.db.escape(pageSize)
-                + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
+            var queryParams = st.db.escape(skillArray) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom)
+                + ',' + st.db.escape(salaryTo)+ ',' + st.db.escape(salaryType) + ',' + st.db.escape(locIds)
+                + ',' + st.db.escape(experienceFrom)+ ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId)
+                + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
                 + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(lineofcarrer);
 
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
-            //console.log('------------');
             console.log(query);
             st.db.query(query, function (err, getResult) {
                 //console.log(getResult);
-                //console.log(getResult[0]);
-                //console.log(getResult[1]);
+
                 if (!err) {
                     if (getResult) {
 
@@ -1235,8 +1252,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
                                 responseMessage.message = 'Job Seeker send successfully';
                                 responseMessage.count = getResult[0][0].count;
                                 responseMessage.data = getResult[1];
-
-                                console.log(responseMessage);
                                 res.status(200).json(responseMessage);
                                 console.log('FnGetJobSeeker: Job Seeker send successfully');
                             }
@@ -1271,17 +1286,102 @@ Job.prototype.searchJobSeekers = function(req,res) {
             });
         };
 
+        // saving locations
+        var insertLocations = function(locationDetails){
+            var list = {
+                location_title: locationDetails.location_title,
+                latitude: locationDetails.latitude,
+                longitude: locationDetails.longitude,
+                country: locationDetails.country,
+                maptype : locationDetails.maptype
+            };
 
-        if (jobSkills) {
-            var m = 0;
-            job(m);
+            var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
+                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
+            console.log('CALL psavejoblocation(' + queryParams + ')');
+            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                if (results) {
+                    if (results[0]) {
+                        if (results[0][0]) {
+                            location_id += results[0][0].id + ',';
+                            locCount +=1;
+                            if(locCount < locationsList.length){
+                                insertLocations(locationsList[locCount]);
+                            }
+                            else{
+                                if (jobSkills) {
+                                    var m = 0;
+
+                                    locationIds = location_id;
+                                    console.log('locationIds......1');
+                                    console.log(locationIds);
+                                    job(m,locationIds);
+                                }
+                                else
+                                {
+                                    var skillMatrix = '';
+                                    locationIds = location_id;
+                                    next(skillMatrix,locationIds);
+                                    console.log('FnGetJobSeeker : skill is empty');
+                                }
+                            }
+                        }
+                        else {
+                            console.log('FnSaveJobLocation:results no found');
+                            responseMessage.message = 'results no found';
+                            res.status(200).json(responseMessage);
+                        }
+                    }
+                    else {
+                        console.log('FnSaveJobLocation:results no found');
+                        responseMessage.message = 'results no found';
+                        res.status(200).json(responseMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveJobLocation:results no found');
+                    responseMessage.message = 'results no found';
+                    res.status(200).json(responseMessage);
+                }
+            });
+        };
+        //calling function at first time
+
+        if (locationsList) {
+            console.log('coming..');
+            if (locationsList.length > 0) {
+                insertLocations(locationDetails);
+            }
+            else {
+                locationIds = '';
+                if (jobSkills) {
+                    var m = 0;
+                    job(m,locationIds);
+
+                }
+                else
+                {
+                    var skillMatrix = '';
+                    next(skillMatrix,locationIds);
+                    console.log('FnGetJobSeeker : skill is empty');
+                }
+            }
 
         }
-        else
-        {
-            var skillMatrix = '';
-            next(skillMatrix);
-            console.log('FnGetJobSeeker : skill is empty');
+
+        else {
+            locationIds = '';
+            if (jobSkills) {
+                var m = 0;
+                job(m,locationIds);
+
+            }
+            else
+            {
+                var skillMatrix = '';
+                next(skillMatrix,locationIds);
+                console.log('FnGetJobSeeker : skill is empty');
+            }
         }
     }
 

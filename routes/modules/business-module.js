@@ -68,6 +68,13 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
         var expFrom = req.query.exp_from ? req.query.exp_from : 0;
         var expTo = req.query.exp_to ? req.query.exp_to : 0;
         var locationID = req.query.location_id ? req.query.location_id : '';
+        //var type = 1;
+        //var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
+        //var clientQuery = req.query.clq ? req.query.clq : '';
+        //var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
+        //var contactQuery = req.query.ctq ? req.query.ctq : '';
+        //var ezeoneIdSort = (!isNaN(parseInt(req.query.ezes))) ?  parseInt(req.query.ezes) : 0;
+        //var ezeoneIdQuery = req.query.ezeq ? req.query.ezeq : '';
 
         console.log(req.query);
         var RtnMessage = {
@@ -184,24 +191,19 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
      */
     var _this = this;
     try {
-
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var FunctionType = parseInt(req.query.FunctionType);
-        var Page = parseInt(req.query.Page);
-        var Status = (req.query.Status) ? req.query.Status : null;
-        var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
-        var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
-        var folderRules = (req.query.folder_rules) ? req.query.folder_rules : '';
-        var jobIDS = req.query.job_id ? req.query.job_id : '';
-        var institute = req.query.institute ? req.query.institute : '';
-        var expFrom = req.query.exp_from ? req.query.exp_from : 0;
-        var expTo = req.query.exp_to ? req.query.exp_to : 0;
-        var locationID = req.query.location_id ? req.query.location_id : '';
+        var token = req.query.token;
+        var functionType = parseInt(req.query.functionType);
+        var page = parseInt(req.query.page);
+        var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
+        var clientQuery = req.query.clq ? req.query.clq : '';
+        var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
+        var contactQuery = req.query.ctq ? req.query.ctq : '';
+        var ezeoneIdSort = (!isNaN(parseInt(req.query.ezes))) ?  parseInt(req.query.ezes) : 0;
+        var ezeoneIdQuery = req.query.ezeq ? req.query.ezeq : '';
 
-        console.log(req.query);
         var RtnMessage = {
             TotalPage:'',
             tc : '',   // total task count
@@ -209,25 +211,24 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
             Result:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (Token != null && FunctionType.toString() != null && Page.toString() != 'NaN' && Page.toString() != 0) {
-            st.validateToken(Token, function (err, Result) {
+        if (token != null && functionType.toString() != null && page.toString() != 'NaN' && page.toString() != 0) {
+            st.validateToken(token, function (err, Result) {
                 if (!err) {
                     if (Result) {
 
-                        var ToPage = 10 * Page;
+                        var ToPage = 10 * page;
                         var FromPage = ToPage - 10;
 
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
 
-                        var parameters = st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(Status)
-                            + ',' + st.db.escape(FromPage) + ',' + st.db.escape(10) + ',' + st.db.escape(searchkeyword)
-                            + ',' + st.db.escape(sortBy) + ','+ st.db.escape(folderRules)+ ',' + st.db.escape(jobIDS)
-                            + ',' + st.db.escape(institute) + ',' + st.db.escape(expFrom)+ ',' + st.db.escape(expTo)
-                            + ','+ st.db.escape(locationID);
-                        console.log('CALL pGetMessagesNew(' + parameters + ')');
-                        st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
+                        var parameters = st.db.escape(token) + ',' + st.db.escape(functionType) + ',' + st.db.escape(FromPage)
+                            + ',' + st.db.escape(10)+ ',' + st.db.escape(clientSort)  + ',' + st.db.escape(clientQuery)
+                            + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery)+ ',' + st.db.escape(ezeoneIdSort)
+                            + ',' + st.db.escape(ezeoneIdQuery);
+                        console.log('CALL pGetSalesTransaction(' + parameters + ')');
+                        st.db.query('CALL pGetSalesTransaction(' + parameters + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
                                     //console.log('Length:'+GetResult[0].length);
@@ -281,16 +282,16 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (token == null) {
                 console.log('FnGetTranscation: Token is empty');
             }
-            else if (FunctionType == null) {
+            else if (functionType == null) {
                 console.log('FnGetTranscation: FunctionType is empty');
             }
-            else if (Page.toString() == 'NaN') {
+            else if (page.toString() == 'NaN') {
                 console.log('FnGetMessages: Page is empty');
             }
-            else if (Page.toString() == 0) {
+            else if (page.toString() == 0) {
                 console.log('FnGetMessages: Sending page 0');
             }
             res.statusCode=400;
@@ -425,13 +426,12 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                             if (transResult[0][0]._e) {
                                                 respMsg.status = true;
                                                 respMsg.message = 'Transaction not saved';
-                                                if(TID == 0) {
+                                                if (TID == 0) {
                                                     respMsg.error = {
                                                         folder: 'You do not have permission to save into this folder'
                                                     };
                                                 }
-                                                else
-                                                {
+                                                else {
                                                     respMsg.error = {
                                                         folder: 'You do not have permission to update into this folder'
                                                     };
@@ -474,7 +474,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                     specializationId: specializationId,
                                                     salaryType: salaryType,
                                                     contactId: contactId
-
                                                 };
                                                 res.status(403).json(respMsg);
                                             }
@@ -661,6 +660,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
 
                         });
                     }
+
                     else {
                         respMsg.message = 'Invalid token';
                         respMsg.error = {
