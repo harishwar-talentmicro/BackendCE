@@ -1795,9 +1795,6 @@ User.prototype.saveResume = function(req,res,next){
                          *
                          */
 
-
-
-
                         if (Pin == '') {
                             Pin = null;
                         }
@@ -1930,13 +1927,15 @@ User.prototype.saveResume = function(req,res,next){
                                                     exp: locMatrix[k].exp,
                                                     cvid: InsertResult[0][0].ID,
                                                     fid: locMatrix[k].fid,
-                                                    careerId: locMatrix[k].career_id
+                                                    careerId: locMatrix[k].career_id,
+                                                    locUid: locMatrix[k].loc_uid
+
                                                 };
 
 
                                                 var queryParams = st.db.escape(locSkills.fid)+ ',' + st.db.escape(locSkills.careerId)
-                                                        + ',' + st.db.escape(locSkills.expertiseLevel)
-                                                        + ',' + st.db.escape(locSkills.exp) + ',' + st.db.escape(locSkills.cvid);
+                                                    + ',' + st.db.escape(locSkills.expertiseLevel)+ ',' + st.db.escape(locSkills.exp)
+                                                    + ',' + st.db.escape(locSkills.cvid)+ ',' + st.db.escape(locSkills.locUid);
 
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
@@ -3662,7 +3661,7 @@ User.prototype.saveUserDetails = function(req,res,next){
                             + ',' + st.db.escape(pin)+ ',' + st.db.escape(statusId)+ ',' + st.db.escape(functionId)
                             + ',' + st.db.escape(categoryId) + ',' + st.db.escape(businessKeywords)+ ',' + st.db.escape(aboutCompany);
                         var query = 'CALL psaveuserdetails(' + queryParams + ')';
-                        //console.log(query);
+                        console.log(query);
                         st.db.query(query, function (err, insertResult) {
                             if (!err) {
                                 //console.log(insertResult);
