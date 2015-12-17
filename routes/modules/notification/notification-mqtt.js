@@ -78,14 +78,14 @@ if(amqpConn){
 function NotificationMqtt(){
     try{
         if(!amqpConn){
-            amqpConn = amqp.createConnection({url: url},  { defaultExchangeName: 'amq.topic' });
+            amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
             amqpConn.on('ready',function(){
                 console.log('Connection established successfully to rabbitmq broker');
             });
 
             amqpConn.on('error',function(){
                 console.log('Connection generated an error event');
-                amqpConn = amqp.createConnection({url: url},  { defaultExchangeName: 'amq.topic' });
+                amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
             });
         }
     }
