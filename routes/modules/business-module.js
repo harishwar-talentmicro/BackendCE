@@ -173,14 +173,548 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
 };
 
 /**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.getSalesTransaction = function(req,res,next){
+    /**
+     * @todo FnGetSalesTransaction
+     */
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.query.Token;
+        var FunctionType = parseInt(req.query.FunctionType);
+        var Page = parseInt(req.query.Page);
+        var Status = (req.query.Status) ? req.query.Status : null;
+        var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
+        var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
+        var folderRules = (req.query.folder_rules) ? req.query.folder_rules : '';
+        var jobIDS = req.query.job_id ? req.query.job_id : '';
+        var institute = req.query.institute ? req.query.institute : '';
+        var expFrom = req.query.exp_from ? req.query.exp_from : 0;
+        var expTo = req.query.exp_to ? req.query.exp_to : 0;
+        var locationID = req.query.location_id ? req.query.location_id : '';
+
+        console.log(req.query);
+        var RtnMessage = {
+            TotalPage:'',
+            tc : '',   // total task count
+            oc :'',    // open count
+            Result:''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if (Token != null && FunctionType.toString() != null && Page.toString() != 'NaN' && Page.toString() != 0) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result) {
+
+                        var ToPage = 10 * Page;
+                        var FromPage = ToPage - 10;
+
+                        if (FromPage <= 1) {
+                            FromPage = 0;
+                        }
+
+                        var parameters = st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(Status)
+                            + ',' + st.db.escape(FromPage) + ',' + st.db.escape(10) + ',' + st.db.escape(searchkeyword)
+                            + ',' + st.db.escape(sortBy) + ','+ st.db.escape(folderRules)+ ',' + st.db.escape(jobIDS)
+                            + ',' + st.db.escape(institute) + ',' + st.db.escape(expFrom)+ ',' + st.db.escape(expTo)
+                            + ','+ st.db.escape(locationID);
+                        console.log('CALL pGetMessagesNew(' + parameters + ')');
+                        st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
+                            if (!err) {
+                                if (GetResult) {
+                                    //console.log('Length:'+GetResult[0].length);
+                                    if (GetResult[0].length > 0) {
+                                        var totalRecord=GetResult[0][0].TotalCount;
+                                        var limit= 10;
+                                        var PageValue = parseInt(totalRecord / limit);
+                                        var PageMod = totalRecord % limit;
+                                        if (PageMod > 0){
+                                            var TotalPage = PageValue + 1;
+                                        }
+                                        else{
+                                            TotalPage = PageValue;
+                                        }
+
+                                        //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
+                                        RtnMessage.TotalPage = TotalPage;
+                                        RtnMessage.Result = GetResult[0];
+                                        res.send(RtnMessage);
+                                        console.log('FnGetTranscation: Transaction details Send successfully');
+                                    }
+
+                                    else {
+                                        console.log('FnGetTranscation:No Transaction details found');
+                                        res.json(null);
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetTranscation:No transaction details found');
+                                    res.json(null);
+                                }
+                            }
+                            else {
+                                console.log('FnGetTranscation: error in getting transaction details' + err);
+                                res.statusCode = 500;
+                                res.json(null);
+                            }
+                        });
+                    }
+                    else {
+                        res.statusCode = 401;
+                        res.json(null);
+                        console.log('FnGetTranscation: Invalid Token');
+                    }
+                } else {
+
+                    res.statusCode = 500;
+                    res.json(null);
+                    console.log('FnGetTranscation: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else {
+            if (Token == null) {
+                console.log('FnGetTranscation: Token is empty');
+            }
+            else if (FunctionType == null) {
+                console.log('FnGetTranscation: FunctionType is empty');
+            }
+            else if (Page.toString() == 'NaN') {
+                console.log('FnGetMessages: Page is empty');
+            }
+            else if (Page.toString() == 0) {
+                console.log('FnGetMessages: Sending page 0');
+            }
+            res.statusCode=400;
+            res.json(null);
+        }
+    }
+    catch (ex) {
+        console.log('FnGetTranscation error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
+
+/**
  * Method : POST
  * @param req
  * @param res
  * @param next
  */
-BusinessManager.prototype.saveTransaction = function(req,res,next){
+BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
     /**
-     * @todo FnSaveTransaction
+     * @todo FnSaveSalesTransaction
+     */
+
+    var _this = this;
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var fs = require("fs");
+
+        var Token = req.body.Token;
+        var TID = parseInt(req.body.TID) ? parseInt(req.body.TID) : 0;
+        var MessageText = (req.body.MessageText) ? req.body.MessageText : '';
+        var Status = req.body.Status;
+        var TaskDateTime = req.body.TaskDateTime;
+        var Notes = (req.body.Notes) ? req.body.Notes : '';
+        var LocID = req.body.LocID;
+        var Country = (req.body.Country) ? req.body.Country : '';    //country short name
+        var State = (req.body.State) ? req.body.State : '';         //admin level 1
+        var City = (req.body.City) ? req.body.City : '';       //ADMIN level 2
+        var Area = (req.body.Area) ? req.body.Area : '';       //admin level 3
+        var FunctionType = req.body.FunctionType;
+        var Latitude = (req.body.Latitude) ? req.body.Latitude : 0;
+        var Longitude = (req.body.Longitude) ? req.body.Longitude : 0;
+        var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
+        var ContactInfo = req.body.ContactInfo;
+        var FolderRuleID = parseInt(req.body.FolderRuleID);
+        var Duration = req.body.Duration;
+        var DurationScales = req.body.DurationScales;
+        var ItemsList = req.body.ItemsList;
+        if (ItemsList) {
+            ItemsList = JSON.parse(ItemsList);
+        }
+        else {
+            ItemsList = [];
+        }
+        var NextAction = req.body.NextAction;
+        var NextActionDateTime = req.body.NextActionDateTime;
+        var TaskDateNew = new Date(TaskDateTime);
+        var NextActionDateTimeNew = new Date(NextActionDateTime);
+        var DeliveryAddress = (req.body.DeliveryAddress) ? req.body.DeliveryAddress : '';
+        var ItemIDList = '';
+        var ToEZEID = alterEzeoneId(req.body.ToEZEID);
+        var item_list_type = (req.body.item_list_type) ? req.body.item_list_type : 0;
+        var companyName = req.body.companyName ? req.body.companyName : '';
+        var company_id = req.body.company_id ? req.body.company_id : 0;
+        var attachment = req.body.attachment ? req.body.attachment : null;
+        var proabilities = req.body.proabilities ? req.body.proabilities : 0;
+        var attachment_name = req.body.attachment_name ? req.body.attachment_name : '';
+        var mime_type = req.body.mime_type ? req.body.mime_type : '';
+        var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
+        var targetDate = req.body.target_date ? req.body.target_date : '';
+        var amount = req.body.amount ? req.body.amount : 0;
+        var instituteId = req.body.institute_id ? req.body.institute_id : 0;
+        var jobId = req.body.job_id ? req.body.job_id : 0;
+        var educationId = (req.body.education_id) ? req.body.education_id : 0;
+        var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
+        var salaryType = req.body.salary_type ? req.body.salary_type : 3;
+        var contactId = req.body.ctid ? req.body.ctid : 1;
+
+        var respMsg = {
+            status: false,
+            message: '',
+            error: {},
+            data: null
+
+        };
+
+        if (TID.toString() == 'NaN')
+            TID = 0;
+
+        if (TID != 0) {
+            for (var i = 0; i < ItemsList.length; i++) {
+                if (ItemsList[i].TID != 0)
+                    ItemIDList = ItemsList[i].TID + ',' + ItemIDList;
+            }
+            console.log(ItemIDList);
+            ItemIDList = ItemIDList.slice(0, -1);
+            console.log('TID comma Values:' + ItemIDList);
+        }
+        if (FolderRuleID.toString() == 'NaN')
+            FolderRuleID = 0;
+
+        if (Token) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        var query = st.db.escape(Token) + "," + st.db.escape(FunctionType) + "," + st.db.escape(MessageText)
+                            + "," + st.db.escape(Status) + "," + st.db.escape(TaskDateNew) + "," + st.db.escape(Notes)
+                            + "," + st.db.escape(LocID) + "," + st.db.escape(Country) + "," + st.db.escape(State)
+                            + "," + st.db.escape(City) + "," + st.db.escape(Area) + "," + st.db.escape(Latitude)
+                            + "," + st.db.escape(Longitude) + "," + st.db.escape(EZEID) + "," + st.db.escape(ContactInfo)
+                            + "," + st.db.escape(FolderRuleID) + "," + st.db.escape(Duration) + "," + st.db.escape(DurationScales)
+                            + "," + st.db.escape(NextAction) + "," + st.db.escape(NextActionDateTimeNew) + "," + st.db.escape(TID)
+                            + "," + st.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + st.db.escape(DeliveryAddress)
+                            + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName)
+                            + "," + st.db.escape(company_id) + "," + st.db.escape(attachment) + "," + st.db.escape(proabilities)
+                            + "," + st.db.escape(attachment_name) + "," + st.db.escape(mime_type) + "," + st.db.escape(alarmDuration)
+                            + "," + st.db.escape(targetDate) + "," + st.db.escape(amount) + ', ' + st.db.escape(instituteId) +
+                            ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId) + ', ' + st.db.escape(specializationId)
+                            + ', ' + st.db.escape(salaryType) + ', ' + st.db.escape(contactId);
+                        //console.log('CALL pSaveTrans(' + query + ')');
+                        st.db.query('CALL pSaveTrans(' + query + ')', function (err, transResult) {
+                            if (!err) {
+                                console.log(transResult);
+                                if (transResult) {
+                                    if (transResult[0].length > 0) {
+
+                                        if (transResult[0][0]) {
+                                            if (transResult[0][0]._e) {
+                                                respMsg.status = true;
+                                                respMsg.message = 'Transaction not saved';
+                                                if(TID == 0) {
+                                                    respMsg.error = {
+                                                        folder: 'You do not have permission to save into this folder'
+                                                    };
+                                                }
+                                                else
+                                                {
+                                                    respMsg.error = {
+                                                        folder: 'You do not have permission to update into this folder'
+                                                    };
+                                                }
+                                                respMsg.data = {
+                                                    TID: TID,
+                                                    MessageText: MessageText,
+                                                    Status: Status,
+                                                    TaskDateTime: TaskDateTime,
+                                                    Notes: Notes,
+                                                    LocID: LocID,
+                                                    Country: Country,
+                                                    State: State,
+                                                    City: City,
+                                                    Area: Area,
+                                                    FunctionType: FunctionType,
+                                                    Latitude: Latitude,
+                                                    Longitude: Longitude,
+                                                    EZEID: EZEID,
+                                                    ContactInfo: ContactInfo,
+                                                    FolderRuleID: FolderRuleID,
+                                                    Duration: Duration,
+                                                    DurationScales: DurationScales,
+                                                    NextAction: NextAction,
+                                                    NextActionDateTime: NextActionDateTime,
+                                                    DeliveryAddress: DeliveryAddress,
+                                                    ToEZEID: ToEZEID,
+                                                    item_list_type: item_list_type,
+                                                    companyName: companyName,
+                                                    company_id: company_id,
+                                                    proabilities: proabilities,
+                                                    attachment_name: attachment_name,
+                                                    mime_type: mime_type,
+                                                    alarmDuration: alarmDuration,
+                                                    targetDate: targetDate,
+                                                    amount: amount,
+                                                    instituteId: instituteId,
+                                                    jobId: jobId,
+                                                    educationId: educationId,
+                                                    specializationId: specializationId,
+                                                    salaryType: salaryType,
+                                                    contactId: contactId
+
+                                                };
+                                                res.status(403).json(respMsg);
+                                            }
+                                            else {
+                                                if (transResult[0][0].MessageID) {
+                                                    respMsg.status = true;
+                                                    respMsg.message = 'Transaction saved successfully';
+                                                    respMsg.data = {
+                                                        messageId: transResult[0][0].MessageID,
+                                                        TID: TID,
+                                                        MessageText: MessageText,
+                                                        Status: Status,
+                                                        TaskDateTime: TaskDateTime,
+                                                        Notes: Notes,
+                                                        LocID: LocID,
+                                                        Country: Country,
+                                                        State: State,
+                                                        City: City,
+                                                        Area: Area,
+                                                        FunctionType: FunctionType,
+                                                        Latitude: Latitude,
+                                                        Longitude: Longitude,
+                                                        EZEID: EZEID,
+                                                        ContactInfo: ContactInfo,
+                                                        FolderRuleID: FolderRuleID,
+                                                        Duration: Duration,
+                                                        DurationScales: DurationScales,
+                                                        NextAction: NextAction,
+                                                        NextActionDateTime: NextActionDateTime,
+                                                        DeliveryAddress: DeliveryAddress,
+                                                        ToEZEID: ToEZEID,
+                                                        item_list_type: item_list_type,
+                                                        companyName: companyName,
+                                                        company_id: company_id,
+                                                        proabilities: proabilities,
+                                                        attachment_name: attachment_name,
+                                                        mime_type: mime_type,
+                                                        alarmDuration: alarmDuration,
+                                                        targetDate: targetDate,
+                                                        amount: amount,
+                                                        instituteId: instituteId,
+                                                        jobId: jobId,
+                                                        educationId: educationId,
+                                                        specializationId: specializationId,
+                                                        salaryType: salaryType,
+                                                        contactId: contactId
+                                                    };
+
+
+                                                    for (var i = 0; i < ItemsList.length; i++) {
+                                                        var itemsDetails = ItemsList[i];
+                                                        var items = {
+                                                            MessageID: (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0,
+                                                            ItemID: itemsDetails.ItemID,
+                                                            Qty: itemsDetails.Qty,
+                                                            Rate: itemsDetails.Rate,
+                                                            Amount: itemsDetails.Amount,
+                                                            Duration: itemsDetails.Durations
+                                                        };
+                                                        console.log(items);
+                                                        console.log('TID:' + itemsDetails.TID);
+                                                        if (itemsDetails.TID == 0) {
+                                                            var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                                // Neat!
+                                                                if (!err) {
+                                                                    if (result != null) {
+                                                                        if (result.affectedRows > 0) {
+                                                                            console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnSaveFolderRules: Folder rule not saved');
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSaveFolderRules: Folder rule not saved');
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                                }
+                                                            });
+
+                                                        }
+
+                                                        else {
+                                                            var items = {
+
+                                                                ItemID: itemsDetails.ItemID,
+                                                                Qty: itemsDetails.Qty,
+                                                                Rate: itemsDetails.Rate,
+                                                                Amount: itemsDetails.Amount,
+                                                                Duration: itemsDetails.Durations
+                                                            };
+                                                            console.log('TID:' + itemsDetails.TID);
+                                                            var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
+                                                                // Neat!
+                                                                console.log(result);
+                                                                if (!err) {
+                                                                    if (result != null) {
+                                                                        if (result.affectedRows > 0) {
+
+                                                                            console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnSaveFolderRules: Folder rule not updated');
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSaveFolderRules: Folder rule not updated')
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                    res.status(200).json(respMsg);
+
+                                                    console.log('FnSaveTranscation: Transaction details save successfully');
+
+                                                    var messageContent = {
+                                                        token: req.body.Token,
+                                                        LocId: LocID,
+                                                        messageType: parseInt(req.body.FunctionType),
+                                                        message: MessageText,
+                                                        ezeid: EZEID,
+                                                        toEzeid: ToEZEID
+                                                    };
+
+                                                    /*sending sales enquiry mail*/
+                                                    mail.fnMessageMail(messageContent, function (err, statusResult) {
+                                                        console.log(statusResult);
+                                                        if (!err) {
+                                                            if (Result) {
+                                                                if (statusResult.status == true) {
+                                                                    console.log('FnSendMail: Mail Sent Successfully');
+                                                                    //res.send(RtnMessage);
+                                                                }
+                                                                else {
+                                                                    console.log('FnSendMail: Mail not Sent...1');
+                                                                    //res.send(RtnMessage);
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail: Mail not Sent..2');
+                                                                //res.send(RtnMessage);
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnSendMail:Error in sending mails' + err);
+                                                            //res.send(RtnMessage);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                        else {
+
+                                            respMsg.message = 'Transaction not save';
+                                            res.status(200).json(respMsg);
+                                            console.log('FnSaveTranscation:Transaction not save');
+
+                                        }
+                                    }
+
+                                    else {
+                                        respMsg.message = 'Transaction not save';
+                                        res.status(200).json(respMsg);
+                                        console.log('FnSaveTranscation:Transaction not save');
+                                    }
+                                }
+
+                                else {
+
+                                    respMsg.message = 'An error occured ! Please try again';
+                                    respMsg.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    console.log('FnSaveTranscation: error in saving Transaction' + err);
+                                }
+
+                            }
+
+                        });
+                    }
+                    else {
+                        respMsg.message = 'Invalid token';
+                        respMsg.error = {
+                            token: 'invalid token'
+                        };
+                        respMsg.data = null;
+                        res.status(401).json(respMsg);
+                        console.log('FnSaveTranscation: Invalid token');
+
+                    }
+
+                }
+                else {
+                    respMsg.error = {
+                        server: 'Internal server error'
+                    };
+                    respMsg.message = 'Error in validating Token';
+                    res.status(500).json(respMsg);
+                    console.log('FnSaveTranscation:Error in processing Token' + err);
+
+                }
+            });
+        }
+        else {
+            if (!Token) {
+                respMsg.message = 'Invalid token';
+                respMsg.error = {
+                    token: 'invalid token'
+                };
+                respMsg.data = null;
+                res.status(401).json(respMsg);
+                console.log('FnSaveTranscation: Invalid token');
+            }
+        }
+    }
+    catch (ex) {
+        console.log('FnSaveTranscation:error ' + ex.description);
+        console.log(ex);
+        console.log(ex.line);
+        var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+    }
+};
+
+
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.sendSalesRequest = function(req,res,next){
+    /**
+     * @todo FnSendSalesRequest
      */
 
     var _this = this;
@@ -255,7 +789,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                     ItemIDList = ItemsList[i].TID + ',' + ItemIDList  ;
             }
             console.log(ItemIDList);
-            ItemIDList=ItemIDList.slice(0,-1)
+            ItemIDList=ItemIDList.slice(0,-1);
             console.log('TID comma Values:'+ ItemIDList);
         }
         if(FolderRuleID.toString() == 'NaN')
@@ -279,20 +813,20 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
                             + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)+ ', ' + st.db.escape(instituteId)+
                             ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)
                             + ', ' + st.db.escape(salaryType)+ ', ' + st.db.escape(contactId);
-                        // st.db.escape(NextActionDateTime);
-                        //console.log('CALL pSaveTrans(' + query + ')');
-                        st.db.query('CALL pSaveTrans(' + query + ')', function (err, InsertResult) {
+                        //console.log('CALL psendsalesrequest(' + query + ')');
+                        st.db.query('CALL psendsalesrequest(' + query + ')', function (err, transResult) {
                             if (!err) {
-                                if (InsertResult[0] != null) {
-                                    if (InsertResult[0].length > 0) {
+                                console.log(transResult);
+                                if (transResult) {
+                                    if (transResult[0].length > 0) {
+
                                         RtnMessage.IsSuccessfull = true;
-                                        var Message = InsertResult[0];
-                                        RtnMessage.MessageID = Message[0].MessageID;
-                                        console.log(Message);
+                                        RtnMessage.MessageID = transResult[0][0].MessageID;
+
                                         for (var i = 0; i < ItemsList.length; i++) {
                                             var itemsDetails = ItemsList[i];
                                             var items = {
-                                                MessageID: Message[0].MessageID,
+                                                MessageID: (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0,
                                                 ItemID: itemsDetails.ItemID,
                                                 Qty: itemsDetails.Qty,
                                                 Rate: itemsDetails.Rate,
@@ -444,6 +978,7 @@ BusinessManager.prototype.saveTransaction = function(req,res,next){
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
+
 
 /**
  * Method : PUT

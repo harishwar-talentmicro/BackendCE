@@ -5610,15 +5610,13 @@ Alumni.prototype.getAlumniUserDetails = function(req,res,next){
                                     if(results[0]){
                                         for( var i=0; i < results[0].length;i++){
                                             var result = {};
-                                            console.log(results[0][i].profileid);
-                                            result.logoimage = '';
                                             result.page1title = results[0][i].page1title;
                                             result.AlumniID = results[0][i].AlumniID;
                                             result.alumnicode = results[0][i].alumnicode;
                                             result.profilestatus = results[0][i].profilestatus;
                                             result.profile_id = results[0][i].profileid;
 
-                                            result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + '8c40eb14-5f97-4240-a0aa-3771c336dc38.png';
+                                            result.s_url = (results[0][i].logoimage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][i].logoimage) :'';
                                             output.push(result);
                                         }
 
