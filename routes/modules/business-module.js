@@ -233,7 +233,7 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                             + ',' + st.db.escape(ezeoneIdQuery);
                         console.log('CALL pGetSalesTransaction(' + parameters + ')');
                         st.db.query('CALL pGetSalesTransaction(' + parameters + ')', function (err, transResult) {
-                            console.log(transResult);
+                            //console.log(transResult);
                             if (!err) {
                                 if (transResult) {
                                     if (transResult[0].length > 0) {
