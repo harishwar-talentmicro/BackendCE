@@ -736,10 +736,9 @@ function FnSaveSkills(skill, callBack) {
 Job.prototype.getAll = function(req,res,next){
     var _this = this;
 
-    var ezeid = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
-    var pageSize = req.query.page_size;
-    var pageCount = req.query.page_count;
+    var pageSize = (!isNaN(parseInt(req.query.page_size))) ?  parseInt(req.query.page_size) : 100;
+    var pageCount = (!isNaN(parseInt(req.query.page_count))) ?  parseInt(req.query.page_count) : 0;
     var alumniCode = req.query.a_code ? req.query.a_code : '';
     var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
     var clientQuery = req.query.clq ? req.query.clq : '';
@@ -760,10 +759,6 @@ Job.prototype.getAll = function(req,res,next){
         data: null
     };
     var validateStatus = true, error = {};
-    if(!ezeid){
-        error['ezeone_id'] = 'Invalid ezeone_id';
-        validateStatus *= false;
-    }
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -779,7 +774,7 @@ Job.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(ezeid) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)
+                        var query = st.db.escape(token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)
                             + ',' + st.db.escape(alumniCode)+ ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
                             + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(jobTitleSort)
                             + ',' + st.db.escape(jobTitleQuery)+ ',' + st.db.escape(createdDateSort) + ',' + st.db.escape(status)
@@ -793,29 +788,29 @@ Job.prototype.getAll = function(req,res,next){
                                         if (getresult[0][0]) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
-                                            responseMessage.message = 'Jobs send successfully';
+                                            responseMessage.message = 'Jobs loaded successfully';
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
                                                 result : getresult[1]
                                             };
                                             res.status(200).json(responseMessage);
-                                            console.log('FnGetJobs: Jobs send successfully');
+                                            console.log('FnGetJobs: Jobs loaded successfully');
                                         }
                                         else {
-                                            responseMessage.message = 'No founded Jobs details';
-                                            console.log('FnGetJobs: No founded Jobs details');
+                                            responseMessage.message = 'No Jobs details found';
+                                            console.log('FnGetJobs: No Jobs details found');
                                             res.status(200).json(responseMessage);
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'No founded Jobs details';
-                                        console.log('FnGetJobs: No founded Jobs details');
+                                        responseMessage.message = 'No Jobs details found';
+                                        console.log('FnGetJobs: No Jobs details found');
                                         res.status(200).json(responseMessage);
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'No founded Jobs details';
-                                    console.log('FnGetJobs: No founded Jobs details');
+                                    responseMessage.message = 'No Jobs details found';
+                                    console.log('FnGetJobs: No Jobs details found');
                                     res.status(200).json(responseMessage);
                                 }
                             }
@@ -824,7 +819,7 @@ Job.prototype.getAll = function(req,res,next){
                                     server : 'Internal serever error'
                                 };
                                 responseMessage.message = 'Error getting from Jobs details';
-                                console.log('FnGetJobs:Error getting from Jobs details:' + err);
+                                console.log('FnGetJobs:Error from loading Jobs details:' + err);
                                 res.status(500).json(responseMessage);
                             }
                         });
