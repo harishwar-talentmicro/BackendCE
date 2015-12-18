@@ -116,7 +116,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             job_id : jobId,
             a_url : aUrl
         };
-        console.log(messagePayload);
+        //console.log(messagePayload);
         console.log('Actual receiver Id : '+receiverId);
         if(receiverId){
             _notificationMqtt.publish(receiverId,messagePayload);

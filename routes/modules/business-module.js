@@ -39,134 +39,141 @@ function BusinessManager(db,stdLib){
     }
 };
 
-
 /**
  * Method : GET
  * @param req
  * @param res
  * @param next
  */
-BusinessManager.prototype.getTransactions = function(req,res,next){
+BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
     /**
-     * @todo FnGetTransaction
+     * @todo FnGetApplicantTransaction
      */
     var _this = this;
-    try {
 
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var FunctionType = parseInt(req.query.FunctionType);
-        var Page = parseInt(req.query.Page);
-        var Status = (req.query.Status) ? req.query.Status : null;
-        var searchkeyword = req.query.searchkeyword ? req.query.searchkeyword : '';
-        var sortBy = (parseInt(req.query.sort_by) !== NaN) ? parseInt(req.query.sort_by) : 0 ;
-        var folderRules = (req.query.folder_rules) ? req.query.folder_rules : '';
-        var jobIDS = req.query.job_id ? req.query.job_id : '';
-        var institute = req.query.institute ? req.query.institute : '';
-        var expFrom = req.query.exp_from ? req.query.exp_from : 0;
-        var expTo = req.query.exp_to ? req.query.exp_to : 0;
-        var locationID = req.query.location_id ? req.query.location_id : '';
+    var token = req.query.token;
+    var page = (!isNaN(parseInt(req.query.page))) ?  parseInt(req.query.page): 1;
+    var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
+    var clientQuery = req.query.clq ? req.query.clq : '';
+    var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
+    var contactQuery = req.query.ctq ? req.query.ctq : '';
+    var jobId = req.query.jid ? req.query.jid : 0;
+    var jobCodeSort = (!isNaN(parseInt(req.query.jcs))) ?  parseInt(req.query.jcs) : 0;
+    var jobCodeQuery = req.query.jcq ? req.query.jcq : '';
+    var jobTitleSort = (!isNaN(parseInt(req.query.jts))) ?  parseInt(req.query.jts): 0;
+    var jobTitleQuery = req.query.jtq ? req.query.jtq : '';
+    var status = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 0;
+    var applicantSearch = req.query.aps ? req.query.aps : '';
+    var folderSort = (!isNaN(parseInt(req.query.fs))) ?  parseInt(req.query.fs): 0;
 
-        console.log(req.query);
-        var RtnMessage = {
-            TotalPage:'',
-            Result:''
-        };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (Token != null && FunctionType.toString() != null && Page.toString() != 'NaN' && Page.toString() != 0) {
-            st.validateToken(Token, function (err, Result) {
+    var responseMessage = {
+        status: false,
+        error:{},
+        message:'',
+        totalCount:0,
+        data: null
+    };
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error ;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result) {
+                    if (tokenResult) {
 
-                        var ToPage = 10 * Page;
+                        var ToPage = 10 * page;
                         var FromPage = ToPage - 10;
 
                         if (FromPage <= 1) {
                             FromPage = 0;
                         }
-
-                        var parameters = st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ',' + st.db.escape(Status)
-                            + ',' + st.db.escape(FromPage) + ',' + st.db.escape(10) + ',' + st.db.escape(searchkeyword)
-                            + ',' + st.db.escape(sortBy) + ','+ st.db.escape(folderRules)+ ',' + st.db.escape(jobIDS)
-                            + ',' + st.db.escape(institute) + ',' + st.db.escape(expFrom)+ ',' + st.db.escape(expTo)
-                            + ','+ st.db.escape(locationID);
+                        var parameters = st.db.escape(token) + ',' + st.db.escape(4)
+                            + ',' + st.db.escape(FromPage) + ',' + st.db.escape(10)+ ',' + st.db.escape(jobId)
+                            + ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
+                            + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(jobCodeSort)
+                            + ',' + st.db.escape(jobCodeQuery)+ ',' + st.db.escape(jobTitleSort)+ ',' + st.db.escape(jobTitleQuery)
+                            + ',' + st.db.escape(applicantSearch)+ ',' + st.db.escape(status)+ ',' + st.db.escape(folderSort);
                         console.log('CALL pGetMessagesNew(' + parameters + ')');
-                        st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, transResult) {
                             if (!err) {
-                                if (GetResult) {
-                                    //console.log('Length:'+GetResult[0].length);
-                                    if (GetResult[0].length > 0) {
-                                        var totalRecord=GetResult[0][0].TotalCount;
-                                        var limit= 10;
-                                        var PageValue = parseInt(totalRecord / limit);
-                                        var PageMod = totalRecord % limit;
-                                        if (PageMod > 0){
-                                            var TotalPage = PageValue + 1;
-                                        }
-                                        else{
-                                            TotalPage = PageValue;
-                                        }
-
-                                        //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
-                                        RtnMessage.TotalPage = TotalPage;
-                                        RtnMessage.Result = GetResult[0];
-                                        res.send(RtnMessage);
-                                        console.log('FnGetTranscation: Transaction details Send successfully');
+                                if (transResult) {
+                                    if (transResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.totalCount = transResult[0][0].count;
+                                        responseMessage.data = transResult[1];
+                                        responseMessage.message = 'Transaction details Send successfully';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTransaction: Transaction details Send successfully');
                                     }
-
                                     else {
-                                        console.log('FnGetTranscation:No Transaction details found');
-                                        res.json(null);
+                                        responseMessage.status = true;
+                                        responseMessage.data =[];
+                                        responseMessage.message = 'No Transaction details found';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTransaction:No Transaction details found');
                                     }
                                 }
                                 else {
-                                    console.log('FnGetTranscation:No transaction details found');
-                                    res.json(null);
+                                    responseMessage.message = 'No Transaction details found';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTransaction:No Transaction details found');
                                 }
                             }
                             else {
-                                console.log('FnGetTranscation: error in getting transaction details' + err);
-                                res.statusCode = 500;
-                                res.json(null);
+                                responseMessage.error = {
+                                    server: 'Internal serever error'
+                                };
+                                responseMessage.message = 'Error getting from Transaction details';
+                                console.log('FnGetTransaction:Error getting from Transaction details:' + err);
+                                res.status(500).json(responseMessage);
                             }
                         });
                     }
                     else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnGetTranscation: Invalid Token');
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetTransaction: Invalid token');
                     }
-                } else {
-
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetTranscation: Error in validating token:  ' + err);
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTransaction:Error in processing Token' + err);
                 }
             });
         }
-        else {
-            if (Token == null) {
-                console.log('FnGetTranscation: Token is empty');
-            }
-            else if (FunctionType == null) {
-                console.log('FnGetTranscation: FunctionType is empty');
-            }
-            else if (Page.toString() == 'NaN') {
-                console.log('FnGetMessages: Page is empty');
-            }
-            else if (Page.toString() == 0) {
-                console.log('FnGetMessages: Sending page 0');
-            }
-            res.statusCode=400;
-            res.json(null);
+
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal server error'
+            };
+            responseMessage.message = 'An error occured !';
+            console.log('FnGetSalesTransaction:error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
         }
-    }
-    catch (ex) {
-        console.log('FnGetTranscation error:' + ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -186,7 +193,7 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
     var token = req.query.token;
-    var page = parseInt(req.query.page);
+    var page = (!isNaN(parseInt(req.query.page))) ?  parseInt(req.query.page): 1;
     var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
     var clientQuery = req.query.clq ? req.query.clq : '';
     var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
@@ -303,7 +310,6 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
     }
 };
 
-
 /**
  * Method : POST
  * @param req
@@ -326,7 +332,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         var TID = parseInt(req.body.TID) ? parseInt(req.body.TID) : 0;
         var MessageText = (req.body.MessageText) ? req.body.MessageText : '';
         var Status = req.body.Status;
-        var TaskDateTime = req.body.TaskDateTime;
         var Notes = (req.body.Notes) ? req.body.Notes : '';
         var LocID = req.body.LocID;
         var Country = (req.body.Country) ? req.body.Country : '';    //country short name
@@ -337,7 +342,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         var Latitude = (req.body.Latitude) ? req.body.Latitude : 0;
         var Longitude = (req.body.Longitude) ? req.body.Longitude : 0;
         var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
-        var ContactInfo = req.body.ContactInfo;
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
@@ -348,10 +352,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         else {
             ItemsList = [];
         }
-        var NextAction = req.body.NextAction;
-        var NextActionDateTime = req.body.NextActionDateTime;
-        var TaskDateNew = new Date(TaskDateTime);
-        var NextActionDateTimeNew = new Date(NextActionDateTime);
         var DeliveryAddress = (req.body.DeliveryAddress) ? req.body.DeliveryAddress : '';
         var ItemIDList = '';
         var ToEZEID = alterEzeoneId(req.body.ToEZEID);
@@ -359,7 +359,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         var companyName = req.body.companyName ? req.body.companyName : '';
         var company_id = req.body.company_id ? req.body.company_id : 0;
         var attachment = req.body.attachment ? req.body.attachment : null;
-        var proabilities = req.body.proabilities ? req.body.proabilities : 0;
+        var proabilities = (req.body.proabilities) ? (req.body.proabilities) : 2;
         var attachment_name = req.body.attachment_name ? req.body.attachment_name : '';
         var mime_type = req.body.mime_type ? req.body.mime_type : '';
         var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
@@ -400,18 +400,17 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                 if (!err) {
                     if (Result != null) {
                         var query = st.db.escape(Token) + "," + st.db.escape(FunctionType) + "," + st.db.escape(MessageText)
-                            + "," + st.db.escape(Status) + "," + st.db.escape(TaskDateNew) + "," + st.db.escape(Notes)
+                            + "," + st.db.escape(Status)+ "," + st.db.escape(Notes)
                             + "," + st.db.escape(LocID) + "," + st.db.escape(Country) + "," + st.db.escape(State)
                             + "," + st.db.escape(City) + "," + st.db.escape(Area) + "," + st.db.escape(Latitude)
-                            + "," + st.db.escape(Longitude) + "," + st.db.escape(EZEID) + "," + st.db.escape(ContactInfo)
+                            + "," + st.db.escape(Longitude) + "," + st.db.escape(EZEID)
                             + "," + st.db.escape(FolderRuleID) + "," + st.db.escape(Duration) + "," + st.db.escape(DurationScales)
-                            + "," + st.db.escape(NextAction) + "," + st.db.escape(NextActionDateTimeNew) + "," + st.db.escape(TID)
-                            + "," + st.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + st.db.escape(DeliveryAddress)
-                            + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName)
-                            + "," + st.db.escape(company_id) + "," + st.db.escape(attachment) + "," + st.db.escape(proabilities)
-                            + "," + st.db.escape(attachment_name) + "," + st.db.escape(mime_type) + "," + st.db.escape(alarmDuration)
-                            + "," + st.db.escape(targetDate) + "," + st.db.escape(amount) + ', ' + st.db.escape(instituteId) +
-                            ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId) + ', ' + st.db.escape(specializationId)
+                            + "," + st.db.escape(TID)+ "," + st.db.escape(((ItemIDList != "") ? ItemIDList : ""))
+                            + "," + st.db.escape(DeliveryAddress)+ "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type)
+                            + "," + st.db.escape(companyName)+ "," + st.db.escape(company_id) + "," + st.db.escape(attachment)
+                            + "," + st.db.escape(proabilities)+ "," + st.db.escape(attachment_name) + "," + st.db.escape(mime_type)
+                            + "," + st.db.escape(alarmDuration)+ "," + st.db.escape(targetDate) + "," + st.db.escape(amount)
+                            + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId) + ', ' + st.db.escape(specializationId)
                             + ', ' + st.db.escape(salaryType) + ', ' + st.db.escape(contactId);
                         //console.log('CALL pSaveTrans(' + query + ')');
                         st.db.query('CALL pSaveTrans(' + query + ')', function (err, transResult) {
@@ -702,8 +701,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
     }
 };
 
-
-
 /**
  * Method : POST
  * @param req
@@ -737,7 +734,6 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         var Latitude = (req.body.Latitude) ? req.body.Latitude : 0;
         var Longitude = (req.body.Longitude) ? req.body.Longitude : 0;
         var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
-        var ContactInfo = req.body.ContactInfo;
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
@@ -749,10 +745,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         {
             ItemsList = [];
         }
-        var NextAction = req.body.NextAction;
-        var NextActionDateTime = req.body.NextActionDateTime;
-        var  TaskDateNew = new Date(TaskDateTime);
-        var NextActionDateTimeNew = new Date(NextActionDateTime);
+
         var DeliveryAddress = (req.body.DeliveryAddress) ? req.body.DeliveryAddress : '';
         var ItemIDList='';
         var ToEZEID = alterEzeoneId(req.body.ToEZEID);
@@ -760,7 +753,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         var companyName = req.body.companyName ? req.body.companyName : '' ;
         var company_id = req.body.company_id ? req.body.company_id : 0 ;
         var attachment = req.body.attachment ? req.body.attachment : null ;
-        var proabilities = req.body.proabilities ? req.body.proabilities : 0 ;
+        var proabilities = req.body.proabilities ? req.body.proabilities : 2;
         var attachment_name = req.body.attachment_name ? req.body.attachment_name : '' ;
         var mime_type = req.body.mime_type ? req.body.mime_type : '' ;
         var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
@@ -798,19 +791,18 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                 if (!err) {
                     if (Result != null) {
                         var query = st.db.escape(Token) + "," + st.db.escape(FunctionType) + "," + st.db.escape(MessageText)
-                            + "," + st.db.escape(Status) + "," + st.db.escape(TaskDateNew) + "," + st.db.escape(Notes)
+                            + "," + st.db.escape(Status) + "," + st.db.escape(Notes)
                             + "," + st.db.escape(LocID) + "," + st.db.escape(Country) + "," + st.db.escape(State)
                             + "," + st.db.escape(City) + "," + st.db.escape(Area) + "," + st.db.escape(Latitude)
-                            + "," + st.db.escape(Longitude) + "," + st.db.escape(EZEID) + "," + st.db.escape(ContactInfo)
+                            + "," + st.db.escape(Longitude) + "," + st.db.escape(EZEID)
                             + "," + st.db.escape(FolderRuleID) + "," + st.db.escape(Duration) + "," + st.db.escape(DurationScales)
-                            + "," + st.db.escape(NextAction) + "," + st.db.escape(NextActionDateTimeNew) + "," + st.db.escape(TID)
-                            + "," + st.db.escape(((ItemIDList != "") ? ItemIDList : "")) + "," + st.db.escape(DeliveryAddress)
-                            + "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type) + "," + st.db.escape(companyName)
-                            + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ "," + st.db.escape(proabilities)
-                            + "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type)+ "," + st.db.escape(alarmDuration)
-                            + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)+ ', ' + st.db.escape(instituteId)+
-                            ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)+ ', ' + st.db.escape(specializationId)
-                            + ', ' + st.db.escape(salaryType)+ ', ' + st.db.escape(contactId);
+                            + "," + st.db.escape(TID)+ "," + st.db.escape(((ItemIDList != "") ? ItemIDList : ""))
+                            + "," + st.db.escape(DeliveryAddress)+ "," + st.db.escape(ToEZEID) + "," + st.db.escape(item_list_type)
+                            + "," + st.db.escape(companyName) + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ ","
+                            + st.db.escape(proabilities)+ "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type)
+                            + "," + st.db.escape(alarmDuration) + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)
+                            + ', ' + st.db.escape(instituteId)+', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)
+                            + ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType)+ ', ' + st.db.escape(contactId);
                         //console.log('CALL psendsalesrequest(' + query + ')');
                         st.db.query('CALL psendsalesrequest(' + query + ')', function (err, transResult) {
                             if (!err) {
@@ -976,7 +968,6 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
     }
 };
-
 
 /**
  * Method : PUT

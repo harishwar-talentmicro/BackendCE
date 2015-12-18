@@ -119,6 +119,7 @@ router.post('/location_for_employer',locationModule.saveLocationforEmployers);
 var BusinessManager = require('./modules/business-module.js');
 var businessManager = new BusinessManager(db,stdLib);
 router.get('/ewtGetTranscation',businessManager.getTransactions);
+router.get('/applicant_transaction',businessManager.getApplicantTransaction);
 router.post('/sales_transaction',businessManager.saveSalesTransaction);
 router.get('/sales_transaction',businessManager.getSalesTransaction);
 router.put('/update_transaction',businessManager.updateTransaction);

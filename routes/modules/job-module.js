@@ -513,6 +513,7 @@ Job.prototype.create = function(req,res,next){
                                                                                                         var jid = jobID;
                                                                                                         //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                         notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude, prioritys, dateTime, a_name, msgUserid,jid);
+                                                                                                        console.log('Job Post Notification Send Successfully');
                                                                                                     });
                                                                                                 }
                                                                                                 else {
@@ -737,16 +738,20 @@ Job.prototype.getAll = function(req,res,next){
 
     var ezeid = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
-    var keywordsForSearch = req.query.keywordsForSearch ? req.query.keywordsForSearch : '';
-    var status = req.query.status ? req.query.status : '';
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
-    var orderBy = req.query.order_by;  // 1-ascending else descending
     var alumniCode = req.query.a_code ? req.query.a_code : '';
-    //var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
-    //var clientQuery = req.query.clq ? req.query.clq : '';
-    //var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
-    //var contactQuery = req.query.ctq ? req.query.ctq : '';
+    var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
+    var clientQuery = req.query.clq ? req.query.clq : '';
+    var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
+    var contactQuery = req.query.ctq ? req.query.ctq : '';
+    var jobCodeSort = (!isNaN(parseInt(req.query.jcs))) ?  parseInt(req.query.jcs) : 0;
+    var jobCodeQuery = req.query.jcq ? req.query.jcq : '';
+    var jobTitleSort = (!isNaN(parseInt(req.query.jts))) ?  parseInt(req.query.jts): 0;
+    var jobTitleQuery = req.query.jtq ? req.query.jtq : '';
+    var createdDateSort = (!isNaN(parseInt(req.query.cds))) ?  parseInt(req.query.cds): 0;
+    var status = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 1;
+
 
     var responseMessage = {
         status: false,
@@ -756,7 +761,7 @@ Job.prototype.getAll = function(req,res,next){
     };
     var validateStatus = true, error = {};
     if(!ezeid){
-        error['ezeid'] = 'Invalid ezeid';
+        error['ezeone_id'] = 'Invalid ezeone_id';
         validateStatus *= false;
     }
     if(!token){
@@ -774,9 +779,11 @@ Job.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(ezeid) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
-                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy)
-                            + ',' + st.db.escape(alumniCode);
+                        var query = st.db.escape(ezeid) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)
+                            + ',' + st.db.escape(alumniCode)+ ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
+                            + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(jobTitleSort)
+                            + ',' + st.db.escape(jobTitleQuery)+ ',' + st.db.escape(createdDateSort) + ',' + st.db.escape(status)
+                            + ',' + st.db.escape(jobCodeSort)+ ',' + st.db.escape(jobCodeQuery);
                         console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
 
