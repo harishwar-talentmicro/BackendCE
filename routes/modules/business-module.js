@@ -68,19 +68,10 @@ BusinessManager.prototype.getTransactions = function(req,res,next){
         var expFrom = req.query.exp_from ? req.query.exp_from : 0;
         var expTo = req.query.exp_to ? req.query.exp_to : 0;
         var locationID = req.query.location_id ? req.query.location_id : '';
-        //var type = 1;
-        //var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
-        //var clientQuery = req.query.clq ? req.query.clq : '';
-        //var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
-        //var contactQuery = req.query.ctq ? req.query.ctq : '';
-        //var ezeoneIdSort = (!isNaN(parseInt(req.query.ezes))) ?  parseInt(req.query.ezes) : 0;
-        //var ezeoneIdQuery = req.query.ezeq ? req.query.ezeq : '';
 
         console.log(req.query);
         var RtnMessage = {
             TotalPage:'',
-            tc : '',   // total task count
-            oc :'',    // open count
             Result:''
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
@@ -190,31 +181,44 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
      * @todo FnGetSalesTransaction
      */
     var _this = this;
-    try {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var token = req.query.token;
-        var functionType = parseInt(req.query.functionType);
-        var page = parseInt(req.query.page);
-        var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
-        var clientQuery = req.query.clq ? req.query.clq : '';
-        var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
-        var contactQuery = req.query.ctq ? req.query.ctq : '';
-        var ezeoneIdSort = (!isNaN(parseInt(req.query.ezes))) ?  parseInt(req.query.ezes) : 0;
-        var ezeoneIdQuery = req.query.ezeq ? req.query.ezeq : '';
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var RtnMessage = {
-            TotalPage:'',
-            tc : '',   // total task count
-            oc :'',    // open count
-            Result:''
-        };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (token != null && functionType.toString() != null && page.toString() != 'NaN' && page.toString() != 0) {
-            st.validateToken(token, function (err, Result) {
+    var token = req.query.token;
+    var page = parseInt(req.query.page);
+    var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
+    var clientQuery = req.query.clq ? req.query.clq : '';
+    var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
+    var contactQuery = req.query.ctq ? req.query.ctq : '';
+    var ezeoneIdSort = (!isNaN(parseInt(req.query.ezes))) ?  parseInt(req.query.ezes) : 0;
+    var ezeoneIdQuery = req.query.ezeq ? req.query.ezeq : '';
+
+    var responseMessage = {
+        status: false,
+        error:{},
+        message:'',
+        totalCount:0,
+        data: null
+    };
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error ;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result) {
+                    if (tokenResult) {
 
                         var ToPage = 10 * page;
                         var FromPage = ToPage - 10;
@@ -223,85 +227,79 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                             FromPage = 0;
                         }
 
-                        var parameters = st.db.escape(token) + ',' + st.db.escape(functionType) + ',' + st.db.escape(FromPage)
-                            + ',' + st.db.escape(10)+ ',' + st.db.escape(clientSort)  + ',' + st.db.escape(clientQuery)
-                            + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery)+ ',' + st.db.escape(ezeoneIdSort)
+                        var parameters = st.db.escape(token) + ',' + st.db.escape(FromPage)
+                            + ',' + st.db.escape(10) + ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
+                            + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(ezeoneIdSort)
                             + ',' + st.db.escape(ezeoneIdQuery);
                         console.log('CALL pGetSalesTransaction(' + parameters + ')');
-                        st.db.query('CALL pGetSalesTransaction(' + parameters + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetSalesTransaction(' + parameters + ')', function (err, transResult) {
+                            console.log(transResult);
                             if (!err) {
-                                if (GetResult) {
-                                    //console.log('Length:'+GetResult[0].length);
-                                    if (GetResult[0].length > 0) {
-                                        var totalRecord=GetResult[0][0].TotalCount;
-                                        var limit= 10;
-                                        var PageValue = parseInt(totalRecord / limit);
-                                        var PageMod = totalRecord % limit;
-                                        if (PageMod > 0){
-                                            var TotalPage = PageValue + 1;
-                                        }
-                                        else{
-                                            TotalPage = PageValue;
-                                        }
-
-                                        //TotalPage = parseInt(GetResult[0][0].TotalCount / 10) + 1;
-                                        RtnMessage.TotalPage = TotalPage;
-                                        RtnMessage.Result = GetResult[0];
-                                        res.send(RtnMessage);
-                                        console.log('FnGetTranscation: Transaction details Send successfully');
+                                if (transResult) {
+                                    if (transResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.totalCount = transResult[0][0].count;
+                                        responseMessage.data = transResult[1];
+                                        responseMessage.message = 'Transaction details Send successfully';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetSalesTransaction: Transaction details Send successfully');
                                     }
 
                                     else {
-                                        console.log('FnGetTranscation:No Transaction details found');
-                                        res.json(null);
+                                        responseMessage.status = true;
+                                        responseMessage.data =[];
+                                        responseMessage.message = 'No Transaction details found';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetSalesTransaction:No Transaction details found');
                                     }
                                 }
                                 else {
-                                    console.log('FnGetTranscation:No transaction details found');
-                                    res.json(null);
+                                    responseMessage.message = 'No Transaction details found';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetSalesTransaction:No Transaction details found');
                                 }
                             }
                             else {
-                                console.log('FnGetTranscation: error in getting transaction details' + err);
-                                res.statusCode = 500;
-                                res.json(null);
+                                responseMessage.error = {
+                                    server: 'Internal serever error'
+                                };
+                                responseMessage.message = 'Error getting from Transaction details';
+                                console.log('FnGetSalesTransaction:Error getting from Transaction details:' + err);
+                                res.status(500).json(responseMessage);
                             }
                         });
                     }
                     else {
-                        res.statusCode = 401;
-                        res.json(null);
-                        console.log('FnGetTranscation: Invalid Token');
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetSalesTransaction: Invalid token');
                     }
-                } else {
-
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetTranscation: Error in validating token:  ' + err);
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetSalesTransaction:Error in processing Token' + err);
                 }
             });
         }
-        else {
-            if (token == null) {
-                console.log('FnGetTranscation: Token is empty');
-            }
-            else if (functionType == null) {
-                console.log('FnGetTranscation: FunctionType is empty');
-            }
-            else if (page.toString() == 'NaN') {
-                console.log('FnGetMessages: Page is empty');
-            }
-            else if (page.toString() == 0) {
-                console.log('FnGetMessages: Sending page 0');
-            }
-            res.statusCode=400;
-            res.json(null);
+
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal server error'
+            };
+            responseMessage.message = 'An error occured !';
+            console.log('FnGetSalesTransaction:error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
         }
-    }
-    catch (ex) {
-        console.log('FnGetTranscation error:' + ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
