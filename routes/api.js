@@ -118,8 +118,10 @@ router.post('/location_for_employer',locationModule.saveLocationforEmployers);
 //BusinessManager module methods
 var BusinessManager = require('./modules/business-module.js');
 var businessManager = new BusinessManager(db,stdLib);
-router.get('/ewtGetTranscation',businessManager.getTransactions);
-router.post('/ewtSaveTranscation',businessManager.saveTransaction);
+//router.get('/ewtGetTranscation',businessManager.getTransactions);
+router.get('/applicant_transaction',businessManager.getApplicantTransaction);
+router.post('/sales_transaction',businessManager.saveSalesTransaction);
+router.get('/sales_transaction',businessManager.getSalesTransaction);
 router.put('/update_transaction',businessManager.updateTransaction);
 router.get('/ewtGetTranscationItems',businessManager.getTransactionItems);
 router.post('/ewtSaveTranscationItems',businessManager.saveTransactionItems);
@@ -135,6 +137,8 @@ router.get('/company_details',businessManager.getCompanyDetails);
 router.get('/ezeoneid',businessManager.getEZEOneIDInfo);
 router.get('/transaction_attachment',businessManager.getTransAttachment);
 router.get('/sales_statistics',businessManager.salesStatistics);
+router.post('/sales_request',businessManager.sendSalesRequest);
+router.post('/ewtSaveTranscation',businessManager.sendSalesRequest);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');

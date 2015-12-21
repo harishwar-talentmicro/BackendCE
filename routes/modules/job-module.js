@@ -78,7 +78,7 @@ Job.prototype.create = function(req,res,next){
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
-    var location_id = 0, resultvalue = '';
+    var location_id = '', resultvalue = '';
     var skillMatrix1 = req.body.skillMatrix;
     skillMatrix1= JSON.parse(JSON.stringify(skillMatrix1));
     if (!skillMatrix1){
@@ -91,7 +91,7 @@ Job.prototype.create = function(req,res,next){
     var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
     var conatctId = req.body.ctid ? parseInt(req.body.ctid) : 0;     // contact id
     var isconfidential = req.body.isconfi ? parseInt(req.body.isconfi) : 0;
-    var alumniCode = req.body.acode;    // alumni code
+    var alumniCode = req.body.acode ? req.body.acode : '';    // alumni code
     var locMatrix = req.body.locMatrix;
     locMatrix= JSON.parse(JSON.stringify(locMatrix));
     var educations = req.body.jobEducation;
@@ -247,7 +247,8 @@ Job.prototype.create = function(req,res,next){
                                             cid : cid,
                                             ctid : conatctId,
                                             isconfi : isconfidential,
-                                            acode : alumniCode
+                                            acode : alumniCode,
+                                            institute_id : req.body.institute_id
                                         };
                                         res.status(200).json(responseMessage);
 
@@ -291,8 +292,7 @@ Job.prototype.create = function(req,res,next){
                                                 });
                                             }
                                         }
-                                        else
-                                        {
+                                        else{
                                             locMatrix='';
                                         }
 
@@ -337,8 +337,7 @@ Job.prototype.create = function(req,res,next){
                                                 });
                                             }
                                         }
-                                        else
-                                        {
+                                        else {
                                             educations='';
                                         }
 
@@ -514,6 +513,7 @@ Job.prototype.create = function(req,res,next){
                                                                                                         var jid = jobID;
                                                                                                         //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                                                         notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude, prioritys, dateTime, a_name, msgUserid,jid);
+                                                                                                        console.log('Job Post Notification Send Successfully');
                                                                                                     });
                                                                                                 }
                                                                                                 else {
@@ -736,14 +736,21 @@ function FnSaveSkills(skill, callBack) {
 Job.prototype.getAll = function(req,res,next){
     var _this = this;
 
-    var ezeid = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
-    var keywordsForSearch = req.query.keywordsForSearch ? req.query.keywordsForSearch : '';
-    var status = req.query.status ? req.query.status : '';
-    var pageSize = req.query.page_size;
-    var pageCount = req.query.page_count;
-    var orderBy = req.query.order_by;  // 1-ascending else descending
+    var pageSize = (!isNaN(parseInt(req.query.page_size))) ?  parseInt(req.query.page_size) : 100;
+    var pageCount = (!isNaN(parseInt(req.query.page_count))) ?  parseInt(req.query.page_count) : 0;
     var alumniCode = req.query.a_code ? req.query.a_code : '';
+    var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
+    var clientQuery = req.query.clq ? req.query.clq : '';
+    var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
+    var contactQuery = req.query.ctq ? req.query.ctq : '';
+    var jobCodeSort = (!isNaN(parseInt(req.query.jcs))) ?  parseInt(req.query.jcs) : 0;
+    var jobCodeQuery = req.query.jcq ? req.query.jcq : '';
+    var jobTitleSort = (!isNaN(parseInt(req.query.jts))) ?  parseInt(req.query.jts): 0;
+    var jobTitleQuery = req.query.jtq ? req.query.jtq : '';
+    var createdDateSort = (!isNaN(parseInt(req.query.cds))) ?  parseInt(req.query.cds): 0;
+    var status = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 1;
+
 
     var responseMessage = {
         status: false,
@@ -752,10 +759,6 @@ Job.prototype.getAll = function(req,res,next){
         data: null
     };
     var validateStatus = true, error = {};
-    if(!ezeid){
-        error['ezeid'] = 'Invalid ezeid';
-        validateStatus *= false;
-    }
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -771,9 +774,11 @@ Job.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(ezeid) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
-                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy)
-                            + ',' + st.db.escape(alumniCode);
+                        var query = st.db.escape(token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)
+                            + ',' + st.db.escape(alumniCode)+ ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
+                            + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(jobTitleSort)
+                            + ',' + st.db.escape(jobTitleQuery)+ ',' + st.db.escape(createdDateSort) + ',' + st.db.escape(status)
+                            + ',' + st.db.escape(jobCodeSort)+ ',' + st.db.escape(jobCodeQuery);
                         console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
 
@@ -783,29 +788,29 @@ Job.prototype.getAll = function(req,res,next){
                                         if (getresult[0][0]) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
-                                            responseMessage.message = 'Jobs send successfully';
+                                            responseMessage.message = 'Jobs loaded successfully';
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
                                                 result : getresult[1]
                                             };
                                             res.status(200).json(responseMessage);
-                                            console.log('FnGetJobs: Jobs send successfully');
+                                            console.log('FnGetJobs: Jobs loaded successfully');
                                         }
                                         else {
-                                            responseMessage.message = 'No founded Jobs details';
-                                            console.log('FnGetJobs: No founded Jobs details');
+                                            responseMessage.message = 'No Jobs details found';
+                                            console.log('FnGetJobs: No Jobs details found');
                                             res.status(200).json(responseMessage);
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'No founded Jobs details';
-                                        console.log('FnGetJobs: No founded Jobs details');
+                                        responseMessage.message = 'No Jobs details found';
+                                        console.log('FnGetJobs: No Jobs details found');
                                         res.status(200).json(responseMessage);
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'No founded Jobs details';
-                                    console.log('FnGetJobs: No founded Jobs details');
+                                    responseMessage.message = 'No Jobs details found';
+                                    console.log('FnGetJobs: No Jobs details found');
                                     res.status(200).json(responseMessage);
                                 }
                             }
@@ -814,7 +819,7 @@ Job.prototype.getAll = function(req,res,next){
                                     server : 'Internal serever error'
                                 };
                                 responseMessage.message = 'Error getting from Jobs details';
-                                console.log('FnGetJobs:Error getting from Jobs details:' + err);
+                                console.log('FnGetJobs:Error from loading Jobs details:' + err);
                                 res.status(500).json(responseMessage);
                             }
                         });
@@ -851,6 +856,8 @@ Job.prototype.getAll = function(req,res,next){
         }
     }
 };
+
+
 
 /**
  * @todo FnGetJobLocations
@@ -1027,49 +1034,60 @@ Job.prototype.searchJobs = function(req,res,next){
  */
 Job.prototype.searchJobSeekers = function(req,res) {
 
+
+    var keyword = req.body.keyword ? req.body.keyword : '';
+    var jobType = req.body.job_type;
+    var salaryFrom = req.body.salary_from;
+    var salaryTo = req.body.salary_to;
+    var salaryType = req.body.salary_type;
+    var experienceFrom = req.body.experience_from;
+    var experienceTo = req.body.experience_to;
+    var instituteId = req.body.institute_id ? req.body.institute_id : '';
+    var pageSize = req.body.page_size ? req.body.page_size : 10;
+    var pageCount = req.body.page_count ? req.body.page_count : 0;
+    var source = req.body.source;   // 1-internal, 2-for ezeone cvs
+    var token = req.body.token;
+    var jobSkills = req.body.job_skills;
+    jobSkills = JSON.parse(JSON.stringify(jobSkills));
+    var educations = req.body.jobEducations;
+    educations = JSON.parse(JSON.stringify(educations));
+    var locMatrix = req.body.locMatrix;
+    locMatrix = JSON.parse(JSON.stringify(locMatrix));
+    var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
+    var locationsList = req.body.locationsList;
+    if(typeof(locationsList) == "string") {
+        locationsList = JSON.parse(locationsList);
+    }
+    var location_id='',locCount= 0,locationIds;
+
+    if (!jobSkills) {
+        jobSkills = [];
+    }
+
+    /**
+     * Validations
+     */
+    salaryFrom = (parseFloat(salaryFrom) !== NaN && parseFloat(salaryFrom) > 0) ? parseFloat(salaryFrom) : 0;
+    salaryTo = (parseFloat(salaryTo) !== NaN && parseFloat(salaryTo) > 0) ? parseFloat(salaryTo) : 0;
+    salaryType = (parseInt(salaryType) !== NaN && parseInt(salaryType) > 0) ? parseInt(salaryType) : 1;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        count: '',
+        data: null
+    };
     try {
-        var keyword = req.body.keyword ? req.body.keyword : '';
-        var jobType = req.body.job_type;
-        var salaryFrom = req.body.salary_from;
-        var salaryTo = req.body.salary_to;
-        var salaryType = req.body.salary_type;
-        var experienceFrom = req.body.experience_from;
-        var experienceTo = req.body.experience_to;
-        var locationIds = req.body.location_ids;
-        var instituteId = req.body.institute_id ? req.body.institute_id : '';
-        var pageSize = req.body.page_size ? req.body.page_size : 10;
-        var pageCount = req.body.page_count ? req.body.page_count : 0;
-        var source = req.body.source;   // 1-internal, 2-for ezeone cvs
-        var token = req.body.token;
-        var jobSkills = req.body.job_skills;
-        jobSkills = JSON.parse(JSON.stringify(jobSkills));
-        var educations = req.body.jobEducations;
-        educations = JSON.parse(JSON.stringify(educations));
-        var locMatrix = req.body.locMatrix;
-        locMatrix = JSON.parse(JSON.stringify(locMatrix));
-        var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
 
-        if (!jobSkills) {
-            jobSkills = [];
-        }
+        var locationDetails = locationsList[locCount];
 
-        /**
-         * Validations
-         */
-        salaryFrom = (parseFloat(salaryFrom) !== NaN && parseFloat(salaryFrom) > 0) ? parseFloat(salaryFrom) : 0;
-        salaryTo = (parseFloat(salaryTo) !== NaN && parseFloat(salaryTo) > 0) ? parseFloat(salaryTo) : 0;
-        salaryType = (parseInt(salaryType) !== NaN && parseInt(salaryType) > 0) ? parseInt(salaryType) : 1;
+        var job = function (m,locationIds) {
 
-
-        var responseMessage = {
-            status: false,
-            error: {},
-            message: '',
-            count: '',
-            data: null
-        };
-
-        var job = function (m) {
+            console.log('locationIds...2');
+            var ids = locationIds;
+            console.log(ids);
 
             if (m < jobSkills.length) {
 
@@ -1097,28 +1115,31 @@ Job.prototype.searchJobSeekers = function(req,res) {
                             ' find_in_set(b.SkillStatusID' + ',' + jskills.active_status + '))';
                     }
                     m = m + 1;
-                    job(m);
+                    job(m,ids);
                 });
 
             }
             else {
                 if (skillMatrix != ' ') {
                     skillMatrix = ' and ( ' + skillMatrix + ')';
-                    next(skillMatrix);
+                    next(skillMatrix,ids);
                     console.log('sending skill matrix..');
                 }
 
                 else {
-                    skillMatrix = ' ';
-                    next(skillMatrix);
+                    skillMatrix = '';
+                    next(skillMatrix,ids);
                     console.log('skill matrix is empty..');
                 }
             }
         };
 
-
-        var next = function (skillMatrix) {
+        var next = function (skillMatrix,locationIds) {
             var skillArray = skillMatrix;
+            var locIds = locationIds;
+
+            console.log('locationIds...3');
+            console.log(locIds);
             //educations
             if (educations.length) {
                 for(var j=0; j < educations.length; j++){
@@ -1197,24 +1218,22 @@ Job.prototype.searchJobSeekers = function(req,res) {
                 lineofcarrer = '';
             }
 
-            jobSeeker(skillArray, educationMatrix, lineofcarrer);
+            jobSeeker(skillArray, educationMatrix, lineofcarrer,locIds);
         };
 
-        var jobSeeker = function (skillArray, educationMatrix, lineofcarrer) {
+        var jobSeeker = function (skillArray, educationMatrix, lineofcarrer,locIds) {
 
-            var queryParams = st.db.escape(skillArray) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom) + ',' + st.db.escape(salaryTo)
-                + ',' + st.db.escape(salaryType) + ',' + st.db.escape(locationIds) + ',' + st.db.escape(experienceFrom)
-                + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId) + ',' + st.db.escape(pageSize)
-                + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
+            var queryParams = st.db.escape(skillArray) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom)
+                + ',' + st.db.escape(salaryTo)+ ',' + st.db.escape(salaryType) + ',' + st.db.escape(locIds)
+                + ',' + st.db.escape(experienceFrom)+ ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId)
+                + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
                 + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(lineofcarrer);
 
             var query = 'CALL pGetjobseekers(' + queryParams + ')';
-            //console.log('------------');
             console.log(query);
             st.db.query(query, function (err, getResult) {
                 //console.log(getResult);
-                //console.log(getResult[0]);
-                //console.log(getResult[1]);
+
                 if (!err) {
                     if (getResult) {
 
@@ -1235,8 +1254,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
                                 responseMessage.message = 'Job Seeker send successfully';
                                 responseMessage.count = getResult[0][0].count;
                                 responseMessage.data = getResult[1];
-
-                                console.log(responseMessage);
                                 res.status(200).json(responseMessage);
                                 console.log('FnGetJobSeeker: Job Seeker send successfully');
                             }
@@ -1271,17 +1288,102 @@ Job.prototype.searchJobSeekers = function(req,res) {
             });
         };
 
+        // saving locations
+        var insertLocations = function(locationDetails){
+            var list = {
+                location_title: locationDetails.location_title,
+                latitude: locationDetails.latitude,
+                longitude: locationDetails.longitude,
+                country: locationDetails.country,
+                maptype : locationDetails.maptype
+            };
 
-        if (jobSkills) {
-            var m = 0;
-            job(m);
+            var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
+                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
+            console.log('CALL psavejoblocation(' + queryParams + ')');
+            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                if (results) {
+                    if (results[0]) {
+                        if (results[0][0]) {
+                            location_id += results[0][0].id + ',';
+                            locCount +=1;
+                            if(locCount < locationsList.length){
+                                insertLocations(locationsList[locCount]);
+                            }
+                            else{
+                                if (jobSkills) {
+                                    var m = 0;
+
+                                    locationIds = location_id;
+                                    console.log('locationIds......1');
+                                    console.log(locationIds);
+                                    job(m,locationIds);
+                                }
+                                else
+                                {
+                                    var skillMatrix = '';
+                                    locationIds = location_id;
+                                    next(skillMatrix,locationIds);
+                                    console.log('FnGetJobSeeker : skill is empty');
+                                }
+                            }
+                        }
+                        else {
+                            console.log('FnSaveJobLocation:results no found');
+                            responseMessage.message = 'results no found';
+                            res.status(200).json(responseMessage);
+                        }
+                    }
+                    else {
+                        console.log('FnSaveJobLocation:results no found');
+                        responseMessage.message = 'results no found';
+                        res.status(200).json(responseMessage);
+                    }
+                }
+                else {
+                    console.log('FnSaveJobLocation:results no found');
+                    responseMessage.message = 'results no found';
+                    res.status(200).json(responseMessage);
+                }
+            });
+        };
+        //calling function at first time
+
+        if (locationsList) {
+            console.log('coming..');
+            if (locationsList.length > 0) {
+                insertLocations(locationDetails);
+            }
+            else {
+                locationIds = '';
+                if (jobSkills) {
+                    var m = 0;
+                    job(m,locationIds);
+
+                }
+                else
+                {
+                    var skillMatrix = '';
+                    next(skillMatrix,locationIds);
+                    console.log('FnGetJobSeeker : skill is empty');
+                }
+            }
 
         }
-        else
-        {
-            var skillMatrix = '';
-            next(skillMatrix);
-            console.log('FnGetJobSeeker : skill is empty');
+
+        else {
+            locationIds = '';
+            if (jobSkills) {
+                var m = 0;
+                job(m,locationIds);
+
+            }
+            else
+            {
+                var skillMatrix = '';
+                next(skillMatrix,locationIds);
+                console.log('FnGetJobSeeker : skill is empty');
+            }
         }
     }
 

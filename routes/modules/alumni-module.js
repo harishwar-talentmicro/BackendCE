@@ -4201,16 +4201,22 @@ Alumni.prototype.getClientContacts = function(req,res,next){
 Alumni.prototype.getAll = function(req,res,next){
     var _this = this;
 
-    var ezeone_id = alterEzeoneId(req.query.ezeone_id);
+    var ezeid = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
-    var keywordsForSearch = req.query.keywordsForSearch;
-    var status = req.query.status;
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
-    var orderBy = req.query.order_by;  // 1-ascending else descending
-    //console.log(req.query);
-    var final_result=[],loc_result = [],get_result=[],get_result1,tid, location_result={},jobids,job_location;
     var alumniCode = req.query.a_code ? req.query.a_code : '';
+    var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
+    var clientQuery = req.query.clq ? req.query.clq : '';
+    var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
+    var contactQuery = req.query.ctq ? req.query.ctq : '';
+    var jobCodeSort = (!isNaN(parseInt(req.query.jcs))) ?  parseInt(req.query.jcs) : 0;
+    var jobCodeQuery = req.query.jcq ? req.query.jcq : '';
+    var jobTitleSort = (!isNaN(parseInt(req.query.jts))) ?  parseInt(req.query.jts): 0;
+    var jobTitleQuery = req.query.jtq ? req.query.jtq : '';
+    var createdDateSort = (!isNaN(parseInt(req.query.cds))) ?  parseInt(req.query.cds): 0;
+    var status = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 1;
+
 
     var responseMessage = {
         status: false,
@@ -4219,7 +4225,7 @@ Alumni.prototype.getAll = function(req,res,next){
         data: null
     };
     var validateStatus = true, error = {};
-    if(!ezeone_id){
+    if(!ezeid){
         error['ezeone_id'] = 'Invalid ezeone_id';
         validateStatus *= false;
     }
@@ -4238,10 +4244,12 @@ Alumni.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(ezeone_id) + ',' + st.db.escape(keywordsForSearch)  + ',' + st.db.escape(status)
-                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)  + ',' + st.db.escape(orderBy)
-                            + ',' + st.db.escape(alumniCode);
-                        //console.log('CALL pGetJobs(' + query + ')');
+                        var query = st.db.escape(ezeid) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)
+                            + ',' + st.db.escape(alumniCode)+ ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
+                            + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(jobTitleSort)
+                            + ',' + st.db.escape(jobTitleQuery)+ ',' + st.db.escape(createdDateSort) + ',' + st.db.escape(status)
+                            + ',' + st.db.escape(jobCodeSort)+ ',' + st.db.escape(jobCodeQuery);
+                        console.log('CALL pGetJobs(' + query + ')');
                         st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
 
                             if (!err) {
@@ -5610,15 +5618,13 @@ Alumni.prototype.getAlumniUserDetails = function(req,res,next){
                                     if(results[0]){
                                         for( var i=0; i < results[0].length;i++){
                                             var result = {};
-                                            console.log(results[0][i].profileid);
-                                            result.logoimage = '';
                                             result.page1title = results[0][i].page1title;
                                             result.AlumniID = results[0][i].AlumniID;
                                             result.alumnicode = results[0][i].alumnicode;
                                             result.profilestatus = results[0][i].profilestatus;
                                             result.profile_id = results[0][i].profileid;
 
-                                            result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + '8c40eb14-5f97-4240-a0aa-3771c336dc38.png';
+                                            result.s_url = (results[0][i].logoimage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][i].logoimage) :'';
                                             output.push(result);
                                         }
 
