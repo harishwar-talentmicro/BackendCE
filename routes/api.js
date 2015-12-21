@@ -110,8 +110,6 @@ router.get('/location_details',locationModule.getLocationDetails);
 router.post('/share_location',locationModule.shareLocation);
 router.get('/validate_ezeone', locationModule.validateEZEOne);
 router.get('/locations_map_view',locationModule.getLocationsofezeid);
-router.get('/loc',locationModule.getLoc);
-router.post('/loc',locationModule.saveLoc);
 router.post('/location_for_employer',locationModule.saveLocationforEmployers);
 
 
@@ -139,6 +137,8 @@ router.get('/transaction_attachment',businessManager.getTransAttachment);
 router.get('/sales_statistics',businessManager.salesStatistics);
 router.post('/sales_request',businessManager.sendSalesRequest);
 router.post('/ewtSaveTranscation',businessManager.sendSalesRequest);
+router.post('/transaction_history',businessManager.createTransactionHistory);
+router.get('/transaction_history',businessManager.getTransactionHistory);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');
@@ -248,6 +248,9 @@ router.get('/loc_map',jobModule.getLocMap);
 router.get('/loc_details/employer',jobModule.loadLocDetailsEmployer);
 router.get('/loc_details/trainer',jobModule.loadLocDetailsTrainer);
 router.get('/loc_details/syllabus',jobModule.loadLocDetailsSyllabus);
+router.get('/loc',jobModule.getLoc);
+router.post('/loc',jobModule.saveLoc);
+router.get('/candidates_list',jobModule.getCandidatesList);
 
 //MessageBox module methods
 var Messagebox = require('./modules/messagebox-module.js');

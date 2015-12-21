@@ -3828,7 +3828,7 @@ Job.prototype.saveLocMap = function(req,res,next){
                                 console.log(locDetails);
 
 
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
+                                var queryParams = st.db.escape(req.body.token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
                                     + ',' + st.db.escape(locDetails.internshipCount) + ',' + st.db.escape(locDetails.fresherCtc)
                                     + ',' + st.db.escape(locDetails.fresherCount) + ',' + st.db.escape(locDetails.lateralCount)
                                     + ',' + st.db.escape(locDetails.tid);
@@ -3865,7 +3865,7 @@ Job.prototype.saveLocMap = function(req,res,next){
                         }
                         else {
                             responseMessage.message = 'Invalid Input Content Type';
-                            //res.status(200).json(responseMessage);
+                            res.status(200).json(responseMessage);
                             console.log('FnSaveLocMap:Invalid Input Content Type');
                         }
                     }
@@ -4405,6 +4405,292 @@ Job.prototype.loadLocDetailsSyllabus = function(req,res,next){
         }
     }
 };
+
+/**
+ * @todo FnGetLoc
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get loc
+ */
+Job.prototype.getLoc = function(req,res,next){
+
+    var token = req.query.token;
+    var functionId = req.query.fid;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+
+            var queryParams = st.db.escape(functionId);
+            var query = 'CALL pgetLOC(' + queryParams + ')';
+            //console.log(query);
+            st.db.query(query, function (err, locResult) {
+                //console.log(getResult);
+                if (!err) {
+                    if (locResult) {
+                        if (locResult[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Loc loaded sucessfully';
+                            responseMessage.data = locResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetLoc: Loc loaded sucessfully');
+                        }
+                        else {
+                            responseMessage.message = 'Loc is not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetLoc:Loc is not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Loc is not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetLoc:Loc is not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetLoc: error in getting Loc :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetLoc ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnSaveLoc
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get save location
+ */
+Job.prototype.saveLoc = function(req,res,next){
+    var _this = this;
+    var fs = require("fs");
+
+    var token = req.body.token;
+    var functionId = req.body.fid;
+    var locationTitle = req.body.loc_title;
+    var locationGuide = req.body.loc_guide;
+    var docTitle = req.body.doc_title;
+    var docFilename = req.body.doc_filename;
+    var id = req.body.id;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(functionId) + ','  + st.db.escape(locationTitle)+ ','  + st.db.escape(locationGuide)
+                            + ','  + st.db.escape(docTitle)+ ','  + st.db.escape(docFilename)+ ','  + st.db.escape(id);
+                        var query = 'CALL pSaveLOC(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'loc Saved successfully';
+                                    responseMessage.data = {
+                                        fid : req.body.fid,
+                                        loc_title : req.body.loc_title,
+                                        loc_guide : req.body.loc_guide,
+                                        doc_title : req.body.doc_title,
+                                        doc_filename : req.body.doc_filename,
+                                        id : req.body.id
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveLoc: loc Saved  successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'loc not Saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveLoc:loc not Saved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveLoc: error in saving loc:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveLoc: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveLoc:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnSaveLoc ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetCandidatesList
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get loc
+ */
+Job.prototype.getCandidatesList = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+
+            var queryParams = st.db.escape(token);
+            var query = 'CALL pgetlistofcanPO(' + queryParams + ')';
+            //console.log(query);
+            st.db.query(query, function (err, candidatesList) {
+                if (!err) {
+                    if (candidatesList) {
+                        if (candidatesList[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Candidates List loaded sucessfully';
+                            responseMessage.data = candidatesList[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetCandidatesList: Candidates List loaded sucessfully');
+                        }
+                        else {
+                            responseMessage.message = 'Candidates List is not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetCandidatesList:Candidates List is not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Candidates List is not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetCandidatesList:Candidates List is not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetCandidatesList: error in getting Candidates List :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetCandidatesList ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 
 

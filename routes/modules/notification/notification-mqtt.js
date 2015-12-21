@@ -69,7 +69,7 @@ if(amqpConn){
     amqpConn.on('error',function(err){
         console.log(err);
         console.log('Connection generated an error event');
-        amqpConn = amqp.createConnection({connOpt,  { defaultExchangeName: 'amq.topic' });
+        amqpConn = amqp.createConnection({url: url},  { defaultExchangeName: 'amq.topic' });
     });
 }
 
