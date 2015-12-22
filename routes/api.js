@@ -241,7 +241,7 @@ router.get('/applicant_list',jobModule.viewApplicantList);
 router.get('/view_job_details',jobModule.viewJobDetails);
 router.post('/job_notification',jobModule.jobNotification);
 router.get('/find_institute',jobModule.findInstitute);
-router.post('/add_selected_job',jobModule.addtoSelectedJob);
+router.post('/job/:jobId/candidate',jobModule.addtoSelectedJob);
 router.post('/job_location',jobModule.saveJobLocation);
 router.post('/loc_map',jobModule.saveLocMap);
 router.get('/loc_map',jobModule.getLocMap);
