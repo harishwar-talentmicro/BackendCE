@@ -1928,16 +1928,14 @@ User.prototype.saveResume = function(req,res,next){
                                                     cvid: InsertResult[0][0].ID,
                                                     fid: locMatrix[k].fid,
                                                     careerId: locMatrix[k].career_id,
-                                                    locUid: locMatrix[k].loc_uid,
-                                                    locScore: locMatrix[k].loc_score
+                                                    locUid: locMatrix[k].loc_uid
 
                                                 };
 
 
                                                 var queryParams = st.db.escape(locSkills.fid)+ ',' + st.db.escape(locSkills.careerId)
                                                     + ',' + st.db.escape(locSkills.expertiseLevel)+ ',' + st.db.escape(locSkills.exp)
-                                                    + ',' + st.db.escape(locSkills.cvid)+ ',' + st.db.escape(locSkills.locUid)
-                                                    + ',' + st.db.escape(locSkills.locScore);
+                                                    + ',' + st.db.escape(locSkills.cvid)+ ',' + st.db.escape(locSkills.locUid);
 
 
                                                 var query = 'CALL psavecvLOC(' + queryParams + ')';
