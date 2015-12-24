@@ -1072,7 +1072,7 @@ Tag.prototype.getTags = function(req,res,next){
                         console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
-                                console.log(getresult);
+                                //console.log(getresult);
                                 if (getresult[0]) {
 
                                     for( var i=0; i < getresult[0].length;i++){

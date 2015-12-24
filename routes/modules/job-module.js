@@ -263,12 +263,15 @@ Job.prototype.create = function(req,res,next){
                                                     expFrom: locMatrix[i].exp_from,
                                                     expTo: locMatrix[i].exp_to,
                                                     fid: locMatrix[i].fid,
-                                                    careerId: locMatrix[i].career_id
+                                                    careerId: locMatrix[i].career_id,
+                                                    scoreFrom: locMatrix[i].score_from,
+                                                    scoreTo: locMatrix[i].score_to
                                                 };
 
                                                 var queryParams = st.db.escape(locSkills.jobId) + ',' + st.db.escape(locSkills.fid)
                                                     + ',' + st.db.escape(locSkills.expFrom) + ',' + st.db.escape(locSkills.expTo)
-                                                    + ',' + st.db.escape(locSkills.expertiseLevel) + ',' + st.db.escape(locSkills.careerId);
+                                                    + ',' + st.db.escape(locSkills.expertiseLevel) + ',' + st.db.escape(locSkills.careerId)
+                                                    + ',' + st.db.escape(locSkills.scoreFrom) + ',' + st.db.escape(locSkills.scoreTo);
 
                                                 var query = 'CALL pSaveJobLOC(' + queryParams + ')';
                                                 console.log(query);
@@ -1034,43 +1037,10 @@ Job.prototype.searchJobs = function(req,res,next){
  */
 Job.prototype.searchJobSeekers = function(req,res) {
 
-
-    var keyword = req.body.keyword ? req.body.keyword : '';
-    var jobType = req.body.job_type;
-    var salaryFrom = req.body.salary_from;
-    var salaryTo = req.body.salary_to;
-    var salaryType = req.body.salary_type;
-    var experienceFrom = req.body.experience_from;
-    var experienceTo = req.body.experience_to;
-    var instituteId = req.body.institute_id ? req.body.institute_id : '';
-    var pageSize = req.body.page_size ? req.body.page_size : 10;
-    var pageCount = req.body.page_count ? req.body.page_count : 0;
-    var source = req.body.source;   // 1-internal, 2-for ezeone cvs
-    var token = req.body.token;
-    var jobSkills = req.body.job_skills;
-    jobSkills = JSON.parse(JSON.stringify(jobSkills));
-    var educations = req.body.jobEducations;
-    educations = JSON.parse(JSON.stringify(educations));
-    var locMatrix = req.body.locMatrix;
-    locMatrix = JSON.parse(JSON.stringify(locMatrix));
-    var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
-    var locationsList = req.body.locationsList;
-    if(typeof(locationsList) == "string") {
-        locationsList = JSON.parse(locationsList);
-    }
-    var location_id='',locCount= 0,locationIds;
-
-    if (!jobSkills) {
-        jobSkills = [];
-    }
-
     /**
-     * Validations
+     * checking input parameters are json or not
      */
-    salaryFrom = (parseFloat(salaryFrom) !== NaN && parseFloat(salaryFrom) > 0) ? parseFloat(salaryFrom) : 0;
-    salaryTo = (parseFloat(salaryTo) !== NaN && parseFloat(salaryTo) > 0) ? parseFloat(salaryTo) : 0;
-    salaryType = (parseInt(salaryType) !== NaN && parseInt(salaryType) > 0) ? parseInt(salaryType) : 1;
-
+    var isJson = req.is('json');
 
     var responseMessage = {
         status: false,
@@ -1079,183 +1049,238 @@ Job.prototype.searchJobSeekers = function(req,res) {
         count: '',
         data: null
     };
-    try {
 
-        var locationDetails = locationsList[locCount];
+    var validateStatus=true,error={};
 
-        var job = function (m,locationIds) {
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else {
 
-            console.log('locationIds...2');
-            var ids = locationIds;
-            console.log(ids);
+        var jobType = req.body.job_type;
+        var salaryFrom = (parseFloat(req.body.salary_from) !== NaN && parseFloat(req.body.salary_from) > 0) ? parseFloat(req.body.salary_from) : 0;
+        var salaryTo = (parseFloat(req.body.salary_to) !== NaN && parseFloat(req.body.salary_to) > 0) ? parseFloat(req.body.salary_to) : 0;
+        var salaryType = (parseInt(req.body.salary_type) !== NaN && parseInt(req.body.salary_type) > 0) ? parseInt(req.body.salary_type) : 1;
+        var experienceFrom = req.body.experience_from;
+        var experienceTo = req.body.experience_to;
+        var instituteId = req.body.institute_id ? req.body.institute_id : '';
+        var pageSize = req.body.page_size ? req.body.page_size : 10;
+        var pageCount = req.body.page_count ? req.body.page_count : 0;
+        var source = req.body.source;   // 1-internal, 2-for ezeone cvs
+        var token = req.body.token;
+        var jobSkills = req.body.job_skills;
+        jobSkills = JSON.parse(JSON.stringify(jobSkills));
+        var educations = req.body.jobEducations;
+        educations = JSON.parse(JSON.stringify(educations));
+        var locMatrix = req.body.locMatrix;
+        locMatrix = JSON.parse(JSON.stringify(locMatrix));
+        var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
+        var locationsList = req.body.locationsList;
+        if (typeof(locationsList) == "string") {
+            locationsList = JSON.parse(locationsList);
+        }
+        var location_id = '', locCount = 0, locationIds;
 
-            if (m < jobSkills.length) {
+        if (!jobSkills) {
+            jobSkills = [];
+        }
 
-                var jskills = {
-                    skillname: jobSkills[m].skillname,
-                    expertiseLevel: jobSkills[m].expertiseLevel,
-                    exp_from: jobSkills[m].exp_from,
-                    exp_to: jobSkills[m].exp_to,
-                    active_status: jobSkills[m].active_status,
-                    fid : jobSkills[m].fid,
-                    type : jobSkills[m].type
-                };
+        if(!token){
+            error['token'] = 'token is mandatory';
+            validateStatus *= false;
+        }
+    }
 
-                FnSaveSkills(jskills, function (err, idResult) {
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
 
-                    if (skillMatrix == ' ') {
+            var locationDetails = locationsList[locCount];
 
-                        skillMatrix = ' (find_in_set(b.SkillID' + ',' + idResult.SkillID + ') and find_in_set(b.ExpertLevel' + ',' + JSON.stringify(jskills.expertiseLevel) + ' )' +
-                            ' and b.ExpYrs>= ' + jskills.exp_from + ' and b.ExpYrs<= ' + jskills.exp_to + ' and ' +
-                            ' find_in_set(b.SkillStatusID' + ',' + jskills.active_status + '))';
-                    }
-                    else {
-                        skillMatrix = skillMatrix + ' or' + ' ( find_in_set(b.SkillID' + ',' + idResult.SkillID + ') and find_in_set(b.ExpertLevel' + ',' + JSON.stringify(jskills.expertiseLevel) + ' )' +
-                            ' and b.ExpYrs>= ' + jskills.exp_from + ' and b.ExpYrs<= ' + jskills.exp_to + ' and ' +
-                            ' find_in_set(b.SkillStatusID' + ',' + jskills.active_status + '))';
-                    }
-                    m = m + 1;
-                    job(m,ids);
-                });
+            var job = function (m, locationIds) {
+                var ids = locationIds;
 
-            }
-            else {
-                if (skillMatrix != ' ') {
-                    skillMatrix = ' and ( ' + skillMatrix + ')';
-                    next(skillMatrix,ids);
-                    console.log('sending skill matrix..');
+                if (m < jobSkills.length) {
+
+                    var jskills = {
+                        skillname: jobSkills[m].skillname,
+                        expertiseLevel: jobSkills[m].expertiseLevel,
+                        exp_from: jobSkills[m].exp_from,
+                        exp_to: jobSkills[m].exp_to,
+                        active_status: jobSkills[m].active_status,
+                        fid: jobSkills[m].fid,
+                        type: jobSkills[m].type
+                    };
+
+
+                    FnSaveSkills(jskills, function (err, idResult) {
+
+                        if (skillMatrix == ' ') {
+
+                            skillMatrix = ' (find_in_set(b.SkillID' + ',' + idResult.SkillID + ') and find_in_set(b.ExpertLevel' + ',' + JSON.stringify(jskills.expertiseLevel) + ' )' +
+                                ' and b.ExpYrs>= ' + jskills.exp_from + ' and b.ExpYrs<= ' + jskills.exp_to + ' and ' +
+                                ' find_in_set(b.SkillStatusID' + ',' + jskills.active_status + '))';
+                        }
+                        else {
+                            skillMatrix = skillMatrix + ' or' + ' ( find_in_set(b.SkillID' + ',' + idResult.SkillID + ') and find_in_set(b.ExpertLevel' + ',' + JSON.stringify(jskills.expertiseLevel) + ' )' +
+                                ' and b.ExpYrs>= ' + jskills.exp_from + ' and b.ExpYrs<= ' + jskills.exp_to + ' and ' +
+                                ' find_in_set(b.SkillStatusID' + ',' + jskills.active_status + '))';
+                        }
+                        m = m + 1;
+                        job(m, ids);
+                    });
+
                 }
-
                 else {
-                    skillMatrix = '';
-                    next(skillMatrix,ids);
-                    console.log('skill matrix is empty..');
-                }
-            }
-        };
+                    if (skillMatrix != ' ') {
+                        console.log('sending skill matrix..');
+                        skillMatrix = ' and ( ' + skillMatrix + ')';
+                        next(skillMatrix, ids);
 
-        var next = function (skillMatrix,locationIds) {
-            var skillArray = skillMatrix;
-            var locIds = locationIds;
-
-            console.log('locationIds...3');
-            console.log(locIds);
-            //educations
-            if (educations.length) {
-                for(var j=0; j < educations.length; j++){
-                    //async.each(educations, function iterator(eduDetails, callback) {
-
-                    count = count - 1;
-
-                    var eduSkills = {
-                        education: educations[j].edu_id,
-                        spc: educations[j].spc_id,
-                        score_from: educations[j].score_from,
-                        score_to: educations[j].score_to
-
-                    };
-
-                    if (eduMatrix == ' ') {
-
-                        eduMatrix = ' (FIND_IN_SET(c.Educationid,' + eduSkills.education + ' ) ' +
-                            'AND FIND_IN_SET(c.Specializationids,' + eduSkills.spc + ') ' +
-                            'AND c.Score>=' + eduSkills.score_from + ' AND c.Score<=' + eduSkills.score_to + ')';
                     }
+
                     else {
-                        eduMatrix = eduMatrix + ' or' + ' (FIND_IN_SET(c.Educationid,' + eduSkills.education + ' ) ' +
-                            'AND FIND_IN_SET(c.Specializationids,' + eduSkills.spc + ') ' +
-                            'AND c.Score>=' + eduSkills.score_from + ' AND c.Score<=' + eduSkills.score_to + ')';
+                        skillMatrix = '';
+                        next(skillMatrix, ids);
+                        console.log('skill matrix is empty..');
+                    }
+                }
+            };
+
+            var next = function (skillMatrix, locationIds) {
+                var skillArray = skillMatrix;
+                var locIds = locationIds;
+
+                //educations
+                if (educations.length) {
+                    for (var j = 0; j < educations.length; j++) {
+                        //async.each(educations, function iterator(eduDetails, callback) {
+
+                        count = count - 1;
+
+                        var eduSkills = {
+                            education: educations[j].edu_id,
+                            spc: educations[j].spc_id,
+                            score_from: educations[j].score_from,
+                            score_to: educations[j].score_to
+
+                        };
+
+                        if (eduMatrix == ' ') {
+
+                            eduMatrix = ' (FIND_IN_SET(c.Educationid,' + eduSkills.education + ' ) ' +
+                                'AND FIND_IN_SET(c.Specializationids,' + eduSkills.spc + ') ' +
+                                'AND c.Score>=' + eduSkills.score_from + ' AND c.Score<=' + eduSkills.score_to + ')';
+                        }
+                        else {
+                            eduMatrix = eduMatrix + ' or' + ' (FIND_IN_SET(c.Educationid,' + eduSkills.education + ' ) ' +
+                                'AND FIND_IN_SET(c.Specializationids,' + eduSkills.spc + ') ' +
+                                'AND c.Score>=' + eduSkills.score_from + ' AND c.Score<=' + eduSkills.score_to + ')';
+                        }
+
                     }
 
-                }
-
-                if (eduMatrix != ' ') {
-                    educationMatrix = ' and ( ' + eduMatrix + ')';
-                }
-            }
-            else {
-                educationMatrix = '';
-            }
-
-            //line of carrer
-            if (locMatrix.length) {
-                for(var k=0; k < locMatrix.length; k++){
-                    //async.each(locMatrix, function iterator(locDetails, callback) {
-
-                    count = count - 1;
-
-                    var locSkills = {
-                        fid: locMatrix[k].fid,
-                        locIds: locMatrix[k].career_id,
-                        exp_from: locMatrix[k].exp_from,
-                        exp_to: locMatrix[k].exp_to,
-                        level: locMatrix[k].expertiseLevel
-
-                    };
-
-                    //(FIND_IN_SET(d.Functionid,array) AND FIND_IN_SET(d.LOCid,array) AND FIND_IN_SET(d.Level,array) AND d.Exp>=array AND d.Exp<=array )
-                    if (loc == ' ') {
-
-                        loc = ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
-                            'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
-                            'AND FIND_IN_SET(d.Level,'+'\'' + locSkills.level + '\') ' +
-                            'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
+                    if (eduMatrix != ' ') {
+                        educationMatrix = ' and ( ' + eduMatrix + ')';
                     }
-                    else {
-                        loc = loc + ' or' + ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
-                            'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
-                            'AND FIND_IN_SET(d.Level,'+'\'' + locSkills.level + '\') ' +
-                            'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
+                }
+                else {
+                    educationMatrix = '';
+                }
+
+                //line of carrer
+                if (locMatrix.length) {
+                    for (var k = 0; k < locMatrix.length; k++) {
+                        //async.each(locMatrix, function iterator(locDetails, callback) {
+
+                        count = count - 1;
+
+                        var locSkills = {
+                            fid: locMatrix[k].fid,
+                            locIds: locMatrix[k].career_id,
+                            exp_from: locMatrix[k].exp_from,
+                            exp_to: locMatrix[k].exp_to,
+                            level: locMatrix[k].expertiseLevel,
+                            scoreFrom: locMatrix[k].score_from,
+                            scoreTo: locMatrix[k].score_to
+
+                        };
+
+                        //(FIND_IN_SET(d.Functionid,array) AND FIND_IN_SET(d.LOCid,array) AND FIND_IN_SET(d.Level,array) AND d.Exp>=array AND d.Exp<=array )
+                        if (loc == ' ') {
+
+                            loc = ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
+                                'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
+                                'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
+                                'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
+                                ' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
+                        }
+                        else {
+                            loc = loc + ' or' + ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
+                                'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
+                                'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
+                                'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
+                                ' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
+                        }
+
                     }
 
+                    if (loc != ' ') {
+                        lineofcarrer = ' and ( ' + loc + ')';
+                    }
+                }
+                else {
+                    lineofcarrer = '';
                 }
 
-                if (loc != ' ') {
-                    lineofcarrer = ' and ( ' + loc + ')';
-                }
-            }
-            else {
-                lineofcarrer = '';
-            }
+                jobSeeker(skillArray, educationMatrix, lineofcarrer, locIds);
+            };
 
-            jobSeeker(skillArray, educationMatrix, lineofcarrer,locIds);
-        };
+            var jobSeeker = function (skillArray, educationMatrix, lineofcarrer, locIds) {
 
-        var jobSeeker = function (skillArray, educationMatrix, lineofcarrer,locIds) {
+                var queryParams = st.db.escape(skillArray) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom)
+                    + ',' + st.db.escape(salaryTo) + ',' + st.db.escape(salaryType) + ',' + st.db.escape(locIds)
+                    + ',' + st.db.escape(experienceFrom) + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId)
+                    + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
+                    + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(lineofcarrer);
 
-            var queryParams = st.db.escape(skillArray) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom)
-                + ',' + st.db.escape(salaryTo)+ ',' + st.db.escape(salaryType) + ',' + st.db.escape(locIds)
-                + ',' + st.db.escape(experienceFrom)+ ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId)
-                + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
-                + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(lineofcarrer);
+                var query = 'CALL pGetjobseekers(' + queryParams + ')';
+                console.log(query);
+                st.db.query(query, function (err, getResult) {
+                    //console.log(getResult);
+                    if (!err) {
+                        if (getResult) {
+                            if (getResult[0]) {
+                                if (getResult[0].length > 0) {
 
-            var query = 'CALL pGetjobseekers(' + queryParams + ')';
-            console.log(query);
-            st.db.query(query, function (err, getResult) {
-                //console.log(getResult);
-
-                if (!err) {
-                    if (getResult) {
-
-                        if(getResult[0]){
-                            if (getResult[0].length > 0) {
-
-                                if(getResult[1]){
-                                    if(getResult[1].length > 0){
-                                        for(var ct = 0; ct < getResult[1].length; ct++){
-                                            getResult[1][ct].surl = (getResult[1][ct].resumeurl) ?
-                                                (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].resumeurl) : '';
-                                            //console.log(getResult[1][ct]);
+                                    if (getResult[1]) {
+                                        if (getResult[1].length > 0) {
+                                            for (var ct = 0; ct < getResult[1].length; ct++) {
+                                                getResult[1][ct].surl = (getResult[1][ct].resumeurl) ?
+                                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].resumeurl) : '';
+                                                //console.log(getResult[1][ct]);
+                                            }
                                         }
                                     }
+
+                                    responseMessage.status = true;
+                                    responseMessage.message = 'Job Seeker send successfully';
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.data = getResult[1];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetJobSeeker: Job Seeker send successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Job Seeker not found';
+                                    console.log('FnGetJobSeeker: Job Seeker not found');
+                                    res.status(200).json(responseMessage);
                                 }
 
-                                responseMessage.status = true;
-                                responseMessage.message = 'Job Seeker send successfully';
-                                responseMessage.count = getResult[0][0].count;
-                                responseMessage.data = getResult[1];
-                                res.status(200).json(responseMessage);
-                                console.log('FnGetJobSeeker: Job Seeker send successfully');
                             }
                             else {
                                 responseMessage.message = 'Job Seeker not found';
@@ -1264,68 +1289,63 @@ Job.prototype.searchJobSeekers = function(req,res) {
                             }
 
                         }
-                        else{
+                        else {
                             responseMessage.message = 'Job Seeker not found';
                             console.log('FnGetJobSeeker: Job Seeker not found');
                             res.status(200).json(responseMessage);
                         }
-
                     }
                     else {
-                        responseMessage.message = 'Job Seeker not found';
-                        console.log('FnGetJobSeeker: Job Seeker not found');
-                        res.status(200).json(responseMessage);
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'Error getting from Job Seeker';
+                        console.log('FnGetJobSeeker:Error getting from Job Seeker:' + err);
+                        res.status(500).json(responseMessage);
                     }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'Error getting from Job Seeker';
-                    console.log('FnGetJobSeeker:Error getting from Job Seeker:' + err);
-                    res.status(500).json(responseMessage);
-                }
-            });
-        };
-
-        // saving locations
-        var insertLocations = function(locationDetails){
-            var list = {
-                location_title: locationDetails.location_title,
-                latitude: locationDetails.latitude,
-                longitude: locationDetails.longitude,
-                country: locationDetails.country,
-                maptype : locationDetails.maptype
+                });
             };
 
-            var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
-                + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
-            console.log('CALL psavejoblocation(' + queryParams + ')');
-            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
-                if (results) {
-                    if (results[0]) {
-                        if (results[0][0]) {
-                            location_id += results[0][0].id + ',';
-                            locCount +=1;
-                            if(locCount < locationsList.length){
-                                insertLocations(locationsList[locCount]);
-                            }
-                            else{
-                                if (jobSkills) {
-                                    var m = 0;
+            // saving locations
+            var insertLocations = function (locationDetails) {
+                var list = {
+                    location_title: locationDetails.location_title,
+                    latitude: locationDetails.latitude,
+                    longitude: locationDetails.longitude,
+                    country: locationDetails.country,
+                    maptype: locationDetails.maptype
+                };
 
-                                    locationIds = location_id;
-                                    console.log('locationIds......1');
-                                    console.log(locationIds);
-                                    job(m,locationIds);
+                var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
+                    + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country) + ',' + st.db.escape(list.maptype);
+                console.log('CALL psavejoblocation(' + queryParams + ')');
+                st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                    if (results) {
+                        if (results[0]) {
+                            if (results[0][0]) {
+                                location_id += results[0][0].id + ',';
+                                locCount += 1;
+                                if (locCount < locationsList.length) {
+                                    insertLocations(locationsList[locCount]);
                                 }
-                                else
-                                {
-                                    var skillMatrix = '';
-                                    locationIds = location_id;
-                                    next(skillMatrix,locationIds);
-                                    console.log('FnGetJobSeeker : skill is empty');
+                                else {
+                                    if (jobSkills) {
+                                        var m = 0;
+                                        locationIds = location_id;
+                                        job(m, locationIds);
+                                    }
+                                    else {
+                                        var skillMatrix = '';
+                                        locationIds = location_id;
+                                        next(skillMatrix, locationIds);
+                                        console.log('FnGetJobSeeker : skill is empty');
+                                    }
                                 }
+                            }
+                            else {
+                                console.log('FnSaveJobLocation:results no found');
+                                responseMessage.message = 'results no found';
+                                res.status(200).json(responseMessage);
                             }
                         }
                         else {
@@ -1339,64 +1359,57 @@ Job.prototype.searchJobSeekers = function(req,res) {
                         responseMessage.message = 'results no found';
                         res.status(200).json(responseMessage);
                     }
+                });
+            };
+            //calling function at first time
+
+            if (locationsList) {
+                if (locationsList.length > 0) {
+                    insertLocations(locationDetails);
                 }
                 else {
-                    console.log('FnSaveJobLocation:results no found');
-                    responseMessage.message = 'results no found';
-                    res.status(200).json(responseMessage);
-                }
-            });
-        };
-        //calling function at first time
+                    locationIds = '';
+                    if (jobSkills) {
+                        var m = 0;
+                        job(m, locationIds);
 
-        if (locationsList) {
-            console.log('coming..');
-            if (locationsList.length > 0) {
-                insertLocations(locationDetails);
+                    }
+                    else {
+                        var skillMatrix = '';
+                        next(skillMatrix, locationIds);
+                        console.log('FnGetJobSeeker : skill is empty');
+                    }
+                }
+
             }
+
             else {
                 locationIds = '';
                 if (jobSkills) {
                     var m = 0;
-                    job(m,locationIds);
+                    job(m, locationIds);
 
                 }
-                else
-                {
+                else {
                     var skillMatrix = '';
-                    next(skillMatrix,locationIds);
+                    next(skillMatrix, locationIds);
                     console.log('FnGetJobSeeker : skill is empty');
                 }
             }
 
         }
 
-        else {
-            locationIds = '';
-            if (jobSkills) {
-                var m = 0;
-                job(m,locationIds);
-
-            }
-            else
-            {
-                var skillMatrix = '';
-                next(skillMatrix,locationIds);
-                console.log('FnGetJobSeeker : skill is empty');
-            }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnJobSeekerSearch ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
-    }
-
-    catch (ex) {
-        responseMessage.error = {
-            server : 'Internal server error'
-        };
-        responseMessage.message = 'An error occurred !';
-        res.status(400).json(responseMessage);
-        console.log('Error : FnJobSeekerSearch ' + ex.description);
-        console.log(ex);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 
 };
@@ -3524,11 +3537,11 @@ Job.prototype.findInstitute = function(req,res,next){
  * @description api code for add to selected job
  */
 Job.prototype.addtoSelectedJob = function(req,res,next){
-    var _this = this;
 
-    var token = req.body.token;
-    var cvid = parseInt(req.body.cvid);
-    var jobId = parseInt(req.body.job_id);
+
+    var jobId = (parseInt(req.params.jobId) !== NaN && parseInt(req.params.jobId) > 0) ? parseInt(req.params.jobId) : '';
+    var isJson = req.is('json');
+    var token,cvId;
 
     var responseMessage = {
         status: false,
@@ -3538,14 +3551,32 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
     };
 
     var validateStatus = true,error = {};
-    if(!token){
-        error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
+
     if(!jobId){
-        error['jobId'] = 'Invalid job ID';
+        error['jobId'] = 'Invalid jobId';
         validateStatus *= false;
     }
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else {
+        cvId = parseInt(req.body.cv_id);
+
+        if(req.body.token){
+            token = req.body.token;
+        }
+        else{
+            token = req.query.token;
+        }
+
+        if (!token) {
+            error['token'] = 'token is Mandatory';
+            validateStatus *= false;
+        }
+    }
+
 
     if(!validateStatus){
         responseMessage.error = error;
@@ -3554,28 +3585,33 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(cvid)+ ',' + st.db.escape(jobId);
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(cvId)+ ',' + st.db.escape(jobId);
                         var query = 'CALL pAddcandtoselectedjob(' + queryParams + ')';
-                        st.db.query(query, function (err, insertResult) {
+                        console.log(query);
+                        st.db.query(query, function (err, jobResult) {
                             if (!err) {
-                                if (insertResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'SelectedJob Added successfully';
-                                    responseMessage.data = {
-                                        cvid : parseInt(req.body.cvid),
-                                        job_id : parseInt(req.body.job_id)
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnAddtoSelectedJob: SelectedJob Added successfully');
+                                if (jobResult) {
+                                    if (jobResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Job Added successfully';
+                                        responseMessage.data = jobResult[0][0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnAddtoSelectedJob: Job Added successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Job is not Added';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnAddtoSelectedJob:Job is not Added');
+                                    }
                                 }
                                 else {
-                                    responseMessage.message = 'SelectedJob not Added';
+                                    responseMessage.message = 'Job is not Added';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnAddtoSelectedJob:SelectedJob not Added');
+                                    console.log('FnAddtoSelectedJob:Job is not Added');
                                 }
                             }
                             else {
@@ -3584,7 +3620,7 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnAddtoSelectedJob: error in saving SelectedJob Added :' + err);
+                                console.log('FnAddtoSelectedJob: error in adding selected job :' + err);
                             }
 
                         });
@@ -3750,7 +3786,6 @@ Job.prototype.saveJobLocation = function(req,res,next){
  * @description api code for save loc map
  */
 Job.prototype.saveLocMap = function(req,res,next){
-    var _this = this;
 
     /**
      * checking input parameters are json or not
@@ -3767,7 +3802,7 @@ Job.prototype.saveLocMap = function(req,res,next){
     var validateStatus = true,error = {};
 
     if(!isJson){
-        error['isJson'] = 'Invalid ContentType';
+        error['isJson'] = 'Invalid Input ContentType';
         validateStatus *= false;
     }
     else{
@@ -3828,7 +3863,7 @@ Job.prototype.saveLocMap = function(req,res,next){
                                 console.log(locDetails);
 
 
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
+                                var queryParams = st.db.escape(req.body.token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
                                     + ',' + st.db.escape(locDetails.internshipCount) + ',' + st.db.escape(locDetails.fresherCtc)
                                     + ',' + st.db.escape(locDetails.fresherCount) + ',' + st.db.escape(locDetails.lateralCount)
                                     + ',' + st.db.escape(locDetails.tid);
@@ -3865,7 +3900,7 @@ Job.prototype.saveLocMap = function(req,res,next){
                         }
                         else {
                             responseMessage.message = 'Invalid Input Content Type';
-                            //res.status(200).json(responseMessage);
+                            res.status(200).json(responseMessage);
                             console.log('FnSaveLocMap:Invalid Input Content Type');
                         }
                     }
@@ -4406,6 +4441,411 @@ Job.prototype.loadLocDetailsSyllabus = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnGetLoc
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get loc
+ */
+Job.prototype.getLoc = function(req,res,next){
+
+    var token = req.query.token;
+    var functionId = req.query.fid;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+
+            var queryParams = st.db.escape(functionId);
+            var query = 'CALL pgetLOC(' + queryParams + ')';
+            //console.log(query);
+            st.db.query(query, function (err, locResult) {
+                //console.log(getResult);
+                if (!err) {
+                    if (locResult) {
+                        if (locResult[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Loc loaded sucessfully';
+                            responseMessage.data = locResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetLoc: Loc loaded sucessfully');
+                        }
+                        else {
+                            responseMessage.message = 'Loc is not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetLoc:Loc is not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Loc is not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetLoc:Loc is not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetLoc: error in getting Loc :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetLoc ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnSaveLoc
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get save location
+ */
+Job.prototype.saveLoc = function(req,res,next){
+    var _this = this;
+    var fs = require("fs");
+
+    var token = req.body.token;
+    var functionId = req.body.fid;
+    var locationTitle = req.body.loc_title;
+    var locationGuide = req.body.loc_guide;
+    var docTitle = req.body.doc_title;
+    var docFilename = req.body.doc_filename;
+    var id = req.body.id;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(functionId) + ','  + st.db.escape(locationTitle)+ ','  + st.db.escape(locationGuide)
+                            + ','  + st.db.escape(docTitle)+ ','  + st.db.escape(docFilename)+ ','  + st.db.escape(id);
+                        var query = 'CALL pSaveLOC(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
+                            if (!err) {
+                                if (getResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'loc Saved successfully';
+                                    responseMessage.data = {
+                                        fid : req.body.fid,
+                                        loc_title : req.body.loc_title,
+                                        loc_guide : req.body.loc_guide,
+                                        doc_title : req.body.doc_title,
+                                        doc_filename : req.body.doc_filename,
+                                        id : req.body.id
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveLoc: loc Saved  successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'loc not Saved';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveLoc:loc not Saved');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveLoc: error in saving loc:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveLoc: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveLoc:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnSaveLoc ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetCandidatesList
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get loc
+ */
+Job.prototype.getCandidatesList = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+
+            var queryParams = st.db.escape(token);
+            var query = 'CALL pgetlistofcanPO(' + queryParams + ')';
+            //console.log(query);
+            st.db.query(query, function (err, candidatesList) {
+                if (!err) {
+                    if (candidatesList) {
+                        if (candidatesList[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Candidates List loaded sucessfully';
+                            responseMessage.data = candidatesList[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetCandidatesList: Candidates List loaded sucessfully');
+                        }
+                        else {
+                            responseMessage.message = 'Candidates List is not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetCandidatesList:Candidates List is not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Candidates List is not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetCandidatesList:Candidates List is not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetCandidatesList: error in getting Candidates List :' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetCandidatesList ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnUpdateCandidateStatus
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for update candidate status
+ */
+Job.prototype.updateCandidateStatus = function(req,res,next){
+
+    /* input parameters
+     * cvid <int>
+     * salary <DECIMAL(4,2)>
+     * jt <VARCHAR(150)>  // job title
+     * st <int> // status
+     * n <varchar(250)>  // notes
+     */
+    // checking input parameters are json or not
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else {
+        if (!req.body.token) {
+            error['token'] = 'Invalid token';
+            validateStatus *= false;
+        }
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(req.body.cv_id) + ','  + st.db.escape(req.body.salary)
+                            + ','  + st.db.escape(req.body.jt) + ','  + st.db.escape(req.body.st)+ ','  + st.db.escape(req.body.n);
+
+                        var query = 'CALL pupdatecandidateinterviewstatus(' + queryParams + ')';
+                        st.db.query(query, function (err, statusResult) {
+                            if (!err) {
+                                if (statusResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Status Updated successfully';
+                                    responseMessage.data = {
+                                        cv_id : req.body.cv_id,
+                                        salary : req.body.salary,
+                                        jt : req.body.jt,
+                                        st : req.body.st,
+                                        n : req.body.n
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateCandidateStatus: Status Updated  successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Status not updated';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateCandidateStatus:Status not updated');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnUpdateCandidateStatus: error in updating status:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnUpdateCandidateStatus: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnUpdateCandidateStatus:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnUpdateCandidateStatus ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = Job;

@@ -384,3 +384,4 @@ db.query('CALL pvalidatealumnicode('+db.escape('sjbit')+')',function(err,results
        console.log(results);
    }
 });
+

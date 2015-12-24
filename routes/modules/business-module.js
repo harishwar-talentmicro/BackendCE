@@ -73,7 +73,7 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
         status: false,
         error:{},
         message:'',
-        totalCount:0,
+        total_count:0,
         data: null
     };
     var validateStatus = true, error = {};
@@ -113,7 +113,7 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                                 if (transResult) {
                                     if (transResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.totalCount = transResult[0][0].count;
+                                        responseMessage.total_count = transResult[0][0].count;
                                         responseMessage.data = transResult[1];
                                         responseMessage.message = 'Transaction details Send successfully';
                                         res.status(200).json(responseMessage);
@@ -169,7 +169,7 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                 server: 'Internal server error'
             };
             responseMessage.message = 'An error occured !';
-            console.log('FnGetSalesTransaction:error ' + ex.description);
+            console.log('FnGetTransaction:error ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
             res.status(400).json(responseMessage);
@@ -205,7 +205,7 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
         status: false,
         error:{},
         message:'',
-        totalCount:0,
+        total_count:0,
         data: null
     };
     var validateStatus = true, error = {};
@@ -245,7 +245,7 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                                 if (transResult) {
                                     if (transResult[0].length > 0) {
                                         responseMessage.status = true;
-                                        responseMessage.totalCount = transResult[0][0].count;
+                                        responseMessage.total_count = transResult[0][0].count;
                                         responseMessage.data = transResult[1];
                                         responseMessage.message = 'Transaction details Send successfully';
                                         res.status(200).json(responseMessage);
@@ -437,7 +437,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                     TID: TID,
                                                     MessageText: MessageText,
                                                     Status: Status,
-                                                    TaskDateTime: TaskDateTime,
                                                     Notes: Notes,
                                                     LocID: LocID,
                                                     Country: Country,
@@ -448,12 +447,9 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                     Latitude: Latitude,
                                                     Longitude: Longitude,
                                                     EZEID: EZEID,
-                                                    ContactInfo: ContactInfo,
                                                     FolderRuleID: FolderRuleID,
                                                     Duration: Duration,
                                                     DurationScales: DurationScales,
-                                                    NextAction: NextAction,
-                                                    NextActionDateTime: NextActionDateTime,
                                                     DeliveryAddress: DeliveryAddress,
                                                     ToEZEID: ToEZEID,
                                                     item_list_type: item_list_type,
@@ -483,7 +479,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                         TID: TID,
                                                         MessageText: MessageText,
                                                         Status: Status,
-                                                        TaskDateTime: TaskDateTime,
                                                         Notes: Notes,
                                                         LocID: LocID,
                                                         Country: Country,
@@ -494,12 +489,9 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                         Latitude: Latitude,
                                                         Longitude: Longitude,
                                                         EZEID: EZEID,
-                                                        ContactInfo: ContactInfo,
                                                         FolderRuleID: FolderRuleID,
                                                         Duration: Duration,
                                                         DurationScales: DurationScales,
-                                                        NextAction: NextAction,
-                                                        NextActionDateTime: NextActionDateTime,
                                                         DeliveryAddress: DeliveryAddress,
                                                         ToEZEID: ToEZEID,
                                                         item_list_type: item_list_type,
@@ -1349,7 +1341,7 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnGetOutboxMessages:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -2461,6 +2453,223 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnCreateTransactionHistory
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for create transaction history
+ */
+BusinessManager.prototype.createTransactionHistory = function(req,res,next){
+    var _this = this;
+
+    var token = req.body.token;
+    var id = (!isNaN(parseInt(req.body.id))) ?  parseInt(req.body.id): 0;
+    var stageType = req.body.s_type;
+    var transactionId = req.body.tid;
+    var stage = req.body.s;
+    var reason = req.body.reason ? req.body.reason : '';
+    var comments = req.body.comments ? req.body.comments : '';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(id) + ',' + st.db.escape(stageType)
+                            + ',' + st.db.escape(transactionId) + ',' + st.db.escape(stage) + ',' + st.db.escape(reason)
+                            + ',' + st.db.escape(comments);
+                        var query = 'CALL pcreatetranshistory(' + queryParams + ')';
+                        st.db.query(query, function (err, historyResult) {
+                            //console.log(historyResult);
+                            if (!err) {
+                                if (historyResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Transaction history created successfully';
+                                    responseMessage.data = {
+                                        transaction_id : historyResult[0][0].id,
+                                        id: id,
+                                        s_type: parseInt(req.body.s_type),
+                                        tid: parseInt(req.body.tid),
+                                        stage: parseInt(req.body.s),
+                                        reason: reason,
+                                        comments: comments
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnCreateTransactionHistory: Transaction history created successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Transaction history not created';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnCreateTransactionHistory:Transaction history not created');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal server error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnCreateTransactionHistory: error in creating transaction history:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnCreateTransactionHistory: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnCreateTransactionHistory:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnCreateTransactionHistory ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetTransactionHistory
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get transaction history
+ */
+BusinessManager.prototype.getTransactionHistory = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token;
+    var transactionId = req.query.t_id;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(token)+ ',' + st.db.escape(transactionId);
+                        var query = 'CALL pgettranshistory(' + queryParams + ')';
+                        st.db.query(query, function (err, historyResult) {
+                            if (!err) {
+                                if (historyResult[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Transaction history loaded successfully';
+                                    responseMessage.data = historyResult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTransactionHistory: Transaction history loaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Transaction history not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTransactionHistory:Transaction history not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal server error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetTransactionHistory: error in loading transaction history:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetTransactionHistory: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTransactionHistory:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetTransactionHistory ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = BusinessManager;

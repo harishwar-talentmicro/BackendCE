@@ -471,12 +471,12 @@ Search.prototype.searchInformation = function(req,res,next){
         var longitude = req.query.lng ? req.query.lng : 0;
         var output = [];
 
-        var WorkingDate
+        var WorkingDate;
         var moment = require('moment');
         if(CurrentDate != null)
-            var WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
+            WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
         else
-            var WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
+            WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
 
 
         if (ezeTerm) {
