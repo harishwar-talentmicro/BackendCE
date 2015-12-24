@@ -4741,7 +4741,7 @@ Job.prototype.updateCandidateStatus = function(req,res,next){
      * salary <DECIMAL(4,2)>
      * jt <VARCHAR(150)>  // job title
      * st <int> // status
-     * tn <varchar(250)>
+     * n <varchar(250)>  // notes
      */
     // checking input parameters are json or not
     var isJson = req.is('json');
@@ -4779,7 +4779,7 @@ Job.prototype.updateCandidateStatus = function(req,res,next){
                 if (!err) {
                     if (tokenResult) {
                         var queryParams = st.db.escape(req.body.cv_id) + ','  + st.db.escape(req.body.salary)
-                            + ','  + st.db.escape(req.body.jt) + ','  + st.db.escape(req.body.st)+ ','  + st.db.escape(req.body.tn);
+                            + ','  + st.db.escape(req.body.jt) + ','  + st.db.escape(req.body.st)+ ','  + st.db.escape(req.body.n);
 
                         var query = 'CALL pupdatecandidateinterviewstatus(' + queryParams + ')';
                         st.db.query(query, function (err, statusResult) {
@@ -4793,7 +4793,7 @@ Job.prototype.updateCandidateStatus = function(req,res,next){
                                         salary : req.body.salary,
                                         jt : req.body.jt,
                                         st : req.body.st,
-                                        tn : req.body.tn
+                                        n : req.body.n
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateCandidateStatus: Status Updated  successfully');
