@@ -265,7 +265,7 @@ Job.prototype.create = function(req,res,next){
                                                     fid: locMatrix[i].fid,
                                                     careerId: locMatrix[i].career_id,
                                                     scoreFrom: locMatrix[i].score_from,
-                                                    scoreTo: locMatrix[i].score_to,
+                                                    scoreTo: locMatrix[i].score_to
                                                 };
 
                                                 var queryParams = st.db.escape(locSkills.jobId) + ',' + st.db.escape(locSkills.fid)
@@ -1205,7 +1205,9 @@ Job.prototype.searchJobSeekers = function(req,res) {
                             locIds: locMatrix[k].career_id,
                             exp_from: locMatrix[k].exp_from,
                             exp_to: locMatrix[k].exp_to,
-                            level: locMatrix[k].expertiseLevel
+                            level: locMatrix[k].expertiseLevel,
+                            scoreFrom: locMatrix[k].score_from,
+                            scoreTo: locMatrix[k].score_to
 
                         };
 
@@ -1215,13 +1217,15 @@ Job.prototype.searchJobSeekers = function(req,res) {
                             loc = ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
                                 'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
                                 'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
-                                'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
+                                'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
+                                ' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
                         }
                         else {
                             loc = loc + ' or' + ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
                                 'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
                                 'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
-                                'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to + ' )';
+                                'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
+                                ' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
                         }
 
                     }
@@ -4722,7 +4726,126 @@ Job.prototype.getCandidatesList = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnUpdateCandidateStatus
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for update candidate status
+ */
+Job.prototype.updateCandidateStatus = function(req,res,next){
 
+    /* input parameters
+     * cvid <int>
+     * salary <DECIMAL(4,2)>
+     * jt <VARCHAR(150)>  // job title
+     * st <int> // status
+     * tn <varchar(250)>
+     */
+    // checking input parameters are json or not
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else {
+        if (!req.body.token) {
+            error['token'] = 'Invalid token';
+            validateStatus *= false;
+        }
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(req.body.cv_id) + ','  + st.db.escape(req.body.salary)
+                            + ','  + st.db.escape(req.body.jt) + ','  + st.db.escape(req.body.st)+ ','  + st.db.escape(req.body.tn);
+
+                        var query = 'CALL pupdatecandidateinterviewstatus(' + queryParams + ')';
+                        st.db.query(query, function (err, statusResult) {
+                            if (!err) {
+                                if (statusResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Status Updated successfully';
+                                    responseMessage.data = {
+                                        cv_id : req.body.cv_id,
+                                        salary : req.body.salary,
+                                        jt : req.body.jt,
+                                        st : req.body.st,
+                                        tn : req.body.tn
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateCandidateStatus: Status Updated  successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Status not updated';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateCandidateStatus:Status not updated');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnUpdateCandidateStatus: error in updating status:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnUpdateCandidateStatus: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnUpdateCandidateStatus:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnUpdateCandidateStatus ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 module.exports = Job;

@@ -32,6 +32,7 @@ router.get('/ms_auth/resource',notification.authResource);
 var Auth = require('./modules/auth-module.js');
 var authModule = new Auth(db,stdLib);
 router.post('/ewSavePrimaryEZEData', authModule.register);
+router.post('/register', authModule.registerNew);
 router.post('/ewLogin', authModule.login);
 router.get('/ewLogout', authModule.logout);
 router.get('/pass_reset_code',authModule.verifyResetCode);
@@ -251,6 +252,7 @@ router.get('/loc_details/syllabus',jobModule.loadLocDetailsSyllabus);
 router.get('/loc',jobModule.getLoc);
 router.post('/loc',jobModule.saveLoc);
 router.get('/candidates_list',jobModule.getCandidatesList);
+router.post('/candidates_status',jobModule.updateCandidateStatus);
 
 //MessageBox module methods
 var Messagebox = require('./modules/messagebox-module.js');
