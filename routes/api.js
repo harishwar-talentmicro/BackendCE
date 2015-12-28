@@ -37,6 +37,7 @@ router.post('/ewLogin', authModule.login);
 router.get('/ewLogout', authModule.logout);
 router.get('/pass_reset_code',authModule.verifyResetCode);
 router.post('/verify_secret_code',authModule.verifySecretCode);
+router.post('/otp', authModule.sendOtp);
 
 //User module methods
 var User = require('./modules/user-module.js');
