@@ -32,7 +32,6 @@ router.get('/ms_auth/resource',notification.authResource);
 var Auth = require('./modules/auth-module.js');
 var authModule = new Auth(db,stdLib);
 router.post('/ewSavePrimaryEZEData', authModule.register);
-router.post('/register', authModule.registerNew);
 router.post('/ewLogin', authModule.login);
 router.get('/ewLogout', authModule.logout);
 router.get('/pass_reset_code',authModule.verifyResetCode);
@@ -245,13 +244,6 @@ router.post('/job_notification',jobModule.jobNotification);
 router.get('/find_institute',jobModule.findInstitute);
 router.post('/job/:jobId/candidate',jobModule.addtoSelectedJob);
 router.post('/job_location',jobModule.saveJobLocation);
-router.post('/loc_map',jobModule.saveLocMap);
-router.get('/loc_map',jobModule.getLocMap);
-router.get('/loc_details/employer',jobModule.loadLocDetailsEmployer);
-router.get('/loc_details/trainer',jobModule.loadLocDetailsTrainer);
-router.get('/loc_details/syllabus',jobModule.loadLocDetailsSyllabus);
-router.get('/loc',jobModule.getLoc);
-router.post('/loc',jobModule.saveLoc);
 router.get('/candidates_list',jobModule.getCandidatesList);
 router.post('/candidates_status',jobModule.updateCandidateStatus);
 
@@ -381,6 +373,24 @@ router.get('/sos_request',sosModule.loadSosRequest);
 router.post('/sos_update_request',sosModule.updateSosRequest);
 router.post('/sos_service_provider',sosModule.saveSosServiceProvider);
 router.get('/sos_service_provider',sosModule.getSosServiceProvider);
+
+//Loc Module
+var Loc = require('./modules/loc-module.js');
+var locModule = new Loc(db,stdLib);
+router.post('/loc_map',locModule.saveLocMap);
+router.get('/loc_map',locModule.getLocMap);
+router.get('/loc_details/employer',locModule.loadLocDetailsEmployer);
+router.get('/loc_details/trainer',locModule.loadLocDetailsTrainer);
+router.get('/loc_details/syllabus',locModule.loadLocDetailsSyllabus);
+router.get('/loc',locModule.getLoc);
+router.post('/loc',locModule.saveLoc);
+router.get('/loc_basket',locModule.getLocBasket);
+
+//Service Module
+var Service = require('./modules/service-module.js');
+var serviceModule = new Service(db,stdLib);
+router.get('/service_provider',serviceModule.getServiceProviders);
+
 
 
 //EZEIDAP Methods

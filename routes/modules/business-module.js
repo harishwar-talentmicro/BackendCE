@@ -2510,11 +2510,10 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'Transaction history created successfully';
                                     responseMessage.data = {
-                                        transaction_id : historyResult[0][0].id,
-                                        id: id,
+                                        id : historyResult[0][0].id,                                
                                         s_type: parseInt(req.body.s_type),
                                         tid: parseInt(req.body.tid),
-                                        stage: parseInt(req.body.s),
+                                        s: parseInt(req.body.s),
                                         reason: reason,
                                         comments: comments
                                     };
