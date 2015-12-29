@@ -470,7 +470,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
     }
 };
 
-
+// still not complete this method
 /**
  * @todo FnCreateService
  * Method : POST
@@ -484,7 +484,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
  * @param pic  (file)
  * @description api code for created new service
  */
-Loc.prototype.createService = function(req,res,next){
+Service.prototype.createService = function(req,res,next){
 
     /**
      * checking input parameters are json or not

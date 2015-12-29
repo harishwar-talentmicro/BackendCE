@@ -394,6 +394,7 @@ router.get('/service_provider',serviceModule.getServiceProviders);
 router.get('/service',serviceModule.getServices);
 router.get('/service_categories',serviceModule.getServiceCategories);
 router.get('/service_details',serviceModule.getServiceDetails);
+router.post('/service',serviceModule.createService);
 
 
 
