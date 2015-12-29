@@ -246,6 +246,7 @@ router.post('/job/:jobId/candidate',jobModule.addtoSelectedJob);
 router.post('/job_location',jobModule.saveJobLocation);
 router.get('/candidates_list',jobModule.getCandidatesList);
 router.post('/candidates_status',jobModule.updateCandidateStatus);
+router.get('/auto_search',jobModule.autoSearchJobs);
 
 //MessageBox module methods
 var Messagebox = require('./modules/messagebox-module.js');
@@ -390,6 +391,9 @@ router.get('/loc_basket',locModule.getLocBasket);
 var Service = require('./modules/service-module.js');
 var serviceModule = new Service(db,stdLib);
 router.get('/service_provider',serviceModule.getServiceProviders);
+router.get('/service',serviceModule.getServices);
+router.get('/service_categories',serviceModule.getServiceCategories);
+router.get('/service_details',serviceModule.getServiceDetails);
 
 
 

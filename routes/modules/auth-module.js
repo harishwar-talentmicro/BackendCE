@@ -496,7 +496,7 @@ Auth.prototype.register = function(req,res,next){
                                                 req.connection.socket.remoteAddress;
                                             var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                                            st.generateToken(ip, userAgent, EZEID, function (err, token) {
+                                            st.generateToken(ip, userAgent, ezeid, function (err, token) {
                                                 if (err) {
                                                     console.log('FnRegistration: Token Generation Error' + err);
                                                 }
