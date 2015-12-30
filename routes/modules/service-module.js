@@ -6,6 +6,8 @@
  */
 "use strict";
 
+var uuid = require('node-uuid');
+
 var st = null;
 function Service(db,stdLib){
 
@@ -26,6 +28,134 @@ function alterEzeoneId(ezeoneId){
     }
     return alteredEzeoneId;
 }
+
+var stream = require( "stream" );
+var chalk = require( "chalk" );
+var util = require( "util" );
+// I turn the given source Buffer into a Readable stream.
+function BufferStream( source ) {
+
+    if ( ! Buffer.isBuffer( source ) ) {
+
+        throw( new Error( "Source must be a buffer." ) );
+
+    }
+
+    // Super constructor.
+    stream.Readable.call( this );
+
+    this._source = source;
+
+    // I keep track of which portion of the source buffer is currently being pushed
+    // onto the internal stream buffer during read actions.
+    this._offset = 0;
+    this._length = source.length;
+
+    // When the stream has ended, try to clean up the memory references.
+    this.on( "end", this._destroy );
+
+}
+
+util.inherits( BufferStream, stream.Readable );
+
+
+// I attempt to clean up variable references once the stream has been ended.
+// --
+// NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
+// usage since my Node.js apps will (eventually) never restart.
+BufferStream.prototype._destroy = function() {
+
+    this._source = null;
+    this._offset = null;
+    this._length = null;
+
+};
+
+
+// I read chunks from the source buffer into the underlying stream buffer.
+// --
+// NOTE: We can assume the size value will always be available since we are not
+// altering the readable state options when initializing the Readable stream.
+BufferStream.prototype._read = function( size ) {
+
+    // If we haven't reached the end of the source buffer, push the next chunk onto
+    // the internal stream buffer.
+    if ( this._offset < this._length ) {
+
+        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
+
+        this._offset += size;
+
+    }
+
+    // If we've consumed the entire source buffer, close the readable stream.
+    if ( this._offset >= this._length ) {
+
+        this.push( null );
+
+    }
+
+};
+
+var gcloud = require('gcloud');
+var fs = require('fs');
+
+var appConfig = require('../../ezeone-config.json');
+
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
+
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+
+/**
+ * image uploading to cloud server
+ * @param uniqueName
+ * @param readStream
+ * @param callback
+ */
+var uploadDocumentToCloud = function(uniqueName,readStream,callback){
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function(){
+        console.log('done');
+        if(callback){
+            if(typeof(callback)== 'function'){
+                callback(null);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function(err){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                console.log(err);
+                callback(err);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+};
 
 
 /**
@@ -129,7 +259,6 @@ Service.prototype.getServiceProviders = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetServices
  * Method : GET
@@ -158,11 +287,11 @@ Service.prototype.getServices = function(req,res,next){
         validateStatus *= false;
     }
     if(isNaN(status)){
-        error['status'] = 'status is not integer value';
+        error['status'] = 'status is a integer value';
         validateStatus *= false;
     }
     if(isNaN(masterId)){
-        error['master_id'] = 'master_id is not integer value';
+        error['master_id'] = 'master_id is a integer value';
         validateStatus *= false;
     }
 
@@ -274,7 +403,7 @@ Service.prototype.getServiceCategories= function(req,res,next){
         validateStatus *= false;
     }
     if(isNaN(masterId)){
-        error['master_id'] = 'master_id is not integer value';
+        error['master_id'] = 'master_id is a integer value';
         validateStatus *= false;
     }
 
@@ -289,7 +418,7 @@ Service.prototype.getServiceCategories= function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(masterId);
+                        var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token);
                         var query = 'CALL pgetservicecatagories(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, categoryResult) {
@@ -386,7 +515,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
         validateStatus *= false;
     }
     if(isNaN(serviceId)){
-        error['id'] = 'id is not integer value';
+        error['id'] = 'id is a integer value';
         validateStatus *= false;
     }
 
@@ -470,24 +599,23 @@ Service.prototype.getServiceDetails = function(req,res,next){
     }
 };
 
-// still not complete this method
 /**
  * @todo FnCreateService
  * Method : POST
  * @param req
  * @param res
  * @param next
- * @param token (char(36))
- * @param master_id (int)
- * @param message (VARCHAR(250))
- * @param cid (int) category id
- * @param pic  (file)
  * @description api code for created new service
  */
 Service.prototype.createService = function(req,res,next){
 
     /**
      * checking input parameters are json or not
+     * @param token (char(36))
+     * @param master_id (int)
+     * @param message (VARCHAR(250))
+     * @param cid (int) category id
+     * @param pic  (file)
      */
     var isJson = req.is('json');
 
@@ -512,18 +640,19 @@ Service.prototype.createService = function(req,res,next){
         var token = req.body.token;
         var masterId = parseInt(req.body.master_id);
         var categoryId = parseInt(req.body.cid);
+        var randomName='',pic;
 
         if(!(token)){
             error['token'] = 'token is Mandatory';
             validateStatus *= false;
         }
         if(isNaN(masterId)){
-            error['masterId'] = 'masterId is not integer value';
+            error['masterId'] = 'masterId is a integer value';
             validateStatus *= false;
         }
 
         if(isNaN(categoryId)){
-            error['categoryId'] = 'categoryId is not integer value';
+            error['categoryId'] = 'categoryId is a integer value';
             validateStatus *= false;
         }
     }
@@ -540,13 +669,36 @@ Service.prototype.createService = function(req,res,next){
                     if (result) {
 
                         /**
-                         * @todo pic upload to cloud server
+                         * pic upload to cloud server
                          */
+                        if (req.files.pic) {
 
+                            var uniqueId = uuid.v4();
+                            var filetype = (req.files.pic.extension) ? req.files.pic.extension : 'jpg';
+                            randomName = uniqueId + '.' + filetype;
+
+                            var readStream = fs.createReadStream(req.files.pic.path);
+
+                            uploadDocumentToCloud(randomName, readStream, function (err) {
+                                if (!err) {
+                                    pic = randomName;
+                                    console.log(pic);
+                                    console.log('FnCreateService:Pic Uploaded Successfully');
+                                }
+                                else {
+                                    console.log(err);
+                                    console.log('FnCreateService:Error in uploading pic');
+                                }
+                            });
+                        }
+                        else
+                        {
+                            pic = '';
+                        }
 
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(masterId)
                             + ',' + st.db.escape(req.body.message) + ',' + st.db.escape(categoryId)
-                            + ',' + st.db.escape(req.body.pic);
+                            + ',' + st.db.escape(pic);
 
                         var query = 'CALL ppostservice(' + queryParams + ')';
                         console.log(query);
@@ -554,15 +706,21 @@ Service.prototype.createService = function(req,res,next){
                             if (!err) {
                                 if (serviceResult) {
                                     responseMessage.status = true;
-                                    responseMessage.message = 'LocMap saved successfully';
-                                    responseMessage.data = id;
+                                    responseMessage.message = 'Service Created successfully';
+                                    responseMessage.data = {
+                                        master_id : masterId,
+                                        message : req.body.message,
+                                        cid : categoryId,
+                                        pic : pic ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pic : ''
+
+                                    };
                                     res.status(200).json(responseMessage);
-                                    console.log('FnSaveLocMap: LocMap saved successfully');
+                                    console.log('FnCreateService: Service Created successfully');
                                 }
                                 else {
-                                    responseMessage.message = 'LocMap not saved';
+                                    responseMessage.message = 'service not created';
                                     res.status(200).json(responseMessage);
-                                    console.log('FnSaveLocMap:LocMap not saved');
+                                    console.log('FnCreateService:service not created');
                                 }
                             }
                             else {
@@ -571,7 +729,7 @@ Service.prototype.createService = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('FnSaveLocMap: error in saving LocMap  :' + err);
+                                console.log('FnCreateService: error in saving service  :' + err);
                             }
 
                         });
@@ -584,7 +742,7 @@ Service.prototype.createService = function(req,res,next){
                         };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('FnSaveLocMap: Invalid token');
+                        console.log('FnCreateService: Invalid token');
                     }
                 }
                 else {
@@ -593,7 +751,7 @@ Service.prototype.createService = function(req,res,next){
                     };
                     responseMessage.message = 'Error in validating Token';
                     res.status(500).json(responseMessage);
-                    console.log('FnSaveLocMap:Error in processing Token' + err);
+                    console.log('FnCreateService:Error in processing Token' + err);
                 }
             });
         }
@@ -603,12 +761,172 @@ Service.prototype.createService = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
-            console.log('Error : FnSaveLocMap ' + ex.description);
+            console.log('Error : FnCreateService ' + ex.description);
+            console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
 };
 
+/**
+ * @todo FnUpdateService
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for update service
+ */
+Service.prototype.updateService = function(req,res,next){
+
+    /**
+     * checking input parameters are json or not
+     * @param token (CHAR(36))
+     * @param id 	(int)
+     * @param ep (int) // earned points
+     * @param rp (int) //
+     * @param replay  (VARCHAR(250))
+     * @param st	 (int) // status  [1-submit,2-close,3-cancel]
+     * @param master_id  (int) //servicemaster id
+     */
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else{
+        /**
+         * storing and validating the input parameters
+         */
+
+        var token = req.body.token;
+        var id = parseInt(req.body.id);
+        var earnedPoints = parseInt(req.body.ep);
+        var redeemedPoints = parseInt(req.body.rp);
+        var status = parseInt(req.body.st);
+        var masterId = parseInt(req.body.master_id);
+
+        if(!(token)){
+            error['token'] = 'token is Mandatory';
+            validateStatus *= false;
+        }
+        if(isNaN(masterId)){
+            error['masterId'] = 'masterId is not integer value';
+            validateStatus *= false;
+        }
+
+        if(isNaN(earnedPoints)){
+            error['earnedPoints'] = 'ep is not integer value';
+            validateStatus *= false;
+        }
+        if(isNaN(redeemedPoints)){
+            error['redeemedPoints'] = 'rp is not integer value';
+            validateStatus *= false;
+        }
+
+        if(isNaN(id)){
+            error['id'] = 'id is not integer value';
+            validateStatus *= false;
+        }
+        if(isNaN(status)){
+            error['status'] = 'st is not integer value';
+            validateStatus *= false;
+        }
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(id)
+                            + ',' + st.db.escape(earnedPoints) + ',' + st.db.escape(redeemedPoints)
+                            + ',' + st.db.escape(req.body.replay) + ',' + st.db.escape(status)+ ',' + st.db.escape(masterId);
+
+                        var query = 'CALL pupdateservice(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, updateserviceResult) {
+                            if (!err) {
+                                if (updateserviceResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.message = 'Service updated successfully';
+                                    responseMessage.data = {
+                                        id : id,
+                                        ep : earnedPoints,
+                                        rp : redeemedPoints,
+                                        replay : req.body.replay,
+                                        st : status,
+                                        master_id : masterId
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateService: Service updated successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'service not updated';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnUpdateService:service not updated');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnUpdateService: error in updating service  :' + err);
+                            }
+
+                        });
+
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnUpdateService: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnUpdateService:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnUpdateService ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 module.exports = Service;
