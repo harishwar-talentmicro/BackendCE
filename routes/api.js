@@ -396,7 +396,7 @@ router.get('/service_categories',serviceModule.getServiceCategories);
 router.get('/service_details',serviceModule.getServiceDetails);
 router.post('/service',serviceModule.createService);
 router.put('/service',serviceModule.updateService);
-
+router.post('/join_member',serviceModule.addMembersToService);
 
 
 //EZEIDAP Methods

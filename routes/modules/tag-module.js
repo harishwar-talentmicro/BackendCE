@@ -739,6 +739,7 @@ Tag.prototype.saveTags = function(req,res,next){
             for(var pr in req.files){
                 if(req.files.hasOwnProperty(pr)){
                     fileProperty = pr;
+                    console.log(req.files);
                 }
             }
 
@@ -785,6 +786,8 @@ Tag.prototype.saveTags = function(req,res,next){
                             /**
                              * Directly save into db
                              */
+
+
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(1) + ',' +
                                 st.db.escape('')+ ',' + st.db.escape(tag) + ',' + st.db.escape(pin) +
                                 ',' + st.db.escape(link);
@@ -824,14 +827,28 @@ Tag.prototype.saveTags = function(req,res,next){
                             });
 
                         }
-                        else{
+                        else {
                             /**
                              * Upload file to cloud and then save to db
                              */
 
+
+
                             var readStream = fs.createReadStream(req.files[pr].path);
-                            var uniqueFileName = uuid.v4() + ((req.files[pr].extension) ? ('.'+req.files[pr].extension) : '');
+                            var uniqueFileName = uuid.v4() + ((req.files[pr].extension) ? ('.' + req.files[pr].extension) : '');
                             var originalFileName = req.files[pr].originalname;
+                            if (tag == 'CV') {
+                                if (req.files) {
+                                    originalFileName = req.files.image.extension;
+                                }
+                                else {
+                                    originalFileName = req.files[pr].originalname;
+                                }
+                            }
+                            else {
+                                originalFileName = req.files[pr].originalname;
+                            }
+
 
                             uploadDocumentToCloud(uniqueFileName,readStream,function(err){
                                 if(!err){

@@ -177,12 +177,12 @@ Service.prototype.getServiceProviders = function(req,res,next){
     var validateStatus = true, error = {};
 
     if(!token){
-        error['token'] = 'Sorry! token is mandatory'
+        error['token'] = 'Sorry! token is mandatory';
         console.log('token is mandatory');
         validateStatus *= false;
     }
     if(isNaN(serviceType)){
-        error['service_type'] = 'Sorry! service_type is not integer value'
+        error['service_type'] = 'Sorry! service_type is not integer value';
         console.log('service_type is a integer value');
         validateStatus *= false;
     }
@@ -922,6 +922,174 @@ Service.prototype.updateService = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnUpdateService ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnAddMembersToService
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for created new service
+ */
+Service.prototype.addMembersToService = function(req,res,next){
+
+    /**
+     * checking input parameters are json or not
+     * @param token (char(36))
+     * @param ezeid VARCHAR(35)
+     * @param identify name VARCHAR(25)
+     * @param notes VARCHAR(150)
+     * @param service_type VARCHAR(150)
+     */
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else{
+        /**
+         * storing and validating the input parameters
+         */
+
+        var token = req.body.token;
+        var ezeid = alterEzeoneId(req.body.ezeid);
+        var serviceType = parseInt(req.body.service_type);
+
+        if(!(token)){
+            error['token'] = 'token is Mandatory';
+            validateStatus *= false;
+        }
+        if(isNaN(serviceType)){
+            error['serviceType'] = 'serviceType is not integer value';
+            validateStatus *= false;
+        }
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(ezeid)
+                            + ',' + st.db.escape(req.body.identify_name) + ',' + st.db.escape(req.body.notes)
+                            + ',' + st.db.escape(serviceType);
+
+                        var query = 'CALL paddmembertoservice(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, memberResult) {
+                            console.log(memberResult);
+                            if (!err) {
+                                if (memberResult) {
+                                    if (memberResult.affectedRows > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.message = 'Member added successfully';
+                                        responseMessage.data = {
+                                            ezeid: ezeid,
+                                            identify_name: req.body.identify_name,
+                                            notes: req.body.notes,
+                                            service_type : serviceType
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnAddMembersToService: Member added successfully');
+                                    }
+                                    else {
+                                        if (memberResult[0]) {
+                                            if (memberResult[0][0]) {
+                                                if (memberResult[0][0].message == -2) {
+                                                    responseMessage.status = true;
+                                                    responseMessage.message = 'community doesnt exists';
+                                                    responseMessage.data = { message : memberResult[0][0].message };
+                                                    res.status(200).json(responseMessage);
+                                                    console.log('FnAddMembersToService: community doesnt exists');
+                                                }
+                                                else {
+                                                    responseMessage.status = true;
+                                                    responseMessage.message = 'already a member of that community';
+                                                    responseMessage.data = { message : memberResult[0][0].message };
+                                                    res.status(200).json(responseMessage);
+                                                    console.log('FnAddMembersToService: already a member of that community');
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.message = 'Member not add';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnAddMembersToService:Member not add');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.message = 'Member not add';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnAddMembersToService:Member not add');
+                                        }
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Member not add';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnAddMembersToService:Member not add');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnAddMembersToService: error in adding member  :' + err);
+                            }
+
+                        });
+
+                    }
+                    else {
+                        responseMessage.message = 'Sorry! token is invalid';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnAddMembersToService: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnAddMembersToService:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnAddMembersToService ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
