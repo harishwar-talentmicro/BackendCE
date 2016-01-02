@@ -30,7 +30,8 @@
     "ejs" : "~2.3.4",
     "nodemailer" : "~1.4.0",
     "amqp":"~0.2.4",
-    "gcloud": "~0.24.1"
+    "gcloud": "~0.24.1",
+    "random-string" : "0.1.2"
 
   },
   "devDependencies": {
