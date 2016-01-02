@@ -2465,7 +2465,6 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
     var _this = this;
 
     var token = req.body.token;
-    var id = (!isNaN(parseInt(req.body.id))) ?  parseInt(req.body.id): 0;
     var stageType = req.body.s_type;
     var transactionId = req.body.tid;
     var stage = req.body.s;
@@ -2498,7 +2497,7 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(id) + ',' + st.db.escape(stageType)
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(stageType)
                             + ',' + st.db.escape(transactionId) + ',' + st.db.escape(stage) + ',' + st.db.escape(reason)
                             + ',' + st.db.escape(comments);
                         var query = 'CALL pcreatetranshistory(' + queryParams + ')';
@@ -2510,11 +2509,10 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'Transaction history created successfully';
                                     responseMessage.data = {
-                                        transaction_id : historyResult[0][0].id,
-                                        id: id,
+                                        id : historyResult[0][0].id,
                                         s_type: parseInt(req.body.s_type),
                                         tid: parseInt(req.body.tid),
-                                        stage: parseInt(req.body.s),
+                                        s: parseInt(req.body.s),
                                         reason: reason,
                                         comments: comments
                                     };

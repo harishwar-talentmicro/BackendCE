@@ -1005,11 +1005,21 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                     var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid='+userID;
                                     st.db.query(queryParameters, function (err, iosResult) {
                                         if (iosResult) {
-                                            iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                          if (iosResult[0]) {
+                                            iphoneID = iosResult[0].iphoneID;
+                                          }
+                                          else{
+                                            iphoneID='';
+                                          }
+                                        }
+                                        else{
+                                          iphoneID='';
+                                          }
                                             //console.log(iphoneId);
                                             var query1 = 'select tid from tmgroups where GroupName=' + st.db.escape(groupName);
                                             st.db.query(query1, function (err, groupDetails) {
                                                 if (groupDetails) {
+                                                  if (groupDetails[0]) {
                                                     var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
                                                     st.db.query(query2, function (err, getDetails) {
                                                         if (getDetails) {
@@ -1041,10 +1051,13 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                                 else {
                                                     console.log('FnSendMessageRequest:Error getting from groupdetails');
                                                 }
+                                              }
+                                                else {
+                                                    console.log('FnSendMessageRequest:Error getting from groupdetails');
+                                                }
                                             });
+                                          });
                                         }
-                                    });
-                                }
                                 else {
                                     responseMessage.message = 'Message Request not send';
                                     res.status(200).json(responseMessage);

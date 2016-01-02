@@ -769,7 +769,7 @@ Mail.prototype.sendRegMail= function(mailContent, callBack) {
                 if (!err) {
 
                     if (mailResult) {
-                        console.log(mailResult);
+                        //console.log(mailResult);
 
                         var post = {
                             MessageType: 8,
