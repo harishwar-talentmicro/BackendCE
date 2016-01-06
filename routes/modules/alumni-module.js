@@ -2096,8 +2096,10 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Alumni Profile saved successfully';
-                                    if(insertresult[0][0]){
-                                        ps = insertresult[0][0].profilestatus;
+                                    if(insertresult[0]){
+                                        if(insertresult[0][0]){
+                                            ps = insertresult[0][0].profilestatus;
+                                        }
                                     }
                                     else
                                     { ps = '';}
@@ -3462,6 +3464,17 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
     var code = req.query.code;  // college code
 
 
+    /**
+     * Allowed codes for alumni are as follows
+     * 0 : Not Verified
+     * 1 : Verified
+     * 2 : Rejected
+     * Default : 0 (Not Verified)
+     */
+    var alumniStatus = (!isNaN(parseInt(req.query.alumni_status))) ?
+        (((parseInt(req.query.alumni_status)) > 2) ? 0 : (parseInt(req.query.alumni_status)))  : 0;  // college code
+
+
     var responseMessage = {
         status: false,
         error: {},
@@ -3490,7 +3503,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(code);
+                        var queryParams = st.db.escape(code) + ',' + st.db.escape(alumniStatus);
                         var query = 'CALL pGetAlumniMemberApprovalList(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
