@@ -1,0 +1,29 @@
+{
+  "BASE_URL" : "https://sandbox.citruspay.com/",
+  "VANITY_URL_PART" : "0qo29x6rgs",
+  "SECRET_KEY" : "	ff6c266f5598bcdf659f47e8876140231b9ed47c",
+  "CURRENCY" : "INR",
+  "RETURN_URL" : "",
+  "NOTIFY_URL" : "",
+  "PAYMENT_CONFIRM_WEBPAGE_URL" : "",
+  "MESSAGE" : [
+    "Payment completed successfully",
+    "Payment failed",
+    "Transaction was cancelled ! Payment unsuccessful",
+    "Transaction was cancelled ! Payment unsuccessful",
+    "Transaction was cancelled ! Payment unsuccessful",
+    "Transaction was cancelled ! Payment unsuccessful",
+    "Transaction was cancelled ! Payment unsuccessful",
+    "Payment Session Expired ! Please try again",
+    "Payment refund initiated",
+    "Payment refund in process",
+    "Payment refund in process",
+    "Payment refund completed successfully",
+    "Refund process not completed successfully",
+    "Payment verification is pending",
+    "Payment successful but verification is pending ",
+    "Failed to process the transaction ! Payment unsuccessful",
+    "Failed to process the transaction ! Payment unsuccessful",
+    "Failed to process the transaction ! Payment unsuccessful"
+  ]
+}
