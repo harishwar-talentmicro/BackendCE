@@ -2055,14 +2055,6 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
         error['specialization'] = 'Invalid specialization';
         validateStatus *= false;
     }
-    //if(!batch){
-    //    error['batch'] = 'Invalid batch';
-    //    validateStatus *= false;
-    //}
-    //if(!code){
-    //    error['code'] = 'Invalid code';
-    //    validateStatus *= false;
-    //}
     if(!accesstype){
         accesstype = 0;
     }
@@ -2096,11 +2088,19 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Alumni Profile saved successfully';
-                                    if(insertresult[0][0]){
-                                        ps = insertresult[0][0].profilestatus;
+                                    if(insertresult[0]) {
+                                        if (insertresult[0][0]) {
+                                            ps = insertresult[0][0].profilestatus;
+                                        }
+                                        else
+                                        {
+                                            ps = '';
+                                        }
                                     }
                                     else
-                                    { ps = '';}
+                                    {
+                                        ps = '';
+                                    }
                                     responseMessage.data = {
                                         profile_status : ps,
                                         profile: req.body.profile,
