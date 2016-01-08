@@ -22,9 +22,9 @@ app.use(multer({
     dest: './uploads/',
     limits: {
         fieldNameSize: 200,
-        files: 1,
+        files: 10,
         fields: 1,
-        fileSize : (1024*1024*2)
+        fileSize : (1024*1024*5)
     }
 }));
 app.use(compress());
@@ -34,7 +34,7 @@ app.use(cors());
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false,type : '*/x-www-form-urlencoded' }));
+
 app.use(cookieParser());
 var CONFIG = JSON.parse(fs.readFileSync(__dirname+'/ezeone-config.json'));
 

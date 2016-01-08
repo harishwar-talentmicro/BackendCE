@@ -5,7 +5,11 @@
  *  @description Handles functions related to alumni profile and events
  */
 
+"use strict";
 
+
+
+var uuid = require('node-uuid');
 var stream = require( "stream" );
 var chalk = require( "chalk" );
 var util = require( "util" );
@@ -35,7 +39,6 @@ function BufferStream( source ) {
 
 util.inherits( BufferStream, stream.Readable );
 
-
 // I attempt to clean up variable references once the stream has been ended.
 // --
 // NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
@@ -47,7 +50,6 @@ BufferStream.prototype._destroy = function() {
     this._length = null;
 
 };
-
 
 // I read chunks from the source buffer into the underlying stream buffer.
 // --
@@ -75,18 +77,21 @@ BufferStream.prototype._read = function( size ) {
 };
 
 
+var NotificationMqtt = require('./notification/notification-mqtt.js');
+var notificationMqtt = new NotificationMqtt();
+var NotificationQueryManager = require('./notification/notification-query.js');
+var notificationQmManager = null;
+var mailModule = require('./mail-module.js');
+var mail = null;
 
-
-"use strict";
-
-
-
-var uuid = require('node-uuid');
-var nodemailer = require("nodemailer");
-
-var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeone.com';
-var moment = require('moment');
+var st = null;
+function Alumni(db,stdLib){
+    if(stdLib){
+        st = stdLib;
+        notificationQmManager = new NotificationQueryManager(db,st);
+        mail = new mailModule(db,stdLib);
+    }
+}
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -101,7 +106,6 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-
 function isURl(str, callback) {
 
     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
@@ -109,23 +113,65 @@ function isURl(str, callback) {
     callback(null, regexp.test(str));
 }
 
-var NotificationMqtt = require('./notification/notification-mqtt.js');
-var notificationMqtt = new NotificationMqtt();
-var NotificationQueryManager = require('./notification/notification-query.js');
-var notificationQmManager = null;
-var mailModule = require('./mail-module.js');
-var mail = null;
+var gcloud = require('gcloud');
+var fs = require('fs');
 
+var appConfig = require('../../ezeone-config.json');
 
-var st = null;
-function Alumni(db,stdLib){
-    if(stdLib){
-        st = stdLib;
-        notificationQmManager = new NotificationQueryManager(db,st);
-        mail = new mailModule(db,stdLib);
-    }
-}
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
 
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+
+/**
+ * image uploading to cloud server
+ * @param uniqueName
+ * @param readStream
+ * @param callback
+ */
+var uploadDocumentToCloud = function(uniqueName,readStream,callback){
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function(){
+        console.log('done');
+        if(callback){
+            if(typeof(callback)== 'function'){
+                callback(null);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function(err){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                console.log(err);
+                callback(err);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+};
 
 
 var bcrypt = null;
@@ -696,8 +742,6 @@ Alumni.prototype.registerAlumni = function(req,res,next){
     }
 };
 
-
-
 /**
  * @todo FnSaveAlumniProfilePic
  * Method : POST
@@ -742,55 +786,55 @@ Alumni.prototype.saveAlumniProfilePic = function(req,res,next) {
             console.log('coming....');
             console.log(req.files.pg_pic);
 
-        var imageParams = {
-            path: req.files.pg_pic.path,
-            type: pictureType,
-            width: 1200,
-            height: 600,
-            scale: '',
-            crop: ''
-        };
-        //console.log(imageParams);
-        FnCropImage(imageParams, function (err, imageBuffer) {
+            var imageParams = {
+                path: req.files.pg_pic.path,
+                type: pictureType,
+                width: 1200,
+                height: 600,
+                scale: '',
+                crop: ''
+            };
+            //console.log(imageParams);
+            FnCropImage(imageParams, function (err, imageBuffer) {
 
-            if (imageBuffer) {
+                if (imageBuffer) {
 
-                console.log('uploading to cloud server...');
+                    console.log('uploading to cloud server...');
 
-                var uniqueId = uuid.v4();
-                randomName = uniqueId + '.' + req.files.pg_pic.extension;
+                    var uniqueId = uuid.v4();
+                    randomName = uniqueId + '.' + req.files.pg_pic.extension;
 
-                // Upload a local file to a new file to be created in your bucket
+                    // Upload a local file to a new file to be created in your bucket
 
-                var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                var bufferStream = new BufferStream(imageBuffer);
-                bufferStream.pipe(remoteWriteStream);
+                    var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                    var bufferStream = new BufferStream(imageBuffer);
+                    bufferStream.pipe(remoteWriteStream);
 
 
-                remoteWriteStream.on('finish', function () {
-                    console.log('file is uploaded to cloud');
-                    url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
-                    responseMessage.message = 'page pic save success';
-                    responseMessage.status = true;
-                    responseMessage.data = randomName;
-                    res.status(200).json(responseMessage);
+                    remoteWriteStream.on('finish', function () {
+                        console.log('file is uploaded to cloud');
+                        url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
+                        responseMessage.message = 'page pic save success';
+                        responseMessage.status = true;
+                        responseMessage.data = randomName;
+                        res.status(200).json(responseMessage);
 
-                });
+                    });
 
-                remoteWriteStream.on('error', function () {
-                    responseMessage.message = 'An error occurred';
-                    responseMessage.error = {
-                        server: 'Cloud Server error'
-                    };
-                    responseMessage.data = null;
-                    res.status(400).json(responseMessage);
-                    console.log('FnSaveAlumniContent: Image upload error in cloud');
+                    remoteWriteStream.on('error', function () {
+                        responseMessage.message = 'An error occurred';
+                        responseMessage.error = {
+                            server: 'Cloud Server error'
+                        };
+                        responseMessage.data = null;
+                        res.status(400).json(responseMessage);
+                        console.log('FnSaveAlumniContent: Image upload error in cloud');
 
-                });
-            }
-        });
+                    });
+                }
+            });
 
-    }
+        }
         else{
             console.log('save url...');
             var pic = ((picture).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
@@ -815,7 +859,6 @@ Alumni.prototype.saveAlumniProfilePic = function(req,res,next) {
         res.status(400).json(responseMessage);
     }
 };
-
 
 /**
  * @todo FnSaveAlumniContent
@@ -1391,7 +1434,6 @@ function FnCropImage(imageParams, callback){
 
     var cropFlag = (imageParams.crop) ? imageParams.crop : true;
     var scaleFlag = (imageParams.scale) ? imageParams.scale : true;
-    //var token = (req.body.Token && req.body.Token !==2 ) ? req.body.Token : '';
     var outputType = (allowedTypes.indexOf(imageParams.type) == -1) ? 'png' : imageParams.type;
 
     if(!(targetHeight && targetWidth)){
@@ -1405,20 +1447,6 @@ function FnCropImage(imageParams, callback){
         deleteTempFile();
         return;
     }
-
-    //if(!token){
-    //    respMsg.message = 'Please login to continue';
-    //    respMsg.error = {
-    //        Token : 'Token is invalid'
-    //    };
-    //    res.status(401).json(respMsg);
-    //    //deleteTempFile();
-    //    return;
-    //}
-
-    //st.validateToken(token, function (err, Result) {
-    //    if (!err) {
-    //        if (Result != null) {
     try{
         fs.readFile('../bin/'+ imageParams.path,function(err,data){
             if(!err){
@@ -1577,22 +1605,6 @@ function FnCropImage(imageParams, callback){
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
-    //}
-    //        else{
-    //            respMsg.message = 'Please login to continue';
-    //            respMsg.error = {
-    //                Token : 'Token is invalid'
-    //            };
-    //            res.status(401).json(respMsg);
-    //            throw new Error('FnCropImage : '+ 'Invalid Token');
-    //        }
-    //    }
-    //    else{
-    //        throw new Error('FnCropImage : '+ 'Error in query execution while validating token');
-    //        res.status(400).json(respMsg);
-    //    }
-    //});
-
 };
 
 /**
@@ -1607,7 +1619,7 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
     var _this = this;
 
     //var token = req.query.token;
-    var code = req.query.code;   // college code
+    var code = alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -1714,7 +1726,7 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var code = req.query.code;   // college code
+    var code = alterEzeoneId(req.query.code);   // college code
     var type = parseInt(req.query.type);   // 0=core group 1=mentor 2=faculty
 
     var responseMessage = {
@@ -1938,7 +1950,7 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
 Alumni.prototype.getAlumniContentImage = function(req,res,next){
     var _this = this;
 
-    var code = req.query.code;   // college code
+    var code = alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -2022,7 +2034,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var education = parseInt(req.body.education);
     var specialization = parseInt(req.body.specialization);
     var batch = req.body.batch;
-    var code = req.body.code;     // college code
+    var code = alterEzeoneId(req.body.code);     // college code
     var accesstype = req.body.access_type;  // 0-no relation, 1-is admin, 2-is member
     var ps;
 
@@ -2278,7 +2290,7 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var code = req.query.code;   // college code
+    var code = alterEzeoneId(req.query.code);   // college code
 
     console.log(req.query);
 
@@ -2383,26 +2395,21 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
  * @description save ten master details
  */
 Alumni.prototype.saveTENMaster = function(req,res,next) {
-    var _this = this;
 
-    var token = req.body.token;
-    var tid = req.body.tid ? req.body.tid : 0;      // while saving time 0 else id of user
-    var title = req.body.title;
-    var description = req.body.description;
-    var startDate = req.body.s_date;
-    var endDate = req.body.e_date;
-    var status = req.body.status;   // 1(pending),2=closed,3=on-hold,4=canceled
-    var regLastDate = req.body.reg_lastdate;
-    var type = req.body.type;     // 1(training),2=event,3=news,4=knowledge
-    var note = req.body.note;
-    var venueId = req.body.venue_id;
-    var attachment = req.body.attachment ? req.body.attachment : '';
-    var code = req.body.code;
-    var capacity = req.body.capacity ? req.body.capacity : 0;
-    var attachmenttitle = req.body.a_title ? req.body.a_title : '';
-    var attachmenttype = req.body.a_type ? req.body.a_type : '';
-    var randomName,filetype,url,bufferData;
-
+    var token = req.query.token;
+    var tid = req.query.tid ? req.query.tid : 0;      // while saving time 0 else id of user
+    var title = req.query.title;
+    var description = req.query.description;
+    var startDate = req.query.s_date;
+    var endDate = req.query.e_date;
+    var status = req.query.status;   // 1(pending),2=closed,3=on-hold,4=canceled
+    var regLastDate = req.query.reg_lastdate;
+    var type = req.query.type;     // 1(training),2=event,3=news,4=knowledge
+    var note = req.query.note;
+    var venueId = req.query.venue_id;
+    var code = alterEzeoneId(req.query.code);
+    var capacity = req.query.capacity ? req.query.capacity : 0;
+    var randomName,tenId;
 
     var responseMessage = {
         status: false,
@@ -2411,31 +2418,32 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
         data: null
     };
 
-    var error = {},validateStatus = true;
+    var validateStatus = true,error = {};
 
-    if(!token){
+    if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(!tid){
+    if (!tid) {
         tid = 0;
     }
-    if(parseInt(tid) == NaN){
+    if (parseInt(tid) == NaN) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    if(!status){
+    if (!status) {
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
-    if(!type){
+    if (!type) {
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
-    if(!code){
+    if (!code) {
         error['code'] = 'Invalid code';
         validateStatus *= false;
     }
+
 
     if(!validateStatus){
         responseMessage.status = false;
@@ -2450,129 +2458,119 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                 if (!err) {
                     if (result) {
 
-                        var uploadToCloud = function(){
+                        var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
+                            + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
+                            + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
+                            + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(code) + ',' + st.db.escape(capacity);
+                        var query = 'CALL pSaveTENMaster(' + queryParams + ')';
 
-                            filetype = attachmenttitle.split('.');
-                            var uniqueId = uuid.v4();
-                            randomName = uniqueId + '.' + filetype[1];
+                        console.log(query);
 
-                            bufferData = new Buffer((req.body.attachment).replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''),  'base64');
-
-                            if (bufferData) {
-
-                                console.log('uploading to cloud server...');
-
-                                var gcloud = require('gcloud');
-
-                                var fs = require('fs');
-
-
-                                var gcs = gcloud.storage({
-                                    projectId: req.CONFIG.CONSTANT.GOOGLE_PROJECT_ID,
-                                    keyFilename: req.CONFIG.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
-                                });
-
-                                // Reference an existing bucket.
-                                var bucket = gcs.bucket(req.CONFIG.CONSTANT.STORAGE_BUCKET);
-
-                                bucket.acl.default.add({
-                                    entity: 'allUsers',
-                                    role: gcs.acl.READER_ROLE
-                                }, function (err, aclObject) {
-                                });
-
-                                // Upload a local file to a new file to be created in your bucket
-
-                                var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                                var bufferStream = new BufferStream(bufferData);
-                                bufferStream.pipe(remoteWriteStream);
-
-                                remoteWriteStream.on('finish', function () {
-                                    console.log('file uploaded to cloud');
-                                    url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName;
-                                    saveTenmaster(randomName, url);
-                                });
-                                remoteWriteStream.on('error', function () {
-                                    responseMessage.message = 'An error occurred';
-                                    responseMessage.error = {
-                                        server: 'cloud Server error'
+                        st.db.query(query, function (err, insertresult) {
+                            console.log(insertresult);
+                            if (!err) {
+                                if (insertresult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Data saved successfully';
+                                    responseMessage.data = {
+                                        tid: req.query.tid,
+                                        title: req.query.title,
+                                        description: req.query.description,
+                                        s_date: req.query.s_date,
+                                        e_date: req.query.e_date,
+                                        status: req.query.status,
+                                        reg_lastdate: req.query.reg_lastdate,
+                                        type: req.query.type,
+                                        ezeone_id: req.query.ezeone_id,
+                                        note: req.query.note,
+                                        venue_id: req.query.venue_id,
+                                        code: alterEzeoneId(req.query.code)
                                     };
-                                    responseMessage.data = null;
-                                    res.status(400).json(responseMessage);
-                                    console.log('FnSaveTENMaster: file upload error in cloud');
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTENMaster: Data saved successfully');
 
-                                });
-                            }
-
-                        };
-
-                        var saveTenmaster = function(randomName,url) {
-
-                            var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
-                                + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
-                                + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
-                                + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(randomName)
-                                + ',' + st.db.escape(code) + ',' + st.db.escape(capacity) + ',' + st.db.escape(attachmenttitle)
-                                + ',' + st.db.escape(attachmenttype);
-                            var query = 'CALL pSaveTENMaster(' + queryParams + ')';
-
-                            console.log(query);
-
-                            st.db.query(query, function (err, insertresult) {
-                                if (!err) {
-                                    if (insertresult) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Data saved successfully';
-                                        responseMessage.data = {
-                                            token: req.body.token,
-                                            tid: req.body.tid,
-                                            title: req.body.title,
-                                            description: req.body.description,
-                                            s_date: req.body.s_date,
-                                            e_date: req.body.e_date,
-                                            status: req.body.status,
-                                            reg_lastdate: req.body.reg_lastdate,
-                                            type: req.body.type,
-                                            ezeone_id: req.body.ezeone_id,
-                                            note: req.body.note,
-                                            venue_id: req.body.venue_id,
-                                            code: req.body.code,
-                                            a_title: req.body.a_title,
-                                            a_type: req.body.a_type,
-                                            s_url : url
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveTENMaster: Data saved successfully');
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
+                                            tenId = insertresult[0][0].id;
+                                        }
+                                        else {
+                                            tenId = 0;
+                                        }
                                     }
                                     else {
-                                        responseMessage.message = 'No save Data';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveTENMaster:No save Data');
+                                        tenId = 0;
+                                    }
+
+                                    //upload to cloud server
+                                    if(req.files) {
+                                        console.log(req.files);
+                                        for (var prop in req.files) {
+                                            console.log('hi');
+                                            if (req.files.hasOwnProperty(prop)) {
+
+                                                var uniqueId = uuid.v4();
+                                                var filetype = (req.files[prop].extension) ? req.files[prop].extension : 'jpg';
+                                                randomName = uniqueId + '.' + filetype;
+                                                console.log(randomName);
+
+                                                var readStream = fs.createReadStream(req.files[prop].path);
+                                                var remoteWriteStream = bucket.file(randomName).createWriteStream();
+                                                readStream.pipe(remoteWriteStream);
+                                                remoteWriteStream.on('finish', function () {
+                                                    console.log(randomName);
+
+                                                    console.log('FnSaveTENMasterattachment: Pic Uploaded successfully');
+
+                                                    var queryParams1 = st.db.escape(0) + ',' + st.db.escape(tenId) + ',' + st.db.escape(randomName)
+                                                        + ',' + st.db.escape(req.files[prop].originalname);
+                                                    var query1 = 'CALL pSaveTENMasterattachment(' + queryParams1 + ')';
+
+                                                    console.log(query1);
+
+                                                    st.db.query(query1, function (err, attachmentResult) {
+                                                        if (!err) {
+                                                            if (attachmentResult) {
+                                                                console.log('attachment file saved');
+                                                            }
+                                                            else {
+                                                                console.log('attachment file not save');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('attachment file not save');
+                                                            console.log(err);
+                                                        }
+                                                    });
+                                                });
+
+                                                remoteWriteStream.on('error', function () {
+                                                    console.log('FnSavePictures: Image upload error to google cloud');
+                                                });
+                                            }
+                                            else {
+                                                console.log('attachment is empty');
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        console.log('attachment is empty');
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'An error occured ! Please try again';
-                                    res.status(500).json(responseMessage);
-                                    console.log('FnSaveTENMaster: error in saving tenmaster data:' + err);
+                                    responseMessage.message = 'No save Data';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTENMaster:No save Data');
                                 }
-                            });
-
-
-                        };
-
-                        if(req.body.attachment){
-
-                            uploadToCloud();
-                        }
-                        else
-                        {
-                            randomName = '';
-                            url='';
-                            saveTenmaster(randomName,url);
-                        }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveTENMaster: error in saving tenmaster data:' + err);
+                            }
+                        });
                     }
-
                     else {
                         responseMessage.message = 'Invalid token';
                         responseMessage.error = {
@@ -2606,6 +2604,17 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     }
 };
 
+
+//var express = require('express');
+//var router = express.Router();
+//var multer = require('multer');
+//var upload = multer();
+//
+//router.post('/profile', upload.array(), function (req, res, next) {
+//    console.log(req.body);
+//    res.json(req.body);
+//});
+
 /**
  * @todo FnGetTENDetails
  * Method : GET
@@ -2618,7 +2627,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
     var _this = this;
 
     var token = req.query.token ? req.query.token : '';
-    var code = req.query.code;   // college code
+    var code = alterEzeoneId(req.query.code);   // college code
     var type = parseInt(req.query.type);   // 1(training),2=event,3=news,4=knowledge
     var status = parseInt(req.query.status);
     var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
@@ -2666,7 +2675,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
                     if (getResult[0]) {
                         if (getResult[0][0].count > 0) {
 
-                            //console.log(getResult[1]);
+                            console.log(getResult[1]);
                             for( var i=0; i < getResult[1].length;i++){
                                 var result = {};
                                 result.tid = getResult[1][i].tid;
@@ -2777,7 +2786,7 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var code = req.query.code;   // college code
+    var code = alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -3459,7 +3468,18 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var code = req.query.code;  // college code
+    var code = alterEzeoneId(req.query.code);  // college code
+
+
+    /**
+     * Allowed codes for alumni are as follows
+     * 0 : Not Verified
+     * 1 : Verified
+     * 2 : Rejected
+     * Default : 0 (Not Verified)
+     */
+    var alumniStatus = (!isNaN(parseInt(req.query.alumni_status))) ?
+        (((parseInt(req.query.alumni_status)) > 2) ? 0 : (parseInt(req.query.alumni_status)))  : 0;  // college code
 
 
     var responseMessage = {
@@ -3490,7 +3510,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(code);
+                        var queryParams = st.db.escape(code) + ',' + st.db.escape(alumniStatus);
                         var query = 'CALL pGetAlumniMemberApprovalList(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
@@ -3571,7 +3591,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
 Alumni.prototype.getTeamContent = function(req,res,next){
     var _this = this;
 
-    var code = req.query.code;   // college code
+    var code = alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
         status: false,
@@ -3654,10 +3674,10 @@ Alumni.prototype.getTeamContent = function(req,res,next){
  * @param next
  * @description api code for get team image
  */
-Alumni.prototype.getTeamImage = function(req,res,next){
+Alumni.prototype.getTeamImage = function(req,res,next) {
     var _this = this;
 
-    var code = req.query.code;   // college code
+    var code = alterEzeoneId(req.query.code);   // college code
     var type = parseInt(req.query.type);   // 0=core group 1=mentor 2=faculty
 
     var responseMessage = {
@@ -3667,22 +3687,22 @@ Alumni.prototype.getTeamImage = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true, error = {};
 
 
-    if(!code){
+    if (!code) {
         error['code'] = 'Invalid code';
         validateStatus *= false;
     }
-    if(!type){
+    if (!type) {
         type = 0;
     }
-    if(parseInt(type) == NaN){
+    if (parseInt(type) == NaN) {
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
 
-    if(!validateStatus){
+    if (!validateStatus) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
@@ -3697,7 +3717,7 @@ Alumni.prototype.getTeamImage = function(req,res,next){
                     if (getResult[0]) {
                         if (getResult[0].length > 0) {
 
-                            for( var i=0; i < getResult[0].length;i++){
+                            for (var i = 0; i < getResult[0].length; i++) {
                                 getResult[0][i].picture = (getResult[0][i].picture) ?
                                 req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].picture : '';
                             }
@@ -3744,6 +3764,7 @@ Alumni.prototype.getTeamImage = function(req,res,next){
         }
     }
 };
+
 
 /**
  * @todo FnGetTENAttachment
@@ -5024,7 +5045,7 @@ Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var code = req.query.code;  // college code
+    var code = alterEzeoneId(req.query.code);  // college code
     var status = req.query.status; // 0-Pending,1-Active,2-inactive
 
 
@@ -5255,6 +5276,7 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
     var title = req.query.keyword;
     var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
     var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0. start result count
+    var code = alterEzeoneId(req.query.code);
 
     var responseMessage = {
         status: false,
@@ -5281,7 +5303,8 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(title)+ ',' + st.db.escape(pageCount) + ',' + st.db.escape(pageSize);
+                        var queryParams = st.db.escape(title)+ ',' + st.db.escape(pageCount) + ',' + st.db.escape(pageSize)
+                            + ',' + st.db.escape(code);
                         var query = 'CALL pSearchAlumniTEN(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
@@ -6028,6 +6051,141 @@ Alumni.prototype.testUrl = function(req,res,next) {
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 
+};
+
+
+/**
+ * @todo FnApproveAlumnimembers
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @server_param
+ * @description Approve Alumni members
+ */
+Alumni.prototype.approveAlumnimembers = function(req,res,next) {
+
+    /**
+     * checking input parameters are json or not
+     * @param token (char(36))
+     * @param id int    // person id
+     * @param status int // 0-not verified,1-verified,2-rejected
+     */
+
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+
+    else{
+        /**
+         * storing and validating the input parameters
+         */
+
+        var token = req.body.token;
+        var id = parseInt(req.body.id);  // person id
+        var status = parseInt(req.body.status); // 0-not verified,1-verified,2-rejected
+
+        if(!(token)){
+            error['token'] = 'token is Mandatory';
+            validateStatus *= false;
+        }
+        if(isNaN(id)){
+            error['id'] = 'id is not integer value';
+            validateStatus *= false;
+        }
+        if(isNaN(status)){
+            error['status'] = 'status is not integer value';
+            validateStatus *= false;
+        }
+    }
+
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(id)+ ',' + st.db.escape(status);
+                        var query = 'CALL pApproveAlumnimembers(' + queryParams + ')';
+                        console.log(query);
+
+                        st.db.query(query, function (err, approveResult) {
+                            console.log(approveResult);
+                            if (!err) {
+                                if (approveResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'ApproveAlumnimembers updated successfully';
+                                    responseMessage.data = {
+                                        token : req.body.token,
+                                        id : id,
+                                        status : status
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnApproveAlumnimembers: ApproveAlumnimembers updated successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'ApproveAlumnimembers not update';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnApproveAlumnimembers:ApproveAlumnimembers not update');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnApproveAlumnimembers: error in updating ApproveAlumnimembers:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnApproveAlumnimembers: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnApproveAlumnimembers:Error in processing Token' + err);
+                }
+            });
+        }
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnApproveAlumnimembers:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
 };
 
 
