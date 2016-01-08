@@ -60,6 +60,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     var taskDate = req.body.ts;            // Task Date and Time (YYYY-MM-DD HH:mm:ss)
     var ownerId = parseInt(req.body.ow);   // Owner ID (Master ID of the task owner)
     var nextActionId = (parseInt(req.body.nxid) == NaN) ? 0 : parseInt(req.body.nxid);
+    var tid,cd;
 
     var responseMessage = {
         status: false,
@@ -106,9 +107,12 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id)+ ',' + st.db.escape(transactionId)
                             + ',' + st.db.escape(status) + ',' + st.db.escape(c_particulars) + ',' + st.db.escape(c_amount)
-                            + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId) + ',' + st.db.escape(nextActionId);
+                            + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId)
+                            + ',' + st.db.escape(nextActionId);
 
                         var query = 'CALL psavetask(' + queryParams + ')';
+
+                        console.log(query);
 
                         st.db.query(query, function (err, insertresult) {
                             console.log(insertresult);
@@ -117,15 +121,30 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'TaskManager saved successfully';
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
+                                            tid = insertresult[0][0].id;
+                                            cd=insertresult[0][0].cd;
+                                        }
+                                        else {
+                                            tid = id;
+                                            cd='';
+                                        }
+                                    }
+                                    else {
+                                        tid = id;
+                                        cd='';
+                                    }
+
                                     responseMessage.data = {
-                                        id : insertresult[0][0].id,
+                                        id : tid,
                                         s  : parseInt(req.body.s),
                                         tx : parseInt(req.body.tx),
                                         cp : req.body.cp,
                                         ca : req.body.ca,
                                         au : req.body.au,
                                         ts : req.body.ts,
-                                        cd : insertresult[0][0].cd,
+                                        cd : cd,
                                         ow : parseInt(req.body.ow),
                                         nxid : parseInt(req.body.nxid)
                                     };
@@ -178,6 +197,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     }
 };
 
+
 /**
  * @todo FnGetTasks
  * Method : GET
@@ -199,6 +219,11 @@ TaskManager.prototype.getTasks = function(req,res,next){
         error: {}
     };
 
+    /**
+     * Function Type : 0 - Sales and 4 : Recruitment
+     */
+    var functionType = (parseInt(req.query.fn_type) == 4) ? req.query.fn_type : 0;
+
     var validateStatus = true,error = {};
 
     if(!token){
@@ -216,7 +241,8 @@ TaskManager.prototype.getTasks = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(startDate)+ ',' + st.db.escape(endDate) + ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(startDate)+ ',' + st.db.escape(endDate) + ',' +
+                            st.db.escape(token)+ ',' + st.db.escape(functionType);
                         var query = 'CALL pGetTasks(' + queryParams + ')';
                         console.log(query);
 
@@ -232,9 +258,11 @@ TaskManager.prototype.getTasks = function(req,res,next){
                                         console.log('FnGetTasks: Tasks loaded successfully');
                                     }
                                     else {
-                                        responseMessage.message = 'Tasks not loaded';
+                                        responseMessage.data = getResult[0];
+                                        responseMessage.message = 'Tasks loaded successfully';
+                                        responseMessage.error = null;
                                         res.status(200).json(responseMessage);
-                                        console.log('FnGetTasks: Tasks not loaded');
+                                        console.log('FnGetTasks: Tasks not present');
                                     }
                                 }
                                 else {
