@@ -199,6 +199,11 @@ TaskManager.prototype.getTasks = function(req,res,next){
         error: {}
     };
 
+    /**
+     * Function Type : 0 - Sales and 4 : Recruitment
+     */
+    var functionType = (parseInt(req.query.fn_type) == 4) ? req.query.fn_type : 0;
+
     var validateStatus = true,error = {};
 
     if(!token){
@@ -216,7 +221,8 @@ TaskManager.prototype.getTasks = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(startDate)+ ',' + st.db.escape(endDate) + ',' + st.db.escape(token);
+                        var queryParams = st.db.escape(startDate)+ ',' + st.db.escape(endDate) + ',' +
+                            st.db.escape(token)+ ',' + st.db.escape(functionType);
                         var query = 'CALL pGetTasks(' + queryParams + ')';
                         console.log(query);
 
@@ -232,9 +238,11 @@ TaskManager.prototype.getTasks = function(req,res,next){
                                         console.log('FnGetTasks: Tasks loaded successfully');
                                     }
                                     else {
-                                        responseMessage.message = 'Tasks not loaded';
+                                        responseMessage.data = getResult[0];
+                                        responseMessage.message = 'Tasks loaded successfully';
+                                        responseMessage.error = null;
                                         res.status(200).json(responseMessage);
-                                        console.log('FnGetTasks: Tasks not loaded');
+                                        console.log('FnGetTasks: Tasks not present');
                                     }
                                 }
                                 else {
