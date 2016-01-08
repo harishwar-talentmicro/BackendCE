@@ -56,6 +56,7 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
 
     var token = req.query.token;
     var page = (!isNaN(parseInt(req.query.page))) ?  parseInt(req.query.page): 1;
+    var pageSize = (!isNaN(parseInt(req.query.ps))) ?  parseInt(req.query.ps): 10;
     var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
     var clientQuery = req.query.clq ? req.query.clq : '';
     var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
@@ -68,6 +69,10 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
     var status = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 0;
     var applicantSearch = req.query.aps ? req.query.aps : '';
     var folderSort = (!isNaN(parseInt(req.query.fs))) ?  parseInt(req.query.fs): 0;
+
+    if(!pageSize){
+        pageSize = 10;
+    }
 
     var responseMessage = {
         status: false,
@@ -102,7 +107,7 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                             FromPage = 0;
                         }
                         var parameters = st.db.escape(token) + ',' + st.db.escape(4)
-                            + ',' + st.db.escape(FromPage) + ',' + st.db.escape(10)+ ',' + st.db.escape(jobId)
+                            + ',' + st.db.escape(FromPage) + ',' + st.db.escape(pageSize)+ ',' + st.db.escape(jobId)
                             + ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
                             + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(jobCodeSort)
                             + ',' + st.db.escape(jobCodeQuery)+ ',' + st.db.escape(jobTitleSort)+ ',' + st.db.escape(jobTitleQuery)

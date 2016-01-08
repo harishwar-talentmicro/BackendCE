@@ -94,7 +94,7 @@ msgNotification.prototype.sendNotification= function(msgContent, callBack) {
                                                         if (groupDetails1) {
                                                             for (var i = 0; i < groupDetails[1].length; i++) {
                                                                 receiverId = groupDetails[1][i].tid;
-                                                                senderTitle = groupDetails1[0][0].groupname;
+                                                                senderTitle = groupDetails[0][0].groupname;
                                                                 if (id_type == 0) {
                                                                     groupId = groupDetails1[0][0].groupid;
                                                                     groupTitle = groupDetails1[0][0].groupname;
@@ -210,21 +210,35 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                 if (!err) {
                     //console.log('yes going into isGroupAdminByToken');
                     var isAdmin = isAdmin;
+
+                    console.log(isAdmin);
                     switch (parseInt(details.status)) {
                         case 0 :
                             callBack(null,null);
                             break;
                         case 1 :
-                            //console.log('Accepted');
+                            console.log('Accepted');
                             var query2 = 'select tid,GroupType,GroupName,AdminID from tmgroups where tid=' + groupId;
+                            console.log(query2);
                             st.db.query(query2, function (err, getDetails) {
                                 if (getDetails) {
                                     if (getDetails[0]) {
                                         var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + getDetails[0].AdminID;
                                         st.db.query(queryParameters, function (err, iosResult) {
                                             if (iosResult) {
-                                                iphoneId = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                                if (iosResult[0]) {
+                                                    iphoneId = iosResult[0].iphoneID;
+                                                }
+                                                else {
+                                                    iphoneId = '';
+                                                }
+                                            }
+                                            else {
+                                                iphoneId = '';
+                                            }
+
                                                 var getQuery2 = 'select EZEID from tmaster where tid=' + details.masterId;
+                                            console.log(getQuery2);
                                                 st.db.query(getQuery2, function (err, memberDetails) {
                                                     if (memberDetails) {
                                                         if (memberDetails[0]) {
@@ -347,7 +361,7 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                                         callBack(null, null);
                                                     }
                                                 });
-                                            }
+
                                         });
                                     }
                                     else {

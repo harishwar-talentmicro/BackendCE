@@ -314,11 +314,12 @@ router.get('/participants_list',alumniModule.getParticipantsList);
 router.get('/job_approval_list',alumniModule.getAlumniJobApprovalList);
 router.post('/job_approve',alumniModule.approveAlumniJobs);
 router.get('/search_alumni_ten',alumniModule.searchAlumniTEN);
-router.get('/search_alumni_job',alumniModule.searchAlumniTEN);
+router.get('/search_alumni_job',alumniModule.searchAlumniJobs);
 router.get('/my_alumni_jobs',alumniModule.getMyAlumniJobs);
 router.get('/alumni_user_details', alumniModule.getAlumniUserDetails);
 router.get('/search_alumni', alumniModule.searchAlumni);
 router.put('/leave_alumni', alumniModule.leaveAlumni);
+router.put('/alumni_member', alumniModule.approveAlumnimembers);
 //new url's
 router.get('/client_list',alumniModule.getClientList);
 router.get('/contact_list',alumniModule.getClientContacts);
@@ -395,8 +396,10 @@ router.get('/service',serviceModule.getServices);
 router.get('/service_categories',serviceModule.getServiceCategories);
 router.get('/service_details',serviceModule.getServiceDetails);
 router.post('/service',serviceModule.createService);
-router.put('/service',serviceModule.updateService);
+router.post('/service_change',serviceModule.updateService);
 router.post('/join_member',serviceModule.addMembersToService);
+router.get('/joined_community',serviceModule.getJoinedCommunity);
+router.delete('/community_member',serviceModule.deleteCommunityMember);
 
 
 //EZEIDAP Methods
