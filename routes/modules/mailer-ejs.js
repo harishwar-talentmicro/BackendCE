@@ -22,18 +22,18 @@ var defaultConfig = {
     }
 };
 
-try{
-    var conf = fs.readFileSync(__dirname + separator + '..'+separator+'..'+separator+'config.json');
-    if(conf){
-        var jConf = JSON.parse(conf);
-        if(typeof(jConf) == 'object'){
-            defaultConfig = jConf;
-        }
-    }
-}
-catch(ex){
-    console.log(ex);
-}
+//try{
+//    var conf = fs.readFileSync(__dirname + separator + '..'+separator+'..'+separator+'config.json');
+//    if(conf){
+//        var jConf = JSON.parse(conf);
+//        if(typeof(jConf) == 'object'){
+//            defaultConfig = jConf;
+//        }
+//    }
+//}
+//catch(ex){
+//    console.log(ex);
+//}
 
 
 //// NB! No need to recreate the transporter object. You can use
