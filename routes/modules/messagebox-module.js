@@ -1005,21 +1005,21 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                     var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid='+userID;
                                     st.db.query(queryParameters, function (err, iosResult) {
                                         if (iosResult) {
-                                          if (iosResult[0]) {
-                                            iphoneID = iosResult[0].iphoneID;
-                                          }
-                                          else{
-                                            iphoneID='';
-                                          }
+                                            if (iosResult[0]) {
+                                                iphoneID = iosResult[0].iphoneID;
+                                            }
+                                            else{
+                                                iphoneID='';
+                                            }
                                         }
                                         else{
-                                          iphoneID='';
-                                          }
-                                            //console.log(iphoneId);
-                                            var query1 = 'select tid from tmgroups where GroupName=' + st.db.escape(groupName);
-                                            st.db.query(query1, function (err, groupDetails) {
-                                                if (groupDetails) {
-                                                  if (groupDetails[0]) {
+                                            iphoneID='';
+                                        }
+                                        //console.log(iphoneId);
+                                        var query1 = 'select tid from tmgroups where GroupName=' + st.db.escape(groupName);
+                                        st.db.query(query1, function (err, groupDetails) {
+                                            if (groupDetails) {
+                                                if (groupDetails[0]) {
                                                     var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
                                                     st.db.query(query2, function (err, getDetails) {
                                                         if (getDetails) {
@@ -1051,13 +1051,13 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                                 else {
                                                     console.log('FnSendMessageRequest:Error getting from groupdetails');
                                                 }
-                                              }
-                                                else {
-                                                    console.log('FnSendMessageRequest:Error getting from groupdetails');
-                                                }
-                                            });
-                                          });
-                                        }
+                                            }
+                                            else {
+                                                console.log('FnSendMessageRequest:Error getting from groupdetails');
+                                            }
+                                        });
+                                    });
+                                }
                                 else {
                                     responseMessage.message = 'Message Request not send';
                                     res.status(200).json(responseMessage);
@@ -1364,60 +1364,89 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                             console.log(query);
 
                             st.db.query(query, function (err, insertResult) {
-                                //console.log(insertResult);
+                                console.log(insertResult);
                                 if (!err) {
                                     if (insertResult) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Message Composed successfully';
-                                        responseMessage.data = {
-                                            message_id: insertResult[0][0].messageids,
-                                            message_userid: insertResult[0][0].mesguserid,
-                                            message: req.body.message,
-                                            attachmentFilename: req.body.attachment_filename,
-                                            priority: req.body.priority,
-                                            targetDate: req.body.target_date,
-                                            expiryDate: req.body.expiry_date,
-                                            token: req.body.token,
-                                            previousMessageID: req.body.previous_messageID,
-                                            toID: req.body.to_id,
-                                            idType: req.body.id_type,
-                                            s_url: (randomName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName) : ''
+                                        if (insertResult[0]) {
+                                            if (insertResult[0][0]) {
+                                                if (insertResult[0][0].messageids) {
+                                                    if (insertResult[0][0].mesguserid) {
 
-                                        };
-                                        res.status(200).json(responseMessage);
+                                                        responseMessage.status = true;
+                                                        responseMessage.error = null;
+                                                        responseMessage.message = 'Message Composed successfully';
+                                                        responseMessage.data = {
+                                                            message_id: insertResult[0][0].messageids,
+                                                            message_userid: insertResult[0][0].mesguserid,
+                                                            message: req.body.message,
+                                                            attachmentFilename: req.body.attachment_filename,
+                                                            priority: req.body.priority,
+                                                            targetDate: req.body.target_date,
+                                                            expiryDate: req.body.expiry_date,
+                                                            token: req.body.token,
+                                                            previousMessageID: req.body.previous_messageID,
+                                                            toID: req.body.to_id,
+                                                            idType: req.body.id_type,
+                                                            s_url: (randomName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName) : ''
 
-                                        /**
-                                         * @todo add code for push notification like this
-                                         */
-                                        var msgContent = {
-                                            message_id: insertResult[0][0].messageids,
-                                            message_userid: insertResult[0][0].mesguserid,
-                                            message  : req.body.message ? req.body.message : '',
-                                            attachment  : (randomName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName) : '',
-                                            attachmentFilename  : req.body.attachment_filename ? req.body.attachment_filename : '',
-                                            token : req.body.token,
-                                            toID : req.body.to_id,
-                                            idType : req.body.id_type ? req.body.id_type : '',
-                                            priority : (parseInt(req.body.priority) !== NaN) ? req.body.priority : 1,
-                                            mimeType : (req.body.mime_type) ? req.body.mime_type : '',
-                                            ezeid : alterEzeoneId(req.body.ezeid)
-                                        };
+                                                        };
+                                                        res.status(200).json(responseMessage);
 
-                                        msgNotification.sendNotification(msgContent, function (err, statusResult) {
-                                            console.log(statusResult);
-                                            if(!err) {
-                                                if (statusResult) {
-                                                    console.log('Message Notification send successfully');
+                                                        /**
+                                                         * @todo add code for push notification like this
+                                                         */
+                                                        var msgContent = {
+                                                            message_id: insertResult[0][0].messageids,
+                                                            message_userid: insertResult[0][0].mesguserid,
+                                                            message: req.body.message ? req.body.message : '',
+                                                            attachment: (randomName) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName) : '',
+                                                            attachmentFilename: req.body.attachment_filename ? req.body.attachment_filename : '',
+                                                            token: req.body.token,
+                                                            toID: req.body.to_id,
+                                                            idType: req.body.id_type ? req.body.id_type : '',
+                                                            priority: (parseInt(req.body.priority) !== NaN) ? req.body.priority : 1,
+                                                            mimeType: (req.body.mime_type) ? req.body.mime_type : '',
+                                                            ezeid: alterEzeoneId(req.body.ezeid)
+                                                        };
+
+                                                        msgNotification.sendNotification(msgContent, function (err, statusResult) {
+                                                            console.log(statusResult);
+                                                            if (!err) {
+                                                                if (statusResult) {
+                                                                    console.log('Message Notification send successfully');
+                                                                }
+                                                                else {
+                                                                    console.log('Message Notification not send');
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log('Error in sending message notification');
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        responseMessage.message = 'Message not Composed';
+                                                        res.status(200).json(responseMessage);
+                                                        console.log('FnComposeMessage:Message not Composed');
+                                                    }
                                                 }
-                                                else{
-                                                    console.log('Message Notification not send');
+                                                else {
+                                                    responseMessage.message = 'Message not Composed';
+                                                    res.status(200).json(responseMessage);
+                                                    console.log('FnComposeMessage:Message not Composed');
                                                 }
                                             }
-                                            else{
-                                                console.log('Error in sending message notification');
+                                            else {
+                                                responseMessage.message = 'Message not Composed';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnComposeMessage:Message not Composed');
                                             }
-                                        });
+                                        }
+                                        else {
+                                            responseMessage.message = 'Message not Composed';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnComposeMessage:Message not Composed');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'Message not Composed';
@@ -1513,6 +1542,7 @@ MessageBox.prototype.getMembersList = function(req,res,next){
     else {
         try {
             st.db.query('CALL pGetMembersList(' + st.db.escape(groupID) + ')', function (err, getResult) {
+                console.log(getResult);
                 if (!err) {
                     if (getResult) {
                         if(getResult[0].length > 0){

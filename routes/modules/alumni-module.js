@@ -2409,7 +2409,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var venueId = req.query.venue_id;
     var code = alterEzeoneId(req.query.code);
     var capacity = req.query.capacity ? req.query.capacity : 0;
-    var randomName,tenId;
+    var randomName='',tenId=0,originalName='';
 
     var responseMessage = {
         status: false,
@@ -2505,47 +2505,40 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                     //upload to cloud server
                                     if(req.files) {
                                         console.log(req.files);
+                                        var count = 0;
                                         for (var prop in req.files) {
-                                            console.log('hi');
+
                                             if (req.files.hasOwnProperty(prop)) {
 
                                                 var uniqueId = uuid.v4();
                                                 var filetype = (req.files[prop].extension) ? req.files[prop].extension : 'jpg';
                                                 randomName = uniqueId + '.' + filetype;
+                                                originalName = req.files[prop].originalname;
                                                 console.log(randomName);
 
                                                 var readStream = fs.createReadStream(req.files[prop].path);
-                                                var remoteWriteStream = bucket.file(randomName).createWriteStream();
-                                                readStream.pipe(remoteWriteStream);
-                                                remoteWriteStream.on('finish', function () {
-                                                    console.log(randomName);
 
-                                                    console.log('FnSaveTENMasterattachment: Pic Uploaded successfully');
+                                                var picContent = {
+                                                    randomName: randomName,
+                                                    readStream: readStream,
+                                                    originalName: originalName,
+                                                    tenId: tenId
+                                                };
 
-                                                    var queryParams1 = st.db.escape(0) + ',' + st.db.escape(tenId) + ',' + st.db.escape(randomName)
-                                                        + ',' + st.db.escape(req.files[prop].originalname);
-                                                    var query1 = 'CALL pSaveTENMasterattachment(' + queryParams1 + ')';
 
-                                                    console.log(query1);
-
-                                                    st.db.query(query1, function (err, attachmentResult) {
-                                                        if (!err) {
-                                                            if (attachmentResult) {
-                                                                console.log('attachment file saved');
-                                                            }
-                                                            else {
-                                                                console.log('attachment file not save');
-                                                            }
+                                                fnsavepic(picContent, function (err, picResult) {
+                                                    if (!err) {
+                                                        if (picResult) {
+                                                            console.log(picResult);
                                                         }
                                                         else {
-                                                            console.log('attachment file not save');
-                                                            console.log(err);
+                                                            console.log('result not load');
                                                         }
-                                                    });
-                                                });
-
-                                                remoteWriteStream.on('error', function () {
-                                                    console.log('FnSavePictures: Image upload error to google cloud');
+                                                    }
+                                                    else {
+                                                        console.log('error in save multiple pic');
+                                                        console.log(err);
+                                                    }
                                                 });
                                             }
                                             else {
@@ -2604,16 +2597,58 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     }
 };
 
+function fnsavepic(picContent, callback) {
 
-//var express = require('express');
-//var router = express.Router();
-//var multer = require('multer');
-//var upload = multer();
-//
-//router.post('/profile', upload.array(), function (req, res, next) {
-//    console.log(req.body);
-//    res.json(req.body);
-//});
+    try {
+
+        var localStream = picContent.readStream;
+        var remoteWriteStream = bucket.file(picContent.randomName).createWriteStream();
+        localStream.pipe(remoteWriteStream);
+
+        remoteWriteStream.on('finish', function () {
+            console.log(picContent.randomName);
+
+            console.log('FnSaveTENMasterattachment: Pic Uploaded successfully');
+
+            var queryParams1 = st.db.escape(0) + ',' + st.db.escape(picContent.tenId) + ',' + st.db.escape(picContent.randomName)
+                + ',' + st.db.escape(picContent.originalName);
+            var query1 = 'CALL pSaveTENMasterattachment(' + queryParams1 + ')';
+
+            console.log(query1);
+
+            st.db.query(query1, function (err, attachmentResult) {
+                if (!err) {
+                    if (attachmentResult) {
+                        console.log('attachment file saved');
+                        var url = appConfig.CONSTANT.GS_URL + appConfig.CONSTANT.STORAGE_BUCKET + '/' + picContent.randomName;
+                        callback(null, url);
+                    }
+                    else {
+                        console.log('attachment file not save');
+                        callback(null, null);
+                    }
+                }
+                else {
+                    console.log('attachment file not save');
+                    console.log(err);
+                    callback(null, null);
+                }
+            });
+        });
+
+        remoteWriteStream.on('error', function () {
+            console.log('FnSavePictures: Image upload error to google cloud');
+            callback(null, null);
+        });
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
+        return 'error'
+    }
+};
+
 
 /**
  * @todo FnGetTENDetails
@@ -2632,7 +2667,6 @@ Alumni.prototype.getTENDetails = function(req,res,next){
     var status = parseInt(req.query.status);
     var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
     var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;
-    var output =[];
 
     var responseMessage = {
         status: false,
@@ -2664,58 +2698,50 @@ Alumni.prototype.getTENDetails = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
+
             var queryParams = st.db.escape(type) + ',' + st.db.escape(code)+ ',' + st.db.escape(status)+ ',' + st.db.escape(pageSize)
                 + ',' + st.db.escape(pageCount) + ',' + st.db.escape(token);
             var query = 'CALL pGetTENDetails(' + queryParams + ')';
+            console.log(query);
             st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult[0]) {
                         if (getResult[0][0].count > 0) {
+                            //console.log(getResult);
+                            //console.log(getResult[1]);
+                            if (getResult[1]) {
+                                for (var i = 0; i < getResult[1].length; i++) {
+                                    var output =[];
+                                    if (getResult[1][i].attachment) {
 
-                            console.log(getResult[1]);
-                            for( var i=0; i < getResult[1].length;i++){
-                                var result = {};
-                                result.tid = getResult[1][i].tid;
-                                result.title = getResult[1][i].title;
-                                result.description = getResult[1][i].description;
-                                result.s_date = getResult[1][i].s_date;
-                                result.e_date = getResult[1][i].e_date;
-                                result.reg_lastdate = getResult[1][i].reg_lastdate;
-                                result.type = getResult[1][i].type;
-                                result.note = getResult[1][i].note;
-                                result.venue_id = getResult[1][i].venue_id;
-                                result.Approveddate = getResult[1][i].Approveddate;
-                                result.approveduser = getResult[1][i].approveduser;
-                                result.capacity = getResult[1][i].capacity;
-                                result.a_title = getResult[1][i].a_title;
-                                result.a_type = getResult[1][i].a_type;
-                                result.status = getResult[1][i].status;
-                                result.createddate = getResult[1][i].createddate;
-                                result.ezeone = getResult[1][i].ezeone;
-                                result.name = getResult[1][i].name;
-                                result.tnpa = getResult[1][i].tnpa;
-                                result.ps = getResult[1][i].ps;
-                                result.Latitude = getResult[1][i].Latitude;
-                                result.Longitude = getResult[1][i].Longitude;
-                                result.AL1 = getResult[1][i].AL1;
-                                result.AL2 = getResult[1][i].AL2;
-                                result.s_url = (getResult[1][i].attachment) ?
-                                    (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][i].attachment) : '';
+                                        var attach = getResult[1][i].attachment.split(',');
 
-                                output.push(result);
+                                        for (var j = 0; j < attach.length; j++) {
+                                            var joinAttach = {
+                                                s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attach[j]
+                                            };
+                                            output.push(joinAttach);
+                                            getResult[1][i].attachment = output;
+
+                                        }
+                                    }
+                                    else {
+                                        getResult[1][i].attachment = '';
+                                    }
+                                }
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Data loaded successfully';
+                                responseMessage.count = getResult[0][0].count;
+                                responseMessage.data = getResult[1];
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTENDetails: Data loaded successfully');
                             }
-                            //console.log(output);
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Data loaded successfully';
-                            responseMessage.count = getResult[0][0].count;
-
-                            responseMessage.data = output;
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetTENDetails: Data loaded successfully');
+                            else {
+                                responseMessage.message = 'Data not loaded';
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTENDetails: Data not loaded');
+                            }
                         }
                         else {
                             responseMessage.message = 'Data not loaded';
@@ -2740,26 +2766,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
 
             });
         }
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid Token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnGetTENDetails: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal Server Error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnGetTENDetails:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
+
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'

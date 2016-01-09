@@ -400,6 +400,7 @@ router.post('/service_change',serviceModule.updateService);
 router.post('/join_member',serviceModule.addMembersToService);
 router.get('/joined_community',serviceModule.getJoinedCommunity);
 router.delete('/community_member',serviceModule.deleteCommunityMember);
+router.post('/service_pic',serviceModule.saveServicePic);
 
 
 //EZEIDAP Methods

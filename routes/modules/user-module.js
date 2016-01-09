@@ -421,6 +421,7 @@ User.prototype.getUserDetails = function(req,res,next){
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
+                                        UserDetailsResult[0][0].isCommunity =1;
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {

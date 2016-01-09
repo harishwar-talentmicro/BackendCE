@@ -121,11 +121,12 @@ msgNotification.prototype.sendNotification= function(msgContent, callBack) {
                                                                 //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                 //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                 notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid,jobId,a_url);
-                                                                responseMessage.status = true;
-                                                                callBack(null, responseMessage);
+
                                                             }
                                                             c = c+1;
                                                             loopFunction(c);
+                                                            responseMessage.status = true;
+                                                            callBack(null, responseMessage);
                                                         }
                                                         else {
                                                             console.log('FnComposeMessage:Error getting from groupname1');

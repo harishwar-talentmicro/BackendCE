@@ -10,13 +10,10 @@
 
 var fs = require('fs');
 var uuid = require('node-uuid');
-
-//var request = require('request');
-//console.log(__dirname+'../../../ezeone-config.json');
-//var CONFIG = JSON.parse(fs.readFileSync('./ezeone-config.json'));
+var amqp = require('amqp');
+var mqtt    = require('mqtt');
 
 var CONFIG = require('../../../ezeone-config.json');
-console.log(CONFIG);
 
 function MqttFalse(){};
 function MqttFalseClient(){};
@@ -29,23 +26,23 @@ MqttFalse.prototype.publish = function(){};
 MqttFalseClient.prototype.publish = function(topic,payload){};
 
 
+var mqttClient  = mqtt.connect("tcp://"+CONFIG.MQTT.HOST+":"+CONFIG.MQTT.PORT, {
+    clientId : "mqtt-8947983217"+Date.now(), clean : false,
+    username : 'indrajeet',
+    password : "indrajeet",
+    connectTimeout : 30000,
+    reconnectPeriod : 1000,
+    keepalive : 20
+});
+
+mqttClient.on('connect', function () {
+    console.log('mqtt connected');
+});
+
+
 /*********************************************** AMQP upgraded code **************************************/
 
-var amqp = require('amqp');
 var url = 'amqp://indrajeet:indrajeet@'+CONFIG.MQTT.HOST+':5672/%2f';
-
-
-//var connOpt = {
-//        host: CONFIG.MQTT.HOST,
-//    port: 5672, login: 'indrajeet'
-//    , password: 'indrajeet'
-//    , connectionTimeout: 1000
-//    , authMechanism: 'AMQPLAIN'
-//    //, vhost: '/'
-//    , vhost: "/"
-//    , noDelay: false
-//    , ssl: { enabled : false}
-//};
 
 var connOpt = { defaultExchangeName: 'amq.topic',
         url : url,
@@ -58,23 +55,6 @@ var connOpt = { defaultExchangeName: 'amq.topic',
 
 
 var amqpConn = null;
-
-var mqtt    = require('mqtt');
-var mqttClient  = mqtt.connect("tcp://"+CONFIG.MQTT.HOST+":"+CONFIG.MQTT.PORT, {
-    clientId : "mqtt-8947983217"+Date.now(), clean : false,
-    username : 'indrajeet',
-    password : "indrajeet",
-    connectTimeout : 30000,
-    reconnectPeriod : 1000,
-    keepalive : 20
-});
-
-mqttClient.on('connect', function () {
-    console.log('mqtt connected')
-});
-
-
-//amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
 amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
 console.log('.....................................................................');
 //console.log(amqpConn);
@@ -87,34 +67,10 @@ if(amqpConn){
     amqpConn.on('error',function(err){
         console.log(err);
         console.log('Connection generated an error event');
+        amqpConn.disconnect();
         amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
     });
 }
-
- /*||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||*/
-
-
-//var server = "ms1.ezeone.com";
-//var port = "5672";
-//var vhost = "%2f"; //for "/" vhost, use "%2f" instead
-//var username = "indrajeet";
-//var password = "indrajeet";
-//var exchangeName = "amq.topic";
-//var routingKey = "74";
-
-//producer = amqp.connect("amqp://" + username + ":" + password + "@" + server + ":" + port + "/" + vhost + "?heartbeat=60");
-//producer.then(function(conn) {
-//    return conn.createConfirmChannel().then(function(ch) {
-//        ch.publish(exchangeName, routingKey, content = new Buffer("Hello World!"), options = {contentType: "text/plain", deliveryMode: 1}, function(err, ok) {
-//            if (err != null) {
-//                console.error("Error: failed to send message\n" + err);
-//            }
-//            conn.close();
-//        });
-//    });
-//}).then(null, function(err) {
-//    console.error(err);
-//});
 
 function NotificationMqtt(){
     try{
@@ -126,6 +82,7 @@ function NotificationMqtt(){
 
             amqpConn.on('error',function(){
                 console.log('Connection generated an error event');
+                amqpConn.disconnect();
                 amqpConn = amqp.createConnection(connOpt,  { defaultExchangeName: 'amq.topic' });
             });
         }
@@ -213,7 +170,7 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
         messagePayload._id = Date.now() + '-' + uniqueMid;
 
         console.log('RabbitTopic : '+topic);
-        console.log(messagePayload);
+       // console.log(messagePayload);
 
         try{
             this.createQueue(topic.toString(),function(){
