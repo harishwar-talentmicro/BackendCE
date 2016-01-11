@@ -307,7 +307,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
         var IconFileName = req.body.IconFileName;
         var ISDPhoneNumber = req.body.ISDPhoneNumber;
         var ISDMobileNumber = req.body.ISDMobileNumber;
-        var ParkingStatus = req.body.ParkingStatus;
+        var ParkingStatus = req.body.ParkingStatus ? req.body.ParkingStatus : 3;
         var Gender = parseInt(req.body.Gender);
         var DOB = req.body.DOB;
         if(Gender.toString() == 'NaN')
@@ -368,14 +368,18 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                     DOBDate = new Date(DOB);
                     // console.log(TaskDate);
                 }
-                var InsertQuery = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD) + ',' + st.db.escape(FirstName) + ',' +
-                    st.db.escape(LastName) + ',' + st.db.escape(CompanyName) + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' +
-                    st.db.escape(RoleID) + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' +
-                    st.db.escape(TokenNo) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude) + ',' +
-                    st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle) + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' +
-                    st.db.escape(PostalCode) + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber) + ',' + st.db.escape(EMailID) + ',' +
-                    st.db.escape(Picture) + ',' + st.db.escape(PictureFileName) + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany) + ','
-                    + st.db.escape(StatusID) + ',' + st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
+
+                var queryParams = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD)
+                    + ',' + st.db.escape(FirstName) + ',' + st.db.escape(LastName) + ',' + st.db.escape(CompanyName)
+                    + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' + st.db.escape(RoleID)
+                    + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' + st.db.escape(TokenNo)
+                    + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude)
+                    + ',' + st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle)
+                    + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' + st.db.escape(PostalCode)
+                    + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber)
+                    + ',' + st.db.escape(EMailID) + ',' + st.db.escape(Picture) + ',' + st.db.escape(PictureFileName)
+                    + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany)
+                    + ','+ st.db.escape(StatusID) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress)
                     + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
                     + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
@@ -579,21 +583,24 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                     DOBDate = new Date(DOB);
                 }
 
-                var InsertQuery = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD) + ',' + st.db.escape(FirstName) + ',' +
-                    st.db.escape(LastName) + ',' + st.db.escape(CompanyName) + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' +
-                    st.db.escape(RoleID) + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' +
-                    st.db.escape(TokenNo) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude) + ',' +
-                    st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle) + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' +
-                    st.db.escape(PostalCode) + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber) + ',' + st.db.escape(EMailID) + ',' +
-                    st.db.escape(Picture) + ',' + st.db.escape(PictureFileName) + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany) + ','
-                    + st.db.escape(StatusID) + ',' + st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
+                var queryParams = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD)
+                    + ',' + st.db.escape(FirstName) + ',' + st.db.escape(LastName) + ',' + st.db.escape(CompanyName)
+                    + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' + st.db.escape(RoleID)
+                    + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' + st.db.escape(TokenNo)
+                    + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude)
+                    + ',' + st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle)
+                    + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' + st.db.escape(PostalCode)
+                    + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber)
+                    + ',' + st.db.escape(EMailID) + ',' + st.db.escape(Picture) + ',' + st.db.escape(PictureFileName)
+                    + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany)
+                    + ','+ st.db.escape(StatusID) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
                     + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress)
                     + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
                     + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                     + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                     + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
                 //console.log(InsertQuery);
-                st.db.query('CALL pSaveEZEIDData(' + InsertQuery + ')', function (err, InsertResult) {
+                st.db.query('CALL pSaveEZEIDData(' + queryParams + ')', function (err, InsertResult) {
                     if (!err) {
                         //console.log('InsertResult....');
                         //console.log(InsertResult);
@@ -1618,7 +1625,6 @@ function FnCropImage(imageParams, callback){
 Alumni.prototype.getAlumniContent = function(req,res,next){
     var _this = this;
 
-    //var token = req.query.token;
     var code = alterEzeoneId(req.query.code);   // college code
 
     var responseMessage = {
@@ -1630,10 +1636,6 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
 
     var validateStatus = true,error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
     if(!code){
         error['code'] = 'Invalid code';
         validateStatus *= false;
@@ -1646,9 +1648,6 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
             var query = st.db.escape(code);
             console.log('CALL pGetAlumniContent(' + query + ')');
             st.db.query('CALL pGetAlumniContent(' + query + ')', function (err, getResult) {
@@ -1680,26 +1679,6 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
 
             });
         }
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid Token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnGetAlumniContent: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal Server Error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnGetAlumniContent:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -2710,23 +2689,27 @@ Alumni.prototype.getTENDetails = function(req,res,next){
                             //console.log(getResult);
                             //console.log(getResult[1]);
                             if (getResult[1]) {
+                                for (var ct = 0; ct < getResult[1].length; ct++) {
+                                    getResult[1][ct].attachment = getResult[1][ct].attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].attachment : '';
+                                }
+
                                 for (var i = 0; i < getResult[1].length; i++) {
                                     var output =[];
-                                    if (getResult[1][i].attachment) {
+                                    if (getResult[1][i].attachment1) {
 
-                                        var attach = getResult[1][i].attachment.split(',');
+                                        var attach = getResult[1][i].attachment1.split(',');
 
                                         for (var j = 0; j < attach.length; j++) {
                                             var joinAttach = {
                                                 s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attach[j]
                                             };
                                             output.push(joinAttach);
-                                            getResult[1][i].attachment = output;
+                                            getResult[1][i].attachment1 = output;
 
                                         }
                                     }
                                     else {
-                                        getResult[1][i].attachment = '';
+                                        getResult[1][i].attachment1 = '';
                                     }
                                 }
                                 responseMessage.status = true;
@@ -3476,8 +3459,6 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
 
     var token = req.query.token;
     var code = alterEzeoneId(req.query.code);  // college code
-
-
     /**
      * Allowed codes for alumni are as follows
      * 0 : Not Verified
@@ -3485,8 +3466,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
      * 2 : Rejected
      * Default : 0 (Not Verified)
      */
-    var alumniStatus = (!isNaN(parseInt(req.query.alumni_status))) ?
-        (((parseInt(req.query.alumni_status)) > 2) ? 0 : (parseInt(req.query.alumni_status)))  : 0;  // college code
+    var alumniStatus = req.query.alumni_status ? req.query.alumni_status : 0;
 
 
     var responseMessage = {
@@ -3519,6 +3499,7 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(code) + ',' + st.db.escape(alumniStatus);
                         var query = 'CALL pGetAlumniMemberApprovalList(' + queryParams + ')';
+                        console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
@@ -3623,6 +3604,7 @@ Alumni.prototype.getTeamContent = function(req,res,next){
         try {
             var queryParams = st.db.escape(code);
             var query = 'CALL pgetTeamContent(' + queryParams + ')';
+            console.log(query);
 
             st.db.query(query, function (err, getResult) {
                 //console.log(getResult);
