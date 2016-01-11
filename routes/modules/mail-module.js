@@ -14,6 +14,7 @@ function error(err, req, res, next) {
 
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -811,4 +812,205 @@ Mail.prototype.sendRegMail= function(mailContent, callBack) {
     }
 };
 
+/**
+ * @todo FnBussinessMail
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description send business mail
+ */
+Mail.prototype.bussinessMail = function(req,res,next) {
+
+    /**
+     * checking input parameters are json or not
+     * @param token (char(36))
+     * @param subject (string)
+     * @param recipients (array) // to email id
+     * @param recipients_cc <array>
+     * @param recipients_bcc <array>
+     * @param body (string)
+     */
+
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else {
+        /**
+         * storing and validating the input parameters
+         */
+
+        var token = req.body.token;
+        var subject = req.body.subject;
+        var recipients = req.body.recipients;
+        var recipientsCc = req.body.recipients_cc;
+        var recipientsBcc = req.body.recipients_bcc;
+        var body = req.body.body;
+
+        var util = require('util');
+        util.isArray(recipients);
+        console.log(util.isArray(recipients));
+
+
+        if (!token) {
+            error['token'] = 'token is Mandatory';
+            validateStatus *= false;
+        }
+        if (!(util.isArray(recipients))) {
+            error['recipients'] = 'recipients is array';
+            validateStatus *= false;
+        }
+        if (!(util.isArray(recipientsCc))) {
+            error['recipientsCc'] = 'recipients Cc is array';
+            validateStatus *= false;
+        }
+        if (!(util.isArray(recipientsBcc))) {
+            error['recipientsBcc'] = 'recipients Bcc is array';
+            validateStatus *= false;
+        }
+        if (!body) {
+            error['body'] = 'body is Mandatory';
+            validateStatus *= false;
+        }
+    }
+
+    if(!validateStatus) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token);
+                        var query = 'CALL pcheckverifiedstatus(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, userstatusResult) {
+                            console.log(userstatusResult);
+                            if (!err) {
+                                if (userstatusResult) {
+                                    if (userstatusResult[0]) {
+                                        if (userstatusResult[0][0]) {
+                                            if (userstatusResult[0][0].verified == 2)
+
+                                            var email = new sendgrid.Email();
+                                            email.from = 'noreply@ezeone.com';
+                                            email.setTos(recipients);
+                                            email.setCcs(recipientsCc);
+                                            email.setBccs(recipientsBcc);
+                                            email.subject = subject;
+                                            email.html = body;
+
+                                            sendgrid.send(email, function (err, result) {
+                                                console.log(err);
+                                                if (!err) {
+                                                    responseMessage.status = true;
+                                                    responseMessage.message = 'Mail Send successfully';
+                                                    responseMessage.data = {
+                                                        subject: req.body.subject,
+                                                        recipients: req.body.recipients,
+                                                        recipientsCc: req.body.recipients_cc,
+                                                        recipientsBcc: req.body.recipients_bcc,
+                                                        body: req.body.body
+                                                    };
+                                                    res.status(200).json(responseMessage);
+                                                    console.log('FnBussinessMail: Mail Send successfully');
+                                                }
+                                                else {
+                                                    responseMessage.message = 'An error occured ! Please try again';
+                                                    responseMessage.error = {
+                                                        server: 'Sendgrid Server Error'
+                                                    };
+                                                    res.status(500).json(responseMessage);
+                                                    console.log('FnBussinessMail: error in sending business mail  :' + err);
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            responseMessage.message = 'Sorry! you cannot send because you are not verified';
+                                            responseMessage.error = {
+                                                user_status: 'Not Verified'
+                                            };
+                                            responseMessage.data = null;
+                                            res.status(403).json(responseMessage);
+                                            console.log('FnBussinessMail: User not verified');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'Sorry! you cannot send because you are not verified';
+                                        responseMessage.error = {
+                                            user_status: 'Not Verified'
+                                        };
+                                        responseMessage.data = null;
+                                        res.status(403).json(responseMessage);
+                                        console.log('FnBussinessMail: User not verified');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Sorry! you cannot send because you are not verified';
+                                    responseMessage.error = {
+                                        user_status: 'Not Verified'
+                                    };
+                                    responseMessage.data = null;
+                                    res.status(403).json(responseMessage);
+                                    console.log('FnBussinessMail: User not verified');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnBussinessMail: error in checking user status  :' + err);
+                            }
+                        });
+                }
+                else {
+                    responseMessage.message = 'Invalid token';
+                    responseMessage.error = {
+                        token: 'Invalid Token'
+                    };
+                    responseMessage.data = null;
+                    res.status(401).json(responseMessage);
+                    console.log('FnCreateService: Invalid token');
+                }
+            }
+        else {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'Error in validating Token';
+                res.status(500).json(responseMessage);
+                console.log('FnBussinessMail:Error in processing Token' + err);
+            }
+        });
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(400).json(responseMessage);
+        console.log('Error : FnBussinessMail ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+}
+};
 module.exports = Mail;
