@@ -31,7 +31,8 @@
     "nodemailer" : "~1.4.0",
     "amqp":"~0.2.4",
     "gcloud": "~0.24.1",
-    "random-string" : "0.1.2"
+    "random-string" : "0.1.2",
+	"util":"~0.10.3"
 
   },
   "devDependencies": {
