@@ -305,12 +305,15 @@ Auth.prototype.register = function(req,res,next){
 
                                                 st.generateToken(ip, userAgent, ezeid, function (err, token) {
                                                     if (err) {
-                                                        console.log('FnRegistration: Token Generation Error' + err);
+                                                        console.log('FnRegistration: Token Generation Error');
+                                                        console.log(err);
+
                                                     }
                                                     else {
+                                                        console.log(token);
                                                         rtnMessage.Token = token;
+                                                        res.send(rtnMessage);
                                                     }
-                                                    res.send(rtnMessage);
                                                 });
 
                                                 console.log('FnRegistration:tmaster: Registration success');
@@ -350,7 +353,6 @@ Auth.prototype.register = function(req,res,next){
                                                         }
                                                     });
                                                 }
-
 
                                                 //send mail for registeration
                                                 if (email) {
@@ -470,7 +472,7 @@ Auth.prototype.register = function(req,res,next){
                     }
 
                     var queryParams = st.db.escape(idtypeId) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(encryptPwd)
-                        + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName) + ',' + st.db.escape(comapanyName)
+                        + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName) + ',' + st.db.escape(companyName)
                         + ',' + st.db.escape(jobTitle) + ',' + st.db.escape(functionId) + ',' + st.db.escape(roleId)
                         + ',' + st.db.escape(languageId) + ',' + st.db.escape(nameTitleId) + ',' + st.db.escape(token)
                         + ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(altitude)
