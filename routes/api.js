@@ -191,6 +191,7 @@ router.get('/navigation',searchModule.navigateSearch);
 var Mail = require('./modules/mail-module.js');
 var mailModule = new Mail(db,stdLib);
 router.post('/ewtSendMail', mailModule.sendMail);
+router.post('/business/mail', mailModule.bussinessMail);
 
 //Message Notification Module methods
 var MessageNotification = require('./modules/message-notification-module.js');
@@ -401,6 +402,8 @@ router.post('/join_member',serviceModule.addMembersToService);
 router.get('/joined_community',serviceModule.getJoinedCommunity);
 router.delete('/community_member',serviceModule.deleteCommunityMember);
 router.post('/service_pic',serviceModule.saveServicePic);
+router.post('/service_attachment',serviceModule.saveServiceAttachment);
+router.post('/service_video',serviceModule.saveServiceVideo);
 
 
 //EZEIDAP Methods
@@ -468,6 +471,16 @@ router.get('/ewtGetGatesVES',vesModule.getGatesVES);
 router.post('/ewtSaveDepartmentsVES',vesModule.saveDepartmentsVES);
 router.post('/ewtSaveGatesVES',vesModule.saveGatesVES);
 router.post('/ewtSaveCitysVES',vesModule.saveCitysVES);
+
+router.get('/error_test',function(req,res,next){
+    try {
+        b.toString();
+    }
+    catch(ex){
+        console.log(ex);
+    }
+    res.send('');
+});
 
 /**
  * Default error handler
