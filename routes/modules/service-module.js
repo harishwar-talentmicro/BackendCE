@@ -315,6 +315,11 @@ Service.prototype.getServices = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'services loaded successfully';
+                                        for(var i=0;i<serviceResult[0].length;i++){
+                                            serviceResult[0][i].isimage = (serviceResult[0][i].isimage != 0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isimage :0;
+                                            serviceResult[0][i].isattachment = (serviceResult[0][i].isattachment !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isattachment :0;
+                                            serviceResult[0][i].isvideo = (serviceResult[0][i].isvideo !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isvideo :0;
+                                        }
                                         responseMessage.data = serviceResult[0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetServices: services loaded successfully');
@@ -864,7 +869,7 @@ Service.prototype.createService = function(req,res,next){
         var masterId = parseInt(req.body.master_id);
         var message = req.body.message;
         var categoryId = parseInt(req.body.cid);
-        var pic = req.body.pic ? req.body.pic :'';
+        var pic = req.body.pic_url ? req.body.pic_url :'';
         var picFilename = req.body.pic_fn ? req.body.pic_fn :'';
         var attachment = req.body.a_url ? req.body.a_url :'';
         var aFilename = req.body.a_fn ? req.body.a_fn :'';
@@ -914,8 +919,12 @@ Service.prototype.createService = function(req,res,next){
                                         master_id: masterId,
                                         message: req.body.message,
                                         cid: categoryId,
-                                        pic: pic ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pic : ''
-
+                                        pic_url : req.body.pic_url ? req.body.pic_url :'',
+                                        pic_fn : req.body.pic_fn ? req.body.pic_fn :'',
+                                        a_url : req.body.a_url ? req.body.a_url :'',
+                                        a_fn : req.body.a_fn ? req.body.a_fn :'',
+                                        video_url : req.body.video_url ? req.body.video_url :'',
+                                        video_fn : req.body.video_fn ? req.body.video_fn :''
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnCreateService: Service Created successfully');
