@@ -65,8 +65,8 @@ Location.prototype.getAll = function(req,res,next){
                         st.db.query('CALL pGetSecondaryLocationDetails(' + st.db.escape(Token) + ')', function (err, SecondaryResult) {
                             if (!err) {
                                 // console.log(UserDetailsResult);
-                                if (SecondaryResult[0]) {
-                                    if (SecondaryResult[0].length > 0) {
+                                if (SecondaryResult) {
+                                    if (SecondaryResult[0]) {
                                         // console.log('FnGetSecondaryLocation: Token: ' + Token);
                                         console.log('FnGetSecondaryLocation : tmaster: Secondary User details sent successfully');
                                         res.send(SecondaryResult[0]);
@@ -462,8 +462,8 @@ Location.prototype.getLoactionList = function(req,res,next){
 
                         st.db.query('CALL pGetLocationList(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
 
                                         console.log('FnGetLocationList: Location List Send successfully');
                                         res.send(GetResult[0]);
@@ -778,7 +778,7 @@ Location.prototype.shareLocation = function(req,res,next){
     var locationTitle = req.body.lm ? req.body.lm : ''; // landmark
     var latitude = req.body.lat;
     var longitude = req.body.long;
-    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupID,messageText,messageType,operationType,iphoneId,iphoneID,messageId;
+    var masterid='',receiverId,senderTitle,groupTitle,groupID,messageText,messageType,operationType,iphoneId,iphoneID,messageId;
 
     var responseMessage = {
         status: false,
@@ -820,70 +820,83 @@ Location.prototype.shareLocation = function(req,res,next){
                         var queryParams = st.db.escape(token) + ','  + st.db.escape(locationTitle)+ ','  + st.db.escape(latitude)
                             + ','  + st.db.escape(longitude)+ ','  + st.db.escape(ezeone_id);
                         var query = 'CALL psharelocation(' + queryParams + ')';
+                        console.log(query);
                         st.db.query(query, function (err, getResult) {
+                            console.log(getResult[0]);
                             if (!err) {
                                 if (getResult) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'location send successfully';
-                                        responseMessage.data = getResult[0][0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnShareLocation: location send successfully');
+                                    if(getResult[0]) {
+                                        if (getResult[0][0]) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'location send successfully';
+                                            responseMessage.data = getResult[0][0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnShareLocation: location send successfully');
 
-                                        //send notification
-                                        var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where EZEID=' + st.db.escape(ezeone_id);
-                                        //console.log(queryParameters);
-                                        st.db.query(queryParameters, function (err, iosResult) {
-                                            if (iosResult) {
-                                                iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
-                                                //console.log(iphoneID);
-                                                var queryParams = 'select tid,GroupName from tmgroups where GroupName=' + st.db.escape(ezeone_id);
-                                                //console.log(queryParams);
-                                                st.db.query(queryParams, function (err, userDetails) {
-                                                    if (userDetails) {
-                                                        if (userDetails[0]) {
-                                                            //console.log(userDetails);
-                                                            receiverId = userDetails[0].tid;
-                                                            senderTitle = getResult[0][0].ezeid;
-                                                            groupTitle = userDetails[0].GroupName;
-                                                            groupID = userDetails[0].tid;
-                                                            if(locationTitle) {
-                                                                messageText = 'click here to navigate and reach ' + senderTitle.slice(1) + ' in ' + locationTitle;
-                                                            }
-                                                            else
-                                                            {
-                                                                messageText = 'click here to navigate and reach ' + senderTitle.slice(1);
-                                                            }
-                                                            messageType = 9;
-                                                            operationType = 0;
-                                                            iphoneId = iphoneID;
-                                                            messageId = 0;
-                                                            masterid = '';
-                                                            // console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
-                                                            notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
+                                            //send notification
+                                            var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where EZEID=' + st.db.escape(ezeone_id);
+                                            //console.log(queryParameters);
+                                            st.db.query(queryParameters, function (err, iosResult) {
+                                                if (iosResult) {
+                                                    if (iosResult[0]) {
+                                                        iphoneID = iosResult[0].iphoneID;
+                                                    }
+                                                    else {
+                                                        iphoneID = '';
+                                                    }
+                                                    //console.log(iphoneID);
+                                                    var queryParams = 'select tid,GroupName from tmgroups where GroupName=' + st.db.escape(ezeone_id);
+                                                    //console.log(queryParams);
+                                                    st.db.query(queryParams, function (err, userDetails) {
+                                                        if (userDetails) {
+                                                            if (userDetails[0]) {
+                                                                //console.log(userDetails);
+                                                                receiverId = userDetails[0].tid;
+                                                                senderTitle = getResult[0][0].ezeid;
+                                                                groupTitle = userDetails[0].GroupName;
+                                                                groupID = userDetails[0].tid;
+                                                                if (locationTitle) {
+                                                                    messageText = 'click here to navigate and reach ' + senderTitle.slice(1) + ' in ' + locationTitle;
+                                                                }
+                                                                else {
+                                                                    messageText = 'click here to navigate and reach ' + senderTitle.slice(1);
+                                                                }
+                                                                messageType = 9;
+                                                                operationType = 0;
+                                                                iphoneId = iphoneID;
+                                                                messageId = 0;
+                                                                masterid = '';
+                                                                // console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
+                                                                notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude);
 
+                                                            }
+                                                            else {
+                                                                console.log('FnShareLocation:userDetails not loaded');
+                                                            }
                                                         }
                                                         else {
                                                             console.log('FnShareLocation:userDetails not loaded');
                                                         }
-                                                    }
-                                                    else {
-                                                        console.log('FnShareLocation:userDetails not loaded');
-                                                    }
-                                                });
-                                            }
-                                            else {
-                                                console.log('FnShareLocation:iphoneID not loaded');
-                                            }
-                                        });
+                                                    });
+                                                }
+                                                else {
+                                                    console.log('FnShareLocation:iphoneID not loaded');
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            responseMessage.message = 'location not send';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnShareLocation:location not send');
+                                        }
                                     }
-                                    else {
+                                    else
+                                    {
                                         responseMessage.message = 'location not send';
                                         res.status(200).json(responseMessage);
                                         console.log('FnShareLocation:location not send');
                                     }
-
                                 }
                                 else {
                                     responseMessage.message = 'location not send';
@@ -954,8 +967,8 @@ Location.prototype.validateEZEOne = function(req,res,next){
         status: false,
         error: {},
         message: '',
-        data: null,
-        isBussinessUser : ''
+        data: [],
+        isBussinessUser : 0
     };
 
     var validateStatus = true, error = {};
@@ -989,34 +1002,36 @@ Location.prototype.validateEZEOne = function(req,res,next){
                 if (!err) {
                     if (getResult) {
                         if (getResult[0]) {
-                            if (getResult[0][0].masterid != 0) {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'EZEoneID is available';
-                                responseMessage.data = getResult[0][0].masterid;
-                                responseMessage.isBussinessUser = getResult[0][0].isBussinessUser;
-                                res.status(200).json(responseMessage);
-                                console.log('FnValidateEZEOne: EZEoneID is available');
+                            if (getResult[0][0]) {
+                                if (getResult[0][0].masterid != 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'EZEoneID is available';
+                                    responseMessage.data = getResult[0][0].masterid;
+                                    responseMessage.isBussinessUser = getResult[0][0].isBussinessUser;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnValidateEZEOne: EZEoneID is available');
+                                }
+                                else {
+                                    responseMessage.message = 'EZEoneID is not available';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnValidateEZEOne:EZEoneID is not available');
+                                }
                             }
                             else {
                                 responseMessage.message = 'EZEoneID is not available';
-                                responseMessage.data = getResult[0][0].masterid;
-                                responseMessage.isBussinessUser = getResult[0][0].isBussinessUser;
                                 res.status(200).json(responseMessage);
                                 console.log('FnValidateEZEOne:EZEoneID is not available');
                             }
                         }
                         else {
                             responseMessage.message = 'EZEoneID is not available';
-                            responseMessage.data = getResult[0][0].masterid;
-                            responseMessage.isBussinessUser = getResult[0][0].isBussinessUser;
                             res.status(200).json(responseMessage);
                             console.log('FnValidateEZEOne:EZEoneID is not available');
                         }
                     }
                     else {
                         responseMessage.message = 'EZEoneID is not available';
-                        responseMessage.data = getResult[0][0].masterid;
                         res.status(200).json(responseMessage);
                         console.log('FnValidateEZEOne:EZEoneID is not available');
                     }

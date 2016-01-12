@@ -330,13 +330,13 @@ Auth.prototype.register = function(req,res,next){
                                                  * Creating queue for the user dynamically on rabbit server
                                                  *
                                                  */
-                                                notificationQmManager.getIndividualGroupId(registerResult[0][0].TID, function (err1, getIndividualGroupIdRes) {
-                                                    if (!err1) {
-                                                        if (getIndividualGroupIdRes) {
-                                                            notificationMqtt.createQueue(getIndividualGroupIdRes.tid);
-                                                        }
-                                                    }
-                                                });
+                                                //notificationQmManager.getIndividualGroupId(registerResult[0][0].TID, function (err1, getIndividualGroupIdRes) {
+                                                //    if (!err1) {
+                                                //        if (getIndividualGroupIdRes) {
+                                                //            notificationMqtt.createQueue(getIndividualGroupIdRes.tid);
+                                                //        }
+                                                //    }
+                                                //});
 
                                                 //saving iphone device token
                                                 if (isIphone == 1) {
@@ -397,7 +397,7 @@ Auth.prototype.register = function(req,res,next){
                                                 else {
                                                     console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
                                                     console.log(rtnMessage);
-                                                    res.send(rtnMessage);
+                                                    //res.send(rtnMessage);
                                                 }
                                             }
 
@@ -497,7 +497,7 @@ Auth.prototype.register = function(req,res,next){
                                     if (registerResult[0].length > 0) {
                                         if (registerResult[0][0].TID != 0) {
                                             if (idtypeId == 2) {
-                                                rtnMessage.FirstName = comapanyName;
+                                                rtnMessage.FirstName = companyName;
                                             }
                                             else {
                                                 rtnMessage.FirstName = firstName;

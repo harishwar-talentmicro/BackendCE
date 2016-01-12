@@ -130,7 +130,7 @@ Loc.prototype.saveLocMap = function(req,res,next){
                                 st.db.query(query, function (err, insertResult) {
                                     if (!err) {
                                         if (insertResult) {
-                                            id = insertResult[0][0].id;
+                                            id = insertResult[0][0] ? insertResult[0][0].id : 0;
                                             console.log('FnSaveLocMap: LocMap saved successfully');
                                         }
                                         else {
@@ -358,23 +358,35 @@ Loc.prototype.loadLocDetailsEmployer = function(req,res,next){
 
                             if (!err) {
                                 if (getResult) {
-                                    if(getResult[0]){
-                                        if(getResult[0][0].message != -2){
+                                    if(getResult[0]) {
+                                        if (getResult[0][0]) {
+                                            if (getResult[0][0].message != -2) {
 
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Employer LocDetails loaded successfully';
-                                            responseMessage.data = {
-                                                count : getResult[0][0].count,
-                                                sic: getResult[0][0].sic,
-                                                sfc: getResult[0][0].sfc,
-                                                slc: getResult[0][0].slc,
-                                                result: getResult[1]
-                                            };
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnLoadLocDetails: Employer LocDetails loaded successfully');
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Employer LocDetails loaded successfully';
+                                                responseMessage.data = {
+                                                    count: getResult[0][0].count,
+                                                    sic: getResult[0][0].sic,
+                                                    sfc: getResult[0][0].sfc,
+                                                    slc: getResult[0][0].slc,
+                                                    result: getResult[1]
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnLoadLocDetails: Employer LocDetails loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Employer LocDetails loaded successfully';
+                                                responseMessage.data = {
+                                                    result: getResult[0]
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnLoadLocDetails: Employer LocDetails loaded successfully');
+                                            }
                                         }
-                                        else{
+                                        else {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Employer LocDetails loaded successfully';
@@ -385,7 +397,6 @@ Loc.prototype.loadLocDetailsEmployer = function(req,res,next){
                                             console.log('FnLoadLocDetails: Employer LocDetails loaded successfully');
                                         }
                                     }
-
                                     else {
                                         responseMessage.message = 'Employer LocDetails not loaded';
                                         res.status(200).json(responseMessage);
@@ -495,22 +506,34 @@ Loc.prototype.loadLocDetailsTrainer = function(req,res,next){
                             console.log(getResult);
                             if (!err) {
                                 if (getResult) {
-                                    if(getResult[0]){
-                                        if(getResult[0][0].message != -2){
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Trainer LocDetails loaded successfully';
-                                            responseMessage.data = {
-                                                count : getResult[0][0].count,
-                                                sic: getResult[0][0].sic,
-                                                sfc: getResult[0][0].sfc,
-                                                slc: getResult[0][0].slc,
-                                                result: getResult[1]
-                                            };
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnLoadLocDetails: Trainer LocDetails loaded successfully');
+                                    if(getResult[0]) {
+                                        if (getResult[0][0]) {
+                                            if (getResult[0][0].message != -2) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Trainer LocDetails loaded successfully';
+                                                responseMessage.data = {
+                                                    count: getResult[0][0].count,
+                                                    sic: getResult[0][0].sic,
+                                                    sfc: getResult[0][0].sfc,
+                                                    slc: getResult[0][0].slc,
+                                                    result: getResult[1]
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnLoadLocDetails: Trainer LocDetails loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Trainer LocDetails loaded successfully';
+                                                responseMessage.data = {
+                                                    result: getResult[0]
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnLoadLocDetails:Trainer LocDetails loaded successfully');
+                                            }
                                         }
-                                        else{
+                                        else {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Trainer LocDetails loaded successfully';
@@ -625,21 +648,29 @@ Loc.prototype.loadLocDetailsSyllabus = function(req,res,next){
                             if (!err) {
                                 if (getResult) {
                                     if(getResult[0]){
-                                        if(getResult[0][0].message != -2){
-
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Syllabus LocDetails loaded successfully';
-                                            getResult[0][0].url = (getResult[0][0].url) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].url) : '';
-                                            responseMessage.data = {url: getResult[0][0].url};
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnLoadLocDetails: Syllabus LocDetails loaded successfully');
+                                        if(getResult[0][0]){
+                                            if(getResult[0][0].message != -2){
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Syllabus LocDetails loaded successfully';
+                                                getResult[0][0].url = (getResult[0][0].url) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].url) : '';
+                                                responseMessage.data = {url: getResult[0][0].url};
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnLoadLocDetails: Syllabus LocDetails loaded successfully');
+                                            }
+                                            else{
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Syllabus LocDetails loaded successfully';
+                                                responseMessage.data = getResult[0][0];
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnLoadLocDetails: Syllabus LocDetails loaded successfully');}
                                         }
                                         else{
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Syllabus LocDetails loaded successfully';
-                                            responseMessage.data = getResult[0][0];
+                                            responseMessage.data = [];
                                             res.status(200).json(responseMessage);
                                             console.log('FnLoadLocDetails: Syllabus LocDetails loaded successfully');}
                                     }
@@ -929,7 +960,7 @@ Loc.prototype.getLocBasket = function(req,res,next){
     var stateSort = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 0;
     var stateQuery = req.query.stq ? req.query.stq : '';
     var countrySort = (!isNaN(parseInt(req.query.cnts))) ?  parseInt(req.query.cnts): 0;
-    var countryQuery = req.query.cntq ? req.query.cntq : ''
+    var countryQuery = req.query.cntq ? req.query.cntq : '';
     var statusSort = (!isNaN(parseInt(req.query.stss))) ?  parseInt(req.query.stss): 0;
     var statusQuery = req.query.stsq ? req.query.stsq : '';
     var mobileSort = (!isNaN(parseInt(req.query.mns))) ?  parseInt(req.query.mns): 0;
@@ -939,7 +970,7 @@ Loc.prototype.getLocBasket = function(req,res,next){
         status: false,
         error: {},
         message: '',
-        data: null
+        data: []
     };
 
     var validateStatus = true, error = {};
@@ -960,36 +991,66 @@ Loc.prototype.getLocBasket = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams =   st.db.escape(token) + ',' + st.db.escape(locId) + ',' + st.db.escape(type)
-                        + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude)+ ',' + st.db.escape(firstNameSort)
-                        + ',' + st.db.escape(firstNameQuery)+ ',' + st.db.escape(lastNameSort)+ ',' + st.db.escape(lastNameQuery)
-                        + ',' + st.db.escape(emailSort)+ ',' + st.db.escape(emailQuery)+ ',' + st.db.escape(phoneSort)
-                        + ',' + st.db.escape(phoneQuery)+ ',' + st.db.escape(citySort)+ ',' + st.db.escape(cityQuery)
-                        + ',' + st.db.escape(stateSort)+ ',' + st.db.escape(stateQuery)+ ',' + st.db.escape(countrySort)
-                        + ',' + st.db.escape(countryQuery)+ ',' + st.db.escape(statusSort)+ ',' + st.db.escape(statusQuery)
-                        + ',' + st.db.escape(mobileSort)+ ',' + st.db.escape(mobileQuery);
+                            + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude)+ ',' + st.db.escape(firstNameSort)
+                            + ',' + st.db.escape(firstNameQuery)+ ',' + st.db.escape(lastNameSort)+ ',' + st.db.escape(lastNameQuery)
+                            + ',' + st.db.escape(emailSort)+ ',' + st.db.escape(emailQuery)+ ',' + st.db.escape(phoneSort)
+                            + ',' + st.db.escape(phoneQuery)+ ',' + st.db.escape(citySort)+ ',' + st.db.escape(cityQuery)
+                            + ',' + st.db.escape(stateSort)+ ',' + st.db.escape(stateQuery)+ ',' + st.db.escape(countrySort)
+                            + ',' + st.db.escape(countryQuery)+ ',' + st.db.escape(statusSort)+ ',' + st.db.escape(statusQuery)
+                            + ',' + st.db.escape(mobileSort)+ ',' + st.db.escape(mobileQuery);
                         var query = 'CALL ploadLOCbasket(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, locBasket) {
                             if (!err) {
                                 if (locBasket) {
-                                    if(locBasket[0]){
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Loc Basket loaded successfully';
-                                        responseMessage.data = {
-                                          count :locBasket[0][0].count,
-                                          result : locBasket[1]
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetLocBasket: Loc Basket loaded successfully');
+                                    if(locBasket[0]) {
+                                        if (locBasket[0][0]) {
+                                            if (locBasket[1]) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Loc Basket loaded successfully';
+                                                responseMessage.data = {
+                                                    count: locBasket[0][0].count,
+                                                    result: locBasket[1]
+                                                };
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetLocBasket: Loc Basket loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.data = {
+                                                    count: 0,
+                                                    result: []
+                                                };
+                                                responseMessage.message = 'Loc Basket not loaded';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetLocBasket:Loc Basket not loaded');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.data = {
+                                                count: 0,
+                                                result: []
+                                            };
+                                            responseMessage.message = 'Loc Basket not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetLocBasket:Loc Basket not loaded');
+                                        }
                                     }
                                     else {
+                                        responseMessage.data = {
+                                            count: 0,
+                                            result: []
+                                        };
                                         responseMessage.message = 'Loc Basket not loaded';
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetLocBasket:Loc Basket not loaded');
                                     }
                                 }
                                 else {
+                                    responseMessage.data = {
+                                        count: 0,
+                                        result: []
+                                    };
                                     responseMessage.message = 'Loc Basket not loaded';
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetLocBasket:Loc Basket not loaded');

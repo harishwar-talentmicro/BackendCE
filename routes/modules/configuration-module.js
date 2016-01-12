@@ -338,7 +338,7 @@ Configuration.prototype.get = function(req,res,next){
                         st.db.query('CALL pGetconfiguration(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
+                                    if (GetResult[0]) {
 
                                         console.log('FnGetConfig: Details Send successfully');
                                         GetResult[0][0].dealbanner= (GetResult[0][0].dealbanner) ?
@@ -415,7 +415,7 @@ Configuration.prototype.getBusinessCategories = function(req,res,next){
             var Query = 'Select CategoryID, CategoryTitle from mcategory where LangID=' + st.db.escape(LangID);
             st.db.query(Query, function (err, CategoryResult) {
                 if (!err) {
-                    if (CategoryResult.length > 0) {
+                    if (CategoryResult) {
                         res.send(CategoryResult);
                         console.log('FnGetCategory: mcategory: Category sent successfully');
                     }
@@ -472,7 +472,7 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
                         st.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
                                 if (StatusResult) {
-                                    if (StatusResult[0].length > 0) {
+                                    if (StatusResult[0]) {
                                         console.log('FnGetStatusType: Status type details Send successfully');
                                         res.send(StatusResult[0]);
                                     }
@@ -581,8 +581,8 @@ Configuration.prototype.StatusTypes = function(req,res,next){
                         st.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
 
                             if (!err) {
-                                if (StatusResult != null) {
-                                    if (StatusResult[0].length > 0) {
+                                if (StatusResult) {
+                                    if (StatusResult[0]) {
                                         StatusResult[0].unshift(StatusAll);
                                         StatusResult[0].unshift(StatusAllOpen);
                                         RtnMessage.Result = StatusResult[0];
@@ -686,7 +686,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
                             + ',' + st.db.escape(StatusValue);
                         st.db.query('CALL pSaveStatusTypes(' + query + ')', function (err, result) {
                             if (!err) {
-                                if(result != null){
+                                if(result){
                                     if(result.affectedRows > 0){
                                         console.log('FnSaveStatusType: Status type saved successfully');
                                         RtnMessage.IsSuccessfull = true;
@@ -949,8 +949,8 @@ Configuration.prototype.getItems = function(req,res,next){
                         st.db.query('CALL pGetItemList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
 
                             if (!err) {
-                                if (GetResult[0]) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
                                         console.log('FnGetItemList: Item list details Send successfully');
                                         res.json(GetResult[0]);
                                     }
@@ -1137,8 +1137,8 @@ Configuration.prototype.getFolders = function(req,res,next){
 
                         st.db.query('CALL pGetFolderList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0]) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
                                         console.log('FnGetRoleList: Role list details Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -1315,8 +1315,7 @@ Configuration.prototype.getSubusers = function(req,res,next){
                         st.db.query('CALL pGetSubUserList(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-
+                                    if (GetResult[0]) {
                                         console.log('FnGetSubUserList: Sub user list details Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -1428,10 +1427,8 @@ Configuration.prototype.createSubuser = function(req,res,next){
                         console.log('InsertResult......');
                         console.log(InsertResult);
                         if (!err){
-                            if (InsertResult[0])
-                            {
-                                if(InsertResult[0].length > 0)
-                                {
+                            if (InsertResult) {
+                                if(InsertResult[0]) {
                                     var Result = InsertResult[0];
                                     if(Result[0].RowAffected == 1)
                                     {
@@ -1519,7 +1516,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
 
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
+                        if (GetResult[0]) {
                             responseMessage.status = true;
                             responseMessage.data = GetResult[0] ;
                             responseMessage.error = null;
@@ -1528,7 +1525,6 @@ Configuration.prototype.getReservationResources = function(req,res,next){
                             res.status(200).json(responseMessage);
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded Resource details';
                             console.log('FnGetReservationResource: No founded Resource details');
@@ -1536,8 +1532,6 @@ Configuration.prototype.getReservationResources = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No Resource details found';
                         console.log('FnGetReservationResource: No Resource details found');
@@ -1546,7 +1540,6 @@ Configuration.prototype.getReservationResources = function(req,res,next){
 
                 }
                 else {
-
                     responseMessage.data = null ;
                     responseMessage.error = {};
                     responseMessage.message = 'Error in getting Resource details';
@@ -1570,7 +1563,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnGetReservationResource:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');

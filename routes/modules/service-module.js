@@ -544,6 +544,11 @@ Service.prototype.getServiceDetails = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'service details loaded successfully';
+                                        if(details[0][0]) {
+                                            details[0][0].isimage = details[0][0].isimage ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isimage : 0;
+                                            details[0][0].isattachment = details[0][0].isattachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isattachment : 0;
+                                            details[0][0].isvideo = details[0][0].isvideo ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isvideo : 0;
+                                        }
                                         responseMessage.data = details[0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetServiceDetails: service details loaded successfully');
