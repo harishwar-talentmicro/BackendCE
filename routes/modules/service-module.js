@@ -315,6 +315,11 @@ Service.prototype.getServices = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'services loaded successfully';
+                                        for(var i=0;i<serviceResult[0].length;i++){
+                                            serviceResult[0][i].isimage = (serviceResult[0][i].isimage != 0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isimage :0;
+                                            serviceResult[0][i].isattachment = (serviceResult[0][i].isattachment !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isattachment :0;
+                                            serviceResult[0][i].isvideo = (serviceResult[0][i].isvideo !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isvideo :0;
+                                        }
                                         responseMessage.data = serviceResult[0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetServices: services loaded successfully');
@@ -600,7 +605,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
 };
 
 /**
- * @todo FnSavePic
+ * @todo FnSaveServicePic
  * Method : POST
  * @param req
  * @param res
@@ -609,7 +614,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
  */
 Service.prototype.saveServicePic = function(req,res,next) {
 
-    var randomName='';
+    var picUrl='',picFilename='';
 
     var responseMessage = {
         status: false,
@@ -621,33 +626,36 @@ Service.prototype.saveServicePic = function(req,res,next) {
     try{
 
         if(req.files) {
-            console.log('coming....');
-            console.log(req.files.pic);
+            if(req.files.pic) {
+                console.log(req.files.pic);
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.pic.extension) ? req.files.pic.extension : 'jpg';
+                picUrl = uniqueId + '.' + filetype;
+                picFilename = req.files.pic.originalname;
+                var readStream = fs.createReadStream(req.files.pic.path);
 
-            var uniqueId = uuid.v4();
-            var filetype = (req.files.pic.extension) ? req.files.pic.extension : 'jpg';
-            randomName = uniqueId + '.' + filetype;
-
-            var readStream = fs.createReadStream(req.files.pic.path);
-
-            uploadDocumentToCloud(randomName, readStream, function (err) {
-                if (!err) {
-                    responseMessage.status = true;
-                    responseMessage.message = 'Pic Uploaded successfully';
-                    responseMessage.data = { pic : randomName};
-                    res.status(200).json(responseMessage);
-                    console.log('FnSavePic: Pic Uploaded successfully');
-                }
-                else {
-                    responseMessage.message = 'Pic not upload';
-                    res.status(200).json(responseMessage);
-                    console.log('FnSavePic:Pic not upload');
-                }
-            });
+                uploadDocumentToCloud(picUrl, readStream, function (err) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.message = 'Pic Uploaded successfully';
+                        responseMessage.data = {
+                            pic_url : picUrl,
+                            pic_fn :picFilename
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSavePic: Pic Uploaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'Pic not upload';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSavePic:Pic not upload');
+                    }
+                });
+            }
         }
         else{
             console.log('save url...');
-            var pic = ((picture).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
             pic = pic[2];
             console.log(pic);
             responseMessage.message = 'page pic is updated';
@@ -669,6 +677,154 @@ Service.prototype.saveServicePic = function(req,res,next) {
         res.status(400).json(responseMessage);
     }
 };
+
+/**
+ * @todo FnSaveServiceAttachment
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save service pic
+ */
+Service.prototype.saveServiceAttachment = function(req,res,next) {
+
+    var aUrl='',aFilename='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try{
+
+        if(req.files) {
+            if(req.files.attachment) {
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
+                aUrl = uniqueId + '.' + filetype;
+                aFilename = req.files.attachment.originalname;
+                var readStream = fs.createReadStream(req.files.attachment.path);
+
+                uploadDocumentToCloud(aUrl, readStream, function (err) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.message = 'attachment Uploaded successfully';
+                        responseMessage.data = {
+                            a_url : aUrl,
+                            a_fn :aFilename
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'attachment not upload';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceAttachment:attachment not upload');
+                    }
+                });
+            }
+        }
+        else{
+            console.log('save url...');
+            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+            pic = pic[2];
+            console.log(pic);
+            responseMessage.message = 'attachment is updated';
+            responseMessage.status = true;
+            responseMessage.data = pic;
+            res.status(200).json(responseMessage);
+            console.log('FnSaveServiceAttachment:attachment is updating');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveServiceAttachment:error ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+/**
+ * @todo FnSaveServiceVideo
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save service video
+ */
+Service.prototype.saveServiceVideo = function(req,res,next) {
+
+    var vUrl='',vFilename='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try{
+
+        if(req.files) {
+
+            if(req.files.video) {
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.video.extension) ? req.files.video.extension : '';
+                vUrl = uniqueId + '.' + filetype;
+                vFilename = req.files.video.originalname;
+                var readStream = fs.createReadStream(req.files.video.path);
+
+                uploadDocumentToCloud(vUrl, readStream, function (err) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.message = 'video Uploaded successfully';
+                        responseMessage.data = {
+                            v_url : vUrl,
+                            v_fn :vFilename
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceVideo: video Uploaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'video not upload';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceVideo:video not upload');
+                    }
+                });
+            }
+        }
+        else{
+            console.log('save url...');
+            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+            pic = pic[2];
+            console.log(pic);
+            responseMessage.message = 'video is updated';
+            responseMessage.status = true;
+            responseMessage.data = pic;
+            res.status(200).json(responseMessage);
+            console.log('FnSaveServiceVideo:video is updating');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveServiceVideo:error ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
 
 /**
  * @todo FnCreateService
@@ -713,7 +869,12 @@ Service.prototype.createService = function(req,res,next){
         var masterId = parseInt(req.body.master_id);
         var message = req.body.message;
         var categoryId = parseInt(req.body.cid);
-        var pic = req.body.pic ? req.body.pic :'';
+        var pic = req.body.pic_url ? req.body.pic_url :'';
+        var picFilename = req.body.pic_fn ? req.body.pic_fn :'';
+        var attachment = req.body.a_url ? req.body.a_url :'';
+        var aFilename = req.body.a_fn ? req.body.a_fn :'';
+        var videoUrl = req.body.video_url ? req.body.video_url :'';
+        var vFilename = req.body.video_fn ? req.body.video_fn :'';
 
         if (!token) {
             error['token'] = 'token is Mandatory';
@@ -730,7 +891,6 @@ Service.prototype.createService = function(req,res,next){
         }
     }
 
-
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
@@ -744,7 +904,9 @@ Service.prototype.createService = function(req,res,next){
 
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(masterId)
                             + ',' + st.db.escape(message) + ',' + st.db.escape(categoryId)
-                            + ',' + st.db.escape(pic);
+                            + ',' + st.db.escape(pic)+ ',' + st.db.escape(picFilename)
+                            + ',' + st.db.escape(attachment) + ',' + st.db.escape(aFilename)
+                            + ',' + st.db.escape(videoUrl)+ ',' + st.db.escape(vFilename);
 
                         var query = 'CALL ppostservice(' + queryParams + ')';
                         console.log(query);
@@ -757,8 +919,12 @@ Service.prototype.createService = function(req,res,next){
                                         master_id: masterId,
                                         message: req.body.message,
                                         cid: categoryId,
-                                        pic: pic ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pic : ''
-
+                                        pic_url : req.body.pic_url ? req.body.pic_url :'',
+                                        pic_fn : req.body.pic_fn ? req.body.pic_fn :'',
+                                        a_url : req.body.a_url ? req.body.a_url :'',
+                                        a_fn : req.body.a_fn ? req.body.a_fn :'',
+                                        video_url : req.body.video_url ? req.body.video_url :'',
+                                        video_fn : req.body.video_fn ? req.body.video_fn :''
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnCreateService: Service Created successfully');
