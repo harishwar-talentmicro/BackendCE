@@ -473,12 +473,11 @@ Job.prototype.create = function(req,res,next){
                                                                     var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeoneId);
                                                                     st.db.query(name, function (err, companyResult) {
                                                                         if (companyResult) {
+                                                                            var cn= '';
                                                                             if(companyResult[0]){
-                                                                                var cn = companyResult[0].CompanyName;
+                                                                                cn = companyResult[0].CompanyName;
                                                                             }
-                                                                            else{
-                                                                                var cn= '';
-                                                                            }
+
                                                                             data = data.replace("[JobType]", jobtype);
                                                                             data = data.replace("[JobTitle]", jobTitle);
                                                                             data = data.replace("[JobCode]", jobCode);

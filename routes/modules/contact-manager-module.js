@@ -399,11 +399,14 @@ ContactManager.prototype.saveClient = function(req,res,next) {
                             //console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
+                                    }
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Client saved successfully';
                                     responseMessage.data = {
-                                        id: insertresult[0][0] ? parseInt(insertresult[0][0].id) : 0,
+                                        id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)): 0,
                                         cc: req.body.cc,
                                         ct: req.body.ct,
                                         cs: parseInt(req.body.cs)
@@ -545,23 +548,38 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
                             //console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'ClientContct saved successfully';
-                                    responseMessage.data = {
-                                        id: insertresult[0][0] ? parseInt(insertresult[0][0].id) : 0,
-                                        fn: req.body.fn,
-                                        ln: req.body.ln,
-                                        jt: req.body.jt,
-                                        mn: req.body.mn,
-                                        em: req.body.em,
-                                        ph: req.body.ph,
-                                        st: parseInt(req.body.st),
-                                        cid: parseInt(req.body.cid)
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
 
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveClientContact: ClientContct saved successfully');
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'ClientContct saved successfully';
+                                            responseMessage.data = {
+                                                id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)):0,
+                                                fn: req.body.fn,
+                                                ln: req.body.ln,
+                                                jt: req.body.jt,
+                                                mn: req.body.mn,
+                                                em: req.body.em,
+                                                ph: req.body.ph,
+                                                st: parseInt(req.body.st),
+                                                cid: parseInt(req.body.cid)
+
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveClientContact: ClientContct saved successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'No save ClientContct';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveClientContact:No save ClientContct');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'No save ClientContct';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveClientContact:No save ClientContct');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'No save ClientContct';
