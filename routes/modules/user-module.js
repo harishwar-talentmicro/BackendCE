@@ -355,7 +355,7 @@ User.prototype.getCity = function(req,res,next){
             var Query = 'Select  CityID, CityName from mcity where LangID=' + st.db.escape(LangID) + ' and StateID= ' + st.db.escape(StateID);
             st.db.query(Query, function (err, CityResult) {
                 if (!err) {
-                    if (CityResult.length > 0) {
+                    if (CityResult.length) {
                         res.send(CityResult);
                         console.log('FnGetCity: mcity: City sent successfully');
                     }
@@ -700,86 +700,90 @@ User.prototype.forgetPassword = function(req,res,next){
                             //console.log(UserQuery);
                             st.db.query(UserQuery, function (err, UserResult) {
                                 if (!err) {
+
                                     if(UserResult){
-                                        {
+                                        if(UserResult.EMailID) {
+                                                UserResult[0].FirstName = (UserResult[0].FirstName) ? UserResult[0].FirstName : 'Anonymous';
+                                                UserResult[0].LastName = (UserResult[0].LastName) ? UserResult[0].LastName : ' ';
+                                                var fs = require('fs');
+                                                var path = require('path');
+                                                var file = path.join(__dirname, '../../mail/templates/password_reset_req.html');
 
-                                            //console.log(UserResult);
-                                            UserResult[0].FirstName = (UserResult[0].FirstName) ? UserResult[0].FirstName : 'Anonymous';
-                                            UserResult[0].LastName = (UserResult[0].LastName) ? UserResult[0].LastName : ' ';
-                                            var fs = require('fs');
-                                            var path = require('path');
-                                            var file = path.join(__dirname,'../../mail/templates/password_reset_req.html');
+                                                fs.readFile(file, "utf8", function (err, data) {
 
-                                            fs.readFile(file, "utf8", function (err, data) {
+                                                    if (err) throw err;
+                                                    var passwordResetLink = req.CONFIG.SCHEME + "://" + req.CONFIG.DOMAIN + "/" +
+                                                        req.CONFIG.PASS_RESET_PAGE_LINK + "/" + EZEID + "/" + resetCode
+                                                    data = data.replace("[Firstname]", UserResult[0].FirstName);
+                                                    data = data.replace("[Lastname]", UserResult[0].LastName);
+                                                    data = data.replace("[reset link]", passwordResetLink);
+                                                    data = data.replace("[resetlink]", passwordResetLink);
 
-                                                if (err) throw err;
-                                                var passwordResetLink = req.CONFIG.SCHEME + "://" + req.CONFIG.DOMAIN + "/" +
-                                                    req.CONFIG.PASS_RESET_PAGE_LINK + "/" + EZEID + "/" + resetCode
-                                                data = data.replace("[Firstname]", UserResult[0].FirstName);
-                                                data = data.replace("[Lastname]", UserResult[0].LastName);
-                                                data = data.replace("[reset link]", passwordResetLink);
-                                                data = data.replace("[resetlink]", passwordResetLink);
+                                                    //console.log(UserResult);
+                                                    //console.log('Body:' + data);
+                                                    var mailOptions = {
+                                                        from: EZEIDEmail,
+                                                        to: UserResult[0].EMailID,
+                                                        subject: 'EZEOne : Password reset request',
+                                                        html: data // html body
+                                                    };
 
-                                                //console.log(UserResult);
-                                                //console.log('Body:' + data);
-                                                var mailOptions = {
-                                                    from: EZEIDEmail,
-                                                    to: UserResult[0].EMailID,
-                                                    subject: 'EZEOne : Password reset request',
-                                                    html: data // html body
-                                                };
+                                                    // send mail with defined transport object
+                                                    //message Type 7 - Forgot password mails service
+                                                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                                    var email = new sendgrid.Email();
+                                                    email.from = mailOptions.from;
+                                                    email.to = mailOptions.to;
+                                                    email.subject = mailOptions.subject;
+                                                    email.html = mailOptions.html;
 
-                                                // send mail with defined transport object
-                                                //message Type 7 - Forgot password mails service
-                                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                                var email = new sendgrid.Email();
-                                                email.from = mailOptions.from;
-                                                email.to = mailOptions.to;
-                                                email.subject = mailOptions.subject;
-                                                email.html = mailOptions.html;
-
-                                                sendgrid.send(email, function (err, result) {
-                                                    console.log(result);
-                                                    if (!err) {
-                                                        if (result.message == 'success') {
-                                                            var post = {
-                                                                MessageType: 7,
-                                                                Priority: 1,
-                                                                ToMailID: mailOptions.to,
-                                                                Subject: mailOptions.subject,
-                                                                Body: mailOptions.html,
-                                                                SentbyMasterID: UserResult[0].TID,
-                                                                SentStatus: 1
-                                                            };
-                                                            //console.log(post);
-                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                // Neat!
-                                                                if (!err) {
-                                                                    console.log('FnForgetPassword: Mail saved Successfully');
-                                                                    RtnMessage.IsChanged = true;
-                                                                    RtnMessage.mailSend = true;
-                                                                    res.send(RtnMessage);
-                                                                }
-                                                                else {
-                                                                    console.log('FnForgetPassword: Mail not Saved Successfully' + err);
-                                                                    res.send(RtnMessage);
-                                                                }
-                                                            });
+                                                    sendgrid.send(email, function (err, result) {
+                                                        console.log(result);
+                                                        if (!err) {
+                                                            if (result.message == 'success') {
+                                                                var post = {
+                                                                    MessageType: 7,
+                                                                    Priority: 1,
+                                                                    ToMailID: mailOptions.to,
+                                                                    Subject: mailOptions.subject,
+                                                                    Body: mailOptions.html,
+                                                                    SentbyMasterID: UserResult[0].TID,
+                                                                    SentStatus: 1
+                                                                };
+                                                                //console.log(post);
+                                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                    // Neat!
+                                                                    if (!err) {
+                                                                        console.log('FnForgetPassword: Mail saved Successfully');
+                                                                        RtnMessage.IsChanged = true;
+                                                                        RtnMessage.mailSend = true;
+                                                                        res.send(RtnMessage);
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                                                        res.send(RtnMessage);
+                                                                    }
+                                                                });
+                                                            }
+                                                            else {
+                                                                console.log('FnForgetPassword: Mail not Saved Successfully' + err);
+                                                                res.send(RtnMessage);
+                                                            }
                                                         }
                                                         else {
                                                             console.log('FnForgetPassword: Mail not Saved Successfully' + err);
                                                             res.send(RtnMessage);
                                                         }
-                                                    }
-                                                    else {
-                                                        console.log('FnForgetPassword: Mail not Saved Successfully' + err);
-                                                        res.send(RtnMessage);
-                                                    }
+                                                    });
                                                 });
-                                            });
 
-                                            console.log('FnForgetPassword: Password reset successfully');
                                         }
+                                        else{
+                                            console.log('FnForgetPassword: mail not sended Missing destination email');
+                                            res.send(RtnMessage);
+                                        }
+                                            console.log('FnForgetPassword: Password reset successfully');
+
                                     }
                                     else{
                                         RtnMessage.IsChanged = false;
@@ -1206,20 +1210,18 @@ User.prototype.saveCompanyProfile = function(req,res,next){
                     if (Result) {
                         var query = st.db.escape(Token)+ ',' + st.db.escape(CompanyProfile);
                         st.db.query('CALL pSaveTagLine(' + query + ')', function (err, InsertResult) {
-                            //console.log(InsertResult[0]);
                             if (!err) {
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    RtnMessage.Message = 'Inserted successfully';
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveCompanyProfile:Inserted sucessfully..');
-                                }
-                                else
-                                {
-                                    RtnMessage.Message = 'Not inserted';
-                                    console.log('FnSaveCompanyProfile:No Inserted sucessfully..');
-                                    res.send(RtnMessage);
-                                }
+                                    if (InsertResult.affectedRows > 0) {
+                                        RtnMessage.IsSuccessfull = true;
+                                        RtnMessage.Message = 'Inserted successfully';
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveCompanyProfile:Inserted sucessfully..');
+                                    }
+                                    else {
+                                        RtnMessage.Message = 'Not inserted';
+                                        console.log('FnSaveCompanyProfile:No Inserted sucessfully..');
+                                        res.send(RtnMessage);
+                                    }
                             }
                             else
                             {
@@ -1292,8 +1294,16 @@ User.prototype.getWebLink = function(req,res,next){
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0]) {
-                                        console.log('FnGetWebLink: Web Links Send successfully');
-                                        res.send(GetResult[0]);
+                                        if(GetResult[0].length >0){
+                                            console.log('FnGetWebLink: Web Links Send successfully');
+                                            res.send(GetResult[0]);
+                                        }
+                                        else {
+
+                                            console.log('FnGetWebLink:No Web Links found');
+                                            res.json(null);
+                                        }
+
                                     }
                                     else {
 
