@@ -77,8 +77,8 @@ BufferStream.prototype._read = function( size ) {
 };
 
 
-var NotificationMqtt = require('./notification/notification-mqtt.js');
-var notificationMqtt = new NotificationMqtt();
+//var NotificationMqtt = require('./notification/notification-mqtt.js');
+//var notificationMqtt = new NotificationMqtt();
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notificationQmManager = null;
 var mailModule = require('./mail-module.js');
@@ -419,13 +419,13 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                              * Creating queue for the user dynamically on rabbit server
                                              *
                                              */
-                                            notificationQmManager.getIndividualGroupId(RegResult[0].TID,function(err1,getIndividualGroupIdRes){
-                                                if(!err1){
-                                                    if(getIndividualGroupIdRes){
-                                                        notificationMqtt.createQueue(getIndividualGroupIdRes.tid);
-                                                    }
-                                                }
-                                            });
+                                            //notificationQmManager.getIndividualGroupId(RegResult[0].TID,function(err1,getIndividualGroupIdRes){
+                                            //    if(!err1){
+                                            //        if(getIndividualGroupIdRes){
+                                            //            notificationMqtt.createQueue(getIndividualGroupIdRes.tid);
+                                            //        }
+                                            //    }
+                                            //});
 
                                             //res.send(RtnMessage);
                                             if(isIphone == 1){
