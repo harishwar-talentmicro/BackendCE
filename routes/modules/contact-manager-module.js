@@ -405,7 +405,7 @@ ContactManager.prototype.saveClient = function(req,res,next) {
                                             responseMessage.error = null;
                                             responseMessage.message = 'Client saved successfully';
                                             responseMessage.data = {
-                                                id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)): 0,
+                                                id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)) : 0,
                                                 cc: req.body.cc,
                                                 ct: req.body.ct,
                                                 cs: parseInt(req.body.cs)
@@ -420,165 +420,165 @@ ContactManager.prototype.saveClient = function(req,res,next) {
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'An error occured ! Please try again';
-                                        res.status(500).json(responseMessage);
-                                        console.log('FnSaveClient: error in saving Client:' + err);
+                                        responseMessage.message = 'No save Client';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveClient:No save Client');
                                     }
-                                });
+                                }
+                                else {
+                                    responseMessage.message = 'No save Client';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveClient:No save Client');
+                                }
                             }
                             else {
-                                responseMessage.message = 'Invalid token';
-                                responseMessage.error = {
-                                    token: 'Invalid token'
-                                };
-                                responseMessage.data = null;
-                                res.status(401).json(responseMessage);
-                                console.log('FnSaveClient: Invalid token');
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveClient: error in saving Client:' + err);
                             }
-                        }
+                        });
+                    }
                     else {
-                            responseMessage.error = {
-                                server: 'Internal server error'
-                            };
-                            responseMessage.message = 'Error in validating Token';
-                            res.status(500).json(responseMessage);
-                            console.log('FnSaveClient:Error in processing Token' + err);
-                        }
-                    });
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveClient: Invalid token');
+                    }
                 }
-                catch(ex){
+                else {
                     responseMessage.error = {
-                        server: 'Internal Server error'
+                        server: 'Internal server error'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    console.log('FnSaveClient:error ' + ex.description);
-                    console.log(ex);
-                    var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
-                    res.status(400).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveClient:Error in processing Token' + err);
                 }
-            }
-        };
-
-        /**
-         * @todo FnSaveClientContact
-         * Method : POST
-         * @param req
-         * @param res
-         * @param next
-         * @server_param
-         * token* <CHAR(36)>
-         * id*    <INT>            if id=0 for new else its id
-         * fn     <VARCHAR(30)>    first name
-         * ln     <VARCHAR(30)>    last name
-         * jt     <VARCHAR(100)>   job title
-         * mn     <VARCHAR(12)>    mobile number
-         * em     <VARCHAR(150)>   email
-         * ph     <VARCHAR(12)>    phone no
-         * st*    <TINYINT>        status //(1-active, 2-deactive)
-         * cid*   <INT>            client id
-         * @description save client
-         */
-        ContactManager.prototype.saveClientContact = function(req,res,next) {
-            var _this = this;
-
-            var token = req.body.token;
-            var id = parseInt(req.body.id);
-            var clientId = parseInt(req.body.cid);
-            var firstName = req.body.fn;
-            var lastName = req.body.ln;
-            var mobile = req.body.mn;
-            var email = req.body.em;
-            var phone = req.body.ph;
-            var jobTitle = req.body.jt;
-            var status = parseInt(req.body.st);    //(1-active, 2-deactive)
-
-
-            var responseMessage = {
-                status: false,
-                error: {},
-                message: '',
-                data: null
+            });
+        }
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
             };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSaveClient:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
 
-            var error = {},validateStatus = true;
+/**
+ * @todo FnSaveClientContact
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @server_param
+ * token* <CHAR(36)>
+ * id*    <INT>            if id=0 for new else its id
+ * fn     <VARCHAR(30)>    first name
+ * ln     <VARCHAR(30)>    last name
+ * jt     <VARCHAR(100)>   job title
+ * mn     <VARCHAR(12)>    mobile number
+ * em     <VARCHAR(150)>   email
+ * ph     <VARCHAR(12)>    phone no
+ * st*    <TINYINT>        status //(1-active, 2-deactive)
+ * cid*   <INT>            client id
+ * @description save client
+ */
+ContactManager.prototype.saveClientContact = function(req,res,next) {
+    var _this = this;
 
-            if(!token){
-                error['token'] = 'Invalid token';
-                validateStatus *= false;
-            }
-            if(!id){
-                id = 0;
-            }
-            if(parseInt(id) == NaN){
-                error['tid'] = 'Invalid id';
-                validateStatus *= false;
-            }
-            if(!clientId){
-                error['clientId'] = 'Invalid cid';
-                validateStatus *= false;
-            }
-            if(!status){
-                error['status'] = 'Invalid status';
-                validateStatus *= false;
-            }
+    var token = req.body.token;
+    var id = parseInt(req.body.id);
+    var clientId = parseInt(req.body.cid);
+    var firstName = req.body.fn;
+    var lastName = req.body.ln;
+    var mobile = req.body.mn;
+    var email = req.body.em;
+    var phone = req.body.ph;
+    var jobTitle = req.body.jt;
+    var status = parseInt(req.body.st);    //(1-active, 2-deactive)
 
 
-            if(!validateStatus){
-                responseMessage.status = false;
-                responseMessage.message = 'Please check the errors below';
-                responseMessage.error = error;
-                responseMessage.data = null;
-                res.status(400).json(responseMessage);
-            }
-            else{
-                try {
-                    st.validateToken(token, function (err, result) {
-                        if (!err) {
-                            if (result) {
-                                var queryParams = st.db.escape(token) + ',' + st.db.escape(id) + ',' + st.db.escape(clientId)
-                                    + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName)
-                                    + ',' + st.db.escape(mobile) + ',' + st.db.escape(email)
-                                    + ',' + st.db.escape(phone) + ',' + st.db.escape(jobTitle)
-                                    + ',' + st.db.escape(status);
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
 
-                                var query = 'CALL pSaveClientcontact(' + queryParams + ')';
+    var error = {},validateStatus = true;
 
-                                st.db.query(query, function (err, insertresult) {
-                                    //console.log(insertresult);
-                                    if (!err) {
-                                        if (insertresult) {
-                                            if (insertresult[0]) {
-                                                if (insertresult[0][0]) {
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!id){
+        id = 0;
+    }
+    if(parseInt(id) == NaN){
+        error['tid'] = 'Invalid id';
+        validateStatus *= false;
+    }
+    if(!clientId){
+        error['clientId'] = 'Invalid cid';
+        validateStatus *= false;
+    }
+    if(!status){
+        error['status'] = 'Invalid status';
+        validateStatus *= false;
+    }
 
-                                                    responseMessage.status = true;
-                                                    responseMessage.error = null;
-                                                    responseMessage.message = 'ClientContct saved successfully';
-                                                    responseMessage.data = {
-                                                        id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)):0,
-                                                        fn: req.body.fn,
-                                                        ln: req.body.ln,
-                                                        jt: req.body.jt,
-                                                        mn: req.body.mn,
-                                                        em: req.body.em,
-                                                        ph: req.body.ph,
-                                                        st: parseInt(req.body.st),
-                                                        cid: parseInt(req.body.cid)
 
-                                                    };
-                                                    res.status(200).json(responseMessage);
-                                                    console.log('FnSaveClientContact: ClientContct saved successfully');
-                                                }
-                                                else {
-                                                    responseMessage.message = 'No save ClientContct';
-                                                    res.status(200).json(responseMessage);
-                                                    console.log('FnSaveClientContact:No save ClientContct');
-                                                }
-                                            }
-                                            else {
-                                                responseMessage.message = 'No save ClientContct';
-                                                res.status(200).json(responseMessage);
-                                                console.log('FnSaveClientContact:No save ClientContct');
-                                            }
+    if(!validateStatus){
+        responseMessage.status = false;
+        responseMessage.message = 'Please check the errors below';
+        responseMessage.error = error;
+        responseMessage.data = null;
+        res.status(400).json(responseMessage);
+    }
+    else{
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(id) + ',' + st.db.escape(clientId)
+                            + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName)
+                            + ',' + st.db.escape(mobile) + ',' + st.db.escape(email)
+                            + ',' + st.db.escape(phone) + ',' + st.db.escape(jobTitle)
+                            + ',' + st.db.escape(status);
+
+                        var query = 'CALL pSaveClientcontact(' + queryParams + ')';
+
+                        st.db.query(query, function (err, insertresult) {
+                            //console.log(insertresult);
+                            if (!err) {
+                                if (insertresult) {
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
+
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'ClientContct saved successfully';
+                                            responseMessage.data = {
+                                                id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)):0,
+                                                fn: req.body.fn,
+                                                ln: req.body.ln,
+                                                jt: req.body.jt,
+                                                mn: req.body.mn,
+                                                em: req.body.em,
+                                                ph: req.body.ph,
+                                                st: parseInt(req.body.st),
+                                                cid: parseInt(req.body.cid)
+
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveClientContact: ClientContct saved successfully');
                                         }
                                         else {
                                             responseMessage.message = 'No save ClientContct';
@@ -587,44 +587,56 @@ ContactManager.prototype.saveClient = function(req,res,next) {
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'An error occured ! Please try again';
-                                        res.status(500).json(responseMessage);
-                                        console.log('FnSaveClientContact: error in saving ClientContct:' + err);
+                                        responseMessage.message = 'No save ClientContct';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveClientContact:No save ClientContct');
                                     }
-                                });
+                                }
+                                else {
+                                    responseMessage.message = 'No save ClientContct';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveClientContact:No save ClientContct');
+                                }
                             }
                             else {
-                                responseMessage.message = 'Invalid token';
-                                responseMessage.error = {
-                                    token: 'Invalid token'
-                                };
-                                responseMessage.data = null;
-                                res.status(401).json(responseMessage);
-                                console.log('FnSaveClientContact: Invalid token');
+                                responseMessage.message = 'An error occured ! Please try again';
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveClientContact: error in saving ClientContct:' + err);
                             }
-                        }
-                        else {
-                            responseMessage.error = {
-                                server: 'Internal server error'
-                            };
-                            responseMessage.message = 'Error in validating Token';
-                            res.status(500).json(responseMessage);
-                            console.log('FnSaveClientContact:Error in processing Token' + err);
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveClientContact: Invalid token');
+                    }
                 }
-                catch(ex){
+                else {
                     responseMessage.error = {
-                        server: 'Internal Server error'
+                        server: 'Internal server error'
                     };
-                    responseMessage.message = 'An error occurred !';
-                    console.log('FnSaveClientContact:error ' + ex.description);
-                    console.log(ex);
-                    var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
-                    res.status(400).json(responseMessage);
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveClientContact:Error in processing Token' + err);
                 }
-            }
-        };
+            });
+        }
+        catch(ex){
+            responseMessage.error = {
+                server: 'Internal Server error'
+            };
+            responseMessage.message = 'An error occurred !';
+            console.log('FnSaveClientContact:error ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
 
 
-        module.exports = ContactManager;
+module.exports = ContactManager;
