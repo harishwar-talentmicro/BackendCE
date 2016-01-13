@@ -858,6 +858,7 @@ Mail.prototype.businessMail = function(req,res,next) {
         var recipientsCc = req.body.recipients_cc;
         var recipientsBcc = req.body.recipients_bcc;
         var body = req.body.body;
+        var sender;
 
         var util = require('util');
         util.isArray(recipients);
@@ -907,8 +908,18 @@ Mail.prototype.businessMail = function(req,res,next) {
                                         if (userstatusResult[0][0]) {
                                             if (userstatusResult[0][0].verified == 2) {
 
+                                                if(userstatusResult[0][0].CVMailID){
+                                                    sender = userstatusResult[0][0].CVMailID;
+                                                }
+                                                else if(userstatusResult[0][0].AdminEmailID){
+                                                    sender = userstatusResult[0][0].AdminEmailID;
+                                                }
+                                                else{
+                                                    sender = 'noreply@ezeone.com';
+                                                }
+
                                                 var email = new sendgrid.Email();
-                                                email.from = 'noreply@ezeone.com';
+                                                email.from = sender;
                                                 email.setTos(recipients);
                                                 email.setCcs(recipientsCc);
                                                 email.setBccs(recipientsBcc);

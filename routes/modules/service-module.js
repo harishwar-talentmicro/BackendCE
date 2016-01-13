@@ -534,7 +534,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(serviceId);
+                        var queryParams =   st.db.escape(serviceId)+','+ st.db.escape(token);
                         var query = 'CALL ploadservicedetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, details) {

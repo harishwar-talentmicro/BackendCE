@@ -263,8 +263,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
     var latitude = req.body.Latitude ? req.body.Latitude : 0.00;
     var longitude = req.body.Longitude ? req.body.Longitude : 0.00;
     var altitude = req.body.Altitude ? req.body.Altitude : 0.00;
-    var addressLine1 = req.body.AddressLine1;
-    var addressLine2 = req.body.AddressLine2;
+    var addressLine1 = req.body.AddressLine1 ? req.body.AddressLine1 : '';
+    var addressLine2 = req.body.AddressLine2 ? req.body.AddressLine2 : '';
     var cityTitle = req.body.CityTitle ? req.body.CityTitle : '';
     var stateId = req.body.StateID ? req.body.StateID : 0;
     var countryId = req.body.CountryID ? req.body.CountryID : 0;
@@ -276,7 +276,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
     var picture = req.body.Picture;
     var pictureFileName = req.body.PictureFileName;
     var webSite = req.body.Website ? req.body.Website : '';
-    var aboutCompany = req.body.AboutCompany;
+    var aboutCompany = req.body.AboutCompany ? req.body.AboutCompany : '';
     var token = req.body.Token ? req.body.Token : '';
     var operation = "I";
     if (token) {
@@ -604,7 +604,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
             }
             else {
                 console.log('----------Operation type other than 1--------------');
-                if (idtypeId && ezeid && addressLine1 && cityTitle && stateId && countryId && postalCode) {
+                if (ezeid) {
                     if (password) {
                         encryptPwd = hashPassword(password);
                     }
@@ -720,7 +720,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                                 else {
                                                     console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
                                                     //console.log(rtnMessage);
-                                                    res.send(rtnMessage);
+                                                    //res.send(rtnMessage);
                                                 }
                                             }
                                             else {
@@ -768,20 +768,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                     });
                 }
                 else {
-                    if (!idtypeId) {
-                        console.log('FnRegistration: IDTypeID is empty');
-                    } else if (!ezeid) {
+                    if (!ezeid) {
                         console.log('FnRegistration: EZEID is empty');
-                    } else if (!addressLine1) {
-                        console.log('FnRegistration: AddressLine1 is empty');
-                    } else if (!cityTitle) {
-                        console.log('FnRegistration: CityTitle is empty');
-                    } else if (!stateId) {
-                        console.log('FnRegistration: StateID is empty');
-                    } else if (!countryId) {
-                        console.log('FnRegistration: CountryID is empty');
-                    } else if (!postalCode) {
-                        console.log('FnRegistration: PostalCode is empty');
                     }
                     res.statusCode = 400;
                     res.send(rtnMessage);
@@ -5814,7 +5802,7 @@ Alumni.prototype.searchAlumni = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var title = req.query.title ? req.query.title : '';
+    var title = req.query.title ? alterEzeoneId(req.query.title) : '';
 
     var responseMessage = {
         status: false,
@@ -5842,6 +5830,7 @@ Alumni.prototype.searchAlumni = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(title)+','+st.db.escape(token);
                         var query = 'CALL pFindAlumni(' + queryParams + ')';
+                        console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
                                 if (getresult) {
