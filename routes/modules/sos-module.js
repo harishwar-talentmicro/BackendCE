@@ -86,45 +86,45 @@ Sos.prototype.saveSos = function(req,res,next) {
                     for (var i = 0; i < insertResult[0].length; i++) {
                         var queryParameters = 'select EZEID,tid,IPhoneDeviceID as iphoneID from tmaster where tid=' + insertResult[0][i].masterid;
                         console.log(queryParameters);
-                        st.db.query(queryParameters, function (err, iosResult) {
-                            console.log(iosResult);
-                            if (iosResult) {
-                                iphoneID = iosResult[0].iphoneID;
-                            }
-                            else {
-                                iphoneID = '';
-                            }
-                            console.log(iosResult[0].tid);
-                            var queryParams2 = 'select tid,GroupName from tmgroups where AdminID=' + iosResult[0].tid +' and grouptype=1';
-                            console.log(queryParams2);
-                            st.db.query(queryParams2, function (err, userDetails) {
-                                console.log(userDetails);
-
-                                if (userDetails) {
-                                    if (userDetails[0]) {
-
-                                        var receiverId = userDetails[0].tid;
-                                        var senderTitle = {
-                                            b1 : req.body.b1 ? req.body.b1 : 0,
-                                            b2 : req.body.b2 ? req.body.b2 : 0,
-                                            b3 : req.body.b3 ? req.body.b3 : 0,
-                                            b4 : req.body.b4 ? req.body.b4 : 0,
-                                            b5 : req.body.b5 ? req.body.b5 : 0
-                                        };
-                                        var groupId = '';
-                                        var groupTitle = userDetails[0].GroupName;
-                                        var messageText = 'sos request';
-                                        var messageType = 10;
-                                        var operationType = 0;
-                                        var iphoneId = iphoneID;
-                                        var messageId = '', msgUserid = '', masterid = '', prioritys = '';
-                                        var a_name = '', dateTime = '', latitude = req.body.lat, longitude = req.body.lng;
-                                        //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
-                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                        st.db.query(queryParameters, function (err, details) {
+                            console.log(details);
+                            if (details) {
+                                if(details[0]) {
+                                    if(details[0].length > 0) {
+                                        iphoneID = details[0].iphoneID;
                                     }
-                                }
-                            });
 
+                                    var queryParams2 = 'select tid,GroupName from tmgroups where AdminID=' + details[0].tid +' and grouptype=1';
+                                    console.log(queryParams2);
+                                    st.db.query(queryParams2, function (err, userDetails) {
+                                        console.log(userDetails);
+
+                                        if (userDetails) {
+                                            if (userDetails[0]) {
+
+                                                var receiverId = userDetails[0].tid;
+                                                var senderTitle = {
+                                                    b1 : req.body.b1 ? req.body.b1 : 0,
+                                                    b2 : req.body.b2 ? req.body.b2 : 0,
+                                                    b3 : req.body.b3 ? req.body.b3 : 0,
+                                                    b4 : req.body.b4 ? req.body.b4 : 0,
+                                                    b5 : req.body.b5 ? req.body.b5 : 0
+                                                };
+                                                var groupId = '';
+                                                var groupTitle = userDetails[0].GroupName;
+                                                var messageText = 'sos request';
+                                                var messageType = 10;
+                                                var operationType = 0;
+                                                var iphoneId = iphoneID;
+                                                var messageId = '', msgUserid = '', masterid = '', prioritys = '';
+                                                var a_name = '', dateTime = '', latitude = req.body.lat, longitude = req.body.lng;
+                                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
                         });
                     }
                 }
@@ -335,29 +335,43 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
             //console.log(updateResult);
             if (!err) {
                 if (updateResult) {
-                    responseMessage.status = true;
-                    responseMessage.error = null;
-                    responseMessage.message = 'SosRequest update successfully';
-                    res.status(200).json(responseMessage);
-                    console.log('FnUpdateSosRequest: SosRequest update successfully');
+                    if(updateResult[0]) {
+                        if(updateResult[0][0]){
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'SosRequest update successfully';
+                            res.status(200).json(responseMessage);
+                            console.log('FnUpdateSosRequest: SosRequest update successfully');
 
-                    /**
-                     * send push notification for sos request
-                     */
+                            /**
+                             * send push notification for sos request
+                             */
 
-                    var receiverId = updateResult[0][0].deviceid;
-                    var senderTitle = '';
-                    var groupId = '';
-                    var contact = updateResult[0][0].contactnu +','+ updateResult[0][0].name;
-                    var groupTitle = contact;
-                    var messageText = 'accepted by ';
-                    var messageType = 11;
-                    var operationType = 0;
-                    var iphoneId = iphoneID;
-                    var messageId = '', msgUserid = '', masterid = '', prioritys = '';
-                    var a_name = '', dateTime = '', latitude = '', longitude = '';
+                            var receiverId = updateResult[0][0].deviceid;
+                            var senderTitle = '';
+                            var groupId = '';
+                            var contact = updateResult[0][0].contactnu + ',' + updateResult[0][0].name;
+                            var groupTitle = contact;
+                            var messageText = 'accepted by ';
+                            var messageType = 11;
+                            var operationType = 0;
+                            var iphoneId = iphoneID;
+                            var messageId = '', msgUserid = '', masterid = '', prioritys = '';
+                            var a_name = '', dateTime = '', latitude = '', longitude = '';
 
-                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                        }
+                        else {
+                            responseMessage.message = 'SosRequest not update';
+                            res.status(200).json(responseMessage);
+                            console.log('FnUpdateSosRequest:SosRequest not update');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'SosRequest not update';
+                        res.status(200).json(responseMessage);
+                        console.log('FnUpdateSosRequest:SosRequest not update');
+                    }
                 }
                 else {
                     responseMessage.message = 'SosRequest not update';

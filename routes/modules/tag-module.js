@@ -266,45 +266,47 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                                 st.db.query(query, function (err, idResult) {
                                     if (!err) {
                                         if (idResult) {
-                                            if (idResult[0].idtype == 1) {
-                                                console.log('individual user');
-                                                var imageParams = {
-                                                    path: req.files.image.path,
-                                                    type: req.files.image.extension,
-                                                    width: '200',
-                                                    height: '200',
-                                                    scale: true,
-                                                    crop: true
-                                                };
-                                                //console.log(imageParams);
-                                                FnCropImage(imageParams, function (err, bufferData) {
+                                            if(idResult[0]) {
+                                                if (idResult[0].idtype == 1) {
+                                                    console.log('individual user');
+                                                    var imageParams = {
+                                                        path: req.files.image.path,
+                                                        type: req.files.image.extension,
+                                                        width: '200',
+                                                        height: '200',
+                                                        scale: true,
+                                                        crop: true
+                                                    };
+                                                    //console.log(imageParams);
+                                                    FnCropImage(imageParams, function (err, bufferData) {
 
-                                                    if (bufferData) {
+                                                        if (bufferData) {
 
-                                                        imageBuffer = bufferData;
-                                                        uploadtoServer(imageBuffer);
-                                                    }
-                                                });
-                                            }
-                                            else{
-                                                console.log('business user');
-                                                var imageParams = {
-                                                    path: req.files.image.path,
-                                                    type: req.files.image.extension,
-                                                    width: '880',
-                                                    height: '293',
-                                                    scale: true,
-                                                    crop: true
-                                                };
-                                                //console.log(imageParams);
-                                                FnCropImage(imageParams, function (err, bufferData) {
+                                                            imageBuffer = bufferData;
+                                                            uploadtoServer(imageBuffer);
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    console.log('business user');
+                                                    var imageParams = {
+                                                        path: req.files.image.path,
+                                                        type: req.files.image.extension,
+                                                        width: '880',
+                                                        height: '293',
+                                                        scale: true,
+                                                        crop: true
+                                                    };
+                                                    //console.log(imageParams);
+                                                    FnCropImage(imageParams, function (err, bufferData) {
 
-                                                    if (bufferData) {
+                                                        if (bufferData) {
 
-                                                        imageBuffer = bufferData;
-                                                        uploadtoServer(imageBuffer);
-                                                    }
-                                                });
+                                                            imageBuffer = bufferData;
+                                                            uploadtoServer(imageBuffer);
+                                                        }
+                                                    });
+                                                }
                                             }
                                         }
                                     }
@@ -354,18 +356,25 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                                     console.log(query);
                                     st.db.query(query, function (err, insertResult) {
                                         if (!err) {
-                                            if (insertResult.affectedRows > 0) {
-                                                responseMessage.status = true;
-                                                responseMessage.error = null;
-                                                responseMessage.message = 'Tags Save successfully';
-                                                responseMessage.data = {
-                                                    type: 0,
-                                                    tag: tag,
-                                                    pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
-                                                    s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
-                                                };
-                                                res.status(200).json(responseMessage);
-                                                console.log('FnSaveStandardTags: Tags Save successfully');
+                                            if(insertResult) {
+                                                if (insertResult.affectedRows > 0) {
+                                                    responseMessage.status = true;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Tags Save successfully';
+                                                    responseMessage.data = {
+                                                        type: 0,
+                                                        tag: tag,
+                                                        pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
+                                                        s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                                                    };
+                                                    res.status(200).json(responseMessage);
+                                                    console.log('FnSaveStandardTags: Tags Save successfully');
+                                                }
+                                                else {
+                                                    responseMessage.message = 'Tag not Saved';
+                                                    res.status(200).json(responseMessage);
+                                                    console.log('FnSaveStandardTags:Tag not Saved');
+                                                }
                                             }
                                             else {
                                                 responseMessage.message = 'Tag not Saved';
@@ -410,18 +419,25 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                             console.log(query);
                             st.db.query(query, function (err, insertResult) {
                                 if (!err) {
-                                    if (insertResult.affectedRows > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Tags Save successfully';
-                                        responseMessage.data = {
-                                            type: 0,
-                                            tag: tag,
-                                            pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
-                                            s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveStandardTags: Tags Save successfully');
+                                    if(insertResult){
+                                        if (insertResult.affectedRows > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Tags Save successfully';
+                                            responseMessage.data = {
+                                                type: 0,
+                                                tag: tag,
+                                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
+                                                s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveStandardTags: Tags Save successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Tag not Saved';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveStandardTags:Tag not Saved');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'Tag not Saved';
@@ -968,29 +984,36 @@ Tag.prototype.getStandardTags = function(req,res,next){
                         console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
-                                if (getresult[0]) {
+                                if(getresult) {
+                                    if (getresult[0]) {
 
-                                    for( var i=0; i < getresult[0].length;i++){
-                                        var result = {};
-                                        result.tid = getresult[0][i].tid;
-                                        result.imageurl = getresult[0][i].type;
-                                        result.pin = getresult[0][i].pin;
-                                        result.imagepath = getresult[0][i].path;
-                                        result.tag = getresult[0][i].tag;
-                                        result.imagefilename = getresult[0][i].imagefilename;
-                                        result.s_url = (getresult[0][i].imageurl) ?
-                                            getresult[0][i].imagefilename :
-                                        req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].path;
-                                        output.push(result);
+                                        for (var i = 0; i < getresult[0].length; i++) {
+                                            var result = {};
+                                            result.tid = getresult[0][i].tid;
+                                            result.imageurl = getresult[0][i].type;
+                                            result.pin = getresult[0][i].pin;
+                                            result.imagepath = getresult[0][i].path;
+                                            result.tag = getresult[0][i].tag;
+                                            result.imagefilename = getresult[0][i].imagefilename;
+                                            result.s_url = (getresult[0][i].imageurl) ?
+                                                getresult[0][i].imagefilename :
+                                            req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].path;
+                                            output.push(result);
+                                        }
+
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Tags Loaded successfully';
+                                        responseMessage.data = output;
+
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetStandardTags: Tags Loaded successfully');
                                     }
-
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Tags Loaded successfully';
-                                    responseMessage.data = output;
-
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetStandardTags: Tags Loaded successfully');
+                                    else {
+                                        responseMessage.message = 'Tags not Loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetStandardTags:Tags not Loaded');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Tags not Loaded';
@@ -1090,30 +1113,37 @@ Tag.prototype.getTags = function(req,res,next){
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
                                 //console.log(getresult);
-                                if (getresult[0]) {
+                                if(getresult) {
+                                    if (getresult[0]) {
 
-                                    for( var i=0; i < getresult[0].length;i++){
-                                        var result = {};
-                                        result.tid = getresult[0][i].tid;
-                                        result.imageurl = getresult[0][i].type;
-                                        result.pin = getresult[0][i].pin;
-                                        result.imagepath = getresult[0][i].path;
-                                        result.tag = getresult[0][i].tag;
-                                        result.imagefilename = getresult[0][i].imagefilename;
-                                        result.s_url = (getresult[0][i].type) ?
-                                            getresult[0][i].path :
-                                        req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].path;
-                                        output.push(result);
+                                        for (var i = 0; i < getresult[0].length; i++) {
+                                            var result = {};
+                                            result.tid = getresult[0][i].tid;
+                                            result.imageurl = getresult[0][i].type;
+                                            result.pin = getresult[0][i].pin;
+                                            result.imagepath = getresult[0][i].path;
+                                            result.tag = getresult[0][i].tag;
+                                            result.imagefilename = getresult[0][i].imagefilename;
+                                            result.s_url = (getresult[0][i].type) ?
+                                                getresult[0][i].path :
+                                            req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].path;
+                                            output.push(result);
+                                        }
+
+
+                                        responseMessage.status = true;
+                                        responseMessage.tc = (getresult[1]) ? ((getresult[1][0]) ? getresult[1][0].tc : 0) : 0;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Tags Loaded successfully';
+                                        responseMessage.data = output;
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTags: Tags Loaded successfully');
                                     }
-
-
-                                    responseMessage.status = true;
-                                    responseMessage.tc = (getresult[1]) ? ((getresult[1][0]) ? getresult[1][0].tc : 0) : 0;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Tags Loaded successfully';
-                                    responseMessage.data = output;
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetTags: Tags Loaded successfully');
+                                    else {
+                                        responseMessage.message = 'Tags not Loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTags:Tags not Loaded');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Tags not Loaded';
@@ -1200,20 +1230,27 @@ Tag.prototype.deleteTag = function(req,res,next) {
                     st.db.query(query, function (err, deleteResult) {
                         console.log(deleteResult);
                         if (!err) {
-                            if (deleteResult.affectedRows > 0) {
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Tag deleted Successfully';
-                                responseMessage.data = {
-                                    tag : tag
-                                };
-                                res.status(200).json(responseMessage);
-                                console.log('FnDeleteTag: Tag deleted successfully');
+                            if(deleteResult) {
+                                if (deleteResult.affectedRows > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Tag deleted Successfully';
+                                    responseMessage.data = {
+                                        tag: tag
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnDeleteTag: Tag deleted successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Tag is not deleted';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnDeleteTag:Tag is not deleted1');
+                                }
                             }
                             else {
                                 responseMessage.message = 'Tag is not deleted';
                                 res.status(200).json(responseMessage);
-                                console.log('FnDeleteTag:Tag is not deleted');
+                                console.log('FnDeleteTag:Tag is not deleted2');
                             }
                         }
                         else {
