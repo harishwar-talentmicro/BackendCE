@@ -36,7 +36,7 @@ router.post('/ewLogin', authModule.login);
 router.get('/ewLogout', authModule.logout);
 router.get('/pass_reset_code',authModule.verifyResetCode);
 router.post('/verify_secret_code',authModule.verifySecretCode);
-//router.post('/otp', authModule.sendOtp);
+router.post('/otp', authModule.sendOtp);
 
 //User module methods
 var User = require('./modules/user-module.js');
@@ -191,7 +191,7 @@ router.get('/navigation',searchModule.navigateSearch);
 var Mail = require('./modules/mail-module.js');
 var mailModule = new Mail(db,stdLib);
 router.post('/ewtSendMail', mailModule.sendMail);
-//router.post('/business/mail', mailModule.businessMail);
+router.post('/business/mail', mailModule.businessMail);
 
 //Message Notification Module methods
 var MessageNotification = require('./modules/message-notification-module.js');
@@ -247,8 +247,8 @@ router.post('/job/:jobId/candidate',jobModule.addtoSelectedJob);
 router.post('/job_location',jobModule.saveJobLocation);
 router.get('/candidates_list',jobModule.getCandidatesList);
 router.post('/candidates_status',jobModule.updateCandidateStatus);
-//router.get('/auto_search',jobModule.autoSearchJobs);
-//router.post('/applicant_status',jobModule.applicantStatus);
+router.get('/auto_search',jobModule.autoSearchJobs);
+router.post('/applicant_status',jobModule.applicantStatus);
 
 //MessageBox module methods
 var Messagebox = require('./modules/messagebox-module.js');
@@ -402,9 +402,9 @@ router.post('/service_change',serviceModule.updateService);
 router.post('/join_member',serviceModule.addMembersToService);
 router.get('/joined_community',serviceModule.getJoinedCommunity);
 router.delete('/community_member',serviceModule.deleteCommunityMember);
-//router.post('/service_pic',serviceModule.saveServicePic);
-//router.post('/service_attachment',serviceModule.saveServiceAttachment);
-//router.post('/service_video',serviceModule.saveServiceVideo);
+router.post('/service_pic',serviceModule.saveServicePic);
+router.post('/service_attachment',serviceModule.saveServiceAttachment);
+router.post('/service_video',serviceModule.saveServiceVideo);
 
 
 
