@@ -135,7 +135,9 @@ NotificationMqtt.prototype.checkQueue = function(topic,callback){
         { passive : false,durable : true,exclusive : false,autoDelete : false},
         function(queRef){
             var exchange = amqpConn.exchange();
-            callback();
+            if(callback){
+                callback();
+            }
         }
     );
 };

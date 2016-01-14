@@ -7,6 +7,8 @@
 
 "use strict";
 
+
+
 var uuid = require('node-uuid');
 var stream = require( "stream" );
 var chalk = require( "chalk" );
@@ -74,10 +76,9 @@ BufferStream.prototype._read = function( size ) {
 
 };
 
-var Notification = require('./notification/notification-master.js');
-var notification = null;
-var NotificationMqtt = require('./notification/notification-mqtt.js');
-var notificationMqtt = new NotificationMqtt();
+
+//var NotificationMqtt = require('./notification/notification-mqtt.js');
+//var notificationMqtt = new NotificationMqtt();
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notificationQmManager = null;
 var mailModule = require('./mail-module.js');
@@ -202,19 +203,6 @@ function hash(password){
     }
 }
 
-function hashPassword(password){
-    if(!password){
-        return null;
-    }
-    try{
-        var hash = bcrypt.hashSync(password, 12);
-        return hash;
-    }
-    catch(ex){
-        console.log(ex);
-    }
-}
-
 /**
  * Compare the password and the hash for authenticating purposes
  * @param password
@@ -239,552 +227,525 @@ function comparePassword(password,hash){
  */
 Alumni.prototype.registerAlumni = function(req,res,next){
     /**
-     * @todo FnRegistration
+     * @todo FnRegistrationAlumni
      */
+    var _this = this;
+    try {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-    var operationType = parseInt(req.body.OperationType);
-    var ipAddress = req.ip;
-    var selectionType = (!isNaN(parseInt(req.body.SelectionType))) ?  parseInt(req.body.SelectionType) : 0;
-    var idtypeId = parseInt(req.body.IDTypeID);
-    var ezeid = req.body.EZEID ? (alterEzeoneId(req.body.EZEID).toUpperCase()):'';
-    var password = req.body.Password;
-    var firstName = req.body.FirstName ? req.body.FirstName : '';
-    var lastName = req.body.LastName ? req.body.LastName : '';
-    var companyName = req.body.CompanyName ? req.body.CompanyName : '';
-    var jobTitle = req.body.JobTitle ? req.body.JobTitle : '';
-    var categoryId = (!isNaN(parseInt(req.body.CategoryID))) ?  parseInt(req.body.CategoryID) : 0;
-    var functionId = (!isNaN(parseInt(req.body.FunctionID))) ?  parseInt(req.body.FunctionID) : 0;
-    var roleId = (!isNaN(parseInt(req.body.RoleID))) ?  parseInt(req.body.RoleID) : 0;
-    var languageId = (!isNaN(parseInt(req.body.LanguageID))) ?  parseInt(req.body.LanguageID) : 0;
-    var nameTitleId = req.body.NameTitleID;
-    var latitude = req.body.Latitude ? req.body.Latitude : 0.00;
-    var longitude = req.body.Longitude ? req.body.Longitude : 0.00;
-    var altitude = req.body.Altitude ? req.body.Altitude : 0.00;
-    var addressLine1 = req.body.AddressLine1 ? req.body.AddressLine1 : '';
-    var addressLine2 = req.body.AddressLine2 ? req.body.AddressLine2 : '';
-    var cityTitle = req.body.CityTitle ? req.body.CityTitle : '';
-    var stateId = req.body.StateID ? req.body.StateID : 0;
-    var countryId = req.body.CountryID ? req.body.CountryID : 0;
-    var postalCode = req.body.PostalCode;
-    var pin = req.body.PIN ? req.body.PIN : null;
-    var phoneNumber = req.body.PhoneNumber;
-    var mobileNumber = req.body.MobileNumber;
-    var email = req.body.EMailID;
-    var picture = req.body.Picture;
-    var pictureFileName = req.body.PictureFileName;
-    var webSite = req.body.Website ? req.body.Website : '';
-    var aboutCompany = req.body.AboutCompany ? req.body.AboutCompany : '';
-    var token = req.body.Token ? req.body.Token : '';
-    var operation = "I";
-    if (token) {
-        operation = "U";
-    }
-
-    var isdPhoneNumber =  req.body.ISDPhoneNumber ? req.body.ISDPhoneNumber : '';
-    var isdMobileNumber = req.body.ISDMobileNumber ? req.body.ISDMobileNumber : '';
-    var parkingStatus = req.body.ParkingStatus ? req.body.ParkingStatus : 0;
-    var gender = (!isNaN(parseInt(req.body.Gender))) ?  parseInt(req.body.Gender) : 2;
-    var dob = req.body.DOB ? (new Date(req.body.DOB)) : '';
-    var templateId = req.body.TemplateID ? parseInt(req.body.TemplateID) : 0;
-    var isIphone = req.body.device ? parseInt(req.body.device) : 0;
-    var deviceToken = req.body.device_token ? req.body.device_token : '';
-    var visibleEmail = (!isNaN(parseInt(req.body.ve))) ?  parseInt(req.body.ve) : 1;   // 0-invisible, 1- visible
-    var visibleMobile = (!isNaN(parseInt(req.body.vm))) ?  parseInt(req.body.vm) : 1;  // 0-invisible, 1- visible
-    var visiblePhone = (!isNaN(parseInt(req.body.vp))) ?  parseInt(req.body.vp) : 1;   // 0-invisible, 1- visible
-    var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1; // 0-invisible, 1- visible
-    var locTitle = req.body.loc_title ? req.body.loc_title : '';
-    var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
-    var apUserid = (!isNaN(parseInt(req.body.ap_userid))) ?  parseInt(req.body.ap_userid) : 0;
-    var businessKeywords = (req.body.keywords) ?  req.body.keywords : '';
-    var encryptPwd = '',fullName='';
-
-    var rtnMessage = {
-        error:{},
-        Token: '',
-        IsAuthenticate: false,
-        FirstName: '',
-        CompanyName:'',
-        Type: 0,
-        Icon: '',
-        tid:'',
-        group_id:'',
-        ezeone_id:'',
-        ezeid:'',
-        Verified: 0,
-        SalesModuleTitle: '',
-        AppointmentModuleTitle: '',
-        HomeDeliveryModuleTitle : '',
-        ServiceModuleTitle: '',
-        CVModuleTitle: '',
-        SalesFormMsg: '',
-        ReservationFormMsg: '',
-        HomeDeliveryFormMsg: '',
-        ServiceFormMsg: '',
-        CVFormMsg: '',
-        SalesItemListType: '',
-        RefreshInterval:'',
-        MasterID: 0,
-        UserModuleRights: '',
-        FreshersAccepted: '',
-        HomeDeliveryItemListType : '',
-        PersonalEZEID:'',
-        ReservationDisplayFormat:'',
-        mobilenumber:'',
-        isAddressSaved:'',
-        isinstitute_admin : '',
-        cvid : '',
-        profile_status:''
-
-    };
-
-    var validateStatus = true, error = {};
-
-    if(idtypeId == 1) {
-        if (!firstName) {
-            error['firstName'] = 'firstName is mandatory';
-            validateStatus *= false;
-            console.log('firstName is mandatory');
+        var OperationType = req.body.OperationType;
+        var IPAddress = req._remoteAddress;
+        var SelectionTypes = parseInt(req.body.SelectionType);
+        if(SelectionTypes.toString() == 'NaN'){
+            SelectionTypes = 0;
         }
-    }
-    if(idtypeId == 2 && idtypeId == 3){
-        error['companyName'] = 'companyName is mandatory';
-        validateStatus *= false;
-        console.log('companyName is mandatory');
-    }
 
-    if(!validateStatus){
-        rtnMessage.error = error;
-        res.status(400).json(rtnMessage);
+        var IDTypeID = req.body.IDTypeID;
+        var EZEID = alterEzeoneId(req.body.EZEID);
+        if(EZEID != null)
+            EZEID = EZEID.toUpperCase();
+        var Password = req.body.Password;
+        var FirstName = req.body.FirstName;
+        var LastName = req.body.LastName ? req.body.LastName : '';
+        var CompanyName = req.body.CompanyName;
+        var JobTitle = req.body.JobTitle;
+        var CategoryID = parseInt(req.body.CategoryID);
 
-    }
-    else {
-        try {
-            if (operationType == 1) {
-                console.log('----------Operation type 1--------------');
-                if (idtypeId && ezeid && password) {
-                    if (password) {
-                        encryptPwd = hashPassword(password);
-                    }
+        if (CategoryID.toString() == 'NaN') {
+            CategoryID = 0;
+        }
+        var FunctionID = req.body.FunctionID;
+        if (FunctionID == null || FunctionID == '') {
+            FunctionID = 0;
+        }
+        var RoleID = req.body.RoleID;
+        if (RoleID == null || RoleID == '') {
+            RoleID = 0;
+        }
+        var LanguageID = req.body.LanguageID;
+        if (LanguageID == null || LanguageID == '') {
+            LanguageID = 0;
+        }
+        var NameTitleID = req.body.NameTitleID;
 
-                    var queryParams = st.db.escape(idtypeId) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(encryptPwd)
-                        + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName) + ',' + st.db.escape(companyName)
-                        + ',' + st.db.escape(jobTitle) + ',' + st.db.escape(functionId) + ',' + st.db.escape(roleId)
-                        + ',' + st.db.escape(languageId) + ',' + st.db.escape(nameTitleId) + ',' + st.db.escape(token)
-                        + ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(altitude)
-                        + ',' + st.db.escape(addressLine1) + ',' + st.db.escape(addressLine2) + ',' + st.db.escape(cityTitle)
-                        + ',' + st.db.escape(stateId) + ',' + st.db.escape(countryId) + ',' + st.db.escape(postalCode)
-                        + ',' + st.db.escape(pin) + ',' + st.db.escape(phoneNumber) + ',' + st.db.escape(mobileNumber)
-                        + ',' + st.db.escape(email) + ',' + st.db.escape(picture) + ',' + st.db.escape(pictureFileName)
-                        + ',' + st.db.escape(webSite) + ',' + st.db.escape(operation) + ',' + st.db.escape(aboutCompany)
-                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(isdPhoneNumber) + ',' + st.db.escape(isdMobileNumber)
-                        + ',' + st.db.escape(gender) + ',' + st.db.escape(dob) + ',' + st.db.escape(ipAddress)
-                        + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus) + ',' + st.db.escape(templateId)
-                        + ',' + st.db.escape(categoryId) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
-                        + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+        var Latitude = req.body.Latitude;
+        if (Latitude == null || Latitude == '') {
+            Latitude = 0.0;
+        }
+        var Longitude = req.body.Longitude;
+        if (Longitude == null || Longitude == '') {
+            Longitude = 0.0;
+        }
+        var Altitude = req.body.Altitude;
+        if (Altitude == null || Altitude == '') {
+            Altitude = 0;
+        }
 
-                    var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
-                    console.log(query);
-                    st.db.query(query, function (err, registerResult) {
-                        console.log(registerResult);
-                        if (!err) {
-                            if (registerResult) {
-                                if (registerResult[0]) {
-                                    if (registerResult[0].length > 0) {
-                                        if (registerResult[0][0].TID != 0) {
-                                            rtnMessage.IsAuthenticate = true;
-                                            rtnMessage.tid = registerResult[0][0].TID;
-                                            rtnMessage.group_id = registerResult[0][0].group_id;
-                                            rtnMessage.Token = token;
-                                            rtnMessage.FirstName = registerResult[0][0].FirstName;
-                                            rtnMessage.CompanyName = registerResult[0][0].CompanyName;
-                                            rtnMessage.ezeone_id = registerResult[0][0].EZEID;
-                                            rtnMessage.ezeid = registerResult[0][0].EZEID;
-                                            rtnMessage.Type = registerResult[0][0].IDTypeID;
-                                            rtnMessage.Verified = registerResult[0][0].EZEIDVerifiedID;
-                                            if (registerResult[0][0].ParentMasterID == 0) {
-                                                rtnMessage.MasterID = registerResult[0][0].TID;
+        var AddressLine1 = req.body.AddressLine1 ? req.body.AddressLine1 : '';
+        var AddressLine2 = req.body.AddressLine2 ? req.body.AddressLine2 : '';
+        var Area = req.body.Area ? req.body.Area : '';
+        var Citytitle = req.body.CityTitle ? req.body.CityTitle : '';
+        var StateID = req.body.StateID ? req.body.StateID : 0;
+        var CountryID = req.body.CountryID ? req.body.CountryID :0;
+        var PostalCode = req.body.PostalCode ? req.body.PostalCode : 0;
+        var PIN = req.body.PIN ? req.body.PIN : null;
+        var PhoneNumber = req.body.PhoneNumber ? req.body.PhoneNumber : 0;
+        var MobileNumber = req.body.MobileNumber;
+        var EMailID = req.body.EMailID;
+        var Picture = req.body.Picture;
+        var PictureFileName = req.body.PictureFileName;
+        var WebSite = req.body.Website;
+        var AboutCompany = req.body.AboutCompany;
+        var StatusID = 1;
+        var TokenNo = req.body.Token;
+        var Operation = "I";
+        if (TokenNo != '' && TokenNo != null) {
+            Operation = "U";
+        }
+        var Icon = req.body.Icon;
+        var IconFileName = req.body.IconFileName;
+        var ISDPhoneNumber = req.body.ISDPhoneNumber;
+        var ISDMobileNumber = req.body.ISDMobileNumber;
+        var ParkingStatus = req.body.ParkingStatus ? req.body.ParkingStatus : 3;
+        var Gender = parseInt(req.body.Gender);
+        var DOB = req.body.DOB;
+        if(Gender.toString() == 'NaN')
+            Gender = 2;
+        if (PIN == '') {
+            PIN = null;
+        }
+        var TemplateID = parseInt(req.body.TemplateID);
+        if(TemplateID.toString() == 'NaN')
+            TemplateID =0;
+        var isIphone = req.body.device ? parseInt(req.body.device) : 0;
+        var deviceToken = req.body.device_token ? req.body.device_token : '';
+        var visibleEmail = (!isNaN(parseInt(req.body.ve))) ?  parseInt(req.body.ve) : 1;   // 0-invisible, 1- visible
+        var visibleMobile = (!isNaN(parseInt(req.body.vm))) ?  parseInt(req.body.vm) : 1;  // 0-invisible, 1- visible
+        var visiblePhone = (!isNaN(parseInt(req.body.vp))) ?  parseInt(req.body.vp) : 1;   // 0-invisible, 1- visible
+        var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1; // 0-invisible, 1- visible
+        var locTitle = req.body.loc_title ? req.body.loc_title : '';
+        var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
+        var apUserid = (!isNaN(parseInt(req.body.ap_userid))) ?  parseInt(req.body.ap_userid) : 0;
+        var businessKeywords = (req.body.keywords) ?  req.body.keywords : '';
+
+        var RtnMessage = {
+            Token: '',
+            IsAuthenticate: false,
+            FirstName: '',
+            Type: 0,
+            Icon: '',
+            tid:'',
+            group_id:''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        if(parseInt(OperationType) == 1){
+            console.log('----------req.body for Operation type 1--------------');
+            if( IDTypeID != null && EZEID != null && Password != null ){
+                if(FirstName == null)
+                    FirstName='';
+                if (LastName == null) {
+                    LastName = '';
+                }
+                if (StateID == null || StateID == '') {
+                    StateID = 0;
+                }
+                if (CountryID == null || CountryID == '') {
+                    CountryID = 0;
+                }
+
+                //if (Operation == 'I') {
+                //    TokenNo = st.generateToken();
+                //}
+                var EncryptPWD = '';
+                if (Password != null) {
+                    EncryptPWD = hash(Password);
+                }
+                var DOBDate = null;
+
+                if (DOB != null && DOB != '') {
+                    // datechange = new Date(new Date(TaskDateTime).toUTCString());
+                    DOBDate = new Date(DOB);
+                    // console.log(TaskDate);
+                }
+
+                var queryParams = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD)
+                    + ',' + st.db.escape(FirstName) + ',' + st.db.escape(LastName) + ',' + st.db.escape(CompanyName)
+                    + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' + st.db.escape(RoleID)
+                    + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' + st.db.escape(TokenNo)
+                    + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude)
+                    + ',' + st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle)
+                    + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' + st.db.escape(PostalCode)
+                    + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber)
+                    + ',' + st.db.escape(EMailID) + ',' + st.db.escape(Picture) + ',' + st.db.escape(PictureFileName)
+                    + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany)
+                    + ','+ st.db.escape(StatusID) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
+                    + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress)
+                    + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
+                    + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
+                    + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
+                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+
+                var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
+                //console.log(InsertQuery);
+
+                st.db.query(query, function (err, InsertResult) {
+                    if (!err) {
+                        //console.log('InsertResult: ');
+                        //console.log( InsertResult);
+                        if (InsertResult != null) {
+                            if(InsertResult[0]){
+                                if (InsertResult[0].length > 0) {
+                                    var RegResult = InsertResult[0];
+                                    if(RegResult[0].TID != 0)
+                                    {
+                                        if(IDTypeID == 2)
+                                            RtnMessage.FirstName=CompanyName;
+                                        else
+                                            RtnMessage.FirstName = FirstName;
+
+                                        RtnMessage.IsAuthenticate = true;
+                                        RtnMessage.Token = TokenNo;
+                                        RtnMessage.Type = IDTypeID;
+                                        RtnMessage.Icon = Icon;
+                                        RtnMessage.tid = InsertResult[0][0].TID;
+                                        RtnMessage.group_id = InsertResult[0][0].group_id;
+                                        if (CompanyName == null)
+                                            CompanyName='';
+                                        if (Operation == 'I') {
+                                            console.log('FnRegistrationAlumni:tmaster: Registration success');
+
+                                            /**
+                                             * Creating queue for the user dynamically on rabbit server
+                                             *
+                                             */
+                                            //notificationQmManager.getIndividualGroupId(RegResult[0].TID,function(err1,getIndividualGroupIdRes){
+                                            //    if(!err1){
+                                            //        if(getIndividualGroupIdRes){
+                                            //            notificationMqtt.createQueue(getIndividualGroupIdRes.tid);
+                                            //        }
+                                            //    }
+                                            //});
+
+                                            //res.send(RtnMessage);
+                                            if(isIphone == 1){
+                                                var queryParams = st.db.escape(EZEID) + ',' + st.db.escape(deviceToken);
+                                                var query = 'CALL pSaveIPhoneDeviceID(' + queryParams + ')';
+                                                // console.log(query);
+                                                st.db.query(query, function (err, result) {
+                                                    if(!err){
+                                                        //console.log(result);
+                                                        console.log('FnLogin:IphoneDevice save successfully');
+                                                    }
+                                                    else
+                                                    {
+                                                        console.log(err);
+                                                    }
+                                                });
+                                            }
+                                            if (EMailID != '' && EMailID != null) {
+
+                                                if (FirstName && LastName) {
+                                                    var name = FirstName + ' ' + LastName;
+                                                }
+                                                else {
+                                                    var name = FirstName;
+                                                }
+
+                                                var mailContent = {
+                                                    type: 'register',
+                                                    fullname: name,
+                                                    ezeid: EZEID,
+                                                    toEmail: EMailID
+
+                                                };
+
+                                                mail.sendRegMail(mailContent, function (err, statusResult) {
+                                                    if (!err) {
+                                                        if (statusResult) {
+                                                            if (statusResult.status == true) {
+                                                                console.log('FnSendMail: Mail Sent Successfully');
+                                                                //res.send(RtnMessage);
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail: Mail not Sent...1');
+                                                                //res.send(RtnMessage);
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnSendMail: Mail not Sent..2');
+                                                            //res.send(RtnMessage);
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSendMail:Error in sending mails' + err);
+                                                        //res.send(RtnMessage);
+                                                    }
+                                                });
+
+                                                if (Operation == 'I') {
+                                                    var ip = req.headers['x-forwarded-for'] ||
+                                                        req.connection.remoteAddress ||
+                                                        req.socket.remoteAddress ||
+                                                        req.connection.socket.remoteAddress;
+                                                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+
+                                                    st.generateToken(ip, userAgent, EZEID, function (err, token) {
+                                                        if (err) {
+                                                            console.log('FnRegistrationAlumni: Token Generation Error' + err);
+                                                        }
+                                                        else {
+                                                            RtnMessage.Token = token;
+                                                        }
+                                                        res.send(RtnMessage);
+                                                    });
+                                                }
                                             }
                                             else {
-                                                rtnMessage.MasterID = registerResult[0][0].ParentMasterID;
+                                                console.log('FnRegistrationAlumni: tmaster: registration success but email is empty so mail not sent');
+                                                console.log(RtnMessage);
+                                                res.send(RtnMessage);
                                             }
-                                            rtnMessage.UserModuleRights = registerResult[0][0].UserModuleRights;
-                                            rtnMessage.SalesModuleTitle = registerResult[0][0].SalesModuleTitle;
-                                            rtnMessage.AppointmentModuleTitle = registerResult[0][0].AppointmentModuleTitle;
-                                            rtnMessage.HomeDeliveryModuleTitle = registerResult[0][0].HomeDeliveryModuleTitle;
-                                            rtnMessage.ServiceModuleTitle = registerResult[0][0].ServiceModuleTitle;
-                                            rtnMessage.CVModuleTitle = registerResult[0][0].CVModuleTitle;
-                                            rtnMessage.PersonalEZEID = registerResult[0][0].PersonalEZEID;
-                                            rtnMessage.SalesFormMsg = registerResult[0][0].SalesFormMsg;
-                                            rtnMessage.ReservationFormMsg = registerResult[0][0].ReservationFormMsg;
-                                            rtnMessage.HomeDeliveryFormMsg = registerResult[0][0].HomeDeliveryFormMsg;
-                                            rtnMessage.ServiceFormMsg = registerResult[0][0].ServiceFormMsg;
-                                            rtnMessage.CVFormMsg = registerResult[0][0].CVFormMsg;
-                                            rtnMessage.SalesItemListType = registerResult[0][0].SalesItemListType;
-                                            rtnMessage.FreshersAccepted = registerResult[0][0].FreshersAccepted;
-                                            rtnMessage.HomeDeliveryItemListType = registerResult[0][0].HomeDeliveryItemListType;
-                                            rtnMessage.ReservationDisplayFormat = registerResult[0][0].ReservationDisplayFormat;
-                                            rtnMessage.mobilenumber = registerResult[0][0].mobilenumber;
-                                            rtnMessage.isAddressSaved = registerResult[0][0].isAddressSaved;
-                                            rtnMessage.isinstitute_admin = registerResult[0][0].isinstituteadmin;
-                                            rtnMessage.cvid = registerResult[0][0].cvid;
-                                            rtnMessage.profile_status = registerResult[0][0].ps;
+                                        }
+                                        else {
+                                            console.log('FnRegistrationAlumni: tmaster: Update operation success');
+                                            console.log(RtnMessage);
+                                            res.send(RtnMessage);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnRegistrationAlumni:tmaster: Registration Failed..1');
+                                    }
 
-                                            if (operation == 'I') {
+                                }
+                                else {
+                                    console.log(RtnMessage);
+                                    res.send(RtnMessage);
+                                    console.log('FnRegistrationAlumni:tmaster: Registration Failed..2');
+                                }
+                            }
 
-                                                var ip = req.headers['x-forwarded-for'] ||
+                            else {
+                                console.log(RtnMessage);
+                                res.send(RtnMessage);
+                                console.log('FnRegistrationAlumni:tmaster: Registration Failed..3');
+                            }
+
+                        }
+                        else {
+                            console.log(RtnMessage);
+                            res.send(RtnMessage);
+                            console.log('FnRegistrationAlumni:tmaster: Registration Failed..4');
+                        }
+                    }
+                    else {
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnRegistrationAlumni:tmaster:' + err);
+                    }
+                });
+
+            }
+            else
+            {
+                console.log('FnRegistrationAlumni: Wizard Insertion Failed');
+                if(IDTypeID == null ) {
+                    console.log('FnRegistrationAlumni: IDTypeID is Empty');
+                }
+                else if(EZEID == null){
+                    console.log('FnRegistrationAlumni: EZEID is Empty');
+                }
+                else if(Password == null) {
+                    console.log('FnRegistrationAlumni: Password is Empty');
+                }
+
+                console.log('Insert method validation');
+                console.log('Mandatory fields required');
+                res.statusCode = 400;
+                res.send(RtnMessage);
+            }
+        }
+        else
+        {
+            console.log('----------req.body for Operation type other than 1--------------');
+            if (IDTypeID != null && EZEID != null && Gender.toString() != 'NaN') {
+                var EncryptPWD = '';
+                if (Password) {
+                    EncryptPWD = hash(Password);
+
+                    //console.log(EncryptPWD);
+                }
+                var DOBDate = null;
+                if (DOB != null && DOB != '') {
+                    DOBDate = new Date(DOB);
+                }
+
+                var queryParams = st.db.escape(IDTypeID) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(EncryptPWD)
+                    + ',' + st.db.escape(FirstName) + ',' + st.db.escape(LastName) + ',' + st.db.escape(CompanyName)
+                    + ',' + st.db.escape(JobTitle) + ',' + st.db.escape(FunctionID) + ',' + st.db.escape(RoleID)
+                    + ',' + st.db.escape(LanguageID) + ',' + st.db.escape(NameTitleID) + ',' + st.db.escape(TokenNo)
+                    + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' + st.db.escape(Altitude)
+                    + ',' + st.db.escape(AddressLine1) + ',' + st.db.escape(AddressLine2) + ',' + st.db.escape(Citytitle)
+                    + ',' + st.db.escape(StateID) + ',' + st.db.escape(CountryID) + ',' + st.db.escape(PostalCode)
+                    + ',' + st.db.escape(PIN) + ',' + st.db.escape(PhoneNumber) + ',' + st.db.escape(MobileNumber)
+                    + ',' + st.db.escape(EMailID) + ',' + st.db.escape(Picture) + ',' + st.db.escape(PictureFileName)
+                    + ',' + st.db.escape(WebSite) + ',' + st.db.escape(Operation) + ',' + st.db.escape(AboutCompany)
+                    + ','+ st.db.escape(StatusID) + ',' + st.db.escape(ISDPhoneNumber) + ',' + st.db.escape(ISDMobileNumber) + ','
+                    + st.db.escape(Gender) + ',' + st.db.escape(DOBDate) + ',' + st.db.escape(IPAddress)
+                    + ',' + st.db.escape(SelectionTypes) + ',' + st.db.escape(ParkingStatus)+ ',' + st.db.escape(TemplateID)
+                    + ',' + st.db.escape(CategoryID)+ ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
+                    + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
+                    + ',' + st.db.escape(statusId)+ ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                //console.log(InsertQuery);
+                st.db.query('CALL pSaveEZEIDData(' + queryParams + ')', function (err, InsertResult) {
+                    if (!err) {
+                        //console.log('InsertResult....');
+                        //console.log(InsertResult);
+                        if (InsertResult) {
+
+                            if(InsertResult[0]){
+                                if (InsertResult[0].length > 0) {
+                                    var RegResult = InsertResult[0];
+                                    if(RegResult[0].TID != 0)
+                                    {
+                                        if(IDTypeID == 2)
+                                            RtnMessage.FirstName=CompanyName;
+                                        else
+                                            RtnMessage.FirstName = FirstName;
+                                        RtnMessage.IsAuthenticate = true;
+                                        RtnMessage.Token = TokenNo;
+                                        RtnMessage.Type = IDTypeID;
+                                        RtnMessage.Icon = Icon;
+                                        RtnMessage.tid = InsertResult[0][0].TID;
+                                        RtnMessage.group_id = InsertResult[0][0].group_id;
+                                        if (Operation == 'I') {
+                                            console.log('FnRegistrationAlumni:tmaster: Registration success');
+                                            //res.send(RtnMessage);
+                                            if (EMailID != '' || EMailID != null) {
+                                                if (FirstName && LastName) {
+                                                    var name = FirstName + ' ' + LastName;
+                                                }
+                                                else {
+                                                    var name = FirstName;
+                                                }
+
+                                                var mailContent = {
+                                                    type: 'register',
+                                                    fullname: name,
+                                                    ezeid: EZEID,
+                                                    toEmail: EMailID
+
+                                                };
+
+                                                mail.sendRegMail(mailContent, function (err, statusResult) {
+                                                    if (!err) {
+                                                        if (statusResult) {
+                                                            if (statusResult.status == true) {
+                                                                console.log('FnSendMail: Mail Sent Successfully');
+                                                                //res.send(RtnMessage);
+                                                            }
+                                                            else {
+                                                                console.log('FnSendMail: Mail not Sent...1');
+                                                                //res.send(RtnMessage);
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnSendMail: Mail not Sent..2');
+                                                            //res.send(RtnMessage);
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnSendMail:Error in sending mails' + err);
+                                                        //res.send(RtnMessage);
+                                                    }
+                                                });
+
+                                                var ip =  req.headers['x-forwarded-for'] ||
                                                     req.connection.remoteAddress ||
                                                     req.socket.remoteAddress ||
                                                     req.connection.socket.remoteAddress;
                                                 var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                                                st.generateToken(ip, userAgent, ezeid, function (err, token) {
+                                                st.generateToken(ip,userAgent,EZEID,function(err,token) {
                                                     if (err) {
-                                                        console.log('FnRegistration: Token Generation Error');
-                                                        console.log(err);
-
+                                                        console.log('FnRegistrationAlumni: Token Generation Error' + err);
                                                     }
                                                     else {
-                                                        console.log(token);
-                                                        rtnMessage.Token = token;
-                                                        res.send(rtnMessage);
+                                                        RtnMessage.Token = token;
                                                     }
+                                                    res.send(RtnMessage);
                                                 });
-
-                                                console.log('FnRegistration:tmaster: Registration success');
-
-                                                var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
-                                                var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
-                                                st.db.query(query1, function (err, updateResult) {
-                                                    if (!err) {
-                                                        console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
-                                                    }
-                                                });
-
-                                                /**
-                                                 * Creating queue for the user dynamically on rabbit server
-                                                 *
-                                                 */
-                                                //notificationQmManager.getIndividualGroupId(registerResult[0][0].TID, function (err1, getIndividualGroupIdRes) {
-                                                //    if (!err1) {
-                                                //        if (getIndividualGroupIdRes) {
-                                                //            notificationMqtt.createQueue(getIndividualGroupIdRes.tid);
-                                                //        }
-                                                //    }
-                                                //});
-
-                                                //saving iphone device token
-                                                if (isIphone == 1) {
-                                                    var queryParams2 = st.db.escape(ezeid) + ',' + st.db.escape(deviceToken);
-                                                    var query2 = 'CALL pSaveIPhoneDeviceID(' + queryParams2 + ')';
-                                                    // console.log(query);
-                                                    st.db.query(query2, function (err, result) {
-                                                        if (!err) {
-                                                            //console.log(result);
-                                                            console.log('FnLogin:IphoneDevice save successfully');
-                                                        }
-                                                        else {
-                                                            console.log(err);
-                                                        }
-                                                    });
-                                                }
-
-                                                //send mail for registeration
-                                                if (email) {
-                                                    if (firstName && lastName) {
-                                                        fullName = firstName + ' ' + lastName;
-                                                    }
-                                                    else {
-                                                        fullName = firstName;
-                                                    }
-
-                                                    var mailContent = {
-                                                        type: 'register',
-                                                        fullname: fullName,
-                                                        ezeid: ezeid,
-                                                        toEmail: email
-
-                                                    };
-
-                                                    mail.sendRegMail(mailContent, function (err, statusResult) {
-                                                        if (!err) {
-                                                            if (statusResult) {
-                                                                if (statusResult.status == true) {
-                                                                    console.log('FnSendMail: Mail Sent Successfully');
-                                                                    //res.send(rtnMessage);
-                                                                }
-                                                                else {
-                                                                    console.log('FnSendMail: Mail not Sent...1');
-                                                                    //res.send(rtnMessage);
-                                                                }
-                                                            }
-                                                            else {
-                                                                console.log('FnSendMail: Mail not Sent..2');
-                                                                //res.send(rtnMessage);
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnSendMail:Error in sending mails' + err);
-                                                            //res.send(rtnMessage);
-                                                        }
-                                                    });
-                                                }
-                                                else {
-                                                    console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
-                                                    console.log(rtnMessage);
-                                                    //res.send(rtnMessage);
-                                                }
                                             }
-
                                             else {
-                                                console.log('FnRegistration: tmaster: Update operation success');
-                                                var queryParams3 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
-                                                var query3 = 'CALL pupdateEZEoneKeywords(' + queryParams3 + ')';
-                                                st.db.query(query3, function (err, updateResult) {
-                                                    if (!err) {
-                                                        console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
-                                                    }
-                                                });
-                                                res.send(rtnMessage);
+                                                console.log('FnRegistrationAlumni: tmaster: registration success but email is empty so mail not sent');
+                                                console.log(RtnMessage);
+                                                res.send(RtnMessage);
                                             }
                                         }
                                         else {
-                                            console.log(rtnMessage);
-                                            res.send(rtnMessage);
-                                            console.log('FnRegistration:tmaster: Registration Failed..1');
+                                            console.log('FnRegistrationAlumni: tmaster: Update operation success');
+                                            console.log(RtnMessage);
+                                            res.send(RtnMessage);
                                         }
-
                                     }
                                     else {
-                                        console.log(rtnMessage);
-                                        res.send(rtnMessage);
-                                        console.log('FnRegistration:tmaster: Registration Failed..2');
+                                        console.log(RtnMessage);
+                                        res.send(RtnMessage);
+                                        console.log('FnRegistrationAlumni:tmaster: Registration Failed..1');
                                     }
                                 }
-
-                                else {
-                                    console.log(rtnMessage);
-                                    res.send(rtnMessage);
-                                    console.log('FnRegistration:tmaster: Registration Failed..3');
+                                else{
+                                    console.log(RtnMessage);
+                                    res.send(RtnMessage);
+                                    console.log('FnRegistrationAlumni:tmaster: Registration Failed..2');
                                 }
-
                             }
-                            else {
-                                console.log(rtnMessage);
-                                res.send(rtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed..4');
+
+                            else{
+                                console.log(RtnMessage);
+                                res.send(RtnMessage);
+                                console.log('FnRegistrationAlumni:tmaster: Registration Failed..3');
                             }
                         }
-                        else {
-                            res.statusCode = 500;
-                            res.send(rtnMessage);
-                            console.log('FnRegistration:tmaster:' + err);
+                        else{
+                            console.log(RtnMessage);
+                            res.send(RtnMessage);
+                            console.log('FnRegistrationAlumni:tmaster: Registration Failed..4');
                         }
-                    });
-
-                }
-                else {
-                    if (!idtypeId) {
-                        console.log('FnRegistration: IDTypeID is Empty');
                     }
-                    else if (!ezeid) {
-                        console.log('FnRegistration: EZEID is Empty');
+                    else {
+                        res.statusCode = 500;
+                        res.send(RtnMessage);
+                        console.log('FnRegistrationAlumni:tmaster:' + err);
                     }
-                    else if (!password) {
-                        console.log('FnRegistration: Password is Empty');
-                    }
-
-                    console.log('Mandatory fields is required');
-                    res.statusCode = 400;
-                    res.send(rtnMessage);
-                }
+                });
             }
             else {
-                console.log('----------Operation type other than 1--------------');
-                if (ezeid) {
-                    if (password) {
-                        encryptPwd = hashPassword(password);
-                    }
-
-                    var queryParams = st.db.escape(idtypeId) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(encryptPwd)
-                        + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName) + ',' + st.db.escape(companyName)
-                        + ',' + st.db.escape(jobTitle) + ',' + st.db.escape(functionId) + ',' + st.db.escape(roleId)
-                        + ',' + st.db.escape(languageId) + ',' + st.db.escape(nameTitleId) + ',' + st.db.escape(token)
-                        + ',' + st.db.escape(latitude) + ',' + st.db.escape(longitude) + ',' + st.db.escape(altitude)
-                        + ',' + st.db.escape(addressLine1) + ',' + st.db.escape(addressLine2) + ',' + st.db.escape(cityTitle)
-                        + ',' + st.db.escape(stateId) + ',' + st.db.escape(countryId) + ',' + st.db.escape(postalCode)
-                        + ',' + st.db.escape(pin) + ',' + st.db.escape(phoneNumber) + ',' + st.db.escape(mobileNumber)
-                        + ',' + st.db.escape(email) + ',' + st.db.escape(picture) + ',' + st.db.escape(pictureFileName)
-                        + ',' + st.db.escape(webSite) + ',' + st.db.escape(operation) + ',' + st.db.escape(aboutCompany)
-                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(isdPhoneNumber) + ',' + st.db.escape(isdMobileNumber)
-                        + ',' + st.db.escape(gender) + ',' + st.db.escape(dob) + ',' + st.db.escape(ipAddress)
-                        + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus) + ',' + st.db.escape(templateId)
-                        + ',' + st.db.escape(categoryId) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
-                        + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
-
-                    var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
-                    console.log(query);
-                    st.db.query(query, function (err, registerResult) {
-                        if (!err) {
-                            if (registerResult) {
-                                if (registerResult[0]) {
-                                    if (registerResult[0].length > 0) {
-                                        if (registerResult[0][0].TID != 0) {
-                                            if (idtypeId == 2) {
-                                                rtnMessage.FirstName = companyName;
-                                            }
-                                            else {
-                                                rtnMessage.FirstName = firstName;
-                                            }
-                                            rtnMessage.IsAuthenticate = true;
-                                            rtnMessage.Token = token;
-                                            rtnMessage.Type = idtypeId;
-                                            rtnMessage.tid = registerResult[0][0].TID;
-                                            rtnMessage.group_id = registerResult[0][0].group_id;
-
-                                            if (operation == 'I') {
-
-                                                var ip = req.headers['x-forwarded-for'] ||
-                                                    req.connection.remoteAddress ||
-                                                    req.socket.remoteAddress ||
-                                                    req.connection.socket.remoteAddress;
-                                                var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
-
-                                                st.generateToken(ip, userAgent, ezeid, function (err, token) {
-                                                    if (err) {
-                                                        console.log('FnRegistration: Token Generation Error' + err);
-                                                    }
-                                                    else {
-                                                        rtnMessage.Token = token;
-                                                    }
-                                                    res.send(rtnMessage);
-                                                });
-
-                                                console.log('FnRegistration:tmaster: Registration success');
-
-                                                var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
-                                                var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
-                                                st.db.query(query1, function (err, updateResult) {
-                                                    if (!err) {
-                                                        console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
-                                                    }
-                                                    else {
-                                                        console.log('FnUpdateEZEoneKeywords: Keywords not updated');
-                                                        console.log(err);
-                                                    }
-                                                });
-                                                if (email) {
-
-                                                    if (firstName && lastName) {
-                                                        fullName = firstName + ' ' + lastName;
-                                                    }
-                                                    else {
-                                                        fullName = firstName;
-                                                    }
-
-                                                    var mailContent = {
-                                                        type: 'register',
-                                                        fullname: fullName,
-                                                        ezeid: ezeid,
-                                                        toEmail: email
-
-                                                    };
-
-                                                    mail.sendRegMail(mailContent, function (err, statusResult) {
-                                                        if (!err) {
-                                                            if (statusResult) {
-                                                                if (statusResult.status == true) {
-                                                                    console.log('FnSendMail: Mail Sent Successfully');
-                                                                    //res.send(rtnMessage);
-                                                                }
-                                                                else {
-                                                                    console.log('FnSendMail: Mail not Sent...1');
-                                                                    //res.send(rtnMessage);
-                                                                }
-                                                            }
-                                                            else {
-                                                                console.log('FnSendMail: Mail not Sent..2');
-                                                                //res.send(rtnMessage);
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnSendMail:Error in sending mails' + err);
-                                                            //res.send(rtnMessage);
-                                                        }
-                                                    });
-                                                }
-                                                else {
-                                                    console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
-                                                    //console.log(rtnMessage);
-                                                    //res.send(rtnMessage);
-                                                }
-                                            }
-                                            else {
-                                                var queryParams2 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
-                                                var query2 = 'CALL pupdateEZEoneKeywords(' + queryParams2 + ')';
-                                                console.log(query2);
-                                                st.db.query(query2, function (err, getResult) {
-                                                    if (!err) {
-                                                        console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
-                                                        res.send(rtnMessage);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                        else {
-                                            console.log(rtnMessage);
-                                            res.send(rtnMessage);
-                                            console.log('FnRegistration:tmaster: Registration Failed..1');
-                                        }
-                                    }
-                                    else {
-                                        console.log(rtnMessage);
-                                        res.send(rtnMessage);
-                                        console.log('FnRegistration:tmaster: Registration Failed..2');
-                                    }
-                                }
-
-                                else {
-                                    console.log(rtnMessage);
-                                    res.send(rtnMessage);
-                                    console.log('FnRegistration:tmaster: Registration Failed..3');
-                                }
-                            }
-                            else {
-                                console.log(rtnMessage);
-                                res.send(rtnMessage);
-                                console.log('FnRegistration:tmaster: Registration Failed..4');
-                            }
-                        }
-                        else {
-                            res.statusCode = 500;
-                            res.send(rtnMessage);
-                            console.log('FnRegistration:tmaster:' + err);
-                        }
-                    });
+                console.log('Update method validation');
+                if (IDTypeID == null) {
+                    console.log('FnRegistrationAlumni: IDTypeID is empty');
+                } else if (EZEID == null) {
+                    console.log('FnRegistrationAlumni: EZEID is empty');
                 }
-                else {
-                    if (!ezeid) {
-                        console.log('FnRegistration: EZEID is empty');
-                    }
-                    res.statusCode = 400;
-                    res.send(rtnMessage);
-                    console.log('FnRegistration:tmaster: Manditatory field empty');
+                else if (Gender.toString() == 'NaN') {
+                    console.log('FnRegistrationAlumni: Gender is empty')
                 }
+                res.statusCode = 400;
+                res.send(RtnMessage);
+                console.log('FnRegistrationAlumni:tmaster: Manditatory field empty');
             }
         }
 
-        catch (ex) {
-            console.log(ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
-            console.log('FnRegistration error:' + ex.description);
-            //throw new Error(ex);
-        }
+    }
+    catch (ex) {
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log('FnRegistrationAlumni error:' + ex.description);
+        //throw new Error(ex);
     }
 };
 
@@ -1029,6 +990,10 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         error['mainFooter2'] = 'Invalid mainFooter2';
         validateStatus *= false;
     }
+    //if(!logo){
+    //    error['logo'] = 'Invalid logo';
+    //    validateStatus *= false;
+    //}
     if(!logoTitle){
         error['mainFooter2'] = 'Invalid logoTitle';
         validateStatus *= false;
@@ -1074,6 +1039,13 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                         };
 
                         var saveContent = function (randomName) {
+
+                            console.log('---randomName---');
+                            console.log(randomName);
+
+                            console.log('save content....');
+                            console.log(req.body.logo);
+
                             if (logo) {
                                 logo = logo;
                             }
@@ -1132,9 +1104,9 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
 
                                 var query = 'CALL pSaveAlumniContent(' + queryParams + ')';
                                 console.log(query);
-                                st.db.query(query, function (err, alumniResult) {
+                                st.db.query(query, function (err, insertresult) {
                                     if (!err) {
-                                        if (alumniResult) {
+                                        if (insertresult) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Alumni Content saved successfully';
@@ -1187,10 +1159,13 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                         };
 
                         if (req.body.pg_pic) {
+                            console.log('c1...');
+                            console.log(req.body.pg_pic);
                             var pgPic = req.body.pg_pic;
                             pagePicture(pgPic);
                         }
                         else {
+                            console.log('c2...');
                             randomName = '';
                             saveContent(randomName);
                         }
@@ -1256,7 +1231,9 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var username = req.body.username;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var randomName;
+    var image,randomName,url;
+
+
 
     var responseMessage = {
         status: false,
@@ -1278,6 +1255,10 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
+    //if(!picture){
+    //    error['picture'] = 'Invalid picture';
+    //    validateStatus *= false;
+    //}
     if(!jobTitle){
         error['jobTitle'] = 'Invalid jobTitle';
         validateStatus *= false;
@@ -1335,10 +1316,12 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                 + ',' + st.db.escape(token);
 
                             var query = 'CALL pSaveAlumniTeam(' + queryParams + ')';
+
                             console.log(query);
-                            st.db.query(query, function (err, teamResult) {
+
+                            st.db.query(query, function (err, insertresult) {
                                 if (!err) {
-                                    if (teamResult) {
+                                    if (insertresult) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Alumni Team saved successfully';
@@ -1665,18 +1648,16 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
     }
     else {
         try {
-            var queryParams = st.db.escape(code);
-            var query = 'CALL pGetAlumniContent(' + queryParams + ')';
-            st.db.query(query, function (err, getResult) {
+            var query = st.db.escape(code);
+            console.log('CALL pGetAlumniContent(' + query + ')');
+            st.db.query('CALL pGetAlumniContent(' + query + ')', function (err, getResult) {
                 //console.log(getResult);
                 if (!err) {
                     if (getResult[0]) {
-                        if(getResult[0][0]) {
-                            getResult[0][0].logo = (getResult[0][0].logo) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].logo) : '';
-                        }
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Alumni content loaded successfully';
+                        getResult[0][0].logo = (getResult[0][0].logo) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].logo):'';
                         responseMessage.data = getResult[0];
                         res.status(200).json(responseMessage);
                         console.log('FnGetAlumniContent: Alumni content loaded successfully');
@@ -1873,10 +1854,10 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
                 if (!err) {
                     if (result) {
 
-                        var queryParams = st.db.escape(id);
-                        var query = 'CALL PDeleteAlumniTeam(' + queryParams + ')';
-                        st.db.query(query, function (err, getResult) {
-                            //console.log(getResult);
+                        var query = st.db.escape(id);
+                        console.log('CALL PDeleteAlumniTeam(' + query + ')');
+                        st.db.query('CALL PDeleteAlumniTeam(' + query + ')', function (err, getResult) {
+                            console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     responseMessage.status = true;
@@ -1971,27 +1952,19 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
     }
     else {
         try {
-            var queryParams = st.db.escape(code);
-            var query = 'CALL pGetAlumniContentImage(' + queryParams + ')';
-            st.db.query(query, function (err, getResult) {
-                //console.log(getResult[0]);
+            var query = st.db.escape(code);
+            console.log('CALL pGetAlumniContentImage(' + query + ')');
+            st.db.query('CALL pGetAlumniContentImage(' + query + ')', function (err, getResult) {
+                console.log(getResult[0]);
                 if (!err) {
                     if (getResult[0]) {
-                        if (getResult[0][0]) {
-
-                            getResult[0][0].pg_pic = (getResult[0][0].pg_pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].pg_pic) : '';
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Cover Image loaded successfully';
-                            responseMessage.data = getResult[0][0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetAlumniContentImage: Cover Image loaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'Cover Image not loaded';
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetAlumniContentImage: Cover Image not loaded');
-                        }
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Cover Image loaded successfully';
+                        getResult[0][0].pg_pic = (getResult[0][0].pg_pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].pg_pic):'';
+                        responseMessage.data = getResult[0][0];
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetAlumniContentImage: Cover Image loaded successfully');
                     }
                     else {
                         responseMessage.message = 'Cover Image not loaded';
@@ -2220,28 +2193,19 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(tid);
-                        var query = 'CALL pGetAlumniTeamDetails(' + queryParams + ')';
-                        st.db.query(query, function (err, getResult) {
+                        var query = st.db.escape(tid);
+                        console.log('CALL pGetAlumniTeamDetails(' + query + ')');
+                        st.db.query('CALL pGetAlumniTeamDetails(' + query + ')', function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if(getResult[0][0]) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'AlumniTeam Details loaded successfully';
-                                        responseMessage.data = getResult[0][0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
-                                    }
-                                    else{
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'AlumniTeam Details loaded successfully';
-                                        responseMessage.data = [];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'AlumniTeam Details loaded successfully';
+                                    responseMessage.data = getResult[0][0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
                                 }
+
                                 else {
                                     responseMessage.message = 'AlumniTeam Details not loaded';
                                     res.status(200).json(responseMessage);
@@ -2338,7 +2302,9 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(code);
+
                         var query = 'CALL pGetAlumniProfile(' + queryParams + ')';
+
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
@@ -2474,14 +2440,13 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                         var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
                             + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
                             + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
-                            + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(code)
-                            + ',' + st.db.escape(capacity);
-
+                            + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(code) + ',' + st.db.escape(capacity);
                         var query = 'CALL pSaveTENMaster(' + queryParams + ')';
+
                         console.log(query);
 
                         st.db.query(query, function (err, insertresult) {
-                            //console.log(insertresult);
+                            console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
                                     responseMessage.status = true;
@@ -2519,6 +2484,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                     //upload to cloud server
                                     if(req.files) {
                                         console.log(req.files);
+                                        var count = 0;
                                         for (var prop in req.files) {
 
                                             if (req.files.hasOwnProperty(prop)) {
@@ -2537,6 +2503,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                                     originalName: originalName,
                                                     tenId: tenId
                                                 };
+
 
                                                 fnsavepic(picContent, function (err, picResult) {
                                                     if (!err) {
@@ -2613,53 +2580,45 @@ function fnsavepic(picContent, callback) {
 
     try {
 
-        if(picContent) {
+        var localStream = picContent.readStream;
+        var remoteWriteStream = bucket.file(picContent.randomName).createWriteStream();
+        localStream.pipe(remoteWriteStream);
 
-            var localStream = picContent.readStream;
-            var remoteWriteStream = bucket.file(picContent.randomName).createWriteStream();
-            localStream.pipe(remoteWriteStream);
+        remoteWriteStream.on('finish', function () {
+            console.log(picContent.randomName);
 
-            remoteWriteStream.on('finish', function () {
-                console.log(picContent.randomName);
+            console.log('FnSaveTENMasterattachment: Pic Uploaded successfully');
 
-                console.log('FnSaveTENMasterattachment: Pic Uploaded successfully');
+            var queryParams1 = st.db.escape(0) + ',' + st.db.escape(picContent.tenId) + ',' + st.db.escape(picContent.randomName)
+                + ',' + st.db.escape(picContent.originalName);
+            var query1 = 'CALL pSaveTENMasterattachment(' + queryParams1 + ')';
 
-                var queryParams1 = st.db.escape(0) + ',' + st.db.escape(picContent.tenId) + ',' + st.db.escape(picContent.randomName)
-                    + ',' + st.db.escape(picContent.originalName);
-                var query1 = 'CALL pSaveTENMasterattachment(' + queryParams1 + ')';
+            console.log(query1);
 
-                console.log(query1);
-
-                st.db.query(query1, function (err, attachmentResult) {
-                    if (!err) {
-                        if (attachmentResult) {
-                            console.log('attachment file saved');
-                            var url = appConfig.CONSTANT.GS_URL + appConfig.CONSTANT.STORAGE_BUCKET + '/' + picContent.randomName;
-                            callback(null, url);
-                        }
-                        else {
-                            console.log('attachment file not save');
-                            callback(null, null);
-                        }
+            st.db.query(query1, function (err, attachmentResult) {
+                if (!err) {
+                    if (attachmentResult) {
+                        console.log('attachment file saved');
+                        var url = appConfig.CONSTANT.GS_URL + appConfig.CONSTANT.STORAGE_BUCKET + '/' + picContent.randomName;
+                        callback(null, url);
                     }
                     else {
                         console.log('attachment file not save');
-                        console.log(err);
                         callback(null, null);
                     }
-                });
+                }
+                else {
+                    console.log('attachment file not save');
+                    console.log(err);
+                    callback(null, null);
+                }
             });
+        });
 
-            remoteWriteStream.on('error', function () {
-                console.log('FnSavePictures: Image upload error to google cloud');
-                callback(null, null);
-            });
-        }
-        else
-        {
-            console.log('Pic contnet is empty');
+        remoteWriteStream.on('error', function () {
+            console.log('FnSavePictures: Image upload error to google cloud');
             callback(null, null);
-        }
+        });
     }
     catch (ex) {
         var errorDate = new Date();
@@ -2853,8 +2812,8 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             console.log(getResult);
                             if (!err) {
-                                if(getResult){
-                                    if (getResult[0]) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Data loaded successfully';
@@ -2869,8 +2828,7 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.message = 'Your profile is not created';
                                         responseMessage.data = {
-                                            isProfileCreated : false,
-                                            result : []
+                                            isProfileCreated : false
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetProfileStatus: Your profile is not created');
@@ -3544,8 +3502,8 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult) {
-                                    if (getResult[0]) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'List loaded successfully';
@@ -3651,8 +3609,8 @@ Alumni.prototype.getTeamContent = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 //console.log(getResult);
                 if (!err) {
-                    if (getResult) {
-                        if (getResult[0]) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Team Content loaded successfully';
@@ -3745,15 +3703,12 @@ Alumni.prototype.getTeamImage = function(req,res,next) {
             st.db.query('CALL pgetTeamImages(' + query + ')', function (err, getResult) {
                 //console.log(getResult);
                 if (!err) {
-                    if (getResult) {
-                        if (getResult[0]) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
 
                             for (var i = 0; i < getResult[0].length; i++) {
-
-                                if (getResult[0][i]) {
-                                    getResult[0][i].picture = (getResult[0][i].picture) ?
-                                    req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].picture : '';
-                                }
+                                getResult[0][i].picture = (getResult[0][i].picture) ?
+                                req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].picture : '';
                             }
                             responseMessage.status = true;
                             responseMessage.error = null;
@@ -3782,8 +3737,8 @@ Alumni.prototype.getTeamImage = function(req,res,next) {
                     res.status(500).json(responseMessage);
                     console.log('FnGetTeamImage: error in getting Team image :' + err);
                 }
-            });
 
+            });
         }
         catch (ex) {
             responseMessage.error = {
@@ -3840,8 +3795,8 @@ Alumni.prototype.getTENAttachment = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 //console.log(getResult);
                 if (!err) {
-                    if (getResult) {
-                        if (getResult[0]) {
+                    if (getResult[0]) {
+                        if (getResult[0].length > 0) {
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Attachment loaded successfully';
@@ -3951,22 +3906,11 @@ Alumni.prototype.saveTENVenue = function(req,res,next) {
                             console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
-                                    if(insertresult[0][0]) {
-                                        if (insertresult[0][0].id) {
-                                            var rid = insertresult[0][0].id;
-                                        }
-                                        else {
-                                            var rid = '';
-                                        }
-                                    }
-                                    else{
-                                        var rid = '';
-                                    }
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Venue saved successfully';
                                     responseMessage.data = {
-                                        id: rid
+                                        id: insertresult[0][0].id
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveTENVenue: Venue saved successfully');
@@ -4045,7 +3989,7 @@ Alumni.prototype.getClientList = function(req,res,next){
     var responseMessage = {
         status: false,
         count : 0,
-        data: [],
+        data: null,
         message: '',
         error: {}
     };
@@ -4074,27 +4018,13 @@ Alumni.prototype.getClientList = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0][0]) {
-                                        if (getResult[1]) {
-                                            responseMessage.status = true;
-                                            responseMessage.count = getResult[0][0].count;
-                                            responseMessage.data = getResult[1];
-                                            responseMessage.message = 'Client List loaded successfully';
-                                            responseMessage.error = null;
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetClientList: Client List loaded successfully');
-                                        }
-                                        else {
-                                            responseMessage.message = 'Client List not loaded';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetClientList: Client List not loaded');
-                                        }
-                                    }
-                                    else {
-                                        responseMessage.message = 'Client List not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientList: Client List not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.data = getResult[1];
+                                    responseMessage.message = 'Client List loaded successfully';
+                                    responseMessage.error = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetClientList: Client List loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Client List not loaded';
@@ -4173,7 +4103,7 @@ Alumni.prototype.getClientContacts = function(req,res,next){
         cn:'',
         cc:'',
         page :'',
-        data: [],
+        data: null,
         message: '',
         error: {}
     };
@@ -4205,31 +4135,17 @@ Alumni.prototype.getClientContacts = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    if(getResult[0][0]) {
-                                        if (getResult[1]) {
-                                            responseMessage.status = true;
-                                            responseMessage.count = getResult[0][0].count;
-                                            responseMessage.cid = getResult[0][0].cid;
-                                            responseMessage.cn = getResult[0][0].cn;
-                                            responseMessage.cc = getResult[0][0].cc;
-                                            responseMessage.page = getResult[0][0].page;
-                                            responseMessage.data = getResult[1];
-                                            responseMessage.message = 'Contact List loaded successfully';
-                                            responseMessage.error = null;
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetClientContacts: Contact List loaded successfully');
-                                        }
-                                        else {
-                                            responseMessage.message = 'Contact List not loaded';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetClientContacts: Contact List not loaded');
-                                        }
-                                    }
-                                    else {
-                                        responseMessage.message = 'Contact List not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetClientContacts: Contact List not loaded');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.cid = getResult[0][0].cid;
+                                    responseMessage.cn = getResult[0][0].cn;
+                                    responseMessage.cc = getResult[0][0].cc;
+                                    responseMessage.page = getResult[0][0].page;
+                                    responseMessage.data = getResult[1];
+                                    responseMessage.message = 'Contact List loaded successfully';
+                                    responseMessage.error = null;
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetClientContacts: Contact List loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Contact List not loaded';
@@ -4353,15 +4269,9 @@ Alumni.prototype.getAll = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs send successfully';
-                                            if(getresult[1]){
-                                                var output = getresult[1];
-                                            }
-                                            else{
-                                                output = [];
-                                            }
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
-                                                result : output
+                                                result : getresult[1]
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetJobs: Jobs send successfully');
@@ -5390,15 +5300,10 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
                             //console.log(getResult);
                             if (!err) {
                                 if (getResult[0]) {
-                                    if (getResult[0][0]) {
+                                    if (getResult[0][0].count > 0) {
                                         responseMessage.status = true;
                                         responseMessage.count = getResult[0][0].count;
-                                        if(getResult[1]) {
-                                            responseMessage.data = getResult[1];
-                                        }
-                                        else {
-                                            responseMessage.data = [];
-                                        }
+                                        responseMessage.data = getResult[1];
                                         responseMessage.message = 'Search Result loaded successfully';
                                         responseMessage.error = null;
                                         res.status(200).json(responseMessage);
@@ -5619,8 +5524,8 @@ Alumni.prototype.getMyAlumniJobs = function(req,res,next){
                         var query = 'CALL pgetMyAlumniJobs(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult) {
-                                    if (getResult[0]) {
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'List loaded successfully';
@@ -5802,7 +5707,7 @@ Alumni.prototype.searchAlumni = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var title = req.query.title ? alterEzeoneId(req.query.title) : '';
+    var title = req.query.title ? req.query.title : '';
 
     var responseMessage = {
         status: false,
@@ -5830,23 +5735,15 @@ Alumni.prototype.searchAlumni = function(req,res,next){
                     if (result) {
                         var queryParams = st.db.escape(title)+','+st.db.escape(token);
                         var query = 'CALL pFindAlumni(' + queryParams + ')';
-                        console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
-                                if (getresult) {
-                                    if (getresult[0]) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'AlumniSearch Loaded successfully';
-                                        responseMessage.data = getresult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSearchAlumni: AlumniSearch Loaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'AlumniSearch not Loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSearchAlumni:AlumniSearch not Loaded');
-                                    }
+                                if (getresult[0]) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'AlumniSearch Loaded successfully';
+                                    responseMessage.data = getresult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSearchAlumni: AlumniSearch Loaded successfully');
                                 }
                                 else {
                                     responseMessage.message = 'AlumniSearch not Loaded';
@@ -5912,7 +5809,7 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
 
     var token = req.body.token;
     var alumniId = req.body.aid;
-    var status = req.body.status;
+    var status = req.body.status
 
     var responseMessage = {
         status: false,
@@ -5943,19 +5840,12 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
                                 if (getresult) {
-                                    if (getresult[0]) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Alumni leaved successfully';
-                                        responseMessage.data = getresult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnLeaveAlumni: Alumni leaved successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'Alumni not leaved';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnLeaveAlumni:Alumni not leaved');
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Alumni leaved successfully';
+                                    responseMessage.data = getresult[0];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnLeaveAlumni: Alumni leaved successfully');
                                 }
                                 else {
                                     responseMessage.message = 'Alumni not leaved';

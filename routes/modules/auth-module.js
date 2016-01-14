@@ -29,8 +29,8 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-var NotificationMqtt = require('./notification/notification-mqtt.js');
-var notificationMqtt = new NotificationMqtt();
+//var NotificationMqtt = require('./notification/notification-mqtt.js');
+//var notificationMqtt = new NotificationMqtt();
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notificationQmManager = null;
 var mailModule = require('./mail-module.js');
@@ -326,10 +326,10 @@ Auth.prototype.register = function(req,res,next){
                                                     }
                                                 });
 
-                                                /**
-                                                 * Creating queue for the user dynamically on rabbit server
-                                                 *
-                                                 */
+                                                ///**
+                                                // * Creating queue for the user dynamically on rabbit server
+                                                // *
+                                                // */
                                                 //notificationQmManager.getIndividualGroupId(registerResult[0][0].TID, function (err1, getIndividualGroupIdRes) {
                                                 //    if (!err1) {
                                                 //        if (getIndividualGroupIdRes) {
@@ -397,7 +397,7 @@ Auth.prototype.register = function(req,res,next){
                                                 else {
                                                     console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
                                                     console.log(rtnMessage);
-                                                    //res.send(rtnMessage);
+                                                    res.send(rtnMessage);
                                                 }
                                             }
 
@@ -497,7 +497,7 @@ Auth.prototype.register = function(req,res,next){
                                     if (registerResult[0].length > 0) {
                                         if (registerResult[0][0].TID != 0) {
                                             if (idtypeId == 2) {
-                                                rtnMessage.FirstName = companyName;
+                                                rtnMessage.FirstName = comapanyName;
                                             }
                                             else {
                                                 rtnMessage.FirstName = firstName;
