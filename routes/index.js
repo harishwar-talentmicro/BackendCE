@@ -11,7 +11,7 @@ var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
 
 
-var maintainenceTemplate = fs.readFileSync('../views/maintainence.ejs','utf-8');
+var maintainenceTemplate = fs.readFileSync('./views/maintainence.ejs','utf-8');
 var htmlIndexFile = ejs.render(maintainenceTemplate);
 var indexTemplate = '';
 

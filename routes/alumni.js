@@ -10,7 +10,7 @@ var url = require('url');
 var DbHelper = require('./../helpers/DatabaseHandler');
 var db = DbHelper.getDBContext();
 
-var maintainenceTemplate = fs.readFileSync('../views/maintainence.ejs','utf-8');
+var maintainenceTemplate = fs.readFileSync('./views/maintainence.ejs','utf-8');
 var htmlAlumniIndex = ejs.render(maintainenceTemplate);
 
 function alterEzeoneId(ezeoneId){

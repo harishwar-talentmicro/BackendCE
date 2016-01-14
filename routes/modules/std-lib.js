@@ -239,10 +239,16 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
             //70084b50d3c43822fbef
            _this.db.query(Query, function (err, Result) {
                 if (!err) {
-                    if (Result.length > 0) {
-                        // console.log(Result);
-                        console.log('FnValidateToken: Token found');
-                        CallBack(null, Result[0]);
+                    if(Result) {
+                        if (Result.length > 0) {
+                            // console.log(Result);
+                            console.log('FnValidateToken: Token found');
+                            CallBack(null, Result[0]);
+                        }
+                        else {
+                            CallBack(null, null);
+                            console.log('FnValidateToken:No Token found');
+                        }
                     }
                     else {
                         CallBack(null, null);
@@ -313,7 +319,7 @@ StdLib.prototype.sendMail = function(req, res){
                     //});
                     FnSendMailEzeid(mailOptions, function (err, Result) {
                         if (!err) {
-                            if (Result != null) {
+                            if (Result) {
                                 console.log('FnSendMail: Mail Sent Successfully');
                                 res.send(RtnMessage);
                             }
