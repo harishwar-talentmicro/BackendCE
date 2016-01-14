@@ -191,7 +191,7 @@ router.get('/navigation',searchModule.navigateSearch);
 var Mail = require('./modules/mail-module.js');
 var mailModule = new Mail(db,stdLib);
 router.post('/ewtSendMail', mailModule.sendMail);
-router.post('/business/mail', mailModule.bussinessMail);
+router.post('/business/mail', mailModule.businessMail);
 
 //Message Notification Module methods
 var MessageNotification = require('./modules/message-notification-module.js');
@@ -248,6 +248,7 @@ router.post('/job_location',jobModule.saveJobLocation);
 router.get('/candidates_list',jobModule.getCandidatesList);
 router.post('/candidates_status',jobModule.updateCandidateStatus);
 router.get('/auto_search',jobModule.autoSearchJobs);
+router.post('/applicant_status',jobModule.applicantStatus);
 
 //MessageBox module methods
 var Messagebox = require('./modules/messagebox-module.js');
@@ -406,6 +407,7 @@ router.post('/service_attachment',serviceModule.saveServiceAttachment);
 router.post('/service_video',serviceModule.saveServiceVideo);
 
 
+
 //EZEIDAP Methods
 //Auth-ModuleAP
 var Auth_AP = require('./ap-modules/auth-module-ap.js');
@@ -486,8 +488,8 @@ router.get('/error_test',function(req,res,next){
  * Default error handler
  * Add every API call above this
  */
- 
- 
+
+
 router.all('*',function(req,res,next){
     res.status(404).json({ status : false, error : { api : 'API'}, message : 'Not found'});
 });

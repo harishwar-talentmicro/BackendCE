@@ -146,7 +146,7 @@ Configuration.prototype.save = function(req,res,next){
         var HomeDeliveryItemListType = req.body.HomeDeliveryItemListType;
         var ResumeKeyword = req.body.ResumeKeyword;
         var Category = req.body.Category;
-       // var Keyword = req.body.Keyword;
+        // var Keyword = req.body.Keyword;
         var ReservationDisplayFormat = req.body.ReservationDisplayFormat;
         var DataRefreshInterval = req.body.DataRefreshInterval;
         var SalesFormMsg = req.body.SalesFormMsg;
@@ -338,7 +338,7 @@ Configuration.prototype.get = function(req,res,next){
                         st.db.query('CALL pGetconfiguration(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
+                                    if (GetResult[0]) {
 
                                         console.log('FnGetConfig: Details Send successfully');
                                         GetResult[0][0].dealbanner= (GetResult[0][0].dealbanner) ?
@@ -415,7 +415,7 @@ Configuration.prototype.getBusinessCategories = function(req,res,next){
             var Query = 'Select CategoryID, CategoryTitle from mcategory where LangID=' + st.db.escape(LangID);
             st.db.query(Query, function (err, CategoryResult) {
                 if (!err) {
-                    if (CategoryResult.length > 0) {
+                    if (CategoryResult) {
                         res.send(CategoryResult);
                         console.log('FnGetCategory: mcategory: Category sent successfully');
                     }
@@ -472,7 +472,7 @@ Configuration.prototype.getStatusTypes = function(req,res,next){
                         st.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
                             if (!err) {
                                 if (StatusResult) {
-                                    if (StatusResult[0].length > 0) {
+                                    if (StatusResult[0]) {
                                         console.log('FnGetStatusType: Status type details Send successfully');
                                         res.send(StatusResult[0]);
                                     }
@@ -581,8 +581,8 @@ Configuration.prototype.StatusTypes = function(req,res,next){
                         st.db.query('CALL pGetStatusType(' + query + ')', function (err, StatusResult) {
 
                             if (!err) {
-                                if (StatusResult != null) {
-                                    if (StatusResult[0].length > 0) {
+                                if (StatusResult) {
+                                    if (StatusResult[0]) {
                                         StatusResult[0].unshift(StatusAll);
                                         StatusResult[0].unshift(StatusAllOpen);
                                         RtnMessage.Result = StatusResult[0];
@@ -686,7 +686,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
                             + ',' + st.db.escape(StatusValue);
                         st.db.query('CALL pSaveStatusTypes(' + query + ')', function (err, result) {
                             if (!err) {
-                                if(result != null){
+                                if(result){
                                     if(result.affectedRows > 0){
                                         console.log('FnSaveStatusType: Status type saved successfully');
                                         RtnMessage.IsSuccessfull = true;
@@ -949,8 +949,8 @@ Configuration.prototype.getItems = function(req,res,next){
                         st.db.query('CALL pGetItemList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
 
                             if (!err) {
-                                if (GetResult[0]) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
                                         console.log('FnGetItemList: Item list details Send successfully');
                                         res.json(GetResult[0]);
                                     }
@@ -1137,8 +1137,8 @@ Configuration.prototype.getFolders = function(req,res,next){
 
                         st.db.query('CALL pGetFolderList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0]) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
                                         console.log('FnGetRoleList: Role list details Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -1315,8 +1315,7 @@ Configuration.prototype.getSubusers = function(req,res,next){
                         st.db.query('CALL pGetSubUserList(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
-
+                                    if (GetResult[0]) {
                                         console.log('FnGetSubUserList: Sub user list details Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -1428,20 +1427,23 @@ Configuration.prototype.createSubuser = function(req,res,next){
                         console.log('InsertResult......');
                         console.log(InsertResult);
                         if (!err){
-                            if (InsertResult[0])
-                            {
-                                if(InsertResult[0].length > 0)
-                                {
+                            if (InsertResult) {
+                                if(InsertResult[0]) {
                                     var Result = InsertResult[0];
-                                    if(Result[0].RowAffected == 1)
-                                    {
-                                        RtnMessage.IsSuccessfull = true;
-                                        RtnMessage.TID = Result[0].TID;
+                                    if (Result[0]) {
+                                        if (Result[0].RowAffected == 1) {
+                                            RtnMessage.IsSuccessfull = true;
+                                            RtnMessage.TID = Result[0].TID;
+                                            res.send(RtnMessage);
+                                            console.log('FnCreateSubUser: Sub User details save successfully');
 
-                                        res.send(RtnMessage);
-                                        console.log('FnCreateSubUser: Sub User details save successfully');}
-                                    else
-                                    {
+                                        }
+                                        else {
+                                            console.log('FnCreateSubUser:No Save Sub User details');
+                                            res.send(RtnMessage);
+                                        }
+                                    }
+                                    else {
                                         console.log('FnCreateSubUser:No Save Sub User details');
                                         res.send(RtnMessage);
                                     }
@@ -1519,7 +1521,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
 
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
+                        if (GetResult[0]) {
                             responseMessage.status = true;
                             responseMessage.data = GetResult[0] ;
                             responseMessage.error = null;
@@ -1528,7 +1530,6 @@ Configuration.prototype.getReservationResources = function(req,res,next){
                             res.status(200).json(responseMessage);
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded Resource details';
                             console.log('FnGetReservationResource: No founded Resource details');
@@ -1536,8 +1537,6 @@ Configuration.prototype.getReservationResources = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No Resource details found';
                         console.log('FnGetReservationResource: No Resource details found');
@@ -1546,7 +1545,6 @@ Configuration.prototype.getReservationResources = function(req,res,next){
 
                 }
                 else {
-
                     responseMessage.data = null ;
                     responseMessage.error = {};
                     responseMessage.message = 'Error in getting Resource details';
@@ -1570,7 +1568,7 @@ Configuration.prototype.getReservationResources = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnGetReservationResource:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -2899,67 +2897,67 @@ Configuration.prototype.deleteWorkingHours = function(req,res,next){
      */
     var _this = this;
     try{
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var Token = req.query.Token;
-    var TID = req.query.TID;
-    var RtnMessage = {
-        IsSuccessfull: false,
-        Message:''
-    };
-    var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
+        var Token = req.query.Token;
+        var TID = req.query.TID;
+        var RtnMessage = {
+            IsSuccessfull: false,
+            Message:''
+        };
+        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-    if (Token !=null && TID != null) {
-        st.validateToken(Token, function (err, Result) {
-            if (!err) {
-                if (Result != null) {
-                    //console.log('CALL pDeleteWorkinghours(' + st.db.escape(TID) + ')');
-                    st.db.query('CALL pDeleteWorkinghours(' + st.db.escape(TID) + ')', function (err, deleteResult) {
-                        if (!err){
+        if (Token !=null && TID != null) {
+            st.validateToken(Token, function (err, Result) {
+                if (!err) {
+                    if (Result != null) {
+                        //console.log('CALL pDeleteWorkinghours(' + st.db.escape(TID) + ')');
+                        st.db.query('CALL pDeleteWorkinghours(' + st.db.escape(TID) + ')', function (err, deleteResult) {
+                            if (!err){
 
-                            RtnMessage.IsSuccessfull = true;
-                            RtnMessage.Message = 'delete successfully';
-                            res.send(RtnMessage);
-                            console.log('FnDeleteWorkingHours:Working Hours delete successfully');
-                        }
-                        else {
-                            console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
-                            res.statusCode = 500;
-                            RtnMessage.Message = 'Error in deleting';
-                            res.send(RtnMessage);
-                        }
-                    });
+                                RtnMessage.IsSuccessfull = true;
+                                RtnMessage.Message = 'delete successfully';
+                                res.send(RtnMessage);
+                                console.log('FnDeleteWorkingHours:Working Hours delete successfully');
+                            }
+                            else {
+                                console.log('FnDeleteWorkingHours: error in deleting Working Hours' + err);
+                                res.statusCode = 500;
+                                RtnMessage.Message = 'Error in deleting';
+                                res.send(RtnMessage);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('FnDeleteWorkingHours: Invalid token');
+                        res.statusCode = 401;
+                        res.send(RtnMessage);
+                    }
                 }
                 else {
-                    console.log('FnDeleteWorkingHours: Invalid token');
-                    res.statusCode = 401;
+                    console.log('FnDeleteWorkingHours:Error in processing Token' + err);
+                    res.statusCode = 500;
                     res.send(RtnMessage);
                 }
-            }
-            else {
-                console.log('FnDeleteWorkingHours:Error in processing Token' + err);
-                res.statusCode = 500;
-                res.send(RtnMessage);
-            }
-        });
-    }
-    else {
-        if (Token == null) {
-            console.log('FnDeleteWorkingHours: Token is empty');
+            });
         }
-        else if (TID == null) {
-            console.log('FnDeleteWorkingHours: TID is empty');
+        else {
+            if (Token == null) {
+                console.log('FnDeleteWorkingHours: Token is empty');
+            }
+            else if (TID == null) {
+                console.log('FnDeleteWorkingHours: TID is empty');
+            }
+            res.statusCode=400;
+            res.send(RtnMessage);
         }
-        res.statusCode=400;
-        res.send(RtnMessage);
     }
-}
-catch (ex) {
-    console.log('FnDeleteWorkingHours:error ' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-}
+    catch (ex) {
+        console.log('FnDeleteWorkingHours:error ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
 };
 
 /**
@@ -2975,83 +2973,83 @@ Configuration.prototype.getWorkingHoursDetails = function(req,res,next){
     var _this = this;
     try {
 
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    var Token = req.query.Token;
-    var TID = req.query.TID;
+        var Token = req.query.Token;
+        var TID = req.query.TID;
 
 
-    var responseMessage = {
-        status: false,
-        data: null,
-        error:{},
-        message:''
-    };
+        var responseMessage = {
+            status: false,
+            data: null,
+            error:{},
+            message:''
+        };
 
-    if (TID) {
+        if (TID) {
 
-        st.db.query('CALL PGetworkinghourDetails(' + st.db.escape(Token) + ',' + st.db.escape(TID) + ')', function (err, GetResult) {
-            console.log(GetResult)
-            if (!err) {
-                if (GetResult) {
-                    if (GetResult[0].length > 0) {
-                        responseMessage.status = true;
-                        responseMessage.data = GetResult[0] ;
-                        responseMessage.error = null;
-                        responseMessage.message = ' Working hours Send successfully';
-                        console.log('FnWorkingHoursDetails:Working hours Send successfully');
-                        res.status(200).json(responseMessage);
+            st.db.query('CALL PGetworkinghourDetails(' + st.db.escape(Token) + ',' + st.db.escape(TID) + ')', function (err, GetResult) {
+                console.log(GetResult)
+                if (!err) {
+                    if (GetResult) {
+                        if (GetResult[0].length > 0) {
+                            responseMessage.status = true;
+                            responseMessage.data = GetResult[0] ;
+                            responseMessage.error = null;
+                            responseMessage.message = ' Working hours Send successfully';
+                            console.log('FnWorkingHoursDetails:Working hours Send successfully');
+                            res.status(200).json(responseMessage);
+                        }
+                        else {
+
+                            responseMessage.error = {};
+                            responseMessage.message = 'No founded Working hours';
+                            console.log('FnWorkingHours: No founded Working hours');
+                            res.json(responseMessage);
+                        }
                     }
                     else {
 
+
                         responseMessage.error = {};
-                        responseMessage.message = 'No founded Working hours';
-                        console.log('FnWorkingHours: No founded Working hours');
+                        responseMessage.message = 'No founded Working hours list';
+                        console.log('FnWorkingHours: No founded Working hours list');
                         res.json(responseMessage);
                     }
+
                 }
                 else {
 
-
+                    responseMessage.data = null ;
                     responseMessage.error = {};
-                    responseMessage.message = 'No founded Working hours list';
-                    console.log('FnWorkingHours: No founded Working hours list');
-                    res.json(responseMessage);
+                    responseMessage.message = 'Error in getting Working hours list';
+                    console.log('FnWorkingHours: error in getting Working hours list' + err);
+                    res.status(500).json(responseMessage);
                 }
-
-            }
-            else {
-
-                responseMessage.data = null ;
-                responseMessage.error = {};
-                responseMessage.message = 'Error in getting Working hours list';
-                console.log('FnWorkingHours: error in getting Working hours list' + err);
-                res.status(500).json(responseMessage);
-            }
-        });
-    }
-
-    else {
-        if (!Token) {
-            responseMessage.message = 'Invalid Token';
-            responseMessage.error = {
-                Token : 'Invalid Token'
-            };
-            console.log('FnWorkingHours: Token is mandatory field');
+            });
         }
 
-        res.status(401).json(responseMessage);
+        else {
+            if (!Token) {
+                responseMessage.message = 'Invalid Token';
+                responseMessage.error = {
+                    Token : 'Invalid Token'
+                };
+                console.log('FnWorkingHours: Token is mandatory field');
+            }
+
+            res.status(401).json(responseMessage);
+        }
     }
-}
-catch (ex) {
-    responseMessage.error = {};
-    responseMessage.message = 'An error occured !'
-    console.log('FnWorkingHours:error ' + ex.description);
-    var errorDate = new Date();
-    console.log(errorDate.toTimeString() + ' ......... error ...........');
-    res.status(400).json(responseMessage);
-}
+    catch (ex) {
+        responseMessage.error = {};
+        responseMessage.message = 'An error occured !'
+        console.log('FnWorkingHours:error ' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(400).json(responseMessage);
+    }
 };
 
 
@@ -3197,9 +3195,9 @@ Configuration.prototype.getInstituteGroup = function(req,res,next){
     var validateStatus = true,error = {};
 
     if(!(req.query.token)){
-            error['token'] = 'Token is Mandatory';
-            validateStatus *= false;
-        }
+        error['token'] = 'Token is Mandatory';
+        validateStatus *= false;
+    }
 
     if(!validateStatus){
         responseMessage.error = error;

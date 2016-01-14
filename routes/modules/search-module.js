@@ -290,7 +290,7 @@ Search.prototype.searchKeyword = function(req,res,next){
             if (find != null && find != ''&& Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CurrentDate != null && pagesize != null && pagecount != null) {
 
                 if (ParkingStatus == 0) {
-                    ParkingStatus = "1,2,3";
+                    ParkingStatus = "0,1,2,3";
                 }
 
                 var InsertQuery = st.db.escape(find) + ',' + st.db.escape(Latitude)
@@ -385,7 +385,7 @@ Search.prototype.searchKeyword = function(req,res,next){
 
             if (find != null && find != '' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
                 if (ParkingStatus == 0) {
-                    ParkingStatus = "1,2,3";
+                    ParkingStatus = "0,1,2,3";
                 }
                 var InsertQuery = st.db.escape(find) + ',' + st.db.escape(Latitude)
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)

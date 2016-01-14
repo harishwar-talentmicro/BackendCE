@@ -534,7 +534,7 @@ Service.prototype.getServiceDetails = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(serviceId);
+                        var queryParams =   st.db.escape(serviceId)+','+ st.db.escape(token);
                         var query = 'CALL ploadservicedetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, details) {
@@ -544,6 +544,11 @@ Service.prototype.getServiceDetails = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'service details loaded successfully';
+                                        if(details[0][0]) {
+                                            details[0][0].isimage = details[0][0].isimage ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isimage : 0;
+                                            details[0][0].isattachment = details[0][0].isattachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isattachment : 0;
+                                            details[0][0].isvideo = details[0][0].isvideo ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + details[0][0].isvideo : 0;
+                                        }
                                         responseMessage.data = details[0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetServiceDetails: service details loaded successfully');
