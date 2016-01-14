@@ -233,7 +233,7 @@ StdLib.prototype.validateTokenAp = function(Token, CallBack){
     try {
 
         //below query to check token exists for the users or not.
-        if (Token != null) {
+        if (Token) {
             var Query = 'select Token from tapuser where Token=' +_this.db.escape(Token);
             //var Query = 'select Token from tmaster';
             //70084b50d3c43822fbef
@@ -378,7 +378,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
     try {
 
         //below query to check token exists for the users or not.
-        if (MailContent != null) {
+        if (MailContent) {
             //var Query = 'select Token from tmaster';
             //70084b50d3c43822fbef
             var RtnResponse = {

@@ -291,26 +291,38 @@ User.prototype.getState = function(req,res,next){
             // console.log(Query);
             st.db.query(Query, function (err, StateResult) {
                 if (!err) {
-                    if (StateResult.length > 0) {
-                        var Query = 'Select ifnull(ISDCode,"") as ISDCode from  mcountry where CountryID=' + st.db.escape(CountryID);
-                        st.db.query(Query, function (err, CountryResult) {
-                            if (!err) {
-                                if (CountryResult.length) {
-                                    res.setHeader('ISDCode', CountryResult[0].ISDCode);
-                                    res.send(StateResult);
-                                    console.log('FnGetState: mcountry: State sent successfully');
+                    if(StateResult) {
+                        if (StateResult.length > 0) {
+                            var Query = 'Select ifnull(ISDCode,"") as ISDCode from  mcountry where CountryID=' + st.db.escape(CountryID);
+                            st.db.query(Query, function (err, CountryResult) {
+                                if (!err) {
+                                    if(CountryResult) {
+                                        if (CountryResult.length  > 0) {
+                                            res.setHeader('ISDCode', CountryResult[0].ISDCode);
+                                            res.send(StateResult);
+                                            console.log('FnGetState: mcountry: State sent successfully');
+                                        }
+                                        else {
+                                            res.json(null);
+                                            console.log('FnGetState: mcountry: No Country ISDCode found');
+                                        }
+                                    }
+                                    else {
+                                        res.json(null);
+                                        console.log('FnGetState: mcountry: No Country ISDCode found');
+                                    }
                                 }
                                 else {
                                     res.json(null);
-                                    console.log('FnGetState: mcountry: No Country ISDCode found');
+                                    console.log('FnGetState: mcountry:  No Country ISDCode found: ' + err);
                                 }
-                            }
-                            else {
-                                res.json(null);
-                                console.log('FnGetState: mcountry:  No Country ISDCode found: ' + err);
-                            }
-                        });
+                            });
 
+                        }
+                        else {
+                            res.json(null);
+                            console.log('FnGetState: mstate: No state found');
+                        }
                     }
                     else {
                         res.json(null);
@@ -364,9 +376,15 @@ User.prototype.getCity = function(req,res,next){
             var Query = 'Select  CityID, CityName from mcity where LangID=' + st.db.escape(LangID) + ' and StateID= ' + st.db.escape(StateID);
             st.db.query(Query, function (err, CityResult) {
                 if (!err) {
-                    if (CityResult.length) {
-                        res.send(CityResult);
-                        console.log('FnGetCity: mcity: City sent successfully');
+                    if(CityResult) {
+                        if (CityResult.length > 0) {
+                            res.send(CityResult);
+                            console.log('FnGetCity: mcity: City sent successfully');
+                        }
+                        else {
+                            res.json(null);
+                            console.log('FnGetCity: mcity: No category found');
+                        }
                     }
                     else {
                         res.json(null);
@@ -426,7 +444,6 @@ User.prototype.getUserDetails = function(req,res,next){
                             if (!err) {
                                 if (UserDetailsResult[0]) {
                                     if (UserDetailsResult[0].length > 0) {
-
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
@@ -503,10 +520,17 @@ User.prototype.checkEzeid = function(req,res,next){
             st.db.query(Query, function (err, EzeidExitsResult) {
                 console.log(EzeidExitsResult);
                 if (!err) {
-                    if (EzeidExitsResult.length > 0) {
-                        RtnMessage.IsIdAvailable = false;
-                        res.send(RtnMessage);
-                        console.log('FnCheckEzeid: tmaster: EzeId exists');
+                    if(EzeidExitsResult) {
+                        if (EzeidExitsResult.length > 0) {
+                            RtnMessage.IsIdAvailable = false;
+                            res.send(RtnMessage);
+                            console.log('FnCheckEzeid: tmaster: EzeId exists');
+                        }
+                        else {
+                            RtnMessage.IsIdAvailable = true;
+                            res.send(RtnMessage);
+                            console.log('FnCheckEzeid: tmaster:  EzeId available');
+                        }
                     }
                     else {
                         RtnMessage.IsIdAvailable = true;
@@ -1153,16 +1177,23 @@ User.prototype.getCompanyProfile = function(req,res,next){
             //console.log('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')');
             st.db.query('CALL pGetTagLine(' + st.db.escape(TID)+ ',' + st.db.escape(Token) + ')', function (err, GetResult) {
                 if (!err) {
-                    if (GetResult[0]) {
-                        if (GetResult[0].length > 0) {
-                            RtnMessage.Result=GetResult[0];
-                            RtnMessage.Message = 'About Company Profile sent successfully';
-                            console.log('FnGetCompanyProfile: Company Profile  Send successfully');
-                            res.send(RtnMessage);
+                    if(GetResult) {
+                        if (GetResult[0]) {
+                            if (GetResult[0].length > 0) {
+                                RtnMessage.Result = GetResult[0];
+                                RtnMessage.Message = 'About Company Profile sent successfully';
+                                console.log('FnGetCompanyProfile: Company Profile  Send successfully');
+                                res.send(RtnMessage);
+                            }
+                            else {
+                                RtnMessage.Message = 'No Company Profile  found';
+                                console.log('FnGetCompanyProfile: No Company Profile    found');
+                                res.send(RtnMessage);
+                            }
                         }
                         else {
-                            RtnMessage.Message = 'No Company Profile  found';
-                            console.log('FnGetCompanyProfile: No Company Profile    found');
+                            RtnMessage.Message = 'No Company Profile found';
+                            console.log('FnGetCompanyProfile: No Company Profile found');
                             res.send(RtnMessage);
                         }
                     }
@@ -2213,10 +2244,15 @@ function FnSaveSkills(skill, CallBack) {
                                     if (skillInsertResult.affectedRows > 0) {
                                         st.db.query('select SkillID from mskill where SkillTitle like ' + st.db.escape(skill.skillname) + ' and type=' + st.db.escape(skill.type), function (err, SkillMaxResult) {
                                             if (!err) {
-                                                if (SkillMaxResult[0]) {
-                                                    //console.log('New Skill');
-                                                    RtnResponse.SkillID = SkillMaxResult[0].SkillID;
-                                                    CallBack(null, RtnResponse);
+                                                if(SkillMaxResult) {
+                                                    if (SkillMaxResult[0]) {
+                                                        //console.log('New Skill');
+                                                        RtnResponse.SkillID = SkillMaxResult[0].SkillID;
+                                                        CallBack(null, RtnResponse);
+                                                    }
+                                                    else {
+                                                        CallBack(null, null);
+                                                    }
                                                 }
                                                 else {
                                                     CallBack(null, null);
@@ -2328,13 +2364,19 @@ User.prototype.getDocPin = function(req,res,next) {
                         st.db.query('CALL pGetDocPIN(' + st.db.escape(token) + ')', function (err, BussinessListingResult) {
                             if (!err) {
                                 // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if (BussinessListingResult[0]) {
-                                    if (BussinessListingResult[0].length > 0) {
-                                        res.send(BussinessListingResult[0]);
-                                        console.log('FnGetDocPin: Bussiness Pin sent successfully');
+                                if(BussinessListingResult) {
+                                    if (BussinessListingResult[0]) {
+                                        if (BussinessListingResult[0].length > 0) {
+                                            res.send(BussinessListingResult[0]);
+                                            console.log('FnGetDocPin: Bussiness Pin sent successfully');
+                                        }
+                                        else {
+                                            console.log('FnGetDocPin: Bussiness Pin is not avaiable');
+                                            res.json(null);
+                                        }
                                     }
                                     else {
-                                        console.log('FnGetDocPin: Bussiness Pin is not avaiable');
+                                        console.log('FnGetDocPin: Bussiness listing is not avaiable');
                                         res.json(null);
                                     }
                                 }
@@ -2402,16 +2444,22 @@ User.prototype.getDoc = function(req,res,next) {
                         st.db.query('CALL pGetDocs(' + st.db.escape(Token) + ',' + st.db.escape(Type) + ')', function (err, DocumentResult) {
                             if (!err) {
                                 //console.log(DocumentResult);
-                                if (DocumentResult[0]) {
-                                    if (DocumentResult[0].length > 0) {
-                                        res.send(DocumentResult[0]);
-                                        console.log('FnGetDoc: Document sent successfully');
+                                if(DocumentResult) {
+                                    if (DocumentResult[0]) {
+                                        if (DocumentResult[0].length > 0) {
+                                            res.send(DocumentResult[0]);
+                                            console.log('FnGetDoc: Document sent successfully');
+                                        }
+                                        else {
+                                            console.log('FnGetDoc: No document available');
+                                            res.json(null);
+                                        }
+
                                     }
                                     else {
                                         console.log('FnGetDoc: No document available');
                                         res.json(null);
                                     }
-
                                 }
                                 else {
                                     console.log('FnGetDoc: No document available');
@@ -2481,24 +2529,30 @@ User.prototype.getDocument = function(req,res,next) {
                         //console.log(query);
                         st.db.query('CALL  pGetDocsFile(' + query + ')', function (err, DocumentResult) {
                             if (!err) {
-                                if (DocumentResult[0]) {
-                                    if (DocumentResult[0].length > 0) {
-                                        DocumentResult = DocumentResult[0];
-                                        var docs = DocumentResult[0];
-                                        // console.log(docs);
-                                        res.setHeader('Content-Type', docs.ContentType);
-                                        res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
-                                        res.setHeader('Cache-Control', 'public, max-age=0');
-                                        res.writeHead('200', { 'Content-Type': docs.ContentType });
-                                        //console.log(docs.Docs);
-                                        res.end(docs.Docs, 'base64');
-                                        console.log('FnGetDocument: Document sent successfully-1');
+                                if(DocumentResult) {
+                                    if (DocumentResult[0]) {
+                                        if (DocumentResult[0].length > 0) {
+                                            DocumentResult = DocumentResult[0];
+                                            var docs = DocumentResult[0];
+                                            // console.log(docs);
+                                            res.setHeader('Content-Type', docs.ContentType);
+                                            res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
+                                            res.setHeader('Cache-Control', 'public, max-age=0');
+                                            res.writeHead('200', {'Content-Type': docs.ContentType});
+                                            //console.log(docs.Docs);
+                                            res.end(docs.Docs, 'base64');
+                                            console.log('FnGetDocument: Document sent successfully-1');
+                                        }
+                                        else {
+                                            console.log('FnGetDocument: No document available');
+                                            res.json(null);
+                                        }
+
                                     }
                                     else {
                                         console.log('FnGetDocument: No document available');
                                         res.json(null);
                                     }
-
                                 }
                                 else {
                                     console.log('FnGetDocument: No document available');
@@ -2656,7 +2710,7 @@ User.prototype.saveDoc = function(req,res,next) {
         if (Token != null) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null && tRefType.toString() != 'NaN') {
+                    if (Result && tRefType.toString() != 'NaN') {
                         if (tRefExpiryDate != null) {
                             tRefExpiryDate = new Date(tRefExpiryDate);
                             //console.log(tRefExpiryDate);
