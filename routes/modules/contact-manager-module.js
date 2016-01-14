@@ -60,7 +60,7 @@ ContactManager.prototype.getClientList = function(req,res,next){
     var responseMessage = {
         status: false,
         count : 0,
-        data: null,
+        data: [],
         message: '',
         error: {}
     };
@@ -89,14 +89,41 @@ ContactManager.prototype.getClientList = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             //console.log(getResult);
                             if (!err) {
-                                if (getResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.count = getResult[0][0].count;
-                                    responseMessage.data = getResult[1];
-                                    responseMessage.message = 'Client List loaded successfully';
-                                    responseMessage.error = null;
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetClientList: Client List loaded successfully');
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0][0]) {
+                                            if (getResult[1]) {
+                                                responseMessage.status = true;
+                                                responseMessage.count = getResult[0][0].count;
+                                                responseMessage.data = getResult[1];
+                                                responseMessage.message = 'Client List loaded successfully';
+                                                responseMessage.error = null;
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetClientList: Client List loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.status = true;
+                                                responseMessage.message = 'Client List loaded successfully';
+                                                responseMessage.error = null;
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetClientList: Client List loaded successfully');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.message = 'Client List loaded successfully';
+                                            responseMessage.error = null;
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetClientList: Client List loaded successfully');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.message = 'Client List loaded successfully';
+                                        responseMessage.error = null;
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetClientList: Client List loaded successfully');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Client List not loaded';
@@ -175,7 +202,7 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
         cn:'',
         cc:'',
         page :'',
-        data: null,
+        data: [],
         message: '',
         error: {}
     };
@@ -207,18 +234,43 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.count = getResult[0][0].count;
-                                    responseMessage.cid = getResult[0][0].cid;
-                                    responseMessage.cn = getResult[0][0].cn;
-                                    responseMessage.cc = getResult[0][0].cc;
-                                    responseMessage.page = getResult[0][0].page;
-                                    responseMessage.data = getResult[1];
-                                    responseMessage.message = 'Contact List loaded successfully';
-                                    responseMessage.error = null;
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetClientContacts: Contact List loaded successfully');
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0][0]) {
+                                            if (getResult[1]) {
+
+                                                responseMessage.status = true;
+                                                responseMessage.count = getResult[0][0].count;
+                                                responseMessage.cid = getResult[0][0].cid;
+                                                responseMessage.cn = getResult[0][0].cn;
+                                                responseMessage.cc = getResult[0][0].cc;
+                                                responseMessage.page = getResult[0][0].page;
+                                                responseMessage.data = getResult[1];
+                                                responseMessage.message = 'Contact List loaded successfully';
+                                                responseMessage.error = null;
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetClientContacts: Contact List loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.status = true;
+                                                responseMessage.message = 'Contact List not loaded';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetClientContacts: Contact List not loaded');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.message = 'Contact List not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetClientContacts: Contact List not loaded');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.message = 'Contact List not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetClientContacts: Contact List not loaded');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Contact List not loaded';
@@ -347,17 +399,31 @@ ContactManager.prototype.saveClient = function(req,res,next) {
                             //console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Client saved successfully';
-                                    responseMessage.data = {
-                                        id: parseInt(insertresult[0][0].id),
-                                        cc: req.body.cc,
-                                        ct: req.body.ct,
-                                        cs: parseInt(req.body.cs)
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveClient: Client saved successfully');
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Client saved successfully';
+                                            responseMessage.data = {
+                                                id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)) : 0,
+                                                cc: req.body.cc,
+                                                ct: req.body.ct,
+                                                cs: parseInt(req.body.cs)
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveClient: Client saved successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'No save Client';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveClient:No save Client');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'No save Client';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveClient:No save Client');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'No save Client';
@@ -493,23 +559,38 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
                             //console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'ClientContct saved successfully';
-                                    responseMessage.data = {
-                                        id: parseInt(insertresult[0][0].id),
-                                        fn: req.body.fn,
-                                        ln: req.body.ln,
-                                        jt: req.body.jt,
-                                        mn: req.body.mn,
-                                        em: req.body.em,
-                                        ph: req.body.ph,
-                                        st: parseInt(req.body.st),
-                                        cid: parseInt(req.body.cid)
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
 
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveClientContact: ClientContct saved successfully');
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'ClientContct saved successfully';
+                                            responseMessage.data = {
+                                                id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)):0,
+                                                fn: req.body.fn,
+                                                ln: req.body.ln,
+                                                jt: req.body.jt,
+                                                mn: req.body.mn,
+                                                em: req.body.em,
+                                                ph: req.body.ph,
+                                                st: parseInt(req.body.st),
+                                                cid: parseInt(req.body.cid)
+
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveClientContact: ClientContct saved successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'No save ClientContct';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveClientContact:No save ClientContct');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'No save ClientContct';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveClientContact:No save ClientContct');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'No save ClientContct';

@@ -79,7 +79,7 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
         error:{},
         message:'',
         total_count:0,
-        data: null
+        data: []
     };
     var validateStatus = true, error = {};
 
@@ -116,13 +116,32 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                         st.db.query('CALL pGetMessagesNew(' + parameters + ')', function (err, transResult) {
                             if (!err) {
                                 if (transResult) {
-                                    if (transResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.total_count = transResult[0][0].count;
-                                        responseMessage.data = transResult[1];
-                                        responseMessage.message = 'Transaction details Send successfully';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetTransaction: Transaction details Send successfully');
+                                    if (transResult[0]) {
+                                        if (transResult[0][0]) {
+                                            if (transResult[1]) {
+                                                responseMessage.status = true;
+                                                responseMessage.total_count = transResult[0][0].count;
+                                                responseMessage.data = transResult[1];
+                                                responseMessage.message = 'Transaction details Send successfully';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetTransaction: Transaction details Send successfully');
+                                            }
+                                            else {
+                                                responseMessage.status = true;
+                                                responseMessage.data = [];
+                                                responseMessage.message = 'No Transaction details found';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetTransaction:No Transaction details found');
+                                            }
+                                        }
+
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.data = [];
+                                            responseMessage.message = 'No Transaction details found';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetTransaction:No Transaction details found');
+                                        }
                                     }
                                     else {
                                         responseMessage.status = true;
@@ -243,20 +262,37 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                             + ',' + st.db.escape(10) + ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
                             + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(ezeoneIdSort)
                             + ',' + st.db.escape(ezeoneIdQuery);
-                        console.log('CALL pGetSalesTransaction(' + parameters + ')');
+                        //console.log('CALL pGetSalesTransaction(' + parameters + ')');
                         st.db.query('CALL pGetSalesTransaction(' + parameters + ')', function (err, transResult) {
                             //console.log(transResult);
                             if (!err) {
                                 if (transResult) {
-                                    if (transResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.total_count = transResult[0][0].count;
-                                        responseMessage.data = transResult[1];
-                                        responseMessage.message = 'Transaction details Send successfully';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetSalesTransaction: Transaction details Send successfully');
+                                    if (transResult[0]) {
+                                        if (transResult[0][0]) {
+                                            if (transResult[1]) {
+                                                responseMessage.status = true;
+                                                responseMessage.total_count = transResult[0][0].count;
+                                                responseMessage.data = transResult[1];
+                                                responseMessage.message = 'Transaction details Send successfully';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetSalesTransaction: Transaction details Send successfully');
+                                            }
+                                            else {
+                                                responseMessage.status = true;
+                                                responseMessage.data = [];
+                                                responseMessage.message = 'No Transaction details found';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetSalesTransaction:No Transaction details found');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.data = [];
+                                            responseMessage.message = 'No Transaction details found';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetSalesTransaction:No Transaction details found');
+                                        }
                                     }
-
                                     else {
                                         responseMessage.status = true;
                                         responseMessage.data =[];
@@ -476,7 +512,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                 res.status(403).json(respMsg);
                                             }
                                             else {
-                                                if (transResult[0][0].MessageID) {
+                                                if (transResult[0][0]) {
                                                     respMsg.status = true;
                                                     respMsg.message = 'Transaction saved successfully';
                                                     respMsg.data = {
@@ -808,7 +844,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                     if (transResult[0].length > 0) {
 
                                         RtnMessage.IsSuccessfull = true;
-                                        RtnMessage.MessageID = transResult[0][0].MessageID;
+                                        RtnMessage.MessageID = (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0;
 
                                         for (var i = 0; i < ItemsList.length; i++) {
                                             var itemsDetails = ItemsList[i];
@@ -1082,7 +1118,7 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
                         st.db.query('CALL pGetTranscationItems(' + st.db.escape(MessageID) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
+                                    if (GetResult[0]) {
 
                                         console.log('FnGetTranscationItems: transaction items details Send successfully');
                                         res.send(GetResult[0]);
@@ -1280,7 +1316,7 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
                         st.db.query('CALL pGetOutboxMessages(' + st.db.escape(Token) + ',' + st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(functiontype) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
+                                    if (GetResult[0]) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0] ;
                                         responseMessage.error = null;
@@ -1386,7 +1422,7 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
             st.db.query('CALL PgetTransAutocomplete(' + st.db.escape(title) + ',' + st.db.escape(type) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
+                        if (GetResult[0]) {
                             responseMessage.status = true;
                             responseMessage.data = GetResult[0] ;
                             responseMessage.error = null;
@@ -1437,7 +1473,7 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnGetTransAutoComplete:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -1472,8 +1508,8 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
                         console.log('CALL pItemListforEZEID(' +  st.db.escape(FunctionType)  + ',' + st.db.escape(EZEID) + ')');
                         st.db.query('CALL pItemListforEZEID(' +  st.db.escape(FunctionType)  + ',' + st.db.escape(EZEID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0] != null) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
                                         console.log('FnGetItemListForEZEID: Item list details Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -1631,8 +1667,8 @@ BusinessManager.prototype.itemList = function(req,res,next){
 
                         st.db.query('CALL pItemList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult) {
                                         console.log('FnItemList: Item list details Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -1712,8 +1748,8 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
                     if (Result != null) {
                         st.db.query('CALL pItemDetails(' + st.db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
                                         console.log('FnItemDetails: Item list details Send successfully');
                                         res.send(GetResult[0]);
                                     }
@@ -1793,8 +1829,8 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
 
                         st.db.query('CALL pGetUserWiseFolderList(' + st.db.escape(Token) + ',' + st.db.escape(RuleFunction) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
 
                                         console.log('FnGetUserwiseFolderList: Folder list details Send successfully');
                                         res.send(GetResult[0]);
@@ -1969,7 +2005,7 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
             st.db.query('CALL pGetCompanyDetails(' + st.db.escape(Token) + ',' + st.db.escape(functiontype) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
+                        if (GetResult[0]) {
                             responseMessage.status = true;
                             responseMessage.data = GetResult[0] ;
                             responseMessage.error = null;
@@ -2020,7 +2056,7 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
     }
     catch (ex) {
         responseMessage.error = {};
-        responseMessage.message = 'An error occured !'
+        responseMessage.message = 'An error occured !';
         console.log('FnGetCompanyDetails:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
@@ -2243,7 +2279,7 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
                         st.db.query('CALL pGetTransAttachment(' + st.db.escape(tid) + ')', function (err, GetResult) {
                             if (!err) {
                                 if (GetResult) {
-                                    if (GetResult[0].length > 0) {
+                                    if (GetResult[0]) {
                                         responseMessage.status = true;
                                         responseMessage.data = GetResult[0];
                                         responseMessage.error = null;
@@ -2366,13 +2402,13 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
                 + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, GetResult) {
-                var length = GetResult[0].length;
+
                 var total_count = 0, total_qty = 0;
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult.length > 0) {
+                        if (GetResult[0]) {
 
-                            for (var i = 0; i < length; i++)
+                            for (var i = 0; i < GetResult[0].length; i++)
                             {
                                 total_count = total_count + GetResult[0][i].amount;
                                 total_qty = total_qty + GetResult[0][i].qty;
@@ -2510,11 +2546,19 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                             //console.log(historyResult);
                             if (!err) {
                                 if (historyResult) {
+                                    if (historyResult[0]) {
+                                        if (historyResult[0][0]) {
+                                            if (historyResult[0][0].id) {
+                                                var tid = historyResult[0][0].id;}
+                                            else {var tid = 0;}
+                                        }else {var tid = 0;}
+                                    }
+                                    else { var tid = 0; }
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Transaction history created successfully';
                                     responseMessage.data = {
-                                        id : historyResult[0][0].id,
+                                        id : tid,
                                         s_type: parseInt(req.body.s_type),
                                         tid: parseInt(req.body.tid),
                                         s: parseInt(req.body.s),
@@ -2617,13 +2661,20 @@ BusinessManager.prototype.getTransactionHistory = function(req,res,next){
                         var query = 'CALL pgettranshistory(' + queryParams + ')';
                         st.db.query(query, function (err, historyResult) {
                             if (!err) {
-                                if (historyResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Transaction history loaded successfully';
-                                    responseMessage.data = historyResult[0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetTransactionHistory: Transaction history loaded successfully');
+                                if (historyResult) {
+                                    if (historyResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Transaction history loaded successfully';
+                                        responseMessage.data = historyResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTransactionHistory: Transaction history loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Transaction history not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTransactionHistory:Transaction history not loaded');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Transaction history not loaded';

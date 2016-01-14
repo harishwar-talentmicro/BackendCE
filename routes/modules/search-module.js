@@ -290,7 +290,7 @@ Search.prototype.searchKeyword = function(req,res,next){
             if (find != null && find != ''&& Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CurrentDate != null && pagesize != null && pagecount != null) {
 
                 if (ParkingStatus == 0) {
-                    ParkingStatus = 0;
+                    ParkingStatus = "0,1,2,3";
                 }
 
                 var InsertQuery = st.db.escape(find) + ',' + st.db.escape(Latitude)
@@ -306,7 +306,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                         //console.log(SearchResult[1]);
                         //console.log(SearchResult[2]);
 
-                        if (SearchResult[0]) {
+                        if (SearchResult[0] != null) {
                             if (SearchResult[0].length > 0) {
                                 if (!(SearchResult[0][0].isLoggedIn)) {
 
@@ -385,7 +385,7 @@ Search.prototype.searchKeyword = function(req,res,next){
 
             if (find != null && find != '' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
                 if (ParkingStatus == 0) {
-                    ParkingStatus = 0;
+                    ParkingStatus = "0,1,2,3";
                 }
                 var InsertQuery = st.db.escape(find) + ',' + st.db.escape(Latitude)
                     + ',' + st.db.escape(Longitude) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0) + ',' + st.db.escape(3)
@@ -510,81 +510,65 @@ Search.prototype.searchInformation = function(req,res,next){
             st.db.query('CALL pSearchInformationNew(' + SearchParameter + ')', function (err, UserInfoResult) {
                 // st.db.query(searchQuery, function (err, SearchResult) {
                 if (!err) {
-                    if(UserInfoResult) {
-                        if (UserInfoResult[0]) {
-                            if (UserInfoResult[0].length > 0) {
 
-                                UserInfoResult[0][0].dealbanner = (UserInfoResult[0][0].dealbanner) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[0][0].dealbanner) : '';
-                                //console.log(UserInfoResult[1]);
-                                if (UserInfoResult[1]) {
-                                    if (UserInfoResult[1].length > 0) {
+                    if (UserInfoResult[0].length > 0) {
 
-                                        if (UserInfoResult[1][0].type == 0) {
+                        UserInfoResult[0][0].dealbanner = (UserInfoResult[0][0].dealbanner) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[0][0].dealbanner) : '';
+                        //console.log(UserInfoResult[1]);
 
-                                            for (var i = 0; i < UserInfoResult[1].length; i++) {
+                        if(UserInfoResult[1].length) {
 
-                                                console.log('for loop..type..0');
-                                                var result = {};
+                            if (UserInfoResult[1][0].type == 0) {
 
-                                                result.s_url1 = (UserInfoResult[1][0].pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].pic) : '';
-                                                result.s_url2 = (UserInfoResult[1][0].InfoBannerFile1) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile1) : '';
-                                                result.s_url3 = (UserInfoResult[1][0].InfoBannerFile2) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile2) : '';
-                                                result.s_url4 = (UserInfoResult[1][0].InfoBannerFile3) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile3) : '';
-                                                result.s_url5 = (UserInfoResult[1][0].InfoBannerFile4) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile4) : '';
-                                                result.s_url6 = (UserInfoResult[1][0].InfoBannerFile5) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile5) : '';
-                                                output.push(result);
-                                            }
+                                for (var i = 0; i < UserInfoResult[1].length; i++) {
 
-                                            var finalResult = {
-                                                "banners": [
-                                                    {"s_url": output[0].s_url1},
-                                                    {"s_url": output[0].s_url2},
-                                                    {"s_url": output[0].s_url3},
-                                                    {"s_url": output[0].s_url4},
-                                                    {"s_url": output[0].s_url5},
-                                                    {"s_url": output[0].s_url6}]
-                                            };
-                                            output = finalResult.banners;
+                                    console.log('for loop..type..0');
+                                    var result = {};
 
-                                        }
-                                        else {
-                                            console.log('for loop..type..2');
-                                            for (var i = 0; i < UserInfoResult[1].length; i++) {
-                                                var result = {};
-
-                                                result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][i].path;
-                                                output.push(result);
-                                            }
-                                        }
-
-
-                                        res.json({result: UserInfoResult[0][0], banners: output});
-                                        console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
-                                    }
-                                    else {
-                                        res.json({result: UserInfoResult[0][0], banners: output});
-                                        console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
-                                    }
+                                    result.s_url1 = (UserInfoResult[1][0].pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].pic) : '';
+                                    result.s_url2 = (UserInfoResult[1][0].InfoBannerFile1) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile1) : '';
+                                    result.s_url3 = (UserInfoResult[1][0].InfoBannerFile2) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile2) : '';
+                                    result.s_url4 = (UserInfoResult[1][0].InfoBannerFile3) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile3) : '';
+                                    result.s_url5 = (UserInfoResult[1][0].InfoBannerFile4) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile4) : '';
+                                    result.s_url6 = (UserInfoResult[1][0].InfoBannerFile5) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][0].InfoBannerFile5) : '';
+                                    output.push(result);
                                 }
-                                else {
-                                    res.json({result: UserInfoResult[0][0], banners: output});
-                                    console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
-                                }
+
+                                var finalResult = {"banners":[
+                                    {"s_url":output[0].s_url1},
+                                    {"s_url":output[0].s_url2},
+                                    {"s_url":output[0].s_url3},
+                                    {"s_url":output[0].s_url4},
+                                    {"s_url":output[0].s_url5},
+                                    {"s_url":output[0].s_url6}]};
+                                output = finalResult.banners;
+
                             }
                             else {
-                                res.send('null');
-                                console.log('FnGetSearchInformationNew: tmaster: no search infromation ');
+                                console.log('for loop..type..2');
+                                for (var i = 0; i < UserInfoResult[1].length; i++) {
+                                    var result = {};
+
+                                    result.s_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserInfoResult[1][i].path;
+                                    output.push(result);
+                                }
                             }
+
+
+                            res.json({result: UserInfoResult[0][0], banners: output});
+                            console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                         }
-                        else {
-                            res.send('null');
-                            console.log('FnGetSearchInformationNew: tmaster: no re search infromation ');
+                        else
+                        {
+                            res.json({result :UserInfoResult[0][0],banners:output});
+                            console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                         }
                     }
                     else {
                         res.send('null');
                         console.log('FnGetSearchInformationNew: tmaster: no re search infromation ');
                     }
+
                 }
                 else {
                     res.statusCode = 500;
@@ -639,7 +623,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
         if (Token != null && LocID != null) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
                         var async = require('async');
                         async.parallel([ function FnWorkingHours(CallBack) {
                             try {
@@ -650,21 +634,17 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
 
                                     if (!err) {
 
-                                        if(WorkingResult) {
-                                            if(WorkingResult[0]) {
-                                                if (WorkingResult[0].length > 0) {
-                                                    console.log('FnWorkingHours: Working Hours are available');
-                                                    RtnMessage.WorkingHours = WorkingResult[0];
-                                                    RtnMessage.Result = true;
-                                                    CallBack();
-                                                }
-                                                else {
-                                                    console.log('Fnworkinghours: no working hours avaiable');
-                                                    RtnMessage.Result = true;
-                                                    CallBack();
-                                                }
+                                        if(WorkingResult != null)
+                                        {
+                                            if(WorkingResult[0].length > 0 )
+                                            {
+                                                console.log('FnWorkingHours: Working Hours are available');
+                                                RtnMessage.WorkingHours = WorkingResult[0];
+                                                RtnMessage.Result = true;
+                                                CallBack();
                                             }
-                                            else {
+                                            else
+                                            {
                                                 console.log('Fnworkinghours: no working hours avaiable');
                                                 RtnMessage.Result = true;
                                                 CallBack();
@@ -696,19 +676,14 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
                                     console.log('CALL pGetHolidayList(' + query + ')');
 
                                     if (!err) {
-                                        if(HolidayResult) {
-                                            if(HolidayResult[0]) {
-                                                if (HolidayResult[0].length > 0) {
-                                                    console.log('FnHolidayList: Holiday List are available');
-                                                    RtnMessage.HolidayList = HolidayResult[0];
-                                                    RtnMessage.Result = true;
-                                                    CallBack();
-                                                }
-                                                else {
-                                                    console.log('FnHolidayList: No Holiday List avaiable');
-                                                    RtnMessage.Result = true;
-                                                    CallBack();
-                                                }
+                                        if(HolidayResult != null)
+                                        {
+                                            if(HolidayResult[0].length > 0 )
+                                            {
+                                                console.log('FnHolidayList: Holiday List are available');
+                                                RtnMessage.HolidayList = HolidayResult[0]
+                                                RtnMessage.Result = true;
+                                                CallBack();
                                             }
                                             else
                                             {
@@ -787,7 +762,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
 function FnWorkingHours(WorkingContent, CallBack) {
     try {
 
-        if (WorkingContent) {
+        if (WorkingContent != null) {
 
             console.log('WorkingContent values');
             console.log(WorkingContent);
@@ -798,16 +773,12 @@ function FnWorkingHours(WorkingContent, CallBack) {
 
                 if (!err) {
 
-                    if(WorkingResult){
-                        if(WorkingResult[0]) {
-                            if (WorkingResult[0].length > 0) {
-                                console.log('FnWorkingHours: Working Hours are available');
-                                CallBack(null, WorkingResult[0]);
-                            }
-                            else {
-                                console.log('Fnworkinghours: no working hours avaiable');
-
-                            }
+                    if(WorkingResult != null)
+                    {
+                        if(WorkingResult[0].length > 0 )
+                        {
+                            console.log('FnWorkingHours: Working Hours are available');
+                            CallBack(null, WorkingResult[0]);
                         }
                         else
                         {
@@ -844,7 +815,7 @@ function FnWorkingHours(WorkingContent, CallBack) {
 function FnHolidayList(HolidayContent, CallBack) {
     try {
 
-        if (HolidayContent) {
+        if (HolidayContent != null) {
 
             console.log('HolidayContent values');
             console.log(HolidayContent);
@@ -855,16 +826,12 @@ function FnHolidayList(HolidayContent, CallBack) {
 
                 if (!err) {
 
-                    if(HolidayResult) {
-                        if (HolidayResult[0]) {
-                            if (HolidayResult[0].length > 0) {
-                                console.log('FnHolidayList: Holiday List are available');
-                                CallBack(null, HolidayResult[0]);
-                            }
-                            else {
-                                console.log('FnHolidayList: No Holiday List avaiable');
-                                CallBack(null, null);
-                            }
+                    if(HolidayResult != null)
+                    {
+                        if(HolidayResult[0].length > 0 )
+                        {
+                            console.log('FnHolidayList: Holiday List are available');
+                            CallBack(null, HolidayResult[0]);
                         }
                         else
                         {
@@ -929,20 +896,20 @@ Search.prototype.getBanner = function(req,res,next){
             st.db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
                 if (!err) {
                     //console.log(InsertResult);
-                    if (BannerResult) {
-                        if (BannerResult[0]) {
+                    if (BannerResult != null) {
+                        if (BannerResult[0].length > 0) {
                             var Picture = BannerResult[0];
                             console.log('FnGetBannerPicture: Banner picture sent successfully');
                             res.setHeader('Cache-Control', 'public, max-age=150000');
                             console.log('FnGetBannerPicture: Banner picture sent successfully');
-                            RtnMessage.Picture = (Picture[0]) ? (Picture[0].Picture) : [];
+                            RtnMessage.Picture = Picture[0].Picture;
                             res.send(RtnMessage);
                         }
                         else {
                             var fs = require('fs');
                             //  var path = path + StateTitle+'.jpg' ;
                             fs.exists(path + StateTitle + '.jpg', function (exists) {
-
+                                console.log(exists)
                                 if (exists) {
                                     var bitmap = fs.readFileSync(path + StateTitle + '.jpg');
                                     // convert binary data to base64 encoded string
@@ -953,6 +920,7 @@ Search.prototype.getBanner = function(req,res,next){
                                 else {
                                     // path ='D:\\Mail\\Default.jpg';
                                     fs.exists(path + StateTitle + '.jpg', function (exists) {
+                                        console.log(exists)
                                         if (exists) {
 
                                             var bitmap = fs.readFileSync(path + 'Default.jpg');
@@ -1032,7 +1000,7 @@ Search.prototype.searchTracker = function(req,res,next){
         if (Token != null && Keyword != null && Latitude != null && Longitude != null && currentDateTime) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
                         var query = st.db.escape(Keyword) + ','  + st.db.escape(Latitude) + ',' +
                             st.db.escape(Longitude) + ',' + st.db.escape(Proximity)+
                             ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag);
@@ -1137,7 +1105,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
         if (token != null && find != null && token != '' && find != '') {
             st.validateToken(token, function (err, Result) {
                 if (!err) {
-                    if (Result) {
+                    if (Result != null) {
 
                         var EZEID, Pin = null;
                         var DocType = '';
@@ -1201,47 +1169,43 @@ Search.prototype.getSearchDoc = function(req,res,next){
                         st.db.query('CALL  PGetSearchDocuments(' + SearchQuery + ')', function (err, SearchResult) {
                             // st.db.query(searchQuery, function (err, SearchResult) {
                             if (!err) {
-                                if(SearchResult) {
-                                    if (SearchResult[0]) {
-                                        if (SearchResult[0].length > 0) {
-                                            SearchResult = SearchResult[0];
-                                            //console.log(DocumentResult)
-                                            var docs = SearchResult[0];
-                                            res.setHeader('Content-Type', docs.ContentType);
-                                            res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
-                                            //res.setHeader('Cache-Control', 'public, max-age=86400000');
-                                            res.setHeader('Cache-Control', 'public, max-age=0');
-                                            res.writeHead('200', {'Content-Type': docs.ContentType});
-                                            res.end(docs.Docs, 'base64');
-                                            console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
+                                if (SearchResult[0] != null) {
+                                    if (SearchResult[0].length > 0) {
+                                        SearchResult = SearchResult[0];
+                                        //console.log(DocumentResult)
+                                        var docs = SearchResult[0];
+                                        res.setHeader('Content-Type', docs.ContentType);
+                                        res.setHeader('Content-Disposition', 'attachment; filename=' + docs.Filename);
+                                        //res.setHeader('Cache-Control', 'public, max-age=86400000');
+                                        res.setHeader('Cache-Control', 'public, max-age=0');
+                                        res.writeHead('200', { 'Content-Type': docs.ContentType });
+                                        res.end(docs.Docs, 'base64');
+                                        console.log('FnGetSearchDocuments: tmaster: Search result sent successfully');
 
 
-                                            var getQuery = 'select masterid as TID from tloginout where Token=' + st.db.escape(token);
-                                            st.db.query(getQuery, function (err, getResult) {
-                                                if (!err) {
-                                                    tid = getResult[0].TID;
-                                                    console.log(tid);
+                                        var getQuery = 'select masterid as TID from tloginout where Token='+st.db.escape(token);
+                                        st.db.query(getQuery, function (err, getResult) {
+                                            if(!err){
+                                                tid = getResult[0].TID;
+                                                console.log(tid);
+                                            }
+                                            var query = st.db.escape(tid) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(req.ip) + ',' + st.db.escape(type);
+                                            console.log('CALL pCreateAccessHistory(' + query + ')');
+
+                                            st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err){
+                                                if(!err){
+                                                    console.log('FnSearchByKeywords:Access history is created');
                                                 }
-                                                var query = st.db.escape(tid) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(req.ip) + ',' + st.db.escape(type);
-                                                console.log('CALL pCreateAccessHistory(' + query + ')');
-
-                                                st.db.query('CALL pCreateAccessHistory(' + query + ')', function (err) {
-                                                    if (!err) {
-                                                        console.log('FnSearchByKeywords:Access history is created');
-                                                    }
-                                                    else {
-                                                        console.log('FnSearchByKeywords: tmaster: ' + err);
-                                                    }
-                                                });
+                                                else {
+                                                    console.log('FnSearchByKeywords: tmaster: ' + err);
+                                                }
                                             });
-                                        }
-                                        else {
-                                            res.json(null);
-                                            console.log('FnGetSearchDocuments: tmaster: no search found');
-                                        }
+                                        });
                                     }
                                     else {
                                         res.json(null);
+
+
                                         console.log('FnGetSearchDocuments: tmaster: no search found');
                                     }
                                 }
@@ -1249,6 +1213,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
                                     res.json(null);
                                     console.log('FnGetSearchDocuments: tmaster: no search found');
                                 }
+
                             }
                             else {
                                 res.statusCode = 500;
@@ -1360,20 +1325,15 @@ Search.prototype.searchBusListing = function(req,res,next){
                     db.escape(req.params.ezeid)+ " LIMIT 1";
                 db.query(ezeidQuery,function(err,results){
                     if(!err){
-                        if(results) {
-                            if (results.length > 0) {
-                                if ((!results[0].PIN) && results[0].IDTypeID !== 1) {
-                                    res.redirect('/searchDetails?searchType=2&TID=' + results[0].LID);
-                                }
-                                else {
-                                    next();
-                                }
+                        if(results.length > 0){
+                            if((!results[0].PIN) && results[0].IDTypeID !== 1){
+                                res.redirect('/searchDetails?searchType=2&TID='+results[0].LID);
                             }
-                            else {
+                            else{
                                 next();
                             }
                         }
-                        else {
+                        else{
                             next();
                         }
                     }
