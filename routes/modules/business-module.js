@@ -1013,48 +1013,49 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
      * @todo FnUpdateTransaction
      */
     var _this = this;
-    try{
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var TID = parseInt(req.body.TID);
-        var status = req.body.status;
-        var Token = req.body.Token;
-        //var folderRuleID = parseInt(req.body.folderRuleID);
-        //var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
-        //var nextActionDateTime = new Date(req.body.nextActionDateTime);
-        //var alarmDuration = (parseInt(req.body.alarm_duration) !== NaN) ? parseInt(req.body.alarm_duration) : 0;
-        //var probability = (parseInt(req.body.probability) !== NaN && parseInt(req.body.probability) !== 0) ? parseInt(req.body.probability) : 2 ;
-        //var targetDate = req.body.target_date ? req.body.target_date : null;
-        //var amount = (req.body.amount) ? req.body.amount : 0;
-        //var instituteId = req.body.institute_id ? req.body.institute_id : 0;
-        //var jobId = req.body.job_id ? req.body.job_id : 0;
-        //var educationId = req.body.education_id ? req.body.education_id : 0;
-        //var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
-        //var salaryType = req.body.salary_type ? req.body.salary_type : 3;
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    var tid = (!isNaN(parseInt(req.body.TID))) ? parseInt(req.body.TID) : 0;
+    var status = req.body.status;
+    var token = req.body.Token;
+    //var folderRuleID = parseInt(req.body.folderRuleID);
+    //var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
+    //var nextActionDateTime = new Date(req.body.nextActionDateTime);
+    //var alarmDuration = (parseInt(req.body.alarm_duration) !== NaN) ? parseInt(req.body.alarm_duration) : 0;
+    //var probability = (parseInt(req.body.probability) !== NaN && parseInt(req.body.probability) !== 0) ? parseInt(req.body.probability) : 2 ;
+    //var targetDate = req.body.target_date ? req.body.target_date : null;
+    //var amount = (req.body.amount) ? req.body.amount : 0;
+    //var instituteId = req.body.institute_id ? req.body.institute_id : 0;
+    //var jobId = req.body.job_id ? req.body.job_id : 0;
+    //var educationId = req.body.education_id ? req.body.education_id : 0;
+    //var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
+    //var salaryType = req.body.salary_type ? req.body.salary_type : 3;
 
 
-        var responseMessage = {
-            status: false,
-            error:{},
-            message:'',
-            data: null
-        };
+    var responseMessage = {
+        status: false,
+        error:{},
+        message:'',
+        data: null
+    };
 
-        if(Token){
+    try {
 
-            var query = st.db.escape(status) + ', ' + st.db.escape(TID) + ',' + st.db.escape(Token);
-
+        if (token) {
+            var queryParams = st.db.escape(status) + ', ' + st.db.escape(tid) + ',' + st.db.escape(token);
+            var query = 'CALL pUpdateTrans(' + queryParams + ')';
             console.log(query);
-            st.db.query('CALL pUpdateTrans(' + query + ')', function (err, updateResult) {
-                if (!err){
+            st.db.query(query, function (err, updateResult) {
+                if (!err) {
                     if (updateResult) {
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Transaction details update successfully';
                         responseMessage.data = {
-                            TID : req.body.TID,
-                            status : req.body.status
+                            TID: req.body.TID,
+                            status: req.body.status
                         };
 
                         res.status(200).json(responseMessage);
@@ -1070,13 +1071,9 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
             });
         }
         else {
-            if (!Token)
-            {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {Token : 'Invalid Token'};
-                console.log('FnUpdateTransaction: Token is mandatory field');
-            }
-
+            responseMessage.message = 'Invalid Token';
+            responseMessage.error = {Token: 'Invalid Token'};
+            console.log('FnUpdateTransaction: Token is mandatory field');
             res.status(401).json(responseMessage);
         }
     }
@@ -1107,37 +1104,35 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var MessageID = req.query.MessageID;
+        var token = req.query.Token;
+        var msgId = req.query.MessageID;
 
-        if (Token != null && MessageID != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (token && msgId) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result) {
+                    if (tokenResult) {
 
-                        st.db.query('CALL pGetTranscationItems(' + st.db.escape(MessageID) + ')', function (err, GetResult) {
+                        var queryParams = st.db.escape(msgId);
+                        var query = 'CALL pGetTranscationItems(' + queryParams + ')';
+                        st.db.query(query, function (err, itemlist) {
                             if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0]) {
-
+                                if (itemlist) {
+                                    if (itemlist[0]) {
                                         console.log('FnGetTranscationItems: transaction items details Send successfully');
-                                        res.send(GetResult[0]);
+                                        res.send(itemlist[0]);
                                     }
                                     else {
-
                                         console.log('FnGetTranscationItems:No transaction items details found');
                                         res.json(null);
                                     }
                                 }
                                 else {
-
                                     console.log('FnGetTranscationItems:No transaction items details found');
                                     res.json(null);
                                 }
 
                             }
                             else {
-
                                 console.log('FnGetTranscationItems: error in getting transaction items details' + err);
                                 res.statusCode = 500;
                                 res.json(null);
@@ -1149,8 +1144,8 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
                         res.json(null);
                         console.log('FnGetTranscationItems: Invalid Token');
                     }
-                } else {
-
+                }
+                else {
                     res.statusCode = 500;
                     res.json(null);
                     console.log('FnGetTranscationItems: Error in validating token:  ' + err);
@@ -1158,10 +1153,10 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!token) {
                 console.log('FnGetTranscationItems: Token is empty');
             }
-            else if (MessageID == null) {
+            else if (!msgId) {
                 console.log('FnGetTranscationItems: MessageID is empty');
             }
             res.statusCode=400;
@@ -1190,56 +1185,63 @@ BusinessManager.prototype.saveTransactionItems = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.body.Token;
-        var MessageID = req.body.MessageID;
-        var ItemID = req.body.ItemID;
-        var Qty = req.body.Qty;
-        var Rate = req.body.Rate;
-        var Amount = req.body.Amount;
-        var Duration = req.body.Duration;
+        var token = req.body.Token;
+        var msgId = req.body.MessageID;
+        var itemId = req.body.ItemID;
+        var qty = req.body.Qty;
+        var rate = req.body.Rate;
+        var amount = req.body.Amount;
+        var duration = req.body.Duration;
 
 
-        var RtnMessage = {
+        var rtnMessage = {
             IsSuccessfull: false
         };
 
-        if (Token != null && MessageID!= null && ItemID != null && Qty !=null && Rate !=null && Amount != null && Duration !=null) {
-            st.validateToken(Token, function (err, Result) {
+        if (token && msgId && itemId && qty && rate && amount && duration){
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
-                        var query = st.db.escape(MessageID) + ',' + st.db.escape(ItemID) + ',' + st.db.escape(Qty) +
-                            ',' + st.db.escape(Rate) + ',' +st.db.escape(Amount) + ',' +st.db.escape(Duration);
-                        st.db.query('CALL pSaveTranscationItems(' + query + ')', function (err, InsertResult) {
+                        var queryParams = st.db.escape(msgId) + ',' + st.db.escape(itemId) + ',' + st.db.escape(qty) +
+                            ',' + st.db.escape(rate) + ',' +st.db.escape(amount) + ',' +st.db.escape(duration);
+                        var query = 'CALL pSaveTranscationItems(' + queryParams + ')';
+                        st.db.query(query, function (err, itemResult) {
                             if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                if(itemResult) {
+                                    if (itemResult.affectedRows > 0) {
+                                        rtnMessage.IsSuccessfull = true;
+                                        res.send(rtnMessage);
+                                        console.log('FnSaveTranscationItems: Transaction items details save successfully');
+                                    }
+                                    else {
+                                        console.log('FnSaveTranscationItems:No Save Transaction items details');
+                                        res.send(rtnMessage);
+                                    }
                                 }
                                 else {
                                     console.log('FnSaveTranscationItems:No Save Transaction items details');
-                                    res.send(RtnMessage);
+                                    res.send(rtnMessage);
                                 }
                             }
 
                             else {
                                 console.log('FnSaveTranscationItems: error in saving Transaction items' + err);
                                 res.statusCode = 500;
-                                res.send(RtnMessage);
+                                res.send(rtnMessage);
                             }
                         });
                     }
                     else {
                         console.log('FnSaveTranscationItems: Invalid token');
                         res.statusCode = 401;
-                        res.send(RtnMessage);
+                        res.send(rtnMessage);
                     }
                 }
                 else {
                     console.log('FnSaveTranscationItems:Error in processing Token' + err);
                     res.statusCode = 500;
-                    res.send(RtnMessage);
+                    res.send(rtnMessage);
 
                 }
             });
@@ -1247,35 +1249,36 @@ BusinessManager.prototype.saveTransactionItems = function(req,res,next){
         }
 
         else {
-            if (Token == null) {
+            if (!token) {
                 console.log('FnSaveTranscationItems: Token is empty');
             }
-            else if (MessageID == null) {
+            else if (!msgId) {
                 console.log('FnSaveTranscationItems: MessageID is empty');
             }
-            else if (ItemID == null) {
+            else if (!itemId) {
                 console.log('FnSaveTranscationItems: ItemID is empty');
             }
-            else if (Qty == null) {
+            else if (!qty) {
                 console.log('FnSaveTranscationItems: Qty is empty');
             }
-            else if (Rate == null) {
+            else if (!rate) {
                 console.log('FnSaveTranscationItems: Rate is empty');
             }
-            else if (Amount == null) {
+            else if (!amount) {
                 console.log('FnSaveTranscationItems: Amount is empty');
             }
-            else if (Duration == null) {
+            else if (!duration) {
                 console.log('FnSaveTranscationItems: Duration is empty');
             }
 
             res.statusCode=400;
-            res.send(RtnMessage);
+            res.send(rtnMessage);
         }
 
     }
     catch (ex) {
         console.log('FnSaveTranscationItems:error ' + ex.description);
+        console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1297,54 +1300,52 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var pagesize = req.query.pagesize;
-        var pagecount = req.query.pagecount;
-        var functiontype = req.query.functiontype;
+        var token = req.query.Token;
+        var ps = req.query.pagesize;
+        var pc = req.query.pagecount;
+        var ft = req.query.functiontype;
 
         var responseMessage = {
             status: false,
-            data: null,
+            data: [],
             error:{},
             message:''
         };
 
         if (Token) {
-            st.validateToken(Token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
-                        st.db.query('CALL pGetOutboxMessages(' + st.db.escape(Token) + ',' + st.db.escape(pagesize) + ',' + st.db.escape(pagecount) + ',' + st.db.escape(functiontype) + ')', function (err, GetResult) {
+                    if (tokenResult) {
+
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(ps) + ',' + st.db.escape(pc) + ',' + st.db.escape(ft);
+                        var query = 'CALL pGetOutboxMessages(' + queryParams + ')';
+                        st.db.query(query, function (err, msgResult) {
                             if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0]) {
+                                if (msgResult) {
+                                    if (msgResult[0]) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult[0] ;
+                                        responseMessage.data = msgResult[0] ;
                                         responseMessage.error = null;
                                         responseMessage.message = 'OutBoxMsg details Send successfully';
                                         console.log('FnGetOutboxMessages: OutBoxMsg details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
-
                                         responseMessage.error = {};
                                         responseMessage.message = 'No founded OutBoxMsg details';
                                         console.log('FnGetOutboxMessages: No founded OutBoxMsg details');
-                                        res.json(responseMessage);
+                                        res.status(200).json(responseMessage);
                                     }
                                 }
                                 else {
-
-
                                     responseMessage.error = {};
                                     responseMessage.message = 'No founded OutBoxMsg details';
                                     console.log('FnGetOutboxMessages: No founded OutBoxMsg details');
-                                    res.json(responseMessage);
+                                    res.status(200).json(responseMessage);
                                 }
 
                             }
                             else {
-
-                                responseMessage.data = null ;
                                 responseMessage.error = {};
                                 responseMessage.message = 'Error in getting OutBoxMsg details';
                                 console.log('FnGetOutboxMessages: error in getting OutBoxMsg details' + err);
@@ -1355,7 +1356,6 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
                     else {
                         responseMessage.message = 'Invalid token';
                         responseMessage.error = {};
-                        responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnGetOutboxMessages: Invalid token');
                     }
@@ -1374,7 +1374,7 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
                 responseMessage.error = {
                     ezeid : 'Invalid ezeid'
                 };
-                console.log('FnGetCompanyDetails: ezeid is mandatory field');
+                console.log('FnGetOutboxMessages: ezeid is mandatory field');
             }
 
             res.status(401).json(responseMessage);
@@ -1412,26 +1412,27 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
 
         var responseMessage = {
             status: false,
-            data: null,
+            data: [],
             error:{},
             message:''
         };
 
         if (title) {
 
-            st.db.query('CALL PgetTransAutocomplete(' + st.db.escape(title) + ',' + st.db.escape(type) + ')', function (err, GetResult) {
+            var queryParams = st.db.escape(title) + ',' + st.db.escape(type);
+            var query = 'CALL PgetTransAutocomplete(' + queryParams + ')';
+            st.db.query(query, function (err, transResult) {
                 if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0]) {
+                    if (transResult) {
+                        if (transResult[0]) {
                             responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
+                            responseMessage.data = transResult[0] ;
                             responseMessage.error = null;
                             responseMessage.message = 'Transaction details Send successfully';
                             console.log('FnGetTransAutoComplete: Transaction details Send successfully');
                             res.status(200).json(responseMessage);
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded Transaction details';
                             console.log('FnGetTransAutoComplete: No founded Transaction details');
@@ -1439,8 +1440,6 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No founded Transaction details';
                         console.log('FnGetTransAutoComplete: No founded Transaction details');
@@ -1449,8 +1448,6 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
 
                 }
                 else {
-
-                    responseMessage.data = null ;
                     responseMessage.error = {};
                     responseMessage.message = 'Error in getting Transaction details';
                     console.log('FnGetTransAutoComplete: error in getting Transaction details' + err);
@@ -1496,22 +1493,23 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var FunctionType = req.query.FunctionType;
-        var EZEID = req.query.EZEID;
-        if(Token == "")
-            Token= null;
-        if (Token != null && FunctionType != null && EZEID != null) {
-            st.validateToken(Token, function (err, Result) {
+        var token = req.query.Token ? req.query.Token : null;
+        var ft = req.query.FunctionType;
+        var ezeid = req.query.EZEID;
+
+        if (token && ezeid && ft) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
-                        console.log('CALL pItemListforEZEID(' +  st.db.escape(FunctionType)  + ',' + st.db.escape(EZEID) + ')');
-                        st.db.query('CALL pItemListforEZEID(' +  st.db.escape(FunctionType)  + ',' + st.db.escape(EZEID) + ')', function (err, GetResult) {
+                    if (tokenResult) {
+
+                        var queryParams = st.db.escape(ft)  + ',' + st.db.escape(ezeid);
+                        var query = 'CALL pItemListforEZEID(' + queryParams + ')';
+                        st.db.query(query, function (err, itemList) {
                             if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0]) {
+                                if (itemList) {
+                                    if (itemList[0]) {
                                         console.log('FnGetItemListForEZEID: Item list details Send successfully');
-                                        res.send(GetResult[0]);
+                                        res.send(itemList[0]);
                                     }
                                     else {
                                         console.log('FnGetItemListForEZEID:No Item list details found');
@@ -1543,13 +1541,13 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!token) {
                 console.log('FnGetItemListForEZEID: Token is empty');
             }
-            else if (FunctionType == null) {
+            else if (!ft) {
                 console.log('FnGetItemListForEZEID: FunctionType is empty');
             }
-            else if (EZEID == null) {
+            else if (!ezeid) {
                 console.log('FnGetItemListForEZEID: EZEID is empty');
             }
             res.statusCode=400;
@@ -1558,6 +1556,7 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
     }
     catch (ex) {
         console.log('FnGetItemListForEZEID error:' + ex.description);
+        console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
@@ -1579,59 +1578,67 @@ BusinessManager.prototype.deleteTransaction = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var ItemTID = req.query.ItemTID;
+        var token = req.query.Token;
+        var itemTid = req.query.ItemTID;
 
-        var RtnMessage = {
+        var rtnMessage = {
             IsSuccessfull:false
         };
-        if (Token != null && ItemTID != null){
-            st.validateToken(Token, function (err, Result) {
+        if (token && itemTid){
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
-                        st.db.query('CALL pDeleteTransactionItems(' + st.db.escape(ItemTID) + ')', function (err, deleteResult) {
+                        var queryParams = st.db.escape(itemTid);
+                        var query = 'CALL pDeleteTransactionItems(' + queryParams + ')';
+                        st.db.query(query, function (err, deleteResult) {
                             if (!err) {
-                                if (deleteResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnDeleteTranscation: transaction items delete successfully');
+                                if(deleteResult) {
+                                    if (deleteResult.affectedRows > 0) {
+                                        rtnMessage.IsSuccessfull = true;
+                                        res.send(rtnMessage);
+                                        console.log('FnDeleteTranscation: transaction items delete successfully');
+                                    }
+                                    else {
+                                        console.log('FnDeleteTranscation:No delete transaction items');
+                                        res.send(rtnMessage);
+                                    }
                                 }
                                 else {
                                     console.log('FnDeleteTranscation:No delete transaction items');
-                                    res.send(RtnMessage);
+                                    res.send(rtnMessage);
                                 }
                             }
                             else {
                                 console.log('FnDeleteTranscation: error in deleting transaction items' + err);
                                 res.statusCode = 500;
-                                res.send(RtnMessage);
+                                res.send(rtnMessage);
                             }
                         });
                     }
                     else {
                         console.log('FnDeleteTranscation: Invalid token');
                         res.statusCode = 401;
-                        res.send(RtnMessage);
+                        res.send(rtnMessage);
                     }
                 }
                 else {
                     console.log('FnDeleteTranscation:Error in processing Token' + err);
                     res.statusCode = 500;
-                    res.send(RtnMessage);
+                    res.send(rtnMessage);
 
                 }
             });
         }
         else {
-            if (Token == null) {
+            if (!token) {
                 console.log('FnDeleteTranscation: Token is empty');
             }
-            else if (ItemTID == null) {
+            else if (!itemTid) {
                 console.log('FnDeleteTranscation: ItemTID is empty');
             }
             res.statusCode=400;
-            res.send(RtnMessage);
+            res.send(rtnMessage);
         }
     }
     catch (ex) {
@@ -1657,35 +1664,34 @@ BusinessManager.prototype.itemList = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var FunctionType = req.query.FunctionType;
+        var token = req.query.Token;
+        var ft = req.query.FunctionType;
 
-        if (Token != null && FunctionType != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (token && ft) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(ft);
+                        var query = 'CALL pItemList(' + queryParams + ')';
 
-                        st.db.query('CALL pItemList(' + st.db.escape(Token) + ',' + st.db.escape(FunctionType) + ')', function (err, GetResult) {
+                        st.db.query(query, function (err, itemList) {
                             if (!err) {
-                                if (GetResult) {
-                                    if (GetResult) {
+                                if (itemList) {
+                                    if (itemList[0]) {
                                         console.log('FnItemList: Item list details Send successfully');
-                                        res.send(GetResult[0]);
+                                        res.send(itemList[0]);
                                     }
                                     else {
-
                                         console.log('FnGetItemList:No Item list details found');
                                         res.json(null);
                                     }
                                 }
                                 else {
-
                                     console.log('FnGetItemList:No Item list details found');
                                     res.json(null);
                                 }
                             }
                             else {
-
                                 console.log('FnGetItemList: error in getting Item list details' + err);
                                 res.statusCode = 500;
                                 res.json(null);
@@ -1706,10 +1712,10 @@ BusinessManager.prototype.itemList = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!token) {
                 console.log('FnGetItemList: Token is empty');
             }
-            else if (FunctionType == null) {
+            else if (!ft) {
                 console.log('FnGetItemList: FunctionType is empty');
             }
             res.statusCode=400;
@@ -1739,19 +1745,21 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var TID = req.query.TID;
+        var token = req.query.Token;
+        var tid = req.query.TID;
 
-        if (Token != null && TID != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (token && tid) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
-                        st.db.query('CALL pItemDetails(' + st.db.escape(TID) + ')', function (err, GetResult) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(tid);
+                        var query = 'CALL pItemDetails(' + queryParams + ')';
+                        st.db.query(query, function (err, itemDetails) {
                             if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0]) {
+                                if (itemDetails) {
+                                    if (itemDetails[0]) {
                                         console.log('FnItemDetails: Item list details Send successfully');
-                                        res.send(GetResult[0]);
+                                        res.send(itemDetails[0]);
                                     }
                                     else {
 
@@ -1777,7 +1785,6 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
                         console.log('FnItemDetails: Invalid Token');
                     }
                 } else {
-
                     res.statusCode = 500;
                     res.json(null);
                     console.log('FnItemDetails: Error in validating token:  ' + err);
@@ -1785,13 +1792,12 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!token) {
                 console.log('FnItemDetails: Token is empty');
             }
-            else if (TID == null) {
+            else if (!tid) {
                 console.log('FnItemDetails: TID is empty');
             }
-
             res.statusCode=400;
             res.json(null);
         }
@@ -1819,37 +1825,34 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var RuleFunction = req.query.RuleFunction;
+        var token = req.query.Token;
+        var rf = req.query.RuleFunction;
 
-        if (Token != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (token) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(rf);
+                        var query = 'CALL pGetUserWiseFolderList(' + queryParams  + ')';
 
-                        st.db.query('CALL pGetUserWiseFolderList(' + st.db.escape(Token) + ',' + st.db.escape(RuleFunction) + ')', function (err, GetResult) {
+                        st.db.query(query, function (err, folderList) {
                             if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0]) {
-
+                                if (folderList) {
+                                    if (folderList[0]) {
                                         console.log('FnGetUserwiseFolderList: Folder list details Send successfully');
-                                        res.send(GetResult[0]);
+                                        res.send(folderList[0]);
                                     }
                                     else {
-
                                         console.log('FnGetUserwiseFolderList:No Folder list details found');
                                         res.json(null);
                                     }
                                 }
                                 else {
-
                                     console.log('FnGetUserwiseFolderList:No Folder list details found');
                                     res.json(null);
                                 }
-
                             }
                             else {
-
                                 console.log('FnGetUserwiseFolderList: error in getting Folder list details' + err);
                                 res.statusCode = 500;
                                 res.json(null);
@@ -1862,7 +1865,6 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
                         console.log('FnGetUserwiseFolderList: Invalid Token');
                     }
                 } else {
-
                     res.statusCode = 500;
                     res.json(null);
                     console.log('FnGetUserwiseFolderList: Error in validating token:  ' + err);
@@ -1870,13 +1872,9 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!token) {
                 console.log('FnGetUserwiseFolderList: Token is empty');
             }
-            if (RuleFunction == null) {
-                console.log('FnGetUserwiseFolderList: RuleFunction is empty');
-            }
-
             res.statusCode=400;
             res.json(null);
         }
@@ -1889,82 +1887,83 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
 };
 
 /**
+ * @todo FnUpdateBussinessListing
  * Method : POST
  * @param req
  * @param res
  * @param next
  */
 BusinessManager.prototype.updateBussinessList = function(req,res,next){
-    /**
-     * @todo FnUpdateBussinessListing
-     */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
         var token = req.body.TokenNo;
-        var CategoryID = parseInt(req.body.CategoryID);
-        var Keywords = req.body.Keywords;
-        var RtnMessage = {
+        var categoryId = (!isNaN(parseInt(req.body.CategoryID))) ? parseInt(req.body.CategoryID) : 0;
+        var keywords = req.body.Keywords;
+
+        var rtnMessage = {
             IsUpdated: false
         };
-        var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (token != null && token != '' && CategoryID.toString() != 'NaN' && Keywords != null) {
-            st.validateToken(token, function (err, Result) {
+
+        if (token && keywords) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
-                        //  var fileName = BrochureDocFile.split('.').pop();
-                        var query = st.db.escape(token) + ',' + st.db.escape(Keywords) + ',' + st.db.escape(CategoryID);
-                        //console.log(query);
-                        st.db.query('CALL pUpdateBusinesslist(' + query + ')', function (err, UpdateResult) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(keywords) + ',' + st.db.escape(categoryId);
+                        var query = 'CALL pUpdateBusinesslist(' + queryParams + ')';
+
+                        st.db.query(query, function (err, businesslist) {
                             if (!err) {
-                                //console.log(UpdateResult);
-                                // console.log('FnUpdateMessageStatus: Update result' + UpdateResult);
-                                if (UpdateResult.affectedRows > 0) {
-                                    RtnMessage.IsUpdated = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnUpdateBussinessListing: Bussiness listing update successfully');
+                                if(businesslist) {
+                                    if (businesslist.affectedRows > 0) {
+                                        rtnMessage.IsUpdated = true;
+                                        res.send(rtnMessage);
+                                        console.log('FnUpdateBussinessListing: Bussiness listing update successfully');
+                                    }
+                                    else {
+                                        console.log('FnUpdateBussinessListing: Bussiness listing is not avaiable');
+                                        res.send(rtnMessage);
+                                    }
                                 }
                                 else {
                                     console.log('FnUpdateBussinessListing: Bussiness listing is not avaiable');
-                                    res.send(RtnMessage);
+                                    res.send(rtnMessage);
                                 }
                             }
                             else {
                                 console.log('FnUpdateBussinessListing: ' + err);
                                 res.statusCode = 500;
-                                res.send(RtnMessage);
+                                res.send(rtnMessage);
                             }
                         });
                     }
                     else {
                         res.statusCode = 401;
                         console.log('FnUpdateBussinessListing: Invalid token');
-                        res.send(RtnMessage);
+                        res.send(rtnMessage);
                     }
                 }
                 else {
                     res.statusCode = 500;
                     console.log('FnUpdateBussinessListing: : ' + err);
-                    res.send(RtnMessage);
+                    res.send(rtnMessage);
 
                 }
             });
 
         }
         else {
-            if (token == null || token == '') {
+            if (!token) {
                 console.log('FnUpdateBussinessListing: token is empty');
             }
-            else if (CategoryID.toString() == 'NaN') {
-                console.log('FnUpdateMessageStatus: CategoryID is empty');
-            }
-            else if (Keywords == null) {
+            else if (keywords) {
                 console.log('FnUpdateMessageStatus: Keywords is empty');
             }
             res.statusCode = 400;
-            res.send(RtnMessage);
+            res.send(rtnMessage);
 
         }
     }
@@ -1991,8 +1990,9 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token;
-        var functiontype =  req.query.functiontype;
+        var token = req.query.Token;
+        var ft =  req.query.functiontype;
+
         var responseMessage = {
             status: false,
             data: null,
@@ -2000,21 +2000,22 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
             message:''
         };
 
-        if (Token) {
+        if (token) {
+            var queryParams = st.db.escape(token) + ',' + st.db.escape(ft);
+            var query = 'CALL pGetCompanyDetails(' + queryParams + ')';
 
-            st.db.query('CALL pGetCompanyDetails(' + st.db.escape(Token) + ',' + st.db.escape(functiontype) + ')', function (err, GetResult) {
+            st.db.query(query, function (err, companyDetails) {
                 if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0]) {
+                    if (companyDetails) {
+                        if (companyDetails[0]) {
                             responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
+                            responseMessage.data = companyDetails[0] ;
                             responseMessage.error = null;
                             responseMessage.message = 'Company details Send successfully';
                             console.log('FnGetCompanyDetails: Company details Send successfully');
                             res.status(200).json(responseMessage);
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded Company details';
                             console.log('FnGetCompanyDetails: No founded Company details');
@@ -2022,8 +2023,6 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No founded Company details';
                         console.log('FnGetCompanyDetails: No founded Company details');
@@ -2032,7 +2031,6 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
 
                 }
                 else {
-
                     responseMessage.data = null ;
                     responseMessage.error = {};
                     responseMessage.message = 'Error in getting Company details';
@@ -2043,7 +2041,7 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
         }
 
         else {
-            if (!Token) {
+            if (!token) {
                 responseMessage.message = 'Invalid Token';
                 responseMessage.error = {
                     Token : 'Invalid Token'
@@ -2268,7 +2266,6 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
             console.log('FnGetTransAttachment  error : ' + JSON.stringify(responseMessage.error));
             responseMessage.message = 'Unable to get transaction attachment ! Please check the errors';
             res.status(401).json(responseMessage);
-            return;
         }
 
         else {
@@ -2276,19 +2273,18 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
                 if (!err) {
                     if (result) {
 
-                        st.db.query('CALL pGetTransAttachment(' + st.db.escape(tid) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetTransAttachment(' + st.db.escape(tid) + ')', function (err, attachResult) {
                             if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0]) {
+                                if (attachResult) {
+                                    if (attachResult[0]) {
                                         responseMessage.status = true;
-                                        responseMessage.data = GetResult[0];
+                                        responseMessage.data = attachResult[0];
                                         responseMessage.error = null;
                                         responseMessage.message = 'TransAttachment details Send successfully';
                                         console.log('FnGetTransAttachment: TransAttachment details Send successfully');
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
-
                                         responseMessage.error = {};
                                         responseMessage.message = 'No founded TransAttachment details';
                                         console.log('FnGetTransAttachment: No founded TransAttachment details');
@@ -2296,8 +2292,6 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
                                     }
                                 }
                                 else {
-
-
                                     responseMessage.error = {};
                                     responseMessage.message = 'No founded TransAttachment details';
                                     console.log('FnGetTransAttachment: No founded TransAttachment details');
@@ -2306,7 +2300,6 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
 
                             }
                             else {
-
                                 responseMessage.data = null;
                                 responseMessage.error = {};
                                 responseMessage.message = 'Error in getting TransAttachment details';
@@ -2382,7 +2375,6 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
             responseMessage.error['stages'] = 'Invalid stages';
             validateStatus *= false;
         }
-
         if (!user) {
             responseMessage.error['user'] = 'Invalid user';
             validateStatus *= false;
@@ -2401,17 +2393,17 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
         if (stages && user && probabilities) {
             var query = st.db.escape(from_date) + ',' + st.db.escape(to_date) + ',' + st.db.escape(stages)
                 + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
-            st.db.query('CALL pTransactionfilter(' + query +')', function (err, GetResult) {
+            st.db.query('CALL pTransactionfilter(' + query +')', function (err, transResult) {
 
                 var total_count = 0, total_qty = 0;
                 if (!err) {
-                    if (GetResult) {
-                        if (GetResult[0]) {
+                    if (transResult) {
+                        if (transResult[0]) {
 
-                            for (var i = 0; i < GetResult[0].length; i++)
+                            for (var i = 0; i < transResult[0].length; i++)
                             {
-                                total_count = total_count + GetResult[0][i].amount;
-                                total_qty = total_qty + GetResult[0][i].qty;
+                                total_count = total_count + transResult[0][i].amount;
+                                total_qty = total_qty + transResult[0][i].qty;
                             }
                             responseMessage.status = true;
                             responseMessage.data = {
@@ -2419,10 +2411,10 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
                                 to_date : to_date,
                                 stages : stages,
                                 probabilities : probabilities,
-                                transactions : GetResult[0],
+                                transactions : transResult[0],
                                 total_amount :total_count,
                                 total_items:total_qty,
-                                funnel:GetResult[1]
+                                funnel:transResult[1]
                             };
                             responseMessage.error = null;
                             responseMessage.message = 'Sales Statistics Send successfully';
