@@ -248,28 +248,35 @@ TaskManager.prototype.getTasks = function(req,res,next){
 
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.data = getResult[0];
-                                        responseMessage.message = 'Tasks loaded successfully';
-                                        responseMessage.error = null;
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetTasks: Tasks loaded successfully');
+                                if(getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.data = getResult[0];
+                                            responseMessage.message = 'Tasks loaded successfully';
+                                            responseMessage.error = null;
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetTasks: Tasks loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.data = getResult[0];
+                                            responseMessage.message = 'Tasks loaded successfully';
+                                            responseMessage.error = null;
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetTasks: Tasks not present');
+                                        }
                                     }
                                     else {
-                                        responseMessage.data = getResult[0];
-                                        responseMessage.message = 'Tasks loaded successfully';
-                                        responseMessage.error = null;
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetTasks: Tasks not present');
-                                    }
-                                }
-                                else {
                                         responseMessage.message = 'Tasks not loaded';
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetTasks: Tasks not loaded');
                                     }
+                                }
+                                else {
+                                    responseMessage.message = 'Tasks not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTasks: Tasks not loaded');
+                                }
                             }
                             else {
                                 responseMessage.message = 'An error occured in query ! Please try again';

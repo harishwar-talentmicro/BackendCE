@@ -74,58 +74,65 @@ Sos.prototype.saveSos = function(req,res,next) {
             console.log(insertResult);
             if (!err) {
                 if (insertResult) {
-                    responseMessage.status = true;
-                    responseMessage.error = null;
-                    responseMessage.message = 'Sos saved successfully';
-                    res.status(200).json(responseMessage);
-                    console.log('FnSaveSosRequest: Sos saved successfully');
+                    if (insertResult[0]) {
+                        responseMessage.status = true;
+                        responseMessage.error = null;
+                        responseMessage.message = 'Sos saved successfully';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveSosRequest: Sos saved successfully');
 
-                    /**
-                     * send push notification for sos request
-                     */
-                    for (var i = 0; i < insertResult[0].length; i++) {
-                        var queryParameters = 'select EZEID,tid,IPhoneDeviceID as iphoneID from tmaster where tid=' + insertResult[0][i].masterid;
-                        console.log(queryParameters);
-                        st.db.query(queryParameters, function (err, details) {
-                            console.log(details);
-                            if (details) {
-                                if(details[0]) {
-                                    if(details[0].length > 0) {
-                                        iphoneID = details[0].iphoneID;
-                                    }
-
-                                    var queryParams2 = 'select tid,GroupName from tmgroups where AdminID=' + details[0].tid +' and grouptype=1';
-                                    console.log(queryParams2);
-                                    st.db.query(queryParams2, function (err, userDetails) {
-                                        console.log(userDetails);
-
-                                        if (userDetails) {
-                                            if (userDetails[0]) {
-
-                                                var receiverId = userDetails[0].tid;
-                                                var senderTitle = {
-                                                    b1 : req.body.b1 ? req.body.b1 : 0,
-                                                    b2 : req.body.b2 ? req.body.b2 : 0,
-                                                    b3 : req.body.b3 ? req.body.b3 : 0,
-                                                    b4 : req.body.b4 ? req.body.b4 : 0,
-                                                    b5 : req.body.b5 ? req.body.b5 : 0
-                                                };
-                                                var groupId = '';
-                                                var groupTitle = userDetails[0].GroupName;
-                                                var messageText = 'sos request';
-                                                var messageType = 10;
-                                                var operationType = 0;
-                                                var iphoneId = iphoneID;
-                                                var messageId = '', msgUserid = '', masterid = '', prioritys = '';
-                                                var a_name = '', dateTime = '', latitude = req.body.lat, longitude = req.body.lng;
-                                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
-                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
-                                            }
+                        /**
+                         * send push notification for sos request
+                         */
+                        for (var i = 0; i < insertResult[0].length; i++) {
+                            var queryParameters = 'select EZEID,tid,IPhoneDeviceID as iphoneID from tmaster where tid=' + insertResult[0][i].masterid;
+                            console.log(queryParameters);
+                            st.db.query(queryParameters, function (err, details) {
+                                console.log(details);
+                                if (details) {
+                                    if (details[0]) {
+                                        if (details[0].length > 0) {
+                                            iphoneID = details[0].iphoneID;
                                         }
-                                    });
+
+                                        var queryParams2 = 'select tid,GroupName from tmgroups where AdminID=' + details[0].tid + ' and grouptype=1';
+                                        console.log(queryParams2);
+                                        st.db.query(queryParams2, function (err, userDetails) {
+                                            console.log(userDetails);
+
+                                            if (userDetails) {
+                                                if (userDetails[0]) {
+
+                                                    var receiverId = userDetails[0].tid;
+                                                    var senderTitle = {
+                                                        b1: req.body.b1 ? req.body.b1 : 0,
+                                                        b2: req.body.b2 ? req.body.b2 : 0,
+                                                        b3: req.body.b3 ? req.body.b3 : 0,
+                                                        b4: req.body.b4 ? req.body.b4 : 0,
+                                                        b5: req.body.b5 ? req.body.b5 : 0
+                                                    };
+                                                    var groupId = '';
+                                                    var groupTitle = userDetails[0].GroupName;
+                                                    var messageText = 'sos request';
+                                                    var messageType = 10;
+                                                    var operationType = 0;
+                                                    var iphoneId = iphoneID;
+                                                    var messageId = '', msgUserid = '', masterid = '', prioritys = '';
+                                                    var a_name = '', dateTime = '', latitude = req.body.lat, longitude = req.body.lng;
+                                                    //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                                                }
+                                            }
+                                        });
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Sos not saved';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveSosRequest:Sos not saved');
                     }
                 }
                 else {

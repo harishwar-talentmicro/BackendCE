@@ -1510,18 +1510,25 @@ Tag.prototype.savePictures = function(req,res,next) {
                 console.log(query);
                 st.db.query(query, function (err, insertResult) {
                     if (!err) {
-                        if (insertResult.affectedRows > 0) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Link Save successfully';
-                            responseMessage.data = {
-                                type: type,
-                                tag: tagType,
-                                pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
-                                s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
-                            };
-                            res.status(200).json(responseMessage);
-                            console.log('FnSavePictures: Link Save successfully');
+                        if(insertResult) {
+                            if (insertResult.affectedRows > 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Link Save successfully';
+                                responseMessage.data = {
+                                    type: type,
+                                    tag: tagType,
+                                    pin: (!isNaN(parseInt(req.body.pin))) ? parseInt(req.body.pin) : null,
+                                    s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                                };
+                                res.status(200).json(responseMessage);
+                                console.log('FnSavePictures: Link Save successfully');
+                            }
+                            else {
+                                responseMessage.message = 'Link not Saved';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSavePictures:Link not Saved');
+                            }
                         }
                         else {
                             responseMessage.message = 'Link not Saved';

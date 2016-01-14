@@ -93,7 +93,7 @@ Reservation.prototype.SaveReservTrans = function(req,res,next){
         if (Token) {
             st.validateToken(Token, function (err, result) {
                 if (!err) {
-                    if (result != null) {
+                    if (result) {
 
                         var query = st.db.escape(TID) + ',' + st.db.escape(Token) + ',' + st.db.escape(contactinfo) + ',' + st.db.escape(toEzeid) + ',' + st.db.escape(resourceid) + ',' + st.db.escape(res_datetime) + ',' + st.db.escape(duration) + ',' + st.db.escape(status) + ',' + st.db.escape(serviceid) + ',' + st.db.escape(notes);
 
@@ -366,16 +366,23 @@ Reservation.prototype.getReservTrans = function(req,res,next){
             st.db.query('CALL pGetResTrans(' + st.db.escape(resourceid) + ',' + st.db.escape(date) + ',' + st.db.escape(toEzeid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Reservation Task details Send successfully';
-                            console.log('FnGetReservTask: Reservation Task details Send successfully');
-                            res.status(200).json(responseMessage);
+                        if(GetResult[0]) {
+                            if (GetResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.data = GetResult[0];
+                                responseMessage.error = null;
+                                responseMessage.message = 'Reservation Task details Send successfully';
+                                console.log('FnGetReservTask: Reservation Task details Send successfully');
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.error = {};
+                                responseMessage.message = 'No founded Reservation Task details';
+                                console.log('FnGetReservTask: No founded Reservation Task details');
+                                res.json(responseMessage);
+                            }
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded Reservation Task details';
                             console.log('FnGetReservTask: No founded Reservation Task details');
@@ -383,8 +390,6 @@ Reservation.prototype.getReservTrans = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No founded Reservation Task details';
                         console.log('FnGetReservTask: No founded Reservation Task details');
@@ -456,16 +461,23 @@ Reservation.prototype.getMapedServices = function(req,res,next){
             st.db.query('CALL pgetMapedservices(' + st.db.escape(ezeid) + ',' + st.db.escape(resourceid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'service Maped details Send successfully';
-                            console.log('FnGetMapedServices: service Maped details Send successfully');
-                            res.status(200).json(responseMessage);
+                        if (GetResult[0]) {
+                            if (GetResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.data = GetResult[0];
+                                responseMessage.error = null;
+                                responseMessage.message = 'service Maped details Send successfully';
+                                console.log('FnGetMapedServices: service Maped details Send successfully');
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.error = {};
+                                responseMessage.message = 'No founded service Maped details';
+                                console.log('FnGetMapedServices: No founded service Maped details');
+                                res.json(responseMessage);
+                            }
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded service Maped details';
                             console.log('FnGetMapedServices: No founded service Maped details');
@@ -473,8 +485,6 @@ Reservation.prototype.getMapedServices = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No founded service Maped details';
                         console.log('FnGetMapedServices: No founded service Maped details');
@@ -508,7 +518,7 @@ Reservation.prototype.getMapedServices = function(req,res,next){
     catch (ex) {
         responseMessage.error = {};
         responseMessage.message = 'An error occured !'
-        console.log('FnGetReservTransaction:error ' + ex.description);
+        console.log('FnGetMapedServices:error ' + ex.description);
 		var errorDate = new Date();
 		console.log(errorDate.toTimeString() + ' ......... error ...........');
 
@@ -546,16 +556,23 @@ Reservation.prototype.getTransDetails = function(req,res,next){
             st.db.query('CALL pGetResTransDetails(' + st.db.escape(TID) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Reservation Trans details Send successfully';
-                            console.log('FnGetResTransDetails: Reservation Trans details Send successfully');
-                            res.status(200).json(responseMessage);
+                        if(GetResult[0]) {
+                            if (GetResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.data = GetResult[0];
+                                responseMessage.error = null;
+                                responseMessage.message = 'Reservation Trans details Send successfully';
+                                console.log('FnGetResTransDetails: Reservation Trans details Send successfully');
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.error = {};
+                                responseMessage.message = 'No founded Reservation Trans details';
+                                console.log('FnGetResTransDetails: No founded Reservation Trans details');
+                                res.json(responseMessage);
+                            }
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded Reservation Trans details';
                             console.log('FnGetResTransDetails: No founded Reservation Trans details');
@@ -563,8 +580,6 @@ Reservation.prototype.getTransDetails = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No founded Reservation Trans details';
                         console.log('FnGetResTransDetails: No founded Reservation Trans details');
@@ -667,30 +682,41 @@ Reservation.prototype.changeReservStatus = function(req,res,next){
 
                 }
                 else{
-                    if(updateRes.affectedRows > 0){
-                        responseMsg['status'] = true;
-                        responseMsg['error'] = null;
-                        responseMsg['message'] = 'Status changed successfully';
-                        responseMsg['data'] = {
-                            tid : tid,
-                            status : status
-                        };
-                        res.status(200).json(responseMsg);
-                        console.log('FnChangeReservationStatus: Status changed successfully');
+                    if(updateRes) {
+                        if (updateRes.affectedRows > 0) {
+                            responseMsg['status'] = true;
+                            responseMsg['error'] = null;
+                            responseMsg['message'] = 'Status changed successfully';
+                            responseMsg['data'] = {
+                                tid: tid,
+                                status: status
+                            };
+                            res.status(200).json(responseMsg);
+                            console.log('FnChangeReservationStatus: Status changed successfully');
+                        }
+                        else {
+                            responseMsg['status'] = false;
+                            responseMsg['error'] = {server: 'An error occurred'};
+                            responseMsg['message'] = 'Unable to update ! Please try again';
+                            responseMsg['data'] = {
+                                tid: req.body.tid,
+                                status: req.body.status
+                            };
+                            res.status(400).json(responseMsg);
+                            console.log('FnChangeReservationStatus: Unable to update ! Please try again');
+                        }
                     }
-                    else{
+                    else {
                         responseMsg['status'] = false;
-                        responseMsg['error'] = {server : 'An error occurred'};
+                        responseMsg['error'] = {server: 'An error occurred'};
                         responseMsg['message'] = 'Unable to update ! Please try again';
                         responseMsg['data'] = {
-                            tid : req.body.tid,
-                            status : req.body.status
+                            tid: req.body.tid,
+                            status: req.body.status
                         };
                         res.status(400).json(responseMsg);
                         console.log('FnChangeReservationStatus: Unable to update ! Please try again');
                     }
-
-
                 }
             });
         }
@@ -728,16 +754,23 @@ Reservation.prototype.getworkinghoursList = function(req,res,next){
                 console.log(GetResult)
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = ' Working hours list Send successfully';
-                            console.log('FnGetworkinghoursList:Working hours list Send successfully');
-                            res.status(200).json(responseMessage);
+                        if(GetResult[0]) {
+                            if (GetResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.data = GetResult[0];
+                                responseMessage.error = null;
+                                responseMessage.message = ' Working hours list Send successfully';
+                                console.log('FnGetworkinghoursList:Working hours list Send successfully');
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.error = {};
+                                responseMessage.message = 'No founded Working hours list';
+                                console.log('FnGetworkinghoursList: No founded Working hours list');
+                                res.json(responseMessage);
+                            }
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded Working hours list';
                             console.log('FnGetworkinghoursList: No founded Working hours list');
@@ -745,8 +778,6 @@ Reservation.prototype.getworkinghoursList = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No founded Working hours list';
                         console.log('FnGetworkinghoursList: No founded Working hours list');
@@ -979,23 +1010,31 @@ Reservation.prototype.saveFeedback = function(req,res,next){
                     console.log(insertResult);
 
                     if (!err) {
-                        if (insertResult.affectedRows > 0) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Feedback details saved successfully';
-                            responseMessage.data = {
-                                ezeid: ezeid,
-                                rating: rating,
-                                comments: comments,
-                                module: module,
-                                trans_id: trans_id,
-                                resourceid: resourceid,
-                                toEzeid: toEzeid,
-                                type: type
-                            };
-                            res.status(200).json(responseMessage);
-                            console.log('FnSaveFeedback: Feedback details saved successfully');
+                        if(insertResult) {
+                            if (insertResult.affectedRows > 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Feedback details saved successfully';
+                                responseMessage.data = {
+                                    ezeid: ezeid,
+                                    rating: rating,
+                                    comments: comments,
+                                    module: module,
+                                    trans_id: trans_id,
+                                    resourceid: resourceid,
+                                    toEzeid: toEzeid,
+                                    type: type
+                                };
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveFeedback: Feedback details saved successfully');
 
+                            }
+                            else {
+                                responseMessage.message = 'Feedback details not saved';
+                                responseMessage.error = {};
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveFeedback:Feedback details not saved');
+                            }
                         }
                         else {
                             responseMessage.message = 'Feedback details not saved';

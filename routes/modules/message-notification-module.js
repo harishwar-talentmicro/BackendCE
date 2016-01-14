@@ -72,7 +72,7 @@ msgNotification.prototype.sendNotification= function(msgContent, callBack) {
                     st.db.query(queryParameters, function (err, iosResult) {
                         if (iosResult) {
                             if (iosResult[0]) {
-                                iphoneId = iosResult[0].iphoneID;
+                                iphoneId = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                             }
                             else {
                                 iphoneId = '';
@@ -92,41 +92,53 @@ msgNotification.prototype.sendNotification= function(msgContent, callBack) {
                                                     console.log(messageQuery1);
                                                     st.db.query(messageQuery1, function (err, groupDetails1) {
                                                         if (groupDetails1) {
-                                                            for (var i = 0; i < groupDetails[1].length; i++) {
-                                                                receiverId = groupDetails[1][i].tid;
-                                                                senderTitle = groupDetails[0][0].groupname;
-                                                                if (id_type == 0) {
-                                                                    groupId = groupDetails1[0][0].groupid;
-                                                                    groupTitle = groupDetails1[0][0].groupname;
+                                                            if (groupDetails1[0]) {
+                                                                if (groupDetails1[0][0]) {
+                                                                    for (var i = 0; i < groupDetails[1].length; i++) {
+                                                                        receiverId = groupDetails[1][i].tid;
+                                                                        senderTitle = groupDetails[0][0].groupname;
+                                                                        if (id_type == 0) {
+                                                                            groupId = groupDetails1[0][0].groupid;
+                                                                            groupTitle = groupDetails1[0][0].groupname;
+                                                                        }
+                                                                        else {
+                                                                            groupId = groupDetails[0][0].tid;
+                                                                            groupTitle = groupDetails[0][0].groupname;
+                                                                        }
+                                                                        messageText = msgContent.message;
+                                                                        messageType = id_type;
+                                                                        operationType = 0;
+                                                                        iphoneId = iphoneId;
+                                                                        messageId = msgContent.message_id;
+                                                                        msgUserid = msgContent.message_userid;
+                                                                        masterid = groupDetails[0][0].AdminID;
+                                                                        prioritys = msgContent.priority;
+                                                                        var a_url = msgContent.attachment;
+                                                                        var a_name = msgContent.attachmentFilename;
+                                                                        var now = new Date();
+                                                                        var t = now.toUTCString();
+                                                                        var datetime = t.split(',');
+                                                                        datetime = datetime[1];
+                                                                        var latitude = 0.00, longitude = 0.00, jobId = 0;
+                                                                        //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                                        //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jobId, a_url);
+
+                                                                    }
+                                                                    c = c + 1;
+                                                                    loopFunction(c);
+                                                                    responseMessage.status = true;
+                                                                    callBack(null, responseMessage);
                                                                 }
                                                                 else {
-                                                                    groupId = groupDetails[0][0].tid;
-                                                                    groupTitle = groupDetails[0][0].groupname;
+                                                                    console.log('FnComposeMessage:Error getting from groupname1');
+                                                                    callBack(null, null);
                                                                 }
-                                                                messageText = msgContent.message;
-                                                                messageType = id_type;
-                                                                operationType = 0;
-                                                                iphoneId = iphoneId;
-                                                                messageId = msgContent.message_id;
-                                                                msgUserid = msgContent.message_userid;
-                                                                masterid = groupDetails[0][0].AdminID;
-                                                                prioritys = msgContent.priority;
-                                                                var a_url = msgContent.attachment;
-                                                                var a_name = msgContent.attachmentFilename;
-                                                                var now = new Date();
-                                                                var t = now.toUTCString();
-                                                                var datetime = t.split(',');
-                                                                datetime = datetime[1];
-                                                                var latitude = 0.00, longitude = 0.00,jobId=0;
-                                                                //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid,jobId,a_url);
-
                                                             }
-                                                            c = c+1;
-                                                            loopFunction(c);
-                                                            responseMessage.status = true;
-                                                            callBack(null, responseMessage);
+                                                            else {
+                                                                console.log('FnComposeMessage:Error getting from groupname1');
+                                                                callBack(null, null);
+                                                            }
                                                         }
                                                         else {
                                                             console.log('FnComposeMessage:Error getting from groupname1');
@@ -228,7 +240,7 @@ msgNotification.prototype.updateStatus= function(details, callBack) {
                                         st.db.query(queryParameters, function (err, iosResult) {
                                             if (iosResult) {
                                                 if (iosResult[0]) {
-                                                    iphoneId = iosResult[0].iphoneID;
+                                                    iphoneId = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                                                 }
                                                 else {
                                                     iphoneId = '';
@@ -424,7 +436,7 @@ msgNotification.prototype.sendForwardNotification = function(msgContent, callBac
                     st.db.query(queryParameters, function (err, iosResult) {
                         if (iosResult) {
                             if (iosResult[0]) {
-                                iphoneId = iosResult[0].iphoneID;
+                                iphoneId = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
                             }
                             else {
                                 iphoneId = '';
@@ -444,36 +456,48 @@ msgNotification.prototype.sendForwardNotification = function(msgContent, callBac
                                                     console.log(messageQuery1);
                                                     st.db.query(messageQuery1, function (err, groupDetails1) {
                                                         if (groupDetails1) {
-                                                            for (var i = 0; i < groupDetails[1].length; i++) {
-                                                                receiverId = groupDetails[1][i].tid;
-                                                                senderTitle = groupDetails[0][0].groupname;
-                                                                if (id_type == 0) {
-                                                                    groupId = groupDetails1[0][0].groupid;
-                                                                    groupTitle = groupDetails1[0][0].groupname;
+                                                            if (groupDetails1[0]) {
+                                                                if (groupDetails1[0][0]) {
+                                                                    for (var i = 0; i < groupDetails[1].length; i++) {
+                                                                        receiverId = groupDetails[1][i].tid;
+                                                                        senderTitle = groupDetails[0][0].groupname;
+                                                                        if (id_type == 0) {
+                                                                            groupId = groupDetails1[0][0].groupid;
+                                                                            groupTitle = groupDetails1[0][0].groupname;
+                                                                        }
+                                                                        else {
+                                                                            groupId = groupDetails[0][0].tid;
+                                                                            groupTitle = groupDetails[0][0].groupname;
+                                                                        }
+                                                                        messageText = 'Forward Message';
+                                                                        messageType = id_type;
+                                                                        messageId = msgContent.message_id;
+                                                                        masterid = groupDetails[0][0].AdminID;
+                                                                        iphoneId = iphoneId;
+                                                                        var now = new Date();
+                                                                        var t = now.toUTCString();
+                                                                        var dateTime = t.split(',');
+                                                                        dateTime = dateTime[1];
+                                                                        var latitude = 0.00, longitude = 0.00, jobId = 0;
+                                                                        var aName = '', aUrl = '', operationType = 0, msgUserid = 0, prioritys = 1;
+                                                                        //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
+                                                                        //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, aName, msgUserid, jobId, aUrl);
+                                                                        responseMessage.status = true;
+                                                                        callBack(null, responseMessage);
+                                                                    }
+                                                                    c = c + 1;
+                                                                    loopFunction(c);
                                                                 }
                                                                 else {
-                                                                    groupId = groupDetails[0][0].tid;
-                                                                    groupTitle = groupDetails[0][0].groupname;
+                                                                    console.log('FnForwardMessage:Error getting from groupname1');
+                                                                    callBack(null, null);
                                                                 }
-                                                                messageText = 'Forward Message';
-                                                                messageType = id_type;
-                                                                messageId = msgContent.message_id;
-                                                                masterid = groupDetails[0][0].AdminID;
-                                                                iphoneId = iphoneId;
-                                                                var now = new Date();
-                                                                var t = now.toUTCString();
-                                                                var dateTime = t.split(',');
-                                                                dateTime = dateTime[1];
-                                                                var latitude = 0.00, longitude = 0.00,jobId=0;
-                                                                var aName='',aUrl = '',operationType = 0,msgUserid = 0,prioritys=1;
-                                                                //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
-                                                                //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, aName, msgUserid,jobId,aUrl);
-                                                                responseMessage.status = true;
-                                                                callBack(null, responseMessage);
                                                             }
-                                                            c = c+1;
-                                                            loopFunction(c);
+                                                            else {
+                                                                console.log('FnForwardMessage:Error getting from groupname1');
+                                                                callBack(null, null);
+                                                            }
                                                         }
                                                         else {
                                                             console.log('FnForwardMessage:Error getting from groupname1');
