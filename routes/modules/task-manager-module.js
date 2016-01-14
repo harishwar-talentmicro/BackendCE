@@ -60,6 +60,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     var taskDate = req.body.ts;            // Task Date and Time (YYYY-MM-DD HH:mm:ss)
     var ownerId = parseInt(req.body.ow);   // Owner ID (Master ID of the task owner)
     var nextActionId = (parseInt(req.body.nxid) == NaN) ? 0 : parseInt(req.body.nxid);
+    var tid,cd;
 
     var responseMessage = {
         status: false,
@@ -106,45 +107,49 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id)+ ',' + st.db.escape(transactionId)
                             + ',' + st.db.escape(status) + ',' + st.db.escape(c_particulars) + ',' + st.db.escape(c_amount)
-                            + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId) + ',' + st.db.escape(nextActionId);
+                            + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId)
+                            + ',' + st.db.escape(nextActionId);
 
                         var query = 'CALL psavetask(' + queryParams + ')';
+
+                        console.log(query);
 
                         st.db.query(query, function (err, insertresult) {
                             console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
-                                    if(insertresult[0]) {
-                                        if(insertresult[0][0]) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'TaskManager saved successfully';
-                                            responseMessage.data = {
-                                                id: insertresult[0][0].id,
-                                                s: parseInt(req.body.s),
-                                                tx: parseInt(req.body.tx),
-                                                cp: req.body.cp,
-                                                ca: req.body.ca,
-                                                au: req.body.au,
-                                                ts: req.body.ts,
-                                                cd: insertresult[0][0].cd,
-                                                ow: parseInt(req.body.ow),
-                                                nxid: parseInt(req.body.nxid)
-                                            };
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveTaskManager: TaskManager saved successfully');
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'TaskManager saved successfully';
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
+                                            tid = insertresult[0][0].id;
+                                            cd=insertresult[0][0].cd;
                                         }
                                         else {
-                                            responseMessage.message = 'No save TaskManager';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveTaskManager:No save TaskManager');
+                                            tid = id;
+                                            cd='';
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'No save TaskManager';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveTaskManager:No save TaskManager');
+                                        tid = id;
+                                        cd='';
                                     }
+
+                                    responseMessage.data = {
+                                        id : tid,
+                                        s  : parseInt(req.body.s),
+                                        tx : parseInt(req.body.tx),
+                                        cp : req.body.cp,
+                                        ca : req.body.ca,
+                                        au : req.body.au,
+                                        ts : req.body.ts,
+                                        cd : cd,
+                                        ow : parseInt(req.body.ow),
+                                        nxid : parseInt(req.body.nxid)
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveTaskManager: TaskManager saved successfully');
                                 }
                                 else {
                                     responseMessage.message = 'No save TaskManager';
@@ -191,6 +196,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
         }
     }
 };
+
 
 /**
  * @todo FnGetTasks
@@ -242,35 +248,28 @@ TaskManager.prototype.getTasks = function(req,res,next){
 
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if(getResult) {
-                                    if (getResult[0]) {
-                                        if (getResult[0].length > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.data = getResult[0];
-                                            responseMessage.message = 'Tasks loaded successfully';
-                                            responseMessage.error = null;
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetTasks: Tasks loaded successfully');
-                                        }
-                                        else {
-                                            responseMessage.data = getResult[0];
-                                            responseMessage.message = 'Tasks loaded successfully';
-                                            responseMessage.error = null;
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetTasks: Tasks not present');
-                                        }
+                                if (getResult[0]) {
+                                    if (getResult[0].length > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.data = getResult[0];
+                                        responseMessage.message = 'Tasks loaded successfully';
+                                        responseMessage.error = null;
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTasks: Tasks loaded successfully');
                                     }
                                     else {
-                                        responseMessage.message = 'Tasks not loaded';
+                                        responseMessage.data = getResult[0];
+                                        responseMessage.message = 'Tasks loaded successfully';
+                                        responseMessage.error = null;
                                         res.status(200).json(responseMessage);
-                                        console.log('FnGetTasks: Tasks not loaded1');
+                                        console.log('FnGetTasks: Tasks not present');
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'Tasks not loaded';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetTasks: Tasks not loaded2');
-                                }
+                                        responseMessage.message = 'Tasks not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTasks: Tasks not loaded');
+                                    }
                             }
                             else {
                                 responseMessage.message = 'An error occured in query ! Please try again';

@@ -13,6 +13,19 @@ var db = DbHelper.getDBContext();
 var maintainenceTemplate = fs.readFileSync('./views/maintainence.ejs','utf-8');
 var htmlAlumniIndex = ejs.render(maintainenceTemplate);
 
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
+
 
 
 router.get('*',function(req,res,next){
@@ -24,7 +37,7 @@ router.get('*',function(req,res,next){
             var hostNameParsed = hostName.split('.');
             if(hostNameParsed.length){
 
-                var alumniName = hostNameParsed[0];
+                var alumniName = alterEzeoneId(hostNameParsed[0]);
                 if(alumniName !== 'www'){
                     /**
                      * Call procedure to fetch out alumniName

@@ -135,7 +135,9 @@ NotificationMqtt.prototype.checkQueue = function(topic,callback){
         { passive : false,durable : true,exclusive : false,autoDelete : false},
         function(queRef){
             var exchange = amqpConn.exchange();
-            callback();
+            if(callback){
+                callback();
+            }
         }
     );
 };
@@ -170,7 +172,7 @@ NotificationMqtt.prototype.publish = function(topic,messagePayload){
         messagePayload._id = Date.now() + '-' + uniqueMid;
 
         console.log('RabbitTopic : '+topic);
-        console.log(messagePayload);
+       // console.log(messagePayload);
 
         try{
             this.createQueue(topic.toString(),function(){

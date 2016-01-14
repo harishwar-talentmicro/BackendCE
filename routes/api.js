@@ -191,6 +191,7 @@ router.get('/navigation',searchModule.navigateSearch);
 var Mail = require('./modules/mail-module.js');
 var mailModule = new Mail(db,stdLib);
 router.post('/ewtSendMail', mailModule.sendMail);
+router.post('/business/mail', mailModule.bussinessMail);
 
 //Message Notification Module methods
 var MessageNotification = require('./modules/message-notification-module.js');
@@ -314,11 +315,12 @@ router.get('/participants_list',alumniModule.getParticipantsList);
 router.get('/job_approval_list',alumniModule.getAlumniJobApprovalList);
 router.post('/job_approve',alumniModule.approveAlumniJobs);
 router.get('/search_alumni_ten',alumniModule.searchAlumniTEN);
-router.get('/search_alumni_job',alumniModule.searchAlumniTEN);
+router.get('/search_alumni_job',alumniModule.searchAlumniJobs);
 router.get('/my_alumni_jobs',alumniModule.getMyAlumniJobs);
 router.get('/alumni_user_details', alumniModule.getAlumniUserDetails);
 router.get('/search_alumni', alumniModule.searchAlumni);
 router.put('/leave_alumni', alumniModule.leaveAlumni);
+router.put('/alumni_member', alumniModule.approveAlumnimembers);
 //new url's
 router.get('/client_list',alumniModule.getClientList);
 router.get('/contact_list',alumniModule.getClientContacts);
@@ -395,8 +397,13 @@ router.get('/service',serviceModule.getServices);
 router.get('/service_categories',serviceModule.getServiceCategories);
 router.get('/service_details',serviceModule.getServiceDetails);
 router.post('/service',serviceModule.createService);
-router.put('/service',serviceModule.updateService);
+router.post('/service_change',serviceModule.updateService);
 router.post('/join_member',serviceModule.addMembersToService);
+router.get('/joined_community',serviceModule.getJoinedCommunity);
+router.delete('/community_member',serviceModule.deleteCommunityMember);
+router.post('/service_pic',serviceModule.saveServicePic);
+router.post('/service_attachment',serviceModule.saveServiceAttachment);
+router.post('/service_video',serviceModule.saveServiceVideo);
 
 
 //EZEIDAP Methods
@@ -465,12 +472,26 @@ router.post('/ewtSaveDepartmentsVES',vesModule.saveDepartmentsVES);
 router.post('/ewtSaveGatesVES',vesModule.saveGatesVES);
 router.post('/ewtSaveCitysVES',vesModule.saveCitysVES);
 
+router.get('/error_test',function(req,res,next){
+    try {
+        b.toString();
+    }
+    catch(ex){
+        console.log(ex);
+    }
+    res.send('');
+});
+
 /**
  * Default error handler
  * Add every API call above this
  */
+ 
+ 
 router.all('*',function(req,res,next){
     res.status(404).json({ status : false, error : { api : 'API'}, message : 'Not found'});
 });
 
 module.exports = router;
+
+

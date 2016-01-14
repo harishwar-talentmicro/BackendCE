@@ -315,6 +315,11 @@ Service.prototype.getServices = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'services loaded successfully';
+                                        for(var i=0;i<serviceResult[0].length;i++){
+                                            serviceResult[0][i].isimage = (serviceResult[0][i].isimage != 0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isimage :0;
+                                            serviceResult[0][i].isattachment = (serviceResult[0][i].isattachment !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isattachment :0;
+                                            serviceResult[0][i].isvideo = (serviceResult[0][i].isvideo !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isvideo :0;
+                                        }
                                         responseMessage.data = serviceResult[0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetServices: services loaded successfully');
@@ -600,6 +605,228 @@ Service.prototype.getServiceDetails = function(req,res,next){
 };
 
 /**
+ * @todo FnSaveServicePic
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save service pic
+ */
+Service.prototype.saveServicePic = function(req,res,next) {
+
+    var picUrl='',picFilename='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try{
+
+        if(req.files) {
+            if(req.files.pic) {
+                console.log(req.files.pic);
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.pic.extension) ? req.files.pic.extension : 'jpg';
+                picUrl = uniqueId + '.' + filetype;
+                picFilename = req.files.pic.originalname;
+                var readStream = fs.createReadStream(req.files.pic.path);
+
+                uploadDocumentToCloud(picUrl, readStream, function (err) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.message = 'Pic Uploaded successfully';
+                        responseMessage.data = {
+                            pic_url : picUrl,
+                            pic_fn :picFilename
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSavePic: Pic Uploaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'Pic not upload';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSavePic:Pic not upload');
+                    }
+                });
+            }
+        }
+        else{
+            console.log('save url...');
+            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+            pic = pic[2];
+            console.log(pic);
+            responseMessage.message = 'page pic is updated';
+            responseMessage.status = true;
+            responseMessage.data = pic;
+            res.status(200).json(responseMessage);
+            console.log('pic is updating');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSavePic:error ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+/**
+ * @todo FnSaveServiceAttachment
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save service pic
+ */
+Service.prototype.saveServiceAttachment = function(req,res,next) {
+
+    var aUrl='',aFilename='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try{
+
+        if(req.files) {
+            if(req.files.attachment) {
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
+                aUrl = uniqueId + '.' + filetype;
+                aFilename = req.files.attachment.originalname;
+                var readStream = fs.createReadStream(req.files.attachment.path);
+
+                uploadDocumentToCloud(aUrl, readStream, function (err) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.message = 'attachment Uploaded successfully';
+                        responseMessage.data = {
+                            a_url : aUrl,
+                            a_fn :aFilename
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'attachment not upload';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceAttachment:attachment not upload');
+                    }
+                });
+            }
+        }
+        else{
+            console.log('save url...');
+            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+            pic = pic[2];
+            console.log(pic);
+            responseMessage.message = 'attachment is updated';
+            responseMessage.status = true;
+            responseMessage.data = pic;
+            res.status(200).json(responseMessage);
+            console.log('FnSaveServiceAttachment:attachment is updating');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveServiceAttachment:error ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+/**
+ * @todo FnSaveServiceVideo
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save service video
+ */
+Service.prototype.saveServiceVideo = function(req,res,next) {
+
+    var vUrl='',vFilename='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try{
+
+        if(req.files) {
+
+            if(req.files.video) {
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.video.extension) ? req.files.video.extension : '';
+                vUrl = uniqueId + '.' + filetype;
+                vFilename = req.files.video.originalname;
+                var readStream = fs.createReadStream(req.files.video.path);
+
+                uploadDocumentToCloud(vUrl, readStream, function (err) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.message = 'video Uploaded successfully';
+                        responseMessage.data = {
+                            v_url : vUrl,
+                            v_fn :vFilename
+                        };
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceVideo: video Uploaded successfully');
+                    }
+                    else {
+                        responseMessage.message = 'video not upload';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceVideo:video not upload');
+                    }
+                });
+            }
+        }
+        else{
+            console.log('save url...');
+            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
+            pic = pic[2];
+            console.log(pic);
+            responseMessage.message = 'video is updated';
+            responseMessage.status = true;
+            responseMessage.data = pic;
+            res.status(200).json(responseMessage);
+            console.log('FnSaveServiceVideo:video is updating');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveServiceVideo:error ' + ex.description);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+
+/**
  * @todo FnCreateService
  * Method : POST
  * @param req
@@ -617,6 +844,7 @@ Service.prototype.createService = function(req,res,next){
      * @param cid (int) category id
      * @param pic  (file)
      */
+
     var isJson = req.is('json');
 
     var responseMessage = {
@@ -632,26 +860,32 @@ Service.prototype.createService = function(req,res,next){
         error['isJson'] = 'Invalid Input ContentType';
         validateStatus *= false;
     }
-    else{
+    else {
         /**
-         * storing and validating the input parameters from front end
+         * storing and validating the input parameters
          */
 
         var token = req.body.token;
         var masterId = parseInt(req.body.master_id);
+        var message = req.body.message;
         var categoryId = parseInt(req.body.cid);
-        var randomName='',pic;
+        var pic = req.body.pic_url ? req.body.pic_url :'';
+        var picFilename = req.body.pic_fn ? req.body.pic_fn :'';
+        var attachment = req.body.a_url ? req.body.a_url :'';
+        var aFilename = req.body.a_fn ? req.body.a_fn :'';
+        var videoUrl = req.body.video_url ? req.body.video_url :'';
+        var vFilename = req.body.video_fn ? req.body.video_fn :'';
 
-        if(!(token)){
+        if (!token) {
             error['token'] = 'token is Mandatory';
             validateStatus *= false;
         }
-        if(isNaN(masterId)){
+        if (isNaN(masterId)) {
             error['masterId'] = 'masterId is a integer value';
             validateStatus *= false;
         }
 
-        if(isNaN(categoryId)){
+        if (isNaN(categoryId)) {
             error['categoryId'] = 'categoryId is a integer value';
             validateStatus *= false;
         }
@@ -668,37 +902,11 @@ Service.prototype.createService = function(req,res,next){
                 if (!err) {
                     if (result) {
 
-                        /**
-                         * pic upload to cloud server
-                         */
-                        if (req.files.pic) {
-
-                            var uniqueId = uuid.v4();
-                            var filetype = (req.files.pic.extension) ? req.files.pic.extension : 'jpg';
-                            randomName = uniqueId + '.' + filetype;
-
-                            var readStream = fs.createReadStream(req.files.pic.path);
-
-                            uploadDocumentToCloud(randomName, readStream, function (err) {
-                                if (!err) {
-                                    pic = randomName;
-                                    console.log(pic);
-                                    console.log('FnCreateService:Pic Uploaded Successfully');
-                                }
-                                else {
-                                    console.log(err);
-                                    console.log('FnCreateService:Error in uploading pic');
-                                }
-                            });
-                        }
-                        else
-                        {
-                            pic = '';
-                        }
-
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(masterId)
-                            + ',' + st.db.escape(req.body.message) + ',' + st.db.escape(categoryId)
-                            + ',' + st.db.escape(pic);
+                            + ',' + st.db.escape(message) + ',' + st.db.escape(categoryId)
+                            + ',' + st.db.escape(pic)+ ',' + st.db.escape(picFilename)
+                            + ',' + st.db.escape(attachment) + ',' + st.db.escape(aFilename)
+                            + ',' + st.db.escape(videoUrl)+ ',' + st.db.escape(vFilename);
 
                         var query = 'CALL ppostservice(' + queryParams + ')';
                         console.log(query);
@@ -708,11 +916,15 @@ Service.prototype.createService = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.message = 'Service Created successfully';
                                     responseMessage.data = {
-                                        master_id : masterId,
-                                        message : req.body.message,
-                                        cid : categoryId,
-                                        pic : pic ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + pic : ''
-
+                                        master_id: masterId,
+                                        message: req.body.message,
+                                        cid: categoryId,
+                                        pic_url : req.body.pic_url ? req.body.pic_url :'',
+                                        pic_fn : req.body.pic_fn ? req.body.pic_fn :'',
+                                        a_url : req.body.a_url ? req.body.a_url :'',
+                                        a_fn : req.body.a_fn ? req.body.a_fn :'',
+                                        video_url : req.body.video_url ? req.body.video_url :'',
+                                        video_fn : req.body.video_fn ? req.body.video_fn :''
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnCreateService: Service Created successfully');
@@ -733,8 +945,8 @@ Service.prototype.createService = function(req,res,next){
                             }
 
                         });
-
                     }
+
                     else {
                         responseMessage.message = 'Invalid token';
                         responseMessage.error = {
@@ -811,12 +1023,12 @@ Service.prototype.updateService = function(req,res,next){
 
         var token = req.body.token;
         var id = parseInt(req.body.id);
-        var earnedPoints = parseInt(req.body.ep);
-        var redeemedPoints = parseInt(req.body.rp);
+        var earnedPoints = req.body.ep ? parseInt(req.body.ep) : 0;
+        var redeemedPoints = req.body.rp ? parseInt(req.body.rp):0;
         var status = parseInt(req.body.st);
         var masterId = parseInt(req.body.master_id);
 
-        if(!(token)){
+        if(!token){
             error['token'] = 'token is Mandatory';
             validateStatus *= false;
         }
@@ -825,21 +1037,12 @@ Service.prototype.updateService = function(req,res,next){
             validateStatus *= false;
         }
 
-        if(isNaN(earnedPoints)){
-            error['earnedPoints'] = 'ep is not integer value';
-            validateStatus *= false;
-        }
-        if(isNaN(redeemedPoints)){
-            error['redeemedPoints'] = 'rp is not integer value';
-            validateStatus *= false;
-        }
-
         if(isNaN(id)){
             error['id'] = 'id is not integer value';
             validateStatus *= false;
         }
         if(isNaN(status)){
-            error['status'] = 'st is not integer value';
+            error['status'] = 'status is not integer value';
             validateStatus *= false;
         }
     }
@@ -944,8 +1147,6 @@ Service.prototype.addMembersToService = function(req,res,next){
      * @param token (char(36))
      * @param ezeid VARCHAR(35)
      * @param identify name VARCHAR(25)
-     * @param notes VARCHAR(150)
-     * @param service_type VARCHAR(150)
      */
     var isJson = req.is('json');
 
@@ -969,14 +1170,9 @@ Service.prototype.addMembersToService = function(req,res,next){
 
         var token = req.body.token;
         var ezeid = alterEzeoneId(req.body.ezeid);
-        var serviceType = parseInt(req.body.service_type);
 
         if(!(token)){
             error['token'] = 'token is Mandatory';
-            validateStatus *= false;
-        }
-        if(isNaN(serviceType)){
-            error['serviceType'] = 'serviceType is not integer value';
             validateStatus *= false;
         }
     }
@@ -993,8 +1189,7 @@ Service.prototype.addMembersToService = function(req,res,next){
                     if (result) {
 
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(ezeid)
-                            + ',' + st.db.escape(req.body.identify_name) + ',' + st.db.escape(req.body.notes)
-                            + ',' + st.db.escape(serviceType);
+                            + ',' + st.db.escape(req.body.identify_name);
 
                         var query = 'CALL paddmembertoservice(' + queryParams + ')';
                         console.log(query);
@@ -1007,9 +1202,7 @@ Service.prototype.addMembersToService = function(req,res,next){
                                         responseMessage.message = 'Member added successfully';
                                         responseMessage.data = {
                                             ezeid: ezeid,
-                                            identify_name: req.body.identify_name,
-                                            notes: req.body.notes,
-                                            service_type : serviceType
+                                            identify_name: req.body.identify_name
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnAddMembersToService: Member added successfully');
@@ -1096,5 +1289,215 @@ Service.prototype.addMembersToService = function(req,res,next){
         }
     }
 };
+
+/**
+ * @todo FnGetJoinedCommunity
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get service Details
+ */
+Service.prototype.getJoinedCommunity = function(req,res,next){
+
+    var token = req.query.token;
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'token is mandatory';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(token);
+                        var query = 'CALL pGetjoinedcommunity(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, communityResult) {
+                            if (!err) {
+                                if (communityResult) {
+                                    if(communityResult[0]){
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'communityResult loaded successfully';
+                                        responseMessage.data = communityResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetJoinedCommunity: communityResult loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'communityResult not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetJoinedCommunity:communityResult not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'communityResult not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetJoinedCommunity:communityResult not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetJoinedCommunity: error in getting communityResult:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetJoinedCommunity: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetJoinedCommunity:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnGetJoinedCommunity ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnDeleteCommunityMember
+ * Method : Delete
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for delete Community Member
+ */
+Service.prototype.deleteCommunityMember = function(req,res,next){
+
+    var token = req.query.token;
+    var ezeid = alterEzeoneId(req.query.ezeid);
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+
+                        var queryParams = st.db.escape(ezeid) +','+ st.db.escape(token) ;
+                        var query= 'CALL pdeletecommunitymember(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, deleteResult) {
+                            console.log(deleteResult);
+                            if (!err) {
+                                if (deleteResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Community member deleted successfully';
+                                    responseMessage.data = {ezeid : alterEzeoneId(req.query.ezeid)};
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnDeleteCommunityMember: Community member deleted successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Community member not delete';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnDeleteCommunityMember: Community member not delete');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnDeleteCommunityMember: error in deleting community member :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnDeleteCommunityMember: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnDeleteCommunityMember:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnDeleteCommunityMember : ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 
 module.exports = Service;
