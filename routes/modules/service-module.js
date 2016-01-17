@@ -209,8 +209,8 @@ Service.prototype.getServiceProviders = function(req,res,next){
                                                 req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[1][i].tilebanner: '';
                                             }
                                             res.status(200).json({
-                                                totalcount : serviceResult[0][0].totalcount,
-                                                Result : serviceResult[1]
+                                                totalcount : (serviceResult[0][0]) ? serviceResult[0][0].totalcount : 0,
+                                                Result : (serviceResult[1]) ? serviceResult[1] : []
                                             });
                                             console.log('FnGetServiceProviders: service providers loaded successfully');
                                         }

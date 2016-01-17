@@ -302,6 +302,7 @@ router.get('/alumni_profile',alumniModule.getAlumniProfile);
 router.post('/alumni_signup',alumniModule.registerAlumni);
 router.post('/ten_details',alumniModule.saveTENMaster);
 router.get('/ten_details',alumniModule.getTENDetails);
+router.get('/my_ten_details',alumniModule.getMyTENDetails);
 router.get('/profile_status',alumniModule.getProfileStatus);
 router.post('/join_event',alumniModule.saveTENUsers);
 router.post('/ten_approve',alumniModule.approveTEN);

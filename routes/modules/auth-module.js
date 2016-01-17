@@ -497,7 +497,7 @@ Auth.prototype.register = function(req,res,next){
                                     if (registerResult[0].length > 0) {
                                         if (registerResult[0][0].TID != 0) {
                                             if (idtypeId == 2) {
-                                                rtnMessage.FirstName = comapanyName;
+                                                rtnMessage.FirstName = companyName;
                                             }
                                             else {
                                                 rtnMessage.FirstName = firstName;
