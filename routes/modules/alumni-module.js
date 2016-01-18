@@ -2764,6 +2764,143 @@ Alumni.prototype.getTENDetails = function(req,res,next){
     }
 };
 
+
+/**
+ * @todo FnGetMyTENDetails
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get ten details which are posted by the user who is logged in
+ * @used For getting up pending event details which are showed to user who posted the events before approval
+ */
+Alumni.prototype.getMyTENDetails = function(req,res,next){
+    var _this = this;
+
+    var token = req.query.token ? req.query.token : '';
+    var code = alterEzeoneId(req.query.code);   // college code
+    var type = parseInt(req.query.type);   // 1(training),2=event,3=news,4=knowledge
+    var status = parseInt(req.query.status);
+    var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
+    var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;
+
+    var responseMessage = {
+        status: false,
+        count : 0,
+        data: null,
+        message: '',
+        error: {}
+
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!code){
+        error['code'] = 'Invalid code';
+        validateStatus *= false;
+    }
+    if(!type){
+        type = 0;
+    }
+    if(parseInt(type) == NaN){
+        error['type'] = 'Invalid type';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+
+            var queryParams = st.db.escape(type) + ',' + st.db.escape(code)+ ',' + st.db.escape(status)+ ',' + st.db.escape(pageSize)
+                + ',' + st.db.escape(pageCount) + ',' + st.db.escape(token);
+            var query = 'CALL get_ten_pending_details(' + queryParams + ')';
+            console.log(query);
+            st.db.query(query, function (err, getResult) {
+                if (!err) {
+                    if (getResult[0]) {
+                        if (getResult[0][0].count > 0) {
+                            //console.log(getResult);
+                            //console.log(getResult[1]);
+                            if (getResult[1]) {
+                                for (var ct = 0; ct < getResult[1].length; ct++) {
+                                    getResult[1][ct].attachment = getResult[1][ct].attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].attachment : '';
+                                }
+
+                                for (var i = 0; i < getResult[1].length; i++) {
+                                    var output =[];
+                                    if (getResult[1][i].attachment1) {
+
+                                        var attach = getResult[1][i].attachment1.split(',');
+
+                                        for (var j = 0; j < attach.length; j++) {
+                                            var joinAttach = {
+                                                s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attach[j]
+                                            };
+                                            output.push(joinAttach);
+                                            getResult[1][i].attachment1 = output;
+
+                                        }
+                                    }
+                                    else {
+                                        getResult[1][i].attachment1 = '';
+                                    }
+                                }
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Data loaded successfully';
+                                responseMessage.count = getResult[0][0].count;
+                                responseMessage.data = getResult[1];
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTENDetails: Data loaded successfully');
+                            }
+                            else {
+                                responseMessage.message = 'Data not loaded';
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTENDetails: Data not loaded');
+                            }
+                        }
+                        else {
+                            responseMessage.message = 'Data not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetTENDetails: Data not loaded');
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Data not loaded';
+                        res.status(200).json(responseMessage);
+                        console.log('FnGetTENDetails: Data not loaded');
+                    }
+                }
+                else {
+                    responseMessage.message = 'An error occured in query ! Please try again';
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetTENDetails: error in getting ten details :' + err);
+                }
+
+            });
+        }
+
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetTENDetails ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 /**
  * @todo FnGetProfileStatus
  * Method : GET

@@ -182,13 +182,13 @@ Service.prototype.getServiceProviders = function(req,res,next){
         validateStatus *= false;
     }
     if(isNaN(serviceType)){
-        error['service_type'] = 'Sorry! service_type is not integer value';
+        error['service_type'] = 'Sorry! service_type is invalid';
         console.log('service_type is a integer value');
         validateStatus *= false;
     }
 
     if(!validateStatus){
-        res.json(error);
+        res.status(400).json(error);
     }
     else {
         try {
@@ -209,8 +209,8 @@ Service.prototype.getServiceProviders = function(req,res,next){
                                                 req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[1][i].tilebanner: '';
                                             }
                                             res.status(200).json({
-                                                totalcount : serviceResult[0][0].totalcount,
-                                                Result : serviceResult[1]
+                                                totalcount : (serviceResult[0][0]) ? serviceResult[0][0].totalcount : 0,
+                                                Result : (serviceResult[1]) ? serviceResult[1] : []
                                             });
                                             console.log('FnGetServiceProviders: service providers loaded successfully');
                                         }
@@ -243,7 +243,7 @@ Service.prototype.getServiceProviders = function(req,res,next){
                     }
                 }
                 else {
-                    error['token'] = 'Sorry! Error in validating Token'
+                    error['token'] = 'Sorry! Error in validating Token';
                     res.status(500).json(error);
                     console.log('FnGetServiceProviders:Error in processing Token' + err);
                 }
@@ -659,15 +659,9 @@ Service.prototype.saveServicePic = function(req,res,next) {
             }
         }
         else{
-            console.log('save url...');
-            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
-            pic = pic[2];
-            console.log(pic);
-            responseMessage.message = 'page pic is updated';
-            responseMessage.status = true;
-            responseMessage.data = pic;
+            responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
-            console.log('pic is updating');
+            console.log('pic file is required');
         }
     }
     catch (ex) {
@@ -732,15 +726,9 @@ Service.prototype.saveServiceAttachment = function(req,res,next) {
             }
         }
         else{
-            console.log('save url...');
-            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
-            pic = pic[2];
-            console.log(pic);
-            responseMessage.message = 'attachment is updated';
-            responseMessage.status = true;
-            responseMessage.data = pic;
+            responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
-            console.log('FnSaveServiceAttachment:attachment is updating');
+            console.log('file is required');
         }
     }
     catch (ex) {
@@ -806,15 +794,9 @@ Service.prototype.saveServiceVideo = function(req,res,next) {
             }
         }
         else{
-            console.log('save url...');
-            var pic = ((pic).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
-            pic = pic[2];
-            console.log(pic);
-            responseMessage.message = 'video is updated';
-            responseMessage.status = true;
-            responseMessage.data = pic;
+            responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
-            console.log('FnSaveServiceVideo:video is updating');
+            console.log('file is required');
         }
     }
     catch (ex) {
@@ -1199,7 +1181,6 @@ Service.prototype.addMembersToService = function(req,res,next){
                         var query = 'CALL paddmembertoservice(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, memberResult) {
-                            console.log(memberResult);
                             if (!err) {
                                 if (memberResult) {
                                     if (memberResult.affectedRows > 0) {
