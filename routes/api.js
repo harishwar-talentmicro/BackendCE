@@ -323,6 +323,8 @@ router.get('/alumni_user_details', alumniModule.getAlumniUserDetails);
 router.get('/search_alumni', alumniModule.searchAlumni);
 router.put('/leave_alumni', alumniModule.leaveAlumni);
 router.put('/alumni_member', alumniModule.approveAlumnimembers);
+router.delete('/ten_attachment',alumniModule.deleteTenAttachment);
+
 //new url's
 router.get('/client_list',alumniModule.getClientList);
 router.get('/contact_list',alumniModule.getClientContacts);
