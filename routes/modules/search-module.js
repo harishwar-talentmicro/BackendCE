@@ -51,6 +51,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var type = parseInt(req.body.SearchType);
+
         if (type == 1){
             type = 2;
         }
@@ -67,7 +68,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         var CurrentDate = req.body.CurrentDate;
         var count = 0;
 
-        if(CurrentDate != null)
+        if(CurrentDate)
             CurrentDate = new Date(CurrentDate);
         if(type.toString() == 'NaN')
             type = 0;
@@ -81,7 +82,7 @@ Search.prototype.searchKeyword = function(req,res,next){
 
         if (type == "1") {
 
-            if (find != null && find != '' && token != null && CurrentDate != null && pagesize != null && pagecount != null) {
+            if (find && token != null && CurrentDate != null && pagesize != null && pagecount != null) {
                 st.validateToken(token, function (err, Result) {
                     if (!err) {
                         if (Result) {
@@ -293,7 +294,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         }
         else if (type == "2") {
 
-            if (find != null && find != ''&& Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CurrentDate != null && pagesize != null && pagecount != null) {
+            if (find && !isNaN(Latitude)&& !isNaN(Longitude) && CurrentDate && pagesize != null && pagecount != null) {
 
                 if (ParkingStatus == 0) {
                     ParkingStatus = "0";
@@ -368,14 +369,17 @@ Search.prototype.searchKeyword = function(req,res,next){
                 });
             }
             else {
-                if (find == null || find == '') {
+                if (!find) {
                     console.log('FnSearchByKeywords: keyword is empty');
                 }
-                else if (Latitude == 'NaN') {
+                else if (isNaN(Latitude)) {
                     console.log('FnSearchByKeywords: Latitude is empty');
                 }
-                else if (Longitude == 'NaN') {
+                else if (isNaN(Longitude)) {
                     console.log('FnSearchByKeywords: Longitude is empty');
+                }
+                else if (CurrentDate) {
+                    console.log('FnSearchByKeywords: CurrentDate is empty');
                 }
                 else if (pagesize == null) {
                     console.log('FnSearchByKeywords: pagesize is empty');
@@ -389,7 +393,7 @@ Search.prototype.searchKeyword = function(req,res,next){
         }
         else if (type == "3") {
 
-            if (find != null && find != '' && Latitude.toString() != 'NaN' && Longitude.toString() != 'NaN' && CategoryID != null && CurrentDate != null) {
+            if (find && !isNaN(Latitude)&& !isNaN(Longitude) && CurrentDate) {
                 if (ParkingStatus == 0) {
                     ParkingStatus = "0";
                 }
@@ -437,14 +441,16 @@ Search.prototype.searchKeyword = function(req,res,next){
                 });
             }
             else {
-                if (find == null || find == '') {
+                if (!find) {
                     console.log('FnSearchByKeywords: keyword is empty');
                 }
-
-                else if (Latitude == 'NaN') {
+                else if (CurrentDate) {
+                    console.log('FnSearchByKeywords: CurrentDate is empty');
+                }
+                else if (isNaN(Latitude)) {
                     console.log('FnSearchByKeywords: Latitude is empty');
                 }
-                else if (Longitude == 'NaN') {
+                else if (isNaN(Longitude)) {
                     console.log('FnSearchByKeywords: Longitude is empty');
                 }
                 res.statusCode = 400;
@@ -491,7 +497,7 @@ Search.prototype.searchInformation = function(req,res,next){
 
         var WorkingDate;
         var moment = require('moment');
-        if(CurrentDate != null)
+        if(CurrentDate)
             WorkingDate =  moment(new Date(CurrentDate)).format('YYYY-MM-DD HH:MM');
         else
             WorkingDate = moment(new Date()).format('YYYY-MM-DD HH:MM');
@@ -654,10 +660,10 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         if(LocID == null)
             LocID = 0;
-        if (Token && LocID ) {
+        if (Token && LocID != null) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
-                    if (Result != null) {
+                    if (Result) {
                         var async = require('async');
                         async.parallel([ function FnWorkingHours(CallBack) {
                             try {
@@ -1043,10 +1049,10 @@ Search.prototype.searchTracker = function(req,res,next){
         var Proximity = req.body.Proximity ? req.body.Proximity : 1;
         var currentDateTime = req.body.CurrentDate ? req.body.CurrentDate : '';
         var currentDateTime = req.body.CurrentDate;
-        var trackerFlag = (parseInt(req.body.Flag) !== NaN && parseInt(req.body.Flag) > 0) ? parseInt(req.body.Flag) : 0;
+        var trackerFlag = ((!isNaN(parseInt(req.body.Flag)))&& parseInt(req.body.Flag) > 0) ? parseInt(req.body.Flag) : 0;
 
 
-        if (Token != null && Keyword != null && Latitude != null && Longitude != null && currentDateTime) {
+        if (Token && Keyword != null && Latitude != null && Longitude != null && currentDateTime) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -1103,7 +1109,7 @@ Search.prototype.searchTracker = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnSearchForTracker: Token is empty');
             }
             else if (Keyword == null) {
@@ -1151,7 +1157,7 @@ Search.prototype.getSearchDoc = function(req,res,next){
         var token = req.query.Token;
         var tid;
         //console.log(token);
-        if (token != null && find != null && token != '' && find != '') {
+        if (token && find) {
             st.validateToken(token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -1290,10 +1296,10 @@ Search.prototype.getSearchDoc = function(req,res,next){
             });
         }
         else {
-            if (token == null) {
+            if (!token) {
                 console.log('FnGetSearchDocuments: token is empty');
             }
-            else if (find == null) {
+            else if (!find) {
                 console.log('FnGetSearchDocuments: find is empty');
             }
             res.statusCode = 400;

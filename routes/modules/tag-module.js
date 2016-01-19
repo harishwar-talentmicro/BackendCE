@@ -793,9 +793,9 @@ Tag.prototype.saveTags = function(req,res,next){
 
     if(validationStatus){
         try{
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if(!err){
-                    if(result){
+                    if(tokenResult){
 
 
                         if(type){
@@ -976,9 +976,9 @@ Tag.prototype.getStandardTags = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams = st.db.escape(token);
                         var query = 'CALL pgetDocsandurls(' + queryParams + ')';
                         console.log(query);
@@ -1104,9 +1104,9 @@ Tag.prototype.getTags = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(startCount)+ ',' + st.db.escape(recordsPerPage);
                         var query = 'CALL pgetAllDocsandurls(' + queryParams + ')';
                         console.log(query);
@@ -1221,9 +1221,9 @@ Tag.prototype.deleteTag = function(req,res,next) {
 
 
     try {
-        st.validateToken(token, function (err, result) {
+        st.validateToken(token, function (err, tokenResult) {
             if (!err) {
-                if (result) {
+                if (tokenResult) {
                     var queryParams = st.db.escape(token) + ',' + st.db.escape(tag);
                     var query = 'CALL pdeleteTag(' + queryParams + ')';
                     console.log(query);
@@ -1366,9 +1366,9 @@ Tag.prototype.savePictures = function(req,res,next) {
     else {
         try {
             if (token) {
-                st.validateToken(token, function (err, result) {
+                st.validateToken(token, function (err, tokenResult) {
                     if (!err) {
-                        if (result) {
+                        if (tokenResult) {
                             console.log('token is valid');
                             token = token;
                         }

@@ -79,9 +79,9 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
 
                         //institutes
                         var query = 'CALL pGetInstitutes();';
@@ -218,9 +218,9 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         //company details
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(functionType);
                         var query = 'CALL pGetCompanyDetails(' + queryParams + ');';
