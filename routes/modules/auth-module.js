@@ -397,7 +397,7 @@ Auth.prototype.register = function(req,res,next){
                                                 else {
                                                     console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
                                                     console.log(rtnMessage);
-                                                    res.send(rtnMessage);
+                                                    //res.send(rtnMessage);
                                                 }
                                             }
 

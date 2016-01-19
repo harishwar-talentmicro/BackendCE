@@ -442,12 +442,14 @@ User.prototype.getUserDetails = function(req,res,next){
                     if (Result) {
                         st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ')', function (err, UserDetailsResult) {
                             if (!err) {
+                                console.log('UserDetailsResult',UserDetailsResult);
                                 if (UserDetailsResult[0]) {
                                     if (UserDetailsResult[0].length > 0) {
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                                         console.log('FnGetUserDetails : tmaster: User details sent successfully');
-                                        UserDetailsResult[0][0].isCommunity =1;
+                                        UserDetailsResult[0][0].isCommunity =(UserDetailsResult[0][0].isCommunity) ? 1 : 0;
+                                        //UserDetailsResult[0][0].isCommunity =1;
                                         res.send(UserDetailsResult[0]);
                                     }
                                     else {
