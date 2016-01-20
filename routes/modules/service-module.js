@@ -1485,5 +1485,87 @@ Service.prototype.deleteCommunityMember = function(req,res,next){
     }
 };
 
+/**
+ * @todo FnIsCommunityMember
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @service-param
+ * token <string> [Logged in user token]
+ *
+ * @description
+ * Check for the logged in user that user is a member of any communities or not
+ */
+Service.prototype.isCommunityMember = function(req,res,next){
+    var token = (req.query.token) ? req.query.token  : '';
+    var respMsg = {
+        status : false,
+        message : 'Please login to continue',
+        error : {token : 'Invalid token'},
+        data : null
+    };
+    if(req.query.token){
+
+        try{
+            var queryParams = st.db.escape(token) ;
+            var query= 'CALL is_community_member(' + queryParams + ')';
+            console.log(query);
+            st.db.query(query, function (err, communityResult) {
+                console.log(communityResult);
+                if (!err) {
+                    respMsg.message = 'Community result count loaded';
+                    respMsg.error = null;
+                    respMsg.data = null;
+                    respMsg.status = false;
+                    if(communityResult){
+                        if(communityResult[0]){
+                            if(communityResult[0][0]){
+                                if(communityResult[0][0].err_code == 'UNAUTHORIZED'){
+                                    respMsg.error = {token : 'Invalid token'};
+                                    respMsg.message = 'Please login to continue';
+                                    res.status(401).json(respMsg);
+                                }
+                                else{
+                                    respMsg.status = true;
+                                    respMsg.data = {
+                                        isCommunity : (communityResult[0][0].is_community_member) ? 1 : 0};
+                                    res.status(200).json(respMsg);
+                                }
+                            }
+                            else{
+                                res.status(400).json(respMsg);
+                            }
+
+                        }
+                        else{
+                            res.status(400).json(respMsg);
+                        }
+                    }
+                    else{
+                        res.status(400).json(respMsg);
+                    }
+                }
+                else{
+                    console.log('Error in FnIsCommunityMember : Procedure is_community_member');
+                    console.log(err);
+                    respMsg.message = 'Internal server error';
+                    respMsg.error = {server : 'Internal server error'};
+                    res.status(500).json(respMsg);
+                }
+            });
+        }
+        catch(ex){
+            console.log('Exception in FnIsCommunityMember');
+            console.log(err);
+            res.status(500).json(respMsg);
+        }
+
+    }
+    else{
+        res.status(401).json(respMsg);
+    }
+};
 
 module.exports = Service;

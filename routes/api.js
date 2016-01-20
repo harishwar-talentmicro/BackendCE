@@ -409,6 +409,12 @@ router.post('/service_pic',serviceModule.saveServicePic);
 router.post('/service_attachment',serviceModule.saveServiceAttachment);
 router.post('/service_video',serviceModule.saveServiceVideo);
 
+/**
+ * @service-param
+ * token <string>
+ */
+router.get('/community_member_count',serviceModule.isCommunityMember);
+
 
 
 //EZEIDAP Methods

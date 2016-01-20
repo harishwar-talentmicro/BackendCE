@@ -616,7 +616,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                             + ','+ st.db.escape(deleteStatus);
 
                         var query = 'CALL pUpdateUserStatus(' + queryParams + ')';
-                        //console.log(query);
+                        console.log(query);
                         st.db.query(query, function (err, updateResult) {
                             if (!err) {
                                 if (updateResult) {
@@ -641,7 +641,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                         groupId: groupId,
                                         masterId: masterId,
                                         status: status,
-                                        deleteStatus: deleteStatus,
+                                        group_type: deleteStatus,
                                         requester: requester
                                     };
                                     msgNotification.updateStatus(details,function(err,statusResult) {
@@ -1437,7 +1437,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                             ezeid: alterEzeoneId(req.body.ezeid)
                                                         };
 
-                                                        msgNotification.sendNotification(msgContent, function (err, statusResult) {
+                                                        msgNotification.sendComposeMessage(msgContent, function (err, statusResult) {
                                                             console.log(statusResult);
                                                             if (!err) {
                                                                 if (statusResult) {
@@ -1556,8 +1556,8 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!groupID){
-        error['groupID'] = 'Invalid groupID';
+    if(!groupId){
+        error['groupId'] = 'Invalid groupId';
         validateStatus *= false;
     }
 
