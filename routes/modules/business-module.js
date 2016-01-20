@@ -230,7 +230,7 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
         error:{},
         message:'',
         total_count:0,
-        data: null
+        data: []
     };
     var validateStatus = true, error = {};
 
@@ -279,7 +279,6 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                                             }
                                             else {
                                                 responseMessage.status = true;
-                                                responseMessage.data = [];
                                                 responseMessage.message = 'No Transaction details found';
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnGetSalesTransaction:No Transaction details found');
@@ -287,7 +286,6 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                                         }
                                         else {
                                             responseMessage.status = true;
-                                            responseMessage.data = [];
                                             responseMessage.message = 'No Transaction details found';
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetSalesTransaction:No Transaction details found');
@@ -295,7 +293,6 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                                     }
                                     else {
                                         responseMessage.status = true;
-                                        responseMessage.data =[];
                                         responseMessage.message = 'No Transaction details found';
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetSalesTransaction:No Transaction details found');
@@ -417,7 +414,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
             status: false,
             message: '',
             error: {},
-            data: null
+            data: []
 
         };
 
@@ -429,7 +426,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                 if (ItemsList[i].TID != 0)
                     ItemIDList = ItemsList[i].TID + ',' + ItemIDList;
             }
-            console.log(ItemIDList);
             ItemIDList = ItemIDList.slice(0, -1);
             console.log('TID comma Values:' + ItemIDList);
         }
@@ -456,67 +452,24 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                         //console.log('CALL pSaveTrans(' + query + ')');
                         st.db.query('CALL pSaveTrans(' + query + ')', function (err, transResult) {
                             if (!err) {
-                                console.log(transResult);
                                 if (transResult) {
-                                    if (transResult[0].length > 0) {
-
-                                        if (transResult[0][0]) {
-                                            if (transResult[0][0]._e) {
-                                                respMsg.status = true;
-                                                respMsg.message = 'Transaction not saved';
-                                                if (TID == 0) {
-                                                    respMsg.error = {
-                                                        folder: 'You do not have permission to save into this folder'
-                                                    };
-                                                }
-                                                else {
-                                                    respMsg.error = {
-                                                        folder: 'You do not have permission to update into this folder'
-                                                    };
-                                                }
-                                                respMsg.data = {
-                                                    TID: TID,
-                                                    MessageText: MessageText,
-                                                    Status: Status,
-                                                    Notes: Notes,
-                                                    LocID: LocID,
-                                                    Country: Country,
-                                                    State: State,
-                                                    City: City,
-                                                    Area: Area,
-                                                    FunctionType: FunctionType,
-                                                    Latitude: Latitude,
-                                                    Longitude: Longitude,
-                                                    EZEID: EZEID,
-                                                    FolderRuleID: FolderRuleID,
-                                                    Duration: Duration,
-                                                    DurationScales: DurationScales,
-                                                    DeliveryAddress: DeliveryAddress,
-                                                    ToEZEID: ToEZEID,
-                                                    item_list_type: item_list_type,
-                                                    companyName: companyName,
-                                                    company_id: company_id,
-                                                    proabilities: proabilities,
-                                                    attachment_name: attachment_name,
-                                                    mime_type: mime_type,
-                                                    alarmDuration: alarmDuration,
-                                                    targetDate: targetDate,
-                                                    amount: amount,
-                                                    instituteId: instituteId,
-                                                    jobId: jobId,
-                                                    educationId: educationId,
-                                                    specializationId: specializationId,
-                                                    salaryType: salaryType,
-                                                    contactId: contactId
-                                                };
-                                                res.status(403).json(respMsg);
-                                            }
-                                            else {
-                                                if (transResult[0][0]) {
+                                    if (transResult[0]) {
+                                        if (transResult[0].length > 0) {
+                                            if (transResult[0][0]) {
+                                                if (transResult[0][0]._e) {
                                                     respMsg.status = true;
-                                                    respMsg.message = 'Transaction saved successfully';
+                                                    respMsg.message = 'Transaction not saved';
+                                                    if (TID == 0) {
+                                                        respMsg.error = {
+                                                            folder: 'You do not have permission to save into this folder'
+                                                        };
+                                                    }
+                                                    else {
+                                                        respMsg.error = {
+                                                            folder: 'You do not have permission to update into this folder'
+                                                        };
+                                                    }
                                                     respMsg.data = {
-                                                        messageId: transResult[0][0].MessageID,
                                                         TID: TID,
                                                         MessageText: MessageText,
                                                         Status: Status,
@@ -551,125 +504,170 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                         salaryType: salaryType,
                                                         contactId: contactId
                                                     };
-
-
-                                                    for (var i = 0; i < ItemsList.length; i++) {
-                                                        var itemsDetails = ItemsList[i];
-                                                        var items = {
-                                                            MessageID: (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0,
-                                                            ItemID: itemsDetails.ItemID,
-                                                            Qty: itemsDetails.Qty,
-                                                            Rate: itemsDetails.Rate,
-                                                            Amount: itemsDetails.Amount,
-                                                            Duration: itemsDetails.Durations
+                                                    res.status(403).json(respMsg);
+                                                }
+                                                else {
+                                                    if (transResult[0][0]) {
+                                                        respMsg.status = true;
+                                                        respMsg.message = 'Transaction saved successfully';
+                                                        respMsg.data = {
+                                                            messageId: transResult[0][0].MessageID,
+                                                            TID: TID,
+                                                            MessageText: MessageText,
+                                                            Status: Status,
+                                                            Notes: Notes,
+                                                            LocID: LocID,
+                                                            Country: Country,
+                                                            State: State,
+                                                            City: City,
+                                                            Area: Area,
+                                                            FunctionType: FunctionType,
+                                                            Latitude: Latitude,
+                                                            Longitude: Longitude,
+                                                            EZEID: EZEID,
+                                                            FolderRuleID: FolderRuleID,
+                                                            Duration: Duration,
+                                                            DurationScales: DurationScales,
+                                                            DeliveryAddress: DeliveryAddress,
+                                                            ToEZEID: ToEZEID,
+                                                            item_list_type: item_list_type,
+                                                            companyName: companyName,
+                                                            company_id: company_id,
+                                                            proabilities: proabilities,
+                                                            attachment_name: attachment_name,
+                                                            mime_type: mime_type,
+                                                            alarmDuration: alarmDuration,
+                                                            targetDate: targetDate,
+                                                            amount: amount,
+                                                            instituteId: instituteId,
+                                                            jobId: jobId,
+                                                            educationId: educationId,
+                                                            specializationId: specializationId,
+                                                            salaryType: salaryType,
+                                                            contactId: contactId
                                                         };
-                                                        console.log(items);
-                                                        console.log('TID:' + itemsDetails.TID);
-                                                        if (itemsDetails.TID == 0) {
-                                                            var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
-                                                                // Neat!
-                                                                if (!err) {
-                                                                    if (result != null) {
-                                                                        if (result.affectedRows > 0) {
-                                                                            console.log('FnSaveFolderRules: Folder rules saved successfully');
-                                                                        }
-                                                                        else {
-                                                                            console.log('FnSaveFolderRules: Folder rule not saved');
-                                                                        }
-                                                                    }
-                                                                    else {
-                                                                        console.log('FnSaveFolderRules: Folder rule not saved');
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
-                                                                }
-                                                            });
 
-                                                        }
 
-                                                        else {
+                                                        for (var i = 0; i < ItemsList.length; i++) {
+                                                            var itemsDetails = ItemsList[i];
                                                             var items = {
-
+                                                                MessageID: (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0,
                                                                 ItemID: itemsDetails.ItemID,
                                                                 Qty: itemsDetails.Qty,
                                                                 Rate: itemsDetails.Rate,
                                                                 Amount: itemsDetails.Amount,
                                                                 Duration: itemsDetails.Durations
                                                             };
+                                                            console.log(items);
                                                             console.log('TID:' + itemsDetails.TID);
-                                                            var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
-                                                                // Neat!
-                                                                console.log(result);
-                                                                if (!err) {
-                                                                    if (result != null) {
-                                                                        if (result.affectedRows > 0) {
-
-                                                                            console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                            if (itemsDetails.TID == 0) {
+                                                                var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                                    // Neat!
+                                                                    if (!err) {
+                                                                        if (result != null) {
+                                                                            if (result.affectedRows > 0) {
+                                                                                console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                                            }
+                                                                            else {
+                                                                                console.log('FnSaveFolderRules: Folder rule not saved');
+                                                                            }
                                                                         }
                                                                         else {
-                                                                            console.log('FnSaveFolderRules: Folder rule not updated');
+                                                                            console.log('FnSaveFolderRules: Folder rule not saved');
                                                                         }
                                                                     }
                                                                     else {
-                                                                        console.log('FnSaveFolderRules: Folder rule not updated')
+                                                                        console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                                    }
+                                                                });
+
+                                                            }
+
+                                                            else {
+                                                                var items = {
+
+                                                                    ItemID: itemsDetails.ItemID,
+                                                                    Qty: itemsDetails.Qty,
+                                                                    Rate: itemsDetails.Rate,
+                                                                    Amount: itemsDetails.Amount,
+                                                                    Duration: itemsDetails.Durations
+                                                                };
+                                                                console.log('TID:' + itemsDetails.TID);
+                                                                var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
+                                                                    // Neat!
+                                                                    console.log(result);
+                                                                    if (!err) {
+                                                                        if (result != null) {
+                                                                            if (result.affectedRows > 0) {
+
+                                                                                console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                                            }
+                                                                            else {
+                                                                                console.log('FnSaveFolderRules: Folder rule not updated');
+                                                                            }
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnSaveFolderRules: Folder rule not updated')
+                                                                        }
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                        res.status(200).json(respMsg);
+
+                                                        console.log('FnSaveTranscation: Transaction details save successfully');
+
+                                                        var messageContent = {
+                                                            token: req.body.Token,
+                                                            LocId: LocID,
+                                                            messageType: parseInt(req.body.FunctionType),
+                                                            message: MessageText,
+                                                            ezeid: EZEID,
+                                                            toEzeid: ToEZEID
+                                                        };
+
+                                                        /*sending sales enquiry mail*/
+                                                        mail.fnMessageMail(messageContent, function (err, statusResult) {
+                                                            console.log(statusResult);
+                                                            if (!err) {
+                                                                if (Result) {
+                                                                    if (statusResult.status == true) {
+                                                                        console.log('FnSendMail: Mail Sent Successfully');
+                                                                        //res.send(RtnMessage);
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSendMail: Mail not Sent...1');
+                                                                        //res.send(RtnMessage);
                                                                     }
                                                                 }
                                                                 else {
-                                                                    console.log('FnSaveFolderRules: error in saving folder rules' + err);
-                                                                }
-                                                            });
-                                                        }
-                                                    }
-                                                    res.status(200).json(respMsg);
-
-                                                    console.log('FnSaveTranscation: Transaction details save successfully');
-
-                                                    var messageContent = {
-                                                        token: req.body.Token,
-                                                        LocId: LocID,
-                                                        messageType: parseInt(req.body.FunctionType),
-                                                        message: MessageText,
-                                                        ezeid: EZEID,
-                                                        toEzeid: ToEZEID
-                                                    };
-
-                                                    /*sending sales enquiry mail*/
-                                                    mail.fnMessageMail(messageContent, function (err, statusResult) {
-                                                        console.log(statusResult);
-                                                        if (!err) {
-                                                            if (Result) {
-                                                                if (statusResult.status == true) {
-                                                                    console.log('FnSendMail: Mail Sent Successfully');
-                                                                    //res.send(RtnMessage);
-                                                                }
-                                                                else {
-                                                                    console.log('FnSendMail: Mail not Sent...1');
+                                                                    console.log('FnSendMail: Mail not Sent..2');
                                                                     //res.send(RtnMessage);
                                                                 }
                                                             }
                                                             else {
-                                                                console.log('FnSendMail: Mail not Sent..2');
+                                                                console.log('FnSendMail:Error in sending mails' + err);
                                                                 //res.send(RtnMessage);
                                                             }
-                                                        }
-                                                        else {
-                                                            console.log('FnSendMail:Error in sending mails' + err);
-                                                            //res.send(RtnMessage);
-                                                        }
-                                                    });
+                                                        });
+                                                    }
                                                 }
+                                            }
+                                            else {
+                                                respMsg.message = 'Transaction not save';
+                                                res.status(200).json(respMsg);
+                                                console.log('FnSaveTranscation:Transaction not save');
                                             }
                                         }
                                         else {
-
                                             respMsg.message = 'Transaction not save';
                                             res.status(200).json(respMsg);
                                             console.log('FnSaveTranscation:Transaction not save');
-
                                         }
                                     }
-
                                     else {
                                         respMsg.message = 'Transaction not save';
                                         res.status(200).json(respMsg);
@@ -678,19 +676,15 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                 }
 
                                 else {
-
                                     respMsg.message = 'An error occured ! Please try again';
                                     respMsg.error = {
                                         server: 'Internal Server Error'
                                     };
                                     console.log('FnSaveTranscation: error in saving Transaction' + err);
                                 }
-
                             }
-
                         });
                     }
-
                     else {
                         respMsg.message = 'Invalid token';
                         respMsg.error = {
@@ -699,9 +693,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                         respMsg.data = null;
                         res.status(401).json(respMsg);
                         console.log('FnSaveTranscation: Invalid token');
-
                     }
-
                 }
                 else {
                     respMsg.error = {
@@ -1401,22 +1393,20 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
     /**
      * @todo FnGetTransAutoComplete
      */
-    var _this = this;
-    try {
 
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var title = req.query.title;
-        var type = req.query.type;
+    var title = req.query.title;
+    var type = req.query.type;
 
-        var responseMessage = {
-            status: false,
-            data: [],
-            error:{},
-            message:''
-        };
-
+    var responseMessage = {
+        status: false,
+        data: [],
+        error:{},
+        message:''
+    };
+    try{
         if (title) {
 
             var queryParams = st.db.escape(title) + ',' + st.db.escape(type);
@@ -1433,14 +1423,12 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
                             res.status(200).json(responseMessage);
                         }
                         else {
-                            responseMessage.error = {};
                             responseMessage.message = 'No founded Transaction details';
                             console.log('FnGetTransAutoComplete: No founded Transaction details');
                             res.json(responseMessage);
                         }
                     }
                     else {
-                        responseMessage.error = {};
                         responseMessage.message = 'No founded Transaction details';
                         console.log('FnGetTransAutoComplete: No founded Transaction details');
                         res.json(responseMessage);
@@ -1448,7 +1436,6 @@ BusinessManager.prototype.getTransAutoComplete = function(req,res,next){
 
                 }
                 else {
-                    responseMessage.error = {};
                     responseMessage.message = 'Error in getting Transaction details';
                     console.log('FnGetTransAutoComplete: error in getting Transaction details' + err);
                     res.status(500).json(responseMessage);
@@ -1488,7 +1475,6 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
     /**
      * @todo FnGetItemListForEZEID
      */
-    var _this = this;
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1572,7 +1558,6 @@ BusinessManager.prototype.deleteTransaction = function(req,res,next){
     /**
      * @todo FnDeleteTransaction
      */
-    var _this = this;
     try{
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1658,7 +1643,6 @@ BusinessManager.prototype.itemList = function(req,res,next){
     /**
      * @todo FnItemList
      */
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1739,7 +1723,6 @@ BusinessManager.prototype.itemDetails = function(req,res,next){
     /**
      * @todo FnItemDetails
      */
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1950,7 +1933,6 @@ BusinessManager.prototype.updateBussinessList = function(req,res,next){
                     res.statusCode = 500;
                     console.log('FnUpdateBussinessListing: : ' + err);
                     res.send(rtnMessage);
-
                 }
             });
 
@@ -2285,14 +2267,12 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
-                                        responseMessage.error = {};
                                         responseMessage.message = 'No founded TransAttachment details';
                                         console.log('FnGetTransAttachment: No founded TransAttachment details');
                                         res.json(responseMessage);
                                     }
                                 }
                                 else {
-                                    responseMessage.error = {};
                                     responseMessage.message = 'No founded TransAttachment details';
                                     console.log('FnGetTransAttachment: No founded TransAttachment details');
                                     res.json(responseMessage);
@@ -2300,8 +2280,6 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
 
                             }
                             else {
-                                responseMessage.data = null;
-                                responseMessage.error = {};
                                 responseMessage.message = 'Error in getting TransAttachment details';
                                 console.log('FnGetTransAttachment: error in getting TransAttachment details' + err);
                                 res.status(500).json(responseMessage);
@@ -2314,7 +2292,6 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
                         responseMessage.error = {
                             token: 'Invalid token'
                         };
-                        responseMessage.data = null;
                         res.status(401).json(responseMessage);
                         console.log('FnSaveJobs: Invalid token');
                     }
@@ -2422,7 +2399,6 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
                             res.status(200).json(responseMessage);
                         }
                         else {
-
                             responseMessage.error = {};
                             responseMessage.message = 'No founded Sales Statistics';
                             console.log('FnSalesStatistics: No founded Sales Statistics');
@@ -2430,17 +2406,13 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No founded Sales Statistics';
                         console.log('FnSalesStatistics: No founded Sales Statistics');
                         res.json(responseMessage);
                     }
-
                 }
                 else {
-
                     responseMessage.data = null ;
                     responseMessage.error = {};
                     responseMessage.message = 'Error in getting Sales Statistics';
@@ -2472,7 +2444,6 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
                 };
                 console.log('FnSalesStatistics: user is mandatory field');
             }
-
             res.status(401).json(responseMessage);
         }
     }
@@ -2495,7 +2466,6 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
  * @description api code for create transaction history
  */
 BusinessManager.prototype.createTransactionHistory = function(req,res,next){
-    var _this = this;
 
     var token = req.body.token;
     var stageType = req.body.s_type;
@@ -2503,6 +2473,7 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
     var stage = req.body.s;
     var reason = req.body.reason ? req.body.reason : '';
     var comments = req.body.comments ? req.body.comments : '';
+    var tid=0;
 
     var responseMessage = {
         status: false,
@@ -2517,7 +2488,6 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-
 
     if(!validateStatus){
         responseMessage.error = error;
@@ -2541,24 +2511,34 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                     if (historyResult[0]) {
                                         if (historyResult[0][0]) {
                                             if (historyResult[0][0].id) {
-                                                var tid = historyResult[0][0].id;}
-                                            else {var tid = 0;}
-                                        }else {var tid = 0;}
+                                                tid = historyResult[0][0].id;
+                                            }
+
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Transaction history created successfully';
+                                            responseMessage.data = {
+                                                id: tid,
+                                                s_type: parseInt(req.body.s_type),
+                                                tid: parseInt(req.body.tid),
+                                                s: parseInt(req.body.s),
+                                                reason: reason,
+                                                comments: comments
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnCreateTransactionHistory: Transaction history created successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'Transaction history not created';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnCreateTransactionHistory:Transaction history not created');
+                                        }
                                     }
-                                    else { var tid = 0; }
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Transaction history created successfully';
-                                    responseMessage.data = {
-                                        id : tid,
-                                        s_type: parseInt(req.body.s_type),
-                                        tid: parseInt(req.body.tid),
-                                        s: parseInt(req.body.s),
-                                        reason: reason,
-                                        comments: comments
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnCreateTransactionHistory: Transaction history created successfully');
+                                    else {
+                                        responseMessage.message = 'Transaction history not created';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnCreateTransactionHistory:Transaction history not created');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Transaction history not created';
@@ -2576,6 +2556,7 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                             }
                         });
                     }
+
                     else {
                         responseMessage.message = 'Invalid token';
                         responseMessage.error = {

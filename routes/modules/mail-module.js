@@ -882,59 +882,70 @@ Mail.prototype.businessMail = function(req,res,next) {
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(token);
-                        var query = 'CALL pcheckverifiedstatus(' + queryParams + ')';
-                        console.log(query);
-                        st.db.query(query, function (err, userstatusResult) {
-                            console.log(userstatusResult);
-                            if (!err) {
-                                if (userstatusResult) {
-                                    if (userstatusResult[0]) {
-                                        if (userstatusResult[0][0]) {
-                                            if (userstatusResult[0][0].verified == 2) {
+                        if(recipients.length) {
+                            var queryParams = st.db.escape(token);
+                            var query = 'CALL pcheckverifiedstatus(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, userstatusResult) {
+                                console.log(userstatusResult);
+                                if (!err) {
+                                    if (userstatusResult) {
+                                        if (userstatusResult[0]) {
+                                            if (userstatusResult[0][0]) {
+                                                if (userstatusResult[0][0].verified == 2) {
 
-                                                if(userstatusResult[0][0].CVMailID){
-                                                    sender = userstatusResult[0][0].CVMailID;
-                                                }
-                                                else if(userstatusResult[0][0].AdminEmailID){
-                                                    sender = userstatusResult[0][0].AdminEmailID;
-                                                }
-                                                else{
-                                                    sender = 'noreply@ezeone.com';
-                                                }
-
-                                                var email = new sendgrid.Email();
-                                                email.from = sender;
-                                                email.setTos(recipients);
-                                                email.setCcs(recipientsCc);
-                                                email.setBccs(recipientsBcc);
-                                                email.subject = subject;
-                                                email.html = body;
-
-                                                sendgrid.send(email, function (err, result) {
-                                                    console.log(err);
-                                                    if (!err) {
-                                                        responseMessage.status = true;
-                                                        responseMessage.message = 'Mail Send successfully';
-                                                        responseMessage.data = {
-                                                            subject: req.body.subject,
-                                                            recipients: req.body.recipients,
-                                                            recipientsCc: req.body.recipients_cc,
-                                                            recipientsBcc: req.body.recipients_bcc,
-                                                            body: req.body.body
-                                                        };
-                                                        res.status(200).json(responseMessage);
-                                                        console.log('FnBussinessMail: Mail Send successfully');
+                                                    if (userstatusResult[0][0].CVMailID) {
+                                                        sender = userstatusResult[0][0].CVMailID;
+                                                    }
+                                                    else if (userstatusResult[0][0].AdminEmailID) {
+                                                        sender = userstatusResult[0][0].AdminEmailID;
                                                     }
                                                     else {
-                                                        responseMessage.message = 'An error occured ! Please try again';
-                                                        responseMessage.error = {
-                                                            server: 'Sendgrid Server Error'
-                                                        };
-                                                        res.status(500).json(responseMessage);
-                                                        console.log('FnBussinessMail: error in sending business mail  :' + err);
+                                                        sender = 'noreply@ezeone.com';
                                                     }
-                                                });
+
+                                                    var email = new sendgrid.Email();
+                                                    email.from = sender;
+                                                    email.setTos(recipients);
+                                                    email.setCcs(recipientsCc);
+                                                    email.setBccs(recipientsBcc);
+                                                    email.subject = subject;
+                                                    email.html = body;
+
+                                                    sendgrid.send(email, function (err, result) {
+                                                        console.log(err);
+                                                        if (!err) {
+                                                            responseMessage.status = true;
+                                                            responseMessage.message = 'Mail Send successfully';
+                                                            responseMessage.data = {
+                                                                subject: req.body.subject,
+                                                                recipients: req.body.recipients,
+                                                                recipientsCc: req.body.recipients_cc,
+                                                                recipientsBcc: req.body.recipients_bcc,
+                                                                body: req.body.body
+                                                            };
+                                                            res.status(200).json(responseMessage);
+                                                            console.log('FnBussinessMail: Mail Send successfully');
+                                                        }
+                                                        else {
+                                                            responseMessage.message = 'An error occured ! Please try again';
+                                                            responseMessage.error = {
+                                                                server: 'Sendgrid Server Error'
+                                                            };
+                                                            res.status(500).json(responseMessage);
+                                                            console.log('FnBussinessMail: error in sending business mail  :' + err);
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    responseMessage.message = 'Sorry! you cannot send because you are not verified';
+                                                    responseMessage.error = {
+                                                        user_status: 'Not Verified'
+                                                    };
+                                                    responseMessage.data = null;
+                                                    res.status(403).json(responseMessage);
+                                                    console.log('FnBussinessMail: User not verified');
+                                                }
                                             }
                                             else {
                                                 responseMessage.message = 'Sorry! you cannot send because you are not verified';
@@ -967,24 +978,21 @@ Mail.prototype.businessMail = function(req,res,next) {
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'Sorry! you cannot send because you are not verified';
+                                    responseMessage.message = 'An error occured ! Please try again';
                                     responseMessage.error = {
-                                        user_status: 'Not Verified'
+                                        server: 'Internal Server Error'
                                     };
-                                    responseMessage.data = null;
-                                    res.status(403).json(responseMessage);
-                                    console.log('FnBussinessMail: User not verified');
+                                    res.status(500).json(responseMessage);
+                                    console.log('FnBussinessMail: error in checking user status  :' + err);
                                 }
-                            }
-                            else {
-                                responseMessage.message = 'An error occured ! Please try again';
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                res.status(500).json(responseMessage);
-                                console.log('FnBussinessMail: error in checking user status  :' + err);
-                            }
-                        });
+                            });
+                        }
+                        else
+                        {
+                            responseMessage.message = 'recipients is empty';
+                            res.status(400).json(responseMessage);
+                            console.log('FnBussinessMail: recipients is empty');
+                        }
                     }
                     else {
                         responseMessage.message = 'Invalid token';
@@ -993,7 +1001,7 @@ Mail.prototype.businessMail = function(req,res,next) {
                         };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('FnCreateService: Invalid token');
+                        console.log('FnBussinessMail: Invalid token');
                     }
                 }
                 else {
@@ -1019,4 +1027,5 @@ Mail.prototype.businessMail = function(req,res,next) {
         }
     }
 };
+
 module.exports = Mail;

@@ -251,7 +251,7 @@ Auth.prototype.register = function(req,res,next){
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);
                     st.db.query(query, function (err, registerResult) {
-                        console.log(registerResult);
+                        //console.log(registerResult);
                         if (!err) {
                             if (registerResult) {
                                 if (registerResult[0]) {
@@ -396,7 +396,7 @@ Auth.prototype.register = function(req,res,next){
                                                 }
                                                 else {
                                                     console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
-                                                    console.log(rtnMessage);
+                                                    //console.log(rtnMessage);
                                                     //res.send(rtnMessage);
                                                 }
                                             }
@@ -418,7 +418,6 @@ Auth.prototype.register = function(req,res,next){
                                             res.send(rtnMessage);
                                             console.log('FnRegistration:tmaster: Registration Failed..1');
                                         }
-
                                     }
                                     else {
                                         console.log(rtnMessage);
@@ -426,13 +425,11 @@ Auth.prototype.register = function(req,res,next){
                                         console.log('FnRegistration:tmaster: Registration Failed..2');
                                     }
                                 }
-
                                 else {
                                     console.log(rtnMessage);
                                     res.send(rtnMessage);
                                     console.log('FnRegistration:tmaster: Registration Failed..3');
                                 }
-
                             }
                             else {
                                 console.log(rtnMessage);
@@ -466,7 +463,7 @@ Auth.prototype.register = function(req,res,next){
             }
             else {
                 console.log('----------Operation type other than 1--------------');
-                if (idtypeId && ezeid && addressLine1 && cityTitle && stateId && countryId && postalCode) {
+                if (idtypeId && ezeid) {
                     if (password) {
                         encryptPwd = hashPassword(password);
                     }
@@ -582,7 +579,7 @@ Auth.prototype.register = function(req,res,next){
                                                 else {
                                                     console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
                                                     //console.log(rtnMessage);
-                                                    res.send(rtnMessage);
+                                                    //res.send(rtnMessage);
                                                 }
                                             }
                                             else {
@@ -598,26 +595,26 @@ Auth.prototype.register = function(req,res,next){
                                             }
                                         }
                                         else {
-                                            console.log(rtnMessage);
+                                            //console.log(rtnMessage);
                                             res.send(rtnMessage);
                                             console.log('FnRegistration:tmaster: Registration Failed..1');
                                         }
                                     }
                                     else {
-                                        console.log(rtnMessage);
+                                        //console.log(rtnMessage);
                                         res.send(rtnMessage);
                                         console.log('FnRegistration:tmaster: Registration Failed..2');
                                     }
                                 }
 
                                 else {
-                                    console.log(rtnMessage);
+                                    //console.log(rtnMessage);
                                     res.send(rtnMessage);
                                     console.log('FnRegistration:tmaster: Registration Failed..3');
                                 }
                             }
                             else {
-                                console.log(rtnMessage);
+                                //console.log(rtnMessage);
                                 res.send(rtnMessage);
                                 console.log('FnRegistration:tmaster: Registration Failed..4');
                             }
@@ -634,20 +631,10 @@ Auth.prototype.register = function(req,res,next){
                         console.log('FnRegistration: IDTypeID is empty');
                     } else if (!ezeid) {
                         console.log('FnRegistration: EZEID is empty');
-                    } else if (!addressLine1) {
-                        console.log('FnRegistration: AddressLine1 is empty');
-                    } else if (!cityTitle) {
-                        console.log('FnRegistration: CityTitle is empty');
-                    } else if (!stateId) {
-                        console.log('FnRegistration: StateID is empty');
-                    } else if (!countryId) {
-                        console.log('FnRegistration: CountryID is empty');
-                    } else if (!postalCode) {
-                        console.log('FnRegistration: PostalCode is empty');
                     }
                     res.statusCode = 400;
                     res.send(rtnMessage);
-                    console.log('FnRegistration:tmaster: Manditatory field empty');
+                    console.log('FnRegistration:tmaster: Mandatory field empty');
                 }
             }
         }
@@ -688,7 +675,7 @@ Auth.prototype.login = function(req,res,next){
         req.connection.socket.remoteAddress;
 
     var token = req.body.token ? req.body.token : '';
-    var code = req.body.code ? req.body.code : '';
+    var code = req.body.code ? alterEzeoneId(req.body.code) : '';
 
     // console.log(req.body);
 
@@ -737,153 +724,156 @@ Auth.prototype.login = function(req,res,next){
                 //console.log(loginResult);
                 if (!err) {
                     if(loginResult && password) {
-                        if (loginResult[0].length > 0) {
+                        if (loginResult[0]) {
+                            if (loginResult[0].length > 0) {
 
-                            var loginDetails = loginResult[0];
-                            //console.log(loginDetails);
+                                var loginDetails = loginResult[0];
+                                //console.log(loginDetails);
 
-                            if (!token) {
-                                console.log('compare password..');
-                                if (comparePassword(password, loginDetails[0].Password)) {
-                                    st.generateToken(ip, userAgent, ezeoneId, function (err, tokenResult) {
+                                if (!token) {
+                                    console.log('compare password..');
+                                    if (comparePassword(password, loginDetails[0].Password)) {
+                                        st.generateToken(ip, userAgent, ezeoneId, function (err, tokenResult) {
 
-                                        console.log(err);
-                                        console.log(tokenResult);
-                                        if (!err) {
-                                            if (tokenResult) {
+                                            if (!err) {
+                                                if (tokenResult) {
 
-                                                res.cookie('Token', tokenResult, {maxAge: 900000, httpOnly: true});
-                                                responseMessage.Token = tokenResult;
-                                                responseMessage.IsAuthenticate = true;
-                                                responseMessage.TID = loginDetails[0].TID;
-                                                responseMessage.ezeone_id = loginDetails[0].EZEID;
-                                                responseMessage.FirstName = loginDetails[0].FirstName;
-                                                responseMessage.CompanyName = loginDetails[0].CompanyName;
-                                                responseMessage.Type = loginDetails[0].IDTypeID;
-                                                responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                                responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                                responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                                responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                                responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                                responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                                responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                                responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
-                                                responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
-                                                responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
-                                                responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
-                                                responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
-                                                responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
-                                                responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
-                                                responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                                if(loginDetails[0].ParentMasterID == 0) {
-                                                    responseMessage.MasterID = loginDetails[0].TID;
+                                                    res.cookie('Token', tokenResult, {maxAge: 900000, httpOnly: true});
+                                                    responseMessage.Token = tokenResult;
+                                                    responseMessage.IsAuthenticate = true;
+                                                    responseMessage.TID = loginDetails[0].TID;
+                                                    responseMessage.ezeone_id = loginDetails[0].EZEID;
+                                                    responseMessage.FirstName = loginDetails[0].FirstName;
+                                                    responseMessage.CompanyName = loginDetails[0].CompanyName;
+                                                    responseMessage.Type = loginDetails[0].IDTypeID;
+                                                    responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                                    responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                                    responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                                    responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                                    responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                                    responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                                    responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                                    responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                                    responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                                    responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                                    responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                                    responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                                    responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                                    responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                                    responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                                    if (loginDetails[0].ParentMasterID == 0) {
+                                                        responseMessage.MasterID = loginDetails[0].TID;
+                                                    }
+                                                    else {
+                                                        responseMessage.MasterID = loginDetails[0].ParentMasterID;
+                                                    }
+                                                    responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                                    responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                                    responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                                    responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                                    responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                                    responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                                    responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
+                                                    responseMessage.group_id = loginDetails[0].group_id;
+                                                    responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+                                                    responseMessage.cvid = loginDetails[0].cvid;
+                                                    responseMessage.profile_status = loginDetails[0].ps;
+
+                                                    console.log('FnLogin: Login success');
+                                                    // saving ios device id to database
+                                                    if (isIphone == 1) {
+                                                        var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
+                                                        var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
+                                                        //console.log(query);
+                                                        st.db.query(query1, function (err, deviceResult) {
+                                                            if (!err) {
+                                                                console.log('FnLogin:Ios Device Id saved successfully');
+                                                            }
+                                                            else {
+                                                                console.log(err);
+                                                            }
+                                                        });
+                                                    }
+                                                    res.send(responseMessage);
                                                 }
-                                                else{
-                                                    responseMessage.MasterID = loginDetails[0].ParentMasterID;
-                                                }
-                                                responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
-                                                responseMessage.VisibleModules = loginDetails[0].VisibleModules;
-                                                responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
-                                                responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                                responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                                responseMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                                responseMessage.isAddressSaved = loginDetails[0].isAddressSaved;
-                                                responseMessage.group_id = loginDetails[0].group_id;
-                                                responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-                                                responseMessage.cvid = loginDetails[0].cvid;
-                                                responseMessage.profile_status = loginDetails[0].ps;
+                                                else {
 
-                                                console.log('FnLogin: Login success');
-                                                // saving ios device id to database
-                                                if (isIphone == 1) {
-                                                    var queryParams1 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
-                                                    var query1 = 'CALL pSaveIPhoneDeviceID(' + queryParams1 + ')';
-                                                    //console.log(query);
-                                                    st.db.query(query1, function (err, deviceResult) {
-                                                        if (!err) {
-                                                            console.log('FnLogin:Ios Device Id saved successfully');
-                                                        }
-                                                        else {
-                                                            console.log(err);
-                                                        }
-                                                    });
+                                                    res.send(responseMessage);
+                                                    console.log('FnLogin:failed to generate a token ');
                                                 }
-                                                res.send(responseMessage);
                                             }
                                             else {
-
+                                                res.statusCode = 500;
                                                 res.send(responseMessage);
                                                 console.log('FnLogin:failed to generate a token ');
+                                                console.log('FnLogin:' + err);
                                             }
-                                        }
-                                        else {
-                                            res.statusCode = 500;
-                                            res.send(responseMessage);
-                                            console.log('FnLogin:failed to generate a token ');
-                                            console.log('FnLogin:' + err);
-                                        }
-                                    });
+                                        });
+                                    }
+                                    else {
+                                        res.send(responseMessage);
+                                        console.log('FnLogin:password not matched ');
+                                    }
                                 }
-                                else
-                                {
+                                else {
+                                    responseMessage.Token = token;
+                                    responseMessage.IsAuthenticate = true;
+                                    responseMessage.TID = loginDetails[0].TID;
+                                    responseMessage.ezeone_id = loginDetails[0].EZEID;
+                                    responseMessage.FirstName = loginDetails[0].FirstName;
+                                    responseMessage.CompanyName = loginDetails[0].CompanyName;
+                                    responseMessage.Type = loginDetails[0].IDTypeID;
+                                    responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
+                                    responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
+                                    responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
+                                    responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
+                                    responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
+                                    responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
+                                    responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
+                                    responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
+                                    responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
+                                    responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
+                                    responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
+                                    responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
+                                    responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
+                                    responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
+                                    responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                    if (loginDetails[0].ParentMasterID == 0) {
+                                        responseMessage.MasterID = loginDetails[0].TID;
+                                    }
+                                    else {
+                                        responseMessage.MasterID = loginDetails[0].ParentMasterID;
+                                    }
+                                    responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
+                                    responseMessage.VisibleModules = loginDetails[0].VisibleModules;
+                                    responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
+                                    responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
+                                    responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
+                                    responseMessage.mobilenumber = loginDetails[0].mobilenumber;
+                                    responseMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
+                                    responseMessage.group_id = loginDetails[0].group_id;
+                                    responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
+
+                                    console.log('FnLogin: Login success');
+                                    if (isIphone == 1) {
+                                        var queryParams2 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
+                                        var query2 = 'CALL pSaveIPhoneDeviceID(' + queryParams2 + ')';
+                                        //console.log(query);
+                                        st.db.query(query, function (err, deviceResult) {
+                                            if (!err) {
+                                                console.log('FnLogin:Ios Device Id saved successfully');
+                                            }
+                                            else {
+                                                console.log(err);
+                                            }
+                                        });
+                                    }
                                     res.send(responseMessage);
-                                    console.log('FnLogin:password not matched ');
                                 }
                             }
                             else {
-                                responseMessage.Token = token;
-                                responseMessage.IsAuthenticate = true;
-                                responseMessage.TID = loginDetails[0].TID;
-                                responseMessage.ezeone_id = loginDetails[0].EZEID;
-                                responseMessage.FirstName = loginDetails[0].FirstName;
-                                responseMessage.CompanyName = loginDetails[0].CompanyName;
-                                responseMessage.Type = loginDetails[0].IDTypeID;
-                                responseMessage.Verified = loginDetails[0].EZEIDVerifiedID;
-                                responseMessage.SalesModueTitle = loginDetails[0].SalesModueTitle;
-                                responseMessage.SalesModuleTitle = loginDetails[0].SalesModuleTitle;
-                                responseMessage.AppointmentModuleTitle = loginDetails[0].AppointmentModuleTitle;
-                                responseMessage.HomeDeliveryModuleTitle = loginDetails[0].HomeDeliveryModuleTitle;
-                                responseMessage.ServiceModuleTitle = loginDetails[0].ServiceModuleTitle;
-                                responseMessage.CVModuleTitle = loginDetails[0].CVModuleTitle;
-                                responseMessage.SalesFormMsg = loginDetails[0].SalesFormMsg;
-                                responseMessage.ReservationFormMsg = loginDetails[0].ReservationFormMsg;
-                                responseMessage.HomeDeliveryFormMsg = loginDetails[0].HomeDeliveryFormMsg;
-                                responseMessage.ServiceFormMsg = loginDetails[0].ServiceFormMsg;
-                                responseMessage.CVFormMsg = loginDetails[0].CVFormMsg;
-                                responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
-                                responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
-                                responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
-                                if(loginDetails[0].ParentMasterID == 0) {
-                                    responseMessage.MasterID = loginDetails[0].TID;
-                                }
-                                else{
-                                    responseMessage.MasterID = loginDetails[0].ParentMasterID;
-                                }
-                                responseMessage.PersonalEZEID = loginDetails[0].PersonalEZEID;
-                                responseMessage.VisibleModules = loginDetails[0].VisibleModules;
-                                responseMessage.FreshersAccepted = loginDetails[0].FreshersAccepted;
-                                responseMessage.HomeDeliveryItemListType = loginDetails[0].HomeDeliveryItemListType;
-                                responseMessage.ReservationDisplayFormat = loginDetails[0].ReservationDisplayFormat;
-                                responseMessage.mobilenumber = loginDetails[0].mobilenumber;
-                                responseMessage.PrimaryLocAdded = loginDetails[0].ISPrimaryLocAdded;
-                                responseMessage.group_id = loginDetails[0].group_id;
-                                responseMessage.isinstitute_admin = loginDetails[0].isinstituteadmin;
-
-                                console.log('FnLogin: Login success');
-                                if (isIphone == 1) {
-                                    var queryParams2 = st.db.escape(ezeoneId) + ',' + st.db.escape(deviceToken);
-                                    var query2 = 'CALL pSaveIPhoneDeviceID(' + queryParams2 + ')';
-                                    //console.log(query);
-                                    st.db.query(query, function (err, deviceResult) {
-                                        if (!err) {
-                                            console.log('FnLogin:Ios Device Id saved successfully');
-                                        }
-                                        else {
-                                            console.log(err);
-                                        }
-                                    });
-                                }
                                 res.send(responseMessage);
+                                console.log('FnLogin:login result not found');
                             }
                         }
                         else{

@@ -86,16 +86,16 @@ ContactManager.prototype.getClientList = function(req,res,next){
                             + ',' + st.db.escape(pageCount)+ ',' + st.db.escape(functionType);
                         var query = 'CALL pGetClientList(' + queryParams + ')';
                         //console.log(query);
-                        st.db.query(query, function (err, getResult) {
+                        st.db.query(query, function (err, clientList) {
                             //console.log(getResult);
                             if (!err) {
-                                if (getResult) {
-                                    if (getResult[0]) {
-                                        if (getResult[0][0]) {
-                                            if (getResult[1]) {
+                                if (clientList) {
+                                    if (clientList[0]) {
+                                        if (clientList[0][0]) {
+                                            if (clientList[1]) {
                                                 responseMessage.status = true;
-                                                responseMessage.count = getResult[0][0].count;
-                                                responseMessage.data = getResult[1];
+                                                responseMessage.count = clientList[0][0].count;
+                                                responseMessage.data = clientList[1];
                                                 responseMessage.message = 'Client List loaded successfully';
                                                 responseMessage.error = null;
                                                 res.status(200).json(responseMessage);
@@ -232,20 +232,20 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
                         var queryParams = st.db.escape(cid)+ ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
                         var query = 'CALL pGetClientcontacts(' + queryParams + ')';
                         //console.log(query);
-                        st.db.query(query, function (err, getResult) {
+                        st.db.query(query, function (err, contactList) {
                             if (!err) {
-                                if (getResult) {
-                                    if (getResult[0]) {
-                                        if (getResult[0][0]) {
-                                            if (getResult[1]) {
+                                if (contactList) {
+                                    if (contactList[0]) {
+                                        if (contactList[0][0]) {
+                                            if (contactList[1]) {
 
                                                 responseMessage.status = true;
-                                                responseMessage.count = getResult[0][0].count;
-                                                responseMessage.cid = getResult[0][0].cid;
-                                                responseMessage.cn = getResult[0][0].cn;
-                                                responseMessage.cc = getResult[0][0].cc;
-                                                responseMessage.page = getResult[0][0].page;
-                                                responseMessage.data = getResult[1];
+                                                responseMessage.count = contactList[0][0].count;
+                                                responseMessage.cid = contactList[0][0].cid;
+                                                responseMessage.cn = contactList[0][0].cn;
+                                                responseMessage.cc = contactList[0][0].cc;
+                                                responseMessage.page = contactList[0][0].page;
+                                                responseMessage.data = contactList[1];
                                                 responseMessage.message = 'Contact List loaded successfully';
                                                 responseMessage.error = null;
                                                 res.status(200).json(responseMessage);
@@ -339,7 +339,6 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
  * @description save client
  */
 ContactManager.prototype.saveClient = function(req,res,next) {
-    var _this = this;
 
     var token = req.body.token;
     var id = parseInt(req.body.id);
@@ -395,17 +394,17 @@ ContactManager.prototype.saveClient = function(req,res,next) {
 
                         var query = 'CALL pSaveClient(' + queryParams + ')';
 
-                        st.db.query(query, function (err, insertresult) {
+                        st.db.query(query, function (err, clientResult) {
                             //console.log(insertresult);
                             if (!err) {
-                                if (insertresult) {
-                                    if (insertresult[0]) {
-                                        if (insertresult[0][0]) {
+                                if (clientResult) {
+                                    if (clientResult[0]) {
+                                        if (clientResult[0][0]) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Client saved successfully';
                                             responseMessage.data = {
-                                                id: (!isNaN(parseInt(insertresult[0][0].id))) ? (parseInt(insertresult[0][0].id)) : 0,
+                                                id: (!isNaN(parseInt(clientResult[0][0].id))) ? (parseInt(clientResult[0][0].id)) : 0,
                                                 cc: req.body.cc,
                                                 ct: req.body.ct,
                                                 cs: parseInt(req.body.cs)
@@ -491,7 +490,6 @@ ContactManager.prototype.saveClient = function(req,res,next) {
  * @description save client
  */
 ContactManager.prototype.saveClientContact = function(req,res,next) {
-    var _this = this;
 
     var token = req.body.token;
     var id = parseInt(req.body.id);
