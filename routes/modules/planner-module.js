@@ -68,26 +68,26 @@ Planner.prototype.getAllTask = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams =  st.db.escape(token) + ',' + st.db.escape(startTime)+ ',' + st.db.escape(endTime);
-                        var query = 'CALL pLoadTasks(' + queryParams + ')';
-                        console.log(query);
+                        var taskQuery = 'CALL pLoadTasks(' + queryParams + ')';
+                        console.log(taskQuery);
 
-                        st.db.query(query, function (err, getResult) {
+                        st.db.query(taskQuery, function (err, taskResult) {
                             //console.log(getResult);
                             if (!err) {
-                                if (getResult) {
-                                    if (getResult[0]) {
-                                        if (getResult[0].length > 0){
+                                if (taskResult) {
+                                    if (taskResult[0]) {
+                                        if (taskResult[0].length > 0){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Tasks loaded successfully';
                                             responseMessage.data = {
                                                 s_time : req.query.s_time,
                                                 e_time : req.query.e_time,
-                                                tasks : getResult[0]
+                                                tasks : taskResult[0]
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetAllTask: Tasks loaded successfully');
@@ -198,9 +198,9 @@ Planner.prototype.getTrans = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams = st.db.escape(tid);
                         var query = 'CALL pGetMessagesDetails(' + queryParams + ')';
                         console.log(query);

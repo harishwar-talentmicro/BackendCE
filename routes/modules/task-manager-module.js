@@ -59,7 +59,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     var userIDs = req.body.au;              // Additional User IDs (Comma separted MasterIDs of users) <string>
     var taskDate = req.body.ts;            // Task Date and Time (YYYY-MM-DD HH:mm:ss)
     var ownerId = parseInt(req.body.ow);   // Owner ID (Master ID of the task owner)
-    var nextActionId = (parseInt(req.body.nxid) == NaN) ? 0 : parseInt(req.body.nxid);
+    var nextActionId = (isNaN(parseInt(req.body.nxid))) ? 0 : parseInt(req.body.nxid);
     var tid,cd;
 
     var responseMessage = {
@@ -78,7 +78,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     if(!id){
         id = 0;
     }
-    if(parseInt(id) == NaN){
+    if(isNaN(parseInt(id))){
         error['tid'] = 'Invalid id';
         validateStatus *= false;
     }
@@ -102,9 +102,9 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     }
     else{
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id)+ ',' + st.db.escape(transactionId)
                             + ',' + st.db.escape(status) + ',' + st.db.escape(c_particulars) + ',' + st.db.escape(c_amount)
                             + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId)
@@ -238,9 +238,9 @@ TaskManager.prototype.getTasks = function(req,res,next){
 
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams = st.db.escape(startDate)+ ',' + st.db.escape(endDate) + ',' +
                             st.db.escape(token)+ ',' + st.db.escape(functionType);
                         var query = 'CALL pGetTasks(' + queryParams + ')';

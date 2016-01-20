@@ -177,7 +177,7 @@ StdLib.prototype.validateToken = function(Token, CallBack){
     try {
 
         //below query to check token exists for the users or not.
-        if (Token != null && Token != '') {
+        if (Token) {
             if(Token != 2){
                 /**
                  * @info : Token is now queried from session table i.e. tloginout
@@ -286,7 +286,7 @@ StdLib.prototype.sendMail = function(req, res){
             var Subject = req.body.Subject;
             var Body = req.body.Body;
 
-            if (From != null && To != null && Subject != null) {
+            if (From && To && Subject != null) {
 
                 var fs = require('fs');
 
@@ -354,10 +354,6 @@ StdLib.prototype.sendMail = function(req, res){
                 else if (Body == null) {
                     FinalMsgJson.Message = 'FnSendMail: Body is empty';
                     console.log('FnSendMail: Body is empty');
-                }
-                else if (Token == null) {
-                    FinalMsgJson.Message = 'FnSendMail: Token is empty';
-                    console.log('FnSendMail: Token is empty');
                 }
 
                 res.statusCode = 400;
