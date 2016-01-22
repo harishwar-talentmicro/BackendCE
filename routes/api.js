@@ -140,6 +140,9 @@ router.post('/sales_request',businessManager.sendSalesRequest);
 router.post('/ewtSaveTranscation',businessManager.sendSalesRequest);
 router.post('/transaction_history',businessManager.createTransactionHistory);
 router.get('/transaction_history',businessManager.getTransactionHistory);
+router.post('/m/sales_transaction',businessManager.saveSalesRequest);
+router.get('/m/company_name',businessManager.getCompanyName);
+router.get('/m/contact_details',businessManager.getContactDetails);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');
@@ -324,6 +327,7 @@ router.get('/search_alumni', alumniModule.searchAlumni);
 router.put('/leave_alumni', alumniModule.leaveAlumni);
 router.put('/alumni_member', alumniModule.approveAlumnimembers);
 router.delete('/ten_attachment',alumniModule.deleteTenAttachment);
+router.delete('/event',alumniModule.deleteEvent);
 
 //new url's
 router.get('/client_list',alumniModule.getClientList);

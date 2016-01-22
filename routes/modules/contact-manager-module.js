@@ -345,6 +345,8 @@ ContactManager.prototype.saveClient = function(req,res,next) {
     var clientCode = req.body.cc;          // client code
     var clientTitle = req.body.ct;        // client title
     var status = parseInt(req.body.cs);  // client status (1-sales, 2-recruitment, 3-both)
+    var website = req.body.website ? req.body.website : '';
+    var clientMasterId = req.body.c_masterId ? req.body.c_masterId : 0;
 
 
     var responseMessage = {
@@ -390,7 +392,8 @@ ContactManager.prototype.saveClient = function(req,res,next) {
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id) + ',' + st.db.escape(clientCode)
-                            + ',' + st.db.escape(clientTitle) + ',' + st.db.escape(status);
+                            + ',' + st.db.escape(clientTitle) + ',' + st.db.escape(status)+ ',' + st.db.escape(website)
+                            + ',' + st.db.escape(clientMasterId);
 
                         var query = 'CALL pSaveClient(' + queryParams + ')';
 
@@ -501,6 +504,11 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
     var phone = req.body.ph;
     var jobTitle = req.body.jt;
     var status = parseInt(req.body.st);    //(1-active, 2-deactive)
+    /**
+     * added two parameters
+     */
+    var contactMasterid = req.body.c_mid ? req.body.c_mid : 0; //  contact master id
+    var roleId = req.body.rid ? req.body.rid : 0;  //  role id
 
 
     var responseMessage = {
@@ -549,7 +557,7 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
                             + ',' + st.db.escape(firstName) + ',' + st.db.escape(lastName)
                             + ',' + st.db.escape(mobile) + ',' + st.db.escape(email)
                             + ',' + st.db.escape(phone) + ',' + st.db.escape(jobTitle)
-                            + ',' + st.db.escape(status);
+                            + ',' + st.db.escape(status)+ ',' + st.db.escape(contactMasterid)+ ',' + st.db.escape(roleId);
 
                         var query = 'CALL pSaveClientcontact(' + queryParams + ')';
 

@@ -301,7 +301,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
     var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
     var apUserid = (!isNaN(parseInt(req.body.ap_userid))) ?  parseInt(req.body.ap_userid) : 0;
     var businessKeywords = (req.body.keywords) ?  req.body.keywords : '';
-    var encryptPwd = '',fullName='';
+    var encryptPwd = '';
+    var fullName='';
 
     var rtnMessage = {
         error:{},
@@ -342,7 +343,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
 
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!validateStatus){
         rtnMessage.error = error;
@@ -606,112 +608,119 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                             if (registerResult) {
                                 if (registerResult[0]) {
                                     if (registerResult[0].length > 0) {
-                                        if (registerResult[0][0].TID != 0) {
-                                            if (idtypeId == 2) {
-                                                rtnMessage.FirstName = companyName;
-                                            }
-                                            else {
-                                                rtnMessage.FirstName = firstName;
-                                            }
-                                            rtnMessage.IsAuthenticate = true;
-                                            rtnMessage.Token = token;
-                                            rtnMessage.Type = idtypeId;
-                                            rtnMessage.tid = registerResult[0][0].TID;
-                                            rtnMessage.group_id = registerResult[0][0].group_id;
+                                        if (registerResult[0][0]) {
+                                            if (registerResult[0][0].TID != 0) {
+                                                if (idtypeId == 2) {
+                                                    rtnMessage.FirstName = companyName;
+                                                }
+                                                else {
+                                                    rtnMessage.FirstName = firstName;
+                                                }
+                                                rtnMessage.IsAuthenticate = true;
+                                                rtnMessage.Token = token;
+                                                rtnMessage.Type = idtypeId;
+                                                rtnMessage.tid = registerResult[0][0].TID;
+                                                rtnMessage.group_id = registerResult[0][0].group_id;
 
-                                            if (operation == 'I') {
+                                                if (operation == 'I') {
 
-                                                var ip = req.headers['x-forwarded-for'] ||
-                                                    req.connection.remoteAddress ||
-                                                    req.socket.remoteAddress ||
-                                                    req.connection.socket.remoteAddress;
-                                                var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
+                                                    var ip = req.headers['x-forwarded-for'] ||
+                                                        req.connection.remoteAddress ||
+                                                        req.socket.remoteAddress ||
+                                                        req.connection.socket.remoteAddress;
+                                                    var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
-                                                st.generateToken(ip, userAgent, ezeid, function (err, token) {
-                                                    if (err) {
-                                                        console.log('FnRegistration: Token Generation Error' + err);
-                                                    }
-                                                    else {
-                                                        rtnMessage.Token = token;
-                                                    }
-                                                    res.send(rtnMessage);
-                                                });
+                                                    st.generateToken(ip, userAgent, ezeid, function (err, token) {
+                                                        if (err) {
+                                                            console.log('FnRegistration: Token Generation Error' + err);
+                                                        }
+                                                        else {
+                                                            rtnMessage.Token = token;
+                                                        }
+                                                        res.send(rtnMessage);
+                                                    });
 
-                                                console.log('FnRegistration:tmaster: Registration success');
+                                                    console.log('FnRegistration:tmaster: Registration success');
 
-                                                var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
-                                                var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
-                                                st.db.query(query1, function (err, updateResult) {
-                                                    if (!err) {
-                                                        console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
-                                                    }
-                                                    else {
-                                                        console.log('FnUpdateEZEoneKeywords: Keywords not updated');
-                                                        console.log(err);
-                                                    }
-                                                });
-                                                if (email) {
-
-                                                    if (firstName && lastName) {
-                                                        fullName = firstName + ' ' + lastName;
-                                                    }
-                                                    else {
-                                                        fullName = firstName;
-                                                    }
-
-                                                    var mailContent = {
-                                                        type: 'register',
-                                                        fullname: fullName,
-                                                        ezeid: ezeid,
-                                                        toEmail: email
-
-                                                    };
-
-                                                    mail.sendRegMail(mailContent, function (err, statusResult) {
+                                                    var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
+                                                    var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
+                                                    st.db.query(query1, function (err, updateResult) {
                                                         if (!err) {
-                                                            if (statusResult) {
-                                                                if (statusResult.status == true) {
-                                                                    console.log('FnSendMail: Mail Sent Successfully');
-                                                                    //res.send(rtnMessage);
+                                                            console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                                        }
+                                                        else {
+                                                            console.log('FnUpdateEZEoneKeywords: Keywords not updated');
+                                                            console.log(err);
+                                                        }
+                                                    });
+                                                    if (email) {
+
+                                                        if (firstName && lastName) {
+                                                            fullName = firstName + ' ' + lastName;
+                                                        }
+                                                        else {
+                                                            fullName = firstName;
+                                                        }
+
+                                                        var mailContent = {
+                                                            type: 'register',
+                                                            fullname: fullName,
+                                                            ezeid: ezeid,
+                                                            toEmail: email
+
+                                                        };
+
+                                                        mail.sendRegMail(mailContent, function (err, statusResult) {
+                                                            if (!err) {
+                                                                if (statusResult) {
+                                                                    if (statusResult.status == true) {
+                                                                        console.log('FnSendMail: Mail Sent Successfully');
+                                                                        //res.send(rtnMessage);
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnSendMail: Mail not Sent...1');
+                                                                        //res.send(rtnMessage);
+                                                                    }
                                                                 }
                                                                 else {
-                                                                    console.log('FnSendMail: Mail not Sent...1');
+                                                                    console.log('FnSendMail: Mail not Sent..2');
                                                                     //res.send(rtnMessage);
                                                                 }
                                                             }
                                                             else {
-                                                                console.log('FnSendMail: Mail not Sent..2');
+                                                                console.log('FnSendMail:Error in sending mails' + err);
                                                                 //res.send(rtnMessage);
                                                             }
-                                                        }
-                                                        else {
-                                                            console.log('FnSendMail:Error in sending mails' + err);
-                                                            //res.send(rtnMessage);
+                                                        });
+                                                    }
+                                                    else {
+                                                        console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
+                                                        //console.log(rtnMessage);
+                                                        //res.send(rtnMessage);
+                                                    }
+                                                }
+                                                else {
+                                                    var queryParams2 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
+                                                    var query2 = 'CALL pupdateEZEoneKeywords(' + queryParams2 + ')';
+                                                    console.log(query2);
+                                                    st.db.query(query2, function (err, getResult) {
+                                                        if (!err) {
+                                                            console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
+                                                            res.send(rtnMessage);
                                                         }
                                                     });
                                                 }
-                                                else {
-                                                    console.log('FnRegistration: tmaster: registration success but email is empty so mail not sent');
-                                                    //console.log(rtnMessage);
-                                                    //res.send(rtnMessage);
-                                                }
                                             }
                                             else {
-                                                var queryParams2 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
-                                                var query2 = 'CALL pupdateEZEoneKeywords(' + queryParams2 + ')';
-                                                console.log(query2);
-                                                st.db.query(query2, function (err, getResult) {
-                                                    if (!err) {
-                                                        console.log('FnUpdateEZEoneKeywords: Keywords Updated successfully');
-                                                        res.send(rtnMessage);
-                                                    }
-                                                });
+                                                //console.log(rtnMessage);
+                                                res.send(rtnMessage);
+                                                console.log('FnRegistration:tmaster: Registration Failed..1');
                                             }
                                         }
                                         else {
                                             //console.log(rtnMessage);
                                             res.send(rtnMessage);
-                                            console.log('FnRegistration:tmaster: Registration Failed..1');
+                                            console.log('FnRegistration:tmaster: Registration Failed');
                                         }
                                     }
                                     else {
@@ -2023,11 +2032,11 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var token = req.body.token;
     var profile = req.body.profile;
     var studentID = req.body.student_id;
-    var education = parseInt(req.body.education);
-    var specialization = parseInt(req.body.specialization);
-    var batch = req.body.batch;
+    var education = (!isNaN(parseInt(req.body.education))) ? parseInt(req.body.education) : 0;
+    var specialization = (!isNaN(parseInt(req.body.specialization))) ? parseInt(req.body.specialization) : 0;
+    var batch = req.body.batch ? req.body.batch : '';
     var code = alterEzeoneId(req.body.code);     // college code
-    var accesstype = req.body.access_type;  // 0-no relation, 1-is admin, 2-is member
+    var accesstype = req.body.access_type ? req.body.access_type : 2;  // 0-no relation, 1-is admin, 2-is member
     var ps;
 
     var responseMessage = {
@@ -2041,29 +2050,6 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
 
     if(!token){
         error['token'] = 'Invalid token';
-        validateStatus *= false;
-    }
-    if(!profile){
-        error['profile'] = 'Invalid profile';
-        validateStatus *= false;
-    }
-    if(!studentID){
-        error['studentID'] = 'Invalid studentID';
-        validateStatus *= false;
-    }
-    if(!education){
-        error['education'] = 'Invalid education';
-        validateStatus *= false;
-    }
-    if(!specialization){
-        error['specialization'] = 'Invalid specialization';
-        validateStatus *= false;
-    }
-    if(!accesstype){
-        accesstype = 0;
-    }
-    if(parseInt(accesstype) == NaN){
-        error['accesstype'] = 'Invalid accesstype';
         validateStatus *= false;
     }
 
@@ -2392,10 +2378,10 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var tid = req.query.tid ? req.query.tid : 0;      // while saving time 0 else id of user
     var title = req.query.title;
     var description = req.query.description;
-    var startDate = req.query.s_date;
-    var endDate = req.query.e_date;
+    var startDate = req.query.s_date ? req.query.s_date : null;
+    var endDate = req.query.e_date ? req.query.e_date : null;
     var status = req.query.status;   // 1(pending),2=closed,3=on-hold,4=canceled
-    var regLastDate = req.query.reg_lastdate;
+    var regLastDate = req.query.reg_lastdate ? req.query.reg_lastdate : null;
     var type = req.query.type;     // 1(training),2=event,3=news,4=knowledge
     var note = req.query.note;
     var venueId = req.query.venue_id;
@@ -5855,7 +5841,7 @@ Alumni.prototype.searchAlumni = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var title = req.query.title ? req.query.title : '';
+    var title = req.query.title ? alterEzeoneId(req.query.title) : '';
 
     var responseMessage = {
         status: false,
@@ -6421,6 +6407,117 @@ Alumni.prototype.deleteTenAttachment = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnDeleteTenAttachment : ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnDeleteTenEvent
+ * Method : Delete
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for delete event
+ */
+Alumni.prototype.deleteEvent = function(req,res,next){
+
+    var token = req.query.token;
+    var tenId = req.query.ten_id;
+
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true,error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(parseInt(tenId) == NaN){
+        error['tenId'] = 'Invalid tenId';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+
+                        var queryParams = st.db.escape(tenId);
+                        var query = 'CALL pdeleteten(' + queryParams + ')';
+                        //console.log(query);
+                        st.db.query(query, function (err, eventResult) {
+
+                            if (!err) {
+                                if (eventResult) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Event deleted successfully';
+                                    responseMessage.data = {
+                                        tenId : req.query.ten_id
+                                    };
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnDeleteEvent: Event deleted successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Event not deleted';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnDeleteEvent: Event not deleted');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnDeleteEvent: error in deleting Event :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnDeleteEvent: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnDeleteEvent:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnDeleteEvent : ' + ex.description);
             console.log(ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
