@@ -2378,16 +2378,18 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     var tid = req.query.tid ? req.query.tid : 0;      // while saving time 0 else id of user
     var title = req.query.title;
     var description = req.query.description;
-    var startDate = req.query.s_date ? req.query.s_date : null;
-    var endDate = req.query.e_date ? req.query.e_date : null;
+    var startDate = (req.query.s_date) ? (req.query.s_date) : null;
+    var endDate = (req.query.e_date) ? (req.query.e_date) : null;
     var status = req.query.status;   // 1(pending),2=closed,3=on-hold,4=canceled
-    var regLastDate = req.query.reg_lastdate ? req.query.reg_lastdate : null;
+    var regLastDate = (req.query.reg_lastdate) ? (req.query.reg_lastdate) : null;
     var type = req.query.type;     // 1(training),2=event,3=news,4=knowledge
     var note = req.query.note;
     var venueId = req.query.venue_id;
     var code = alterEzeoneId(req.query.code);
-    var capacity = req.query.capacity ? req.query.capacity : 0;
-    var randomName='',tenId=0,originalName='';
+    var capacity = (req.query.capacity) ? (req.query.capacity) : 0;
+    var randomName='';
+    var tenId=0;
+    var originalName='';
 
     var responseMessage = {
         status: false,
@@ -2396,7 +2398,8 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if (!token) {
         error['token'] = 'Invalid token';
@@ -6442,7 +6445,7 @@ Alumni.prototype.deleteEvent = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(parseInt(tenId) == NaN){
+    if(isNaN(parseInt(tenId))){
         error['tenId'] = 'Invalid tenId';
         validateStatus *= false;
     }

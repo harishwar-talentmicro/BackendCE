@@ -107,6 +107,10 @@ Auth.prototype.register = function(req,res,next){
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
+    var moment = require('moment');
+
+    dob = moment(dob).format('YYYY-MM-DD HH:mm:ss');
+
     var operationType = parseInt(req.body.OperationType);
     var ipAddress = req.ip;
     var selectionType = (!isNaN(parseInt(req.body.SelectionType))) ?  parseInt(req.body.SelectionType) : 0;
@@ -149,8 +153,8 @@ Auth.prototype.register = function(req,res,next){
     var isdMobileNumber = req.body.ISDMobileNumber ? req.body.ISDMobileNumber : '';
     var parkingStatus = req.body.ParkingStatus ? req.body.ParkingStatus : 0;
     var gender = (!isNaN(parseInt(req.body.Gender))) ?  parseInt(req.body.Gender) : 2;
-    var dob = req.body.DOB ? (new Date(req.body.DOB)) : '';
-    console.log(dob);
+    var dob = (req.body.DOB) ? (req.body.DOB) : '';
+    var momentObj = moment(dob,'YYYY-MM-DD HH:mm:ss').isValid();
     var templateId = req.body.TemplateID ? parseInt(req.body.TemplateID) : 0;
     var isIphone = req.body.device ? parseInt(req.body.device) : 0;
     var deviceToken = req.body.device_token ? req.body.device_token : '';
@@ -218,6 +222,16 @@ Auth.prototype.register = function(req,res,next){
         error['companyName'] = 'companyName is mandatory';
         validateStatus *= false;
         console.log('companyName is mandatory');
+    }
+
+    if(momentObj){
+        dob = moment(dob).format('YYYY-MM-DD HH:mm:ss');
+    }
+
+    else {
+        error['dob'] = 'dob date is wrong format';
+        validateStatus *= false;
+        console.log('dob date is wrong format');
     }
 
     if(!validateStatus){
