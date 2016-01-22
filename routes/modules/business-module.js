@@ -2862,7 +2862,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
          */
 
         var token = req.body.token;
-        var toEzeid = req.body.to_ezeid;
+        var toEzeid = alterEzeoneId(req.body.to_ezeid);
         var message = (req.body.requirement) ? req.body.requirement : '';
         var address = req.body.address ? req.body.address : '';
         var notes = (req.body.notes) ? req.body.notes : '';
@@ -2920,6 +2920,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                         console.log(query);
 
                         st.db.query(query, function (err, transResult) {
+                            //console.log(transResult);
                             if (!err) {
                                 if (transResult) {
                                     if (transResult[0]) {
@@ -2928,19 +2929,20 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                                             responseMessage.message = 'Sales request save sucessfully';
                                             responseMessage.data = {
                                                 id: transResult[0][0].id,
-                                                to_ezeid: req.body.to_ezeid,
+                                                to_ezeid: alterEzeoneId(req.body.to_ezeid),
                                                 message: (req.body.msg) ? req.body.msg : '',
                                                 address: req.body.address,
                                                 notes: (req.body.notes) ? req.body.notes : '',
                                                 a_name: req.body.a_name,
                                                 amount: req.body.amount ? req.body.amount : 0.00,
                                                 stage: req.body.stage,
-                                                folder_id: folder_id,
+                                                folder_id: folderId,
                                                 proabilities: req.body.proabilities,
-                                                s_url : attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachment :''
+                                                s_url: attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachment : ''
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnSaveSalesRequest: Sales request save sucessfully');
+
                                         }
                                         else {
                                             responseMessage.message = 'Sales request not save';
