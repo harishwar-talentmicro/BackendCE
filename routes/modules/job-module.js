@@ -1084,7 +1084,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
             locationsList = JSON.parse(locationsList);
         }
         var location_id = '', locCount = 0, locationIds;
-        var filterType = (parseInt(req.body.filter_type) !== NaN) ? parseInt(req.body.filter_type) : 0;
+        var filterType = (!isNaN(parseInt(req.body.filter_type))) ? parseInt(req.body.filter_type) : 0;
 
         if (!jobSkills) {
             jobSkills = [];
@@ -1198,6 +1198,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
                 }
 
                 //line of carrer
+                console.log(locMatrix);
+                console.log(locMatrix.length);
                 if (locMatrix.length) {
                     for (var k = 0; k < locMatrix.length; k++) {
                         //async.each(locMatrix, function iterator(locDetails, callback) {
@@ -1237,9 +1239,11 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     if (loc != ' ') {
                         lineofcarrer = ' and ( ' + loc + ')';
                     }
+                    console.log(lineofcarrer);
                 }
                 else {
                     lineofcarrer = '';
+                    console.log('loc is empty');
                 }
 
                 jobSeeker(skillArray, educationMatrix, lineofcarrer, locIds);
