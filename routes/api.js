@@ -337,6 +337,7 @@ router.post('/test', alumniModule.testUrl);
 var Recruitment = require('./modules/recruitment-module.js');
 var recruitmentModule = new Recruitment(db,stdLib);
 router.get('/recruitment_masters',recruitmentModule.getRecruitmentMasters);
+router.get('/recruitment/institute',recruitmentModule.getInstitutesList);
 router.get('/sales_masters',recruitmentModule.getSalesMasters);
 
 //Gingerbite module

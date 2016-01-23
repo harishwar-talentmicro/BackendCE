@@ -53,7 +53,8 @@ function padWithZero(number,padding){
 };
 
 
-const PAYMENT_CONFIG = require(path.join(__dirname + '../../payment-config.json'));
+var PAYMENT_CONFIG = require(path.join(__dirname, '../../payment-config.json'));
+console.log(PAYMENT_CONFIG);
 function CitrusPayment(){};
 
 /**
@@ -63,7 +64,7 @@ function CitrusPayment(){};
  */
 CitrusPayment.prototype.generateTxSignature = function(txId,amount){
     var hmac = crypto.createHmac('sha1',PAYMENT_CONFIG.SECRET_KEY);
-    var dataStr = CONFIG.VANITY_URL_PART + amount + txId  +  + CONFIG.CURRENCY;
+    var dataStr = PAYMENT_CONFIG.VANITY_URL_PART + amount + txId  + PAYMENT_CONFIG.CURRENCY;
     hmac.update(dataStr);
     return hmac.digest('hex');
 };
@@ -89,14 +90,15 @@ CitrusPayment.prototype.generateUniqueTxId = function(orderId){
  */
 CitrusPayment.prototype.initiatePayment = function(orderId,amount){
     var _this = this;
-    var txId = _this.generateUniqueTxId();
+    var txId = _this.generateUniqueTxId(orderId);
     var txDetails = {
         merchantTxnId : txId,
         orderAmount : amount.toFixed(2),
-        currency : CONFIG.CURRENCY,
+        currency : PAYMENT_CONFIG.CURRENCY,
         secSignature : _this.generateTxSignature(txId,amount.toFixed(2)),
-        returnUrl : CONFIG.RETURN_URL,
-        notifyUrl : CONFIG.NOTIFY_URL
+        returnUrl : PAYMENT_CONFIG.RETURN_URL,
+        notifyUrl : PAYMENT_CONFIG.NOTIFY_URL,
+        vanityUrl : PAYMENT_CONFIG.BASE_URL + PAYMENT_CONFIG.VANITY_URL_PART
     };
     return txDetails;
 };
@@ -110,7 +112,7 @@ CitrusPayment.prototype.initiatePayment = function(orderId,amount){
 CitrusPayment.prototype.parsePaymentData = function(paymentData){
     var parsedPaymentData = null;
     if(paymentData){
-        parsedPaymentData = {};
+        parsedPaymentData = paymentData;
         if(paymentData['pgRespCode']){
             paymentData['pgRespCode'] = parseInt(paymentData['pgRespCode']);
             switch(paymentData['pgRespCode']){
@@ -205,46 +207,140 @@ CitrusPayment.prototype.parsePaymentData = function(paymentData){
  */
 CitrusPayment.prototype.verifyPayment = function(req,res,callback){
     var _this = this;
-    var requestBody = "";
-    if (req.method = "POST") {
-        req.on("data", function (data) { requestBody += data; });
-        req.on("end", function () {
-            try {
-                var citrusRespData = qs.parse(requestBody);
-                var dataStr = citrusRespData['TxId'] + citrusRespData['TxStatus'] + citrusRespData['amount']
-                    + citrusRespData['pgTxnNo'] + citrusRespData['issuerRefNo'] + citrusRespData['authIdCode']
-                    + citrusRespData['firstName'] + citrusRespData['lastName'] + citrusRespData['pgRespCode'] + citrusRespData['addressZip'];
-                console.log(dataStr);
-                var signature = crypto.createHmac('sha1', PAYMENT_CONFIG.SECRET_KEY).update(dataStr).digest('hex');
-                if (signature == citrusRespData['signature']) {
-                    console.log('Transaction Signature Verified');
-                    var parsedPaymentData = _this.parsePaymentData(citrusRespData);
-                    callback(parsedPaymentData,function(orderId){
-                        res.redirect(CONFIG.PAYMENT_CONFIRM_WEBPAGE_URL +((orderId) ? "?oid="+orderId : ''));
-                    });
-                }
-                else {
-                    console.log('Transaction Signature Verification Failed');
-                    callback(null,function(orderId){
-                        res.redirect(CONFIG.PAYMENT_CONFIRM_WEBPAGE_URL +((orderId) ? "?oid="+orderId : ''));
-                    });
-                }
-            }
-            catch (err2) {
-                console.log(err2);
-                console.log('---------Payment return url body---------------------');
-                console.log(requestBody);
-                console.log('---------Payment return url body ends ---------------------');
-                callback(null,function(){
-
-                });
-            }
-        });
+    console.log('req.body',req.body);
+    try {
+        var citrusRespData = req.body;
+        var dataStr = citrusRespData['TxId'] + citrusRespData['TxStatus'] + citrusRespData['amount']
+            + citrusRespData['pgTxnNo'] + citrusRespData['issuerRefNo'] + citrusRespData['authIdCode']
+            + citrusRespData['firstName'] + citrusRespData['lastName'] + citrusRespData['pgRespCode'] + citrusRespData['addressZip'];
+        console.log(dataStr);
+        var signature = crypto.createHmac('sha1', PAYMENT_CONFIG.SECRET_KEY).update(dataStr).digest('hex');
+        if (signature == citrusRespData['signature']) {
+            console.log('Transaction Signature Verified');
+            var parsedPaymentData = _this.parsePaymentData(citrusRespData);
+            callback(parsedPaymentData,function(orderId){
+                res.redirect(PAYMENT_CONFIG.PAYMENT_CONFIRM_WEBPAGE_URL +((orderId) ? "?oid="+orderId : ''));
+            });
+        }
+        else {
+            console.log('Transaction Signature Verification Failed');
+            callback(null,function(orderId){
+                res.redirect(PAYMENT_CONFIG.PAYMENT_CONFIRM_WEBPAGE_URL +((orderId) ? "?oid="+orderId : ''));
+            });
+        }
     }
-    else{
-        console.log('Payment redirect url is not posted with POST method');
-        console.log('------------ Error from payment gateway ! Please check if payment api has changed or updated');
+    catch (err2) {
+        console.log(err2);
+        console.log('---------Payment return url body---------------------');
+        console.log(requestBody);
+        console.log('---------Payment return url body ends ---------------------');
+        callback(null,function(){
+
+        });
     }
 };
 
 module.exports = CitrusPayment;
+
+
+
+/**
+ * Example of usage of the library (used in Fomads Food App Project)
+ */
+/**
+ *
+    'use strict';
+    var express = require('express');
+    var router = express.Router();
+    var validator = require('validator');
+    var CitrusPayment = require('../lib/CitrusPayment.js');
+    var paymentApi = new CitrusPayment();
+
+    router.post('/', function(req, res, next) {
+
+        paymentApi.verifyPayment(req,res,function(parsedPaymentData,paymentVerificationCallback){
+            var error  = {};
+            var validationStatus = true;
+            var respMsg = {
+                S : false,
+                M : '',
+                E : {},
+                D : null
+            };
+
+            if (parsedPaymentData.status == 2){
+                parsedPaymentData.status = 0;
+            }
+            if (parsedPaymentData.status == 0){
+                parsedPaymentData.status = 2;
+            }
+            if(!validationStatus){
+                respMsg.S = false;
+                respMsg.M = 'Please check the errors below';
+                respMsg.E = error;
+                respMsg.D = null;
+                res.status(400).json(respMsg);
+            }
+            else {
+                try {
+                    var procParams = req.dbConn.escape(parsedPaymentData.TxId) + ',' + req.dbConn.escape(parsedPaymentData.status)
+                        + ',' + req.dbConn.escape(parsedPaymentData.TxStatus) + ',' + req.dbConn.escape(parsedPaymentData.TxRefNo)
+                        + ',' + req.dbConn.escape(parsedPaymentData.TxMsg)+ ',' + req.dbConn.escape(parsedPaymentData.pgTxnNo)
+                        + ',' + req.dbConn.escape(parsedPaymentData.issuerRefNo)+ ',' + req.dbConn.escape(parsedPaymentData.authIdCode)
+                        + ',' + req.dbConn.escape(parsedPaymentData.firstName)+ ',' + req.dbConn.escape(parsedPaymentData.lastName)
+                        + ',' + req.dbConn.escape(parsedPaymentData.pgRespCode)+ ',' + req.dbConn.escape(parsedPaymentData.addressZip);
+
+                    var procQuery = 'CALL update_payment(' + procParams + ') ';
+                    console.log(procQuery);
+
+                    req.dbConn.query(procQuery, function (err, results) {
+                        if (!err) {
+                            console.log(results);
+                            if(results){
+                                if(results[0]){
+                                    if(results[0][0]){
+                                        if (results[0][0].oid) {
+                                            paymentVerificationCallback(results[0][0].oid);
+
+                                        }
+                                        else{
+                                            paymentVerificationCallback(null);
+                                        }
+                                    }
+                                    else{
+                                        paymentVerificationCallback(null);
+                                    }
+                                }
+                                else{
+                                    paymentVerificationCallback(null);
+                                }
+                            }
+                            else {
+                                paymentVerificationCallback(null);
+                            }
+                        }
+                        else {
+                            console.log(err);
+                            console.log('Error while performing update_payment');
+                            var errorDate = new Date();
+                            console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            paymentVerificationCallback(null);
+
+                        }
+
+                    });
+                }
+                catch (ex) {
+                    console.log('Error in payment module');
+                    console.log(ex);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    paymentVerificationCallback(null);
+                }
+            }
+
+        });
+
+    });
+
+ **/

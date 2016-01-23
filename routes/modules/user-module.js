@@ -1808,6 +1808,7 @@ User.prototype.saveResume = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         // In tFunctionID Int,In tRoleID Int, In tKeySkills varchar(250), In tCVDoc longtext, In tCVDocFile varchar(250), In iStatus int, In tPin varchar(15), In tToken varchar(15)
+        var gender = (!isNaN(parseInt(req.body.gender))) ? parseInt(req.body.gender) : 3;
         var ids = req.body.skillsTid;
         var FunctionID = req.body.FunctionID;
         var KeySkills = req.body.KeySkills;
@@ -1904,7 +1905,7 @@ User.prototype.saveResume = function(req,res,next){
                                 + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID)
                                 +',' + st.db.escape(expectedSalary)+ ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName)
                                 +',' + st.db.escape(email)+',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
-                                +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath);
+                                +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath)+',' + st.db.escape(gender);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {

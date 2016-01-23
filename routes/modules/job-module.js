@@ -1060,7 +1060,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
         validateStatus *= false;
     }
     else {
-
+        var gender = (!isNaN(parseInt(req.body.gender))) ? parseInt(req.body.gender) : 2;
         var jobType = req.body.job_type;
         var salaryFrom = (parseFloat(req.body.salary_from) !== NaN && parseFloat(req.body.salary_from) > 0) ? parseFloat(req.body.salary_from) : 0;
         var salaryTo = (parseFloat(req.body.salary_to) !== NaN && parseFloat(req.body.salary_to) > 0) ? parseFloat(req.body.salary_to) : 0;
@@ -1252,7 +1252,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     + ',' + st.db.escape(experienceFrom) + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId)
                     + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(lineofcarrer)
-                    + ',' + st.db.escape(filterType);
+                    + ',' + st.db.escape(filterType)+',' + st.db.escape(gender);
 
                 var query = 'CALL pGetjobseekers(' + queryParams + ')';
                 console.log(query);

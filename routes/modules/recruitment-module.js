@@ -310,6 +310,96 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
     }
 };
 
+/**
+ *
+ * @author Indra Jeet
+ * @description Get list of all colleges and group of colleges
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @service-param token <string> Logged in user token
+ * @produces List of colleges and Group of colleges
+ *
+ */
+Recruitment.prototype.getInstitutesList = function(req,res,next){
+
+    var responseMessage = {
+        status : false,
+        message : "Internal Server Error",
+        error : { server : 'Internal Server Error'},
+        data : null
+    };
+
+    try {
+        st.validateToken(req.query.token, function (err, tokenResult) {
+
+            if (!err) {
+
+                if (tokenResult) {
+                    var instituteListQuery = "CALL pgetinstituelist(" + st.db.escape(req.query.token) + ")";
+                    console.log(instituteListQuery);
+
+                    st.db.query(instituteListQuery, function (err, instituteListResult) {
+
+                        if (!err) {
+                            if (instituteListResult) {
+                                console.log('instituteListResult', instituteListResult);
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Colleges and Group of colleges list loaded successfully';
+                                responseMessage.data = (instituteListResult[0]) ?
+                                    ((instituteListResult[0].length) ? instituteListResult[0] : []) : [];
+                                res.status(200).json(responseMessage);
+                                console.log('Colleges and Group of colleges list loaded successfully');
+                            }
+                            else {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.data = [];
+                                responseMessage.message = 'Colleges and Group of colleges list not loaded';
+                                res.status(200).json(responseMessage);
+                                console.log('Colleges and Group of colleges list loaded successfully');
+                            }
+                        }
+                        else{
+                            res.status(500).json(responseMessage);
+                        }
+                    });
+
+                    ///////////////////////////////
+
+
+                }
+                else {
+                    responseMessage.message = "Please login to continue";
+                    responseMessage.error = {
+                        token : "Invalid token"
+                    };
+                    res.status(401).json(responseMessage);
+                }
+            }
+            else {
+                res.status(500).json(responseMessage);
+            }
+        });
+
+    }
+
+    catch(ex){
+        responseMessage.error = {
+            server: 'Internal Server Error'
+        };
+        responseMessage.message = 'An error occurred !';
+        res.status(500).json(responseMessage);
+        console.log('Error : getInstitutesList ');
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+
+};
+
 
 module.exports = Recruitment;
 
