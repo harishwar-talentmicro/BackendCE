@@ -39,6 +39,135 @@ function BusinessManager(db,stdLib){
     }
 };
 
+var uuid = require('node-uuid');
+var stream = require( "stream" );
+var chalk = require( "chalk" );
+var util = require( "util" );
+// I turn the given source Buffer into a Readable stream.
+function BufferStream( source ) {
+
+    if ( ! Buffer.isBuffer( source ) ) {
+
+        throw( new Error( "Source must be a buffer." ) );
+
+    }
+
+    // Super constructor.
+    stream.Readable.call( this );
+
+    this._source = source;
+
+    // I keep track of which portion of the source buffer is currently being pushed
+    // onto the internal stream buffer during read actions.
+    this._offset = 0;
+    this._length = source.length;
+
+    // When the stream has ended, try to clean up the memory references.
+    this.on( "end", this._destroy );
+
+}
+
+util.inherits( BufferStream, stream.Readable );
+
+
+// I attempt to clean up variable references once the stream has been ended.
+// --
+// NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
+// usage since my Node.js apps will (eventually) never restart.
+BufferStream.prototype._destroy = function() {
+
+    this._source = null;
+    this._offset = null;
+    this._length = null;
+
+};
+
+
+// I read chunks from the source buffer into the underlying stream buffer.
+// --
+// NOTE: We can assume the size value will always be available since we are not
+// altering the readable state options when initializing the Readable stream.
+BufferStream.prototype._read = function( size ) {
+
+    // If we haven't reached the end of the source buffer, push the next chunk onto
+    // the internal stream buffer.
+    if ( this._offset < this._length ) {
+
+        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
+
+        this._offset += size;
+
+    }
+
+    // If we've consumed the entire source buffer, close the readable stream.
+    if ( this._offset >= this._length ) {
+
+        this.push( null );
+
+    }
+
+};
+
+var gcloud = require('gcloud');
+var fs = require('fs');
+
+var appConfig = require('../../ezeone-config.json');
+
+var gcs = gcloud.storage({
+    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
+    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
+});
+
+// Reference an existing bucket.
+var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
+
+bucket.acl.default.add({
+    entity: 'allUsers',
+    role: gcs.acl.READER_ROLE
+}, function (err, aclObject) {
+});
+
+/**
+ * image uploading to cloud server
+ * @param uniqueName
+ * @param readStream
+ * @param callback
+ */
+var uploadDocumentToCloud = function(uniqueName,readStream,callback){
+    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function(){
+        console.log('done');
+        if(callback){
+            if(typeof(callback)== 'function'){
+                callback(null);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function(err){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                console.log(err);
+                callback(err);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+};
+
 /**
  * Method : GET
  * @param req
@@ -2692,6 +2821,408 @@ BusinessManager.prototype.getTransactionHistory = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnGetTransactionHistory ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnSaveSalesRequest
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.saveSalesRequest = function(req,res,next){
+
+    /**
+     * checking input parameters are json or not
+     */
+    var isJson = req.is('json');
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true;
+    var error = {};
+
+    if(!isJson){
+        error['isJson'] = 'Invalid Input ContentType';
+        validateStatus *= false;
+    }
+    else {
+        /**
+         * storing and validating the input parameters
+         */
+
+        var token = req.body.token;
+        var toEzeid = alterEzeoneId(req.body.to_ezeid);
+        var message = (req.body.requirement) ? req.body.requirement : '';
+        var address = req.body.address ? req.body.address : '';
+        var notes = (req.body.notes) ? req.body.notes : '';
+        var aName = req.body.a_name;
+        var amount = req.body.amount ? req.body.amount : 0.00;
+        var stage = req.body.stage;
+        var folderId = parseInt(req.body.folder_id);
+        var proabilities = req.body.proabilities;
+        var attachment = req.body.attachment;
+        var id = parseInt(req.body.id);
+        var clientId = parseInt(req.body.cid);
+        var contactId = parseInt(req.body.ct_id);
+
+        if (!token) {
+            error['token'] = 'token is Mandatory';
+            validateStatus *= false;
+        }
+        if (isNaN(folderId)) {
+            error['folderId'] = 'invalid folder id';
+            validateStatus *= false;
+        }
+
+        if (isNaN(id)) {
+            error['id'] = 'invalid id';
+            validateStatus *= false;
+        }
+        if (isNaN(clientId)) {
+            error['clientId'] = 'invalid clientId';
+            validateStatus *= false;
+        }
+        if (isNaN(contactId)) {
+            error['contactId'] = 'invalid contactId';
+            validateStatus *= false;
+        }
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+
+                        var queryParams = st.db.escape(token) + "," + st.db.escape(toEzeid) + "," + st.db.escape(message)
+                            + "," + st.db.escape(address) + "," + st.db.escape(notes)
+                            + "," + st.db.escape(attachment) + "," + st.db.escape(aName) + "," + st.db.escape(amount)
+                            + "," + st.db.escape(stage) + "," + st.db.escape(folderId) + "," + st.db.escape(proabilities)
+                            + "," + st.db.escape(id)+ "," + st.db.escape(clientId)+ "," + st.db.escape(contactId);
+
+                        var query = 'CALL pMSavesalesRequest(' + queryParams + ')';
+                        console.log(query);
+
+                        st.db.query(query, function (err, transResult) {
+                            //console.log(transResult);
+                            if (!err) {
+                                if (transResult) {
+                                    if (transResult[0]) {
+                                        if (transResult[0][0]) {
+                                            responseMessage.status = true;
+                                            responseMessage.message = 'Sales request save sucessfully';
+                                            responseMessage.data = {
+                                                id: transResult[0][0].id,
+                                                to_ezeid: alterEzeoneId(req.body.to_ezeid),
+                                                message: (req.body.msg) ? req.body.msg : '',
+                                                address: req.body.address,
+                                                notes: (req.body.notes) ? req.body.notes : '',
+                                                a_name: req.body.a_name,
+                                                amount: req.body.amount ? req.body.amount : 0.00,
+                                                stage: req.body.stage,
+                                                folder_id: folderId,
+                                                proabilities: req.body.proabilities,
+                                                s_url: attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attachment : ''
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveSalesRequest: Sales request save sucessfully');
+
+                                        }
+                                        else {
+                                            responseMessage.message = 'Sales request not save';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveSalesRequest:Sales request not save');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'Sales request not save';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveSalesRequest:Sales request not save');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Sales request not save';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveSalesRequest:Sales request not save');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnSaveSalesRequest: error in saving Sales request  :' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnSaveSalesRequest: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnSaveSalesRequest:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnSaveSalesRequest ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @todo FnGetCompanyName
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get company name
+ */
+BusinessManager.prototype.getCompanyName = function(req,res,next){
+
+
+    var token = req.query.token;
+    var ezeid = req.query.ezeid ? alterEzeoneId(req.query.ezeid):'';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true, error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(ezeid);
+                        var query = 'CALL pGetCompanyname(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, result) {
+                            //console.log(result);
+                            if (!err) {
+                                if (result) {
+                                    if (result[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'company name loaded successfully';
+                                        responseMessage.data = result[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetCompanyName: company name loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'company name not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetCompanyName:company name not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'company name not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetCompanyName:company name not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal server error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetCompanyName: error in loading company name:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetCompanyName: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetCompanyName:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetCompanyName ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnGetContactDetails
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get contact details
+ */
+BusinessManager.prototype.getContactDetails = function(req,res,next){
+
+
+    var token = req.query.token;
+    var ezeid = req.query.ezeid ? alterEzeoneId(req.query.ezeid):'';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true;
+    var error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(ezeid);
+                        var query = 'CALL pgetcontactdetails(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, result) {
+                            //console.log(result);
+                            if (!err) {
+                                if (result) {
+                                    if (result[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'contact details loaded successfully';
+                                        responseMessage.data = result[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetContactDetails: contact details loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'contact details not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetContactDetails:contact details not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'contact details not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetContactDetails:contact details not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal server error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetContactDetails: error in loading contact details:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetContactDetails: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetContactDetails:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetContactDetails ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

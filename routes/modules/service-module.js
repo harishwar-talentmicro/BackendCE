@@ -9,10 +9,17 @@
 var uuid = require('node-uuid');
 
 var st = null;
+var Notification = require('./notification/notification-master.js');
+var NotificationQueryManager = require('./notification/notification-query.js');
+var notification = null;
+var notificationQmManager = null;
+
 function Service(db,stdLib){
 
     if(stdLib){
         st = stdLib;
+        notification = new Notification(db,stdLib);
+        notificationQmManager = new NotificationQueryManager(db,stdLib);
     }
 };
 
@@ -862,6 +869,7 @@ Service.prototype.createService = function(req,res,next){
         var aFilename = req.body.a_fn ? req.body.a_fn :'';
         var videoUrl = req.body.video_url ? req.body.video_url :'';
         var vFilename = req.body.video_fn ? req.body.video_fn :'';
+        var id = (!isNaN(parseInt(req.body.id))) ? (parseInt(req.body.id)) :0; // new service it s 0 else tid
 
         if (!token) {
             error['token'] = 'token is Mandatory';
@@ -893,11 +901,13 @@ Service.prototype.createService = function(req,res,next){
                             + ',' + st.db.escape(message) + ',' + st.db.escape(categoryId)
                             + ',' + st.db.escape(pic)+ ',' + st.db.escape(picFilename)
                             + ',' + st.db.escape(attachment) + ',' + st.db.escape(aFilename)
-                            + ',' + st.db.escape(videoUrl)+ ',' + st.db.escape(vFilename);
+                            + ',' + st.db.escape(videoUrl)+ ',' + st.db.escape(vFilename)+ ',' + st.db.escape(id);
 
                         var query = 'CALL ppostservice(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {
+
+                            console.log(serviceResult);
                             if (!err) {
                                 if (serviceResult) {
                                     responseMessage.status = true;
@@ -915,6 +925,35 @@ Service.prototype.createService = function(req,res,next){
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnCreateService: Service Created successfully');
+
+                                    if(serviceResult[0]) {
+
+                                        for (var i = 0; i < serviceResult[0].length; i++) {
+
+                                            //send notification
+                                            var receiverId = serviceResult[0][i].groupid;
+                                            var senderTitle = '';
+                                            var groupTitle = '';
+                                            var gid = '';
+                                            var messageText = 'NewService-' + serviceResult[0][i].ct + '-' + serviceResult[0][i].name;
+                                            var messageType = 12;
+                                            var operationType = 0;
+                                            var iphoneId = serviceResult[0][i].iphoneid;
+                                            var priority = '';
+                                            var messageId = 0;
+                                            var msgUserid = 0;
+                                            var masterid = 0;
+                                            var a_url = '';
+                                            var a_name = '';
+                                            var datetime = '';
+                                            var latitude = 0.00;
+                                            var longitude = 0.00;
+                                            var jobId = 0;
+                                            console.log(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                            notification.publish(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                        }
+                                    }
+
                                 }
                                 else {
                                     responseMessage.message = 'service not created';
@@ -1052,6 +1091,7 @@ Service.prototype.updateService = function(req,res,next){
                         var query = 'CALL pupdateservice(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, updateserviceResult) {
+                            console.log(updateserviceResult);
                             if (!err) {
                                 if (updateserviceResult) {
                                     responseMessage.status = true;
@@ -1066,6 +1106,46 @@ Service.prototype.updateService = function(req,res,next){
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateService: Service updated successfully');
+
+
+                                    //send notification
+                                    if(updateserviceResult[0]) {
+
+                                        for (var i = 0; i < updateserviceResult[0].length; i++) {
+
+                                            //send notification
+                                            var status;
+                                            if(updateserviceResult[0][i].status == 1){
+                                                status = 'submit'
+                                            }
+                                            else if(updateserviceResult[0][i].status == 2)
+                                            {status = 'close'}
+                                            else if(updateserviceResult[0][i].status == 3)
+                                            {status = 'cancel'}
+
+                                            var receiverId = updateserviceResult[0][i].groupid;
+                                            var senderTitle = '';
+                                            var groupTitle = '';
+                                            var gid = updateserviceResult[0][i].groupid;
+                                            var messageText = updateserviceResult[0][i].ref_no + '-' + updateserviceResult[0][i].ct + '-' + status;
+                                            var messageType = 12;
+                                            var operationType = 0;
+                                            var iphoneId = updateserviceResult[0][i].iphoneid;
+                                            var priority = '';
+                                            var messageId = 0;
+                                            var msgUserid = 0;
+                                            var masterid = 0;
+                                            var a_url = '';
+                                            var a_name = '';
+                                            var datetime = '';
+                                            var latitude = 0.00;
+                                            var longitude = 0.00;
+                                            var jobId = 0;
+                                            console.log(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                            notification.publish(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                        }
+                                    }
+
                                 }
                                 else {
                                     responseMessage.message = 'service not updated';

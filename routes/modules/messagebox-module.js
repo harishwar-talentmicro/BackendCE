@@ -186,8 +186,6 @@ function MessageBox(db,stdLib){
  */
 MessageBox.prototype.createMessageGroup = function(req,res,next){
 
-    var _this = this;
-
     var token  = req.body.token;
     var groupName  = req.body.group_name;
     var groupType  = req.body.group_type;
@@ -196,7 +194,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
     var tid = req.body.tid ? req.body.tid : 0;
     var restrictReply = req.body.rr;
     var memberVisible = req.body.member_visible ? parseInt(req.body.member_visible) : 0;
-    var alumniCode = req.body.alumni_code ? req.body.alumni_code : '';
+    var alumniCode = req.body.alumni_code ? alterEzeoneId(req.body.alumni_code) : '';
 
     var responseMessage = {
         status: false,
@@ -205,7 +203,8 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -233,22 +232,21 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                             + ',' + st.db.escape(aboutGroup) + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(tid)
                             + ',' + st.db.escape(restrictReply)+ ',' + st.db.escape(memberVisible)+ ',' + st.db.escape(alumniCode);
                         var query = 'CALL pCreateMessageGroup(' + queryParams + ')';
-                        console.log(query);
-                        st.db.query(query, function (err, insertResult) {
+                        st.db.query(query, function (err, groupResult) {
                             if (!err) {
-                                if(insertResult) {
-                                    if (insertResult[0]) {
+                                if(groupResult) {
+                                    if (groupResult[0]) {
 
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Group created successfully';
                                         responseMessage.data = {
-                                            id: insertResult[0][0].ID,
+                                            id: (groupResult[0][0]) ? (groupResult[0][0].ID) : 0,
                                             token: req.body.token,
-                                            groupName: req.body.group_name,
-                                            groupType: req.body.group_type,
-                                            aboutGroup: req.body.about_group,
-                                            autoJoin: req.body.auto_join,
+                                            group_name: req.body.group_name,
+                                            group_type: req.body.group_type,
+                                            about_group: req.body.about_group,
+                                            auto_join: req.body.auto_join,
                                             tid: req.body.tid,
                                             rr: req.body.rr
                                         };
@@ -267,7 +265,6 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
                                     console.log('FnCreateMessageGroup:Group is not created');
                                 }
                             }
-
                             else {
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {
@@ -320,14 +317,17 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
  * @description api code for validate group name
  */
 MessageBox.prototype.validateGroupName = function(req,res,next){
-    var _this = this;
 
     var name = req.query.group_name;
     var token = req.query.token;
     var groupType = req.query.group_type ? req.query.group_type : 0;
-    var ezeid,pin = null ;
+    var ezeid;
+    var pin = null ;
+    var ezeidArray;
 
-    var ezeidArray = name.split('.');
+    if(name) {
+        ezeidArray = name.split('.');
+    }
 
     var responseMessage = {
         status: false,
@@ -378,15 +378,15 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
             var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(token) + ',' + st.db.escape(groupType)
                 + ',' + st.db.escape(pin);
             var query = 'CALL pValidateGroupName(' + queryParams + ')';
-            console.log(query);
-            st.db.query(query, function (err, getResult) {
+            //console.log(query);
+            st.db.query(query, function (err, groupResult) {
                 if (!err) {
-                    if (getResult) {
-                        if (getResult[0]) {
+                    if (groupResult) {
+                        if (groupResult[0]) {
                             responseMessage.status = true;
                             responseMessage.error = null;
                             responseMessage.message = 'Name is available';
-                            responseMessage.data = getResult[0];
+                            responseMessage.data = groupResult[0];
                             res.status(200).json(responseMessage);
                             console.log('FnValidateGroupName: Name is available');
                         }
@@ -440,9 +440,13 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
     var groupId = (parseInt(req.query.group_id) !== NaN && parseInt(req.query.group_id ) > 0) ? parseInt(req.query.group_id) : 0;
     var token = (req.query.token) ? req.query.token : null;
     var ezeoneId = (req.query.ezeone_id) ? alterEzeoneId(req.query.ezeone_id) : null;
-    var ezeid,pin = null ;
+    var ezeid;
+    var pin = null ;
+    var ezeidArray;
 
-    var ezeidArray = ezeoneId.split('.');
+    if(ezeoneId) {
+        ezeidArray = ezeoneId.split('.');
+    }
 
 
     var error  = {};
@@ -452,7 +456,7 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
         message : 'Please check the errors below',
         error : { server : 'Internal Server Error'},
         data : null
-    }
+    };
 
     if(!groupId){
         error['group_id'] = 'Invalid group id';
@@ -565,7 +569,6 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
  * @description api code for Update User status
  */
 MessageBox.prototype.updateUserStatus = function(req,res,next){
-    var _this = this;
 
     var token  = req.body.token;
     var groupId  = parseInt(req.body.group_id);   // groupid of receiver
@@ -573,9 +576,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
     var status  = parseInt(req.body.status);      // Status 0 : Pending, 1: Accepted, 2 : Rejected, 3 : Leaved, 4 : Removed
     var deleteStatus = (parseInt(req.body.group_type) !== NaN && parseInt(req.body.group_type) > 0)
         ? parseInt(req.body.group_type) : 0;
-
-    var requester = req.body.requester ? parseInt(req.body.requester) : 2 ;
-    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupID,messageText,messageType,operationType,iphoneID,iphoneId,messageId;
+    var requester = (!isNaN(parseInt(req.body.requester))) ? parseInt(req.body.requester) : 2 ;
 
     var responseMessage = {
         status: false,
@@ -613,10 +614,11 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(masterId) + ',' + st.db.escape(status) + ','+ st.db.escape(deleteStatus);
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(masterId) + ',' + st.db.escape(status)
+                            + ','+ st.db.escape(deleteStatus);
 
                         var query = 'CALL pUpdateUserStatus(' + queryParams + ')';
-                        //console.log(query);
+                        console.log(query);
                         st.db.query(query, function (err, updateResult) {
                             if (!err) {
                                 if (updateResult) {
@@ -624,10 +626,11 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'User status updated successfully';
                                     responseMessage.data = {
-                                        token: req.body.token,
-                                        groupId: req.body.group_id,
+                                        group_id: req.body.group_id,
                                         masterId: masterId,
-                                        status: req.body.status
+                                        status: status,
+                                        group_type : deleteStatus,
+                                        requester : requester
 
                                     };
 
@@ -635,15 +638,15 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
                                     console.log('FnUpdateUserStatus: User status updated successfully');
 
                                     // send push notification update status
-                                    var details = {
+                                    var params = {
                                         token: token,
                                         groupId: groupId,
                                         masterId: masterId,
                                         status: status,
-                                        deleteStatus: deleteStatus,
+                                        group_type: deleteStatus,
                                         requester: requester
                                     };
-                                    msgNotification.updateStatus(details,function(err,statusResult) {
+                                    msgNotification.updateStatus(params,function(err,statusResult) {
                                         console.log(statusResult);
                                         if(!err) {
                                             if (statusResult) {
@@ -720,11 +723,10 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
  */
 MessageBox.prototype.updateUserRelationship = function(req,res,next){
 
-    var _this = this;
 
     var token  = req.body.token;
     var groupId  = req.body.group_id;
-    var memberID  = req.body.member_id;
+    var memberId  = req.body.member_id;
     var relationType  = req.body.relation_type;
 
     var responseMessage = {
@@ -734,7 +736,8 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -744,8 +747,8 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
         error['groupId'] = 'Invalid groupId';
         validateStatus *= false;
     }
-    if(!memberID){
-        error['memberID'] = 'Invalid memberID';
+    if(!memberId){
+        error['memberId'] = 'Invalid memberId';
         validateStatus *= false;
     }
     if(parseInt(relationType) == NaN){
@@ -763,7 +766,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberID) + ',' + st.db.escape(relationType);
+                        var queryParams = st.db.escape(groupId) + ',' + st.db.escape(memberId) + ',' + st.db.escape(relationType);
 
                         var query = 'CALL pUpdateUserRelationship(' + queryParams + ')';
                         st.db.query(query, function (err, updateResult) {
@@ -774,11 +777,9 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'User Relationship updated successfully';
                                     responseMessage.data = {
-                                        token: req.body.token,
-                                        groupId: req.body.group_id,
-                                        memberID: req.body.member_id,
+                                        group_id: req.body.group_id,
+                                        member_id: req.body.member_id,
                                         relation_type: req.body.relation_type
-
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnUpdateUserRelationship: User Relationship updated successfully');
@@ -789,7 +790,6 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
                                     console.log('FnUpdateUserRelationship:User Relationship is not updated');
                                 }
                             }
-
                             else {
                                 responseMessage.message = 'An error occured ! Please try again';
                                 responseMessage.error = {
@@ -842,10 +842,9 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
  * @description api code for Delete Group
  */
 MessageBox.prototype.deleteGroup = function(req,res,next){
-    var _this = this;
 
     var token  = req.query.token;
-    var groupID = req.query.group_id;
+    var groupId = req.query.group_id;
 
     var responseMessage = {
         status: false,
@@ -856,8 +855,8 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!groupID){
-        error['groupID'] = 'Invalid groupID';
+    if(!groupId){
+        error['groupId'] = 'Invalid groupId';
         validateStatus *= false;
     }
 
@@ -871,14 +870,17 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        st.db.query('CALL pDeleteGroup(' + st.db.escape(groupID) + ')', function (err, getResult) {
+
+                        var queryParams = st.db.escape(groupId);
+                        var query = 'CALL pDeleteGroup(' + queryParams + ')';
+                        st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Group deleted successfully';
                                     responseMessage.data = {
-                                        groupID: groupID
+                                        group_id: groupId
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnDeleteGroup: Group deleted successfully');
@@ -944,15 +946,22 @@ MessageBox.prototype.deleteGroup = function(req,res,next){
  */
 MessageBox.prototype.sendMessageRequest = function(req,res,next){
 
-    var _this = this;
-
     var token  = req.body.token;
     var groupName  = req.body.group_name;
     var groupType  = req.body.group_type;
-    var auto_join = req.body.auto_join ? req.body.auto_join : 0;
+    var autoJoin = req.body.auto_join ? req.body.auto_join : 0;
     var relationType = req.body.relation_type;
-    var userID = req.body.user_id ? req.body.user_id : 0;
-    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId,iphoneID;
+    var userId = req.body.user_id ? req.body.user_id : 0;
+    var masterid='';
+    var iosId='';
+    var receiverId;
+    var senderTitle;
+    var groupTitle;
+    var groupId;
+    var messageText;
+    var messageType;
+    var operationType;
+    var messageId;
 
     var responseMessage = {
         status: false,
@@ -987,7 +996,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(groupName) + ',' + st.db.escape(groupType)
-                            + ',' + st.db.escape(auto_join) + ',' + st.db.escape(relationType) + ',' + st.db.escape(userID);
+                            + ',' + st.db.escape(autoJoin) + ',' + st.db.escape(relationType) + ',' + st.db.escape(userId);
                         var query = 'CALL pSendMessageRequest(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, insertResult) {
@@ -999,53 +1008,52 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
                                         responseMessage.error = null;
                                         responseMessage.message = 'Message Request send successfully';
                                         responseMessage.data = {
-                                            token: req.body.token,
-                                            groupName: req.body.group_name,
-                                            groupType: req.body.group_type,
-                                            relationType: req.body.relation_type,
-                                            userID: req.body.user_id
+                                            group_name: req.body.group_name,
+                                            group_type: req.body.group_type,
+                                            relation_type: req.body.relation_type,
+                                            user_id: req.body.user_id
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnSendMessageRequest: Message Request send successfully');
 
 
                                         //send notification
-                                        var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userID;
-                                        st.db.query(queryParameters, function (err, iosResult) {
+                                        var iosDetailsQuery = 'select EZEID,IPhoneDeviceID as iphoneId from tmaster where tid=' + userId;
+                                        st.db.query(iosDetailsQuery, function (err, iosResult) {
                                             if (iosResult) {
                                                 if (iosResult[0]) {
-                                                    iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                                    iosId = (iosResult[0].iphoneId) ? (iosResult[0].iphoneId) : '';
                                                 }
-                                                else {
-                                                    iphoneID = '';
-                                                }
-                                            }
-                                            else {
-                                                iphoneID = '';
                                             }
                                             //console.log(iphoneId);
-                                            var query1 = 'select tid from tmgroups where GroupName=' + st.db.escape(groupName);
-                                            st.db.query(query1, function (err, groupDetails) {
+                                            var groupDetailsQuery = 'select tid from tmgroups where GroupName=' + st.db.escape(groupName);
+                                            st.db.query(groupDetailsQuery, function (err, groupDetails) {
                                                 if (groupDetails) {
                                                     if (groupDetails[0]) {
-                                                        var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + userID;
-                                                        st.db.query(query2, function (err, getDetails) {
+                                                        var memberDetailsQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId;
+                                                        st.db.query(memberDetailsQuery, function (err, getDetails) {
                                                             if (getDetails) {
                                                                 if (getDetails[0]) {
-                                                                    receiverId = getDetails[0].tid;
-                                                                    senderTitle = groupName;
-                                                                    groupTitle = groupName;
-                                                                    groupId = groupDetails[0].tid;
-                                                                    messageText = 'has sent an invitation ';
-                                                                    messageType = 3;
-                                                                    operationType = 0;
-                                                                    iphoneId = iphoneID;
-                                                                    messageId = 0;
-                                                                    masterid = '';
-                                                                    var latitude = '', longitude = '', prioritys = '';
-                                                                    var dateTime = '', a_name = '', msgUserid = '';
+                                                                    var receiverId = getDetails[0].tid;
+                                                                    var senderTitle = groupName;
+                                                                    var groupTitle = groupName;
+                                                                    var gid = groupDetails[0].tid;
+                                                                    var messageText = 'has sent an invitation ';
+                                                                    var messageType = 3;
+                                                                    var operationType = 0;
+                                                                    var iphoneId = iosId;
+                                                                    var priority = '';
+                                                                    var messageId = 0;
+                                                                    var msgUserid = 0;
+                                                                    var masterid = 0;
+                                                                    var a_url = '';
+                                                                    var a_name = '';
+                                                                    var datetime = '';
+                                                                    var latitude = 0.00;
+                                                                    var longitude = 0.00;
+                                                                    var jobId = 0;
                                                                     //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
+                                                                    notification.publish(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
                                                                 }
                                                                 else {
                                                                     console.log('FnSendMessageRequest:Error getting from requestDetails');
@@ -1157,7 +1165,6 @@ function pass(ezeid, callback){
 
 function FnBussinessChat(params, callback) {
 
-    var _this = this;
     var i= 0,id1='';
     if (params) {
         //console.log('coming business chat func..');
@@ -1226,7 +1233,6 @@ var uploadDocumentToCloud = function(uniqueName,bufferData,callback){
 
 
     console.log('uploading to cloud...');
-    var a_url, randomName, output;
     var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
     var bufferStream = new BufferStream(bufferData);
     bufferStream.pipe(remoteWriteStream);
@@ -1271,8 +1277,6 @@ var uploadDocumentToCloud = function(uniqueName,bufferData,callback){
  */
 MessageBox.prototype.composeMessage = function(req,res,next){
 
-    var _this = this;
-
     var message  = req.body.message;
     var attachment  = req.body.attachment ? req.body.attachment : '';
     var attachmentFilename  = req.body.attachment_filename ? req.body.attachment_filename : '';
@@ -1290,7 +1294,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var ezeid = alterEzeoneId(req.body.ezeid);
     var istask = req.body.istask ? req.body.istask : 0;
     var memberVisible = req.body.member_visible ? req.body.member_visible : 0;
-    var randomName,a_url;
+    var randomName;
 
     if(idType){
         id = idType.split(",");
@@ -1388,7 +1392,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 + ',' + st.db.escape(istask);
                             var query = 'CALL pComposeMessage(' + queryParams + ')';
 
-                            console.log(query);
+                            //console.log(query);
 
                             st.db.query(query, function (err, insertResult) {
                                 console.log(insertResult);
@@ -1436,7 +1440,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                                             ezeid: alterEzeoneId(req.body.ezeid)
                                                         };
 
-                                                        msgNotification.sendNotification(msgContent, function (err, statusResult) {
+                                                        msgNotification.sendComposeMessage(msgContent, function (err, statusResult) {
                                                             console.log(statusResult);
                                                             if (!err) {
                                                                 if (statusResult) {
@@ -1543,9 +1547,8 @@ MessageBox.prototype.composeMessage = function(req,res,next){
  * @description api code for get members list
  */
 MessageBox.prototype.getMembersList = function(req,res,next){
-    var _this = this;
 
-    var groupID = req.query.group_id;
+    var groupId = req.query.group_id;
 
     var responseMessage = {
         status: false,
@@ -1556,8 +1559,8 @@ MessageBox.prototype.getMembersList = function(req,res,next){
 
     var validateStatus = true, error = {};
 
-    if(!groupID){
-        error['groupID'] = 'Invalid groupID';
+    if(!groupId){
+        error['groupId'] = 'Invalid groupId';
         validateStatus *= false;
     }
 
@@ -1568,16 +1571,18 @@ MessageBox.prototype.getMembersList = function(req,res,next){
     }
     else {
         try {
-            st.db.query('CALL pGetMembersList(' + st.db.escape(groupID) + ')', function (err, getResult) {
-                console.log(getResult);
+            var queryParams = st.db.escape(groupId);
+            var query = 'CALL pGetMembersList(' + queryParams + ')';
+            st.db.query(query, function (err, memberList) {
+                //console.log(memberList);
                 if (!err) {
-                    if (getResult) {
-                        if(getResult[0]) {
-                            if (getResult[0].length > 0) {
+                    if (memberList) {
+                        if(memberList[0]) {
+                            if (memberList[0].length > 0) {
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Members List loaded successfully';
-                                responseMessage.data = getResult[0];
+                                responseMessage.data = memberList[0];
                                 res.status(200).json(responseMessage);
                                 console.log('FnGetMembersList: Members List loaded successfully');
                             }
@@ -1632,7 +1637,6 @@ MessageBox.prototype.getMembersList = function(req,res,next){
  * @description api code for load messageBox
  */
 MessageBox.prototype.loadMessageBox = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
@@ -1750,9 +1754,7 @@ MessageBox.prototype.loadMessageBox = function(req,res,next){
  */
 MessageBox.prototype.changeMessageActivity = function(req,res,next){
 
-    var _this = this;
-
-    var messageID  = req.body.message_id;
+    var messageId  = req.body.message_id;
     var status  = req.body.status;
     var token  = req.body.token;
     var isMessage = req.body.group_type ? req.body.group_type : 0;
@@ -1772,8 +1774,8 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(!messageID){
-        error['messageID'] = 'Invalid messageID';
+    if(!messageId){
+        error['messageId'] = 'Invalid messageId';
         validateStatus *= false;
     }
     if(!status){
@@ -1791,11 +1793,11 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams = st.db.escape(messageID) + ',' + st.db.escape(status)+ ',' + st.db.escape(token)
+                        var queryParams = st.db.escape(messageId) + ',' + st.db.escape(status)+ ',' + st.db.escape(token)
                             + ',' + st.db.escape(isMessage)+ ',' + st.db.escape(isdeleteall)+ ',' + st.db.escape(toid);
 
                         var query = 'CALL PchangeMessageActivity(' + queryParams + ')';
-                        console.log(query);
+                        //console.log(query);
                         st.db.query(query, function (err, updateResult) {
                             if (!err) {
                                 if (updateResult) {
@@ -1803,9 +1805,10 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'Message status changed successfully';
                                     responseMessage.data = {
-                                        token: token,
-                                        messageID: messageID,
-                                        status:status
+                                        message_id: messageId,
+                                        status:status,
+                                        group_type : isMessage,
+                                        toid : toid
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnChangeMessageActivity: Message status changed successfully');
@@ -1869,7 +1872,6 @@ MessageBox.prototype.changeMessageActivity = function(req,res,next){
  * @description api code for load outbox messages
  */
 MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
@@ -2098,14 +2100,12 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
  */
 MessageBox.prototype.addGroupMembers = function(req,res,next){
 
-    var _this = this;
-
     var groupId = parseInt(req.body.group_id);
     var memberId  = req.body.member_id;
     var relationType  = req.body.relation_type;
     var requester = req.body.requester; // 1 for group, 2 for user
-    var masterid='',receiverId,toid=[],senderTitle,groupTitle,groupID,messageText,messageType,operationType,iphoneId,iphoneID,messageId;
-
+    var iosId='';
+    var sender;
 
     var responseMessage = {
         status: false,
@@ -2149,131 +2149,274 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
                             //send notification
 
                             if (requester == 1) {
-                                //console.log('group admin to user');
-                                var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + memberId;
-                                st.db.query(queryParameters, function (err, iosResult) {
-                                    if (iosResult) {
-                                        if(iosResult[0]) {
-                                            iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
-                                        }
-                                        else{
-                                            iphoneID = '';
-                                        }
-                                        //console.log(iphoneID);
-                                        var queryParams = 'select tid from tmgroups where GroupType=1 and adminID=' + memberId;
-                                        st.db.query(queryParams, function (err, receiverDetails) {
-                                            if (receiverDetails) {
-                                                if (receiverDetails[0]) {
-                                                    var queryParams = 'select tid,GroupName from tmgroups where tid=' + groupId;
-                                                    st.db.query(queryParams, function (err, groupDetails) {
-                                                        if (groupDetails) {
-                                                            if (groupDetails[0]) {
-                                                                receiverId = receiverDetails[0].tid;
-                                                                senderTitle = groupDetails[0].GroupName;
-                                                                groupTitle = groupDetails[0].GroupName;
-                                                                groupID = groupId;
-                                                                messageText = 'has sent an invitation ';
-                                                                messageType = 3;
-                                                                operationType = 0;
-                                                                iphoneId = iphoneID;
-                                                                messageId = 0;
-                                                                masterid = '';
-                                                                //console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                console.log('group admin added to person');
 
-                                                            }
-                                                            else {
-                                                                console.log('FnAddGroupMembers:Error getting from groupdetails');
-                                                            }
+                                var iosDetailsQuery = 'select ezeid,IPhoneDeviceID as iphoneId from tmaster where tid=' + memberId;
+                                //console.log(queryParams);
+                                st.db.query(iosDetailsQuery, function (err, iosResult) {
+                                    if (iosResult) {
+                                        if (iosResult[0]) {
+                                            iosId = (iosResult[0].iphoneId) ? (iosResult[0].iphoneId) : '';
+                                        }
+                                    }
+
+                                    //console.log(iphoneID);
+                                    var receiverDetailsQuery = 'select tid,GroupName from tmgroups where GroupType=1 and adminID=' + memberId;
+                                    //console.log(receiverDetailsQuery);
+                                    st.db.query(receiverDetailsQuery, function (err, receiverDetails) {
+                                        if (receiverDetails) {
+                                            if (receiverDetails[0]) {
+                                                var queryParams2 = 'select GroupName from tmgroups where tid=' + groupId;
+                                                //console.log(queryParams2);
+                                                st.db.query(queryParams2, function (err, groupDetails) {
+                                                    if (groupDetails) {
+                                                        if (groupDetails[0]) {
+                                                            var receiverId = receiverDetails[0].tid;
+                                                            var senderTitle = groupDetails[0].GroupName;
+                                                            var groupTitle = groupDetails[0].GroupName;
+                                                            var gid = groupId;   // group id
+                                                            var messageText = 'has sent an invitation ';
+                                                            var messageType = 3;
+                                                            var operationType = 0;
+                                                            var iphoneId = iosId;
+                                                            var priority = '';
+                                                            var messageId = 0;
+                                                            var msgUserid = 0;
+                                                            var masterid = 0;
+                                                            var a_url = '';
+                                                            var a_name = '';
+                                                            var datetime = '';
+                                                            var latitude = 0.00;
+                                                            var longitude = 0.00;
+                                                            var jobId = 0;
+                                                            //console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                            notification.publish(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
                                                         }
                                                         else {
                                                             console.log('FnAddGroupMembers:Error getting from groupdetails');
                                                         }
-                                                    });
-                                                }
-                                                else {
-                                                    console.log('FnAddGroupMembers:Error getting from Receiverdetails');
-                                                }
+                                                    }
+                                                    else {
+                                                        console.log('FnAddGroupMembers:Error getting from groupdetails');
+                                                    }
+                                                });
                                             }
                                             else {
                                                 console.log('FnAddGroupMembers:Error getting from Receiverdetails');
                                             }
-                                        });
-                                    }
+                                        }
+                                        else {
+                                            console.log('FnAddGroupMembers:Error getting from Receiverdetails');
+                                        }
+                                    });
+
                                 });
                             }
                             else {
-                                //console.log('user to group admin');
 
-                                // dont send notification to public group admin
 
-                                var getQuery = 'select EZEID from tmaster where tid=' + st.db.escape(memberId);
-                                st.db.query(getQuery, function (err, memberDetails) {
-                                    if (memberDetails) {
-                                        if (memberDetails[0]) {
-                                            var query1 = 'select AdminID,GroupName from tmgroups where AutoJoin=0 and tid=' + st.db.escape(groupId);
-                                            //console.log(query1);
-                                            st.db.query(query1, function (err, groupDetails) {
-                                                if (groupDetails) {
-                                                    if (groupDetails[0]) {
-                                                        var query2 = 'select tid from tmgroups where GroupType=1 and adminID=' + groupDetails[0].AdminID;
-                                                        //console.log(query2);
-                                                        st.db.query(query2, function (err, getDetails) {
-                                                            if (getDetails) {
-                                                                if (getDetails[0]) {
-                                                                    var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + groupDetails[0].AdminID;
-                                                                    st.db.query(queryParameters, function (err, iosResult) {
-                                                                        if (iosResult) {
-                                                                            if(iosResult[0]) {
-                                                                                iphoneID = iosResult[0].iphoneID ? iosResult[0].iphoneID : '';
+                                var groupDetailsQuery = 'select AdminID,GroupName,AutoJoin as isPublic from tmgroups where tid=' + st.db.escape(groupId);
+                                console.log(groupDetailsQuery);
+                                st.db.query(groupDetailsQuery, function (err, groupDetails) {
+                                    console.log(groupDetails);
+                                    if (groupDetails) {
+                                        if (groupDetails[0]) {
+
+                                            //isPublic is 0 - private group, 1-public group
+                                            if (groupDetails[0].isPublic == 0) {
+
+                                                console.log('person join to private group');
+
+                                                var senderDetailsQuery = 'select ezeid from tmaster where tid=' + st.db.escape(memberId);
+                                                st.db.query(senderDetailsQuery, function (err, senderDetails) {
+                                                    if (senderDetails) {
+                                                        if (senderDetails[0]) {
+
+                                                            var receiverDetailsQuery1 = 'select tid,GroupName from tmgroups where GroupType=1 and adminID=' + groupDetails[0].AdminID;
+                                                            console.log(receiverDetailsQuery1);
+                                                            st.db.query(receiverDetailsQuery1, function (err, receiverDetails) {
+                                                                if (receiverDetails) {
+                                                                    if (receiverDetails[0]) {
+                                                                        var iosDetailsQuery = 'select ezeid,IPhoneDeviceID as iphoneId from tmaster where tid=' + groupDetails[0].AdminID;
+                                                                        console.log(iosDetailsQuery);
+                                                                        st.db.query(iosDetailsQuery, function (err, iosResult) {
+                                                                            if (iosResult) {
+                                                                                if (iosResult[0]) {
+                                                                                    iosId = (iosResult[0].iphoneId) ? (iosResult[0].iphoneId) : '';
+                                                                                }
                                                                             }
-                                                                            else{
-                                                                                iphoneID='';
-                                                                            }
-                                                                            //console.log(iphoneID);
-                                                                            receiverId = getDetails[0].tid;
-                                                                            senderTitle = memberDetails[0].EZEID;
-                                                                            groupTitle = groupDetails[0].GroupName;
-                                                                            groupID = groupId;
-                                                                            messageText = 'has sent a request';
-                                                                            messageType = 3;
-                                                                            operationType = 0;
-                                                                            iphoneId = iphoneID;
-                                                                            messageId = 0;
-                                                                            //console.log(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId);
-                                                                            notification.publish(receiverId, senderTitle, groupTitle, groupID, messageText, messageType, operationType, iphoneId, messageId);
 
-                                                                        }
-                                                                        else {
-                                                                            console.log('FnAddGroupMembers:Error getting from iphoneid');
-                                                                        }
-                                                                    });
+                                                                            var receiverId = receiverDetails[0].tid;
+                                                                            var senderTitle = senderDetails[0].ezeid;
+                                                                            var groupTitle = groupDetails[0].GroupName;
+                                                                            var gid = groupId;
+                                                                            var messageText = 'has sent a request';
+                                                                            var messageType = 3;
+                                                                            var operationType = 0;
+                                                                            var iphoneId = iosId;
+                                                                            var prioritys = '';
+                                                                            var messageId = 0;
+                                                                            var msgUserid = 0;
+                                                                            var masterid = 0;
+                                                                            var a_url = '';
+                                                                            var a_name = '';
+                                                                            var datetime = '';
+                                                                            var latitude = 0.00;
+                                                                            var longitude = 0.00;
+                                                                            var jobId = 0;
+                                                                            //console.log(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, datetime, a_name, msgUserid, jobId, a_url);
+                                                                            notification.publish(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, datetime, a_name, msgUserid, jobId, a_url);
+
+                                                                        });
+                                                                    }
+                                                                    else {
+                                                                        console.log('FnAddGroupMembers:Error getting from receiver details');
+                                                                    }
                                                                 }
                                                                 else {
-                                                                    console.log('FnAddGroupMembers:Error getting from Admin Details');
+                                                                    console.log('FnAddGroupMembers:Error getting from receiver details');
                                                                 }
-                                                            }
-                                                            else {
-                                                                console.log('FnAddGroupMembers:Error getting from Admin Details');
-                                                            }
-                                                        });
+                                                            });
+                                                        }
+                                                        else {
+                                                            console.log('FnAddGroupMembers:Error getting from sender details');
+                                                        }
                                                     }
                                                     else {
-                                                        console.log('FnAddGroupMembers:No adminID : No send notification');
+                                                        console.log('FnAddGroupMembers:Error getting from sender details');
                                                     }
+                                                });
+                                            }
+
+                                            //join to public group
+                                            else {
+
+                                                if (groupDetails[0].isPublic == 1) {
+
+                                                    console.log('join to public group');
+
+                                                    var senderDetailsQuery = 'select tid,groupname,AdminID from tmgroups where grouptype=1 and AdminID=' + memberId;
+                                                    //console.log(senderDetailsQuery);
+                                                    st.db.query(senderDetailsQuery, function (err, senderDetails) {
+                                                        if (!err) {
+                                                            if (senderDetails) {
+                                                                if (senderDetails[0]) {
+
+                                                                    //console.log(senderDetails);
+                                                                    sender = senderDetails[0].groupname
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+
+
+                                                    var groupDetailsQuery = 'select GroupID, MemberID from tmgroupusers where GroupID=' + groupId;
+                                                    //console.log(groupDetailsQuery);
+                                                    st.db.query(groupDetailsQuery, function (err, groupMembers) {
+                                                        //console.log(groupMembers);
+                                                        if (!err) {
+                                                            if (groupMembers) {
+
+                                                                var member = function (i) {
+
+                                                                    if (i < groupMembers.length) {
+
+                                                                        var memberDetailsQuery1 = 'select tid,groupname,AdminID  from tmgroups where grouptype=1 and AdminID=' + groupMembers[i].MemberID;
+                                                                        //console.log(memberDetailsQuery1);
+                                                                        st.db.query(memberDetailsQuery1, function (err, receiverDetails) {
+                                                                            if (!err) {
+                                                                                if (receiverDetails) {
+                                                                                    if (receiverDetails[0]) {
+
+                                                                                        //console.log(receiverDetails);
+
+                                                                                        if (memberId != receiverDetails[0].AdminID) {
+
+                                                                                            var iosDetailsQuery1 = 'select ezeid,IPhoneDeviceID as iphoneId from tmaster where tid=' + receiverDetails[0].AdminID;
+                                                                                            //console.log(iosDetailsQuery1);
+                                                                                            st.db.query(iosDetailsQuery1, function (err, iosResult) {
+
+                                                                                                if (iosResult) {
+                                                                                                    if (iosResult[0]) {
+                                                                                                        iosId = (iosResult[0].iphoneId) ? (iosResult[0].iphoneId) : '';
+                                                                                                    }
+                                                                                                }
+                                                                                                var receiverId = receiverDetails[0].tid;
+                                                                                                var senderTitle = sender;
+                                                                                                var groupTitle = groupDetails[0].GroupName;
+                                                                                                var gid = groupId;
+                                                                                                var messageText = 'has joined to group';
+                                                                                                var messageType = 3;
+                                                                                                var operationType = 0;
+                                                                                                var iphoneId = iosId;
+                                                                                                var priority = '';
+                                                                                                var messageId = 0;
+                                                                                                var msgUserid = 0;
+                                                                                                var masterid = 0;
+                                                                                                var a_url = '';
+                                                                                                var a_name = '';
+                                                                                                var datetime = '';
+                                                                                                var latitude = 0.00;
+                                                                                                var longitude = 0.00;
+                                                                                                var jobId = 0;
+                                                                                                console.log(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                                                                                notification.publish(receiverId, senderTitle, groupTitle, gid, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                                                                                i = i + 1;
+                                                                                                member(i);
+                                                                                            });
+                                                                                        }
+                                                                                        else {
+                                                                                            i = i + 1;
+                                                                                            member(i);
+                                                                                        }
+                                                                                    }
+                                                                                    else {
+                                                                                        console.log('FnAddGroupMembers:Error getting from receiver members');
+                                                                                    }
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnAddGroupMembers:Error getting from receiver members');
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                console.log('FnAddGroupMembers:Error getting from receiver members');
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                };
+
+                                                                if (groupMembers.length > 0) {
+                                                                    console.log('call member loop');
+                                                                    var i = 0;
+                                                                    member(i);
+                                                                }
+                                                                else {
+                                                                    console.log('FnAddGroupMembers: Error getting from group members');
+                                                                }
+                                                            }
+
+                                                            else {
+                                                                console.log('FnAddGroupMembers:Error getting from group members');
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnAddGroupMembers:Error getting from group members');
+                                                        }
+                                                    });
                                                 }
                                                 else {
-                                                    console.log('FnAddGroupMembers:Error getting from groupdetails');
+                                                    console.log('FnAddGroupMembers:not a public group');
                                                 }
-                                            });
+                                            }
                                         }
                                         else {
-                                            console.log('FnAddGroupMembers:Error getting from member details');
+                                            console.log('FnAddGroupMembers:Error getting from group Details');
                                         }
                                     }
                                     else {
-                                        console.log('FnAddGroupMembers:Error getting from member details');
+                                        console.log('FnAddGroupMembers:Error getting from group Details');
                                     }
+
                                 });
                             }
                         }
@@ -2304,7 +2447,7 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
             responseMessage.error = {
                 server: 'Internal Server Error'
             };
-            responseMessage.message = 'An error occurred !'
+            responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error : FnAddGroupMembers ' + ex.description);
             var errorDate = new Date();
