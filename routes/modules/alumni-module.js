@@ -2027,14 +2027,13 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
  * @description save alumni team profile
  */
 Alumni.prototype.saveAlumniProfile = function(req,res,next) {
-    var _this = this;
 
     var token = req.body.token;
     var profile = req.body.profile;
     var studentID = req.body.student_id;
-    var education = (!isNaN(parseInt(req.body.education))) ? parseInt(req.body.education) : 0;
-    var specialization = (!isNaN(parseInt(req.body.specialization))) ? parseInt(req.body.specialization) : 0;
-    var batch = req.body.batch ? req.body.batch : '';
+    var education = parseInt(req.body.education);
+    var specialization = parseInt(req.body.specialization);
+    var batch = req.body.batch;
     var code = alterEzeoneId(req.body.code);     // college code
     var accesstype = req.body.access_type ? req.body.access_type : 2;  // 0-no relation, 1-is admin, 2-is member
     var ps;
@@ -2046,10 +2045,23 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
         data: null
     };
 
-    var error = {},validateStatus = true;
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!education && (isNaN(education))){
+        error['education'] = 'Invalid education';
+        validateStatus *= false;
+    }
+    if(!specialization && (isNaN(specialization))){
+        error['specialization'] = 'Invalid specialization';
+        validateStatus *= false;
+    }
+    if(!batch && (isNaN(batch))){
+        error['batch'] = 'Invalid batch';
         validateStatus *= false;
     }
 

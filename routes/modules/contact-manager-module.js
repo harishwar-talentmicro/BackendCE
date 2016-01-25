@@ -50,13 +50,12 @@ function ContactManager(db,stdLib){
  * @description api code for get client list
  */
 ContactManager.prototype.getClientList = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
-    var title = req.query.s ? req.query.s : '';   // title
-    var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
-    var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0
-    var functionType = req.query.ft ? parseInt(req.query.ft) : 0;
+    var title = (req.query.s) ? (req.query.s) : '';   // title
+    var pageSize = (req.query.ps) ? (parseInt(req.query.ps)) : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = (req.query.pc) ? (parseInt(req.query.pc)) : 0;     // first time its 0
+    var functionType = (req.query.ft) ? (parseInt(req.query.ft)) : 0;
     var responseMessage = {
         status: false,
         count : 0,
@@ -65,7 +64,8 @@ ContactManager.prototype.getClientList = function(req,res,next){
         error: {}
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var  error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -188,12 +188,11 @@ ContactManager.prototype.getClientList = function(req,res,next){
  * @description api code for get client contacts
  */
 ContactManager.prototype.getClientContacts = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var cid = parseInt(req.query.cid);
-    var pageSize = req.query.ps ? parseInt(req.query.ps) : 1000;       // no of records per page (constant value) eg: 10
-    var pageCount = req.query.pc ? parseInt(req.query.pc) : 0;     // first time its 0
+    var pageSize = (req.query.ps) ? (parseInt(req.query.ps)) : 1000;       // no of records per page (constant value) eg: 10
+    var pageCount = (req.query.pc) ? (parseInt(req.query.pc)) : 0;     // first time its 0
 
     var responseMessage = {
         status: false,
@@ -207,7 +206,8 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
         error: {}
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -345,8 +345,8 @@ ContactManager.prototype.saveClient = function(req,res,next) {
     var clientCode = req.body.cc;          // client code
     var clientTitle = req.body.ct;        // client title
     var status = parseInt(req.body.cs);  // client status (1-sales, 2-recruitment, 3-both)
-    var website = req.body.website ? req.body.website : '';
-    var clientMasterId = req.body.c_masterId ? req.body.c_masterId : 0;
+    var website = (req.body.website) ? (req.body.website) : '';
+    var clientMasterId = (req.body.c_masterId) ? (req.body.c_masterId) : 0;
 
 
     var responseMessage = {
@@ -356,7 +356,8 @@ ContactManager.prototype.saveClient = function(req,res,next) {
         data: null
     };
 
-    var error = {},validateStatus = true;
+    var error = {};
+    var validateStatus = true;
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -507,8 +508,8 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
     /**
      * added two parameters
      */
-    var contactMasterid = req.body.c_mid ? req.body.c_mid : 0; //  contact master id
-    var roleId = req.body.rid ? req.body.rid : 0;  //  role id
+    var contactMasterid = (req.body.c_mid) ? (req.body.c_mid) : 0; //  contact master id
+    var roleId = (req.body.rid) ? (req.body.rid) : 0;  //  role id
 
 
     var responseMessage = {
@@ -518,7 +519,8 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
         data: null
     };
 
-    var error = {},validateStatus = true;
+    var error = {};
+    var validateStatus = true;
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -527,8 +529,8 @@ ContactManager.prototype.saveClientContact = function(req,res,next) {
     if(!id){
         id = 0;
     }
-    if(parseInt(id) == NaN){
-        error['tid'] = 'Invalid id';
+    if(isNaN(parseInt(id))){
+        error['id'] = 'Invalid id';
         validateStatus *= false;
     }
     if(!clientId){

@@ -932,9 +932,9 @@ Service.prototype.createService = function(req,res,next){
 
                                             //send notification
                                             var receiverId = serviceResult[0][i].groupid;
-                                            var senderTitle = '';
+                                            var senderTitle = serviceResult[0][i].sender;
                                             var groupTitle = '';
-                                            var gid = '';
+                                            var gid = serviceResult[0][i].groupid;
                                             var messageText = 'NewService-' + serviceResult[0][i].ct + '-' + serviceResult[0][i].name;
                                             var messageType = 12;
                                             var operationType = 0;
@@ -1031,8 +1031,8 @@ Service.prototype.updateService = function(req,res,next){
 
     var responseMessage = {
         status: false,
-        error: {},
         message: '',
+        error: {},
         data: null
     };
 
@@ -1124,7 +1124,7 @@ Service.prototype.updateService = function(req,res,next){
                                             {status = 'cancel'}
 
                                             var receiverId = updateserviceResult[0][i].groupid;
-                                            var senderTitle = '';
+                                            var senderTitle = updateserviceResult[0][i].sender;
                                             var groupTitle = '';
                                             var gid = updateserviceResult[0][i].groupid;
                                             var messageText = updateserviceResult[0][i].ref_no + '-' + updateserviceResult[0][i].ct + '-' + status;
