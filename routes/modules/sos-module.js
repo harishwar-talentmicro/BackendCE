@@ -41,14 +41,13 @@ function Sos(db,stdLib){
  */
 Sos.prototype.saveSos = function(req,res,next) {
 
-    var _this = this;
 
-    var ezeid = req.body.ezeid ? alterEzeoneId(req.body.ezeid) : '';
-    var b1 = req.body.b1 ? req.body.b1 : 0;   // 0-unselect 1-select
-    var b2 = req.body.b2 ? req.body.b2 : 0;
-    var b3 = req.body.b3 ? req.body.b3 : 0;
-    var b4 = req.body.b4 ? req.body.b4 : 0;
-    var b5 = req.body.b5 ? req.body.b5 : 0;
+    var ezeid = (req.body.ezeid) ? alterEzeoneId(req.body.ezeid) : '';
+    var b1 = (req.body.b1) ? req.body.b1 : 0;   // 0-unselect 1-select
+    var b2 = (req.body.b2) ? req.body.b2 : 0;
+    var b3 = (req.body.b3) ? req.body.b3 : 0;
+    var b4 = (req.body.b4) ? req.body.b4 : 0;
+    var b5 = (req.body.b5) ? req.body.b5 : 0;
     var latitude = req.body.lat;
     var longitude = req.body.lng;
     var deviceId = req.body.device_id;
@@ -71,7 +70,7 @@ Sos.prototype.saveSos = function(req,res,next) {
         var query = 'CALL pSaveSOSrequest(' + queryParams + ')';
         console.log(query);
         st.db.query(query, function (err, insertResult) {
-            console.log(insertResult);
+            //console.log(insertResult);
             if (!err) {
                 if (insertResult) {
                     if (insertResult[0]) {
@@ -88,7 +87,7 @@ Sos.prototype.saveSos = function(req,res,next) {
                             var queryParameters = 'select EZEID,tid,IPhoneDeviceID as iphoneID from tmaster where tid=' + insertResult[0][i].masterid;
                             console.log(queryParameters);
                             st.db.query(queryParameters, function (err, details) {
-                                console.log(details);
+                                //console.log(details);
                                 if (details) {
                                     if (details[0]) {
                                         if (details[0].length > 0) {
@@ -98,18 +97,18 @@ Sos.prototype.saveSos = function(req,res,next) {
                                         var queryParams2 = 'select tid,GroupName from tmgroups where AdminID=' + details[0].tid + ' and grouptype=1';
                                         console.log(queryParams2);
                                         st.db.query(queryParams2, function (err, userDetails) {
-                                            console.log(userDetails);
+                                            //console.log(userDetails);
 
                                             if (userDetails) {
                                                 if (userDetails[0]) {
 
                                                     var receiverId = userDetails[0].tid;
                                                     var senderTitle = {
-                                                        b1: req.body.b1 ? req.body.b1 : 0,
-                                                        b2: req.body.b2 ? req.body.b2 : 0,
-                                                        b3: req.body.b3 ? req.body.b3 : 0,
-                                                        b4: req.body.b4 ? req.body.b4 : 0,
-                                                        b5: req.body.b5 ? req.body.b5 : 0
+                                                        b1: (req.body.b1) ? req.body.b1 : 0,
+                                                        b2: (req.body.b2) ? req.body.b2 : 0,
+                                                        b3: (req.body.b3) ? req.body.b3 : 0,
+                                                        b4: (req.body.b4) ? req.body.b4 : 0,
+                                                        b5: (req.body.b5) ? req.body.b5 : 0
                                                     };
                                                     var groupId = '';
                                                     var groupTitle = userDetails[0].GroupName;
@@ -117,8 +116,14 @@ Sos.prototype.saveSos = function(req,res,next) {
                                                     var messageType = 10;
                                                     var operationType = 0;
                                                     var iphoneId = iphoneID;
-                                                    var messageId = '', msgUserid = '', masterid = '', prioritys = '';
-                                                    var a_name = '', dateTime = '', latitude = req.body.lat, longitude = req.body.lng;
+                                                    var messageId = '';
+                                                    var msgUserid = '';
+                                                    var masterid = '';
+                                                    var prioritys = '';
+                                                    var a_name = '';
+                                                    var dateTime = ''
+                                                    var latitude = req.body.lat;
+                                                    var longitude = req.body.lng;
                                                     //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
                                                     notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
                                                 }
@@ -175,9 +180,7 @@ Sos.prototype.saveSos = function(req,res,next) {
 Sos.prototype.postSos = function(req,res,next) {
 
 
-    var _this = this;
-
-    var request = req.body.request ? req.body.request : '';
+    var request = (req.body.request) ? req.body.request : '';
     var mobile = req.body.mobile;
     var latitude = req.body.lat;
     var longitude = req.body.lng;
@@ -246,7 +249,6 @@ Sos.prototype.postSos = function(req,res,next) {
  */
 Sos.prototype.loadSosRequest = function(req,res,next) {
 
-    var _this = this;
 
     var masterId = req.query.master_id;
 
@@ -319,7 +321,6 @@ Sos.prototype.loadSosRequest = function(req,res,next) {
  */
 Sos.prototype.updateSosRequest = function(req,res,next) {
 
-    var _this = this;
 
     var id = req.body.id;    // tid
     var token = req.body.token;
@@ -363,8 +364,14 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
                             var messageType = 11;
                             var operationType = 0;
                             var iphoneId = iphoneID;
-                            var messageId = '', msgUserid = '', masterid = '', prioritys = '';
-                            var a_name = '', dateTime = '', latitude = '', longitude = '';
+                            var messageId = '';
+                            var msgUserid = '';
+                            var masterid = '';
+                            var prioritys = '';
+                            var a_name = '';
+                            var dateTime = '';
+                            var latitude = '';
+                            var longitude = '';
 
                             notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid);
                         }
@@ -419,18 +426,17 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
  */
 Sos.prototype.saveSosServiceProvider = function(req,res,next) {
 
-    var _this = this;
 
     var token = req.body.token;
     var latitude = req.body.lat;
     var longitude = req.body.lng;
     var proximity = req.body.proximity;
     var mobile = req.body.mobile;
-    var b1 = req.body.b1 ? req.body.b1 : 0;   // 0-unselect 1-select
-    var b2 = req.body.b2 ? req.body.b2 : 0;
-    var b3 = req.body.b3 ? req.body.b3 : 0;
-    var b4 = req.body.b4 ? req.body.b4 : 0;
-    var b5 = req.body.b5 ? req.body.b5 : 0;
+    var b1 = (req.body.b1) ? req.body.b1 : 0;   // 0-unselect 1-select
+    var b2 = (req.body.b2) ? req.body.b2 : 0;
+    var b3 = (req.body.b3) ? req.body.b3 : 0;
+    var b4 = (req.body.b4) ? req.body.b4 : 0;
+    var b5 = (req.body.b5) ? req.body.b5 : 0;
 
     var responseMessage = {
         status: false,
@@ -496,8 +502,6 @@ Sos.prototype.saveSosServiceProvider = function(req,res,next) {
  * @description api code for load sos
  */
 Sos.prototype.getSosServiceProvider = function(req,res,next) {
-
-    var _this = this;
 
     var token = req.query.token;
 

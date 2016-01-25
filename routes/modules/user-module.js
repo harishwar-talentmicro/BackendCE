@@ -139,7 +139,7 @@ User.prototype.getLoginDetails = function(req,res,next){
     /**
      * @todo FnGetLoginDetails
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -223,7 +223,7 @@ User.prototype.getCountry = function(req,res,next){
     /**
      * @todo FnGetCountry
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -279,14 +279,14 @@ User.prototype.getState = function(req,res,next){
     /**
      * @todo FnGetState
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var LangID = parseInt(req.query.LangID);
         var CountryID = parseInt(req.query.CountryID);
 
-        if (CountryID.toString() != 'NaN' && LangID.toString() != 'NaN') {
+        if (!isNaN(CountryID) && !isNaN(LangID)) {
             var Query = 'Select StateID, StateName  from mstate where LangID=' + st.db.escape(LangID) + ' and CountryID=' + st.db.escape(CountryID);
             // console.log(Query);
             st.db.query(Query, function (err, StateResult) {
@@ -337,10 +337,10 @@ User.prototype.getState = function(req,res,next){
             });
         }
         else {
-            if (LangID.toString() == 'NaN') {
+            if (isNaN(LangID)) {
                 console.log('LangID is empty');
             }
-            else if (CountryID.toString() == 'NaN') {
+            else if (isNaN(CountryID)) {
                 console.log('CountryId is empty');
             }
             res.statusCode = 400;
@@ -365,14 +365,14 @@ User.prototype.getCity = function(req,res,next){
     /**
      * @todo FnGetCity
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var LangID = parseInt(req.query.LangID);
         var StateID = parseInt(req.query.StateID);
-        if (LangID.toString() != 'NaN' && StateID.toString() != 'NaN') {
+        if (!isNaN(LangID) && !isNaN(StateID)) {
             var Query = 'Select  CityID, CityName from mcity where LangID=' + st.db.escape(LangID) + ' and StateID= ' + st.db.escape(StateID);
             st.db.query(Query, function (err, CityResult) {
                 if (!err) {
@@ -399,10 +399,10 @@ User.prototype.getCity = function(req,res,next){
             });
         }
         else {
-            if (LangID.toString() == 'NaN') {
+            if (isNaN(LangID)) {
                 console.log('FnGetCity: LangId is empty');
             }
-            else if (StateID.toString() == 'NaN') {
+            else if (isNaN(StateID)) {
                 console.log('FnGetCity: StateID is empty');
             }
             res.statusCode = 400;
@@ -427,7 +427,7 @@ User.prototype.getUserDetails = function(req,res,next){
     /**
      * @todo FnGetUserDetails
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -442,7 +442,7 @@ User.prototype.getUserDetails = function(req,res,next){
                     if (tokenResult) {
                         st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ')', function (err, UserDetailsResult) {
                             if (!err) {
-                                console.log('UserDetailsResult',UserDetailsResult);
+                                //console.log('UserDetailsResult',UserDetailsResult);
                                 if (UserDetailsResult[0]) {
                                     if (UserDetailsResult[0].length > 0) {
                                         UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
@@ -505,7 +505,7 @@ User.prototype.checkEzeid = function(req,res,next){
     /**
      * @todo FnCheckEzeid
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -518,7 +518,7 @@ User.prototype.checkEzeid = function(req,res,next){
             var Query = 'Select EZEID from tmaster where EZEID=' + st.db.escape(EZEID);
             //var Query = 'CALL pcheckEzeid(' + st.db.escape(EZEID) + ')';
             st.db.query(Query, function (err, EzeidExitsResult) {
-                console.log(EzeidExitsResult);
+                //console.log(EzeidExitsResult);
                 if (!err) {
                     if(EzeidExitsResult) {
                         if (EzeidExitsResult.length > 0) {
@@ -571,7 +571,7 @@ User.prototype.changePassword = function(req,res,next){
     /**
      * @todo FnChangePassword
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -626,7 +626,7 @@ User.prototype.changePassword = function(req,res,next){
                                                         }
                                                         else{
                                                             if(passChangeResult){
-                                                                console.log(passChangeResult);
+                                                                //console.log(passChangeResult);
                                                                 RtnMessage.IsChanged = true;
                                                                 res.status(200).json(RtnMessage);
                                                             }
@@ -697,7 +697,7 @@ User.prototype.forgetPassword = function(req,res,next){
     /**
      * @todo FnForgetPassword
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -772,7 +772,7 @@ User.prototype.forgetPassword = function(req,res,next){
                                                         email.html = mailOptions.html;
 
                                                         sendgrid.send(email, function (err, result) {
-                                                            console.log(result);
+                                                            //console.log(result);
                                                             if (!err) {
                                                                 if (result.message == 'success') {
                                                                     var post = {
@@ -1095,7 +1095,7 @@ User.prototype.decryptPassword = function(req,res,next){
     /**
      * @todo FnDecryptPassword
      */
-    var _this = this;
+
     try {
 //res.setHeader("Access-Control-Allow-Origin", "*");
 //res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1110,7 +1110,7 @@ User.prototype.decryptPassword = function(req,res,next){
             Password : ''
         };
         RtnMessage.Password = FnDecrypt(password);
-        console.log(RtnMessage.Password);
+        //console.log(RtnMessage.Password);
         res.send(RtnMessage);
 
 
@@ -1154,7 +1154,7 @@ User.prototype.getCompanyProfile = function(req,res,next){
     /**
      * @todo FnGetCompanyProfile
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1217,6 +1217,10 @@ User.prototype.getCompanyProfile = function(req,res,next){
                 console.log('FnGetCompanyProfile: TID is empty');
                 RtnMessage.Message = 'TID is empty';
             }
+            else if(Token == null){
+                console.log('FnGetCompanyProfile: Token is empty');
+                RtnMessage.Message = 'Token is empty';
+            }
             res.statusCode=400;
             res.send(RtnMessage);
         }
@@ -1239,7 +1243,7 @@ User.prototype.saveCompanyProfile = function(req,res,next){
     /**
      * @todo FnSaveCompanyProfile
      */
-    var _this = this;
+
     try{
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1332,7 +1336,7 @@ User.prototype.getWebLink = function(req,res,next){
     /**
      * @todo FnGetWebLink
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1419,7 +1423,7 @@ User.prototype.saveWebLink = function(req,res,next){
     /**
      * @todo FnSaveWebLink
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1524,7 +1528,7 @@ User.prototype.deleteWebLink = function(req,res,next){
     /**
      * @todo FnDeleteWebLink
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1612,7 +1616,7 @@ User.prototype.getEzeidDetails = function(req,res,next){
     /**
      * @todo FnEZEIDPrimaryDetails
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1716,7 +1720,7 @@ User.prototype.getResume = function(req,res,next){
     /**
      * @todo FnGetCVInfo
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1803,7 +1807,7 @@ User.prototype.saveResume = function(req,res,next){
     /**
      * @todo FnSaveCVInfo
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1833,12 +1837,12 @@ User.prototype.saveResume = function(req,res,next){
          */
         var salary = req.body.salary;  // Float (Decimal)
         var noticePeriod = req.body.notice_period; // Integer, in days
-        var experience = req.body.experience ? req.body.experience : 0; //
-        var currentEmployeer = req.body.current_employeer ? req.body.current_employeer : '';
-        var currentJobTitle = req.body.current_job_title ? req.body.current_job_title : '';
+        var experience = (req.body.experience) ? req.body.experience : 0; //
+        var currentEmployeer = (req.body.current_employeer) ? req.body.current_employeer : '';
+        var currentJobTitle = (req.body.current_job_title) ? req.body.current_job_title : '';
         var jobType = req.body.job_type;
         var locationsList = req.body.job_location;
-        var categoryID = req.body.category_id ? req.body.category_id : 0;
+        var categoryID = (req.body.category_id) ? req.body.category_id : 0;
         //var instituteID = req.body.institute_id ? req.body.institute_id : 0;
         //var institueTitle = req.body.institute_title ? req.body.institute_title : '';
         var expectedSalary = (parseFloat(req.body.exp_salary) !== NaN) ? parseFloat(req.body.exp_salary) : 0.00;
@@ -1847,8 +1851,8 @@ User.prototype.saveResume = function(req,res,next){
         var email = req.body.eid;
         var mobile = req.body.mn;
         var tid = req.body.tid;
-        var salarytype = req.body.salary_type ? req.body.salary_type : 0;
-        var expectedSalarytype = req.body.exp_salary_type ? req.body.exp_salary_type : 0;
+        var salarytype = (req.body.salary_type) ? req.body.salary_type : 0;
+        var expectedSalarytype = (req.body.exp_salary_type) ? req.body.exp_salary_type : 0;
 
         var locMatrix = req.body.locMatrix;
         locMatrix= JSON.parse(JSON.stringify(locMatrix));
@@ -2216,7 +2220,7 @@ User.prototype.saveResume = function(req,res,next){
 };
 
 function FnSaveSkills(skill, CallBack) {
-    var _this = this;
+
     try {
 
         //below query to check token exists for the users or not.
@@ -2301,9 +2305,8 @@ User.prototype.getSkills = function(req,res,next){
     /**
      * @todo FnPGetSkills
      */
-    var _this = this;
 
-    var functionId = req.query.fid ? req.query.fid : 0;
+    var functionId = (req.query.fid) ? req.query.fid : 0;
     var type = req.query.type;  //0-core,1-soft
     var responseMsg = {
         status : false,
@@ -2351,7 +2354,7 @@ User.prototype.getDocPin = function(req,res,next) {
     /**
      * @todo FnGetDocPin
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -2428,7 +2431,7 @@ User.prototype.getDoc = function(req,res,next) {
     /**
      * @todo FnGetDoc
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -2513,13 +2516,13 @@ User.prototype.getDocument = function(req,res,next) {
     /**
      * @todo FnGetDocument
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.TokenNo;
         var Type = parseInt(req.query.RefType);
-        var cvid = req.query.cvid ? parseInt(req.query.cvid) : 0;
+        var cvid = (req.query.cvid) ? parseInt(req.query.cvid) : 0;
         if (Token && !isNaN(Type) && Type.toString() != '0') {
             st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
@@ -2606,7 +2609,7 @@ User.prototype.updateDocPin = function(req,res,next) {
     /**
      * @todo FnUpdateDocPin
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -2692,7 +2695,7 @@ User.prototype.saveDoc = function(req,res,next) {
     /**
      * @todo FnSaveDoc
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -2784,7 +2787,7 @@ User.prototype.getFunctions = function(req,res,next) {
     /**
      * @todo FnGetFunctions
      */
-    var _this = this;
+
     var type = (!isNaN(parseInt(req.query.type))) ?  parseInt(req.query.type) : 0;
 
     try {
@@ -2839,7 +2842,7 @@ User.prototype.uploadDoc = function(req,res,next) {
     /**
      * @todo FnUploadDocument
      */
-    var _this = this;
+
     try {
 
         var deleteTempFile = function(){
@@ -2857,8 +2860,8 @@ User.prototype.uploadDoc = function(req,res,next) {
         var CntType = req.files.file.mimetype;
         var RefFileName = req.files.file.path;
         var tRefType = req.body.RefType;
-        var cvid = req.body.cvid ? parseInt(req.body.cvid) : 0;
-        var isinternal = req.body.isinternal ? parseInt(req.body.isinternal) : 0;
+        var cvid = (req.body.cvid) ? parseInt(req.body.cvid) : 0;
+        var isinternal = (req.body.isinternal) ? parseInt(req.body.isinternal) : 0;
         //console.log(req.body);
 
         st.validateToken(Token, function (err, tokenResult) {
@@ -2965,7 +2968,7 @@ var FnGetRedirectLink = function(ezeid,tag,redirectCallback) {
     var query = 'select tid from tmaster where ezeid=' + st.db.escape(ezeid);
     st.db.query(query, function (err, result) {
         if (!err) {
-            console.log(result);
+            //console.log(result);
             if(result) {
 
                 var query1 = 'SELECT tid,imageurl,pin,imagefilename as URL,tag FROM t_docsandurls WHERE masterid=' + st.db.escape(result[0].tid) + ' AND tag=' + st.db.escape(tag) + ' AND imageurl=1';
@@ -2974,7 +2977,7 @@ var FnGetRedirectLink = function(ezeid,tag,redirectCallback) {
                     if (!err) {
                         if(results) {
                             if (results.length > 0) {
-                                console.log(results);
+                                //console.log(results);
                                 redirectCallback(results[0].URL);
                             }
                             else {
@@ -3013,9 +3016,10 @@ User.prototype.webLinkRedirect = function(req,res,next) {
      * @todo FnWebLinkRedirect
      */
 
-
-    var _this = this;
-    var ezeid,tag, pin,output=[];
+    var ezeid;
+    var tag;
+    var pin;
+    var output=[];
 
     var respMsg = {
         status: false,
@@ -3063,8 +3067,8 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                         if (results) {
                             if (results[0]) {
                                 console.log('----results.length-----');
-                                console.log(results[0].length);
-                                console.log(results);
+                                //console.log(results[0].length);
+                               // console.log(results);
 
                                 if(results[0][0]){
                                     /**
@@ -3170,7 +3174,7 @@ User.prototype.getMTitle = function(req,res,next) {
     /**
      * @todo FnGetMTitle
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -3222,7 +3226,7 @@ User.prototype.updateProfilePicture = function(req,res,next) {
     /**
      * @todo FnUpdateProfilePicture
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -3340,7 +3344,6 @@ User.prototype.getLoginCheck = function(req,res,next) {
     /**
      * @todo FnGetLoginCheck
      */
-    var _this = this;
 
     try {
 
@@ -3400,7 +3403,6 @@ User.prototype.getProxmity = function(req,res,next) {
     /**
      * @todo FnGetProxmity
      */
-    var _this = this;
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -3448,7 +3450,6 @@ User.prototype.getProxmity = function(req,res,next) {
  */
 User.prototype.getInstitutes = function(req,res,next) {
 
-    var _this = this;
     var token = req.query.token;
     var responseMsg = {
         status: false,
@@ -3457,7 +3458,8 @@ User.prototype.getInstitutes = function(req,res,next) {
         error: {}
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
     if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -3535,7 +3537,6 @@ User.prototype.getInstitutes = function(req,res,next) {
  */
 User.prototype.getEducations = function(req,res,next) {
 
-    var _this = this;
     var token = req.query.token;
     var responseMsg = {
         status: false,
@@ -3544,7 +3545,8 @@ User.prototype.getEducations = function(req,res,next) {
         error: {}
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
     if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -3622,9 +3624,8 @@ User.prototype.getEducations = function(req,res,next) {
  */
 User.prototype.getSpecialization = function(req,res,next) {
 
-    var _this = this;
     var token = req.query.token;
-    var educationId = req.query.education_id ? req.query.education_id : '';
+    var educationId = (req.query.education_id) ? req.query.education_id : '';
     var responseMsg = {
         status: false,
         data: [],
@@ -3632,7 +3633,8 @@ User.prototype.getSpecialization = function(req,res,next) {
         error: {}
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
     if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -3710,7 +3712,6 @@ User.prototype.getSpecialization = function(req,res,next) {
  */
 User.prototype.getVerifiedInstitutes = function(req,res,next) {
 
-    var _this = this;
     var token = req.query.token;
     var responseMsg = {
         status: false,
@@ -3719,7 +3720,8 @@ User.prototype.getVerifiedInstitutes = function(req,res,next) {
         error: {}
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
     if (!token) {
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -3741,7 +3743,7 @@ User.prototype.getVerifiedInstitutes = function(req,res,next) {
                                 res.status(400).json(responseMsg);
                             }
                             else {
-                                console.log(verifiedinstituteResult);
+                                //console.log(verifiedinstituteResult);
                                 if(verifiedinstituteResult) {
                                     if(verifiedinstituteResult[0]) {
                                         responseMsg.status = true;
@@ -3808,36 +3810,34 @@ User.prototype.getVerifiedInstitutes = function(req,res,next) {
  */
 User.prototype.saveUserDetails = function(req,res,next){
 
-    var _this = this;
-
     var token  = req.body.token;
-    var firstName  = req.body.first_name ? req.body.first_name : '';
-    var lastName = req.body.last_name ? req.body.last_name : '';
-    var companyName = req.body.company_name ? req.body.company_name : '';
-    var jobTitle  = req.body.job_title ? req.body.job_title : '';
-    var gender  = req.body.gender ? req.body.gender : '';
+    var firstName  = (req.body.first_name) ? req.body.first_name : '';
+    var lastName = (req.body.last_name) ? req.body.last_name : '';
+    var companyName = (req.body.company_name) ? req.body.company_name : '';
+    var jobTitle  = (req.body.job_title) ? req.body.job_title : '';
+    var gender  = (req.body.gender) ? req.body.gender : '';
     var dob  = req.body.dob;
     var companyTagline  = req.body.company_tagline;
-    var email  = req.body.email ? req.body.email : '';
+    var email  = (req.body.email) ? req.body.email : '';
     var visibleEmail = (!isNaN(parseInt(req.body.ve))) ?  parseInt(req.body.ve) : 1; // 0-invisible, 1- visible
     var visibleMobile = (!isNaN(parseInt(req.body.vm))) ?  parseInt(req.body.vm) : 1;     // 0-invisible, 1- visible
     var visiblePhone = (!isNaN(parseInt(req.body.vp))) ?  parseInt(req.body.vp) : 1;// 0-invisible, 1- visible
     var visibleAddress = (!isNaN(parseInt(req.body.va))) ?  parseInt(req.body.va) : 1;// 0-invisible, 1- visible
-    var locTitle = req.body.loc_title ? req.body.loc_title : '';
-    var latitude = req.body.lat ? req.body.lat : '';
-    var longitude = req.body.lng ? req.body.lng : '';
-    var address1 = req.body.address_line1 ? req.body.address_line1 : '';
-    var address2 = req.body.address_line2 ? req.body.address_line2 : '';
-    var city = req.body.city ? req.body.city : '';
-    var stateId = req.body.state_id ?  req.body.state_id : '';
-    var countryId = req.body.country_id ? req.body.country_id : '';
-    var postalCode = req.body.postal_code ? req.body.postal_code : '';
-    var phone = req.body.ph ? req.body.ph : '';
-    var mobile = req.body.mn ? req.body.mn : '';
-    var website = req.body.website ? req.body.website : '';
-    var isdPhone = req.body.isd_phone ? req.body.isd_phone : '';
-    var isdMobile = req.body.isd_mobile ? req.body.isd_mobile : '';
-    var parkingStatus = req.body.parking_status ? req.body.parking_status : '';
+    var locTitle = (req.body.loc_title) ? req.body.loc_title : '';
+    var latitude = (req.body.lat) ? req.body.lat : '';
+    var longitude = (req.body.lng) ? req.body.lng : '';
+    var address1 = (req.body.address_line1) ? req.body.address_line1 : '';
+    var address2 = (req.body.address_line2) ? req.body.address_line2 : '';
+    var city = (req.body.city) ? req.body.city : '';
+    var stateId = (req.body.state_id) ?  req.body.state_id : '';
+    var countryId = (req.body.country_id) ? req.body.country_id : '';
+    var postalCode = (req.body.postal_code) ? req.body.postal_code : '';
+    var phone = (req.body.ph) ? req.body.ph : '';
+    var mobile = (req.body.mn) ? req.body.mn : '';
+    var website = (req.body.website) ? req.body.website : '';
+    var isdPhone = (req.body.isd_phone) ? req.body.isd_phone : '';
+    var isdMobile = (req.body.isd_mobile) ? req.body.isd_mobile : '';
+    var parkingStatus = (req.body.parking_status) ? req.body.parking_status : '';
     var templateId = (!isNaN(parseInt(req.body.template_id))) ? parseInt(req.body.template_id) : '';
     var pin = req.body.pin ? req.body.pin : null;
     var statusId = (!isNaN(parseInt(req.body.status_id))) ?  parseInt(req.body.status_id) : 1;  // 1-active, 2-inactive
@@ -3854,7 +3854,8 @@ User.prototype.saveUserDetails = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -3870,7 +3871,7 @@ User.prototype.saveUserDetails = function(req,res,next){
         try {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    console.log(tokenResult);
+                    //console.log(tokenResult);
                     if (tokenResult) {
                         var queryParams =  st.db.escape(firstName) + ',' + st.db.escape(lastName)
                             + ',' + st.db.escape(companyName)+ ','+ st.db.escape(jobTitle) + ',' + st.db.escape(gender)
@@ -3903,29 +3904,29 @@ User.prototype.saveUserDetails = function(req,res,next){
                                             dob: req.body.dob,
                                             company_tagline: req.body.company_tagline,
                                             email: req.body.email,
-                                            ve: req.body.ve ? parseInt(req.body.ve) : 1,
-                                            vm: req.body.vm ? parseInt(req.body.vm) : 1,
-                                            vp: req.body.vp ? parseInt(req.body.vp) : 1,
-                                            va: req.body.va ? parseInt(req.body.va) : 1,
-                                            loc_title: req.body.loc_title ? req.body.loc_title : '',
-                                            lat: req.body.lat ? req.body.lat : '',
-                                            lng: req.body.lng ? req.body.lng : '',
-                                            address_line1: req.body.address_line1 ? req.body.address_line1 : '',
-                                            address_line2: req.body.address_line2 ? req.body.address_line2 : '',
-                                            city: req.body.city ? req.body.city : '',
-                                            state_id: req.body.state_id ? parseInt(req.body.state_id) : 0,
-                                            country_id: req.body.country_id ? parseInt(req.body.country_id) : 0,
-                                            postal_code: req.body.postal_code ? req.body.postal_code : '',
-                                            ph: req.body.ph ? req.body.ph : '',
-                                            mn: req.body.mn ? req.body.mn : '',
-                                            website: req.body.website ? req.body.website : '',
-                                            isd_phone: req.body.isd_phone ? req.body.isd_phone : '',
-                                            isd_mobile: req.body.isd_mobile ? req.body.isd_mobile : '',
-                                            parking_status: req.body.parking_status ? req.body.parking_status : '',
-                                            template_id: req.body.template_id ? parseInt(req.body.template_id) : '',
-                                            pin: req.body.pin ? parseInt(req.body.pin) : null,
-                                            keywords: req.body.keywords ? req.body.keywords : '',
-                                            about_company: req.body.about_company ? req.body.about_company : ''
+                                            ve: (req.body.ve) ? parseInt(req.body.ve) : 1,
+                                            vm: (req.body.vm) ? parseInt(req.body.vm) : 1,
+                                            vp: (req.body.vp) ? parseInt(req.body.vp) : 1,
+                                            va: (req.body.va) ? parseInt(req.body.va) : 1,
+                                            loc_title: (req.body.loc_title) ? req.body.loc_title : '',
+                                            lat: (req.body.lat) ? req.body.lat : '',
+                                            lng: (req.body.lng) ? req.body.lng : '',
+                                            address_line1: (req.body.address_line1) ? req.body.address_line1 : '',
+                                            address_line2: (req.body.address_line2) ? req.body.address_line2 : '',
+                                            city: (req.body.city) ? req.body.city : '',
+                                            state_id: (req.body.state_id) ? parseInt(req.body.state_id) : 0,
+                                            country_id: (req.body.country_id) ? parseInt(req.body.country_id) : 0,
+                                            postal_code: (req.body.postal_code) ? req.body.postal_code : '',
+                                            ph: (req.body.ph) ? req.body.ph : '',
+                                            mn: (req.body.mn) ? req.body.mn : '',
+                                            website: (req.body.website) ? req.body.website : '',
+                                            isd_phone: (req.body.isd_phone) ? req.body.isd_phone : '',
+                                            isd_mobile: (req.body.isd_mobile) ? req.body.isd_mobile : '',
+                                            parking_status: (req.body.parking_status) ? req.body.parking_status : '',
+                                            template_id: (req.body.template_id) ? parseInt(req.body.template_id) : '',
+                                            pin: (req.body.pin) ? parseInt(req.body.pin) : null,
+                                            keywords: (req.body.keywords) ? req.body.keywords : '',
+                                            about_company: (req.body.about_company) ? req.body.about_company : ''
 
                                         };
                                         res.status(200).json(responseMessage);
@@ -4110,7 +4111,6 @@ User.prototype.getUserDetailsNew = function(req,res,next){
  * @description api code for send resume
  */
 User.prototype.sendResume = function(req,res,next){
-    var _this = this;
 
     var token = req.body.token;
     var cvid = (!isNaN(parseInt(req.body.cvid))) ? parseInt(req.body.cvid):0;
@@ -4122,7 +4122,8 @@ User.prototype.sendResume = function(req,res,next){
         data: []
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -4225,7 +4226,6 @@ User.prototype.sendResume = function(req,res,next){
  * @description api code for download resume
  */
 User.prototype.downloadResume = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var id = parseInt(req.query.id);
@@ -4237,7 +4237,8 @@ User.prototype.downloadResume = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -4337,12 +4338,14 @@ User.prototype.downloadResume = function(req,res,next){
  * @description api code for get conveyance report
  */
 User.prototype.getConveyanceReport = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var startDate = req.query.s_date;
     var endDate = req.query.e_date;
-    var pdfcontent='',data1,total=0;
+    var pdfcontent='';
+    var data1;
+    var total=0;
+
 
     var path = require('path');
 
@@ -4360,7 +4363,8 @@ User.prototype.getConveyanceReport = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -4617,7 +4621,6 @@ User.prototype.getindustryType = function(req,res,next) {
     /**
      * @todo FnGetindustryType
      */
-    var _this = this;
     var responseMsg = {
         status: false,
         data: [],
@@ -4673,7 +4676,6 @@ User.prototype.getindustryType = function(req,res,next) {
  * @description api code for get industry category
  */
 User.prototype.getindustrycategory = function(req,res,next){
-    var _this = this;
 
     var industryId = req.query.iid;
 
@@ -4747,8 +4749,6 @@ User.prototype.getindustrycategory = function(req,res,next){
  */
 User.prototype.profilePicForEzeid = function(req,res,next){
 
-    var _this = this;
-
     var ezeid = alterEzeoneId(req.query.ezeid);
 
     var responseMessage = {
@@ -4758,7 +4758,8 @@ User.prototype.profilePicForEzeid = function(req,res,next){
         data: {s_url:''}
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
 
     if(!ezeid){

@@ -6,9 +6,6 @@
  */
 "use strict";
 
-var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeone.com';
-
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -41,7 +38,6 @@ function Planner(db,stdLib){
  * @description api code for get all tasks based on timestamp
  */
 Planner.prototype.getAllTask = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var startTime = req.query.s_time;    // YYYY-MM-DD HH:mm:ss
@@ -54,7 +50,8 @@ Planner.prototype.getAllTask = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -76,7 +73,7 @@ Planner.prototype.getAllTask = function(req,res,next){
                         console.log(taskQuery);
 
                         st.db.query(taskQuery, function (err, taskResult) {
-                            //console.log(getResult);
+                            //console.log(taskResult);
                             if (!err) {
                                 if (taskResult) {
                                     if (taskResult[0]) {
@@ -167,7 +164,6 @@ Planner.prototype.getAllTask = function(req,res,next){
  * @description api code for get transaction based on tid
  */
 Planner.prototype.getTrans = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var tid = parseInt(req.query.tid);
@@ -180,7 +176,8 @@ Planner.prototype.getTrans = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';

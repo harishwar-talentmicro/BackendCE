@@ -46,7 +46,7 @@ Search.prototype.searchKeyword = function(req,res,next){
     /**
      * @todo FnSearchByKeywords
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -73,10 +73,10 @@ Search.prototype.searchKeyword = function(req,res,next){
         if(type.toString() == 'NaN')
             type = 0;
 
-        var isPagination = req.body.isPagination ? parseInt(req.body.isPagination) : 0 ;
-        var pagesize = req.body.pagesize ? parseInt(req.body.pagesize) : 0;
-        var pagecount = req.body.pagecount ? parseInt(req.body.pagecount) : 0;
-        var total = req.body.total ? parseInt(req.body.total) : 0;
+        var isPagination = (req.body.isPagination) ? parseInt(req.body.isPagination) : 0 ;
+        var pagesize = (req.body.pagesize) ? parseInt(req.body.pagesize) : 0;
+        var pagecount = (req.body.pagecount) ? parseInt(req.body.pagecount) : 0;
+        var total = (req.body.total) ? parseInt(req.body.total) : 0;
         var promotionFlag = (req.body.promotion_flag) ? ((parseInt(req.body.promotion_flag) == 1) ? req.body.promotion_flag : 2) : 2;
 
 
@@ -169,8 +169,8 @@ Search.prototype.searchKeyword = function(req,res,next){
                             console.log('CALL pSearchResultNew(' + SearchQuery + ')');
                             st.db.query('CALL pSearchResultNew(' + SearchQuery + ')', function (err, SearchResult) {
                                 // st.db.query(searchQuery, function (err, SearchResult) {
-                                console.log(SearchResult[0]);
-                                console.log(SearchResult[1]);
+                                //console.log(SearchResult[0]);
+                                //console.log(SearchResult[1]);
                                 if (!err) {
                                     if (SearchResult[0]) {
                                         if (SearchResult[0].length > 0) {
@@ -196,7 +196,7 @@ Search.prototype.searchKeyword = function(req,res,next){
                                             }
                                             else {
                                                 console.log('coming..2');
-                                                console.log(SearchResult[0]);
+                                                //console.log(SearchResult[0]);
                                                 res.send(SearchResult[0]);
                                                 //res.json({
                                                 //    totalcount: 1,
@@ -276,7 +276,7 @@ Search.prototype.searchKeyword = function(req,res,next){
 
             }
             else {
-                if (find == null || find == '') {
+                if (!find) {
                     console.log('FnSearchByKeywords: keyword is empty');
                 }
                 else if (CurrentDate == null || CurrentDate == '') {
@@ -481,18 +481,18 @@ Search.prototype.searchInformation = function(req,res,next){
     /**
      * @todo FnGetSearchInformationNew
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var Token = req.query.Token ? req.query.Token : '';
+        var Token = (req.query.Token) ? req.query.Token : '';
         var ezeTerm = alterEzeoneId(req.query.ezeTerm);
         var CurrentDate = req.query.CurrentDate;
         var IPAddress = req._remoteAddress; //(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
-        var latitude = req.query.lat ? req.query.lat : 0;
-        var longitude = req.query.lng ? req.query.lng : 0;
+        var latitude = (req.query.lat) ? req.query.lat : 0;
+        var longitude = (req.query.lng) ? req.query.lng : 0;
         var output = [];
 
         var WorkingDate;
@@ -643,7 +643,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
     /**
      * @todo FnGetWorkingHrsHolidayList
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -808,8 +808,8 @@ function FnWorkingHours(WorkingContent, CallBack) {
 
         if (WorkingContent) {
 
-            console.log('WorkingContent values');
-            console.log(WorkingContent);
+            //console.log('WorkingContent values');
+           // console.log(WorkingContent);
 
             var query = st.db.escape(WorkingContent.Token) + ',' + st.db.escape(WorkingContent.LocID);
             st.db.query('CALL pGetWorkingHours(' + query + ')', function (err, WorkingResult) {
@@ -864,8 +864,8 @@ function FnHolidayList(HolidayContent, CallBack) {
 
         if (HolidayContent) {
 
-            console.log('HolidayContent values');
-            console.log(HolidayContent);
+            //console.log('HolidayContent values');
+            //console.log(HolidayContent);
 
             var query = st.db.escape(HolidayContent.LocID) + ',' + st.db.escape(0);
             st.db.query('CALL pGetHolidayList(' + query + ')', function (err, HolidayResult) {
@@ -924,7 +924,7 @@ Search.prototype.getBanner = function(req,res,next){
     /**
      * @todo FnGetBannerPicture
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -939,12 +939,12 @@ Search.prototype.getBanner = function(req,res,next){
         };
         RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
         Ezeid = Ezeid.split(',').pop();
-        if ( SeqNo.toString() != 'NaN' && Ezeid != null && LocID != null) {
+        if ( !isNaN(SeqNo)&& Ezeid != null && LocID != null) {
             var Query = st.db.escape(Ezeid) + ',' + st.db.escape(SeqNo) + ',' + st.db.escape(0);
-            //console.log(InsertQuery);
+            console.log(Query);
             st.db.query('CALL PGetBannerPicsUsers(' + Query + ')', function (err, BannerResult) {
                 if (!err) {
-                    //console.log(InsertResult);
+                    //console.log(BannerResult);
                     if (BannerResult ) {
                         if(BannerResult[0]) {
                             if (BannerResult[0].length > 0) {
@@ -959,7 +959,7 @@ Search.prototype.getBanner = function(req,res,next){
                                 var fs = require('fs');
                                 //  var path = path + StateTitle+'.jpg' ;
                                 fs.exists(path + StateTitle + '.jpg', function (exists) {
-                                    console.log(exists)
+                                   // console.log(exists)
                                     if (exists) {
                                         var bitmap = fs.readFileSync(path + StateTitle + '.jpg');
                                         // convert binary data to base64 encoded string
@@ -970,7 +970,7 @@ Search.prototype.getBanner = function(req,res,next){
                                     else {
                                         // path ='D:\\Mail\\Default.jpg';
                                         fs.exists(path + StateTitle + '.jpg', function (exists) {
-                                            console.log(exists)
+                                            //console.log(exists)
                                             if (exists) {
 
                                                 var bitmap = fs.readFileSync(path + 'Default.jpg');
@@ -1006,7 +1006,7 @@ Search.prototype.getBanner = function(req,res,next){
             });
         }
         else {
-            if (SeqNo.toString() == 'NaN') {
+            if (isNaN(SeqNo)) {
                 console.log('FnGetBannerPicture: SeqNo is empty');
             }
             else if(Ezeid == null) {
@@ -1037,7 +1037,7 @@ Search.prototype.searchTracker = function(req,res,next){
     /**
      * @todo FnSearchForTracker
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1046,9 +1046,9 @@ Search.prototype.searchTracker = function(req,res,next){
         var Keyword = req.body.Keyword;
         var Latitude = req.body.Latitude;
         var Longitude = req.body.Longitude;
-        var Proximity = req.body.Proximity ? req.body.Proximity : 1;
-        var currentDateTime = req.body.CurrentDate ? req.body.CurrentDate : '';
-        var currentDateTime = req.body.CurrentDate;
+        var Proximity = (req.body.Proximity) ? req.body.Proximity : 1;
+        var currentDateTime = (req.body.CurrentDate) ? req.body.CurrentDate : '';
+        //var currentDateTime = req.body.CurrentDate;
         var trackerFlag = ((!isNaN(parseInt(req.body.Flag)))&& parseInt(req.body.Flag) > 0) ? parseInt(req.body.Flag) : 0;
 
 
@@ -1061,7 +1061,7 @@ Search.prototype.searchTracker = function(req,res,next){
                             ',' + st.db.escape(Token) + ',' +st.db.escape(currentDateTime) + ',' +st.db.escape(trackerFlag);
                         console.log('CALL pTrackerSearch(' + query + ')');
                         st.db.query('CALL pTrackerSearch(' + query + ')', function (err, GetResult) {
-                            console.log(GetResult);
+                           // console.log(GetResult);
                             if (!err) {
                                 if (GetResult) {
                                     if (GetResult[0]) {
@@ -1124,7 +1124,7 @@ Search.prototype.searchTracker = function(req,res,next){
             else if (Proximity == null) {
                 console.log('FnSearchForTracker: Proximity is empty');
             }
-            else if (currentDateTime == null) {
+            else if (!currentDateTime) {
                 console.log('FnSearchForTracker: currentDateTime is empty');
             }
             res.statusCode=400;
@@ -1148,7 +1148,6 @@ Search.prototype.getSearchDoc = function(req,res,next){
     /**
      * @todo FnGetSearchDocuments
      */
-    var _this = this;
 
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1431,9 +1430,9 @@ Search.prototype.navigateSearch = function(req,res,next){
     try {
 
         var token = req.query.token;
-        var latitude = req.query.lat ? req.query.lat : 0;
-        var longitude = req.query.lng ? req.query.lng : 0;
-        var keywords = req.query.k ? req.query.k : '';
+        var latitude = (req.query.lat) ? req.query.lat : 0;
+        var longitude = (req.query.lng) ? req.query.lng : 0;
+        var keywords = (req.query.k) ? req.query.k : '';
 
 
         var responseMessage = {
