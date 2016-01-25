@@ -292,6 +292,7 @@ router.get('/ewtGetTransaction',plannerModule.getTrans);
 //Alumni module
 var Alumni = require('./modules/alumni-module.js');
 var alumniModule = new Alumni(db,stdLib);
+router.delete('/event',alumniModule.deleteEvent);
 router.post('/alumni_content',alumniModule.saveAlumniContent);
 router.post('/alumni_profile_pic',alumniModule.saveAlumniProfilePic);
 router.post('/alumni_team',alumniModule.saveAlumniTeam);
@@ -327,7 +328,7 @@ router.get('/search_alumni', alumniModule.searchAlumni);
 router.put('/leave_alumni', alumniModule.leaveAlumni);
 router.put('/alumni_member', alumniModule.approveAlumnimembers);
 router.delete('/ten_attachment',alumniModule.deleteTenAttachment);
-router.delete('/event',alumniModule.deleteEvent);
+
 
 //new url's
 router.get('/client_list',alumniModule.getClientList);
