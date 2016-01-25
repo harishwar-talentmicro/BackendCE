@@ -109,12 +109,11 @@ Auth.prototype.register = function(req,res,next){
 
     var moment = require('moment');
 
-    dob = moment(dob).format('YYYY-MM-DD HH:mm:ss');
-
     var operationType = parseInt(req.body.OperationType);
     var ipAddress = req.ip;
     var selectionType = (!isNaN(parseInt(req.body.SelectionType))) ?  parseInt(req.body.SelectionType) : 0;
     var idtypeId = parseInt(req.body.IDTypeID);
+
     var ezeid = req.body.EZEID ? (alterEzeoneId(req.body.EZEID).toUpperCase()):'';
     var password = req.body.Password;
     var firstName = req.body.FirstName ? req.body.FirstName : '';
@@ -154,7 +153,13 @@ Auth.prototype.register = function(req,res,next){
     var parkingStatus = req.body.ParkingStatus ? req.body.ParkingStatus : 0;
     var gender = (!isNaN(parseInt(req.body.Gender))) ?  parseInt(req.body.Gender) : 2;
     var dob = (req.body.DOB) ? (req.body.DOB) : '';
-    var momentObj = moment(dob,'YYYY-MM-DD HH:mm:ss').isValid();
+    if(idtypeId != 1){
+        dob = moment().format('YYYY-MM-DD');
+    }
+
+    console.log(dob);
+
+    var momentObj = moment(dob,'YYYY-MM-DD').isValid();
     var templateId = req.body.TemplateID ? parseInt(req.body.TemplateID) : 0;
     var isIphone = req.body.device ? parseInt(req.body.device) : 0;
     var deviceToken = req.body.device_token ? req.body.device_token : '';

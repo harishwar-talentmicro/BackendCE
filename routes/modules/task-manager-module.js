@@ -258,6 +258,7 @@ TaskManager.prototype.getTasks = function(req,res,next){
                                             console.log('FnGetTasks: Tasks loaded successfully');
                                         }
                                         else {
+                                            responseMessage.status = true;
                                             responseMessage.data = getResult[0];
                                             responseMessage.message = 'Tasks loaded successfully';
                                             responseMessage.error = null;
@@ -266,9 +267,12 @@ TaskManager.prototype.getTasks = function(req,res,next){
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'Tasks not loaded';
+                                        responseMessage.status = true;
+                                        responseMessage.data = [];
+                                        responseMessage.message = 'Tasks loaded successfully';
+                                        responseMessage.error = null;
                                         res.status(200).json(responseMessage);
-                                        console.log('FnGetTasks: Tasks not loaded');
+                                        console.log('FnGetTasks: Tasks not present');
                                     }
                                 }
                                 else {

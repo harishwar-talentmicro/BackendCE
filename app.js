@@ -82,7 +82,7 @@ app.use('/api',api);
  * EZEOne Alumni Middleware
  */
 
-app.use('/',alumni);
+//app.use('/',alumni);
 app.use(express.static(path.join(__dirname,'public')));
 
 app.use('/',index);
