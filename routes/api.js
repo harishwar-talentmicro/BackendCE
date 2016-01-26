@@ -143,6 +143,7 @@ router.get('/transaction_history',businessManager.getTransactionHistory);
 router.post('/m/sales_transaction',businessManager.saveSalesRequest);
 router.get('/m/company_name',businessManager.getCompanyName);
 router.get('/m/contact_details',businessManager.getContactDetails);
+router.get('/role',businessManager.getRoles);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');

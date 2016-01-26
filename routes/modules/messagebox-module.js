@@ -100,8 +100,6 @@ BufferStream.prototype._read = function( size ) {
 
 "use strict";
 var uuid = require('node-uuid');
-var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeone.com';
 
 // attachment upload to cloud server
 var uploadDocumentToCloud = function(uniqueName,bufferData,callback){
@@ -210,7 +208,7 @@ MessageBox.prototype.createMessageGroup = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(parseInt(groupType) == NaN){
+    if(isNaN(parseInt(groupType))){
         error['groupType'] = 'Invalid groupType';
         validateStatus *= false;
     }
@@ -336,7 +334,8 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!name){
         error['name'] = 'Invalid name';
@@ -437,8 +436,8 @@ MessageBox.prototype.validateGroupName = function(req,res,next){
  */
 MessageBox.prototype.validateGroupMember = function(req,res,next){
 
-    var groupId = (parseInt(req.query.group_id) !== NaN && parseInt(req.query.group_id ) > 0) ? parseInt(req.query.group_id) : 0;
-    var token = (req.query.token) ? req.query.token : null;
+    var groupId = ((!isNaN(parseInt(req.query.group_id))) && (parseInt(req.query.group_id)) > 0) ? parseInt(req.query.group_id) : 0;
+    var token = (req.query.token) ? (req.query.token) : null;
     var ezeoneId = (req.query.ezeone_id) ? alterEzeoneId(req.query.ezeone_id) : null;
     var ezeid;
     var pin = null ;
@@ -480,7 +479,7 @@ MessageBox.prototype.validateGroupMember = function(req,res,next){
                     if (result) {
                         if (ezeidArray.length > 1) {
                             ezeid = ezeidArray[0];
-                            pin = parseInt(ezeidArray[1]) ? parseInt(ezeidArray[1]) : ezeidArray[1];
+                            pin = (!isNaN(parseInt(ezeidArray[1]))) ? parseInt(ezeidArray[1]) : null;
                         }
                         else
                         {
@@ -574,7 +573,7 @@ MessageBox.prototype.updateUserStatus = function(req,res,next){
     var groupId  = parseInt(req.body.group_id);   // groupid of receiver
     var masterId  = req.body.master_id;
     var status  = parseInt(req.body.status);      // Status 0 : Pending, 1: Accepted, 2 : Rejected, 3 : Leaved, 4 : Removed
-    var deleteStatus = (parseInt(req.body.group_type) !== NaN && parseInt(req.body.group_type) > 0)
+    var deleteStatus = ((!isNaN(parseInt(req.body.group_type))) && (parseInt(req.body.group_type) > 0))
         ? parseInt(req.body.group_type) : 0;
     var requester = (!isNaN(parseInt(req.body.requester))) ? parseInt(req.body.requester) : 2 ;
 
@@ -751,7 +750,7 @@ MessageBox.prototype.updateUserRelationship = function(req,res,next){
         error['memberId'] = 'Invalid memberId';
         validateStatus *= false;
     }
-    if(parseInt(relationType) == NaN){
+    if(isNaN(parseInt(relationType))){
         error['relationType'] = 'Invalid relationType';
         validateStatus *= false;
     }
@@ -952,16 +951,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
     var autoJoin = req.body.auto_join ? req.body.auto_join : 0;
     var relationType = req.body.relation_type;
     var userId = req.body.user_id ? req.body.user_id : 0;
-    var masterid='';
     var iosId='';
-    var receiverId;
-    var senderTitle;
-    var groupTitle;
-    var groupId;
-    var messageText;
-    var messageType;
-    var operationType;
-    var messageId;
 
     var responseMessage = {
         status: false,
@@ -980,7 +970,7 @@ MessageBox.prototype.sendMessageRequest = function(req,res,next){
         error['groupName'] = 'Invalid groupName';
         validateStatus *= false;
     }
-    if(parseInt(groupType) == NaN){
+    if(isNaN(parseInt(groupType))){
         error['groupType'] = 'Invalid groupType';
         validateStatus *= false;
     }
@@ -1885,7 +1875,8 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['toke'] = 'Invalid token';
@@ -1985,7 +1976,6 @@ MessageBox.prototype.loadOutBoxMessages = function(req,res,next){
  * @description api code for get Suggestion list
  */
 MessageBox.prototype.getSuggestionList = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var keywordsForSearch = req.query.keywordsForSearch;
@@ -1997,7 +1987,8 @@ MessageBox.prototype.getSuggestionList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!keywordsForSearch){
         error['keyword'] = 'Invalid keyword';
@@ -2465,7 +2456,6 @@ MessageBox.prototype.addGroupMembers = function(req,res,next){
  * @description api code for get Pending Request
  */
 MessageBox.prototype.getPendingRequest = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
 
@@ -2476,7 +2466,8 @@ MessageBox.prototype.getPendingRequest = function(req,res,next){
         data: []
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2579,10 +2570,9 @@ MessageBox.prototype.getPendingRequest = function(req,res,next){
  * @description api code for get group list
  */
 MessageBox.prototype.getGroupList = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
-    var groupId,count,date,arrayResult,arrayResult1,finalResult = [],invitation_count;
+    var groupId;
 
     var responseMessage = {
         status: false,
@@ -2592,7 +2582,8 @@ MessageBox.prototype.getGroupList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2661,15 +2652,29 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                                             }
                                                         }
                                                         else {
-                                                            responseMessage.message = 'GroupList not loaded';
-                                                            res.status(200).json(responseMessage);
-                                                            console.log('FnGetGroupList:GroupList not loaded');
+                                                            var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                                            st.db.query(queryCount, function (err, invitationResult) {
+                                                                responseMessage.status = true;
+                                                                responseMessage.error = null;
+                                                                responseMessage.message = 'GroupList loaded successfully';
+                                                                responseMessage.i_count = invitationResult[0].length;
+                                                                responseMessage.data = getResult[0];
+                                                                res.status(200).json(responseMessage);
+                                                                console.log('FnGetGroupList: GroupList loaded successfully');
+                                                            });
                                                         }
                                                     }
                                                     else {
-                                                        responseMessage.message = 'GroupList not loaded';
-                                                        res.status(200).json(responseMessage);
-                                                        console.log('FnGetGroupList:GroupList not loaded');
+                                                        var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                                        st.db.query(queryCount, function (err, invitationResult) {
+                                                            responseMessage.status = true;
+                                                            responseMessage.error = null;
+                                                            responseMessage.message = 'GroupList loaded successfully';
+                                                            responseMessage.i_count = invitationResult[0].length;
+                                                            responseMessage.data = getResult[0];
+                                                            res.status(200).json(responseMessage);
+                                                            console.log('FnGetGroupList: GroupList loaded successfully');
+                                                        });
                                                     }
                                                 }
                                                 else {
@@ -2683,21 +2688,42 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                             });
                                         }
                                         else {
-                                            responseMessage.message = 'GroupList not loaded';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetGroupList:GroupList not loaded');
+                                            var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                            st.db.query(queryCount, function (err, invitationResult) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'GroupList loaded successfully';
+                                                responseMessage.i_count = invitationResult[0].length;
+                                                responseMessage.data = [];
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetGroupList: GroupList loaded successfully');
+                                            });
                                         }
                                     }
                                     else {
-                                        responseMessage.message = 'GroupList not loaded';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetGroupList:GroupList not loaded');
+                                        var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                        st.db.query(queryCount, function (err, invitationResult) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'GroupList loaded successfully';
+                                            responseMessage.i_count = invitationResult[0].length;
+                                            responseMessage.data = [];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetGroupList: GroupList loaded successfully');
+                                        });
                                     }
                                 }
                                 else {
-                                    responseMessage.message = 'GroupList not loaded';
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetGroupList:GroupList not loaded');
+                                    var queryCount = 'CALL pGetPendingRequest(' + st.db.escape(token) + ')';
+                                    st.db.query(queryCount, function (err, invitationResult) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'GroupList loaded successfully';
+                                        responseMessage.i_count = invitationResult[0].length;
+                                        responseMessage.data = [];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetGroupList: GroupList loaded successfully');
+                                    });
                                 }
                             }
                             else {

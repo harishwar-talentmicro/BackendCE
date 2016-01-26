@@ -10,8 +10,20 @@
  */
 "use strict";
 
-var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeone.com';
+var util = require( "util" );
+var fs = require("fs");
+
+var st = null;
+var mailModule = require('./mail-module.js');
+var mail = null;
+
+function BusinessManager(db,stdLib){
+
+    if(stdLib){
+        st = stdLib;
+        mail = new mailModule(db,stdLib);
+    }
+};
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -26,148 +38,6 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
-
-var st = null;
-var mailModule = require('./mail-module.js');
-var mail = null;
-
-function BusinessManager(db,stdLib){
-
-    if(stdLib){
-        st = stdLib;
-        mail = new mailModule(db,stdLib);
-    }
-};
-
-var uuid = require('node-uuid');
-var stream = require( "stream" );
-var chalk = require( "chalk" );
-var util = require( "util" );
-// I turn the given source Buffer into a Readable stream.
-function BufferStream( source ) {
-
-    if ( ! Buffer.isBuffer( source ) ) {
-
-        throw( new Error( "Source must be a buffer." ) );
-
-    }
-
-    // Super constructor.
-    stream.Readable.call( this );
-
-    this._source = source;
-
-    // I keep track of which portion of the source buffer is currently being pushed
-    // onto the internal stream buffer during read actions.
-    this._offset = 0;
-    this._length = source.length;
-
-    // When the stream has ended, try to clean up the memory references.
-    this.on( "end", this._destroy );
-
-}
-
-util.inherits( BufferStream, stream.Readable );
-
-
-// I attempt to clean up variable references once the stream has been ended.
-// --
-// NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
-// usage since my Node.js apps will (eventually) never restart.
-BufferStream.prototype._destroy = function() {
-
-    this._source = null;
-    this._offset = null;
-    this._length = null;
-
-};
-
-
-// I read chunks from the source buffer into the underlying stream buffer.
-// --
-// NOTE: We can assume the size value will always be available since we are not
-// altering the readable state options when initializing the Readable stream.
-BufferStream.prototype._read = function( size ) {
-
-    // If we haven't reached the end of the source buffer, push the next chunk onto
-    // the internal stream buffer.
-    if ( this._offset < this._length ) {
-
-        this.push( this._source.slice( this._offset, ( this._offset + size ) ) );
-
-        this._offset += size;
-
-    }
-
-    // If we've consumed the entire source buffer, close the readable stream.
-    if ( this._offset >= this._length ) {
-
-        this.push( null );
-
-    }
-
-};
-
-var gcloud = require('gcloud');
-var fs = require('fs');
-
-var appConfig = require('../../ezeone-config.json');
-
-var gcs = gcloud.storage({
-    projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
-    keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
-});
-
-// Reference an existing bucket.
-var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
-
-bucket.acl.default.add({
-    entity: 'allUsers',
-    role: gcs.acl.READER_ROLE
-}, function (err, aclObject) {
-});
-
-/**
- * image uploading to cloud server
- * @param uniqueName
- * @param readStream
- * @param callback
- */
-var uploadDocumentToCloud = function(uniqueName,readStream,callback){
-    var remoteWriteStream = bucket.file(uniqueName).createWriteStream();
-    readStream.pipe(remoteWriteStream);
-
-    remoteWriteStream.on('finish', function(){
-        console.log('done');
-        if(callback){
-            if(typeof(callback)== 'function'){
-                callback(null);
-            }
-            else{
-                console.log('callback is required for uploadDocumentToCloud');
-            }
-        }
-        else{
-            console.log('callback is required for uploadDocumentToCloud');
-        }
-    });
-
-    remoteWriteStream.on('error', function(err){
-        if(callback){
-            if(typeof(callback)== 'function'){
-                console.log(err);
-                callback(err);
-            }
-            else{
-                console.log('callback is required for uploadDocumentToCloud');
-            }
-        }
-        else{
-            console.log('callback is required for uploadDocumentToCloud');
-        }
-    });
-};
-
 /**
  * Method : GET
  * @param req
@@ -178,7 +48,6 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
     /**
      * @todo FnGetApplicantTransaction
      */
-    var _this = this;
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -187,16 +56,16 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
     var page = (!isNaN(parseInt(req.query.page))) ?  parseInt(req.query.page): 1;
     var pageSize = (!isNaN(parseInt(req.query.ps))) ?  parseInt(req.query.ps): 10;
     var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
-    var clientQuery = req.query.clq ? req.query.clq : '';
+    var clientQuery = (req.query.clq) ? (req.query.clq) : '';
     var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
     var contactQuery = req.query.ctq ? req.query.ctq : '';
-    var jobId = req.query.jid ? req.query.jid : 0;
+    var jobId = (req.query.jid) ? (req.query.jid) : 0;
     var jobCodeSort = (!isNaN(parseInt(req.query.jcs))) ?  parseInt(req.query.jcs) : 0;
-    var jobCodeQuery = req.query.jcq ? req.query.jcq : '';
+    var jobCodeQuery = (req.query.jcq) ? (req.query.jcq) : '';
     var jobTitleSort = (!isNaN(parseInt(req.query.jts))) ?  parseInt(req.query.jts): 0;
-    var jobTitleQuery = req.query.jtq ? req.query.jtq : '';
+    var jobTitleQuery = (req.query.jtq) ? (req.query.jtq) : '';
     var status = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 0;
-    var applicantSearch = req.query.aps ? req.query.aps : '';
+    var applicantSearch = (req.query.aps) ? (req.query.aps) : '';
     var folderSort = (!isNaN(parseInt(req.query.fs))) ?  parseInt(req.query.fs): 0;
 
     if(!pageSize){
@@ -210,7 +79,8 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
         total_count:0,
         data: []
     };
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -257,7 +127,6 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                                             }
                                             else {
                                                 responseMessage.status = true;
-                                                responseMessage.data = [];
                                                 responseMessage.message = 'No Transaction details found';
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnGetTransaction:No Transaction details found');
@@ -266,7 +135,6 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
 
                                         else {
                                             responseMessage.status = true;
-                                            responseMessage.data = [];
                                             responseMessage.message = 'No Transaction details found';
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetTransaction:No Transaction details found');
@@ -274,7 +142,6 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                                     }
                                     else {
                                         responseMessage.status = true;
-                                        responseMessage.data =[];
                                         responseMessage.message = 'No Transaction details found';
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetTransaction:No Transaction details found');
@@ -338,9 +205,8 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
  */
 BusinessManager.prototype.getSalesTransaction = function(req,res,next){
     /**
-     * @todo FnGetSalesTransaction
+     * FnGetSalesTransaction
      */
-    var _this = this;
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -348,11 +214,16 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
     var token = req.query.token;
     var page = (!isNaN(parseInt(req.query.page))) ?  parseInt(req.query.page): 1;
     var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
-    var clientQuery = req.query.clq ? req.query.clq : '';
+    var clientQuery = (req.query.clq) ? (req.query.clq) : '';
     var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
-    var contactQuery = req.query.ctq ? req.query.ctq : '';
+    var contactQuery = (req.query.ctq) ? (req.query.ctq) : '';
     var ezeoneIdSort = (!isNaN(parseInt(req.query.ezes))) ?  parseInt(req.query.ezes) : 0;
-    var ezeoneIdQuery = req.query.ezeq ? req.query.ezeq : '';
+    var ezeoneIdQuery = (req.query.ezeq) ? (req.query.ezeq) : '';
+    var pageSize = (!isNaN(parseInt(req.query.ps))) ?  parseInt(req.query.ps): 10;
+
+    if(!pageSize){
+        pageSize = 10;
+    }
 
     var responseMessage = {
         status: false,
@@ -361,7 +232,8 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
         total_count:0,
         data: []
     };
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -388,7 +260,7 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                         }
 
                         var parameters = st.db.escape(token) + ',' + st.db.escape(FromPage)
-                            + ',' + st.db.escape(10) + ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
+                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
                             + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(ezeoneIdSort)
                             + ',' + st.db.escape(ezeoneIdQuery);
                         //console.log('CALL pGetSalesTransaction(' + parameters + ')');
@@ -488,27 +360,25 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
      * @todo FnSaveSalesTransaction
      */
 
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var fs = require("fs");
 
         var Token = req.body.Token;
-        var TID = parseInt(req.body.TID) ? parseInt(req.body.TID) : 0;
-        var MessageText = (req.body.MessageText) ? req.body.MessageText : '';
+        var TID = (req.body.TID) ? (parseInt(req.body.TID)) : 0;
+        var MessageText = (req.body.MessageText) ? (req.body.MessageText) : '';
         var Status = req.body.Status;
-        var Notes = (req.body.Notes) ? req.body.Notes : '';
+        var Notes = (req.body.Notes) ? (req.body.Notes) : '';
         var LocID = req.body.LocID;
-        var Country = (req.body.Country) ? req.body.Country : '';    //country short name
-        var State = (req.body.State) ? req.body.State : '';         //admin level 1
-        var City = (req.body.City) ? req.body.City : '';       //ADMIN level 2
-        var Area = (req.body.Area) ? req.body.Area : '';       //admin level 3
+        var Country = (req.body.Country) ? (req.body.Country) : '';    //country short name
+        var State = (req.body.State) ? (req.body.State) : '';         //admin level 1
+        var City = (req.body.City) ? (req.body.City) : '';       //ADMIN level 2
+        var Area = (req.body.Area) ? (req.body.Area) : '';       //admin level 3
         var FunctionType = req.body.FunctionType;
-        var Latitude = (req.body.Latitude) ? req.body.Latitude : 0;
-        var Longitude = (req.body.Longitude) ? req.body.Longitude : 0;
-        var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
+        var Latitude = (req.body.Latitude) ? (req.body.Latitude) : 0;
+        var Longitude = (req.body.Longitude) ? (req.body.Longitude) : 0;
+        var EZEID = (req.body.EZEID) ? (alterEzeoneId(req.body.EZEID)) : '';
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
         var DurationScales = req.body.DurationScales;
@@ -519,25 +389,25 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         else {
             ItemsList = [];
         }
-        var DeliveryAddress = (req.body.DeliveryAddress) ? req.body.DeliveryAddress : '';
+        var DeliveryAddress = (req.body.DeliveryAddress) ? (req.body.DeliveryAddress) : '';
         var ItemIDList = '';
         var ToEZEID = alterEzeoneId(req.body.ToEZEID);
-        var item_list_type = (req.body.item_list_type) ? req.body.item_list_type : 0;
-        var companyName = req.body.companyName ? req.body.companyName : '';
-        var company_id = req.body.company_id ? req.body.company_id : 0;
-        var attachment = req.body.attachment ? req.body.attachment : null;
+        var item_list_type = (req.body.item_list_type) ? (req.body.item_list_type) : 0;
+        var companyName = (req.body.companyName) ? (req.body.companyName) : '';
+        var company_id = (req.body.company_id) ? (req.body.company_id) : 0;
+        var attachment = (req.body.attachment) ? (req.body.attachment) : null;
         var proabilities = (req.body.proabilities) ? (req.body.proabilities) : 2;
-        var attachment_name = req.body.attachment_name ? req.body.attachment_name : '';
-        var mime_type = req.body.mime_type ? req.body.mime_type : '';
-        var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
-        var targetDate = req.body.target_date ? req.body.target_date : '';
-        var amount = req.body.amount ? req.body.amount : 0;
-        var instituteId = req.body.institute_id ? req.body.institute_id : 0;
-        var jobId = req.body.job_id ? req.body.job_id : 0;
-        var educationId = (req.body.education_id) ? req.body.education_id : 0;
-        var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
-        var salaryType = req.body.salary_type ? req.body.salary_type : 3;
-        var contactId = req.body.ctid ? req.body.ctid : 1;
+        var attachment_name = (req.body.attachment_name) ? (req.body.attachment_name) : '';
+        var mime_type = (req.body.mime_type) ? (req.body.mime_type) : '';
+        var alarmDuration = (req.body.alarm_duration) ? (req.body.alarm_duration) : 0;
+        var targetDate = (req.body.target_date) ? (req.body.target_date) : '';
+        var amount = (req.body.amount) ? (req.body.amount) : 0;
+        var instituteId = (req.body.institute_id) ? (req.body.institute_id) : 0;
+        var jobId = (req.body.job_id) ? (req.body.job_id) : 0;
+        var educationId = (req.body.education_id) ? (req.body.education_id) : 0;
+        var specializationId = (req.body.specialization_id) ? (req.body.specialization_id) : 0;
+        var salaryType = (req.body.salary_type) ? (req.body.salary_type) : 3;
+        var contactId = (req.body.ctid) ? (req.body.ctid) : 1;
 
         var respMsg = {
             status: false,
@@ -547,8 +417,9 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
 
         };
 
-        if (TID.toString() == 'NaN')
+        if (isNaN(TID)) {
             TID = 0;
+        }
 
         if (TID != 0) {
             for (var i = 0; i < ItemsList.length; i++) {
@@ -558,13 +429,14 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
             ItemIDList = ItemIDList.slice(0, -1);
             console.log('TID comma Values:' + ItemIDList);
         }
-        if (FolderRuleID.toString() == 'NaN')
+        if (isNaN(FolderRuleID)) {
             FolderRuleID = 0;
+        }
 
         if (Token) {
-            st.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
                         var query = st.db.escape(Token) + "," + st.db.escape(FunctionType) + "," + st.db.escape(MessageText)
                             + "," + st.db.escape(Status)+ "," + st.db.escape(Notes)
                             + "," + st.db.escape(LocID) + "," + st.db.escape(Country) + "," + st.db.escape(State)
@@ -578,6 +450,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                             + "," + st.db.escape(alarmDuration)+ "," + st.db.escape(targetDate) + "," + st.db.escape(amount)
                             + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId) + ', ' + st.db.escape(specializationId)
                             + ', ' + st.db.escape(salaryType) + ', ' + st.db.escape(contactId);
+
                         //console.log('CALL pSaveTrans(' + query + ')');
                         st.db.query('CALL pSaveTrans(' + query + ')', function (err, transResult) {
                             if (!err) {
@@ -687,8 +560,8 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                                 Amount: itemsDetails.Amount,
                                                                 Duration: itemsDetails.Durations
                                                             };
-                                                            console.log(items);
-                                                            console.log('TID:' + itemsDetails.TID);
+                                                            //console.log(items);
+                                                            //console.log('TID:' + itemsDetails.TID);
                                                             if (itemsDetails.TID == 0) {
                                                                 var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
                                                                     // Neat!
@@ -721,7 +594,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                                     Amount: itemsDetails.Amount,
                                                                     Duration: itemsDetails.Durations
                                                                 };
-                                                                console.log('TID:' + itemsDetails.TID);
+                                                                //console.log('TID:' + itemsDetails.TID);
                                                                 var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
                                                                     // Neat!
                                                                     console.log(result);
@@ -866,27 +739,24 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
      * @todo FnSendSalesRequest
      */
 
-    var _this = this;
     try{
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var fs = require("fs");
 
         var Token = req.body.Token;
-        var TID = parseInt(req.body.TID) ?  parseInt(req.body.TID) : 0;
-        var MessageText = (req.body.MessageText) ? req.body.MessageText : '';
+        var TID = (req.body.TID) ?  parseInt(req.body.TID) : 0;
+        var MessageText = (req.body.MessageText) ? (req.body.MessageText) : '';
         var Status = req.body.Status;
-        var TaskDateTime = req.body.TaskDateTime;
-        var Notes = (req.body.Notes) ? req.body.Notes : '';
+        var Notes = (req.body.Notes) ? (req.body.Notes) : '';
         var LocID = req.body.LocID;
-        var Country = (req.body.Country) ? req.body.Country : '';    //country short name
-        var State = (req.body.State) ? req.body.State : '';         //admin level 1
-        var City =  (req.body.City) ? req.body.City : '';       //ADMIN level 2
-        var Area = (req.body.Area) ? req.body.Area : '';       //admin level 3
+        var Country = (req.body.Country) ? (req.body.Country) : '';    //country short name
+        var State = (req.body.State) ? (req.body.State) : '';         //admin level 1
+        var City =  (req.body.City) ? (req.body.City) : '';       //ADMIN level 2
+        var Area = (req.body.Area) ? (req.body.Area) : '';       //admin level 3
         var FunctionType = req.body.FunctionType;
-        var Latitude = (req.body.Latitude) ? req.body.Latitude : 0;
-        var Longitude = (req.body.Longitude) ? req.body.Longitude : 0;
+        var Latitude = (req.body.Latitude) ? (req.body.Latitude) : 0;
+        var Longitude = (req.body.Longitude) ? (req.body.Longitude) : 0;
         var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
         var FolderRuleID = parseInt(req.body.FolderRuleID);
         var Duration = req.body.Duration;
@@ -900,33 +770,34 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
             ItemsList = [];
         }
 
-        var DeliveryAddress = (req.body.DeliveryAddress) ? req.body.DeliveryAddress : '';
+        var DeliveryAddress = (req.body.DeliveryAddress) ? (req.body.DeliveryAddress) : '';
         var ItemIDList='';
         var ToEZEID = alterEzeoneId(req.body.ToEZEID);
-        var item_list_type = (req.body.item_list_type) ? req.body.item_list_type : 0;
-        var companyName = req.body.companyName ? req.body.companyName : '' ;
-        var company_id = req.body.company_id ? req.body.company_id : 0 ;
-        var attachment = req.body.attachment ? req.body.attachment : null ;
-        var proabilities = req.body.proabilities ? req.body.proabilities : 2;
-        var attachment_name = req.body.attachment_name ? req.body.attachment_name : '' ;
-        var mime_type = req.body.mime_type ? req.body.mime_type : '' ;
-        var alarmDuration = req.body.alarm_duration ? req.body.alarm_duration : 0;
-        var targetDate = req.body.target_date ? req.body.target_date : '';
-        var amount = req.body.amount ? req.body.amount : 0;
-        var instituteId = req.body.institute_id ? req.body.institute_id : 0;
-        var jobId = req.body.job_id ? req.body.job_id : 0;
-        var educationId = (req.body.education_id) ? req.body.education_id : 0;
-        var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
-        var salaryType = req.body.salary_type ? req.body.salary_type : 3;
-        var contactId = req.body.ctid ? req.body.ctid : 1;
+        var item_list_type = (req.body.item_list_type) ? (req.body.item_list_type) : 0;
+        var companyName = (req.body.companyName) ? (req.body.companyName) : '' ;
+        var company_id = (req.body.company_id) ? (req.body.company_id) : 0 ;
+        var attachment = (req.body.attachment) ? (req.body.attachment) : null ;
+        var proabilities = (req.body.proabilities) ? (req.body.proabilities) : 2;
+        var attachment_name = (req.body.attachment_name) ? (req.body.attachment_name) : '' ;
+        var mime_type = (req.body.mime_type) ? (req.body.mime_type) : '' ;
+        var alarmDuration = (req.body.alarm_duration) ? (req.body.alarm_duration) : 0;
+        var targetDate = (req.body.target_date) ? (req.body.target_date) : '';
+        var amount = (req.body.amount) ? (req.body.amount) : 0;
+        var instituteId = (req.body.institute_id) ? (req.body.institute_id) : 0;
+        var jobId = (req.body.job_id) ? (req.body.job_id) : 0;
+        var educationId = (req.body.education_id) ? (req.body.education_id) : 0;
+        var specializationId = (req.body.specialization_id) ? (req.body.specialization_id) : 0;
+        var salaryType = (req.body.salary_type) ? (req.body.salary_type) : 3;
+        var contactId = (req.body.ctid) ? (req.body.ctid) : 1;
 
-        var RtnMessage = {
+        var rtnMessage = {
             IsSuccessfull: false,
             MessageID:0
         };
 
-        if(TID.toString() == 'NaN')
+        if(isNaN(TID)) {
             TID = 0;
+        }
 
         if(TID != 0){
             for(var i=0; i < ItemsList.length; i++) {
@@ -937,13 +808,14 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
             ItemIDList=ItemIDList.slice(0,-1);
             console.log('TID comma Values:'+ ItemIDList);
         }
-        if(FolderRuleID.toString() == 'NaN')
-            FolderRuleID=0;
+        if(isNaN(FolderRuleID)) {
+            FolderRuleID = 0;
+        }
 
         if (Token) {
-            st.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
                         var query = st.db.escape(Token) + "," + st.db.escape(FunctionType) + "," + st.db.escape(MessageText)
                             + "," + st.db.escape(Status) + "," + st.db.escape(Notes)
                             + "," + st.db.escape(LocID) + "," + st.db.escape(Country) + "," + st.db.escape(State)
@@ -957,6 +829,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                             + "," + st.db.escape(alarmDuration) + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)
                             + ', ' + st.db.escape(instituteId)+', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)
                             + ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType)+ ', ' + st.db.escape(contactId);
+                        console.log(company_id);
                         //console.log('CALL psendsalesrequest(' + query + ')');
                         st.db.query('CALL psendsalesrequest(' + query + ')', function (err, transResult) {
                             if (!err) {
@@ -964,8 +837,8 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                 if (transResult) {
                                     if (transResult[0].length > 0) {
 
-                                        RtnMessage.IsSuccessfull = true;
-                                        RtnMessage.MessageID = (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0;
+                                        rtnMessage.IsSuccessfull = true;
+                                        rtnMessage.MessageID = (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0;
 
                                         for (var i = 0; i < ItemsList.length; i++) {
                                             var itemsDetails = ItemsList[i];
@@ -977,8 +850,8 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                 Amount: itemsDetails.Amount,
                                                 Duration: itemsDetails.Durations
                                             };
-                                            console.log(items);
-                                            console.log('TID:' + itemsDetails.TID);
+                                            //console.log(items);
+                                            //console.log('TID:' + itemsDetails.TID);
                                             if (itemsDetails.TID == 0) {
                                                 var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
                                                     // Neat!
@@ -1011,7 +884,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                     Amount: itemsDetails.Amount,
                                                     Duration: itemsDetails.Durations
                                                 };
-                                                console.log('TID:' + itemsDetails.TID);
+                                                //console.log('TID:' + itemsDetails.TID);
                                                 var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
                                                     // Neat!
                                                     console.log(result);
@@ -1035,7 +908,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                 });
                                             }
                                         }
-                                        res.send(RtnMessage);
+                                        res.send(rtnMessage);
                                         console.log('FnSaveTranscation: Transaction details save successfully');
 
                                         var messageContent = {
@@ -1051,44 +924,44 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                         mail.fnMessageMail(messageContent, function (err, statusResult) {
                                             console.log(statusResult);
                                             if (!err) {
-                                                if (Result) {
+                                                if (statusResult) {
                                                     if (statusResult.status == true) {
                                                         console.log('FnSendMail: Mail Sent Successfully');
-                                                        //res.send(RtnMessage);
+                                                        //res.send(rtnMessage);
                                                     }
                                                     else {
                                                         console.log('FnSendMail: Mail not Sent...1');
-                                                        //res.send(RtnMessage);
+                                                        //res.send(rtnMessage);
                                                     }
                                                 }
                                                 else {
                                                     console.log('FnSendMail: Mail not Sent..2');
-                                                    //res.send(RtnMessage);
+                                                    //res.send(rtnMessage);
                                                 }
                                             }
                                             else {
                                                 console.log('FnSendMail:Error in sending mails' + err);
-                                                //res.send(RtnMessage);
+                                                //res.send(rtnMessage);
                                             }
                                         });
                                     }
                                     else
                                     {
                                         console.log('FnSaveTranscation:No Save Transaction');
-                                        res.send(RtnMessage);
+                                        res.send(rtnMessage);
                                     }
                                 }
 
                                 else {
                                     console.log('FnSaveTranscation:No Save Transaction');
-                                    res.send(RtnMessage);
+                                    res.send(rtnMessage);
                                 }
                             }
 
                             else {
                                 console.log('FnSaveTranscation: error in saving Transaction' + err);
                                 res.statusCode = 500;
-                                res.send(RtnMessage);
+                                res.send(rtnMessage);
                             }
 
                         });
@@ -1096,23 +969,23 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                     else {
                         console.log('FnSaveTranscation: Invalid token');
                         res.statusCode = 401;
-                        res.send(RtnMessage);
+                        res.send(rtnMessage);
                     }
 
                 }
                 else {
                     console.log('FnSaveTranscation:Error in processing Token' + err);
                     res.statusCode = 500;
-                    res.send(RtnMessage);
+                    res.send(rtnMessage);
                 }
             });
         }
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnSaveTranscation: Token is empty');
             }
             res.statusCode=400;
-            res.send(RtnMessage);
+            res.send(rtnMessage);
         }
     }
     catch (ex) {
@@ -1133,7 +1006,6 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
     /**
      * @todo FnUpdateTransaction
      */
-    var _this = this;
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1141,19 +1013,6 @@ BusinessManager.prototype.updateTransaction = function(req,res,next){
     var tid = (!isNaN(parseInt(req.body.TID))) ? parseInt(req.body.TID) : 0;
     var status = req.body.status;
     var token = req.body.Token;
-    //var folderRuleID = parseInt(req.body.folderRuleID);
-    //var nextAction = (parseInt(req.body.nextAction) != NaN ) ? parseInt(req.body.nextAction) : 0;
-    //var nextActionDateTime = new Date(req.body.nextActionDateTime);
-    //var alarmDuration = (parseInt(req.body.alarm_duration) !== NaN) ? parseInt(req.body.alarm_duration) : 0;
-    //var probability = (parseInt(req.body.probability) !== NaN && parseInt(req.body.probability) !== 0) ? parseInt(req.body.probability) : 2 ;
-    //var targetDate = req.body.target_date ? req.body.target_date : null;
-    //var amount = (req.body.amount) ? req.body.amount : 0;
-    //var instituteId = req.body.institute_id ? req.body.institute_id : 0;
-    //var jobId = req.body.job_id ? req.body.job_id : 0;
-    //var educationId = req.body.education_id ? req.body.education_id : 0;
-    //var specializationId = req.body.specialization_id ? req.body.specialization_id : 0;
-    //var salaryType = req.body.salary_type ? req.body.salary_type : 3;
-
 
     var responseMessage = {
         status: false,
@@ -1219,7 +1078,6 @@ BusinessManager.prototype.getTransactionItems = function(req,res,next){
     /**
      * @todo FnGetTransactionItems
      */
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1301,7 +1159,6 @@ BusinessManager.prototype.saveTransactionItems = function(req,res,next){
     /**
      * @todo FnSaveTransactionItems
      */
-    var _this = this;
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1415,7 +1272,6 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
     /**
      * @todo FnGetOutBoxMessages
      */
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1433,7 +1289,7 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
             message:''
         };
 
-        if (Token) {
+        if (token) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
@@ -1490,12 +1346,12 @@ BusinessManager.prototype.getOutboxTransactions = function(req,res,next){
             });
         }
         else {
-            if (!ezeid) {
-                responseMessage.message = 'Invalid ezeid';
+            if (!token) {
+                responseMessage.message = 'Invalid token';
                 responseMessage.error = {
-                    ezeid : 'Invalid ezeid'
+                    token : 'Invalid token'
                 };
-                console.log('FnGetOutboxMessages: ezeid is mandatory field');
+                console.log('FnGetOutboxMessages: token is mandatory field');
             }
 
             res.status(401).json(responseMessage);
@@ -1931,7 +1787,6 @@ BusinessManager.prototype.getUserwiseFolderList = function(req,res,next){
     /**
      * @todo FnGetUserwiseFolderList
      */
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -2070,7 +1925,7 @@ BusinessManager.prototype.updateBussinessList = function(req,res,next){
             if (!token) {
                 console.log('FnUpdateBussinessListing: token is empty');
             }
-            else if (keywords) {
+            else if (!keywords) {
                 console.log('FnUpdateMessageStatus: Keywords is empty');
             }
             res.statusCode = 400;
@@ -2095,7 +1950,6 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
     /**
      * @todo FnGetCompanyDetails
      */
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -2106,7 +1960,7 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
 
         var responseMessage = {
             status: false,
-            data: null,
+            data: [],
             error:{},
             message:''
         };
@@ -2127,14 +1981,12 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
                             res.status(200).json(responseMessage);
                         }
                         else {
-                            responseMessage.error = {};
                             responseMessage.message = 'No founded Company details';
                             console.log('FnGetCompanyDetails: No founded Company details');
                             res.json(responseMessage);
                         }
                     }
                     else {
-                        responseMessage.error = {};
                         responseMessage.message = 'No founded Company details';
                         console.log('FnGetCompanyDetails: No founded Company details');
                         res.json(responseMessage);
@@ -2142,8 +1994,6 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
 
                 }
                 else {
-                    responseMessage.data = null ;
-                    responseMessage.error = {};
                     responseMessage.message = 'Error in getting Company details';
                     console.log('FnGetCompanyDetails: error in getting Company details' + err);
                     res.status(500).json(responseMessage);
@@ -2164,7 +2014,6 @@ BusinessManager.prototype.getCompanyDetails = function(req,res,next){
         }
     }
     catch (ex) {
-        responseMessage.error = {};
         responseMessage.message = 'An error occured !';
         console.log('FnGetCompanyDetails:error ' + ex.description);
         var errorDate = new Date();
@@ -2195,9 +2044,8 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
      * @param next
      * @constructor
      */
-    var _this = this;
-    var ezeTerm = alterEzeoneId(req.query['ezeoneid']);
-    var token = req.query['token'];
+    var ezeTerm = alterEzeoneId(req.query.ezeoneid);
+    var token = req.query.token;
     var locationSeq = 0;
     var pin = null;
     var ezeoneId = null;
@@ -2347,7 +2195,6 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
     /**
      * @todo FnGetTransAttachment
      */
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -2364,17 +2211,18 @@ BusinessManager.prototype.getTransAttachment = function(req,res,next){
         };
 
         var validateStatus = true;
+        var error = {};
 
         if (!tid) {
-            responseMessage.error['tid'] = 'Invalid tid';
+            error['tid'] = 'Invalid tid';
             validateStatus *= false;
         }
         if (!token) {
-            responseMessage.error['token'] = 'Invalid token';
+            error['token'] = 'Invalid token';
             validateStatus *= false;
         }
         if (!validateStatus) {
-            console.log('FnGetTransAttachment  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.error = error;
             responseMessage.message = 'Unable to get transaction attachment ! Please check the errors';
             res.status(401).json(responseMessage);
         }
@@ -2456,7 +2304,6 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
     /**
      * @todo FnSalesStatistics
      */
-    var _this = this;
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -2465,7 +2312,7 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
         var from_date = req.query.from_date;
         var to_date = req.query.to_date;
         var stages = req.query.stages;
-        var probabilities = req.query.probabilities ? req.query.probabilities : null;
+        var probabilities = (req.query.probabilities) ? (req.query.probabilities) : null;
         var user = req.query.user;
 
         var responseMessage = {
@@ -2476,21 +2323,22 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
         };
 
         var validateStatus = true;
+        var error={};
 
         if (!stages) {
-            responseMessage.error['stages'] = 'Invalid stages';
+            error['stages'] = 'Invalid stages';
             validateStatus *= false;
         }
         if (!user) {
-            responseMessage.error['user'] = 'Invalid user';
+            error['user'] = 'Invalid user';
             validateStatus *= false;
         }
         if (!probabilities) {
-            responseMessage.error['probabilities'] = 'Invalid probabilities';
+            error['probabilities'] = 'Invalid probabilities';
             validateStatus *= false;
         }
         if (!validateStatus) {
-            console.log('FnSalesStatistics  error : ' + JSON.stringify(responseMessage.error));
+            responseMessage.error = error;
             responseMessage.message = 'Unable to get Sales Statistics ! Please check the errors';
             res.status(200).json(responseMessage);
             return;
@@ -2501,7 +2349,8 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
                 + ',' + st.db.escape(probabilities)+ ',' + st.db.escape(user);
             st.db.query('CALL pTransactionfilter(' + query +')', function (err, transResult) {
 
-                var total_count = 0, total_qty = 0;
+                var total_count = 0;
+                var total_qty = 0;
                 if (!err) {
                     if (transResult) {
                         if (transResult[0]) {
@@ -2600,8 +2449,8 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
     var stageType = req.body.s_type;
     var transactionId = req.body.tid;
     var stage = req.body.s;
-    var reason = req.body.reason ? req.body.reason : '';
-    var comments = req.body.comments ? req.body.comments : '';
+    var reason = (req.body.reason) ? (req.body.reason) : '';
+    var comments = (req.body.comments) ? (req.body.comments) : '';
     var tid=0;
 
     var responseMessage = {
@@ -2611,7 +2460,8 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2728,7 +2578,6 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
  * @description api code for get transaction history
  */
 BusinessManager.prototype.getTransactionHistory = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var transactionId = req.query.t_id;
@@ -2740,7 +2589,8 @@ BusinessManager.prototype.getTransactionHistory = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -3223,6 +3073,118 @@ BusinessManager.prototype.getContactDetails = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(400).json(responseMessage);
             console.log('Error : FnGetContactDetails ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * @todo FnGetRoles
+ * Method : post
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get roles
+ */
+BusinessManager.prototype.getRoles = function(req,res,next){
+
+    /**
+     * @param token
+     */
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true;
+    var error = {};
+
+    if(!(req.query.token)){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var queryParams = st.db.escape(req.query.token);
+                        var query = 'CALL pgetroles(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, result) {
+                            //console.log(result);
+                            if (!err) {
+                                if (result) {
+                                    if (result[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'roles loaded successfully';
+                                        responseMessage.data = result[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetRoles: roles loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'roles not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetRoles:roles not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'roles not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetRoles:roles not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal server error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnGetRoles: error in loading roles:' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Sorry ! Token is invalid';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetRoles: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetRoles:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : FnGetRoles ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
