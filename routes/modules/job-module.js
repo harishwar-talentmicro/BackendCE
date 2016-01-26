@@ -7,6 +7,7 @@
 "use strict";
 
 var async = require('async');
+var util = require('util');
 
 var path ='D:\\EZEIDBanner\\';
 var EZEIDEmail = 'noreply@ezeone.com';
@@ -4270,6 +4271,168 @@ Job.prototype.applicantStatus = function(req,res,next){
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
+    }
+};
+
+/**
+ * Link multiple candidates to multiple jobs at once
+ *
+ * @method POST
+ * @service-param candidate_list
+ * @service-param job_list
+ * @api /jobs_to_applicants
+ */
+Job.prototype.assignJobsToApplicants = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    if(req.is('json')){
+        var validationFlag = true;
+
+        var error = {};
+
+
+        if(!util.isArray(req.body.candidate_list)){
+            validationFlag *= false;
+            error['candidate_list'] = "Candidate list is empty or not present";
+        }
+
+        if(validationFlag){
+            if(req.body.candidate_list.length < 1){
+                validationFlag *= false;
+                error['candidate_list'] = "Candidate list is empty or not present";
+            }
+        }
+
+        if(!util.isArray(req.body.job_list)){
+            validationFlag *= false;
+            error['job_list'] = "Job list is empty or not present";
+        }
+
+        if(validationFlag){
+            if(req.body.job_list.length < 1){
+                validationFlag *= false;
+                error['job_list'] = "Job list is empty or not present";
+            }
+        }
+
+        if(!validationFlag){
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                st.validateToken(req.body.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+
+                            var combinedQuery = "";
+                            console.log(req.body.candidate_list);
+                            console.log(req.body.job_list);
+
+                            for(var i = 0; i < req.body.candidate_list.length; i++){
+                                /**
+                                 * Adding validation for every cvid passed (Candidate list consists of cvIds)
+                                 */
+                                if(!isNaN(parseInt(req.body.candidate_list[i]))){
+                                    for(var j = 0; j < req.body.job_list.length; j++){
+                                        /**
+                                         * Adding validation for every jobId passed (Job list consists of jobIds)
+                                         */
+                                        if(!isNaN(parseInt(req.body.job_list[j]))){
+                                            var queryParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.candidate_list[i])+
+                                                ',' + st.db.escape(req.body.job_list[j]);
+                                            var addQuery = "CALL pAddcandtoselectedjob(" + queryParams + ");";
+                                            combinedQuery += addQuery;
+                                            console.log(addQuery);
+                                        }
+                                    }
+                                }
+                            }
+                            console.log('combinedQuery',combinedQuery);
+                            st.db.query(combinedQuery, function (err, jobResult) {
+                                if (!err) {
+                                    console.log(jobResult);
+                                    if (jobResult) {
+                                        if (jobResult.length > 1) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Jobs Added successfully to candidates';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else{
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Jobs Added successfully to candidates';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else{
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Problem adding jobs to candidates';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else{
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : assignJobsToApplicants ',err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                }
+                            });
+                        }
+                        else{
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('FnGetListOfJobs: Invalid token');
+                        }
+                    }
+                    else{
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error : assignJobsToApplicants ',err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    }
+                });
+            }
+            catch(ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error assignJobsToApplicants :  ',ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+
+    }
+    else{
+        responseMessage.error = "Accepted content type is json only";
+        res.status(400).json(responseMessage);
     }
 };
 

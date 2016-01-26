@@ -254,6 +254,15 @@ router.post('/candidates_status',jobModule.updateCandidateStatus);
 router.get('/auto_search',jobModule.autoSearchJobs);
 router.post('/applicant_status',jobModule.applicantStatus);
 
+/**
+ * Link multiple candidates to multiple jobs at once
+ *
+ * @method POST
+ * @service-param candidate_list
+ * @service-param job_list
+ */
+router.post('/jobs_to_applicants',jobModule.assignJobsToApplicants);
+
 //MessageBox module methods
 var Messagebox = require('./modules/messagebox-module.js');
 var messageBox = new Messagebox(db,stdLib);
