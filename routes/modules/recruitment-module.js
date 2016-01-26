@@ -17,9 +17,6 @@ function error(err, req, res, next) {
     res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
 
-var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeone.com';
-
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -52,7 +49,6 @@ function Recruitment(db,stdLib){
  * @description api code for get Recruitment Masters list
  */
 Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var functionType = req.query.function_type;
@@ -65,7 +61,8 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
     };
 
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -191,7 +188,6 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
  * @description api code for get Recruitment Masters list
  */
 Recruitment.prototype.getSalesMasters = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var functionType = req.query.function_type;
@@ -204,7 +200,8 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
     };
 
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -344,12 +341,11 @@ Recruitment.prototype.getInstitutesList = function(req,res,next){
 
                         if (!err) {
                             if (instituteListResult) {
-                                console.log('instituteListResult', instituteListResult);
+                               // console.log('instituteListResult', instituteListResult);
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'Colleges and Group of colleges list loaded successfully';
-                                responseMessage.data = (instituteListResult[0]) ?
-                                    ((instituteListResult[0].length) ? instituteListResult[0] : []) : [];
+                                responseMessage.data = (instituteListResult[0]) ?((instituteListResult[0].length) ? instituteListResult[0] : []) : [];
                                 res.status(200).json(responseMessage);
                                 console.log('Colleges and Group of colleges list loaded successfully');
                             }
@@ -366,8 +362,6 @@ Recruitment.prototype.getInstitutesList = function(req,res,next){
                             res.status(500).json(responseMessage);
                         }
                     });
-
-                    ///////////////////////////////
 
 
                 }
