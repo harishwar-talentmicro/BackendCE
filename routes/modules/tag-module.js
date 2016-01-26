@@ -162,15 +162,14 @@ function Tag(db,stdLib){
  */
 Tag.prototype.saveStandardTags = function(req,res,next){
 
-    var _this = this;
-
-
     var token = req.query.token;
     var image = req.body.image;
     var type = 0;   // 0-image, 1-url
     var tag = (!isNaN(parseInt(req.query.tag))) ?  parseInt(req.query.tag) : 'PIC';
     var pin = (!isNaN(parseInt(req.query.pin))) ?  parseInt(req.query.pin) : null;
-    var randomName,tagType,imageBuffer;
+    var randomName;
+    var tagType;
+    var imageBuffer;
 
     if (tag == 0){
         tagType = 0;
@@ -191,7 +190,8 @@ Tag.prototype.saveStandardTags = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -319,7 +319,7 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                             var uploadtoServer = function (imageBuffer) {
                                 //upload to cloud storage
                                 console.log('uploading to cloud server...');
-                                console.log(imageBuffer);
+                                //console.log(imageBuffer);
                                 var gcloud = require('gcloud');
                                 var fs = require('fs');
 
@@ -502,7 +502,6 @@ function FnCropImage(imageParams, callback){
     /**
      * @todo FnCropImage
      */
-    var _this = this;
 
     console.log('image croping...');
 
@@ -527,7 +526,8 @@ function FnCropImage(imageParams, callback){
         targetWidth = (imageParams.width) ? (!isNaN(parseInt(imageParams.width)) ? parseInt(imageParams.width) : 0 ) : 0  ;
 
 
-    var scaleHeight = null,scaleWidth = null;
+    var scaleHeight = null;
+    var scaleWidth = null;
 
     var cropFlag = (imageParams.crop) ? imageParams.crop : true;
     var scaleFlag = (imageParams.scale) ? imageParams.scale : true;
@@ -722,7 +722,6 @@ function FnCropImage(imageParams, callback){
  */
 Tag.prototype.saveTags = function(req,res,next){
 
-    var _this = this;
 
     var standardTagList = ['PIC','1','2','3','4','5','0'];
 
@@ -818,7 +817,7 @@ Tag.prototype.saveTags = function(req,res,next){
                                     res.status(400).json(respMsg);
                                 }
                                 else{
-                                    console.log(tQResults);
+                                    //console.log(tQResults);
                                     if(tQResults){
                                         if(tQResults.affectedRows){
                                             respMsg.status = true;
@@ -882,7 +881,7 @@ Tag.prototype.saveTags = function(req,res,next){
                                             res.status(400).json(respMsg);
                                         }
                                         else{
-                                            console.log(tQResults);
+                                            //console.log(tQResults);
                                             if(tQResults){
                                                 if(tQResults.affectedRows){
                                                     respMsg.status = true;
@@ -950,7 +949,6 @@ Tag.prototype.saveTags = function(req,res,next){
  * @description api code for download resume
  */
 Tag.prototype.getStandardTags = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var output = [];
@@ -962,7 +960,8 @@ Tag.prototype.getStandardTags = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -1075,7 +1074,6 @@ Tag.prototype.getStandardTags = function(req,res,next){
  * @description api code for get tags
  */
 Tag.prototype.getTags = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var startCount = ((!isNaN(parseInt(req.query.pc))) && parseInt(req.query.pc) > 0) ?  parseInt(req.query.pc) : 0;
@@ -1090,7 +1088,8 @@ Tag.prototype.getTags = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -1206,8 +1205,6 @@ Tag.prototype.deleteTag = function(req,res,next) {
     /**
      * @todo FnDeleteTag
      */
-    var _this = this;
-
 
     var token = req.query.token;
     var tag = req.query.tag;
@@ -1228,7 +1225,7 @@ Tag.prototype.deleteTag = function(req,res,next) {
                     var query = 'CALL pdeleteTag(' + queryParams + ')';
                     console.log(query);
                     st.db.query(query, function (err, deleteResult) {
-                        console.log(deleteResult);
+                        //console.log(deleteResult);
                         if (!err) {
                             if(deleteResult) {
                                 if (deleteResult.affectedRows > 0) {
@@ -1304,24 +1301,34 @@ Tag.prototype.deleteTag = function(req,res,next) {
  * @description api code for get save pictures
  */
 Tag.prototype.savePictures = function(req,res,next) {
-    var _this = this;
     var fs = require("fs");
 
     // params order
     //flag,token,tag,type,pin,link,tid
     var params = req.body.params;
-    var flag,token, tagType,type,pin,link,tid,randomName = '', originalFileName = '', imageBuffer, tags, spQuery;
+    var flag;
+    var token;
+    var tagType;
+    var type;
+    var pin;
+    var link;
+    var tid;
+    var randomName = '';
+    var originalFileName = '';
+    var imageBuffer;
+    var tags;
+    var spQuery;
     params = params.split(',');
     console.log('----------params--------');
     console.log(params);
 
     flag = params[0]; // 1-send token,2-send tid
     token = params[1];
-    tagType = params[2] ? params[2] : 'PIC';
-    type = params[3] ? params[3] : 0;   // 0 - image, 1-url
-    pin = params[4] ? params[4] : null;
-    link = params[5] ? params[5] : '';
-    tid = params[6] ? params[6] : 0;
+    tagType = (params[2]) ? params[2] : 'PIC';
+    type = (params[3]) ? params[3] : 0;   // 0 - image, 1-url
+    pin = (params[4]) ? params[4] : null;
+    link = (params[5]) ? params[5] : '';
+    tid = (params[6]) ? params[6] : 0;
 
 
     if (tagType == 0) {
@@ -1341,7 +1348,8 @@ Tag.prototype.savePictures = function(req,res,next) {
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if (flag == 1) {
         if (!token) {

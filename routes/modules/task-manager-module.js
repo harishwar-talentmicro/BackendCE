@@ -12,8 +12,6 @@ function error(err, req, res, next) {
     res.json(500,{ status : false, message : 'Internal Server Error', error : {server : 'Exception'}});
 };
 
-var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeone.com';
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -48,7 +46,6 @@ function TaskManager(db,stdLib){
  * @description save tasks
  */
 TaskManager.prototype.saveTaskManager = function(req,res,next) {
-    var _this = this;
 
     var token = req.body.token;
     var id = parseInt(req.body.id);            // task id
@@ -70,7 +67,8 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
         data: null
     };
 
-    var error = {},validateStatus = true;
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -209,11 +207,16 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
  * @description api code for get tasks
  */
 TaskManager.prototype.getTasks = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var startDate = req.query.st;
     var endDate = req.query.et;
+    /**
+     * Function Type : 0 - Sales and 4 : Recruitment
+     */
+    var functionType = (parseInt(req.query.fn_type) == 4) ? req.query.fn_type : 0;
+    var tid = (!isNaN(parseInt(req.query.t_id))) ? (parseInt(req.query.t_id)) : 0;  // transaction id
+
     var responseMessage = {
         status: false,
         data: null,
@@ -221,12 +224,8 @@ TaskManager.prototype.getTasks = function(req,res,next){
         error: {}
     };
 
-    /**
-     * Function Type : 0 - Sales and 4 : Recruitment
-     */
-    var functionType = (parseInt(req.query.fn_type) == 4) ? req.query.fn_type : 0;
-
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -244,7 +243,7 @@ TaskManager.prototype.getTasks = function(req,res,next){
                 if (!err) {
                     if (tokenResult) {
                         var queryParams = st.db.escape(startDate)+ ',' + st.db.escape(endDate) + ',' +
-                            st.db.escape(token)+ ',' + st.db.escape(functionType);
+                            st.db.escape(token)+ ',' + st.db.escape(functionType)+ ',' + st.db.escape(tid);
                         var query = 'CALL pGetTasks(' + queryParams + ')';
                         console.log(query);
 

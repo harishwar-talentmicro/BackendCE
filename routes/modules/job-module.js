@@ -3602,7 +3602,7 @@ Job.prototype.findInstitute = function(req,res,next){
 Job.prototype.addtoSelectedJob = function(req,res,next){
 
 
-    var jobId = (parseInt(req.params.jobId) !== NaN && parseInt(req.params.jobId) > 0) ? parseInt(req.params.jobId) : '';
+    var jobId = ((!isNaN(parseInt(req.params.jobId))) && (parseInt(req.params.jobId)) > 0) ? parseInt(req.params.jobId) : '';
     var isJson = req.is('json');
     var token,cvId;
 
@@ -3636,6 +3636,10 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
 
         if (!token) {
             error['token'] = 'token is Mandatory';
+            validateStatus *= false;
+        }
+        if (isNaN(cvId)) {
+            error['cv_id'] = 'Invalid cv id';
             validateStatus *= false;
         }
     }

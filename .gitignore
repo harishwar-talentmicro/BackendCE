@@ -6,3 +6,4 @@ bin/uploads/
 Gruntfile.js
 npm-debug.log
 node_modules/*
+bin/daemon/helloworld.xml
