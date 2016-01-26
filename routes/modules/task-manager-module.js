@@ -60,6 +60,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     var taskDate = req.body.ts;            // Task Date and Time (YYYY-MM-DD HH:mm:ss)
     var ownerId = parseInt(req.body.ow);   // Owner ID (Master ID of the task owner)
     var nextActionId = (isNaN(parseInt(req.body.nxid))) ? 0 : parseInt(req.body.nxid);
+    var taskParticulars = (req.body.tp) ? req.body.tp  : ''; // Task particulars
     var tid,cd;
 
     var responseMessage = {
@@ -108,7 +109,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(id)+ ',' + st.db.escape(transactionId)
                             + ',' + st.db.escape(status) + ',' + st.db.escape(c_particulars) + ',' + st.db.escape(c_amount)
                             + ',' + st.db.escape(userIDs) + ',' + st.db.escape(taskDate)+ ',' + st.db.escape(ownerId)
-                            + ',' + st.db.escape(nextActionId);
+                            + ',' + st.db.escape(nextActionId) + ',' + st.db.escape(taskParticulars); // New parameter added
 
                         var query = 'CALL psavetask(' + queryParams + ')';
 
@@ -141,6 +142,7 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
                                         s  : parseInt(req.body.s),
                                         tx : parseInt(req.body.tx),
                                         cp : req.body.cp,
+                                        tp : req.body.tp, // Added task particulars
                                         ca : req.body.ca,
                                         au : req.body.au,
                                         ts : req.body.ts,
