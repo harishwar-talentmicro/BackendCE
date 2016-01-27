@@ -499,6 +499,9 @@ router.post('/ewtSaveDepartmentsVES',vesModule.saveDepartmentsVES);
 router.post('/ewtSaveGatesVES',vesModule.saveGatesVES);
 router.post('/ewtSaveCitysVES',vesModule.saveCitysVES);
 
+router.get('/api_health',function(req,res){
+   res.status(200).json({status : true});
+});
 router.get('/error_test',function(req,res,next){
     try {
         b.toString();
