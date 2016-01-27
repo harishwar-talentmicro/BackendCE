@@ -6,11 +6,8 @@
  */
 "use strict";
 
-var async = require('async');
-var util = require('util');
 
-var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeone.com';
+var util = require('util');
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -52,7 +49,6 @@ function Job(db,stdLib){
  * @description save jobs of a person
  */
 Job.prototype.create = function(req,res,next){
-    var _this = this;
     var fs = require("fs");
 
     var token = req.body.token;
@@ -86,9 +82,6 @@ Job.prototype.create = function(req,res,next){
         skillMatrix1=[];
     }
 
-    var jobID,m= 0,jobtype,receiverId,senderTitle,groupTitle,groupId,messageText;
-    var messageType,operationType,iphoneId,userId;
-
     var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
     var conatctId = req.body.ctid ? parseInt(req.body.ctid) : 0;     // contact id
     var isconfidential = req.body.isconfi ? parseInt(req.body.isconfi) : 0;
@@ -98,6 +91,19 @@ Job.prototype.create = function(req,res,next){
     var educations = req.body.jobEducation;
     educations= JSON.parse(JSON.stringify(educations));
     var iphoneID='';
+    var jobID;
+    var m= 0;
+    var jobtype;
+    var receiverId;
+    var senderTitle;
+    var groupTitle;
+    var groupId;
+    var messageText;
+    var messageType;
+    var operationType;
+    var iphoneId;
+    var userId;
+
 
 
     if (jobType == 0){
@@ -131,7 +137,10 @@ Job.prototype.create = function(req,res,next){
         message: '',
         data: null
     };
-    var error = {},validateStatus = true;
+
+    var error = {};
+    var validateStatus = true;
+
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -139,7 +148,7 @@ Job.prototype.create = function(req,res,next){
     if(!tid){
         tid = 0;
     }
-    if(parseInt(tid) == NaN){
+    if(isNaN(parseInt(tid))){
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
@@ -171,23 +180,23 @@ Job.prototype.create = function(req,res,next){
         error['openings'] = 'Invalid openings';
         validateStatus *= false;
     }
-    if(parseInt(jobType) == NaN){
+    if(isNaN(parseInt(jobType))){
         error['jobType'] = 'Invalid jobType';
         validateStatus *= false;
     }
 
-    if(parseInt(status) == NaN){
+    if(isNaN(parseInt(status))){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
     if(!locationsList){
         locationsList = [];
     }
-    if(parseInt(cid) == NaN){
+    if(isNaN(parseInt(cid))){
         error['cid'] = 'Invalid client id';
         validateStatus *= false;
     }
-    if(parseInt(conatctId) == NaN){
+    if(isNaN(parseInt(conatctId))){
         error['conatctId'] = 'Invalid conatctId';
         validateStatus *= false;
     }
@@ -226,7 +235,6 @@ Job.prototype.create = function(req,res,next){
                                         responseMessage.error = null;
                                         responseMessage.message = 'Jobs save successfully';
                                         responseMessage.data = {
-                                            token: token,
                                             tid: tid,
                                             ezeoneId: ezeoneId,
                                             job_code: jobCode,
@@ -668,7 +676,6 @@ Job.prototype.create = function(req,res,next){
 };
 
 function FnSaveSkills(skill, callBack) {
-    var _this = this;
     try {
 
         //below query to check token exists for the users or not.
@@ -677,16 +684,11 @@ function FnSaveSkills(skill, callBack) {
             var responseMessage = {
                 SkillID: 0
             };
-            responseMessage = JSON.parse(JSON.stringify((responseMessage)));
 
             st.db.query('Select SkillID from mskill where SkillTitle = ' + st.db.escape(skill.skillname) +' and functionid='+st.db.escape(skill.fid), function (err, skillResult) {
                 if ((!err)) {
                     if (skillResult[0]) {
-                        //console.log(skillResult);
-                        //console.log('Skill value:' + skillResult[0].SkillID);
-                        //console.log('Skill exists');
                         responseMessage.SkillID = skillResult[0].SkillID;
-                        //console.log(responseMessage.SkillID);
                         callBack(null, responseMessage);
                     }
                     else {
@@ -743,20 +745,19 @@ function FnSaveSkills(skill, callBack) {
  * @description  get jobs of a person based on ezeone_id
  */
 Job.prototype.getAll = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var pageSize = (!isNaN(parseInt(req.query.page_size))) ?  parseInt(req.query.page_size) : 100;
     var pageCount = (!isNaN(parseInt(req.query.page_count))) ?  parseInt(req.query.page_count) : 0;
-    var alumniCode = req.query.a_code ? req.query.a_code : '';
+    var alumniCode = (req.query.a_code) ? req.query.a_code : '';
     var clientSort = (!isNaN(parseInt(req.query.cls))) ?  parseInt(req.query.cls) : 0;
-    var clientQuery = req.query.clq ? req.query.clq : '';
+    var clientQuery = (req.query.clq) ? req.query.clq : '';
     var contactSort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
-    var contactQuery = req.query.ctq ? req.query.ctq : '';
+    var contactQuery = (req.query.ctq) ? req.query.ctq : '';
     var jobCodeSort = (!isNaN(parseInt(req.query.jcs))) ?  parseInt(req.query.jcs) : 0;
-    var jobCodeQuery = req.query.jcq ? req.query.jcq : '';
+    var jobCodeQuery = (req.query.jcq) ? req.query.jcq : '';
     var jobTitleSort = (!isNaN(parseInt(req.query.jts))) ?  parseInt(req.query.jts): 0;
-    var jobTitleQuery = req.query.jtq ? req.query.jtq : '';
+    var jobTitleQuery = (req.query.jtq) ? req.query.jtq : '';
     var createdDateSort = (!isNaN(parseInt(req.query.cds))) ?  parseInt(req.query.cds): 0;
     var status = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 1;
 
@@ -767,7 +768,9 @@ Job.prototype.getAll = function(req,res,next){
         message: '',
         data: []
     };
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
+
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -783,13 +786,15 @@ Job.prototype.getAll = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var query = st.db.escape(token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount)
                             + ',' + st.db.escape(alumniCode)+ ',' + st.db.escape(clientSort) + ',' + st.db.escape(clientQuery)
                             + ',' + st.db.escape(contactSort) + ',' + st.db.escape(contactQuery) + ',' + st.db.escape(jobTitleSort)
                             + ',' + st.db.escape(jobTitleQuery)+ ',' + st.db.escape(createdDateSort) + ',' + st.db.escape(status)
                             + ',' + st.db.escape(jobCodeSort)+ ',' + st.db.escape(jobCodeQuery);
-                        console.log('CALL pGetJobs(' + query + ')');
-                        st.db.query('CALL pGetJobs(' + query + ')', function (err, getresult) {
+
+                        var query = 'CALL pGetJobs(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getresult) {
 
                             if (!err) {
                                 if (getresult) {
@@ -800,7 +805,7 @@ Job.prototype.getAll = function(req,res,next){
                                             responseMessage.message = 'Jobs loaded successfully';
                                             responseMessage.data = {
                                                 total_count: getresult[0][0].count,
-                                                result : getresult[1] ? getresult[1] :[]
+                                                result : (getresult[1]) ? (getresult[1]) :[]
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetJobs: Jobs loaded successfully');
@@ -876,10 +881,6 @@ Job.prototype.getAll = function(req,res,next){
  */
 Job.prototype.getJobLocations = function(req,res,next){
 
-    var _this = this;
-
-    var token = req.query.token;
-    var mapType = req.query.map_type;
 
     var responseMsg = {
         status : false,
@@ -924,24 +925,23 @@ Job.prototype.getJobLocations = function(req,res,next){
  * @description search jobs of a person
  */
 Job.prototype.searchJobs = function(req,res,next){
-    var _this = this;
     try{
-        var latitude = req.query.latitude ? req.query.latitude : 0.00;
-        var longitude = req.query.longitude ? req.query.longitude : 0.00;
+        var latitude = (req.query.latitude) ? req.query.latitude : 0.00;
+        var longitude = (req.query.longitude) ? req.query.longitude : 0.00;
         var proximity = (req.query.proximity) ? req.query.proximity : 0;
-        var jobType = req.query.jobType ? req.query.jobType : '';
+        var jobType = (req.query.jobType) ? req.query.jobType : '';
         var exp = (req.query.exp) ? req.query.exp : -1;
-        var keywords = req.query.keywords ? req.query.keywords : '';
+        var keywords = (req.query.keywords) ? req.query.keywords : '';
         var token = (req.query.token) ? req.query.token : '';
         var pageSize = req.query.page_size;
         var pageCount = req.query.page_count;
-        var locations = req.query.locations ? req.query.locations : '';
-        var category = req.query.category ? req.query.category : '';
-        var salary = req.query.salary ? req.query.salary : '';
-        var filter = req.query.filter ? req.query.filter : 0;
-        var restrictToInstitue = req.query.restrict ? req.query.restrict : 0;
+        var locations = (req.query.locations) ? req.query.locations : '';
+        var category = (req.query.category) ? req.query.category : '';
+        var salary = (req.query.salary) ? req.query.salary : '';
+        var filter = (req.query.filter) ? req.query.filter : 0;
+        var restrictToInstitue = (req.query.restrict) ? req.query.restrict : 0;
         var type = req.query.type ? parseInt(req.query.type) : 0;  //0-normal job search, 1-Show my institue jobs, 2-for matching jobs of my cv and Default is 0
-        var toEzeid = req.query.to_ezeone ? alterEzeoneId(req.query.to_ezeone) : '';
+        var toEzeid = (req.query.to_ezeone) ? alterEzeoneId(req.query.to_ezeone) : '';
 
         var responseMessage = {
             status: false,
@@ -1054,7 +1054,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
         data: null
     };
 
-    var validateStatus=true,error={};
+    var validateStatus=true;
+    var error={};
 
     if(!isJson){
         error['isJson'] = 'Invalid Input ContentType';
@@ -1068,9 +1069,9 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var salaryType = (parseInt(req.body.salary_type) !== NaN && parseInt(req.body.salary_type) > 0) ? parseInt(req.body.salary_type) : 1;
         var experienceFrom = req.body.experience_from;
         var experienceTo = req.body.experience_to;
-        var instituteId = req.body.institute_id ? req.body.institute_id : '';
-        var pageSize = req.body.page_size ? req.body.page_size : 10;
-        var pageCount = req.body.page_count ? req.body.page_count : 0;
+        var instituteId = (req.body.institute_id) ? req.body.institute_id : '';
+        var pageSize = (req.body.page_size) ? req.body.page_size : 10;
+        var pageCount = (req.body.page_count) ? req.body.page_count : 0;
         var source = req.body.source;   // 1-internal, 2-for ezeone cvs
         var token = req.body.token;
         var jobSkills = req.body.job_skills;
@@ -1079,12 +1080,19 @@ Job.prototype.searchJobSeekers = function(req,res) {
         educations = JSON.parse(JSON.stringify(educations));
         var locMatrix = req.body.locMatrix;
         locMatrix = JSON.parse(JSON.stringify(locMatrix));
-        var skillMatrix = ' ', m = 0, eduMatrix = ' ', count, loc = ' ', educationMatrix = ' ', lineofcarrer = ' ';
+
+        var skillMatrix = ' ';
+        var eduMatrix = ' ';
+        var count;
+        var loc = ' ';
+        var educationMatrix = ' ';
         var locationsList = req.body.locationsList;
         if (typeof(locationsList) == "string") {
             locationsList = JSON.parse(locationsList);
         }
-        var location_id = '', locCount = 0, locationIds;
+        var location_id = '';
+        var locCount = 0;
+        var locationIds;
         var filterType = (!isNaN(parseInt(req.body.filter_type))) ? parseInt(req.body.filter_type) : 0;
 
         if (!jobSkills) {
@@ -1178,13 +1186,13 @@ Job.prototype.searchJobSeekers = function(req,res) {
 
                         if (eduMatrix == ' ') {
 
-                            eduMatrix = ' (FIND_IN_SET(c.Educationid,' + eduSkills.education + ' ) ' +
-                                'AND FIND_IN_SET(c.Specializationids,' + eduSkills.spc + ') ' +
+                            eduMatrix = ' (FIND_IN_SET(c.Educationid,' + '\'' + eduSkills.education + '\') ' +
+                                'AND FIND_IN_SET(c.Specializationids,' + '\'' + eduSkills.spc + '\') ' +
                                 'AND c.Score>=' + eduSkills.score_from + ' AND c.Score<=' + eduSkills.score_to + ')';
                         }
                         else {
-                            eduMatrix = eduMatrix + ' or' + ' (FIND_IN_SET(c.Educationid,' + eduSkills.education + ' ) ' +
-                                'AND FIND_IN_SET(c.Specializationids,' + eduSkills.spc + ') ' +
+                            eduMatrix = eduMatrix + ' or' + ' (FIND_IN_SET(c.Educationid,' + '\'' + eduSkills.education + '\') ' +
+                                'AND FIND_IN_SET(c.Specializationids,' + '\'' + eduSkills.spc + '\') ' +
                                 'AND c.Score>=' + eduSkills.score_from + ' AND c.Score<=' + eduSkills.score_to + ')';
                         }
 
@@ -1199,65 +1207,45 @@ Job.prototype.searchJobSeekers = function(req,res) {
                 }
 
                 //line of carrer
-                console.log(locMatrix);
-                console.log(locMatrix.length);
-                if (locMatrix.length) {
-                    for (var k = 0; k < locMatrix.length; k++) {
-                        //async.each(locMatrix, function iterator(locDetails, callback) {
+                if (locMatrix) {
 
-                        count = count - 1;
+                    count = count - 1;
 
-                        var locSkills = {
-                            fid: locMatrix[k].fid,
-                            locIds: locMatrix[k].career_id,
-                            exp_from: locMatrix[k].exp_from,
-                            exp_to: locMatrix[k].exp_to,
-                            level: locMatrix[k].expertiseLevel,
-                            scoreFrom: locMatrix[k].score_from,
-                            scoreTo: locMatrix[k].score_to
+                    var locSkills = {
+                        fid: locMatrix.fid,
+                        locIds: locMatrix.career_id,
+                        exp_from: locMatrix.exp_from,
+                        exp_to: locMatrix.exp_to,
+                        level: locMatrix.expertiseLevel,
+                        scoreFrom: locMatrix.score_from,
+                        scoreTo: locMatrix.score_to
 
-                        };
+                    };
 
-                        //(FIND_IN_SET(d.Functionid,array) AND FIND_IN_SET(d.LOCid,array) AND FIND_IN_SET(d.Level,array) AND d.Exp>=array AND d.Exp<=array )
-                        if (loc == ' ') {
+                    //(FIND_IN_SET(d.Functionid,array) AND FIND_IN_SET(d.LOCid,array) AND FIND_IN_SET(d.Level,array) AND d.Exp>=array AND d.Exp<=array )
+                    if (loc == ' ') {
 
-                            loc = ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
-                                'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
-                                'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
-                                'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
-                                ' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
-                        }
-                        else {
-                            loc = loc + ' or' + ' (FIND_IN_SET(d.Functionid,' + locSkills.fid + ') ' +
-                                'AND FIND_IN_SET(d.LOCid,' + locSkills.locIds + ') ' +
-                                'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
-                                'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
-                                ' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
-                        }
-
+                        loc = ' and (FIND_IN_SET(d.Functionid,' + '\'' + locSkills.fid + '\') ' +
+                            'AND FIND_IN_SET(d.LOCid,' + '\'' + locSkills.locIds + '\') ' +
+                            'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
+                            'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
+                            ' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
                     }
 
-                    if (loc != ' ') {
-                        lineofcarrer = ' and ( ' + loc + ')';
-                    }
-                    console.log(lineofcarrer);
-                }
-                else {
-                    lineofcarrer = '';
-                    console.log('loc is empty');
                 }
 
-                jobSeeker(skillArray, educationMatrix, lineofcarrer, locIds);
+
+                jobSeeker(skillArray, educationMatrix, loc, locIds,locSkills);
             };
 
-            var jobSeeker = function (skillArray, educationMatrix, lineofcarrer, locIds) {
+            var jobSeeker = function (skillArray, educationMatrix, loc, locIds,locSkills) {
 
                 var queryParams = st.db.escape(skillArray) + ',' + st.db.escape(jobType) + ',' + st.db.escape(salaryFrom)
                     + ',' + st.db.escape(salaryTo) + ',' + st.db.escape(salaryType) + ',' + st.db.escape(locIds)
                     + ',' + st.db.escape(experienceFrom) + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId)
                     + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
-                    + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(lineofcarrer)
-                    + ',' + st.db.escape(filterType)+',' + st.db.escape(gender);
+                    + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(loc)
+                    + ',' + st.db.escape(filterType)+',' + st.db.escape(gender)+',' + st.db.escape(locSkills.locIds);
 
                 var query = 'CALL pGetjobseekers(' + queryParams + ')';
                 console.log(query);
@@ -1433,7 +1421,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
  * @description api code for apply job
  */
 Job.prototype.applyJob = function(req,res,next){
-    var _this = this;
 
     var token = req.body.token;
     var jobId = req.body.job_id;
@@ -1446,7 +1433,9 @@ Job.prototype.applyJob = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
+
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -1545,7 +1534,6 @@ Job.prototype.applyJob = function(req,res,next){
  * @description api code for applied job list
  */
 Job.prototype.appliedJobList = function(req,res,next){
-    var _this = this;
 
     var jobId = req.query.job_id;
 
@@ -1556,7 +1544,8 @@ Job.prototype.appliedJobList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!jobId){
         error['jobId'] = 'Invalid job ID';
@@ -1626,11 +1615,11 @@ Job.prototype.appliedJobList = function(req,res,next){
  * @description api code for get job details
  */
 Job.prototype.getJobDetails = function(req,res,next){
-    var _this = this;
+
     var token = req.query.token;
     var jobId = req.query.job_id;
-    var latitude = req.query.lat ? req.query.lat : '';
-    var longitude = req.query.lng ? req.query.lng : '';
+    var latitude = (req.query.lat) ? req.query.lat : '';
+    var longitude = (req.query.lng) ? req.query.lng : '';
 
     var responseMessage = {
         status: false,
@@ -1639,7 +1628,8 @@ Job.prototype.getJobDetails = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!jobId){
         error['jobId'] = 'Invalid job ID';
@@ -1735,7 +1725,6 @@ Job.prototype.getJobDetails = function(req,res,next){
  * @description  get jobs of a person based on ezeone_id
  */
 Job.prototype.jobs = function(req,res,next){
-    var _this = this;
 
     var ezeone_id = alterEzeoneId(req.query.ezeone_id);
     var token = req.query.token;
@@ -1744,7 +1733,7 @@ Job.prototype.jobs = function(req,res,next){
     var pageSize = req.query.page_size;
     var pageCount = req.query.page_count;
     var orderBy = req.query.order_by;
-    var alumniCode = req.query.a_code ? req.query.a_code : '';// 1-ascending else descending
+    var alumniCode = (req.query.a_code) ? req.query.a_code : '';// 1-ascending else descending
     var output=[];
     //console.log(req.query);
 
@@ -1754,7 +1743,9 @@ Job.prototype.jobs = function(req,res,next){
         message: '',
         data: null
     };
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
+
     if(!ezeone_id){
         error['ezeone_id'] = 'Invalid ezeone_id';
         validateStatus *= false;
@@ -1885,7 +1876,6 @@ Job.prototype.jobs = function(req,res,next){
  * @description api code for applied job list
  */
 Job.prototype.getAppliedJob = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var pageSize = req.query.page_size;
@@ -1899,7 +1889,8 @@ Job.prototype.getAppliedJob = function(req,res,next){
         data: []
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2013,7 +2004,6 @@ Job.prototype.getAppliedJob = function(req,res,next){
  */
 Job.prototype.getJobcountry = function(req,res,next){
 
-    var _this = this;
 
     var responseMsg = {
         status : false,
@@ -2059,7 +2049,6 @@ Job.prototype.getJobcountry = function(req,res,next){
  */
 Job.prototype.getjobcity = function(req,res,next){
 
-    var _this = this;
 
     var countryTitle = req.query.country_title;
 
@@ -2116,7 +2105,7 @@ Job.prototype.getjobcity = function(req,res,next){
  * @description api code for Get Job Seekers Mail Details
  */
 Job.prototype.jobSeekersMessage = function(req,res,next){
-    var _this = this;
+
     var fs = require("fs");
     var token = req.body.token;
     var ids = req.body.ids;
@@ -2124,7 +2113,12 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
     var jobTitle = req.body.job_title;
     var jobId = req.body.job_id;
     var mailFlag = parseInt(req.body.mailflag);
-    var id, i,tid,jobResult,messageContent,link;
+    var id;
+    var i;
+    var tid;
+    var jobResult;
+    var messageContent;
+    var link;
 
     if(ids){
         id = ids.split(",");
@@ -2139,7 +2133,8 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2487,7 +2482,6 @@ Job.prototype.jobSeekersMessage = function(req,res,next){
  * @description api code for applied job list
  */
 Job.prototype.getListOfJobs = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
 
@@ -2498,7 +2492,8 @@ Job.prototype.getListOfJobs = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2593,7 +2588,6 @@ Job.prototype.getListOfJobs = function(req,res,next){
  * @description api code for get job refresh
  */
 Job.prototype.jobRefresh = function(req,res,next){
-    var _this = this;
 
     var token = req.body.token;
     var jobId = req.body.job_id;
@@ -2605,7 +2599,8 @@ Job.prototype.jobRefresh = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -2694,7 +2689,6 @@ Job.prototype.jobRefresh = function(req,res,next){
  * @description api code for get job match
  */
 Job.prototype.jobsMatch = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
 
@@ -2705,7 +2699,8 @@ Job.prototype.jobsMatch = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -2805,7 +2800,6 @@ Job.prototype.jobsMatch = function(req,res,next){
  * @description api code for get job MyInstitute
  */
 Job.prototype.jobsMyInstitute = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var latitude = req.query.latitude;
@@ -2818,7 +2812,8 @@ Job.prototype.jobsMyInstitute = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -2913,7 +2908,6 @@ Job.prototype.jobsMyInstitute = function(req,res,next){
  * @description api code for get notify RelevantStudent
  */
 Job.prototype.notifyRelevantStudent = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var jobId = parseInt(req.query.job_id);
@@ -2925,7 +2919,9 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
+
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -3020,7 +3016,6 @@ Job.prototype.notifyRelevantStudent = function(req,res,next){
  * @description api code for view cv details
  */
 Job.prototype.viewApplicantList = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var cvId = req.query.cv_ids;
@@ -3032,7 +3027,8 @@ Job.prototype.viewApplicantList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -3127,7 +3123,7 @@ Job.prototype.viewApplicantList = function(req,res,next){
  * @description api code for view job details
  */
 Job.prototype.viewJobDetails = function(req,res,next){
-    var _this = this;
+
     var token = req.query.token;
     var jobId = req.query.job_id;
 
@@ -3138,7 +3134,8 @@ Job.prototype.viewJobDetails = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -3244,15 +3241,27 @@ Job.prototype.viewJobDetails = function(req,res,next){
  * @description api code for Get Job Seekers Mail Details
  */
 Job.prototype.jobNotification = function(req,res,next) {
-    var _this = this;
+
     var fs = require("fs");
     var token = req.body.token;
     var ezeid = alterEzeoneId(req.body.ezeid);
     var ids = req.body.ids;    // tid of student ids
     var templateId = req.body.template_id;
     var jobId = req.body.job_id;
-    var id, i, types='',gid;
-    var masterid='',receiverId,senderTitle,groupTitle,groupId,messageText,messageType,operationType,iphoneId,messageId;
+    var id;
+    var i;
+    var types='';
+    var gid;
+    var masterid='';
+    var receiverId;
+    var senderTitle;
+    var groupTitle;
+    var groupId;
+    var messageText;
+    var messageType;
+    var operationType;
+    var iphoneId;
+    var messageId;
 
     //console.log(req.body);
 
@@ -3495,7 +3504,7 @@ Job.prototype.jobNotification = function(req,res,next) {
  * @description api code for view job details
  */
 Job.prototype.findInstitute = function(req,res,next){
-    var _this = this;
+
     var token = req.query.token;
     var keywords = req.query.keywords;
 
@@ -3506,7 +3515,8 @@ Job.prototype.findInstitute = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -3605,7 +3615,8 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
 
     var jobId = ((!isNaN(parseInt(req.params.jobId))) && (parseInt(req.params.jobId)) > 0) ? parseInt(req.params.jobId) : '';
     var isJson = req.is('json');
-    var token,cvId;
+    var token;
+    var cvId;
 
     var responseMessage = {
         status: false,
@@ -3614,7 +3625,8 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!jobId){
         error['jobId'] = 'Invalid jobId';
@@ -3743,7 +3755,6 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
  * @description api code for jsave ob location
  */
 Job.prototype.saveJobLocation = function(req,res,next){
-    var _this = this;
 
     var token = req.body.token;
     var locationTitle = req.body.location_title;
@@ -3759,7 +3770,8 @@ Job.prototype.saveJobLocation = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -3854,7 +3866,6 @@ Job.prototype.saveJobLocation = function(req,res,next){
  * @description api code for get loc
  */
 Job.prototype.getCandidatesList = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
 
@@ -3865,7 +3876,8 @@ Job.prototype.getCandidatesList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -3956,7 +3968,8 @@ Job.prototype.updateCandidateStatus = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!isJson){
         error['isJson'] = 'Invalid Input ContentType';
@@ -4060,7 +4073,7 @@ Job.prototype.updateCandidateStatus = function(req,res,next){
  * @description api code for auto search jobs
  */
 Job.prototype.autoSearchJobs = function(req,res,next){
-    var _this = this;
+
     var token = req.query.token;
     var title = req.query.title;
 
@@ -4071,7 +4084,8 @@ Job.prototype.autoSearchJobs = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'token is a mandatory';
@@ -4183,7 +4197,8 @@ Job.prototype.applicantStatus = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!isJson){
         error['isJson'] = 'Invalid Input ContentType';
@@ -4208,7 +4223,7 @@ Job.prototype.applicantStatus = function(req,res,next){
                 if (!err) {
                     if (tokenResult) {
                         var queryParams = st.db.escape(req.body.token) + ','  + st.db.escape(req.body.cv_id)
-                           + ','  + st.db.escape(req.body.st);
+                            + ','  + st.db.escape(req.body.st);
 
                         var query = 'CALL phideorshowApplicant(' + queryParams + ')';
                         console.log(query);

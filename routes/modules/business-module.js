@@ -3191,5 +3191,145 @@ BusinessManager.prototype.getRoles = function(req,res,next){
     }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
+    /**
+     * FnGetTransactionOfSales
+     */
+
+    var token = req.query.token;
+    var pageCount = (!isNaN(parseInt(req.query.pc))) ?  parseInt(req.query.pc): 0;      // no of records per page
+    var pageSize = (!isNaN(parseInt(req.query.ps))) ?  parseInt(req.query.ps): 10;   //  page size
+    var stage = (req.query.stage) ? (req.query.stage) : '';
+    var probability = (req.query.probability) ? (req.query.probability) : '';
+    var folder = (req.query.folder) ? (req.query.folder) : '';
+    var startDate = (req.query.sd) ? (req.query.sd) : null;
+    var endDate = (req.query.ed) ? (req.query.ed) : null;
+
+
+    var responseMessage = {
+        status: false,
+        error:{},
+        message:'',
+        total_count:0,
+        data: []
+    };
+
+    var validateStatus = true;
+    var error = {};
+
+    if(!token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error ;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+
+
+                        var parameters = st.db.escape(token) + ',' + st.db.escape(pageCount)
+                            + ',' + st.db.escape(pageSize) + ',' + st.db.escape(stage) + ',' + st.db.escape(probability)
+                            + ',' + st.db.escape(folder) + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate);
+
+                        var query = 'CALL pMGetSalesTransaction(' + parameters + ')';
+
+                        st.db.query(query, function (err, transResult) {
+                            //console.log(transResult);
+                            if (!err) {
+                                if (transResult) {
+                                    if (transResult[0]) {
+                                        if (transResult[0][0]) {
+                                            if (transResult[1]) {
+                                                responseMessage.status = true;
+                                                responseMessage.total_count = transResult[0][0].count;
+                                                responseMessage.data = transResult[1];
+                                                responseMessage.message = 'Transaction details loaded successfully';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetSalesTransaction: Transaction details loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.status = true;
+                                                responseMessage.message = 'Transaction details not loaded';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnGetSalesTransaction:Transaction details not loaded');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.message = 'Transaction details not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetSalesTransaction:Transaction details not loaded');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.message = 'Transaction details not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetSalesTransaction:Transaction details not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Transaction details not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetSalesTransaction:Transaction details not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal serever error'
+                                };
+                                responseMessage.message = 'Error getting from Transaction details';
+                                console.log('FnGetSalesTransaction:Error getting from Transaction details:' + err);
+                                res.status(500).json(responseMessage);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnGetSalesTransaction: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnGetSalesTransaction:Error in processing Token' + err);
+                }
+            });
+        }
+
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal server error'
+            };
+            responseMessage.message = 'An error occured !';
+            console.log('FnGetSalesTransaction:error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
 
 module.exports = BusinessManager;

@@ -82,13 +82,12 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
         validateStatus *= false;
     }
 
-    if(!status){
+    if(isNaN(parseInt(status))){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
-
-    if(!nextActionId){
-        error['status'] = 'Invalid task id';
+    if(isNaN(parseInt(nextActionId))){
+        error['nextActionId'] = 'Invalid nextActionId';
         validateStatus *= false;
     }
 
