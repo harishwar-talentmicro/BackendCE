@@ -759,7 +759,7 @@ Job.prototype.getAll = function(req,res,next){
     var jobTitleSort = (!isNaN(parseInt(req.query.jts))) ?  parseInt(req.query.jts): 0;
     var jobTitleQuery = (req.query.jtq) ? req.query.jtq : '';
     var createdDateSort = (!isNaN(parseInt(req.query.cds))) ?  parseInt(req.query.cds): 0;
-    var status = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 1;
+    var status = (req.query.sts) ?  req.query.sts: 0; // status date type is changed to varchar
 
 
     var responseMessage = {
