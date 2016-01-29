@@ -991,6 +991,7 @@ msgNotification.prototype.sendForwardNotification = function(msgContent, callBac
                                                                             var aUrl = '';
                                                                             var operationType = 0;
                                                                             var priority = 1;
+                                                                            var msgUserid=0;
                                                                             //console.log('senderid:' + groupId + '     receiverid:' + receiverId);
                                                                             //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                                             notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, dateTime, aName, msgUserid, jobId, aUrl);
