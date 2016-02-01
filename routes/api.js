@@ -500,6 +500,14 @@ router.post('/ewtSaveDepartmentsVES',vesModule.saveDepartmentsVES);
 router.post('/ewtSaveGatesVES',vesModule.saveGatesVES);
 router.post('/ewtSaveCitysVES',vesModule.saveCitysVES);
 
+//hris-module
+var Hris = require('./modules/hris-module.js');
+var hrisModule = new Hris(db,stdLib);
+router.get('/hris_business_loc_details',hrisModule.businessLocation);
+
+
+
+
 router.get('/api_health',function(req,res){
    res.status(200).json({status : true});
 });
