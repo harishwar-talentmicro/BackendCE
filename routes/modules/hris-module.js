@@ -39,7 +39,7 @@ function Hris(db,stdLib){
  * @method GET
  *
  */
-Hris.prototype.businessLocation = function(req,res,next){
+Hris.prototype.hrisMasters = function(req,res,next){
     var responseMessage = {
         status: false,
         error: {},
@@ -69,7 +69,10 @@ Hris.prototype.businessLocation = function(req,res,next){
                     if (!err) {
                         if (tokenResult) {
                             var procParams = st.db.escape(token);
-                            var procQuery = 'CALL pgetbusinesslocation(' + procParams + ')';
+                            var procQuery = 'CALL pgetbusinesslocation(' + procParams + '); CALL pgetjobtitle(' + procParams + ')' +
+                                ' ; CALL pgetdepartment(' + procParams + ') ; CALL pgetgrade(' + procParams + ') ; CALL pget_salary_template(' + procParams + '); ' +
+                                'CALL pget_leave_types(' + procParams + ')';
+
                             console.log(procQuery);
 
                             st.db.query(procQuery, function (err, results) {
@@ -82,7 +85,13 @@ Hris.prototype.businessLocation = function(req,res,next){
                                                 responseMessage.error = null;
                                                 responseMessage.message = 'Business location list loaded successfully';
                                                 responseMessage.data = {
-                                                    li : results[0]
+                                                    bl : results[0],
+                                                    jt : results[2],
+                                                    dp : results[4],
+                                                    gd : results[6],
+                                                    st : results[8],
+                                                    lt : results[10]
+
                                                 };
                                                 res.status(200).json(responseMessage);
                                             }

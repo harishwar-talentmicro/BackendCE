@@ -503,7 +503,7 @@ router.post('/ewtSaveCitysVES',vesModule.saveCitysVES);
 //hris-module
 var Hris = require('./modules/hris-module.js');
 var hrisModule = new Hris(db,stdLib);
-router.get('/hris_business_loc_details',hrisModule.businessLocation);
+router.get('/hris_masters',hrisModule.hrisMasters);
 
 
 
