@@ -30,7 +30,7 @@ bucket.acl.default.add({
 
 
 var stream = require( "stream" );
-var chalk = require( "chalk" );
+//var chalk = require( "chalk" );
 var util = require( "util" );
 // I turn the given source Buffer into a Readable stream.
 function BufferStream( source ) {
@@ -159,9 +159,9 @@ Configuration.prototype.save = function(req,res,next){
         var serviceURL = req.body.ServiceURL;
         var resumeURL = req.body.ResumeURL;
         var deal_enable = (!isNaN(parseInt(req.body.deal_enable))) ? parseInt(req.body.deal_enable) : 2;
-        var deal_banner = req.body.deal_banner ? req.body.deal_banner : '';
-        var deal_title = req.body.deal_title ? req.body.deal_title : '';
-        var deal_desc = req.body.deal_desc ? req.body.deal_desc : '' ;
+        var deal_banner = (req.body.deal_banner) ? req.body.deal_banner : '';
+        var deal_title = (req.body.deal_title) ? req.body.deal_title : '';
+        var deal_desc = (req.body.deal_desc) ? req.body.deal_desc : '' ;
         var randomName;
 
         var rtnMessage = {
@@ -564,8 +564,7 @@ Configuration.prototype.StatusTypes = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var statusAllOpen =
-                        {
+                        var statusAllOpen = {
                             TID:'-1',
                             MasterID:'0',
                             StatusTitle:'All Open',
@@ -847,7 +846,7 @@ Configuration.prototype.saveActionType = function(req,res,next){
     /**
      * @todo FnSaveActionType
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -933,7 +932,7 @@ Configuration.prototype.getItems = function(req,res,next){
     /**
      * @todo FnGetItemList
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1018,7 +1017,7 @@ Configuration.prototype.saveItems = function(req,res,next){
     /**
      * @todo FnSaveItem
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1029,7 +1028,7 @@ Configuration.prototype.saveItems = function(req,res,next){
         var itemName = req.body.ItemName;
         var itemDescription = req.body.ItemDescription;
         var pic = req.body.Pic;
-        var rate = req.body.Rate ? req.body.Rate : 0.00;
+        var rate = (req.body.Rate) ? req.body.Rate : 0.00;
         var status = req.body.Status;
         var itemDuration = req.body.ItemDuration;
 
@@ -1045,7 +1044,7 @@ Configuration.prototype.saveItems = function(req,res,next){
 
                         var deleteFlag = false;
 
-                        if(parseInt(tid) != NaN && parseInt(tid)> 0 && parseInt(status) != 1){
+                        if(!isNaN(parseInt(tid))&& parseInt(tid)> 0 && parseInt(status) != 1){
                             deleteFlag = true;
                         }
 
@@ -1530,14 +1529,14 @@ Configuration.prototype.getReservationResources = function(req,res,next){
     /**
      * @todo FnGetReservationResource
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var ezeid = alterEzeoneId(req.query.ezeid);
-        var type = req.query.type ? req.query.type : 0 ;
+        var type = (req.query.type) ? req.query.type : 0 ;
 
         var responseMessage = {
             status: false,
@@ -1619,7 +1618,7 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
     /**
      * @todo FnSaveReseravtionResource
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1630,8 +1629,8 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
         var title = (req.body.title) ? ((req.body.title.trim().length > 0) ? req.body.title : null ) : null ;
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-        var operatorid = req.body.operatorid ? req.body.operatorid : '';
-        var workingtemp = req.body.working_temp ? req.body.working_temp : 0;
+        var operatorid = (req.body.operatorid) ? req.body.operatorid : '';
+        var workingtemp = (req.body.working_temp) ? req.body.working_temp : 0;
 
         var responseMessage = {
             status: false,
@@ -1668,18 +1667,34 @@ Configuration.prototype.saveReservationResource = function(req,res,next){
                         st.db.query('CALL pSaveResource(' + query + ')', function (err, insertResult) {
                             if (!err){
                                 if (insertResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Resource details save successfully';
-                                    responseMessage.data = {
-                                        TID : insertResult[0][0].maxid,
-                                        title : req.body.title,
-                                        status : req.body.status,
-                                        description : req.body.description,
-                                        picture : req.body.picture
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservationResource: Resource details save successfully');
+                                    if (insertResult[0]) {
+                                        if (insertResult[0][0]) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Resource details save successfully';
+                                            responseMessage.data = {
+                                                TID: insertResult[0][0].maxid,
+                                                title: req.body.title,
+                                                status: req.body.status,
+                                                description: req.body.description,
+                                                picture: req.body.picture
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveReservationResource: Resource details save successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'An error occured ! Please try again';
+                                            responseMessage.error = {};
+                                            res.status(400).json(responseMessage);
+                                            console.log('FnSaveReservationResource:No save Resource details');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured ! Please try again';
+                                        responseMessage.error = {};
+                                        res.status(400).json(responseMessage);
+                                        console.log('FnSaveReservationResource:No save Resource details');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'An error occured ! Please try again';
@@ -1753,7 +1768,7 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
     /**
      * @todo FnUpdateReservationResource
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1765,7 +1780,7 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
         var description = req.body.description;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
         var operatorid = req.body.operatorid;
-        var workingTemp = (parseInt(req.body.working_temp) !== NaN) ? parseInt(req.body.working_temp) : 0;
+        var workingTemp = (!isNaN(parseInt(req.body.working_temp))) ? parseInt(req.body.working_temp) : 0;
 
         var responseMessage = {
             status: false,
@@ -1804,19 +1819,27 @@ Configuration.prototype.updateReservationResource = function(req,res,next){
                             ',' + st.db.escape(status) + ',' + st.db.escape(operatorid) + ','+st.db.escape(workingTemp);
                         st.db.query('CALL pSaveResource(' + query + ')', function (err, updateResult) {
                             if (!err){
-                                if (updateResult.affectedRows > 0) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Resource details update successfully';
-                                    responseMessage.data = {
-                                        TID : req.body.TID,
-                                        title : req.body.title,
-                                        status : req.body.status,
-                                        description : req.body.description,
-                                        picture : req.body.pictures
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnUpdateReservationResource: Resource details update successfully');
+                                if(updateResult) {
+                                    if (updateResult.affectedRows > 0) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Resource details update successfully';
+                                        responseMessage.data = {
+                                            TID: req.body.TID,
+                                            title: req.body.title,
+                                            status: req.body.status,
+                                            description: req.body.description,
+                                            picture: req.body.pictures
+                                        };
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnUpdateReservationResource: Resource details update successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured ! Please try again';
+                                        responseMessage.error = {};
+                                        res.status(400).json(responseMessage);
+                                        console.log('FnUpdateReservationResource:No Resource details updated');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'An error occured ! Please try again';
@@ -1890,7 +1913,7 @@ Configuration.prototype.getReservationServices = function(req,res,next){
     /**
      * @todo FnGetReservationService
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1908,25 +1931,31 @@ Configuration.prototype.getReservationServices = function(req,res,next){
             st.db.query('CALL pGetResServices(' + st.db.escape(ezeid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0];
-                            responseMessage.error = null;
-                            responseMessage.message = 'Service details Send successfully';
-                            console.log('FnGetReservationService: Service details Send successfully');
-                            res.status(200).json(responseMessage);
+                        if (GetResult[0]) {
+                            if (GetResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.data = GetResult[0];
+                                responseMessage.error = null;
+                                responseMessage.message = 'Service details Send successfully';
+                                console.log('FnGetReservationService: Service details Send successfully');
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+
+                                responseMessage.error = {};
+                                responseMessage.message = 'No Service details found';
+                                console.log('FnGetReservationService: No Service details found');
+                                res.json(responseMessage);
+                            }
                         }
                         else {
-
                             responseMessage.error = {};
-                            responseMessage.message = 'No founded service details';
-                            console.log('FnGetReservationService: No founded Service details');
+                            responseMessage.message = 'No Service details found';
+                            console.log('FnGetReservationService: No Service details found');
                             res.json(responseMessage);
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No Service details found';
                         console.log('FnGetReservationService: No Service details found');
@@ -1976,7 +2005,7 @@ Configuration.prototype.saveReservationService = function(req,res,next){
     /**
      * @todo FnSaveReservationService
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -1987,7 +2016,7 @@ Configuration.prototype.saveReservationService = function(req,res,next){
         var duration = req.body.duration;
         var rate = req.body.rate;
         var status = (parseInt(req.body.status)=== 1 || parseInt(req.body.status) === 2) ? req.body.status : 1;
-        var service_ids = req.body.service_ids ? req.body.service_ids : 0;
+        var service_ids = (req.body.service_ids) ? req.body.service_ids : 0;
 
         var ID=''
         if(service_ids){
@@ -2028,19 +2057,35 @@ Configuration.prototype.saveReservationService = function(req,res,next){
                         st.db.query('CALL pSaveResServices(' + query + ')', function (err, insertResult) {
                             if (!err){
                                 if (insertResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Service details save successfully';
-                                    responseMessage.data = {
-                                        TID : insertResult[0][0].maxid,
-                                        title : req.body.title,
-                                        status : req.body.status,
-                                        duration : req.body.duration,
-                                        rate : req.body.rate,
-                                        service_ids : req.body.service_ids
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveReservationService: Service details save successfully');
+                                    if (insertResult[0]) {
+                                        if (insertResult[0][0]) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Service details save successfully';
+                                            responseMessage.data = {
+                                                TID: insertResult[0][0].maxid,
+                                                title: req.body.title,
+                                                status: req.body.status,
+                                                duration: req.body.duration,
+                                                rate: req.body.rate,
+                                                service_ids: req.body.service_ids
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveReservationService: Service details save successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'An error occured ! Please try again';
+                                            responseMessage.error = {};
+                                            res.status(400).json(responseMessage);
+                                            console.log('FnSaveReservationService:No Service details saved');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'An error occured ! Please try again';
+                                        responseMessage.error = {};
+                                        res.status(400).json(responseMessage);
+                                        console.log('FnSaveReservationService:No Service details saved');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'An error occured ! Please try again';
@@ -2107,7 +2152,7 @@ Configuration.prototype.updateReservationService = function(req,res,next){
     /**
      * @todo FnUpdateReservationService
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -2238,7 +2283,7 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
     /**
      * @todo FnGetReservResourceServiceMap,
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -2257,25 +2302,31 @@ Configuration.prototype.getResourceServiceMaps = function(req,res,next){
             st.db.query('CALL pGetResResourceServiceMap(' + st.db.escape(ezeid) + ')', function (err, GetResult) {
                 if (!err) {
                     if (GetResult) {
-                        if (GetResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.data = GetResult[0] ;
-                            responseMessage.error = null;
-                            responseMessage.message = 'ResourceServiceMap details Send successfully';
-                            console.log('FnGetReservResourceServiceMap: ResourceServiceMap details Send successfully');
-                            res.status(200).json(responseMessage);
+                        if(GetResult[0]) {
+                            if (GetResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.data = GetResult[0];
+                                responseMessage.error = null;
+                                responseMessage.message = 'ResourceServiceMap details Send successfully';
+                                console.log('FnGetReservResourceServiceMap: ResourceServiceMap details Send successfully');
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+
+                                responseMessage.error = {};
+                                responseMessage.message = 'Not founded ResourceServiceMap details';
+                                console.log('FnGetReservResourceServiceMap: No founded ResourceServiceMap details');
+                                res.json(responseMessage);
+                            }
                         }
                         else {
-
                             responseMessage.error = {};
-                            responseMessage.message = 'No founded ResourceServiceMap details';
-                            console.log('FnGetReservResourceServiceMap: No founded ResourceServiceMap details');
+                            responseMessage.message = 'No ResourceServiceMap details found';
+                            console.log('FnGetReservResourceServiceMap: No ResourceServiceMap details found');
                             res.json(responseMessage);
                         }
                     }
                     else {
-
-
                         responseMessage.error = {};
                         responseMessage.message = 'No ResourceServiceMap details found';
                         console.log('FnGetReservResourceServiceMap: No ResourceServiceMap details found');
@@ -2326,7 +2377,7 @@ Configuration.prototype.saveResourceServiceMap = function(req,res,next){
     /**
      * @todo FnSaveReservResourceServiceMap
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -2516,7 +2567,7 @@ Configuration.prototype.getWorkingHoursTemplates = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnGetWorkingHours: Token is empty');
             }
 
@@ -2679,7 +2730,7 @@ Configuration.prototype.getHolidays = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var token = req.query.Token;
-        var locId = req.query.LocID ? req.query.LocID : 0;
+        var locId = (req.query.LocID) ? req.query.LocID : 0;
         var templateId = req.query.TemplateID;
 
         if (token) {
@@ -3159,7 +3210,8 @@ Configuration.prototype.saveInstituteGroup = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!isJson){
         error['isJson'] = 'Invalid Input ContentType';
@@ -3272,7 +3324,8 @@ Configuration.prototype.getInstituteGroup = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!(req.query.token)){
         error['token'] = 'Token is Mandatory';

@@ -44,14 +44,14 @@ Audit.prototype.getAccessHistory = function(req,res,next){
     /**
      * @todo FnGetAccessHistory
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.TokenNo;
         //var Page = parseInt(req.query.Page);
-        var pageSize = req.query.page_size ? parseInt(req.query.page_size) : 100;
-        var pageCount = req.query.page_count ? parseInt(req.query.page_count) : 0;
+        var pageSize = (req.query.page_size) ? parseInt(req.query.page_size) : 100;
+        var pageCount = (req.query.page_count) ? parseInt(req.query.page_count) : 0;
 
         var responseMessage = {
             status: false,
@@ -62,9 +62,9 @@ Audit.prototype.getAccessHistory = function(req,res,next){
         };
 
         if (Token) {
-            st.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result) {
+                    if (tokenResult) {
                         //var ToPage = 25 * Page;
                         //var FromPage = ToPage - 24;
                         //
@@ -74,23 +74,30 @@ Audit.prototype.getAccessHistory = function(req,res,next){
                         console.log('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ')');
                         st.db.query('CALL pAccessHistory(' + st.db.escape(Token) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ')', function (err, AccessHistoryResult) {
                             if (!err) {
-                                console.log(AccessHistoryResult);
-                                if (AccessHistoryResult[0]) {
-                                    if (AccessHistoryResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'AccessHistory List loaded successfully';
-                                        responseMessage.count = AccessHistoryResult[0][0].count;
-                                        responseMessage.data = AccessHistoryResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAccessHistory: AccessHistory List loaded successfully');
+                                //console.log(AccessHistoryResult);
+                                if (AccessHistoryResult) {
+                                    if (AccessHistoryResult[0]) {
+                                        if (AccessHistoryResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'AccessHistory List loaded successfully';
+                                            responseMessage.count = AccessHistoryResult[0][0].count;
+                                            responseMessage.data = AccessHistoryResult[0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetAccessHistory: AccessHistory List loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'AccessHistory List not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetAccessHistory:AccessHistory List not loaded');
+                                        }
+
                                     }
                                     else {
                                         responseMessage.message = 'AccessHistory List not loaded';
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetAccessHistory:AccessHistory List not loaded');
                                     }
-
                                 }
                                 else {
                                     responseMessage.message = 'AccessHistory List not loaded';
@@ -130,7 +137,7 @@ Audit.prototype.getAccessHistory = function(req,res,next){
 
         }
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnGetAccessHistory: Token is empty');
                 responseMessage.error = {
                     token : 'Token is empty'
@@ -161,7 +168,7 @@ Audit.prototype.saveList = function(req,res,next){
     /**
      * @todo FnSaveWhiteBlackList
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -177,17 +184,23 @@ Audit.prototype.saveList = function(req,res,next){
         };
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (List!= null && RelationType.toString() != 'NaN' && Tag.toString() != 'NaN' && EZEID !=null && Token != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (List!= null && !isNaN(RelationType) && !isNaN(Tag) && EZEID !=null && Token) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
                         var query = st.db.escape(List) + ',' + st.db.escape(RelationType) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(Tag) + ',' +st.db.escape(Token);
                         st.db.query('CALL pSavewhiteblacklist(' + query + ')', function (err, InsertResult) {
                             if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveWhiteBlackList: White/Black list details save successfully');
+                                if (InsertResult) {
+                                    if (InsertResult.affectedRows > 0) {
+                                        RtnMessage.IsSuccessfull = true;
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveWhiteBlackList: White/Black list details save successfully');
+                                    }
+                                    else {
+                                        console.log('FnSaveWhiteBlackList:No Save White/Black list details');
+                                        res.send(RtnMessage);
+                                    }
                                 }
                                 else {
                                     console.log('FnSaveWhiteBlackList:No Save White/Black list details');
@@ -218,16 +231,16 @@ Audit.prototype.saveList = function(req,res,next){
             if (List == null) {
                 console.log('FnSaveWhiteBlackList: List is empty');
             }
-            else if (RelationType == 'NaN') {
+            else if (isNaN(RelationType)) {
                 console.log('FnSaveWhiteBlackList: RelationType is empty');
             }
             else if (EZEID == null) {
                 console.log('FnSaveWhiteBlackList: Ezeid is empty');
             }
-            else if (Tag == 'NaN') {
+            else if (isNaN(Tag)) {
                 console.log('FnSaveWhiteBlackList: Tag is empty');
             }
-            else if (Token == null) {
+            else if (!Token) {
                 console.log('FnSaveWhiteBlackList: Token is empty');
             }
 
@@ -253,7 +266,7 @@ Audit.prototype.getList = function(req,res,next){
     /**
      * @todo FnGetWhiteBlackList
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -263,14 +276,14 @@ Audit.prototype.getList = function(req,res,next){
         //var EZEID = req.query.EZEID;
 
 
-        if (Token != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (Token) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
                         st.db.query('CALL pGetwhiteblacklist(' + st.db.escape(Token) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
+                                if (GetResult) {
                                     if (GetResult[0].length > 0) {
 
                                         console.log('FnGetWhiteBlackList: white/black list details Sent successfully');
@@ -336,7 +349,7 @@ Audit.prototype.deleteList = function(req,res,next){
     /**
      * @todo FnDeleteWhiteBlackList
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -351,18 +364,24 @@ Audit.prototype.deleteList = function(req,res,next){
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
 
-        if (TID !=null && Token != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (TID !=null && Token ) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
                         var query = st.db.escape(Token) + ',' + st.db.escape(TID);
                         st.db.query('CALL pDeletewhiteblacklist(' + query + ')', function (err, InsertResult) {
                             if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnDeleteWhiteBlackList: White/Black list details delete successfully');
+                                if (InsertResult) {
+                                    if (InsertResult.affectedRows > 0) {
+                                        RtnMessage.IsSuccessfull = true;
+                                        res.send(RtnMessage);
+                                        console.log('FnDeleteWhiteBlackList: White/Black list details delete successfully');
+                                    }
+                                    else {
+                                        console.log('FnDeleteWhiteBlackList:No delete White/Black list details');
+                                        res.send(RtnMessage);
+                                    }
                                 }
                                 else {
                                     console.log('FnDeleteWhiteBlackList:No delete White/Black list details');
@@ -394,7 +413,7 @@ Audit.prototype.deleteList = function(req,res,next){
         }
 
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnDeleteWhiteBlackList: Token is empty');
             }
             else if (TID == null) {
@@ -424,7 +443,7 @@ Audit.prototype.getListCount = function(req,res,next){
     /**
      * @todo FnGetWhiteListCount
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -438,21 +457,28 @@ Audit.prototype.getListCount = function(req,res,next){
         };
 
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (Token != null && EZEID != null && List != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (Token && EZEID != null && List != null) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
                         var query = st.db.escape(Token) + ',' + st.db.escape(EZEID) + ',' + st.db.escape(List);
 
                         st.db.query('CALL pGetWhiteListCount(' + query + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult[0] != null) {
-                                    if (GetResult[0].length > 0) {
-                                        var WhiteListCount =GetResult[0];
-                                        RtnMessage.WhiteListCount=WhiteListCount[0].WhiteListCount;
-                                        console.log('FnGetWhiteListCount: white list count Sent successfully');
-                                        res.send(RtnMessage);
+                                if (GetResult) {
+                                    if (GetResult[0]) {
+                                        if (GetResult[0].length > 0) {
+                                            var WhiteListCount = GetResult[0];
+                                            RtnMessage.WhiteListCount = WhiteListCount[0].WhiteListCount;
+                                            console.log('FnGetWhiteListCount: white list count Sent successfully');
+                                            res.send(RtnMessage);
+                                        }
+                                        else {
+
+                                            console.log('FnGetWhiteListCount:No white list details found');
+                                            res.send(RtnMessage);
+                                        }
                                     }
                                     else {
 
@@ -489,7 +515,7 @@ Audit.prototype.getListCount = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnGetWhiteListCount: Token is empty');
             }
             else if (EZEID == null) {
@@ -520,22 +546,29 @@ Audit.prototype.getRelation = function(req,res,next){
     /**
      * @todo FnGetRelationType
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var LangID = parseInt(req.query.LangID);
-        if (LangID.toString != 'NaN') {
+        if (!isNaN(LangID)) {
             var Query = 'Select RelationID, RelationshipTitle from mrelationtype where LangID=' + st.db.escape(LangID);
             st.db.query(Query, function (err, RelationTypeResult) {
                 if (!err) {
-                    if (RelationTypeResult.length > 0) {
-                        res.send(RelationTypeResult);
-                        console.log('FnGetRelationType: mrelationtype: Relation Type sent successfully');
+                    if (RelationTypeResult) {
+                        if (RelationTypeResult.length > 0) {
+                            res.send(RelationTypeResult);
+                            console.log('FnGetRelationType: mrelationtype: Relation Type sent successfully');
+                        }
+                        else {
+                            res.json(null);
+                            res.statusCode = 200;
+                            console.log('FnGetRelationType: mrelationtype: No Relation type found');
+                        }
                     }
                     else {
                         res.json(null);
-                        res.statusCode = 500;
+                        res.statusCode = 200;
                         console.log('FnGetRelationType: mrelationtype: No Relation type found');
                     }
                 }
@@ -570,30 +603,30 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
     /**
      * @todo FnSaveMailTemplate
      */
-    var _this = this;
+
     try{
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var Token = req.body.Token;
         var Title = req.body.Title;
-        var FromName = req.body.FromName ? req.body.FromName : '';
-        var FromEmailID = req.body.FromEmailID ? req.body.FromEmailID : '';
-        var CCMailIDS = req.body.CCMailIDS ? req.body.CCMailIDS :'';
-        var BCCMailIDS = req.body.BCCMailIDS ? req.body.BCCMailIDS : '';
-        var Subject  = req.body.Subject ? req.body.Subject : '';
+        var FromName = (req.body.FromName) ? req.body.FromName : '';
+        var FromEmailID = (req.body.FromEmailID) ? req.body.FromEmailID : '';
+        var CCMailIDS = (req.body.CCMailIDS) ? req.body.CCMailIDS :'';
+        var BCCMailIDS = (req.body.BCCMailIDS) ? req.body.BCCMailIDS : '';
+        var Subject  = (req.body.Subject) ? req.body.Subject : '';
         var Body = req.body.Body;
-        var templateType = req.body.template_type ? req.body.template_type : 1; //1-bulkmailer, 2-jobseekers bulkmailer, 3-notification
+        var templateType = (req.body.template_type) ? req.body.template_type : 1; //1-bulkmailer, 2-jobseekers bulkmailer, 3-notification
         var tid = (req.body.tid) ? parseInt(req.body.tid) : 0;
 
         var RtnMessage = {
             IsSuccessfull: false
         };
 
-        if (Token != null && Title != null && Body != null ) {
-            st.validateToken(Token, function (err, Result) {
+        if (Token && Title != null && Body != null ) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
                         var query = st.db.escape(Token) + ', ' +st.db.escape(Title) + ',' + st.db.escape(FromName) + ',' + st.db.escape(FromEmailID)
                             + ',' + st.db.escape(CCMailIDS) + ',' + st.db.escape(BCCMailIDS) + ',' + st.db.escape(Subject)
@@ -601,12 +634,18 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
 
                         console.log('CALL pSaveMailTemplate(' + query + ')');
                         st.db.query('CALL pSaveMailTemplate(' + query + ')', function (err, InsertResult) {
-                            console.log(InsertResult);
+                           // console.log(InsertResult);
                             if (!err){
-                                if (InsertResult.affectedRows > 0) {
-                                    RtnMessage.IsSuccessfull = true;
-                                    res.send(RtnMessage);
-                                    console.log('FnSaveMailTemplate: Mail Template save successfully');
+                                if (InsertResult) {
+                                    if (InsertResult.affectedRows > 0) {
+                                        RtnMessage.IsSuccessfull = true;
+                                        res.send(RtnMessage);
+                                        console.log('FnSaveMailTemplate: Mail Template save successfully');
+                                    }
+                                    else {
+                                        console.log('FnSaveMailTemplate:No save  Mail Template');
+                                        res.send(RtnMessage);
+                                    }
                                 }
                                 else {
                                     console.log('FnSaveMailTemplate:No save  Mail Template');
@@ -638,20 +677,11 @@ Audit.prototype.saveMailTemplate = function(req,res,next){
         }
 
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnSaveMailTemplate: Token is empty');
             }
             else if (Title == null) {
                 console.log('FnSaveMailTemplate: Title is empty');
-            }
-            else if (FromName == null) {
-                console.log('FnSaveMailTemplate: FromName is empty');
-            }
-            else if (FromEmailID == null) {
-                console.log('FnSaveMailTemplate: FromEmailID is empty');
-            }
-            else if (Subject == null) {
-                console.log('FnSaveMailTemplate: Subject is empty');
             }
             else if (Body == null) {
                 console.log('FnSaveMailTemplate: Body is empty');
@@ -678,7 +708,7 @@ Audit.prototype.getMailTemplate = function(req,res,next) {
     /**
      * @todo FnGetTemplateList
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -687,18 +717,24 @@ Audit.prototype.getMailTemplate = function(req,res,next) {
         var Token = req.query.Token;
         var templateType = req.query.template_type; //TemplateType=1 for bulkmailer and 2=jobseekers bulkmailer, 3-notification
 
-        if (Token != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (Token) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
                         st.db.query('CALL pgetAllMailtemplate(' + st.db.escape(Token) + ',' + st.db.escape(templateType) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
+                                if (GetResult) {
+                                    if (GetResult[0]) {
+                                        if (GetResult[0].length > 0) {
 
-                                        console.log('FnGetTemplateList: Template list Send successfully');
-                                        res.send(GetResult[0]);
+                                            console.log('FnGetTemplateList: Template list Send successfully');
+                                            res.send(GetResult[0]);
+                                        }
+                                        else {
+                                            console.log('FnGetTemplateList:No Template list found');
+                                            res.json(null);
+                                        }
                                     }
                                     else {
                                         console.log('FnGetTemplateList:No Template list found');
@@ -730,7 +766,7 @@ Audit.prototype.getMailTemplate = function(req,res,next) {
             });
         }
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnGetTemplateList: Token is empty');
             }
             res.statusCode = 400;
@@ -754,7 +790,7 @@ Audit.prototype.getTemplateDetails = function(req,res,next){
     /**
      * @todo FnGetTemplateDetails
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -763,18 +799,24 @@ Audit.prototype.getTemplateDetails = function(req,res,next){
         var Token = req.query.Token;
         var TID = req.query.TID;
 
-        if (Token != null) {
-            st.validateToken(Token, function (err, Result) {
+        if (Token) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
                         //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
                         st.db.query('CALL pgetMailtemplateDetails(' + st.db.escape(TID) + ')', function (err, GetResult) {
                             if (!err) {
-                                if (GetResult != null) {
-                                    if (GetResult[0].length > 0) {
-                                        console.log('FnGetTemplateDetails: Template Details Send successfully');
-                                        res.send(GetResult[0]);
+                                if (GetResult) {
+                                    if (GetResult[0]) {
+                                        if (GetResult[0].length > 0) {
+                                            console.log('FnGetTemplateDetails: Template Details Send successfully');
+                                            res.send(GetResult[0]);
+                                        }
+                                        else {
+                                            console.log('FnGetTemplateDetails:No Template Details found');
+                                            res.json(null);
+                                        }
                                     }
                                     else {
                                         console.log('FnGetTemplateDetails:No Template Details found');
@@ -806,12 +848,10 @@ Audit.prototype.getTemplateDetails = function(req,res,next){
             });
         }
         else {
-            if (Token == null) {
+            if (!Token) {
                 console.log('FnGetTemplateDetails: Token is empty');
             }
-            else if (TID == null) {
-                console.log('FnGetTemplateDetails: TID is empty');
-            }
+
             res.statusCode=400;
             res.json(null);
         }
@@ -833,7 +873,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
     /**
      * @todo FnSendBulkMailer
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -854,26 +894,26 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
         };
         if (TID != null) {
 
-            if (Token != null && Token != '' && TID != null && TID != '' && TemplateID != null && TemplateID != '') {
-                st.validateToken(Token, function (err, Result) {
+            if (Token && TID && TemplateID ) {
+                st.validateToken(Token, function (err, tokenResult) {
                     if (!err) {
-                        if (Result != null) {
+                        if (tokenResult) {
                             //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
                             var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
                             console.log(query);
                             st.db.query(query, function (err, GetResult) {
                                 if (!err) {
-                                    if (GetResult != null) {
+                                    if (GetResult) {
 
-                                        console.log(GetResult[0]);
+                                        //console.log(GetResult[0]);
 
                                         if (GetResult.length > 0) {
                                             var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
                                             st.db.query(templateQuery, function (err, TemplateResult) {
                                                 if (!err) {
-                                                    if (TemplateResult != null) {
+                                                    if (TemplateResult) {
                                                         if (TemplateResult.length > 0) {
-                                                            console.log(TemplateResult);
+                                                           // console.log(TemplateResult);
                                                             RtnResponse.IsSent = true;
                                                             for (var i = 0; i < GetResult.length; i++) {
                                                                 if (GetResult[i].SalesMailID != null && GetResult[i].SalesMailID != ' ') {
@@ -988,13 +1028,13 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
                 });
             }
             else{
-                if (Token == null) {
+                if (!Token) {
                     console.log('FnSendBulkMailer: Token is empty');
                 }
-                else if (TID == null) {
+                else if (!TID) {
                     console.log('FnSendBulkMailer: TID is empty');
                 }
-                else if (TemplateID == null) {
+                else if (!TemplateID) {
                     console.log('FnSendBulkMailer: TemplateID is empty');
                 }
             }
@@ -1002,22 +1042,28 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
         else {
             var fs = require('fs');
 
-            if (Token != null && Attachment != null && AttachmentFileName != null && ToMailID != null) {
-                st.validateToken(Token, function (err, Result) {
+            if (Token && Attachment != null && AttachmentFileName != null && ToMailID != null) {
+                st.validateToken(Token, function (err, tokenResult) {
                     if (!err) {
-                        if (Result != null) {
+                        if (tokenResult) {
                             var query = st.db.escape(Token);
                             console.log('CALL pSendMailerDetails(' + query + ')');
-                            st.db.query('CALL pSendMailerDetails(' + query + ')', function (err, Result) {
+                            st.db.query('CALL pSendMailerDetails(' + query + ')', function (err, MailerDetails) {
                                 if (!err) {
-                                    if (Result.length > 0) {
-                                        var output = Result[0];
-                                        OutputFileName = output[0].Name;
-                                        var EZEID = output[0].EZEID;
+                                    if (MailerDetails) {
+                                        if (MailerDetails.length > 0) {
+                                            var output = MailerDetails[0];
+                                            OutputFileName = output[0].Name;
+                                            var EZEID = output[0].EZEID;
 
-                                        console.log(OutputFileName+'.pdf');
-                                        console.log('FnSendBulkMailer:UserDetails found..');
+                                            console.log(OutputFileName + '.pdf');
+                                            console.log('FnSendBulkMailer:UserDetails found..');
 
+                                        }
+                                        else{
+                                            console.log('FnSendBulkMailer:No EZEID NAME found..');
+
+                                        }
                                     }
                                     else{
                                         console.log('FnSendBulkMailer:No EZEID NAME found..');
@@ -1166,7 +1212,7 @@ Audit.prototype.sendBulkMailer = function(req,res,next){
             }
 
             else {
-                if (Token == null) {
+                if (!Token) {
                     console.log('FnSendBulkMailer: Token is empty');
                 }
                 else if (ToMailID == null) {
