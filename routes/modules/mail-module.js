@@ -45,7 +45,7 @@ function Mail(db,stdLib){
 
 
 Mail.prototype.sendMail = function(req, res){
-    var _this = this;
+
     console.log('coming....');
     try {
         res.setHeader('content-type', 'application/json');
@@ -55,7 +55,7 @@ Mail.prototype.sendMail = function(req, res){
         var Subject = req.body.Subject;
         var Body = req.body.Body;
 
-        if (From != null && To != null && Subject != null) {
+        if (From  && To && Subject != null) {
 
             var fs = require('fs');
 
@@ -75,6 +75,7 @@ Mail.prototype.sendMail = function(req, res){
 
                 FnSendMailEzeid(mailOptions, function (err, Result) {
                     if (!err) {
+                        //console.log(Result);
                         if (Result != null) {
                             console.log('FnSendMail: Mail Sent Successfully');
                             res.send(RtnMessage);
@@ -95,25 +96,17 @@ Mail.prototype.sendMail = function(req, res){
         }
         else {
 
-            if (From == null) {
+            if (!From) {
                 FinalMsgJson.Message = 'FnSendMail: From is empty';
                 console.log('FnSendMail: From is empty');
             }
-            else if (To == null) {
+            else if (!To) {
                 FinalMsgJson.Message = 'FnSendMail : To is empty';
                 console.log('FnSendMail: To is empty');
             }
             else if (Subject == null) {
                 FinalMsgJson.Message = 'FnSendMail: Subject is empty';
                 console.log('FnSendMail: Subject is empty');
-            }
-            else if (Body == null) {
-                FinalMsgJson.Message = 'FnSendMail: Body is empty';
-                console.log('FnSendMail: Body is empty');
-            }
-            else if (Token == null) {
-                FinalMsgJson.Message = 'FnSendMail: Token is empty';
-                console.log('FnSendMail: Token is empty');
             }
 
             res.statusCode = 400;
@@ -130,10 +123,10 @@ Mail.prototype.sendMail = function(req, res){
 };
 
 function FnSendMailEzeid(MailContent, CallBack) {
-    var _this = this;
+
     try {
 
-        if (MailContent != null) {
+        if (MailContent) {
 
             var RtnResponse = {
                 IsSent: false
@@ -176,7 +169,7 @@ function FnSendMailEzeid(MailContent, CallBack) {
 };
 
 Mail.prototype.fnMessageMail= function(messageContent, callBack) {
-    var _this = this;
+
 
     console.log('-----MAIL MODULE-----');
     try {
@@ -187,7 +180,11 @@ Mail.prototype.fnMessageMail= function(messageContent, callBack) {
             };
             // token, locId, messageType, message, ezeid, toEzeid, itemsList
             var fs = require('fs');
-            var i = 1, name, locId = 0, verified, messageType = messageContent.messageType;
+            var i = 1;
+            var name;
+            var locId = 0;
+            var verified;
+            var messageType = messageContent.messageType;
             if (messageType == 0) {
                 console.log('-----SALES MAIL MODULE-----');
                 var query1 = 'select EZEID,EZEIDVerifiedID as verifiedId,TID,IDTypeID as id from tmaster where EZEID=' + st.db.escape(messageContent.ezeid);
@@ -212,7 +209,7 @@ Mail.prototype.fnMessageMail= function(messageContent, callBack) {
                                 //console.log(mail_query);
 
                                 st.db.query(mail_query, function (err, get_result) {
-                                    console.log(get_result);
+                                    //console.log(get_result);
                                     if (get_result) {
                                         if (get_result[0]) {
                                             if (get_result[0].salesEmail) {
@@ -297,7 +294,7 @@ Mail.prototype.fnMessageMail= function(messageContent, callBack) {
                                 var mail_query = 'Select EZEID,SalesMailID as salesEmail,CompanyName,FirstName as fn,ifnull(LastName,"") as ln from tmaster where EZEID=' + st.db.escape(messageContent.toEzeid);
                                 st.db.query(mail_query, function (err, get_result) {
                                     console.log(mail_query);
-                                    console.log(get_result);
+                                    //console.log(get_result);
 
                                     if (get_result) {
                                         if (get_result[0]) {
@@ -621,76 +618,90 @@ Mail.prototype.fnMessageMail= function(messageContent, callBack) {
                 var url = '';
                 var query = 'select TID from tlocations where EZEID=' + st.db.escape(messageContent.toEzeid);
                 st.db.query(query, function (err, getResult) {
-                    if (getResult[0]) {
-                        locId = getResult[0].TID;
-                        var query = st.db.escape(messageContent.token) + ',' + st.db.escape(locId) + ',' + st.db.escape(messageContent.messageType);
-                        console.log('CALL PgetMailSendingDetails(' + query + ')');
-                        st.db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, resumeDetails) {
-                            //console.log(resumeDetails);
-                            if (!err) {
-                                if (resumeDetails[0]) {
-                                    if (resumeDetails[0][0]) {
-                                        if (resumeDetails[0][0].ToMailID) {
-                                            if (resumeDetails[0][0].DocPin) {
-                                                url = 'https://www.ezeone.com/' + resumeDetails[0][0].EZEID + '.CV.' + resumeDetails[0][0].DocPin;
-                                                //console.log(url);
-                                            }
-                                            else {
-                                                url = 'https://www.ezeone.com/' + resumeDetails[0][0].EZEID + '.CV';
-                                                //console.log(url);
-                                            }
+                    if(getResult) {
+                        if (getResult[0]) {
+                            locId = getResult[0].TID;
+                            var query = st.db.escape(messageContent.token) + ',' + st.db.escape(locId) + ',' + st.db.escape(messageContent.messageType);
+                            console.log('CALL PgetMailSendingDetails(' + query + ')');
+                            st.db.query('CALL PgetMailSendingDetails(' + query + ')', function (err, resumeDetails) {
+                                //console.log(resumeDetails);
+                                if (!err) {
+                                    if (resumeDetails) {
+                                        if (resumeDetails[0]) {
+                                            if (resumeDetails[0][0]) {
+                                                if (resumeDetails[0][0].ToMailID) {
+                                                    if (resumeDetails[0][0].DocPin) {
+                                                        url = 'https://www.ezeone.com/' + resumeDetails[0][0].EZEID + '.CV.' + resumeDetails[0][0].DocPin;
+                                                        //console.log(url);
+                                                    }
+                                                    else {
+                                                        url = 'https://www.ezeone.com/' + resumeDetails[0][0].EZEID + '.CV';
+                                                        //console.log(url);
+                                                    }
 
-                                            name = resumeDetails[0][0].FirstName + ' ' + resumeDetails[0][0].LastName;
-                                            var mailContent = {
-                                                type: 'cv',
-                                                fullname: name,
-                                                email: resumeDetails[0][0].MailID,   // from mail id
-                                                toEmail: resumeDetails[0][0].ToMailID,
-                                                status: 'Not Verified',
-                                                toEzeid: messageContent.toEzeid,
-                                                ezeid: resumeDetails[0][0].EZEID,
-                                                function: resumeDetails[0][0].Function,
-                                                keyskills: resumeDetails[0][0].KeySkills,
-                                                url: url,
-                                                message: messageContent.message
-                                            };
-
-                                            //console.log(mailContent);
-
-                                            hussMailer.sendMail(mailContent, function (err, mailResult) {
-                                                //console.log('Mail Result.........');
-                                                //console.log(mailResult);
-                                                if (mailResult) {
-
-                                                    var post = {
-                                                        MessageType: messageContent.messageType,
-                                                        Priority: 3,
-                                                        ToMailID: mailResult.to,
-                                                        Subject: mailResult.subject,
-                                                        Body: mailResult.html,
-                                                        SentStatus: 1
+                                                    name = resumeDetails[0][0].FirstName + ' ' + resumeDetails[0][0].LastName;
+                                                    var mailContent = {
+                                                        type: 'cv',
+                                                        fullname: name,
+                                                        email: resumeDetails[0][0].MailID,   // from mail id
+                                                        toEmail: resumeDetails[0][0].ToMailID,
+                                                        status: 'Not Verified',
+                                                        toEzeid: messageContent.toEzeid,
+                                                        ezeid: resumeDetails[0][0].EZEID,
+                                                        function: resumeDetails[0][0].Function,
+                                                        keyskills: resumeDetails[0][0].KeySkills,
+                                                        url: url,
+                                                        message: messageContent.message
                                                     };
 
-                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, mailboxResult) {
-                                                        if (!err) {
-                                                            console.log('FnMessageMail: Mail saved Successfully....5');
-                                                            responseMessage.status = true;
-                                                            callBack(null, responseMessage);
+                                                    //console.log(mailContent);
+
+                                                    hussMailer.sendMail(mailContent, function (err, mailResult) {
+                                                        //console.log('Mail Result.........');
+                                                        //console.log(mailResult);
+                                                        if (mailResult) {
+
+                                                            var post = {
+                                                                MessageType: messageContent.messageType,
+                                                                Priority: 3,
+                                                                ToMailID: mailResult.to,
+                                                                Subject: mailResult.subject,
+                                                                Body: mailResult.html,
+                                                                SentStatus: 1
+                                                            };
+
+                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, mailboxResult) {
+                                                                if (!err) {
+                                                                    console.log('FnMessageMail: Mail saved Successfully....5');
+                                                                    responseMessage.status = true;
+                                                                    callBack(null, responseMessage);
+                                                                }
+                                                                else {
+                                                                    console.log('FnMessageMail: Mail not Saved Successfully');
+                                                                    callBack(null, responseMessage);
+                                                                }
+                                                            });
                                                         }
                                                         else {
-                                                            console.log('FnMessageMail: Mail not Saved Successfully');
+                                                            console.log('FnMessageMail: Mail Result not found');
                                                             callBack(null, responseMessage);
                                                         }
                                                     });
                                                 }
                                                 else {
-                                                    console.log('FnMessageMail: Mail Result not found');
+                                                    console.log('FnMessageMail: ToMailId not found');
                                                     callBack(null, responseMessage);
+
                                                 }
-                                            });
+                                            }
+                                            else {
+                                                console.log('FnMessageMail: Resume Details not found');
+                                                callBack(null, responseMessage);
+
+                                            }
                                         }
                                         else {
-                                            console.log('FnMessageMail: ToMailId not found');
+                                            console.log('FnMessageMail: Resume Details not found');
                                             callBack(null, responseMessage);
 
                                         }
@@ -702,17 +713,16 @@ Mail.prototype.fnMessageMail= function(messageContent, callBack) {
                                     }
                                 }
                                 else {
-                                    console.log('FnMessageMail: Resume Details not found');
+                                    console.log('FnMessageMail: Resume Details not found : ' + err);
                                     callBack(null, responseMessage);
 
                                 }
-                            }
-                            else {
-                                console.log('FnMessageMail: Resume Details not found : ' + err);
-                                callBack(null, responseMessage);
-
-                            }
-                        });
+                            });
+                        }
+                        else {
+                            console.log('FnMessage:LocID is not found');
+                            callBack(null, responseMessage);
+                        }
                     }
                     else {
                         console.log('FnMessage:LocID is not found');
@@ -742,7 +752,7 @@ Mail.prototype.fnMessageMail= function(messageContent, callBack) {
 };
 
 Mail.prototype.sendRegMail= function(mailContent, callBack) {
-    var _this = this;
+
 
     console.log('-----REGISTERATION MAIL MODULE-----');
     try {
@@ -827,7 +837,8 @@ Mail.prototype.businessMail = function(req,res,next) {
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!isJson){
         error['isJson'] = 'Invalid Input ContentType';
@@ -879,15 +890,15 @@ Mail.prototype.businessMail = function(req,res,next) {
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         if(recipients.length) {
                             var queryParams = st.db.escape(token);
                             var query = 'CALL pcheckverifiedstatus(' + queryParams + ')';
                             console.log(query);
                             st.db.query(query, function (err, userstatusResult) {
-                                console.log(userstatusResult);
+                                //console.log(userstatusResult);
                                 if (!err) {
                                     if (userstatusResult) {
                                         if (userstatusResult[0]) {

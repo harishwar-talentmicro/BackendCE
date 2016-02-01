@@ -566,7 +566,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                                 var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
                                                                     // Neat!
                                                                     if (!err) {
-                                                                        if (result != null) {
+                                                                        if (result) {
                                                                             if (result.affectedRows > 0) {
                                                                                 console.log('FnSaveFolderRules: Folder rules saved successfully');
                                                                             }
@@ -597,9 +597,9 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                                 //console.log('TID:' + itemsDetails.TID);
                                                                 var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
                                                                     // Neat!
-                                                                    console.log(result);
+                                                                   // console.log(result);
                                                                     if (!err) {
-                                                                        if (result != null) {
+                                                                        if (result) {
                                                                             if (result.affectedRows > 0) {
 
                                                                                 console.log('FnSaveFolderRules: Folder rules Updated successfully');
@@ -633,7 +633,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
 
                                                         /*sending sales enquiry mail*/
                                                         mail.fnMessageMail(messageContent, function (err, statusResult) {
-                                                            console.log(statusResult);
+                                                            //console.log(statusResult);
                                                             if (!err) {
                                                                 if (Result) {
                                                                     if (statusResult.status == true) {
@@ -829,11 +829,11 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                             + "," + st.db.escape(alarmDuration) + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)
                             + ', ' + st.db.escape(instituteId)+', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)
                             + ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType)+ ', ' + st.db.escape(contactId);
-                        console.log(company_id);
+                        //console.log(company_id);
                         //console.log('CALL psendsalesrequest(' + query + ')');
                         st.db.query('CALL psendsalesrequest(' + query + ')', function (err, transResult) {
                             if (!err) {
-                                console.log(transResult);
+                                //console.log(transResult);
                                 if (transResult) {
                                     if (transResult[0].length > 0) {
 
@@ -856,7 +856,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                 var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
                                                     // Neat!
                                                     if (!err) {
-                                                        if (result != null) {
+                                                        if (result) {
                                                             if (result.affectedRows > 0) {
                                                                 console.log('FnSaveFolderRules: Folder rules saved successfully');
                                                             }
@@ -887,9 +887,9 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                 //console.log('TID:' + itemsDetails.TID);
                                                 var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
                                                     // Neat!
-                                                    console.log(result);
+                                                    //console.log(result);
                                                     if (!err) {
-                                                        if (result != null) {
+                                                        if (result) {
                                                             if (result.affectedRows > 0) {
 
                                                                 console.log('FnSaveFolderRules: Folder rules Updated successfully');
@@ -922,7 +922,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
 
                                         /*sending sales enquiry mail*/
                                         mail.fnMessageMail(messageContent, function (err, statusResult) {
-                                            console.log(statusResult);
+                                            //console.log(statusResult);
                                             if (!err) {
                                                 if (statusResult) {
                                                     if (statusResult.status == true) {
@@ -1464,7 +1464,7 @@ BusinessManager.prototype.getItemListForEZEID = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var token = req.query.Token ? req.query.Token : null;
+        var token = (req.query.Token) ? req.query.Token : null;
         var ft = req.query.FunctionType;
         var ezeid = req.query.EZEID;
 
@@ -2102,7 +2102,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                          */
                         if(ezeArr[1] && ezeArr[1].substr(0,1).toUpperCase() === 'L'){
                             var seqNo = parseInt(ezeArr[1].substring(1));
-                            if(seqNo !== NaN && seqNo > -1){
+                            if(!isNaN(seqNo) && seqNo > -1){
                                 locationSeq = seqNo;
                             }
                         }
@@ -2111,7 +2111,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                          * If location sequence number is not found assuming that user may have passed the pin
                          * and therefore validating pin using standard rules
                          */
-                        else if(parseInt(ezeArr[1]) !== NaN && parseInt(ezeArr[1]) > 99 && parseInt(ezeArr[1]) < 1000){
+                        else if(!isNaN(parseInt(ezeArr[1])) && parseInt(ezeArr[1]) > 99 && parseInt(ezeArr[1]) < 1000){
                             pin = parseInt(ezeArr[1]).toString();
                         }
 
@@ -2120,7 +2120,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                          * assign it to pin
                          */
                         else if(ezeArr.length > 2){
-                            if(parseInt(ezeArr[2]) !== NaN && parseInt(ezeArr[2]) > 99 && parseInt(ezeArr[2]) < 1000){
+                            if(!isNaN(parseInt(ezeArr[2]))&& parseInt(ezeArr[2]) > 99 && parseInt(ezeArr[2]) < 1000){
                                 pin = parseInt(ezeArr[2]).toString();
                             }
                         }
@@ -2146,14 +2146,24 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
 
 
                         else{
-                            if(result && result.length > 0){
-                                if(result[0].length > 0){
-                                    respMsg.status  = true;
-                                    respMsg.data = result[0][0];
-                                    respMsg.message = 'EZEOne ID found';
-                                    respMsg.error = null;
-                                    res.status(200).json(respMsg);
-                                    return;
+                            if(result) {
+                                if (result.length > 0) {
+                                    if (result[0].length > 0) {
+                                        respMsg.status = true;
+                                        respMsg.data = result[0][0];
+                                        respMsg.message = 'EZEOne ID found';
+                                        respMsg.error = null;
+                                        res.status(200).json(respMsg);
+                                        return;
+                                    }
+                                    else {
+                                        respMsg.status = false;
+                                        respMsg.data = null;
+                                        respMsg.message = 'Nothing found';
+                                        respMsg.error = {ezeoneid: 'No results found'};
+                                        res.status(404).json(respMsg);
+                                    }
+
                                 }
                                 else{
                                     respMsg.status  = false;
@@ -2162,7 +2172,6 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                                     respMsg.error = { ezeoneid : 'No results found'};
                                     res.status(404).json(respMsg);
                                 }
-
                             }
                             else{
                                 respMsg.status  = false;
@@ -2714,10 +2723,10 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
         var token = req.body.token;
         var toEzeid = alterEzeoneId(req.body.to_ezeid);
         var message = (req.body.requirement) ? req.body.requirement : '';
-        var address = req.body.address ? req.body.address : '';
+        var address = (req.body.address) ? req.body.address : '';
         var notes = (req.body.notes) ? req.body.notes : '';
         var aName = req.body.a_name;
-        var amount = req.body.amount ? req.body.amount : 0.00;
+        var amount = (req.body.amount) ? req.body.amount : 0.00;
         var stage = req.body.stage;
         var folderId = parseInt(req.body.folder_id);
         var proabilities = req.body.proabilities;
@@ -2784,7 +2793,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                                                 address: req.body.address,
                                                 notes: (req.body.notes) ? req.body.notes : '',
                                                 a_name: req.body.a_name,
-                                                amount: req.body.amount ? req.body.amount : 0.00,
+                                                amount: (req.body.amount) ? req.body.amount : 0.00,
                                                 stage: req.body.stage,
                                                 folder_id: folderId,
                                                 proabilities: req.body.proabilities,
@@ -2869,7 +2878,7 @@ BusinessManager.prototype.getCompanyName = function(req,res,next){
 
 
     var token = req.query.token;
-    var ezeid = req.query.ezeid ? alterEzeoneId(req.query.ezeid):'';
+    var ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid):'';
 
     var responseMessage = {
         status: false,
@@ -2878,7 +2887,8 @@ BusinessManager.prototype.getCompanyName = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2980,7 +2990,7 @@ BusinessManager.prototype.getContactDetails = function(req,res,next){
 
 
     var token = req.query.token;
-    var ezeid = req.query.ezeid ? alterEzeoneId(req.query.ezeid):'';
+    var ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid):'';
 
     var responseMessage = {
         status: false,
