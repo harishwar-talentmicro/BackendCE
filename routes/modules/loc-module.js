@@ -57,7 +57,8 @@ Loc.prototype.saveLocMap = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!isJson){
         error['isJson'] = 'Invalid Input ContentType';
@@ -87,9 +88,9 @@ Loc.prototype.saveLocMap = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(req.body.token, function (err, result) {
+            st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
 
                         var queryParams1 = st.db.escape(req.body.tids) + ',' + st.db.escape(req.body.token) + ',' + st.db.escape(req.body.type);
                         var query1 = 'CALL pdeletelocmap(' + queryParams1 + ')';
@@ -206,8 +207,6 @@ Loc.prototype.saveLocMap = function(req,res,next){
  */
 Loc.prototype.getLocMap = function(req,res,next){
 
-    var _this = this;
-
     var token = req.query.token;
     var type = req.query.type;  // (1-employer,2-training)
 
@@ -218,7 +217,8 @@ Loc.prototype.getLocMap = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -232,9 +232,9 @@ Loc.prototype.getLocMap = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams =   st.db.escape(token) + ',' + st.db.escape(type);
                         var query = 'CALL pgetlocmap(' + queryParams + ')';
                         //console.log(query);
@@ -314,16 +314,15 @@ Loc.prototype.getLocMap = function(req,res,next){
  */
 Loc.prototype.loadLocDetailsEmployer = function(req,res,next){
 
-    var _this = this;
 
     var token = req.query.token;
     var locId = req.query.loc_id;
     var type = 1;      // (1-employer,2-training)
-    var lat = req.query.lat ? req.query.lat : '';
-    var lng = req.query.lng ? req.query.lng : '';
-    var pageSize = req.query.page_size ? req.query.page_size : 100;
-    var pageCount = req.query.page_count ? req.query.page_count : 0;
-    var keyword = req.query.keyword ? req.query.keyword : '';
+    var lat = (req.query.lat) ? req.query.lat : '';
+    var lng = (req.query.lng) ? req.query.lng : '';
+    var pageSize = (req.query.page_size) ? req.query.page_size : 100;
+    var pageCount = (req.query.page_count) ? req.query.page_count : 0;
+    var keyword = (req.query.keyword) ? req.query.keyword : '';
 
     var responseMessage = {
         status: false,
@@ -332,7 +331,8 @@ Loc.prototype.loadLocDetailsEmployer = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -346,9 +346,9 @@ Loc.prototype.loadLocDetailsEmployer = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams =   st.db.escape(locId) + ',' + st.db.escape(type)+ ',' + st.db.escape(lat)
                             + ',' + st.db.escape(lng)+ ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)
                             + ',' + st.db.escape(keyword);
@@ -462,16 +462,14 @@ Loc.prototype.loadLocDetailsEmployer = function(req,res,next){
  */
 Loc.prototype.loadLocDetailsTrainer = function(req,res,next){
 
-    var _this = this;
-
     var token = req.query.token;
     var locId = req.query.loc_id;
     var type = 2;      // (1-employer,2-training)
-    var lat = req.query.lat ? req.query.lat : '';
-    var lng = req.query.lng ? req.query.lng : '';
-    var pageSize = req.query.page_size ? req.query.page_size : 100;
-    var pageCount = req.query.page_count ? req.query.page_count : 0;
-    var keyword = req.query.keyword ? req.query.keyword : '';
+    var lat = (req.query.lat) ? req.query.lat : '';
+    var lng = (req.query.lng) ? req.query.lng : '';
+    var pageSize = (req.query.page_size) ? req.query.page_size : 100;
+    var pageCount = (req.query.page_count) ? req.query.page_count : 0;
+    var keyword = (req.query.keyword) ? req.query.keyword : '';
 
     var responseMessage = {
         status: false,
@@ -480,7 +478,8 @@ Loc.prototype.loadLocDetailsTrainer = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -494,9 +493,9 @@ Loc.prototype.loadLocDetailsTrainer = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams =   st.db.escape(locId) + ',' + st.db.escape(type)+ ',' + st.db.escape(lat)
                             + ',' + st.db.escape(lng)+ ',' + st.db.escape(pageSize)+ ',' + st.db.escape(pageCount)
                             + ',' + st.db.escape(keyword);
@@ -609,8 +608,6 @@ Loc.prototype.loadLocDetailsTrainer = function(req,res,next){
  */
 Loc.prototype.loadLocDetailsSyllabus = function(req,res,next){
 
-    var _this = this;
-
     var token = req.query.token;
     var locId = req.query.loc_id;
 
@@ -621,7 +618,8 @@ Loc.prototype.loadLocDetailsSyllabus = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -635,16 +633,16 @@ Loc.prototype.loadLocDetailsSyllabus = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams =   st.db.escape(locId) + ',' + st.db.escape(0)+ ',' + st.db.escape(0.00)
                             + ',' + st.db.escape(0.00)+ ',' + st.db.escape(0)+ ',' + st.db.escape(0)
                             + ',' + st.db.escape('');
                         var query = 'CALL pLoadLOCDetails(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
+                            //console.log(getResult);
                             if (!err) {
                                 if (getResult) {
                                     if(getResult[0]){
@@ -751,7 +749,8 @@ Loc.prototype.getLoc = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -825,8 +824,8 @@ Loc.prototype.getLoc = function(req,res,next){
  * @description api code for get save loc
  */
 Loc.prototype.saveLoc = function(req,res,next){
-    var _this = this;
-    var fs = require("fs");
+
+   // var fs = require("fs");
 
     var token = req.body.token;
     var functionId = req.body.fid;
@@ -843,7 +842,8 @@ Loc.prototype.saveLoc = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -859,9 +859,9 @@ Loc.prototype.saveLoc = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams = st.db.escape(functionId) + ','  + st.db.escape(locationTitle)+ ','  + st.db.escape(locationGuide)
                             + ','  + st.db.escape(docTitle)+ ','  + st.db.escape(docFilename)+ ','  + st.db.escape(id);
                         var query = 'CALL pSaveLOC(' + queryParams + ')';
@@ -945,26 +945,26 @@ Loc.prototype.getLocBasket = function(req,res,next){
     var locId = req.query.loc_id;
     var type = (!isNaN(parseInt(req.query.type))) ?  parseInt(req.query.type) : 0;
     //type - (0-Exclude hidden Applicants , 1-Include hidden Applicants , 2-Show hidden Applications only)
-    var latitude = req.query.lat ? req.query.lat : 0.00;
-    var longitude = req.query.lng ? req.query.lng : 0.00;
+    var latitude = (req.query.lat) ? req.query.lat : 0.00;
+    var longitude = (req.query.lng) ? req.query.lng : 0.00;
     var firstNameSort = (!isNaN(parseInt(req.query.fns))) ?  parseInt(req.query.fns) : 0;  // 0 -descending, 1-ascending
-    var firstNameQuery = req.query.fnq ? req.query.fnq : '';                              // filter text
+    var firstNameQuery = (req.query.fnq) ? req.query.fnq : '';                              // filter text
     var lastNameSort =(!isNaN(parseInt(req.query.lns))) ?  parseInt(req.query.lns) : 0;
-    var lastNameQuery = req.query.lnq ? req.query.lnq : '';
+    var lastNameQuery = (req.query.lnq) ? req.query.lnq : '';
     var emailSort = (!isNaN(parseInt(req.query.ems))) ?  parseInt(req.query.ems) : 0;
-    var emailQuery = req.query.emq ? req.query.emq : '';
+    var emailQuery = (req.query.emq) ? req.query.emq : '';
     var phoneSort = (!isNaN(parseInt(req.query.phs))) ?  parseInt(req.query.phs) : 0;
-    var phoneQuery = req.query.phq ? req.query.phq : '';
+    var phoneQuery = (req.query.phq) ? req.query.phq : '';
     var citySort = (!isNaN(parseInt(req.query.cts))) ?  parseInt(req.query.cts): 0;
-    var cityQuery = req.query.ctq ? req.query.ctq : '';
+    var cityQuery = (req.query.ctq) ? req.query.ctq : '';
     var stateSort = (!isNaN(parseInt(req.query.sts))) ?  parseInt(req.query.sts): 0;
-    var stateQuery = req.query.stq ? req.query.stq : '';
+    var stateQuery = (req.query.stq) ? req.query.stq : '';
     var countrySort = (!isNaN(parseInt(req.query.cnts))) ?  parseInt(req.query.cnts): 0;
-    var countryQuery = req.query.cntq ? req.query.cntq : '';
+    var countryQuery = (req.query.cntq) ? req.query.cntq : '';
     var statusSort = (!isNaN(parseInt(req.query.stss))) ?  parseInt(req.query.stss): 0;
-    var statusQuery = req.query.stsq ? req.query.stsq : '';
+    var statusQuery = (req.query.stsq) ? req.query.stsq : '';
     var mobileSort = (!isNaN(parseInt(req.query.mns))) ?  parseInt(req.query.mns): 0;
-    var mobileQuery = req.query.mnq ? req.query.mnq : '';
+    var mobileQuery = (req.query.mnq) ? req.query.mnq : '';
 
     var responseMessage = {
         status: false,
@@ -973,7 +973,8 @@ Loc.prototype.getLocBasket = function(req,res,next){
         data: []
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'token is mandatory';
@@ -987,9 +988,9 @@ Loc.prototype.getLocBasket = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams =   st.db.escape(token) + ',' + st.db.escape(locId) + ',' + st.db.escape(type)
                             + ',' + st.db.escape(latitude)+ ',' + st.db.escape(longitude)+ ',' + st.db.escape(firstNameSort)
                             + ',' + st.db.escape(firstNameQuery)+ ',' + st.db.escape(lastNameSort)+ ',' + st.db.escape(lastNameQuery)
