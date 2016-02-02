@@ -9,8 +9,6 @@
  */
 "use strict";
 
-var path ='D:\\EZEIDBanner\\';
-var EZEIDEmail = 'noreply@ezeone.com';
 
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
@@ -52,16 +50,15 @@ Location.prototype.getAll = function(req,res,next){
     /**
      * @todo FnGetSecondaryLocation
      */
-    var _this = this;
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var Token = req.query.Token;
 
-        if (Token != null && Token != '') {
-            st.validateToken(Token, function (err, Result) {
+        if (Token) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result) {
+                    if (tokenResult) {
                         st.db.query('CALL pGetSecondaryLocationDetails(' + st.db.escape(Token) + ')', function (err, SecondaryResult) {
                             if (!err) {
                                 // console.log(UserDetailsResult);
@@ -125,7 +122,6 @@ Location.prototype.save = function(req,res,next){
     /**
      * @todo FnAddLocation
      */
-    var _this = this;
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -152,7 +148,7 @@ Location.prototype.save = function(req,res,next){
         var ISDMobileNumber = req.body.ISDMobileNumber;
         //below line of code is commented for phase 1
         var ParkingStatus = parseInt(req.body.ParkingStatus);
-        if (ParkingStatus.toString() == 'NaN') {
+        if (isNaN(ParkingStatus)) {
             ParkingStatus = 0;
         }
         if (PIN == '') {
@@ -160,7 +156,7 @@ Location.prototype.save = function(req,res,next){
         }
         var TemplateID = (req.body.TemplateID) ? req.body.TemplateID : 0;
 
-        if (TID.toString() != 'NaN' && Token != null && CityName != null && StateID.toString() != 'NaN' && CountryID.toString() != 'NaN' && LocTitle != null && AddressLine1 != null && Longitude.toString() != 'NaN' && Latitude.toString() != 'NaN') {
+        if (!isNaN(TID) && Token != null && CityName != null && !isNaN(StateID) && !isNaN(CountryID) && LocTitle != null && AddressLine1 != null && !isNaN(Longitude) && !isNaN(Latitude)) {
             st.validateToken(Token, function (err, Result) {
                 if (!err) {
                     if (Result) {
@@ -232,7 +228,7 @@ Location.prototype.save = function(req,res,next){
             });
         }
         else {
-            if (TID.toString() == 'NaN') {
+            if (isNaN(TID)) {
                 console.log('FnAddLocation: TID is empty');
             }
             else if (Token == null) {
@@ -241,10 +237,10 @@ Location.prototype.save = function(req,res,next){
             else if (LocTitle == null) {
                 console.log('FnAddLocation: LocTitle is empty');
             }
-            else if (Latitude.toString() == 'NaN') {
+            else if (isNaN(Latitude)) {
                 console.log('FnAddLocation: Latitude is empty');
             }
-            else if (Longitude.toString() == 'NaN') {
+            else if (isNaN(Longitude)) {
                 console.log('FnAddLocation: Longitude is empty');
             }
             else if (AddressLine1 == null) {
@@ -253,10 +249,10 @@ Location.prototype.save = function(req,res,next){
             else if (CityName == null) {
                 console.log('FnAddLocation: CityName is empty');
             }
-            else if (StateID.toString() == 'NaN') {
+            else if (isNaN(StateID)) {
                 console.log('FnAddLocation: StateID   is empty');
             }
-            else if (CountryID.toString() == 'NaN') {
+            else if (isNaN(CountryID)) {
                 console.log('FnAddLocation: CountryID   is empty');
             }
 
@@ -281,7 +277,7 @@ Location.prototype.deleteLocation = function(req,res,next) {
     /**
      * @todo FnDeleteLocation
      */
-    var _this = this;
+
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -291,18 +287,24 @@ Location.prototype.deleteLocation = function(req,res,next) {
             IsDeleted: false
         };
         var RtnMessage = JSON.parse(JSON.stringify(RtnMessage));
-        if (token != null && token != '' && TID.toString() != 'NaN') {
-            st.validateToken(token, function (err, Result) {
+        if (token && !isNaN(TID)) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
                         var query = 'DELETE FROM tlocations where TID=' + st.db.escape(TID);
                         //  console.log('FnDeleteLocation: DeleteQuery : ' + query);
                         st.db.query(query, function (err, DeleteResult) {
                             if (!err) {
-                                //console.log('DeleteQuery: ' + DeleteResult);
-                                if (DeleteResult.affectedRows > 0) {
-                                    RtnMessage.IsDeleted = true;
-                                    res.send(RtnMessage);
+                                if(DeleteResult) {
+                                    //console.log('DeleteQuery: ' + DeleteResult);
+                                    if (DeleteResult.affectedRows > 0) {
+                                        RtnMessage.IsDeleted = true;
+                                        res.send(RtnMessage);
+                                    }
+                                    else {
+                                        console.log('FnDeleteLocation: deleting item is not avaiable');
+                                        res.send(RtnMessage);
+                                    }
                                 }
                                 else {
                                     console.log('FnDeleteLocation: deleting item is not avaiable');
@@ -329,10 +331,10 @@ Location.prototype.deleteLocation = function(req,res,next) {
             });
         }
         else {
-            if (token == null || token == '') {
+            if (!token) {
                 console.log('FnDeleteLocation: token is empty');
             }
-            if (TID.toString() == 'NaN') {
+            if (isNaN(TID)) {
                 console.log('FnDeleteLocation: TID is empty');
             }
             res.statusCode = 400;
@@ -356,7 +358,7 @@ Location.prototype.getAllForEzeid = function(req,res,next){
     /**
      * @todo FnGetLocationListForEzeid
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -370,32 +372,39 @@ Location.prototype.getAllForEzeid = function(req,res,next){
         };
 
         if (Token) {
-            st.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result) {
+                    if (tokenResult) {
                         //var Query ='select TID, MasterID,LocTitle, Latitude, Longitude,MobileNumber,ifnull((Select FirstName from tmaster where TID='+st.db.escape(TID)+'),"") as FirstName,ifnull((Select LastName from tmaster where TID='+st.db.escape(TID)+'),"")  as LastName from tlocations where MasterID='+st.db.escape(TID);
-                        st.db.query('CALL pGetSubUserLocationList(' + st.db.escape(Result.masterid) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetSubUserLocationList(' + st.db.escape(tokenResult.masterid) + ')', function (err, subUserResult) {
                             if (!err) {
-                                if (GetResult[0]) {
-                                    if (GetResult[0].length > 0) {
-                                        RtnMessage.Result = GetResult[0];
-                                        RtnMessage.Message ='Location List Send successfully';
-                                        console.log('FnGetLocationListForEZEID: Location List Send successfully');
-                                        res.send(RtnMessage);
+                                if(subUserResult) {
+                                    if (subUserResult[0]) {
+                                        if (subUserResult[0].length > 0) {
+                                            RtnMessage.Result = subUserResult[0];
+                                            RtnMessage.Message = 'Location List Send successfully';
+                                            console.log('FnGetLocationListForEZEID: Location List Send successfully');
+                                            res.send(RtnMessage);
+                                        }
+                                        else {
+                                            RtnMessage.Message = 'No Location List found';
+                                            console.log('FnGetLocationListForEZEID:No Location List found1');
+                                            res.send(RtnMessage);
+                                        }
                                     }
                                     else {
-                                        RtnMessage.Message ='No Location List found';
-                                        console.log('FnGetLocationListForEZEID:No Location List found');
+
+                                        RtnMessage.Message = 'No Location List found';
+                                        console.log('FnGetLocationListForEZEID:No Location List found2');
                                         res.send(RtnMessage);
                                     }
                                 }
                                 else {
 
-                                    RtnMessage.Message ='No Location List found';
-                                    console.log('FnGetLocationListForEZEID:No Location List found');
+                                    RtnMessage.Message = 'No Location List found';
+                                    console.log('FnGetLocationListForEZEID:No Location List found3');
                                     res.send(RtnMessage);
                                 }
-
                             }
                             else {
                                 RtnMessage.Message ='error in getting Location List';
@@ -447,7 +456,7 @@ Location.prototype.getLoactionList = function(req,res,next){
     /**
      * @todo FnGetLocationList
      */
-    var _this = this;
+
     try {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -456,17 +465,17 @@ Location.prototype.getLoactionList = function(req,res,next){
         var Token = req.query.Token;
 
         if (Token != null) {
-            st.validateToken(Token, function (err, Result) {
+            st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (Result != null) {
+                    if (tokenResult) {
 
-                        st.db.query('CALL pGetLocationList(' + st.db.escape(Token) + ')', function (err, GetResult) {
+                        st.db.query('CALL pGetLocationList(' + st.db.escape(Token) + ')', function (err, GetLocationResult) {
                             if (!err) {
-                                if (GetResult) {
-                                    if (GetResult[0]) {
+                                if (GetLocationResult) {
+                                    if (GetLocationResult[0]) {
 
                                         console.log('FnGetLocationList: Location List Send successfully');
-                                        res.send(GetResult[0]);
+                                        res.send(GetLocationResult[0]);
                                     }
                                     else {
 
@@ -553,7 +562,7 @@ Location.prototype.getLocationDetails = function(req,res,next){
         try{
             var queryParams = st.db.escape(token) +','+st.db.escape(locationSequence);
             //console.log(queryParams);
-            st.db.query('CALL pGetLocationDetails('+queryParams+')',function(err,result){
+            st.db.query('CALL pGetLocationDetails('+queryParams+')',function(err,locationDetails){
                 if(err){
 
                     console.log('FnGetLocationDetails error:' + err);
@@ -569,13 +578,13 @@ Location.prototype.getLocationDetails = function(req,res,next){
                     res.status(500).json(respMsg);
                 }
                 else{
-                    if(result){
-                        if(result[0]){
-                            if(result[0][0]){
+                    if(locationDetails){
+                        if(locationDetails[0]){
+                            if(locationDetails[0][0]){
                                 respMsg.status = true;
                                 respMsg.message = 'Location loaded successfully';
                                 respMsg.error = null;
-                                respMsg.data = result[0][0];
+                                respMsg.data = locationDetails[0][0];
                             }
                             else{
                                 respMsg.message = 'Location details not found';
@@ -626,7 +635,10 @@ Location.prototype.getLocationDetails = function(req,res,next){
 Location.prototype.getLocationPicture = function(req,res,next){
     var token = (req.query.token) ? req.query.token : null;
 
-    var ezeoneId = null, locationSequence = 0, pin = null, validationFlag = true;
+    var ezeoneId = null;
+    var locationSequence = 0;
+    var pin = null;
+    var validationFlag = true;
     var error = {};
     var respMsg = {
         status : false,
@@ -654,7 +666,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
 
                     if(ezeParts[1][0].toString().toUpperCase() == 'L'){
                         var locNo = parseInt(ezeParts[1].substr(1));
-                        locationSequence = (locNo !== NaN && locNo >= 0) ? locNo : 0;
+                        locationSequence = (!isNaN(locNo) && locNo >= 0) ? locNo : 0;
                     }
                 }
 
@@ -669,7 +681,7 @@ Location.prototype.getLocationPicture = function(req,res,next){
             var queryParams = st.db.escape(token) +',' + st.db.escape(ezeoneId) + ',' +
                 st.db.escape(locationSequence) +',' + st.db.escape(pin);
             // console.log(queryParams);
-            st.db.query('CALL pSearchInfnPic('+queryParams+')',function(err,result){
+            st.db.query('CALL pSearchInfnPic('+queryParams+')',function(err,searchResult){
                 if(err){
                     respMsg.status = false;
                     respMsg.message = 'Internal Server error';
@@ -680,16 +692,16 @@ Location.prototype.getLocationPicture = function(req,res,next){
                     res.status(500).json(respMsg);
                 }
                 else{
-                    if(result){
-                        if(result[0]){
-                            if(result[0][0]){
-                                if(result[0][0].Picture){
+                    if(searchResult){
+                        if(searchResult[0]){
+                            if(searchResult[0][0]){
+                                if(searchResult[0][0].Picture){
                                     respMsg.status = true;
                                     respMsg.message = 'EZEOne ID Image loaded successfully';
                                     respMsg.error = null;
                                     respMsg.data = {
-                                        image : result[0][0].Picture,
-                                        image_name : result[0][0].PictureFileName
+                                        image : searchResult[0][0].Picture,
+                                        image_name : searchResult[0][0].PictureFileName
                                     };
                                     res.status(200).json(respMsg);
                                 }
@@ -770,15 +782,25 @@ Location.prototype.getLocationPicture = function(req,res,next){
  * @description api code for get share location
  */
 Location.prototype.shareLocation = function(req,res,next){
-    var _this = this;
+
     var fs = require("fs");
 
     var token = req.body.token;
     var ezeone_id = alterEzeoneId(req.body.ezeone_id); // to ezeone_id
-    var locationTitle = req.body.lm ? req.body.lm : ''; // landmark
+    var locationTitle = (req.body.lm) ? req.body.lm : ''; // landmark
     var latitude = req.body.lat;
     var longitude = req.body.long;
-    var masterid='',receiverId,senderTitle,groupTitle,groupID,messageText,messageType,operationType,iphoneId,iphoneID,messageId;
+    var masterid='';
+    var receiverId;
+    var senderTitle;
+    var groupTitle;
+    var groupID;
+    var messageText;
+    var messageType;
+    var operationType;
+    var iphoneId;
+    var iphoneID;
+    var messageId;
 
     var responseMessage = {
         status: false,
@@ -787,7 +809,8 @@ Location.prototype.shareLocation = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -814,23 +837,23 @@ Location.prototype.shareLocation = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams = st.db.escape(token) + ','  + st.db.escape(locationTitle)+ ','  + st.db.escape(latitude)
                             + ','  + st.db.escape(longitude)+ ','  + st.db.escape(ezeone_id);
                         var query = 'CALL psharelocation(' + queryParams + ')';
                         console.log(query);
-                        st.db.query(query, function (err, getResult) {
-                            console.log(getResult[0]);
+                        st.db.query(query, function (err, locationResult) {
+                            //console.log(locationResult[0]);
                             if (!err) {
-                                if (getResult) {
-                                    if(getResult[0]) {
-                                        if (getResult[0][0]) {
+                                if (locationResult) {
+                                    if(locationResult[0]) {
+                                        if (locationResult[0][0]) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'location send successfully';
-                                            responseMessage.data = getResult[0][0];
+                                            responseMessage.data = locationResult[0][0];
                                             res.status(200).json(responseMessage);
                                             console.log('FnShareLocation: location send successfully');
 
@@ -853,7 +876,7 @@ Location.prototype.shareLocation = function(req,res,next){
                                                             if (userDetails[0]) {
                                                                 //console.log(userDetails);
                                                                 receiverId = userDetails[0].tid;
-                                                                senderTitle = getResult[0][0].ezeid;
+                                                                senderTitle = locationResult[0][0].ezeid;
                                                                 groupTitle = userDetails[0].GroupName;
                                                                 groupID = userDetails[0].tid;
                                                                 if (locationTitle) {
@@ -956,10 +979,10 @@ Location.prototype.shareLocation = function(req,res,next){
  * @description api code for validate group name
  */
 Location.prototype.validateEZEOne = function(req,res,next){
-    var _this = this;
 
     var name = alterEzeoneId(req.query.ezeone_id);
-    var ezeid,pin = null ;
+    var ezeid;
+    var pin = null ;
 
     var ezeidArray = name.split('.');
 
@@ -971,7 +994,8 @@ Location.prototype.validateEZEOne = function(req,res,next){
         isBussinessUser : 0
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!name){
         error['name'] = 'Invalid name';
@@ -997,18 +1021,18 @@ Location.prototype.validateEZEOne = function(req,res,next){
             var queryParams = st.db.escape(ezeid) + ',' + st.db.escape(pin);
             var query = 'CALL pvalidateEZEOne(' + queryParams + ')';
             //console.log(query);
-            st.db.query(query, function (err, getResult) {
-                console.log(getResult);
+            st.db.query(query, function (err, EZEOneResult) {
+                //console.log(EZEOneResult);
                 if (!err) {
-                    if (getResult) {
-                        if (getResult[0]) {
-                            if (getResult[0][0]) {
-                                if (getResult[0][0].masterid != 0) {
+                    if (EZEOneResult) {
+                        if (EZEOneResult[0]) {
+                            if (EZEOneResult[0][0]) {
+                                if (EZEOneResult[0][0].masterid != 0) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'EZEoneID is available';
-                                    responseMessage.data = getResult[0][0].masterid;
-                                    responseMessage.isBussinessUser = getResult[0][0].isBussinessUser;
+                                    responseMessage.data = EZEOneResult[0][0].masterid;
+                                    responseMessage.isBussinessUser = EZEOneResult[0][0].isBussinessUser;
                                     res.status(200).json(responseMessage);
                                     console.log('FnValidateEZEOne: EZEoneID is available');
                                 }
@@ -1168,7 +1192,7 @@ Location.prototype.getLocationsofezeid = function(req,res,next){
  * @description api code for get save location
  */
 Location.prototype.saveLocationforEmployers = function(req,res,next){
-    var _this = this;
+
     var fs = require("fs");
 
     var token = req.body.token;
@@ -1183,7 +1207,8 @@ Location.prototype.saveLocationforEmployers = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -1199,9 +1224,9 @@ Location.prototype.saveLocationforEmployers = function(req,res,next){
     }
     else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
+                    if (tokenResult) {
                         var queryParams = st.db.escape(masterId) + ','  + st.db.escape(locId);
 
                         var query = 'CALL pSaveLocEmployers(' + queryParams + ')';
