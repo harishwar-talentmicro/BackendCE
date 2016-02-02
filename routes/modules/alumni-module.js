@@ -1679,7 +1679,9 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
                         responseMessage.status = true;
                         responseMessage.error = null;
                         responseMessage.message = 'Alumni content loaded successfully';
-                        getResult[0][0].logo = (getResult[0][0].logo) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].logo):'';
+                        if(getResult[0][0]) {
+                            getResult[0][0].logo = (getResult[0][0].logo) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].logo) : '';
+                        }
                         responseMessage.data = getResult[0];
                         res.status(200).json(responseMessage);
                         console.log('FnGetAlumniContent: Alumni content loaded successfully');

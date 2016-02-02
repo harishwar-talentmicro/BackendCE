@@ -1038,7 +1038,7 @@ Configuration.prototype.saveItems = function(req,res,next){
         };
 
 
-        if (token && ft && itemName) {
+        if (token && itemName) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
@@ -1113,9 +1113,6 @@ Configuration.prototype.saveItems = function(req,res,next){
         else {
             if (!token) {
                 console.log('FnSaveItem: Token is empty');
-            }
-            else if (!ft) {
-                console.log('FnSaveItem: FunctionType is empty');
             }
             else if (!itemName) {
                 console.log('FnSaveItem: ItemName is empty');
@@ -2546,7 +2543,7 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         var token = req.body.Token;
-        var spilloverTime = req.body.SpilloverTime;
+        var spilloverTime = req.body.SpilloverTime ? req.body.SpilloverTime : 0;
         var m1 = req.body.MO1;
         var m2 = req.body.MO2;
         var m3 = req.body.MO3;
@@ -2583,7 +2580,7 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
             IsSuccessfull: false
         };
 
-        if (token && spilloverTime && workingHrsTemplate) {
+        if (token && workingHrsTemplate) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
@@ -2643,9 +2640,6 @@ Configuration.prototype.saveWorkingHoursTemplate = function(req,res,next){
         else {
             if (!token) {
                 console.log('FnSaveWorkingHours: Token is empty');
-            }
-            else if (!spilloverTime) {
-                console.log('FnSaveWorkingHours: SpilloverTime is empty');
             }
             else if (!workingHrsTemplate) {
                 console.log('FnSaveWorkingHours: WorkingHrsTemplate is empty');
