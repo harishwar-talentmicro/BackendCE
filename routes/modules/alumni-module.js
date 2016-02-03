@@ -781,7 +781,6 @@ Alumni.prototype.registerAlumni = function(req,res,next){
  */
 Alumni.prototype.saveAlumniProfilePic = function(req,res,next) {
 
-    var _this = this;
     var picture = req.body.pg_pic;
     var pictureType = req.body.pg_picType;
     var randomName, url;
@@ -812,9 +811,6 @@ Alumni.prototype.saveAlumniProfilePic = function(req,res,next) {
     try {
 
         if(req.files) {
-            console.log('coming....');
-            console.log(req.files.pg_pic);
-
             var imageParams = {
                 path: req.files.pg_pic.path,
                 type: pictureType,
@@ -899,8 +895,6 @@ Alumni.prototype.saveAlumniProfilePic = function(req,res,next) {
  */
 Alumni.prototype.saveAlumniContent = function(req,res,next) {
 
-    var _this = this;
-
     var token = req.body.token;
     var tid = req.body.tid;      // while saving time 0 else id of user
     var picture = req.body.pg_pic;
@@ -929,7 +923,10 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     var facultySubtitle = req.body.f_subtitle;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var randomName,url,logo_name,logo_url;
+    var randomName;
+    var url;
+    var logo_name;
+    var logo_url;
 
     var gcloud = require('gcloud');
     var gcs = gcloud.storage({
@@ -952,7 +949,8 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         message: '',
         data: null
     };
-    var error = {},validateStatus = true;
+    var error = {};
+    var validateStatus = true;
     if(!token){
         error['token'] = 'Invalid token';
         validateStatus *= false;
@@ -960,7 +958,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
     if(!tid){
         tid = 0;
     }
-    if(parseInt(tid) == NaN){
+    if(isNaN(parseInt(tid))){
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
@@ -1012,10 +1010,6 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
         error['mainFooter2'] = 'Invalid mainFooter2';
         validateStatus *= false;
     }
-    //if(!logo){
-    //    error['logo'] = 'Invalid logo';
-    //    validateStatus *= false;
-    //}
     if(!logoTitle){
         error['mainFooter2'] = 'Invalid logoTitle';
         validateStatus *= false;
@@ -1062,12 +1056,6 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
 
                         var saveContent = function (randomName) {
 
-                            console.log('---randomName---');
-                            console.log(randomName);
-
-                            console.log('save content....');
-                            console.log(req.body.logo);
-
                             if (logo) {
                                 logo = logo;
                             }
@@ -1076,8 +1064,7 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                             }
 
                             isURl(logo, function (err, str) {
-                                console.log('----isurl---');
-                                console.log(str);
+
                                 if (str == false) {
 
                                     var uniqueId = uuid.v4();
@@ -1109,10 +1096,10 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                                 else {
 
                                     //https://storage.googleapis.com/ezeone/d65285bd-fb2f-4fc7-a214-a4fbc38b26be.jpg
-                                    console.log('save url...');
+                                    //console.log('save url...');
                                     logo_name = ((logo).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
                                     logo_name = logo_name[2];
-                                    console.log(logo_name);
+
                                 }
                                 var queryParams = st.db.escape(tid) + ',' + st.db.escape(randomName) + ',' + st.db.escape(title)
                                     + ',' + st.db.escape(subTitle) + ',' + st.db.escape(footerL1) + ',' + st.db.escape(footerL2)
@@ -1181,13 +1168,13 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
                         };
 
                         if (req.body.pg_pic) {
-                            console.log('c1...');
-                            console.log(req.body.pg_pic);
+                            //console.log('c1...');
+                            //console.log(req.body.pg_pic);
                             var pgPic = req.body.pg_pic;
                             pagePicture(pgPic);
                         }
                         else {
-                            console.log('c2...');
+                            //console.log('c2...');
                             randomName = '';
                             saveContent(randomName);
                         }
@@ -1236,7 +1223,6 @@ Alumni.prototype.saveAlumniContent = function(req,res,next) {
  * @description save alumni team details
  */
 Alumni.prototype.saveAlumniTeam = function(req,res,next) {
-    var _this = this;
 
     var token = req.body.token;
     var tid = req.body.tid;      // while saving time 0 else id of user
@@ -1253,8 +1239,7 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     var username = req.body.username;
     var width = req.body.width ?  req.body.width : 1200;
     var height = req.body.height ? req.body.height : 600;
-    var image,randomName,url;
-
+    var randomName;
 
 
     var responseMessage = {
@@ -1273,14 +1258,11 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     if(!tid){
         tid = 0;
     }
-    if(parseInt(tid) == NaN){
+    if(isNaN(parseInt(tid))){
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
-    //if(!picture){
-    //    error['picture'] = 'Invalid picture';
-    //    validateStatus *= false;
-    //}
+
     if(!jobTitle){
         error['jobTitle'] = 'Invalid jobTitle';
         validateStatus *= false;
@@ -1296,14 +1278,14 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
     if(!seqNo){
         seqNo = 0;
     }
-    if(parseInt(seqNo) == NaN){
+    if(isNaN(parseInt(seqNo))){
         error['seqNo'] = 'Invalid seqNo';
         validateStatus *= false;
     }
     if(!type){
         type = 0;
     }
-    if(parseInt(type) == NaN){
+    if(isNaN(parseInt(type))){
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
@@ -1348,7 +1330,6 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                                         responseMessage.error = null;
                                         responseMessage.message = 'Alumni Team saved successfully';
                                         responseMessage.data = {
-                                            token: req.body.token,
                                             tid: req.body.tid,
                                             p_title: req.body.p_title,
                                             p_type: req.body.p_type,
@@ -1385,8 +1366,8 @@ Alumni.prototype.saveAlumniTeam = function(req,res,next) {
                             var pic = req.body.picture;
 
                             isURl(pic, function (err, str) {
-                                console.log('----isurl---');
-                                console.log(str);
+                                //console.log('----isurl---');
+                                //console.log(str);
                                 if (str == true) {
                                     randomName = ((req.body.picture).replace(/^https:\/\/storage.googleapis.com/, '')).split('/');
                                     randomName = randomName[2];
@@ -1436,7 +1417,6 @@ function FnCropImage(imageParams, callback){
     /**
      * @todo FnCropImage
      */
-    var _this = this;
 
     var fs = require('fs');
     var deleteTempFile = function(){
@@ -1645,7 +1625,6 @@ function FnCropImage(imageParams, callback){
  * @description api code for get alumni content
  */
 Alumni.prototype.getAlumniContent = function(req,res,next){
-    var _this = this;
 
     var code = alterEzeoneId(req.query.code);   // college code
 
@@ -1656,7 +1635,8 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!code){
         error['code'] = 'Invalid code';
@@ -1675,16 +1655,23 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
             st.db.query('CALL pGetAlumniContent(' + query + ')', function (err, getResult) {
                 //console.log(getResult);
                 if (!err) {
-                    if (getResult[0]) {
-                        responseMessage.status = true;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Alumni content loaded successfully';
-                        if(getResult[0][0]) {
-                            getResult[0][0].logo = (getResult[0][0].logo) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].logo) : '';
+                    if (getResult) {
+                        if (getResult[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Alumni content loaded successfully';
+                            if (getResult[0][0]) {
+                                getResult[0][0].logo = (getResult[0][0].logo) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].logo) : '';
+                            }
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetAlumniContent: Alumni content loaded successfully');
                         }
-                        responseMessage.data = getResult[0];
-                        res.status(200).json(responseMessage);
-                        console.log('FnGetAlumniContent: Alumni content loaded successfully');
+                        else {
+                            responseMessage.message = 'Alumni content not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetAlumniContent: Alumni content not loaded');
+                        }
                     }
                     else {
                         responseMessage.message = 'Alumni content not loaded';
@@ -1726,7 +1713,6 @@ Alumni.prototype.getAlumniContent = function(req,res,next){
  * @description api code for get alumni team
  */
 Alumni.prototype.getAlumniTeam = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var code = alterEzeoneId(req.query.code);   // college code
@@ -1739,7 +1725,8 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -1752,7 +1739,7 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
     if(!type){
         type = 0;
     }
-    if(parseInt(type) == NaN){
+    if(isNaN(parseInt(type))){
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
@@ -1775,15 +1762,21 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             //console.log(getResult);
                             if (!err) {
-                                if (getResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Alumni team loaded successfully';
-                                    responseMessage.data = getResult[0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetAlumniTeam: Alumni team loaded successfully');
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Alumni team loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniTeam: Alumni team loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Alumni team not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniTeam: Alumni team not loaded');
+                                    }
                                 }
-
                                 else {
                                     responseMessage.message = 'Alumni team not loaded';
                                     res.status(200).json(responseMessage);
@@ -1844,7 +1837,6 @@ Alumni.prototype.getAlumniTeam = function(req,res,next){
  * @description api code for delete alumni team
  */
 Alumni.prototype.deleteAlumniTeam = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var id = req.query.id;     // alumni team id
@@ -1856,7 +1848,8 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -1951,7 +1944,6 @@ Alumni.prototype.deleteAlumniTeam = function(req,res,next){
  * @description api code for get alumni content
  */
 Alumni.prototype.getAlumniContentImage = function(req,res,next){
-    var _this = this;
 
     var code = alterEzeoneId(req.query.code);   // college code
 
@@ -1959,10 +1951,11 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
         status: false,
         error: {},
         message: '',
-        data: null
+        data: []
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!code){
         error['code'] = 'Invalid code';
@@ -1982,13 +1975,23 @@ Alumni.prototype.getAlumniContentImage = function(req,res,next){
                 console.log(getResult[0]);
                 if (!err) {
                     if (getResult[0]) {
-                        responseMessage.status = true;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Cover Image loaded successfully';
-                        getResult[0][0].pg_pic = (getResult[0][0].pg_pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].pg_pic):'';
-                        responseMessage.data = getResult[0][0];
-                        res.status(200).json(responseMessage);
-                        console.log('FnGetAlumniContentImage: Cover Image loaded successfully');
+                        if (getResult[0][0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Cover Image loaded successfully';
+                            /**
+                             * added image path
+                             */
+                            getResult[0][0].pg_pic = (getResult[0][0].pg_pic) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][0].pg_pic) : '';
+                            responseMessage.data = getResult[0][0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetAlumniContentImage: Cover Image loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Cover Image not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetAlumniContentImage: Cover Image not loaded');
+                        }
                     }
                     else {
                         responseMessage.message = 'Cover Image not loaded';
@@ -2038,7 +2041,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var batch = req.body.batch;
     var code = alterEzeoneId(req.body.code);     // college code
     var accesstype = req.body.access_type ? req.body.access_type : 2;  // 0-no relation, 1-is admin, 2-is member
-    var ps;
+    var ps='';
 
     var responseMessage = {
         status: false,
@@ -2096,15 +2099,8 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                                         if (insertresult[0][0]) {
                                             ps = insertresult[0][0].profilestatus;
                                         }
-                                        else
-                                        {
-                                            ps = '';
-                                        }
                                     }
-                                    else
-                                    {
-                                        ps = '';
-                                    }
+
                                     responseMessage.data = {
                                         profile_status : ps,
                                         profile: req.body.profile,
@@ -2173,7 +2169,6 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
  * @description api code for get alumni content
  */
 Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var tid = req.query.tid;
@@ -2185,7 +2180,8 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2211,14 +2207,20 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
                         st.db.query('CALL pGetAlumniTeamDetails(' + query + ')', function (err, getResult) {
                             if (!err) {
                                 if (getResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'AlumniTeam Details loaded successfully';
-                                    responseMessage.data = getResult[0][0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
+                                    if (getResult[0][0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'AlumniTeam Details loaded successfully';
+                                        responseMessage.data = getResult[0][0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniTeamDetails: AlumniTeam Details loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'AlumniTeam Details not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniTeamDetails:AlumniTeam v not loaded');
+                                    }
                                 }
-
                                 else {
                                     responseMessage.message = 'AlumniTeam Details not loaded';
                                     res.status(200).json(responseMessage);
@@ -2279,12 +2281,9 @@ Alumni.prototype.getAlumniTeamDetails = function(req,res,next){
  * @description api code for get alumni profile
  */
 Alumni.prototype.getAlumniProfile = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var code = alterEzeoneId(req.query.code);   // college code
-
-    console.log(req.query);
 
     var responseMessage = {
         status: false,
@@ -2293,7 +2292,8 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2320,13 +2320,20 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
 
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Alumni profile loaded successfully';
-                                    responseMessage.data = getResult[0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetAlumniProfile: Alumni profile loaded successfully');
+                                if(getResult){
+                                    if (getResult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Alumni profile loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniProfile: Alumni profile loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Alumni profile not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetAlumniProfile: Alumni profile not loaded');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Alumni profile not loaded';
@@ -2422,7 +2429,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
     if (!tid) {
         tid = 0;
     }
-    if (parseInt(tid) == NaN) {
+    if (isNaN(parseInt(tid))) {
         error['tid'] = 'Invalid tid';
         validateStatus *= false;
     }
@@ -2489,12 +2496,6 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                         if (insertresult[0][0]) {
                                             tenId = insertresult[0][0].id;
                                         }
-                                        else {
-                                            tenId = 0;
-                                        }
-                                    }
-                                    else {
-                                        tenId = 0;
                                     }
 
                                     //upload to cloud server
@@ -2507,7 +2508,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                                 var filetype = (req.files[prop].extension) ? req.files[prop].extension : 'jpg';
                                                 randomName = uniqueId + '.' + filetype;
                                                 originalName = req.files[prop].originalname;
-                                                console.log(randomName);
+                                                //console.log(randomName);
 
                                                 var readStream = fs.createReadStream(req.files[prop].path);
 
@@ -2599,9 +2600,9 @@ function fnsavepic(picContent, callback) {
         localStream.pipe(remoteWriteStream);
 
         remoteWriteStream.on('finish', function () {
-            console.log(picContent.randomName);
+            //console.log(picContent.randomName);
 
-            console.log('FnSaveTENMasterattachment: Pic Uploaded successfully');
+            //console.log('FnSaveTENMasterattachment: Pic Uploaded successfully');
 
             var queryParams1 = st.db.escape(0) + ',' + st.db.escape(picContent.tenId) + ',' + st.db.escape(picContent.randomName)
                 + ',' + st.db.escape(picContent.originalName);
@@ -2652,7 +2653,6 @@ function fnsavepic(picContent, callback) {
  * @description api code for get ten details
  */
 Alumni.prototype.getTENDetails = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token ? req.query.token : '';
     var code = alterEzeoneId(req.query.code);   // college code
@@ -2670,7 +2670,8 @@ Alumni.prototype.getTENDetails = function(req,res,next){
 
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!code){
         error['code'] = 'Invalid code';
@@ -2679,7 +2680,7 @@ Alumni.prototype.getTENDetails = function(req,res,next){
     if(!type){
         type = 0;
     }
-    if(parseInt(type) == NaN){
+    if(isNaN(parseInt(type))){
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
@@ -2703,36 +2704,43 @@ Alumni.prototype.getTENDetails = function(req,res,next){
                             //console.log(getResult);
                             //console.log(getResult[1]);
                             if (getResult[1]) {
-                                for (var ct = 0; ct < getResult[1].length; ct++) {
-                                    getResult[1][ct].attachment = getResult[1][ct].attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].attachment : '';
-                                }
+                                if (getResult[1].length > 0) {
+                                    for (var ct = 0; ct < getResult[1].length; ct++) {
+                                        getResult[1][ct].attachment = getResult[1][ct].attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].attachment : '';
+                                    }
 
-                                for (var i = 0; i < getResult[1].length; i++) {
-                                    var output =[];
-                                    if (getResult[1][i].attachment1) {
+                                    for (var i = 0; i < getResult[1].length; i++) {
+                                        var output = [];
+                                        if (getResult[1][i].attachment1) {
 
-                                        var attach = getResult[1][i].attachment1.split(',');
+                                            var attach = getResult[1][i].attachment1.split(',');
 
-                                        for (var j = 0; j < attach.length; j++) {
-                                            var joinAttach = {
-                                                s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attach[j]
-                                            };
-                                            output.push(joinAttach);
-                                            getResult[1][i].attachment1 = output;
+                                            for (var j = 0; j < attach.length; j++) {
+                                                var joinAttach = {
+                                                    s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attach[j]
+                                                };
+                                                output.push(joinAttach);
+                                                getResult[1][i].attachment1 = output;
 
+                                            }
+                                        }
+                                        else {
+                                            getResult[1][i].attachment1 = '';
                                         }
                                     }
-                                    else {
-                                        getResult[1][i].attachment1 = '';
-                                    }
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Data loaded successfully';
+                                    responseMessage.count = getResult[0][0].count;
+                                    responseMessage.data = getResult[1];
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTENDetails: Data loaded successfully');
                                 }
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Data loaded successfully';
-                                responseMessage.count = getResult[0][0].count;
-                                responseMessage.data = getResult[1];
-                                res.status(200).json(responseMessage);
-                                console.log('FnGetTENDetails: Data loaded successfully');
+                                else {
+                                    responseMessage.message = 'Data not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTENDetails: Data not loaded');
+                                }
                             }
                             else {
                                 responseMessage.message = 'Data not loaded';
@@ -2789,7 +2797,6 @@ Alumni.prototype.getTENDetails = function(req,res,next){
  * @used For getting up pending event details which are showed to user who posted the events before approval
  */
 Alumni.prototype.getMyTENDetails = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token ? req.query.token : '';
     var code = alterEzeoneId(req.query.code);   // college code
@@ -2807,7 +2814,8 @@ Alumni.prototype.getMyTENDetails = function(req,res,next){
 
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!code){
         error['code'] = 'Invalid code';
@@ -2816,7 +2824,7 @@ Alumni.prototype.getMyTENDetails = function(req,res,next){
     if(!type){
         type = 0;
     }
-    if(parseInt(type) == NaN){
+    if(isNaN(parseInt(type))){
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
@@ -2836,40 +2844,54 @@ Alumni.prototype.getMyTENDetails = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 if (!err) {
                     if (getResult[0]) {
-                        if (getResult[0][0].count > 0) {
-                            //console.log(getResult);
-                            //console.log(getResult[1]);
-                            if (getResult[1]) {
-                                for (var ct = 0; ct < getResult[1].length; ct++) {
-                                    getResult[1][ct].attachment = getResult[1][ct].attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].attachment : '';
-                                }
-
-                                for (var i = 0; i < getResult[1].length; i++) {
-                                    var output =[];
-                                    if (getResult[1][i].attachment1) {
-
-                                        var attach = getResult[1][i].attachment1.split(',');
-
-                                        for (var j = 0; j < attach.length; j++) {
-                                            var joinAttach = {
-                                                s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attach[j]
-                                            };
-                                            output.push(joinAttach);
-                                            getResult[1][i].attachment1 = output;
-
+                        if (getResult[0][0]) {
+                            if (getResult[0][0].count > 0) {
+                                //console.log(getResult);
+                                //console.log(getResult[1]);
+                                if (getResult[1]) {
+                                    if (getResult[1].length > 0) {
+                                        for (var ct = 0; ct < getResult[1].length; ct++) {
+                                            getResult[1][ct].attachment = getResult[1][ct].attachment ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[1][ct].attachment : '';
                                         }
+
+                                        for (var i = 0; i < getResult[1].length; i++) {
+                                            var output = [];
+                                            if (getResult[1][i].attachment1) {
+
+                                                var attach = getResult[1][i].attachment1.split(',');
+
+                                                for (var j = 0; j < attach.length; j++) {
+                                                    var joinAttach = {
+                                                        s_url: req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + attach[j]
+                                                    };
+                                                    output.push(joinAttach);
+                                                    getResult[1][i].attachment1 = output;
+
+                                                }
+                                            }
+                                            else {
+                                                getResult[1][i].attachment1 = '';
+                                            }
+                                        }
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Data loaded successfully';
+                                        responseMessage.count = getResult[0][0].count;
+                                        responseMessage.data = getResult[1];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTENDetails: Data loaded successfully');
                                     }
                                     else {
-                                        getResult[1][i].attachment1 = '';
+                                        responseMessage.message = 'Data not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetTENDetails: Data not loaded');
                                     }
                                 }
-                                responseMessage.status = true;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Data loaded successfully';
-                                responseMessage.count = getResult[0][0].count;
-                                responseMessage.data = getResult[1];
-                                res.status(200).json(responseMessage);
-                                console.log('FnGetTENDetails: Data loaded successfully');
+                                else {
+                                    responseMessage.message = 'Data not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnGetTENDetails: Data not loaded');
+                                }
                             }
                             else {
                                 responseMessage.message = 'Data not loaded';
@@ -2924,7 +2946,6 @@ Alumni.prototype.getMyTENDetails = function(req,res,next){
  * @description api code for get profile status
  */
 Alumni.prototype.getProfileStatus = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var code = alterEzeoneId(req.query.code);   // college code
@@ -2936,7 +2957,8 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -2961,25 +2983,35 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(code);
                         var query = 'CALL PgetProfileStatus(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
-                            console.log(getResult);
                             if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Data loaded successfully';
-                                        responseMessage.data = {
-                                            isProfileCreated:true,
-                                            result: getResult[0]
-                                        };
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetProfileStatus: Data loaded successfully');
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Data loaded successfully';
+                                            responseMessage.data = {
+                                                isProfileCreated: true,
+                                                result: getResult[0]
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetProfileStatus: Data loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.message = 'Your profile is not created';
+                                            responseMessage.data = {
+                                                isProfileCreated: false
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetProfileStatus: Your profile is not created');
+                                        }
                                     }
                                     else {
                                         responseMessage.status = true;
                                         responseMessage.message = 'Your profile is not created';
                                         responseMessage.data = {
-                                            isProfileCreated : false
+                                            isProfileCreated: false
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetProfileStatus: Your profile is not created');
@@ -2989,7 +3021,7 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
                                     responseMessage.status = true;
                                     responseMessage.message = 'Your profile is not created';
                                     responseMessage.data = {
-                                        isProfileCreated : false
+                                        isProfileCreated: false
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetProfileStatus: Your profile is not created');
@@ -3049,7 +3081,6 @@ Alumni.prototype.getProfileStatus = function(req,res,next){
  * @description save ten Users details
  */
 Alumni.prototype.saveTENUsers = function(req,res,next) {
-    var _this = this;
 
     var token = req.body.token;
     var tenID = req.body.ten_id;
@@ -3064,7 +3095,8 @@ Alumni.prototype.saveTENUsers = function(req,res,next) {
         data: null
     };
 
-    var error = {},validateStatus = true;
+    var error = {};
+    var validateStatus = true;
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -3074,7 +3106,7 @@ Alumni.prototype.saveTENUsers = function(req,res,next) {
     if(!status){
         status = 0;
     }
-    if(parseInt(status) == NaN){
+    if(isNaN(parseInt(status))){
         error['status'] = 'Invalid status';
         validateStatus *= false;
     }
@@ -3105,7 +3137,6 @@ Alumni.prototype.saveTENUsers = function(req,res,next) {
                                     responseMessage.error = null;
                                     responseMessage.message = 'Data saved successfully';
                                     responseMessage.data = {
-                                        token: req.body.token,
                                         tid: req.body.tid,
                                         ten_id: req.body.ten_id,
                                         type: req.body.type,
@@ -3169,7 +3200,6 @@ Alumni.prototype.saveTENUsers = function(req,res,next) {
  * @description api code for get ten details
  */
 Alumni.prototype.approveTEN = function(req,res,next){
-    var _this = this;
 
     var token = req.body.token;
     var tenID = req.body.ten_id;
@@ -3279,9 +3309,7 @@ Alumni.prototype.approveTEN = function(req,res,next){
  * @description api code for save comments
  */
 Alumni.prototype.saveComments = function(req,res,next){
-    var _this = this;
 
-    //var token = req.body.token;
     var tenID = req.body.ten_id;
     var profileId = req.body.profile_id;  // profileID is AlumniProfileID of that user
     var rating = req.body.rating;
@@ -3294,12 +3322,9 @@ Alumni.prototype.saveComments = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
     if(!tenID){
         error['tenID'] = 'Invalid tenID';
         validateStatus *= false;
@@ -3312,9 +3337,7 @@ Alumni.prototype.saveComments = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
+
             var queryParams = st.db.escape(tenID) + ',' + st.db.escape(profileId)+ ',' + st.db.escape(rating)
                 + ',' + st.db.escape(comments);
             var query = 'CALL pgivecommentsforTEN(' + queryParams + ')';
@@ -3350,26 +3373,7 @@ Alumni.prototype.saveComments = function(req,res,next){
 
             });
         }
-            //        else {
-            //            responseMessage.message = 'Invalid token';
-            //            responseMessage.error = {
-            //                token: 'Invalid Token'
-            //            };
-            //            responseMessage.data = null;
-            //            res.status(401).json(responseMessage);
-            //            console.log('FnSaveComments: Invalid token');
-            //        }
-            //    }
-            //    else {
-            //        responseMessage.error = {
-            //            server: 'Internal Server Error'
-            //        };
-            //        responseMessage.message = 'Error in validating Token';
-            //        res.status(500).json(responseMessage);
-            //        console.log('FnSaveComments:Error in processing Token' + err);
-            //    }
-            //});
-            //}
+
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -3393,9 +3397,7 @@ Alumni.prototype.saveComments = function(req,res,next){
  * @description api code for get profile status
  */
 Alumni.prototype.getParticipatedEventsId = function(req,res,next){
-    var _this = this;
 
-    //var token = req.query.token;
     var profileId = req.query.profile_id;  // profileID is AlumniProfileID of that user
     var ids = req.query.ids;
 
@@ -3406,12 +3408,9 @@ Alumni.prototype.getParticipatedEventsId = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
-    //if(!token){
-    //    error['token'] = 'Invalid token';
-    //    validateStatus *= false;
-    //}
     if(!profileId){
         error['profileId'] = 'Invalid profileId';
         validateStatus *= false;
@@ -3424,20 +3423,25 @@ Alumni.prototype.getParticipatedEventsId = function(req,res,next){
     }
     else {
         try {
-            //st.validateToken(token, function (err, result) {
-            //    if (!err) {
-            //        if (result) {
+
             var queryParams = st.db.escape(profileId) + ',' + st.db.escape(ids);
             var query = 'CALL pLoadparticiapatedTENId(' + queryParams + ')';
             st.db.query(query, function (err, getResult) {
                 if (!err) {
-                    if (getResult[0]) {
-                        responseMessage.status = true;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Data loaded successfully';
-                        responseMessage.data = getResult[0];
-                        res.status(200).json(responseMessage);
-                        console.log('FnGetParticipatedEventsId: Data loaded successfully');
+                    if (getResult) {
+                        if (getResult[0]) {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Data loaded successfully';
+                            responseMessage.data = getResult[0];
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetParticipatedEventsId: Data loaded successfully');
+                        }
+                        else {
+                            responseMessage.message = 'Data not loaded';
+                            res.status(200).json(responseMessage);
+                            console.log('FnGetParticipatedEventsId: Data not loaded');
+                        }
                     }
                     else {
                         responseMessage.message = 'Data not loaded';
@@ -3456,26 +3460,6 @@ Alumni.prototype.getParticipatedEventsId = function(req,res,next){
 
             });
         }
-            //            else {
-            //                responseMessage.message = 'Invalid token';
-            //                responseMessage.error = {
-            //                    token: 'Invalid Token'
-            //                };
-            //                responseMessage.data = null;
-            //                res.status(401).json(responseMessage);
-            //                console.log('FnGetParticipatedEventsId: Invalid token');
-            //            }
-            //        }
-            //        else {
-            //            responseMessage.error = {
-            //                server: 'Internal Server Error'
-            //            };
-            //            responseMessage.message = 'Error in validating Token';
-            //            res.status(500).json(responseMessage);
-            //            console.log('FnGetParticipatedEventsId:Error in processing Token' + err);
-            //        }
-            //    });
-            //}
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
@@ -3499,7 +3483,6 @@ Alumni.prototype.getParticipatedEventsId = function(req,res,next){
  * @description api code for get Participants list
  */
 Alumni.prototype.getParticipantsList = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var tid = req.query.tid;  // id of traning id
@@ -3511,7 +3494,8 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -3536,16 +3520,22 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
                         var query = 'CALL PgetListofParticipants(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult[0]) {
+                                if (getResult) {
+                                    if (getResult[0]) {
 
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Data loaded successfully';
-                                    responseMessage.data = getResult[0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnGetParticipantsList: Data loaded successfully');
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Data loaded successfully';
+                                        responseMessage.data = getResult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetParticipantsList: Data loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Data not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnGetParticipantsList: Data not loaded');
+                                    }
                                 }
-
                                 else {
                                     responseMessage.message = 'Data not loaded';
                                     res.status(200).json(responseMessage);
@@ -3606,7 +3596,6 @@ Alumni.prototype.getParticipantsList = function(req,res,next){
  * @description api code for get profile status
  */
 Alumni.prototype.getAlumniApprovalList = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var code = alterEzeoneId(req.query.code);  // college code
@@ -3627,7 +3616,8 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -3653,14 +3643,21 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
                         console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'List loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniApprovalList: List loaded successfully');
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'List loaded successfully';
+                                            responseMessage.data = getResult[0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetAlumniApprovalList: List loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'List not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetAlumniApprovalList: List not loaded');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'List not loaded';
@@ -3728,7 +3725,6 @@ Alumni.prototype.getAlumniApprovalList = function(req,res,next){
  * @description api code for get alumni team
  */
 Alumni.prototype.getTeamContent = function(req,res,next){
-    var _this = this;
 
     var code = alterEzeoneId(req.query.code);   // college code
 
@@ -3739,7 +3735,8 @@ Alumni.prototype.getTeamContent = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!code){
         error['code'] = 'Invalid code';
@@ -3760,14 +3757,21 @@ Alumni.prototype.getTeamContent = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 //console.log(getResult);
                 if (!err) {
-                    if (getResult[0]) {
-                        if (getResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Team Content loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetTeamContent:Team Content loaded successfully');
+                    if (getResult) {
+                        if (getResult[0]) {
+                            if (getResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Team Content loaded successfully';
+                                responseMessage.data = getResult[0];
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTeamContent:Team Content loaded successfully');
+                            }
+                            else {
+                                responseMessage.message = 'Team Content not loaded';
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTeamContent: Team Content not loaded');
+                            }
                         }
                         else {
                             responseMessage.message = 'Team Content not loaded';
@@ -3815,7 +3819,6 @@ Alumni.prototype.getTeamContent = function(req,res,next){
  * @description api code for get team image
  */
 Alumni.prototype.getTeamImage = function(req,res,next) {
-    var _this = this;
 
     var code = alterEzeoneId(req.query.code);   // college code
     var type = parseInt(req.query.type);   // 0=core group 1=mentor 2=faculty
@@ -3827,7 +3830,8 @@ Alumni.prototype.getTeamImage = function(req,res,next) {
         data: null
     };
 
-    var validateStatus = true, error = {};
+    var validateStatus = true;
+    var error = {};
 
 
     if (!code) {
@@ -3837,7 +3841,7 @@ Alumni.prototype.getTeamImage = function(req,res,next) {
     if (!type) {
         type = 0;
     }
-    if (parseInt(type) == NaN) {
+    if (isNaN(parseInt(type))) {
         error['type'] = 'Invalid type';
         validateStatus *= false;
     }
@@ -3854,19 +3858,26 @@ Alumni.prototype.getTeamImage = function(req,res,next) {
             st.db.query('CALL pgetTeamImages(' + query + ')', function (err, getResult) {
                 //console.log(getResult);
                 if (!err) {
-                    if (getResult[0]) {
-                        if (getResult[0].length > 0) {
+                    if (getResult) {
+                        if (getResult[0]) {
+                            if (getResult[0].length > 0) {
 
-                            for (var i = 0; i < getResult[0].length; i++) {
-                                getResult[0][i].picture = (getResult[0][i].picture) ?
-                                req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].picture : '';
+                                for (var i = 0; i < getResult[0].length; i++) {
+                                    getResult[0][i].picture = (getResult[0][i].picture) ?
+                                    req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getResult[0][i].picture : '';
+                                }
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Team image loaded successfully';
+                                responseMessage.data = getResult[0];
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTeamImage: Team image loaded successfully');
                             }
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Team image loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetTeamImage: Team image loaded successfully');
+                            else {
+                                responseMessage.message = 'Team image not loaded';
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTeamImage: Team image not loaded');
+                            }
                         }
                         else {
                             responseMessage.message = 'Team image not loaded';
@@ -3915,7 +3926,6 @@ Alumni.prototype.getTeamImage = function(req,res,next) {
  * @description api code for get ten attachment
  */
 Alumni.prototype.getTENAttachment = function(req,res,next){
-    var _this = this;
 
     var ids = req.query.ids;   // comma separated tids of training
 
@@ -3926,7 +3936,8 @@ Alumni.prototype.getTENAttachment = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!ids){
         error['ids'] = 'Invalid ids';
@@ -3946,14 +3957,21 @@ Alumni.prototype.getTENAttachment = function(req,res,next){
             st.db.query(query, function (err, getResult) {
                 //console.log(getResult);
                 if (!err) {
-                    if (getResult[0]) {
-                        if (getResult[0].length > 0) {
-                            responseMessage.status = true;
-                            responseMessage.error = null;
-                            responseMessage.message = 'Attachment loaded successfully';
-                            responseMessage.data = getResult[0];
-                            res.status(200).json(responseMessage);
-                            console.log('FnGetTENAttachment:Attachment loaded successfully');
+                    if (getResult){
+                        if (getResult[0]) {
+                            if (getResult[0].length > 0) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Attachment loaded successfully';
+                                responseMessage.data = getResult[0];
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTENAttachment:Attachment loaded successfully');
+                            }
+                            else {
+                                responseMessage.message = 'Attachment not loaded';
+                                res.status(200).json(responseMessage);
+                                console.log('FnGetTENAttachment: Attachment not loaded');
+                            }
                         }
                         else {
                             responseMessage.message = 'Attachment not loaded';
@@ -4001,7 +4019,6 @@ Alumni.prototype.getTENAttachment = function(req,res,next){
  * @description save ten venue details
  */
 Alumni.prototype.saveTENVenue = function(req,res,next) {
-    var _this = this;
 
     var token = req.body.token;
     var lat = req.body.lat;
@@ -4018,7 +4035,8 @@ Alumni.prototype.saveTENVenue = function(req,res,next) {
         data: null
     };
 
-    var error = {},validateStatus = true;
+    var error = {};
+    var validateStatus = true;
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -4028,7 +4046,7 @@ Alumni.prototype.saveTENVenue = function(req,res,next) {
     if(!id){
         id = 0;
     }
-    if(parseInt(id) == NaN){
+    if(isNaN(parseInt(id))){
         error['id'] = 'Invalid id';
         validateStatus *= false;
     }
@@ -4054,17 +4072,31 @@ Alumni.prototype.saveTENVenue = function(req,res,next) {
                         console.log(query);
 
                         st.db.query(query, function (err, insertresult) {
-                            console.log(insertresult);
+                           // console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Venue saved successfully';
-                                    responseMessage.data = {
-                                        id: insertresult[0][0].id
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSaveTENVenue: Venue saved successfully');
+                                    if (insertresult[0]) {
+                                        if (insertresult[0][0]) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Venue saved successfully';
+                                            responseMessage.data = {
+                                                id: insertresult[0][0].id
+                                            };
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveTENVenue: Venue saved successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'No Save Venue';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveTENVenue:No save Venue');
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'No Save Venue';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSaveTENVenue:No save Venue');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'No Save Venue';
@@ -5182,7 +5214,6 @@ Alumni.prototype.viewJobDetails = function(req,res,next){
  * @description api code for get job approval list status
  */
 Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var code = alterEzeoneId(req.query.code);  // college code
@@ -5196,7 +5227,8 @@ Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -5221,14 +5253,21 @@ Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
                         var query = 'CALL pGetAlumniJobListForApproval(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'ApprovalList loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetAlumniJobApprovalList: ApprovalList loaded successfully');
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'ApprovalList loaded successfully';
+                                            responseMessage.data = getResult[0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetAlumniJobApprovalList: ApprovalList loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'ApprovalList not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetAlumniJobApprovalList: ApprovalList not loaded');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'ApprovalList not loaded';
@@ -5297,11 +5336,10 @@ Alumni.prototype.getAlumniJobApprovalList = function(req,res,next){
  * @description api code for save approve alumni job details
  */
 Alumni.prototype.approveAlumniJobs = function(req,res,next){
-    var _this = this;
 
     var token = req.body.token;
     var jobId = req.body.job_id;
-    var status = req.body.st ? parseInt(req.body.st) : 0 ;   // 0=Pending,1=Active,2=inactive
+    var status = (!isNaN(parseInt(req.body.st))) ? parseInt(req.body.st) : 0 ;   // 0=Pending,1=Active,2=inactive
 
     var responseMessage = {
         status: false,
@@ -5310,7 +5348,8 @@ Alumni.prototype.approveAlumniJobs = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -5410,7 +5449,6 @@ Alumni.prototype.approveAlumniJobs = function(req,res,next){
  * @description api code for search alumni ten
  */
 Alumni.prototype.searchAlumniTEN = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var title = req.query.keyword;
@@ -5426,7 +5464,8 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
         error: {}
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -5450,15 +5489,29 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
                         st.db.query(query, function (err, getResult) {
                             //console.log(getResult);
                             if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0][0].count > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.count = getResult[0][0].count;
-                                        responseMessage.data = getResult[1];
-                                        responseMessage.message = 'Search Result loaded successfully';
-                                        responseMessage.error = null;
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSearchAlumniTEN: Search Result loaded successfully');
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0][0]) {
+                                            if (getResult[0][0].count > 0) {
+                                                responseMessage.status = true;
+                                                responseMessage.count = getResult[0][0].count;
+                                                responseMessage.data = getResult[1];
+                                                responseMessage.message = 'Search Result loaded successfully';
+                                                responseMessage.error = null;
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSearchAlumniTEN: Search Result loaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.message = 'Search Result not loaded';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSearchAlumniTEN: Search Result not loaded');
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.message = 'Search Result not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSearchAlumniTEN: Search Result not loaded');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'Search Result not loaded';
@@ -5526,7 +5579,6 @@ Alumni.prototype.searchAlumniTEN = function(req,res,next){
  * @description search jobs of a person
  */
 Alumni.prototype.searchAlumniJobs = function(req,res,next){
-    var _this = this;
     try{
         var latitude = req.query.latitude ? req.query.latitude : 0;
         var longitude = req.query.longitude ? req.query.longitude : 0;
@@ -5637,7 +5689,6 @@ Alumni.prototype.searchAlumniJobs = function(req,res,next){
  * @description api code for get my alumni jobs
  */
 Alumni.prototype.getMyAlumniJobs = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var code = req.query.code;  // college code
@@ -5650,7 +5701,8 @@ Alumni.prototype.getMyAlumniJobs = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -5675,14 +5727,21 @@ Alumni.prototype.getMyAlumniJobs = function(req,res,next){
                         var query = 'CALL pgetMyAlumniJobs(' + queryParams + ')';
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
-                                if (getResult[0]) {
-                                    if (getResult[0].length > 0) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'List loaded successfully';
-                                        responseMessage.data = getResult[0];
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnGetMyAlumniJobs: List loaded successfully');
+                                if (getResult) {
+                                    if (getResult[0]) {
+                                        if (getResult[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'List loaded successfully';
+                                            responseMessage.data = getResult[0];
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetMyAlumniJobs: List loaded successfully');
+                                        }
+                                        else {
+                                            responseMessage.message = 'List not loaded';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnGetMyAlumniJobs: List not loaded');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'List not loaded';
@@ -5855,7 +5914,6 @@ Alumni.prototype.getAlumniUserDetails = function(req,res,next){
  * @description api code for search alumni
  */
 Alumni.prototype.searchAlumni = function(req,res,next){
-    var _this = this;
 
     var token = req.query.token;
     var title = req.query.title ? alterEzeoneId(req.query.title) : '';
@@ -5867,7 +5925,8 @@ Alumni.prototype.searchAlumni = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -5888,13 +5947,20 @@ Alumni.prototype.searchAlumni = function(req,res,next){
                         var query = 'CALL pFindAlumni(' + queryParams + ')';
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
-                                if (getresult[0]) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'AlumniSearch Loaded successfully';
-                                    responseMessage.data = getresult[0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnSearchAlumni: AlumniSearch Loaded successfully');
+                                if (getresult) {
+                                    if (getresult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'AlumniSearch Loaded successfully';
+                                        responseMessage.data = getresult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSearchAlumni: AlumniSearch Loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'AlumniSearch not Loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnSearchAlumni:AlumniSearch not Loaded');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'AlumniSearch not Loaded';
@@ -5956,11 +6022,10 @@ Alumni.prototype.searchAlumni = function(req,res,next){
  * @description api code for leave alumni
  */
 Alumni.prototype.leaveAlumni = function(req,res,next){
-    var _this = this;
 
     var token = req.body.token;
     var alumniId = req.body.aid;
-    var status = req.body.status
+    var status = req.body.status;
 
     var responseMessage = {
         status: false,
@@ -5969,7 +6034,8 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -5991,12 +6057,19 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
                                 if (getresult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Alumni leaved successfully';
-                                    responseMessage.data = getresult[0];
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnLeaveAlumni: Alumni leaved successfully');
+                                    if (getresult[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Alumni leaved successfully';
+                                        responseMessage.data = getresult[0];
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLeaveAlumni: Alumni leaved successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Alumni not leaved';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnLeaveAlumni:Alumni not leaved');
+                                    }
                                 }
                                 else {
                                     responseMessage.message = 'Alumni not leaved';
@@ -6058,7 +6131,6 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
  */
 Alumni.prototype.testUrl = function(req,res,next) {
 
-    var _this = this;
 
     var uuid = require('node-uuid');
 
@@ -6221,7 +6293,8 @@ Alumni.prototype.approveAlumnimembers = function(req,res,next) {
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!isJson){
         error['isJson'] = 'Invalid Input ContentType';
@@ -6268,14 +6341,13 @@ Alumni.prototype.approveAlumnimembers = function(req,res,next) {
                         console.log(query);
 
                         st.db.query(query, function (err, approveResult) {
-                            console.log(approveResult);
+                            //console.log(approveResult);
                             if (!err) {
                                 if (approveResult) {
                                     responseMessage.status = true;
                                     responseMessage.error = null;
                                     responseMessage.message = 'ApproveAlumnimembers updated successfully';
                                     responseMessage.data = {
-                                        token : req.body.token,
                                         id : id,
                                         status : status
                                     };
@@ -6348,7 +6420,8 @@ Alumni.prototype.deleteTenAttachment = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
@@ -6453,7 +6526,8 @@ Alumni.prototype.deleteEvent = function(req,res,next){
         data: null
     };
 
-    var validateStatus = true,error = {};
+    var validateStatus = true;
+    var error = {};
 
     if(!token){
         error['token'] = 'Invalid token';
