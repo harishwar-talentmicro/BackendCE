@@ -193,6 +193,10 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
                     if (tokenResult) {
                         console.log(req.files);
                         if (req.files) {
+                            var deleteTempFile = function(){
+                                fs.unlink('../bin/'+req.files.pr.path);
+                                console.log("Image Path is deleted from server");
+                            };
                             var readStream = fs.createReadStream(req.files.pr.path);
                             var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : '');
                             console.log(uniqueFileName);
@@ -204,6 +208,7 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
                                     responseMessage.data = {
                                         pic: uniqueFileName
                                     };
+                                    deleteTempFile();
                                     res.status(200).json(responseMessage);
                                 }
                                 else {
@@ -211,6 +216,7 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
                                     responseMessage.error = null;
                                     responseMessage.message = 'Error in uploading image';
                                     responseMessage.data = null;
+                                    deleteTempFile();
                                     res.status(500).json(responseMessage);
                                 }
                             });
@@ -287,7 +293,6 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
  * @param picpath <string> random path of image
  *
  */
-
 HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
     var responseMessage = {
         status: false,
@@ -536,9 +541,7 @@ HrisHRM.prototype.hrisGetHRM = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM details loaded successfully';
-                                            responseMessage.data = {
-                                                hrm : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -801,9 +804,7 @@ HrisHRM.prototype.hrisGetHRMContactDtl = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM contact details loaded successfully';
-                                            responseMessage.data = {
-                                                hrm : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -947,9 +948,9 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
                                                                 + ',' + st.db.escape(e_sal[i].ctc) ;
                                                             var procQuery = 'CALL psave_hrmcompensation_details(' + procParams + ')';
                                                             console.log(procQuery);
-                                                            st.db.query(procQuery, function (err, results) {
+                                                            st.db.query(procQuery, function (err, resultsDetails) {
                                                                 if (!err) {
-                                                                    console.log(results);
+                                                                    console.log(resultsDetails);
                                                                     responseMessage.status = true;
                                                                     responseMessage.error = null;
                                                                     responseMessage.message = 'Employe salary details added successfully';
@@ -1074,7 +1075,7 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
  * @param cid <int> compensation id
  *
  */
-HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
+HrisHRM.prototype.hrisGetHRMCompnstnDtl = function(req,res,next){
     var responseMessage = {
         status: false,
         error: {},
@@ -1114,9 +1115,7 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'compensation details loaded successfully';
-                                            responseMessage.data = {
-                                                cd : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -1162,7 +1161,7 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
                         };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('hrisGetHRMContactDtl: Invalid token');
+                        console.log('hrisGetHRMCompnstnDtl: Invalid token');
                     }
                 }
                 else{
@@ -1171,7 +1170,7 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
                     };
                     responseMessage.message = 'An error occurred !';
                     res.status(500).json(responseMessage);
-                    console.log('Error : hrisGetHRMContactDtl ',err);
+                    console.log('Error : hrisGetHRMCompnstnDtl ',err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
@@ -1183,7 +1182,7 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
             };
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
-            console.log('Error hrisGetHRMContactDtl :  ',ex);
+            console.log('Error hrisGetHRMCompnstnDtl :  ',ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
@@ -1467,9 +1466,7 @@ HrisHRM.prototype.hrisGetHRMLeaveRegi = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Leave register details loaded successfully';
-                                            responseMessage.data = {
-                                                lr : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -1613,22 +1610,11 @@ HrisHRM.prototype.hrisGetHRMLeaveAppli = function(req,res,next){
                                 console.log(results);
                                 if (results) {
                                     if (results[0]) {
-                                        if (results[0].length > 0) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Leave applications details loaded successfully';
-                                            responseMessage.data = {
-                                                la : results[0]
-                                            };
+                                            responseMessage.data = results;
                                             res.status(200).json(responseMessage);
-                                        }
-                                        else {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Leave applications details are not available';
-                                            responseMessage.data = null;
-                                            res.status(200).json(responseMessage);
-                                        }
                                     }
                                     else {
                                         responseMessage.status = true;
@@ -1699,6 +1685,145 @@ HrisHRM.prototype.hrisGetHRMLeaveAppli = function(req,res,next){
  * @param req
  * @param res
  * @param next
+ * @description get compensation
+ * @accepts json
+ * @param token <string> token of login user
+ * @param hrm_id <int> hrm id
+ * @param page_size <int> page_size
+ * @param page_count <int> page_count
+ *
+ */
+HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(req.query.hrm_id) || (req.query.hrm_id <= 0)){
+        error.hrm_id = 'Invalid HRM id';
+        validationFlag *= false;
+    }
+    if (req.query.page_size){
+        if (isNaN(req.body.page_size)) {
+            error.page_size = 'Page size should be a number';
+            validationFlag *= false;
+        }
+    }
+    else {
+        req.query.page_size = 10;
+    }
+    if (req.query.page_count){
+        if (isNaN(req.query.page_count)) {
+            error.page_count = 'Page count should be a number';
+            validationFlag *= false;
+        }
+    }
+    else {
+        req.query.page_count = 0;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.hrm_id) + ',' + st.db.escape(req.query.page_size)  + ',' + st.db.escape(req.query.page_count);
+
+                        var procQuery = 'CALL pget_hrmcompensation(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'compensation loaded successfully';
+                                        responseMessage.data = results;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Compensation is not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Compensation is not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pget_hrmcompensation ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisGetHRMCompnstn: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisGetHRMCompnstn ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisGetHRMCompnstn :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
  * @description get HRM contact details
  * @accepts json
  * @param token <string> token of login user
@@ -1748,9 +1873,7 @@ HrisHRM.prototype.hrisGetHRMEmpList = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM Employe list loaded successfully';
-                                            responseMessage.data = {
-                                                la : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -1824,4 +1947,406 @@ HrisHRM.prototype.hrisGetHRMEmpList = function(req,res,next){
     }
 
 };
+
+/**
+ * @type : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save HRM document
+ * @accepts json
+ * @param token <string> token of login user
+ * @param hrm_id <int> tid of hrm primary details
+ * @param dtid <int> document type id
+ * @param dt <int> document type like 1-Document ,2-Link
+ * @param path <array> random path of document u generated
+ */
+HrisHRM.prototype.hrisSaveHRMDoc = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+        var validationFlag = true;
+        var error = {};
+
+        if (!req.body.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.body.path) {
+            error.token = 'Invalid Doc Path';
+            validationFlag *= false;
+        }
+        if (isNaN(req.body.hrm_id) || (req.body.hrm_id) < 0 ) {
+            error.hrm_id = 'Invalid HRM id';
+            validationFlag *= false;
+        }
+        if (isNaN(req.body.dt) || (req.body.dt) < 0 ) {
+            error.dt = 'Invalid document type';
+            validationFlag *= false;
+        }
+        if (isNaN(req.body.dtid) || (req.body.dtid) < 0 ) {
+            error.dtid = 'Invalid Document type id';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                st.validateToken(req.body.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.hrm_id) + ',' + st.db.escape(req.body.dtid)
+                                + ',' + st.db.escape(req.body.dt)+ ',' + st.db.escape(req.body.path);
+                            var procQuery = 'CALL psave_hrmdocument(' + procParams + ')';
+                            console.log(procQuery);
+                            st.db.query(procQuery, function (err, results) {
+                                if (!err) {
+                                    console.log(results);
+                                    if (results) {
+                                        if (results[0]) {
+                                            if (results[0][0]) {
+                                                if (results[0][0].id) {
+                                                    responseMessage.status = true;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'HRM document added successfully';
+                                                    responseMessage.data = {
+                                                        id : results[0][0].id
+                                                    };
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                                else {
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Error in adding HRM document';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in adding HRM document';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in adding HRM document';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in adding HRM document';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : psave_hrmdocument ', err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('hrisSaveHRMDoc: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error : hrisSaveHRMDoc ', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    }
+                });
+            }
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error hrisSaveHRMDoc :  ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+};
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get HRM document
+ * @accepts json
+ * @param token <string> token of login user
+ * @param hrm_id <int> hrm id
+ * @param page_size <int> page_size
+ * @param page_count <int> page_count
+ *
+ */
+HrisHRM.prototype.hrisGetHRMDoc = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(req.query.hrm_id) || (req.query.hrm_id <= 0)){
+        error.hrm_id = 'Invalid HRM id';
+        validationFlag *= false;
+    }
+    if (req.query.page_size){
+        if (isNaN(req.body.page_size)) {
+            error.page_size = 'Page size should be a number';
+            validationFlag *= false;
+        }
+    }
+    else {
+        req.query.page_size = 10;
+    }
+    if (req.query.page_count){
+        if (isNaN(req.query.page_count)) {
+            error.page_count = 'Page count should be a number';
+            validationFlag *= false;
+        }
+    }
+    else {
+        req.query.page_count = 0;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.hrm_id) + ',' + st.db.escape(req.query.page_size)  + ',' + st.db.escape(req.query.page_count);
+                        var procQuery = 'CALL pget_hrmdocument(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Document loaded successfully';
+                                            responseMessage.data = results[0];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Document are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Document are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Document are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pget_hrmdocument ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisGetHRMDoc: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisGetHRMDoc ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisGetHRMDoc :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
+
+/**
+ * @type : DELETE
+ * @param req
+ * @param res
+ * @param next
+ * @description DELETE HRM compensation
+ * @accepts json
+ * @param token <string> token of login user
+ * @param cid <int> HRM compensation id
+ *
+ */
+HrisHRM.prototype.hrisDelHRMCompnstn = function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(req.params.cid) || (req.params.cid <= 0)){
+        error.cid = 'Invalid id of HRM compensation';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.params.cid);
+                        var procQuery = 'CALL pdelete_hrmcompensation(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'HRM compensation has been deleted successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pdelete_document_type ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisDelHRMCompnstn: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisDelHRMCompnstn ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisDelHRMCompnstn :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
+
 module.exports = HrisHRM;

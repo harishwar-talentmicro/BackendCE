@@ -843,9 +843,7 @@ HrisMaster.prototype.hrisGetLeaveType = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Leave type list loaded successfully';
-                                            responseMessage.data = {
-                                                lt : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -973,9 +971,7 @@ HrisMaster.prototype.hrisGetDocType = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Document type list loaded successfully';
-                                            responseMessage.data = {
-                                                dc : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -1103,9 +1099,7 @@ HrisMaster.prototype.hrisGetSalaryHead = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Salary Head list loaded successfully';
-                                            responseMessage.data = {
-                                                sh : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -1233,9 +1227,7 @@ HrisMaster.prototype.hrisGetSalaryTemp = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Salary template loaded successfully';
-                                            responseMessage.data = {
-                                                st : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -1363,9 +1355,7 @@ HrisMaster.prototype.hrisGetSalaryTempDetails = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Salary template details loaded successfully';
-                                            responseMessage.data = {
-                                                std : results[0]
-                                            };
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -1442,6 +1432,585 @@ HrisMaster.prototype.hrisGetSalaryTempDetails = function(req,res,next){
 
 };
 
+/**
+ * @type : DELETE
+ * @param req
+ * @param res
+ * @param next
+ * @description DELETE salary head
+ * @accepts json
+ * @param token <string> token of login user
+ * @param id <int> salary head id
+ *
+ */
+HrisMaster.prototype.hrisDelSalaryHead = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(req.params.id) || (req.params.id <= 0)){
+        error.id = 'Invalid id of salary head';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.params.id);
+                        var procQuery = 'CALL pdelete_salary_header(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+                                            if (results[0][0].message) {
+                                                if (results[0][0].message == 1){
+                                                    responseMessage.status = true;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Salary head has been deleted successfully';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                                else {
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'This salary head is in use, you cannot delete it';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in deleting salary head';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in deleting salary head';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in deleting salary head';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in deleting salary head';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pdelete_salary_header ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisGetSalaryTempDetails: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisGetSalaryTempDetails ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisGetSalaryTempDetails :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
+
+/**
+ * @type : DELETE
+ * @param req
+ * @param res
+ * @param next
+ * @description DELETE leave type
+ * @accepts json
+ * @param token <string> token of login user
+ * @param id <int> leave type id
+ *
+ */
+HrisMaster.prototype.hrisDelLeaveType = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(req.params.id) || (req.params.id <= 0)){
+        error.id = 'Invalid id of leave type';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.params.id);
+                        var procQuery = 'CALL pdelete_leavetype(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+                                            if (results[0][0].message) {
+                                                if (results[0][0].message == 1){
+                                                    responseMessage.status = true;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Leave type has been deleted successfully';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                                else {
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'This leave type is in use, you cannot delete it';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in deleting leave type';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in deleting leave type';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in deleting leave type';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in deleting leave type';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pdelete_leavetype ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisDelLeaveType: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisDelLeaveType ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisDelLeaveType :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
+
+/**
+ * @type : DELETE
+ * @param req
+ * @param res
+ * @param next
+ * @description DELETE leave type
+ * @accepts json
+ * @param token <string> token of login user
+ * @param id <int> document type id
+ *
+ */
+HrisMaster.prototype.hrisDelDocType = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(req.params.id) || (req.params.id <= 0)){
+        error.id = 'Invalid id of document type';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.params.id);
+                        var procQuery = 'CALL pdelete_document_type(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+                                            if (results[0][0].message) {
+                                                if (results[0][0].message == 1){
+                                                    responseMessage.status = true;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Document type has been deleted successfully';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                                else {
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'This document type is in use, you cannot delete it';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in deleting document type';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in deleting document type';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in deleting document type';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in deleting document type';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pdelete_document_type ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisDelDocType: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisDelDocType ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisDelDocType :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
+
+/**
+ * @type : DELETE
+ * @param req
+ * @param res
+ * @param next
+ * @description DELETE leave type
+ * @accepts json
+ * @param token <string> token of login user
+ * @param id <int> salary temp id
+ *
+ */
+HrisMaster.prototype.hrisDelSalaryTpl = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(req.params.id) || (req.params.id <= 0)){
+        error.id = 'Invalid id of salary template';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.params.id);
+                        var procQuery = 'CALL pdelete_salary_template(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+                                            if (results[0][0].message) {
+                                                if (results[0][0].message == 1){
+                                                    responseMessage.status = true;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Salary template has been deleted successfully';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                                else {
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'This salary template is in use, you cannot delete it';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in deleting salary template';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in deleting salary template';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in deleting salary template';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in deleting salary template';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pdelete_salary_template ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisDelSalaryTpl: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisDelSalaryTpl ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisDelSalaryTpl :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
 
 module.exports = HrisMaster;
 

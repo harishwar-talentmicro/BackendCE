@@ -46,6 +46,7 @@ function Recruitment(db,stdLib){
  * @param req
  * @param res
  * @param next
+ * @param flag <int> for different result
  * @description api code for get Recruitment Masters list
  */
 Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
@@ -76,6 +77,7 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
     }
     else {
         try {
+            var flag = (req.query.flag) ? (req.query.flag) : 0 ;
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
@@ -91,7 +93,8 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
                         var query2 = 'CALL pGetSpecialization(' + st.db.escape('') + ');';
 
                         //GetEducations
-                        var query3 = 'CALL pGetEducations();';
+                        var queryParams4 = st.db.escape(flag);
+                        var query3 = 'CALL pGetEducations('+ queryParams4 +');';
 
                         //get jobslist
                         var queryParams2 = st.db.escape(token);

@@ -515,6 +515,10 @@ router.post('/hris_leave_type',hrisMasterModule.hrisSaveLeaveType);
 router.get('/hris_salary_tpl',hrisMasterModule.hrisGetSalaryTemp);
 router.get('/hris_salary_tpl/:id',hrisMasterModule.hrisGetSalaryTempDetails);
 router.post('/hris_salary_tpl',hrisMasterModule.hrisSaveSalaryTpl);
+router.delete('/hris_salary_head/:id',hrisMasterModule.hrisDelSalaryHead);
+router.delete('/hris_leave_type/:id',hrisMasterModule.hrisDelLeaveType);
+router.delete('/hris_doc_type/:id',hrisMasterModule.hrisDelDocType);
+router.delete('/hris_salary_tpl/:id',hrisMasterModule.hrisDelSalaryTpl);
 
 
 //hris-hrm-module
@@ -525,6 +529,7 @@ router.get('/hris_hrm',hrisHRMModule.hrisGetHRM);
 router.post('/hris_hrm_contact_dtl',hrisHRMModule.hrisSaveHRMContactDtl);
 router.get('/hris_hrm_contact_dtl',hrisHRMModule.hrisGetHRMContactDtl);
 router.post('/hris_hrm_compensation',hrisHRMModule.hrisSaveHRMCompnstn);
+router.get('/hris_hrm_compensation_dtl',hrisHRMModule.hrisGetHRMCompnstnDtl);
 router.get('/hris_hrm_compensation',hrisHRMModule.hrisGetHRMCompnstn);
 router.post('/hris_hrm_img',hrisHRMModule.hrisSaveHRMimg);
 router.post('/hris_hrm_leave_regi',hrisHRMModule.hrisSaveHRMLeaveRegi);
@@ -532,7 +537,9 @@ router.post('/hris_hrm_leave_appli',hrisHRMModule.hrisSaveHRMLeaveAppli);
 router.get('/hris_hrm_leave_regi',hrisHRMModule.hrisGetHRMLeaveRegi);
 router.get('/hris_hrm_leave_appli',hrisHRMModule.hrisGetHRMLeaveAppli);
 router.get('/hris_hrm_emp_list',hrisHRMModule.hrisGetHRMEmpList);
-
+router.post('/hris_hrm_doc',hrisHRMModule.hrisSaveHRMDoc);
+router.get('/hris_hrm_doc',hrisHRMModule.hrisGetHRMDoc);
+router.delete('/hris_hrm_compensation/:cid',hrisHRMModule.hrisDelHRMCompnstn);
 
 router.get('/api_health',function(req,res){
    res.status(200).json({status : true});
