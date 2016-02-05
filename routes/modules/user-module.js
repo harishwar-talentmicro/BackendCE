@@ -3544,7 +3544,7 @@ User.prototype.getEducations = function(req,res,next) {
         message: 'Unable to load Institutes ! Please try again',
         error: {}
     };
-
+    var filter = req.query.filter ? req.query.filter : 0; // for different result of alumini and ezeone
     var validateStatus = true;
     var error = {};
     if (!token) {
@@ -3562,7 +3562,8 @@ User.prototype.getEducations = function(req,res,next) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        st.db.query('CALL pGetEducations()', function (err, geteducationResult) {
+                        var parameters = st.db.escape(filter);
+                        st.db.query('CALL pGetEducations('+ parameters +')', function (err, geteducationResult) {
                             if (err) {
                                 console.log('Error : FnGetEducations :' + err);
                                 res.status(400).json(responseMsg);

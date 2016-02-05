@@ -12,6 +12,7 @@
 
 var util = require( "util" );
 var fs = require("fs");
+var validator = require('validator');
 
 var st = null;
 var mailModule = require('./mail-module.js');
@@ -3089,7 +3090,6 @@ BusinessManager.prototype.getContactDetails = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetRoles
  * Method : post
@@ -3249,14 +3249,11 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-
-
                         var parameters = st.db.escape(token) + ',' + st.db.escape(pageCount)
                             + ',' + st.db.escape(pageSize) + ',' + st.db.escape(stage) + ',' + st.db.escape(probability)
                             + ',' + st.db.escape(folder) + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate);
-
                         var query = 'CALL pMGetSalesTransaction(' + parameters + ')';
-
+                        console.log(query);
                         st.db.query(query, function (err, transResult) {
                             //console.log(transResult);
                             if (!err) {
@@ -3341,5 +3338,133 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
         }
     }
 };
+
+/**
+ * @type : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description gives hris master details of user
+ * @accepts json
+ * @param token <string> token of login user
+ * @param toezeoneid  <int> to whom u r raising sales request
+ * @param ctn <string> client name
+ * @param cntn  <string> contact name
+ * @param em <string> contact person email id
+ * @param mn <string>  contact person mobile number
+ * @param ph <string>  contact person phone number
+ * @param msg  <string>   requirement text
+ * @param address <string> address
+ * @param notes <string> information of that request
+ * @param aurl <string>  attachment url (random path node will generate)
+ * @param  aname <string> attachment file name
+ *
+ */
+BusinessManager.prototype.saveExternalsalesRequest = function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.body.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!req.body.toezeoneid){
+        error.toezeoneid  = 'Invalid EzeID';
+        validationFlag *= false;
+    }
+    var address = req.body.address ? req.body.address : '';
+
+    if(!req.body.msg){
+        error.msg  = 'Invalid EzeID';
+        validationFlag *= false;
+    }
+    if (!validator.isLength((req.body.ctn), 3, 150)) {
+        error.ctn = 'Client name can be maximum 150 characters';
+        validationFlag *= false;
+    }
+    if (!validator.isLength((req.body.cntn), 3, 150)) {
+        error.cntn = 'Contact name can be maximum 150 characters';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.toezeoneid) + ',' + st.db.escape(req.body.ctn) + ',' +
+                            st.db.escape(req.body.cntn) + ',' + st.db.escape(req.body.em) + ',' +st.db.escape(req.body.mn) + ',' +
+                            st.db.escape(req.body.ph) + ',' + st.db.escape(req.body.msg) + ',' +st.db.escape(address) + ',' +
+                            st.db.escape(req.body.notes) + ',' + st.db.escape(req.body.aurl) + ',' +st.db.escape(req.body.aname);
+                        var procQuery = 'CALL pMSaveExternalsalesRequest(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'External sales request added successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pMSaveExternalsalesRequest ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('saveExternalsalesRequest: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : saveExternalsalesRequest ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error saveExternalsalesRequest :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+
 
 module.exports = BusinessManager;

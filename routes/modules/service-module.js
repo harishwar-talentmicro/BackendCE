@@ -870,7 +870,7 @@ Service.prototype.createService = function(req,res,next){
         var videoUrl = req.body.video_url ? req.body.video_url :'';
         var vFilename = req.body.video_fn ? req.body.video_fn :'';
         var id = (!isNaN(parseInt(req.body.id))) ? (parseInt(req.body.id)) :0; // new service it s 0 else tid
-
+        var status = req.body.status ? req.body.status : 1; // in case of admin
         if (!token) {
             error['token'] = 'token is Mandatory';
             validateStatus *= false;
@@ -901,7 +901,8 @@ Service.prototype.createService = function(req,res,next){
                             + ',' + st.db.escape(message) + ',' + st.db.escape(categoryId)
                             + ',' + st.db.escape(pic)+ ',' + st.db.escape(picFilename)
                             + ',' + st.db.escape(attachment) + ',' + st.db.escape(aFilename)
-                            + ',' + st.db.escape(videoUrl)+ ',' + st.db.escape(vFilename)+ ',' + st.db.escape(id);
+                            + ',' + st.db.escape(videoUrl)+ ',' + st.db.escape(vFilename)+ ',' + st.db.escape(id)
+                            + ',' + st.db.escape(status);
 
                         var query = 'CALL ppostservice(' + queryParams + ')';
                         console.log(query);
