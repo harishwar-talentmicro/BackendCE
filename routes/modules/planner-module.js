@@ -77,7 +77,6 @@ Planner.prototype.getAllTask = function(req,res,next){
                             if (!err) {
                                 if (taskResult) {
                                     if (taskResult[0]) {
-                                        if (taskResult[0].length > 0){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Tasks loaded successfully';
@@ -88,13 +87,6 @@ Planner.prototype.getAllTask = function(req,res,next){
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetAllTask: Tasks loaded successfully');
-                                        }
-                                        else {
-                                            responseMessage.message = 'Tasks not loaded';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnGetAllTask:Tasks not loaded');
-                                        }
-
                                     }
                                     else {
                                         responseMessage.message = 'Tasks not loaded';

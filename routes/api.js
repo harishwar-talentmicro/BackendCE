@@ -16,7 +16,6 @@ var DbHelper = require('./../helpers/DatabaseHandler'),
 var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
 
-
 /**
  * Services for MQTT Messaging Server Interface
  */
@@ -145,6 +144,7 @@ router.get('/m/company_name',businessManager.getCompanyName);
 router.get('/m/contact_details',businessManager.getContactDetails);
 router.get('/role',businessManager.getRoles);
 router.get('/m/sales_transaction',businessManager.getTransactionOfSales);
+router.post('/external_sales_request', businessManager.saveExternalsalesRequest);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');
@@ -377,6 +377,7 @@ var TaskManager = require('./modules/task-manager-module.js');
 var taskManager = new TaskManager(db,stdLib);
 router.post('/task_manager/task',taskManager.saveTaskManager);
 router.get('/task_manager/task',taskManager.getTasks);
+router.get('/task_manager_details',taskManager.taskDetails);
 
 //Tag Module (save tag of docs, urls, pics and banner pics)
 var Tag = require('./modules/tag-module.js');
@@ -425,6 +426,7 @@ router.delete('/community_member',serviceModule.deleteCommunityMember);
 router.post('/service_pic',serviceModule.saveServicePic);
 router.post('/service_attachment',serviceModule.saveServiceAttachment);
 router.post('/service_video',serviceModule.saveServiceVideo);
+
 
 /**
  * @service-param
@@ -500,17 +502,42 @@ router.post('/ewtSaveDepartmentsVES',vesModule.saveDepartmentsVES);
 router.post('/ewtSaveGatesVES',vesModule.saveGatesVES);
 router.post('/ewtSaveCitysVES',vesModule.saveCitysVES);
 
-//hris-module
-var Hris = require('./modules/hris-module.js');
-var hrisModule = new Hris(db,stdLib);
-router.get('/hris_masters',hrisModule.hrisMasters);
+//hris-master-module
+var HrisMaster = require('./modules/hris-master-module.js');
+var hrisMasterModule = new HrisMaster(db,stdLib);
+router.get('/hris_masters',hrisMasterModule.hrisMasters);
+router.post('/hris_salary_head',hrisMasterModule.hrisSaveSalaryHeader);
+router.get('/hris_salary_head',hrisMasterModule.hrisGetSalaryHead);
+router.get('/hris_doc_type',hrisMasterModule.hrisGetDocType);
+router.get('/hris_leave_type',hrisMasterModule.hrisGetLeaveType);
+router.post('/hris_doc_type',hrisMasterModule.hrisSaveDocType);
+router.post('/hris_leave_type',hrisMasterModule.hrisSaveLeaveType);
+router.get('/hris_salary_tpl',hrisMasterModule.hrisGetSalaryTemp);
+router.get('/hris_salary_tpl/:id',hrisMasterModule.hrisGetSalaryTempDetails);
+router.post('/hris_salary_tpl',hrisMasterModule.hrisSaveSalaryTpl);
 
 
+//hris-hrm-module
+var HrisHRM = require('./modules/hris-hrm-module.js');
+var hrisHRMModule = new HrisHRM(db,stdLib);
+router.post('/hris_hrm',hrisHRMModule.hrisSaveHRM);
+router.get('/hris_hrm',hrisHRMModule.hrisGetHRM);
+router.post('/hris_hrm_contact_dtl',hrisHRMModule.hrisSaveHRMContactDtl);
+router.get('/hris_hrm_contact_dtl',hrisHRMModule.hrisGetHRMContactDtl);
+router.post('/hris_hrm_compensation',hrisHRMModule.hrisSaveHRMCompnstn);
+router.get('/hris_hrm_compensation',hrisHRMModule.hrisGetHRMCompnstn);
+router.post('/hris_hrm_img',hrisHRMModule.hrisSaveHRMimg);
+router.post('/hris_hrm_leave_regi',hrisHRMModule.hrisSaveHRMLeaveRegi);
+router.post('/hris_hrm_leave_appli',hrisHRMModule.hrisSaveHRMLeaveAppli);
+router.get('/hris_hrm_leave_regi',hrisHRMModule.hrisGetHRMLeaveRegi);
+router.get('/hris_hrm_leave_appli',hrisHRMModule.hrisGetHRMLeaveAppli);
+router.get('/hris_hrm_emp_list',hrisHRMModule.hrisGetHRMEmpList);
 
 
 router.get('/api_health',function(req,res){
    res.status(200).json({status : true});
 });
+
 router.get('/error_test',function(req,res,next){
     try {
         b.toString();

@@ -2518,8 +2518,6 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                                     originalName: originalName,
                                                     tenId: tenId
                                                 };
-
-
                                                 fnsavepic(picContent, function (err, picResult) {
                                                     if (!err) {
                                                         if (picResult) {
