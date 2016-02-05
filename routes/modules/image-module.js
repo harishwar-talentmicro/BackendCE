@@ -107,147 +107,172 @@ Image.prototype.cropImage = function(req,res,next){
     st.validateToken(token, function (err, Result) {
         if (!err) {
             if (Result != null) {
-                try{
-                    console.log(req.files.image.path);
-                    //var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
+                try {
 
-                    fs.readFile('../bin/'+ req.files.image.path,function(err,data){
-                        if(!err){
-                            var bitmap = data;
-                            var gm = require('gm').subClass({ imageMagick: true });
-                            gm(bitmap).size(function (err, size) {
+                    if (req.files) {
+                        var type = req.files.image.mimetype;
+                        if (type == 'image/jpeg' || type == 'image/jpg' || type == 'image/gif' || type == 'image/png') {
+
+                            //var bitmap = fs.readFileSync('../bin/'+req.files.image.path);
+
+                            fs.readFile('../bin/' + req.files.image.path, function (err, data) {
                                 if (!err) {
-                                    // Orientation landscape
-                                    if(size.height < size.width){
-                                        // scale++
-                                        if(size.height < targetHeight || size.width < targetWidth){
-                                            if(targetHeight > targetWidth){
-                                                console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
-                                                scaleHeight = targetHeight.toString();
-                                                ////
-                                                scaleWidth = (size.width * scaleHeight)/ size.height;
+                                    var bitmap = data;
+                                    var gm = require('gm').subClass({imageMagick: true});
+                                    gm(bitmap).size(function (err, size) {
+                                        if (!err) {
+                                            // Orientation landscape
+                                            if (size.height < size.width) {
+                                                // scale++
+                                                if (size.height < targetHeight || size.width < targetWidth) {
+                                                    if (targetHeight > targetWidth) {
+                                                        console.log("executing condition 1 : sOrient: landscape & scale++ & tOrient : potrait");
+                                                        scaleHeight = targetHeight.toString();
+                                                        ////
+                                                        scaleWidth = (size.width * scaleHeight) / size.height;
+                                                    }
+                                                    else {
+                                                        console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
+                                                        scaleHeight = targetHeight;
+                                                        scaleWidth = (size.width * scaleHeight) / size.height;
+                                                    }
+                                                }
+                                                // scale--
+                                                else {
+                                                    if (targetHeight > targetWidth) {
+                                                        console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
+                                                        scaleWidth = targetWidth.toString();
+                                                        ////
+                                                        scaleHeight = (scaleWidth * size.height) / size.width;
+                                                    }
+                                                    else {
+
+                                                        console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
+                                                        scaleHeight = targetHeight.toString();
+                                                        ////
+                                                        scaleWidth = (scaleHeight * size.width) / size.height;
+
+                                                    }
+                                                }
                                             }
-                                            else{
-                                                console.log("executing condition 2 : sOrient: landscape & scale++ & tOrient : landscape");
-                                                scaleHeight = targetHeight;
-                                                scaleWidth = (size.width * scaleHeight) / size.height;
+
+                                            // Orientation is potrait
+                                            else {
+                                                //scale++
+                                                if (size.height < targetHeight || size.width < targetHeight) {
+                                                    if (targetHeight > targetWidth) {
+                                                        console.log('condition false');
+
+                                                        scaleHeight = targetHeight.toString();
+                                                        scaleWidth = (scaleHeight * size.width) / size.height;
+
+
+                                                    }
+                                                    else {
+                                                        scaleWidth = targetWidth.toString();
+                                                        scaleHeight = (scaleWidth * size.height) / size.width;
+                                                    }
+                                                }
+                                                else {
+                                                    scaleWidth = targetWidth.toString();
+                                                    ////
+                                                    scaleHeight = (scaleWidth * size.height) / size.width;
+                                                }
+                                            }
+
+                                            var dimensions = {
+                                                originalHeight: size.height,
+                                                originalWidth: size.width,
+                                                scaleHeight: scaleHeight,
+                                                scaleWidth: scaleWidth,
+                                                targetHeight: targetHeight,
+                                                targetWidth: targetWidth
+                                            };
+
+                                            console.log(dimensions);
+
+                                            if (scaleFlag && cropFlag) {
+                                                console.log('Scale and crop');
+                                                gm(bitmap)
+                                                    .resize(scaleWidth, scaleHeight)
+                                                    .crop(targetWidth, targetHeight, 0, 0).toBuffer(outputType.toUpperCase(), function (err, croppedBuff) {
+                                                        if (!err) {
+                                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                            var picUrl = 'data:image/' + outputType + ';base64,' + cdataUrl;
+                                                            res.status(200).json({
+                                                                status: true,
+                                                                picture: picUrl,
+                                                                message: 'Picture cropped successfully'
+                                                            });
+                                                        }
+                                                        else {
+                                                            res.status(400).json(respMsg);
+                                                        }
+                                                    });
+                                                console.log('FnCropImage:Picture cropped successfully...');
+                                                deleteTempFile();
+                                            }
+
+                                            else if (scaleFlag && !cropFlag) {
+                                                gm(bitmap)
+                                                    .resize(scaleWidth, scaleHeight).toBuffer(outputType.toUpperCase(), function (err, croppedBuff) {
+                                                        if (!err) {
+                                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                            var picUrl = 'data:image/' + outputType + ';base64,' + cdataUrl;
+                                                            res.status(200).json({
+                                                                status: true,
+                                                                picture: picUrl,
+                                                                message: 'Picture cropped successfully'
+                                                            });
+                                                            console.log('FnCropImage:Picture cropped successfully');
+                                                            deleteTempFile();
+                                                        }
+                                                        else {
+                                                            res.status(400).json(respMsg);
+                                                        }
+                                                    });
+
+                                            }
+
+                                            else if (!scaleFlag && cropFlag) {
+                                                gm(bitmap)
+                                                    .crop(targetWidth, targetHeight, 0, 0).toBuffer(outputType.toUpperCase(), function (err, croppedBuff) {
+                                                        if (!err) {
+                                                            var cdataUrl = new Buffer(croppedBuff).toString('base64');
+                                                            var picUrl = 'data:image/' + outputType + ';base64,' + cdataUrl;
+                                                            res.status(200).json({
+                                                                status: true,
+                                                                picture: picUrl,
+                                                                message: 'Picture cropped successfully'
+                                                            });
+                                                        }
+                                                        else {
+                                                            res.status(400).json(respMsg);
+                                                        }
+                                                    });
                                             }
                                         }
-                                        // scale--
-                                        else{
-                                            if(targetHeight > targetWidth){
-                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : landscape");
-                                                scaleWidth = targetWidth.toString();
-                                                ////
-                                                scaleHeight = (scaleWidth * size.height)/ size.width;
-                                            }
-                                            else{
-
-                                                console.log("executing condition 2 : sOrient: landscape & scale-- & tOrient : potrait");
-                                                scaleHeight = targetHeight.toString();
-                                                ////
-                                                scaleWidth = (scaleHeight * size.width) / size.height;
-
-                                            }
+                                        else {
+                                            throw new Error('FnCropImage : Invalid image file. Unable to find image size');
+                                            res.status(400).json(respMsg);
                                         }
-                                    }
-
-                                    // Orientation is potrait
-                                    else{
-                                        //scale++
-                                        if(size.height < targetHeight || size.width < targetHeight){
-                                            if(targetHeight > targetWidth){
-                                                console.log('condition false');
-
-                                                scaleHeight = targetHeight.toString();
-                                                scaleWidth = (scaleHeight * size.width)/ size.height;
-
-
-                                            }
-                                            else{
-                                                scaleWidth = targetWidth.toString();
-                                                scaleHeight = (scaleWidth * size.height) / size.width;
-                                            }
-                                        }
-                                        else{
-                                            scaleWidth = targetWidth.toString();
-                                            ////
-                                            scaleHeight = (scaleWidth * size.height) / size.width;
-                                        }
-                                    }
-
-                                    var dimensions = {
-                                        originalHeight : size.height,
-                                        originalWidth : size.width,
-                                        scaleHeight : scaleHeight,
-                                        scaleWidth : scaleWidth,
-                                        targetHeight : targetHeight,
-                                        targetWidth : targetWidth
-                                    };
-
-                                    console.log(dimensions);
-
-                                    if(scaleFlag && cropFlag){
-                                        console.log('Scale and crop');
-                                        gm(bitmap)
-                                            .resize(scaleWidth,scaleHeight)
-                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                                if(!err){
-                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                                }
-                                                else{
-                                                    res.status(400).json(respMsg);
-                                                }
-                                            });
-                                        console.log('FnCropImage:Picture cropped successfully...');
-                                        deleteTempFile();
-                                    }
-
-                                    else if(scaleFlag && !cropFlag){
-                                        gm(bitmap)
-                                            .resize(scaleWidth,scaleHeight).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                                if(!err){
-                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                                    console.log('FnCropImage:Picture cropped successfully');
-                                                    deleteTempFile();
-                                                }
-                                                else{
-                                                    res.status(400).json(respMsg);
-                                                }
-                                            });
-
-                                    }
-
-                                    else if(!scaleFlag && cropFlag){
-                                        gm(bitmap)
-                                            .crop(targetWidth,targetHeight,0,0).toBuffer(outputType.toUpperCase(),function(err,croppedBuff){
-                                                if(!err){
-                                                    var cdataUrl = new Buffer(croppedBuff).toString('base64');
-                                                    var picUrl = 'data:image/'+outputType+';base64,'+cdataUrl;
-                                                    res.status(200).json({status : true, picture : picUrl, message : 'Picture cropped successfully'});
-                                                }
-                                                else{
-                                                    res.status(400).json(respMsg);
-                                                }
-                                            });
-                                    }
+                                    });
                                 }
-                                else{
-                                    throw new Error('FnCropImage : Invalid image file. Unable to find image size');
+                                else {
                                     res.status(400).json(respMsg);
+                                    throw new Error('FnCropImage : Error in reading file ' + ex.description);
                                 }
                             });
                         }
-                        else{
+                        else {
                             res.status(400).json(respMsg);
-                            throw new Error('FnCropImage : Error in reading file '+ ex.description);
+                            console.log('invalid image file');
                         }
-                    });
-
+                    }
+                    else {
+                        res.status(400).json(respMsg);
+                        console.log('invalid image file');
+                    }
                 }
                 catch(ex){
                     console.log(ex);
