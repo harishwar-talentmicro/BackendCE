@@ -1078,6 +1078,7 @@ Tag.prototype.getTags = function(req,res,next){
     var token = req.query.token;
     var startCount = ((!isNaN(parseInt(req.query.pc))) && parseInt(req.query.pc) > 0) ?  parseInt(req.query.pc) : 0;
     var recordsPerPage = ((!isNaN(parseInt(req.query.ps))) && parseInt(req.query.ps) > 0 ) ?  parseInt(req.query.ps) : 10;
+    req.query.q = (req.query.q) ? req.query.q : '';
 
     var output = [];
 
@@ -1106,7 +1107,8 @@ Tag.prototype.getTags = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(startCount)+ ',' + st.db.escape(recordsPerPage);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(startCount)+ ',' + st.db.escape(recordsPerPage) +
+                            ',' + st.db.escape(req.query.q);
                         var query = 'CALL pgetAllDocsandurls(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, getresult) {

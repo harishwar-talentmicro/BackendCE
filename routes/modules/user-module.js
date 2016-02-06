@@ -2604,6 +2604,10 @@ User.prototype.getDocument = function(req,res,next) {
  * @param req
  * @param res
  * @param next
+ *
+ * @service-param token
+ * @service-param pin
+ * @service-param id
  */
 User.prototype.updateDocPin = function(req,res,next) {
     /**
@@ -2613,8 +2617,8 @@ User.prototype.updateDocPin = function(req,res,next) {
     try {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        var token = req.body.TokenNo;
-        var tPin = req.body.Pin;
+        var token = req.body.token;
+        var tPin = (req.body.pin) ? req.body.pin : null;
         var RtnMessage = {
             IsUpdated: false
         };
@@ -2626,7 +2630,7 @@ User.prototype.updateDocPin = function(req,res,next) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var query = st.db.escape(token) + ',' + st.db.escape(tPin);
+                        var query = st.db.escape(token) + ',' + st.db.escape(tPin)  + ',' + st.db.escape(req.body.id);
                         st.db.query('CALL pUpdateDocPIN(' + query + ')', function (err, UpdateResult) {
                             if (!err) {
                                 //  console.log(UpdateResult);
