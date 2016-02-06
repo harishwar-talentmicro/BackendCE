@@ -2735,6 +2735,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
         var id = parseInt(req.body.id);
         var clientId = parseInt(req.body.cid);
         var contactId = parseInt(req.body.ct_id);
+        var targetdate = req.body.targetdate ? req.body.targetdate : null;
 
         if (!token) {
             error['token'] = 'token is Mandatory';
@@ -2774,7 +2775,8 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                             + "," + st.db.escape(address) + "," + st.db.escape(notes)
                             + "," + st.db.escape(attachment) + "," + st.db.escape(aName) + "," + st.db.escape(amount)
                             + "," + st.db.escape(stage) + "," + st.db.escape(folderId) + "," + st.db.escape(proabilities)
-                            + "," + st.db.escape(id)+ "," + st.db.escape(clientId)+ "," + st.db.escape(contactId);
+                            + "," + st.db.escape(id)+ "," + st.db.escape(clientId)+ "," + st.db.escape(contactId)
+                            + "," + st.db.escape(targetdate);
 
                         var query = 'CALL pMSavesalesRequest(' + queryParams + ')';
                         console.log(query);
@@ -3255,15 +3257,45 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
                         var query = 'CALL pMGetSalesTransaction(' + parameters + ')';
                         console.log(query);
                         st.db.query(query, function (err, transResult) {
-                            //console.log(transResult);
+                            console.log(transResult);
                             if (!err) {
                                 if (transResult) {
                                     if (transResult[0]) {
                                         if (transResult[0][0]) {
                                             if (transResult[1]) {
+                                                var output = [];
+                                                for (var i = 0; i < transResult[1].length; i++){
+                                                    var reldata = {};
+                                                    reldata.tid = transResult[1][i].tid,
+                                                        reldata.tid = transResult[1][i].tid,
+                                                        reldata.clientid = transResult[1][i].clientid,
+                                                        reldata.contactid = transResult[1][i].contactid,
+                                                        reldata.toezeid = transResult[1][i].toezeid,
+                                                        reldata.TaskDateTime = transResult[1][i].TaskDateTime,
+                                                        reldata.company_name = transResult[1][i].company_name,
+                                                        reldata.cezeoneid = transResult[1][i].cezeoneid,
+                                                        reldata.contactname = transResult[1][i].contactname,
+                                                        reldata.contactemail = transResult[1][i].contactemail,
+                                                        reldata.contactmobile = transResult[1][i].contactmobile,
+                                                        reldata.contactphone = transResult[1][i].contactphone,
+                                                        reldata.Attachment = (transResult[1][i].Attachment) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +transResult[1][i].Attachment : '' ,
+                                                        reldata.Message = transResult[1][i].Message,
+                                                        reldata.Notes = transResult[1][i].Notes,
+                                                        reldata.stage = transResult[1][i].stage,
+                                                        reldata.LUDate = transResult[1][i].LUDate,
+                                                        reldata.natitle = transResult[1][i].natitle,
+                                                        reldata.nadate = transResult[1][i].nadate,
+                                                        reldata.Proabilities = transResult[1][i].Proabilities,
+                                                        reldata.nid = transResult[1][i].nid,
+                                                        reldata.td = transResult[1][i].td
+                                                    output.push(reldata);
+                                                }
+
+                                                console.log("this is data :"+ reldata);
                                                 responseMessage.status = true;
                                                 responseMessage.total_count = transResult[0][0].count;
-                                                responseMessage.data = transResult[1];
+                                                responseMessage.data = output;
+                                                //responseMessage.Attachment = 'https://storage.googleapis.com/ezeone/'+ transResult[0][0].Attachment ;
                                                 responseMessage.message = 'Transaction details loaded successfully';
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnGetSalesTransaction: Transaction details loaded successfully');
