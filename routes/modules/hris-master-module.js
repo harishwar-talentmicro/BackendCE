@@ -196,7 +196,11 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
             validationFlag *= false;
         }
         if (req.body.id) {
-            if (isNaN(req.body.id)) {
+            if (isNaN(parseInt(req.body.id))) {
+                error.id = 'Invalid id of template';
+                validationFlag *= false;
+            }
+            if (parseInt(req.body.id) < 0) {
                 error.id = 'Invalid id of template';
                 validationFlag *= false;
             }
@@ -204,6 +208,42 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
         else {
             req.body.id = 0;
         }
+
+        var salaryHeadArray = [];
+        if(req.body.s_head){
+            if(util.isArray(req.body.s_head)){
+                if(req.body.s_head.length){
+                    for(var count = 0; count < req.body.s_head; count++){
+                        if(typeof(req.body.s_head[count] == 'object')){
+                            if(!(isFinite(parseInt(req.body.s_head[count].sid)) && parseInt(req.body.s_head[count].sid) > 0)){
+                                continue;
+                            }
+                            if(!(isFinite(parseInt(req.body.s_head[count].seq)) && parseInt(req.body.s_head[count].seq) > 0)){
+                                req.body.s_head[count].seq = 0;
+                            }
+                            if(!(isFinite(parseInt(req.body.s_head[count].sal_type)) && parseInt(req.body.s_head[count].sal_type) > 0)){
+                                /**
+                                 * Default salary type is 3 (if not defined) i.e. per annum
+                                 * @type {number}
+                                 */
+                                req.body.s_head[count].sal_type = 3;
+                            }
+                            salaryHeadArray.push(req.body.s_head[count]);
+                        }
+                        else{
+                            continue;
+                        }
+
+                    }
+                }
+            }
+            else{
+                error.s_head = 'Invalid list of salary_head template';
+                validationFlag *= false;
+            }
+        }
+
+
         if (!validationFlag) {
             responseMessage.error = error;
             responseMessage.message = 'Please check the errors';
@@ -212,57 +252,115 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
         }
         else {
             try {
-                var s_head = req.body.s_head;
                 st.validateToken(req.body.token, function (err, tokenResult) {
                     if (!err) {
                         if (tokenResult) {
                             var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.id) + ',' + st.db.escape(req.body.title);
                             var procQuery = 'CALL psave_salary_template(' + procParams + ')';
                             console.log(procQuery);
-                            st.db.query(procQuery, function (err, results) {
+                            st.db.query(procQuery, function (err, salaryTplResult) {
                                 if (!err) {
-                                    console.log(results);
-                                    if (results) {
-                                        if (results[0]) {
-                                            if (results[0][0]) {
-                                                if (results[0][0].id) {
-                                                    for (var i = 0; i < s_head.length; i++) {
-                                                        if (s_head[i].sid) {
-                                                            s_head[i].seq = s_head[i].seq ? s_head[i].seq : 0;
-                                                            s_head[i].sal_type = s_head[i].sal_type ? s_head[i].sal_type : 3;
-                                                            var procParams = st.db.escape(results[0][0].id) + ',' + st.db.escape(s_head[i].sid)
-                                                                + ',' + st.db.escape(s_head[i].seq) + ',' + st.db.escape(s_head[i].sal_type);
-                                                            var procQuery = 'CALL psave_salary_template_details(' + procParams + ')';
-                                                            console.log(procQuery);
-                                                            st.db.query(procQuery, function (err, results) {
-                                                                if (!err) {
-                                                                    console.log(results);
+                                    console.log(salaryTplResult);
+                                    if (salaryTplResult) {
+                                        if (salaryTplResult[0]) {
+                                            if (salaryTplResult[0][0]) {
+                                                if (salaryTplResult[0][0].id) {
+                                                    var comSaveTplDetailsQuery = "";
+
+                                                    /**
+                                                     * If user is changing salary template, then firtly we have to compare the
+                                                     * salary heads by loading the data and then finding out what to add and what to delete
+                                                     * in salary head list, therefore an extra procedure is required to fetch up the previously
+                                                     * saved data from db
+                                                     */
+                                                    if(req.body.id == salaryTplResult[0][0].id){
+                                                        var tplPrevDetailsQuery = "CALL pget_salary_template_details("+
+                                                            st.db.escape(salaryTplResult[0][0].id) + ")";
+
+                                                        st.db.query(tplPrevDetailsQuery, function (err, tplPrevDetailsResult) {
+                                                            if (!err) {
+                                                                if(tplPrevDetailsResult){
+                                                                    console.log(tplPrevDetailsResult);
+                                                                }
+
+                                                                res.status(200).json(tplPrevDetailsResult[0]);
+                                                            }
+                                                            else{
+                                                                responseMessage.error = {
+                                                                    server: 'Internal Server Error'
+                                                                };
+                                                                responseMessage.message = 'An error occurred !';
+                                                                res.status(500).json(responseMessage);
+                                                                console.log('Error : hrisSaveSalaryTemplate ', err);
+                                                                var errorDate = new Date();
+                                                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                                            }
+                                                        });
+                                                    }
+
+                                                    /**
+                                                     * In case user is creating a new salary template then
+                                                     * we don't have to load the previous salary heads and we can directly insert
+                                                     * the salary head list into db
+                                                     */
+                                                    else if(salaryHeadArray.length){
+
+                                                        for(var i = 0; i < salaryHeadArray.length; i++){
+                                                            var saveTplDetailsQuery = "CALL psave_salary_template_details("+
+                                                                st.db.escape(salaryTplResult[0][0].id) +
+                                                                st.db.escape(salaryHeadArray[i].sid) +
+                                                                st.db.escape(salaryHeadArray[i].seq) +
+                                                                st.db.escape(salaryHeadArray[i].sal_type) +
+                                                                + ");";
+                                                            comSaveTplDetailsQuery =+ saveTplDetailsQuery;
+                                                        }
+
+                                                        st.db.query(comSaveTplDetailsQuery, function (err, tplDetailsResult) {
+                                                            if (!err) {
+                                                                if(tplDetailsResult){
+                                                                    console.log(tplDetailsResult);
                                                                     responseMessage.status = true;
                                                                     responseMessage.error = null;
-                                                                    responseMessage.message = 'Salary template details added successfully';
-                                                                    responseMessage.data = null;
+                                                                    responseMessage.message = "Salary template saved successfully";
+                                                                    responseMessage.data = {
+                                                                        id : salaryTplResult[0][0].id,
+                                                                        title : req.body.title,
+                                                                        s_head : salaryHeadArray
+                                                                    };
                                                                     res.status(200).json(responseMessage);
                                                                 }
-                                                                else {
-                                                                    responseMessage.error = {
-                                                                        server: 'Internal Server Error'
-                                                                    };
-                                                                    responseMessage.message = 'An error occurred !';
+                                                                else{
+                                                                    responseMessage.data = null;
+                                                                    console.log('Data not loaded for psave_salary_template_details');
                                                                     res.status(500).json(responseMessage);
-                                                                    console.log('Error : psave_salary_template_details ', err);
-                                                                    var errorDate = new Date();
-                                                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
                                                                 }
-                                                            });
-                                                        }
-                                                        else{
-                                                            responseMessage.status = false;
-                                                            responseMessage.error = null;
-                                                            responseMessage.message = 'Invalid id of salary header';
-                                                            responseMessage.data = null;
-                                                            res.status(400).json(responseMessage);
-                                                        }
+                                                            }
+                                                            else{
+                                                                responseMessage.error = {
+                                                                    server: 'Internal Server Error'
+                                                                };
+                                                                responseMessage.message = 'An error occurred !';
+                                                                res.status(500).json(responseMessage);
+                                                                console.log('Error : hrisSaveSalaryTemplate ', err);
+                                                                var errorDate = new Date();
+                                                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                                            }
+                                                        });
+
                                                     }
+                                                    else{
+                                                        responseMessage.status = true;
+                                                        responseMessage.error = null;
+                                                        responseMessage.message = "Salary template saved successfully";
+                                                        responseMessage.data = {
+                                                            id : salaryTplResult[0][0].id,
+                                                            title : req.body.title,
+                                                            s_head : []
+                                                        };
+                                                        res.status(200).json(responseMessage);
+                                                    }
+
+
                                                 }
                                                 else {
                                                     responseMessage.status = false;
