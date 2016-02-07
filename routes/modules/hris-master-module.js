@@ -213,8 +213,9 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
         if(req.body.s_head){
             if(util.isArray(req.body.s_head)){
                 if(req.body.s_head.length){
-                    for(var count = 0; count < req.body.s_head; count++){
-                        if(typeof(req.body.s_head[count] == 'object')){
+                    for(var count = 0; count < req.body.s_head.length; count++){
+                        if(typeof(req.body.s_head[count])  == 'object'){
+                            console.log('Cond : ',!(isFinite(parseInt(req.body.s_head[count].sid)) && parseInt(req.body.s_head[count].sid) > 0));
                             if(!(isFinite(parseInt(req.body.s_head[count].sid)) && parseInt(req.body.s_head[count].sid) > 0)){
                                 continue;
                             }
@@ -231,11 +232,13 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
                             salaryHeadArray.push(req.body.s_head[count]);
                         }
                         else{
+                            console.log('missed');
                             continue;
                         }
 
                     }
                 }
+
             }
             else{
                 error.s_head = 'Invalid list of salary_head template';
@@ -243,6 +246,7 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
             }
         }
 
+        console.log('salaryHeadArray',salaryHeadArray);
 
         if (!validationFlag) {
             responseMessage.error = error;
@@ -307,13 +311,15 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
 
                                                         for(var i = 0; i < salaryHeadArray.length; i++){
                                                             var saveTplDetailsQuery = "CALL psave_salary_template_details("+
-                                                                st.db.escape(salaryTplResult[0][0].id) +
-                                                                st.db.escape(salaryHeadArray[i].sid) +
-                                                                st.db.escape(salaryHeadArray[i].seq) +
-                                                                st.db.escape(salaryHeadArray[i].sal_type) +
+                                                                st.db.escape(salaryTplResult[0][0].id) + ','+
+                                                                st.db.escape(salaryHeadArray[i].sid) +','+
+                                                                st.db.escape(salaryHeadArray[i].seq) +','+
+                                                                st.db.escape(parseInt(salaryHeadArray[i].sal_type))
                                                                 + ");";
-                                                            comSaveTplDetailsQuery =+ saveTplDetailsQuery;
+                                                            comSaveTplDetailsQuery += saveTplDetailsQuery;
                                                         }
+
+                                                        console.log('comSaveTplDetailsQuery',comSaveTplDetailsQuery);
 
                                                         st.db.query(comSaveTplDetailsQuery, function (err, tplDetailsResult) {
                                                             if (!err) {
@@ -1446,14 +1452,17 @@ HrisMaster.prototype.hrisGetSalaryTempDetails = function(req,res,next){
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
                             if (!err) {
-                                console.log(results);
+                                console.log('pget_salary_template',results);
                                 if (results) {
                                     if (results[0]) {
                                         if (results[0].length > 0) {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Salary template details loaded successfully';
-                                            responseMessage.data = results[0];
+                                            if(results[0][0]){
+                                                results[0][0].s_head = results[1];
+                                            }
+                                            responseMessage.data = results[0][0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
