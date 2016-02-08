@@ -406,7 +406,7 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
                                                 responseMessage.message = 'HRM added successfully';
                                                 responseMessage.data = {
                                                     id : results[0][0].id,
-                                                    pic : uniqueFileName
+                                                    pic : req.body.picpath
                                                 };
                                                 res.status(200).json(responseMessage);
                                             }
