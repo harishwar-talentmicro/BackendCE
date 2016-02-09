@@ -550,6 +550,7 @@ router.get('/procurement_get_vendor',procurementModule.procurementGetVendors);
 router.delete('/procurement_del_vendor/:id',procurementModule.procurementDelVendor);
 router.get('/procurement_get_attachment',procurementModule.procurementGetEnqAttchment);
 router.delete('/procurement_del_enq_attachment/:id',procurementModule.procurementDelEnqAttachment);
+router.get('/procurement_purchase_trans_details',procurementModule.procurementGetPurchaseTransDetails);
 router.get('/procurement_get_purchase_trans',procurementModule.procurementGetPurchaseTrans);
 router.post('/procurement_save_potemplate',procurementModule.procurementSavePoTemplate);
 router.delete('/procurement_del_potemplate/:id',procurementModule.procurementDelPoTemplate);
