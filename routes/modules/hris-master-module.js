@@ -68,7 +68,7 @@ HrisMaster.prototype.hrisMasters = function(req,res,next){
                                 'CALL pget_salary_template(' + procParams + '); ' +
                                 'CALL pget_leave_types(' + procParams + ') ; ' +
                                 'CALL pget_document_types(' + procParams + ') ; ' +
-                                'CALL pget_reporting_manager_List()';
+                                'CALL pget_reporting_manager_List(' + procParams + ')';
 
                             console.log(procQuery);
 

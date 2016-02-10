@@ -193,33 +193,42 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
                     if (tokenResult) {
                         console.log(req.files);
                         if (req.files) {
-                            var deleteTempFile = function(){
-                                fs.unlink('../bin/'+req.files.pr.path);
-                                console.log("Image Path is deleted from server");
-                            };
-                            var readStream = fs.createReadStream(req.files.pr.path);
-                            var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : '');
-                            console.log(uniqueFileName);
-                            uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
-                                if (!err) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Image uploaded successfully';
-                                    responseMessage.data = {
-                                        pic: uniqueFileName
-                                    };
-                                    deleteTempFile();
-                                    res.status(200).json(responseMessage);
-                                }
-                                else {
-                                    responseMessage.status = false;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Error in uploading image';
-                                    responseMessage.data = null;
-                                    deleteTempFile();
-                                    res.status(500).json(responseMessage);
-                                }
-                            });
+                            if(req.files){
+                                var deleteTempFile = function(){
+                                    fs.unlink('../bin/'+req.files.pr.path);
+                                    console.log("Image Path is deleted from server");
+                                };
+                                var readStream = fs.createReadStream(req.files.pr.path);
+                                var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : '');
+                                console.log(uniqueFileName);
+                                uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
+                                    if (!err) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Image uploaded successfully';
+                                        responseMessage.data = {
+                                            pic: uniqueFileName
+                                        };
+                                        deleteTempFile();
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in uploading image';
+                                        responseMessage.data = null;
+                                        deleteTempFile();
+                                        res.status(500).json(responseMessage);
+                                    }
+                                });
+                            }
+                            else{
+                                responseMessage.status = false;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Invalid input data';
+                                responseMessage.data = null;
+                                res.status(500).json(responseMessage);
+                            }
                         }
                         else{
                             responseMessage.status = false;
@@ -308,8 +317,12 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
         validationFlag *= false;
     }
     if(!req.body.einfn){
-        error.einfn = 'Invalid employee information';
-        validationFlag *= false;
+        //error.einfn = 'Invalid employee information';
+        //validationFlag *= false;
+        /**
+         * Non mandatory parameter
+         */
+        req.body.eifn = "";
     }
     if (!validator.isLength((req.body.fn), 3, 45)) {
         error.fn = 'First Name can be maximum 45 characters';
