@@ -195,20 +195,21 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
             error.title = 'Invalid title';
             validationFlag *= false;
         }
-        if (req.body.id) {
-            if (isNaN(parseInt(req.body.id))) {
+        if (req.body.tid) {
+            if (isNaN(parseInt(req.body.tid))) {
                 error.id = 'Invalid id of template';
                 validationFlag *= false;
             }
-            if (parseInt(req.body.id) < 0) {
+            if (parseInt(req.body.tid) < 0) {
                 error.id = 'Invalid id of template';
                 validationFlag *= false;
             }
         }
         else {
-            req.body.id = 0;
+            req.body.tid = 0;
         }
 
+        console.error('req.body.tid',req.body.tid);
         var salaryHeadArray = [];
         if(req.body.s_head){
             if(util.isArray(req.body.s_head)){
@@ -259,7 +260,7 @@ HrisMaster.prototype.hrisSaveSalaryTpl = function(req,res,next){
                 st.validateToken(req.body.token, function (err, tokenResult) {
                     if (!err) {
                         if (tokenResult) {
-                            var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.id) + ',' + st.db.escape(req.body.title);
+                            var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.tid) + ',' + st.db.escape(req.body.title);
                             var procQuery = 'CALL psave_salary_template(' + procParams + ')';
                             console.log(procQuery);
                             st.db.query(procQuery, function (err, salaryTplResult) {
