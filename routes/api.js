@@ -545,6 +545,18 @@ router.delete('/hris_hrm_compensation/:cid',hrisHRMModule.hrisDelHRMCompnstn);
 var Procurement = require('./modules/procurement-module.js');
 var procurementModule = new Procurement(db,stdLib);
 router.post('/procurement_submit_enquiry',procurementModule.procurementSubmitEnquiry);
+router.post('/procurement_save_vendors',procurementModule.procurementSaveVendors);
+router.get('/procurement_get_vendor',procurementModule.procurementGetVendors);
+router.delete('/procurement_del_vendor/:id',procurementModule.procurementDelVendor);
+router.get('/procurement_get_attachment',procurementModule.procurementGetEnqAttchment);
+router.delete('/procurement_del_enq_attachment/:id',procurementModule.procurementDelEnqAttachment);
+router.get('/procurement_purchase_trans_details',procurementModule.procurementGetPurchaseTransDetails);
+router.get('/procurement_get_purchase_trans',procurementModule.procurementGetPurchaseTrans);
+router.post('/procurement_save_potemplate',procurementModule.procurementSavePoTemplate);
+router.delete('/procurement_del_potemplate/:id',procurementModule.procurementDelPoTemplate);
+router.get('/procurement_get_potemplate',procurementModule.procurementGetPoTemplate);
+router.post('/procurement_po_details',procurementModule.procurementSavePoDetails);
+router.put('/procurement_proposal_details',procurementModule.procurementUpdateProposalDetails);
 
 
 router.get('/api_health',function(req,res){
