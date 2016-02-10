@@ -308,8 +308,12 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
         validationFlag *= false;
     }
     if(!req.body.einfn){
-        error.einfn = 'Invalid employee information';
-        validationFlag *= false;
+        //error.einfn = 'Invalid employee information';
+        //validationFlag *= false;
+        /**
+         * Non mandatory parameter
+         */
+        req.body.eifn = "";
     }
     if (!validator.isLength((req.body.fn), 3, 45)) {
         error.fn = 'First Name can be maximum 45 characters';
