@@ -557,6 +557,8 @@ router.delete('/procurement_del_potemplate/:id',procurementModule.procurementDel
 router.get('/procurement_get_potemplate',procurementModule.procurementGetPoTemplate);
 router.post('/procurement_po_details',procurementModule.procurementSavePoDetails);
 router.put('/procurement_proposal_details',procurementModule.procurementUpdateProposalDetails);
+router.get('/procurement_proposal_details',procurementModule.procurementGetPoDetails);
+router.get('/procurement_vd_eze_details',procurementModule.procurementGetVdEzeDetails);
 
 
 router.get('/api_health',function(req,res){

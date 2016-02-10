@@ -5,21 +5,20 @@
  *  @description Handles procurement  functions
  */
 "use strict";
-
 var util = require('util');
 var validator = require('validator');
+
+
 var chalk = require('chalk');
-
-
 var st = null;
 function Procurement(db,stdLib){
 
     if(stdLib){
+
         st = stdLib;
-
     }
-};
 
+};
 Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
     var responseMessage = {
         status: false,
@@ -69,13 +68,18 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                     if (results[0]) {
                                         if (results[0][0]) {
                                             if (results[0][0].id){
-                                                for (var i = 0; i < results[0][0].id.length; i++) {
-                                                    if (results[0][0].id) {
-                                                        var procParams = st.db.escape(req.body.token)
-                                                            + ',' + st.db.escape(results[0][0].id) + ',' + st.db.escape(req.body.ezeoneid)
-                                                            + ',' + st.db.escape(req.body.vn) + ',' + st.db.escape(req.body.cn) + ',' +
-                                                            st.db.escape(req.body.phone) + ',' + st.db.escape(req.body.email)+ ',' +
-                                                            st.db.escape(req.body.vid);
+                                                var eId = results[0][0].id
+                                                var vArray = []
+                                                vArray.push.results[0][0].vendorArray;
+                                                var subCount;
+                                                var emailCount;
+                                                var nSentCount;
+                                                for (var i = 0; i < vArray.length; i++) {
+                                                        var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(vArray.eid)
+                                                            + ',' + st.db.escape(vArray.vezeoneid) + ',' + st.db.escape(vArray.vn)
+                                                            + ',' + st.db.escape(vArray.cn) + ',' + st.db.escape(vArray.phone_no)
+                                                            + ',' + st.db.escape(vArray.email) + ',' + st.db.escape(vArray.vid);
+
                                                         var procQuery = 'CALL psave_enquiry_vendors(' + procParams + ')';
                                                         console.log(procQuery);
                                                         st.db.query(procQuery, function (err, results) {
@@ -84,7 +88,39 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 if (results) {
                                                                     if (results[0]) {
                                                                         if (results[0][0]) {
-                                                                            if (results[0][0].id){
+                                                                            if (vArray.vezeoneid !=''){
+                                                                                var procParams = st.db.escape(req.body.token)
+                                                                                    + ',' + st.db.escape(vArray.vezeoneid) + ',' + st.db.escape(vArray.vn)
+                                                                                    + ',' + st.db.escape(vArray.cn) + ',' + st.db.escape(req.body.msg) + ',' +
+                                                                                    st.db.escape(req.body.notes) + ',' + st.db.escape(results[0][0].id);
+
+                                                                                var procQuery = 'CALL psend_Procurement_enquiry(' + procParams + ')';
+                                                                                console.log(procQuery);
+                                                                                st.db.query(procQuery, function (err, results) {
+                                                                                    if (!err) {
+                                                                                        if(results.message="already submitted"){
+                                                                                            var subCount = subCount+1;
+                                                                                        }
+
+                                                                                        console.log(results);
+                                                                                        responseMessage.status = true;
+                                                                                        responseMessage.error = null;
+                                                                                        responseMessage.message = 'Procurement enquiry sent successfully';
+                                                                                        responseMessage.data = results;
+                                                                                        res.status(200).json(responseMessage);
+                                                                                    }
+                                                                                    else {
+                                                                                        responseMessage.error = {
+                                                                                            server: 'Internal Server Error'
+                                                                                        };
+                                                                                        responseMessage.message = 'An error occurred !';
+                                                                                        res.status(500).json(responseMessage);
+                                                                                        console.log('Error : psend_Procurement_enquiry ',err);
+                                                                                        var errorDate = new Date();
+                                                                                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                                                                    }
+                                                                                });
+
                                                                                 responseMessage.status = true;
                                                                                 responseMessage.error = null;
                                                                                 responseMessage.message = 'enquiry vendors added successfully';
@@ -93,10 +129,11 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                                 };
                                                                                 res.status(200).json(responseMessage);
                                                                             }
-                                                                            else {
-                                                                                responseMessage.status = false;
+                                                                            else if(vArray.email !='') {
+                                                                                var emailCount = emailCount+1;
+                                                                                responseMessage.status = true;
                                                                                 responseMessage.error = null;
-                                                                                responseMessage.message = 'Error in adding enquiry vendors';
+                                                                                responseMessage.message = 'mail sent successfully';
                                                                                 responseMessage.data = null;
                                                                                 res.status(200).json(responseMessage);
                                                                             }
@@ -137,14 +174,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 console.log(errorDate.toTimeString() + ' ......... error ...........');
                                                             }
                                                         });
-                                                    }
-                                                    else{
-                                                        responseMessage.status = false;
-                                                        responseMessage.error = null;
-                                                        responseMessage.message = 'Invalid id of enquiry vendor';
-                                                        responseMessage.data = null;
-                                                        res.status(400).json(responseMessage);
-                                                    }
+
                                                 }
 
                                             }
@@ -227,13 +257,13 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
         }
     }
 };
+
 /**
  * @type : POST
  * @param req
  * @param res
  * @param next
- * @description save salary template
- * @accepts json
+ * @description save vendors
  * @param token <string> token of login user
  * @param vezeoneid <int>  vendor ezeone id
  * @param vn <string>  vendor name
@@ -273,7 +303,7 @@ Procurement.prototype.procurementSaveVendors = function(req,res,next){
         error.title = 'Invalid Contact name';
         validationFlag *= false;
     }
-    if (!validator.isLength((req.body.a1), 3,50)) {
+  /** if (!validator.isLength((req.body.a1), 3,50)) {
         error.a1 = 'Address should be atleast 3 characters';
         validationFlag *= false;
     }
@@ -291,7 +321,7 @@ Procurement.prototype.procurementSaveVendors = function(req,res,next){
         error.s = 'Country name Invalid';
         validationFlag *= false;
 
-    }
+    }*/
     else {
         try {
             st.validateToken(req.body.token, function (err, tokenResult) {
@@ -366,7 +396,6 @@ Procurement.prototype.procurementSaveVendors = function(req,res,next){
  * @param res
  * @param next
  * @description get Vendor
- * @accepts json
  * @param token <string> token of login user
  * @param filterstr <varchar> filter string
  *
@@ -389,10 +418,16 @@ Procurement.prototype.procurementGetVendors = function(req,res,next){
     }
 
     if(!validationFlag){
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
+
+        responseMessage.error = {token : 'Invalid Token'};
+        responseMessage.message = 'Please check all the errors';
+        res.status(401).json(responseMessage);
         console.log(responseMessage);
+
+        //responseMessage.error = error;
+        //responseMessage.message = 'Please check the errors';
+        //res.status(400).json(responseMessage);
+        //console.log(responseMessage);
     }
     else {
         try {
@@ -486,7 +521,6 @@ Procurement.prototype.procurementGetVendors = function(req,res,next){
     }
 
 };
-
 /**
  * @type : DELETE
  * @param req
@@ -586,12 +620,13 @@ Procurement.prototype.procurementDelVendor = function(req,res,next){
     }
 
 };
+
 /**
  * @type : GET
  * @param req
  * @param res
  * @param next
- * @description get Vendor
+ * @description get enquiry attachments
  * @accepts json
  * @param token <string> token of login user
  * @param eid <int>  enquiry id
@@ -819,7 +854,7 @@ Procurement.prototype.procurementDelEnqAttachment = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description get Vendor
+ * @description get purchase transactions
  * @accepts json
  * @param token <string> token of login user
  *
@@ -937,12 +972,13 @@ Procurement.prototype.procurementGetPurchaseTrans = function(req,res,next){
 
 };
 
+
 /**
  * @type : GET
  * @param req
  * @param res
  * @param next
- * @description get Vendor
+ * @description get purchase transaction details
  * @accepts json
  * @param token <string> token of login user
  * @param enquiryid <string> enquiry id of login user
@@ -985,11 +1021,42 @@ Procurement.prototype.procurementGetPurchaseTransDetails = function(req,res,next
                                 console.log(results);
                                 if (results) {
                                     if (results[0]) {
+
                                         if (results[0].length > 0) {
+
+                                            //for(var i=0;i<results[0].length;i++){
+                                            //    if(results[0][0].proposal_document!=''){
+                                            //        console.log(results[0][0].proposal_document);
+                                            //        var str='https://storage.googleapis.com/ezeone/'
+                                            //        var str1 = results[0][0].proposal_document;
+                                            //        var str2=str.concate(str1);
+                                            //        console.log("sr",str1);
+                                            //    }
+                                            //}
+                                            var output =[];
+                                            for (var i = 0; i < results[0].length; i++) {
+                                                var result = {};
+                                                result.tid = results[0][i].tid;
+                                                result.ezeoneid = results[0][i].ezeoneid;
+                                                result.vendor_name = results[0][i].vendor_name;
+                                                result.contact_name = results[0][i].contact_name;
+                                                result.proposal_amount = results[0][i].proposal_amount;
+                                                result.proposal_reference = results[0][i].proposal_reference;
+                                                result.proposal_date = results[0][i].proposal_date;
+                                                result.vendor_emailid = results[0][i].vendor_emailid;
+                                                result.vendor_contactname = results[0][i].vendor_contactname;
+                                                result.PO_nu = results[0][i].PO_nu;
+                                                result.PO_date = results[0][i].PO_date;
+                                                result.proposal_document = (results[0][i].proposal_document) ?
+                                                req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][i].proposal_document :  '';
+
+                                                output.push(result);
+                                            }
+
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Purchase Transaction details loaded successfully';
-                                            responseMessage.data=results[0];
+                                            responseMessage.data=output;
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -1071,7 +1138,7 @@ Procurement.prototype.procurementGetPurchaseTransDetails = function(req,res,next
  * @param req
  * @param res
  * @param next
- * @description save salary template
+ * @description save po template
  * @accepts json
  * @param token <string> token of login user
  * @param temp_id <int> id is template id
@@ -1339,7 +1406,6 @@ Procurement.prototype.procurementGetPoTemplate = function(req,res,next){
 
 };
 
-
 /**
  * @type : DELETE
  * @param req
@@ -1446,7 +1512,7 @@ Procurement.prototype.procurementDelPoTemplate = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description save salary template
+ * @description save po details
  * @accepts json
  * @param token <string> token of login user
  * @param vendor_id <int> vendor id
@@ -1492,7 +1558,7 @@ Procurement.prototype.procurementSavePoDetails = function(req,res,next){
                     if (tokenResult) {
                         var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.vendor_id)
                             + ',' + st.db.escape(req.body.po_nu)+ ',' + st.db.escape(req.body.po_date)
-                            + ',' + st.db.escape(req.body.po_order);
+                            + ',' + st.db.escape(req.body.po_order)+ ',' + st.db.escape(req.body.notes);
                         var procQuery = 'CALL psave_POdetails(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -1553,15 +1619,493 @@ Procurement.prototype.procurementSavePoDetails = function(req,res,next){
 };
 
 /**
- * @type : POST
+ * @type : PUT
  * @param req
  * @param res
  * @param next
  * @server_param
- * @description Approve Alumni members
+ * @description updating proposal details
  */
-Procurement.prototype.procurementUpdateProposalDetails = function(req,res,next) {
+Procurement.prototype.procurementUpdateProposalDetails = function(req,res,next)     {
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
 
+    if(!req.body.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(req.body.vendor_id) || (req.body.vendor_id <= 0)){
+        error.vendor_id = 'Invalid Vendor Id';
+        validationFlag *= false;
+    }
+    if(!req.body.pro_ref){
+        error.pro_ref = 'Invalid Po reference no';
+        validationFlag *= false;
+    }
+    if (!validator.isEmail(req.body.vendor_emailid)) {
+        error.vendor_emailid = 'Invalid Email';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            var image = null;
+            st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.vendor_id)
+                            + ',' + st.db.escape(req.body.pro_ref)+ ',' + st.db.escape(req.body.pro_date)
+                            + ',' + st.db.escape(req.body.pro_amount)+ ',' + st.db.escape(req.body.pro_doc)
+                            + ',' + st.db.escape(req.body.vendor_emailid)+ ',' + st.db.escape(req.body.vendor_cn)
+                            + ',' + st.db.escape(req.body.notes);
+
+                        var procQuery = 'CALL pupdate_proposaldetails(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Proposal details updated successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pupdate_proposaldetails ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('procurementUpdateProposalDetails: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : procurementUpdateProposalDetails ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error procurementUpdateProposalDetails :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+}
+
+
+Procurement.prototype.hrisSaveSalaryTpl = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    if(req.is('json')) {
+        var validationFlag = true;
+        var error = {};
+        if (!req.body.eid) {
+            error.eid = 'Invalid template details';
+            validationFlag *= false;
+        }
+        if (!req.body.url) {
+            error.url = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.body.fn) {
+            error.fn = 'Invalid title';
+            validationFlag *= false;
+        }
+        if (req.body.id) {
+            if (isNaN(parseInt(req.body.id))) {
+                error.id = 'Invalid id of template';
+                validationFlag *= false;
+            }
+            if (parseInt(req.body.id) < 0) {
+                error.id = 'Invalid id of template';
+                validationFlag *= false;
+            }
+        }
+        else {
+            req.body.id = 0;
+        }
+
+        var salaryHeadArray = [];
+        if(req.body.s_head){
+            if(util.isArray(req.body.s_head)){
+                if(req.body.s_head.length){
+                    for(var count = 0; count < req.body.s_head.length; count++){
+                        if(typeof(req.body.s_head[count])  == 'object'){
+                            console.log('Cond : ',!(isFinite(parseInt(req.body.s_head[count].sid)) && parseInt(req.body.s_head[count].sid) > 0));
+                            if(!(isFinite(parseInt(req.body.s_head[count].sid)) && parseInt(req.body.s_head[count].sid) > 0)){
+                                continue;
+                            }
+                            if(!(isFinite(parseInt(req.body.s_head[count].seq)) && parseInt(req.body.s_head[count].seq) > 0)){
+                                req.body.s_head[count].seq = 0;
+                            }
+                            if(!(isFinite(parseInt(req.body.s_head[count].sal_type)) && parseInt(req.body.s_head[count].sal_type) > 0)){
+                                /**
+                                 * Default salary type is 3 (if not defined) i.e. per annum
+                                 * @type {number}
+                                 */
+                                req.body.s_head[count].sal_type = 3;
+                            }
+                            salaryHeadArray.push(req.body.s_head[count]);
+                        }
+                        else{
+                            console.log('missed');
+                            continue;
+                        }
+
+                    }
+                }
+
+            }
+            else{
+                error.s_head = 'Invalid list of salary_head template';
+                validationFlag *= false;
+            }
+        }
+
+        console.log('salaryHeadArray',salaryHeadArray);
+
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                st.validateToken(req.body.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.id) + ',' + st.db.escape(req.body.title);
+                            var procQuery = 'CALL psave_salary_template(' + procParams + ')';
+                            console.log(procQuery);
+                            st.db.query(procQuery, function (err, salaryTplResult) {
+                                if (!err) {
+                                    console.log(salaryTplResult);
+                                    if (salaryTplResult) {
+                                        if (salaryTplResult[0]) {
+                                            if (salaryTplResult[0][0]) {
+                                                if (salaryTplResult[0][0].id) {
+                                                    var comSaveTplDetailsQuery = "";
+
+                                                    /**
+                                                     * Saving salary array head list to database
+                                                     * Note: Procedure is written in such a way if any attribute changes
+                                                     * then it updates else it adds up (create a new entry) the salary head details to salary template
+                                                     */
+                                                    var saveSalaryHeadArrayFn = function(deleteArray){
+                                                        if(salaryHeadArray.length){
+
+                                                            for(var i = 0; i < salaryHeadArray.length; i++){
+                                                                var saveTplDetailsQuery = "CALL psave_salary_template_details("+
+                                                                    st.db.escape(salaryTplResult[0][0].id) + ','+
+                                                                    st.db.escape(salaryHeadArray[i].sid) +','+
+                                                                    st.db.escape(salaryHeadArray[i].seq) +','+
+                                                                    st.db.escape(parseInt(salaryHeadArray[i].sal_type))
+                                                                    + ");";
+                                                                comSaveTplDetailsQuery += saveTplDetailsQuery;
+                                                            }
+
+                                                            if(deleteArray){
+                                                                if(deleteArray.length){
+                                                                    for(var i = 0; i < salaryHeadArray.length; i++){
+                                                                        var deleteTplDetailsQuery = "CALL pdelete_salary_template_details("+
+                                                                            st.db.escape(salaryTplResult[0][0].id) + ','+
+                                                                            st.db.escape(deleteArray[i].sid) +','+
+                                                                            st.db.escape(deleteArray[i].seq)
+                                                                            + ");";
+                                                                        comSaveTplDetailsQuery += deleteTplDetailsQuery;
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            console.log('comSaveTplDetailsQuery',comSaveTplDetailsQuery);
+
+                                                            st.db.query(comSaveTplDetailsQuery, function (err, tplDetailsResult) {
+                                                                if (!err) {
+                                                                    if(tplDetailsResult){
+                                                                        console.log(tplDetailsResult);
+                                                                        responseMessage.status = true;
+                                                                        responseMessage.error = null;
+                                                                        responseMessage.message = "Salary template saved successfully";
+                                                                        responseMessage.data = {
+                                                                            id : salaryTplResult[0][0].id,
+                                                                            title : req.body.title,
+                                                                            s_head : salaryHeadArray
+                                                                        };
+                                                                        res.status(200).json(responseMessage);
+                                                                    }
+                                                                    else{
+                                                                        responseMessage.data = null;
+                                                                        console.log('Data not loaded for psave_salary_template_details');
+                                                                        res.status(500).json(responseMessage);
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    responseMessage.error = {
+                                                                        server: 'Internal Server Error'
+                                                                    };
+                                                                    responseMessage.message = 'An error occurred !';
+                                                                    res.status(500).json(responseMessage);
+                                                                    console.log('Error : hrisSaveSalaryTemplate ', err);
+                                                                    var errorDate = new Date();
+                                                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                                                }
+                                                            });
+
+                                                        }
+                                                        else{
+                                                            responseMessage.status = true;
+                                                            responseMessage.error = null;
+                                                            responseMessage.message = "Salary template saved successfully";
+                                                            responseMessage.data = {
+                                                                id : salaryTplResult[0][0].id,
+                                                                title : req.body.title,
+                                                                s_head : []
+                                                            };
+                                                            res.status(200).json(responseMessage);
+                                                        }
+                                                    };
+
+                                                    /**
+                                                     * If user is changing salary template, then firtly we have to compare the
+                                                     * salary heads by loading the data and then finding out what to add and what to delete
+                                                     * in salary head list, therefore an extra procedure is required to fetch up the previously
+                                                     * saved data from db
+                                                     */
+                                                    if(req.body.id == salaryTplResult[0][0].id){
+                                                        var tplPrevDetailsQuery = "CALL pget_salary_template_details("+
+                                                            st.db.escape(salaryTplResult[0][0].id) + ")";
+
+                                                        st.db.query(tplPrevDetailsQuery, function (err, tplPrevDetailsResult) {
+                                                            if (!err) {
+                                                                if(tplPrevDetailsResult){
+                                                                    if(tplPrevDetailsResult[0]){
+                                                                        if(tplPrevDetailsResult[0][0]){
+                                                                            if(tplPrevDetailsResult[1]){
+                                                                                if(tplPrevDetailsResult[1].length){
+
+                                                                                    /**
+                                                                                     * Salary head list which has to be deleted
+                                                                                     */
+                                                                                    var deleteArray = [];
+                                                                                    /**
+                                                                                     * Comparing two array and finding out what to delete
+                                                                                     */
+                                                                                    for(var i =0; i < tplPrevDetailsResult[1].length; i++){
+                                                                                        var salaryHeadFound = false;
+                                                                                        for(var j = 0; j < salaryHeadArray.length; j++){
+                                                                                            if(salaryHeadArray[i].sid == tplPrevDetailsResult[1][j].sid){
+                                                                                                salaryHeadFound = true;
+                                                                                                break;
+                                                                                            }
+                                                                                        }
+                                                                                        if(!salaryHeadFound){
+                                                                                            deleteArray.push(tplPrevDetailsResult[1][j]);
+                                                                                        }
+                                                                                    }
+
+                                                                                    console.log(deleteArray);
+                                                                                    saveSalaryHeadArrayFn(deleteArray);
+                                                                                }
+                                                                                else{
+                                                                                    saveSalaryHeadArrayFn();
+                                                                                }
+                                                                            }
+                                                                            else{
+                                                                                saveSalaryHeadArrayFn();
+
+                                                                            }
+                                                                        }
+                                                                        else{
+                                                                            responseMessage.status = false;
+                                                                            responseMessage.error = {
+                                                                                id: 'Salary template not found'
+                                                                            };
+                                                                            responseMessage.message = 'Salary Template not found !';
+                                                                            res.status(200).json(responseMessage);
+                                                                        }
+                                                                    }
+                                                                    else{
+                                                                        responseMessage.status = false;
+                                                                        responseMessage.error = {
+                                                                            id: 'Salary template not found'
+                                                                        };
+                                                                        responseMessage.message = 'Salary Template not found !';
+                                                                        res.status(200).json(responseMessage);
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    responseMessage.status = false;
+                                                                    responseMessage.error = {
+                                                                        id: 'Salary template not found'
+                                                                    };
+                                                                    responseMessage.message = 'Salary Template not found !';
+                                                                    res.status(200).json(responseMessage);
+                                                                }
+                                                            }
+                                                            else{
+                                                                responseMessage.error = {
+                                                                    server: 'Internal Server Error'
+                                                                };
+                                                                responseMessage.message = 'An error occurred !';
+                                                                res.status(500).json(responseMessage);
+                                                                console.log('Error : hrisSaveSalaryTemplate ', err);
+                                                                var errorDate = new Date();
+                                                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                                            }
+                                                        });
+                                                    }
+
+                                                    /**
+                                                     * In case user is creating a new salary template then
+                                                     * we don't have to load the previous salary heads and we can directly insert
+                                                     * the salary head list into db
+                                                     */
+                                                    else {
+                                                        saveSalaryHeadArrayFn();
+                                                    }
+
+
+                                                }
+                                                else {
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Error in adding Salary template details';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in adding Salary template details';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in adding Salary template details';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in adding Salary template details';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : hrisSaveSalaryTemplate ', err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('hrisSaveSalaryTemplate: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error : hrisSaveSalaryTemplate ', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    }
+                });
+            }
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error hrisSaveSalaryTemplate :  ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+    }
+    else{
+        responseMessage.error = "Accepted content type is json only";
+        res.status(400).json(responseMessage);
+    }
+
+};
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get proposal details
+ * @accepts json
+ * @param token <string> token of login user
+ * @param vendor_id <int> vendor id
+ *
+ */
+Procurement.prototype.procurementGetPoDetails = function(req,res,next){
     var responseMessage = {
         status: false,
         error: {},
@@ -1574,79 +2118,245 @@ Procurement.prototype.procurementUpdateProposalDetails = function(req,res,next) 
         error.token = 'Invalid token';
         validationFlag *= false;
     }
+    if (isNaN(req.query.vendor_id) || (req.query.vendor_id <= 0)){
+        error.vendor_id = 'Invalid Venodor id';
+        validationFlag *= false;
+    }
     if(!validationFlag){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
         res.status(400).json(responseMessage);
         console.log(responseMessage);
     }
-    else{
+    else {
         try {
-            st.validateToken(token, function (err, result) {
+            st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
-                    if (result) {
-                        var queryParams = st.db.escape(id)+ ',' + st.db.escape(status);
-                        var query = 'CALL pApproveAlumnimembers(' + queryParams + ')';
-                        console.log(query);
-
-                        st.db.query(query, function (err, approveResult) {
-                            //console.log(approveResult);
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.vendor_id);
+                        var procQuery = 'CALL pGet_proposaldetails(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
                             if (!err) {
-                                if (approveResult) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'ApproveAlumnimembers updated successfully';
-                                    responseMessage.data = {
-                                        id : id,
-                                        status : status
-                                    };
-                                    res.status(200).json(responseMessage);
-                                    console.log('FnApproveAlumnimembers: ApproveAlumnimembers updated successfully');
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Proposal details loaded successfully';
+                                            responseMessage.data = results[0];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Proposal details are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Proposal details are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
                                 }
                                 else {
-                                    responseMessage.message = 'ApproveAlumnimembers not update';
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Proposal details  are not available';
+                                    responseMessage.data = null;
                                     res.status(200).json(responseMessage);
-                                    console.log('FnApproveAlumnimembers:ApproveAlumnimembers not update');
                                 }
                             }
                             else {
-                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
                                 res.status(500).json(responseMessage);
-                                console.log('FnApproveAlumnimembers: error in updating ApproveAlumnimembers:' + err);
+                                console.log('Error : pGet_proposaldetails ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
                             }
                         });
                     }
-                    else {
+                    else{
                         responseMessage.message = 'Invalid token';
                         responseMessage.error = {
-                            token: 'Invalid token'
+                            token: 'invalid token'
                         };
                         responseMessage.data = null;
                         res.status(401).json(responseMessage);
-                        console.log('FnApproveAlumnimembers: Invalid token');
+                        console.log('procurementGetPoTemplate: Invalid token');
                     }
                 }
-                else {
+                else{
                     responseMessage.error = {
-                        server: 'Internal server error'
+                        server: 'Internal Server Error'
                     };
-                    responseMessage.message = 'Error in validating Token';
+                    responseMessage.message = 'An error occurred !';
                     res.status(500).json(responseMessage);
-                    console.log('FnApproveAlumnimembers:Error in processing Token' + err);
+                    console.log('Error : procurementGetPoDetails ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
             });
         }
-        catch(ex){
+        catch(ex) {
             responseMessage.error = {
-                server: 'Internal Server error'
+                server: 'Internal Server Error'
             };
             responseMessage.message = 'An error occurred !';
-            console.log('FnApproveAlumnimembers:error ' + ex.description);
-            console.log(ex);
-            var errorDate = new Date(); console.log(errorDate.toTimeString() + ' ....................');
-            res.status(400).json(responseMessage);
+            res.status(500).json(responseMessage);
+            console.log('Error procurementGetPoDetails :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
+
+};
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get vendor ezeone details
+ * @accepts json
+ * @param token <string> token of login user
+ * @param ezeone_id <int> ezeone id
+ *
+ */
+Procurement.prototype.procurementGetVdEzeDetails = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.ezeone_id){
+        error.ezeone_id = 'Invalid ezeone id';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.ezeone_id);
+                        var procQuery = 'CALL pGet_vendorezeone_details(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+                                            if(results[0][0].message != "EzeoneID is not verified"){
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Vendor Ezeone details are loaded successfully';
+                                                responseMessage.data = results[0];
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else{
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'EzeoneID is not verified';
+                                                responseMessage.data = results[0];
+                                                res.status(200).json(responseMessage);
+                                            }
+
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Vendor Ezeone details are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Vendor Ezeone details are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Vendor Ezeone details  are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pGet_vendorezeone_details ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('procurementGetVdEzeDetails: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : procurementGetVdEzeDetails ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error procurementGetVdEzeDetails :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
 };
 
 module.exports = Procurement;
