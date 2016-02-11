@@ -145,6 +145,7 @@ router.get('/m/contact_details',businessManager.getContactDetails);
 router.get('/role',businessManager.getRoles);
 router.get('/m/sales_transaction',businessManager.getTransactionOfSales);
 router.post('/external_sales_request', businessManager.saveExternalsalesRequest);
+router.get('/m/sales_trans_details', businessManager.getSalesTransDetails);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');
@@ -559,6 +560,8 @@ router.post('/procurement_po_details',procurementModule.procurementSavePoDetails
 router.put('/procurement_proposal_details',procurementModule.procurementUpdateProposalDetails);
 router.get('/procurement_proposal_details',procurementModule.procurementGetPoDetails);
 router.get('/procurement_vd_eze_details',procurementModule.procurementGetVdEzeDetails);
+router.get('/procurement_trans_details',procurementModule.procurementLoadTransDetails);
+router.get('/procurement_vendor_details',procurementModule.procurementGetVendorDetails);
 
 
 router.get('/api_health',function(req,res){

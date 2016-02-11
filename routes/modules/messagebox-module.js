@@ -1285,7 +1285,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     var istask = req.body.istask ? req.body.istask : 0;
     var memberVisible = req.body.member_visible ? req.body.member_visible : 0;
     var randomName;
-
+    var id =[];
     if(idType){
         id = idType.split(",");
         //console.log(id.length);
