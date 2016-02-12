@@ -1858,9 +1858,8 @@ HrisHRM.prototype.hrisGetHRMEmpList = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if(!req.query.st){
-        error.st = 'Invalid status';
-        validationFlag *= false;
+    if(isNaN(parseInt(req.query.st)) || parseInt(req.query.st) < 1){
+        req.query.st = null;
     }
     if(!validationFlag){
         responseMessage.error = error;
