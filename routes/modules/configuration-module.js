@@ -713,6 +713,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
                                                     saved : true
                                                 }
                                                 rtnMessage.error = null;
+                                                res.status(200).json(rtnMessage);
                                             }
                                             else if(result[0][0].deleted == 0){
                                                 rtnMessage.status = true;
@@ -724,6 +725,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
                                                 rtnMessage.error = {
                                                     TID : "Stage cannot be deleted as it is currently in use"
                                                 };
+                                                res.status(200).json(rtnMessage);
                                             }
 
                                             else if(result[0][0].deleted == 1){
@@ -734,6 +736,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
                                                     deleted : true
                                                 }
                                                 rtnMessage.error = null;
+                                                res.status(200).json(rtnMessage);
                                             }
                                             else{
                                                 console.log('FnSaveActionType: Stage Type    not saved');
@@ -933,6 +936,7 @@ Configuration.prototype.saveActionType = function(req,res,next){
                                                     saved : true
                                                 }
                                                 rtnMessage.error = null;
+                                                res.status(200).json(rtnMessage);
                                             }
                                             else if(result[0][0].deleted == 0){
                                                 rtnMessage.status = true;
@@ -944,6 +948,7 @@ Configuration.prototype.saveActionType = function(req,res,next){
                                                 rtnMessage.error = {
                                                     TID : "Task type is currently used in task manager "
                                                 };
+                                                res.status(200).json(rtnMessage);
                                             }
 
                                             else if(result[0][0].deleted == 1){
@@ -954,6 +959,7 @@ Configuration.prototype.saveActionType = function(req,res,next){
                                                     deleted : true
                                                 }
                                                 rtnMessage.error = null;
+                                                res.status(200).json(rtnMessage);
                                             }
                                             else{
                                                 console.log('FnSaveActionType: Action Type (Task Type) type  not saved');
