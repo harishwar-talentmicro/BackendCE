@@ -1887,6 +1887,7 @@ HrisHRM.prototype.hrisGetHRMEmpList = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM Employe list loaded successfully';
                                             responseMessage.data = results[0];
+                                            responseMessage.g_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET;
                                             res.status(200).json(responseMessage);
                                         }
                                         else {

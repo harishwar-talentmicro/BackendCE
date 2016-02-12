@@ -484,8 +484,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                         for(var vCount=0; vCount < vendorList.length; vCount++){
                                                             var salesEnqParam = st.db.escape(req.body.token) + ',' +
                                                             st.db.escape(vendorList[vCount].ezeoneId) + ',' +
-                                                            st.db.escape(vendorList[vCount].vendorName) + ',' +
-                                                            st.db.escape(vendorList[vCount].vendorContact) + ',' +
+                                                            st.db.escape(vendorList[vCount].vendorContactName) + ',' +
                                                             st.db.escape(vendorList[vCount].vendorEmail) + ',' +
                                                             st.db.escape(vendorList[vCount].vendorPhone) + ',' +
                                                             st.db.escape(req.body.message) + ',' +
@@ -505,14 +504,20 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
 
                                                                    if(saveEnqResult){
-                                                                       if(saveEnqResult.msg=="already submitted"){
-                                                                           alreadySubmitted = alreadySubmitted+1;
-                                                                       }
-                                                                       else if(saveEnqResult.msg=="not verified"){
-                                                                           notVerfied = notVerfied+1;
-                                                                       }
-                                                                       else if(saveEnqResult.msg=="submitted"){
-                                                                           submitted = submitted+1;
+                                                                       console.log(saveEnqResult.length/2,"messaget");
+                                                                       console.log(saveEnqResult[0][0].msg,"messagecount");
+                                                                       for(var i=0; i < saveEnqResult.length/2; i++) {
+                                                                           var count = (i) ? 2 * i : 0;
+                                                                           if(saveEnqResult[count][0].msg=="already submitted"){
+                                                                               console.log();
+                                                                               alreadySubmitted = alreadySubmitted+1;
+                                                                           }
+                                                                           else if(saveEnqResult[count][0].msg=="not verified"){
+                                                                               notVerfied = notVerfied+1;
+                                                                           }
+                                                                           else if(saveEnqResult[count][0].msg=="submitted"){
+                                                                               submitted = submitted+1;
+                                                                           }
                                                                        }
 
                                                                    }
@@ -523,7 +528,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                            data : {
                                                                                mail_count  : mailSentCount,
                                                                                already_submitted : alreadySubmitted,
-                                                                               not_verfied : notVerfied,
+                                                                               not_verified : notVerfied,
                                                                                submitted : submitted
                                                                            },
                                                                            error : null
@@ -552,7 +557,9 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                     message : "",
                                                                     data : {
                                                                         mail_count  : mailSentCount,
-                                                                        enq_count : salesEnqCount
+                                                                        already_submitted : alreadySubmitted,
+                                                                        not_verified : notVerfied,
+                                                                        submitted : submitted
                                                                     },
                                                                     error : null
                                                                 });
@@ -578,7 +585,9 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 message : "",
                                                                 data : {
                                                                     mail_count  : mailSentCount,
-                                                                    enq_count : salesEnqCount
+                                                                    already_submitted : alreadySubmitted,
+                                                                    not_verified : notVerfied,
+                                                                    submitted : submitted
                                                                 },
                                                                 error : null
                                                             });
@@ -635,7 +644,9 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                                     vendorName : vendorArray[i].vn,
                                                                                     vendorContact : vendorArray[i].cn,
                                                                                     vendorEmail : vendorArray[i].email,
-                                                                                    vendorPhone : vendorArray[i].phone_no
+                                                                                    vendorPhone : vendorArray[i].phone_no,
+                                                                                    vendorContactName : vendorArray[i].cezeone
+
                                                                                 });
                                                                             }
                                                                             if(vendorArray[i].email){
@@ -683,8 +694,10 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                             sendResponse(200,{
                                                                 status : false,
                                                                 data : {
-                                                                    mail_count : 0,
-                                                                    enq_count : 0
+                                                                    mail_count  : 0,
+                                                                    already_submitted : 0,
+                                                                    not_verified : 0,
+                                                                    submitted : 0
                                                                 },
                                                                 message : "No vendors are there in the list to send enquiries",
                                                                 error : {

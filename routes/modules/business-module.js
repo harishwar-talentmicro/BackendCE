@@ -3290,6 +3290,7 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
                                                         reldata.td = transResult[1][i].td,
                                                         reldata.da = transResult[1][i].da,
                                                         reldata.amount = transResult[1][i].Amount,
+                                                        reldata.folderTitle = transResult[1][i].FolderTitle,
 
                                                     output.push(reldata);
                                                 }
