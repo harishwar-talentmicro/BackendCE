@@ -411,6 +411,7 @@ Procurement.prototype.procurementEnquiry = function(req,res,next){
  * @service-param notes <string>
  */
 Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
+    console.log("test");
     var id = parseInt(req.body.id);
     var responseMessage = {
         status: false,
@@ -432,7 +433,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
             }
         }
         else {
-            req.body.id = 0;
+            id = 0;
         }
         if (!validator.isLength((req.body.title), 2, 100)) {
             error.title = 'Title should be atleast 2 character';
@@ -469,7 +470,9 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                     var areSalesEnquirySentToVendors = false;
 
                                                     var mailSentCount = 0;
-                                                    var salesEnqCount = 0;
+                                                    var alreadySubmitted = 0;
+                                                    var notVerfied = 0;
+                                                    var submitted = 0;
 
 
                                                     var sendResponse = function(respCode,respObj){
@@ -483,6 +486,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                             st.db.escape(vendorList[vCount].ezeoneId) + ',' +
                                                             st.db.escape(vendorList[vCount].vendorName) + ',' +
                                                             st.db.escape(vendorList[vCount].vendorContact) + ',' +
+                                                            st.db.escape(vendorList[vCount].vendorEmail) + ',' +
+                                                            st.db.escape(vendorList[vCount].vendorPhone) + ',' +
                                                             st.db.escape(req.body.message) + ',' +
                                                             st.db.escape(req.body.notes) + ',' +
                                                             st.db.escape(vendorList[vCount].procId);
@@ -500,7 +505,16 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
 
                                                                    if(saveEnqResult){
-                                                                       salesEnqCount = (saveEnqResult.length / 2)
+                                                                       if(saveEnqResult.msg=="already submitted"){
+                                                                           alreadySubmitted = alreadySubmitted+1;
+                                                                       }
+                                                                       else if(saveEnqResult.msg=="not verified"){
+                                                                           notVerfied = notVerfied+1;
+                                                                       }
+                                                                       else if(saveEnqResult.msg=="submitted"){
+                                                                           submitted = submitted+1;
+                                                                       }
+
                                                                    }
                                                                    if(areSalesEnquirySentToVendors && areMailSentToVendors){
                                                                        sendResponse(200,{
@@ -508,7 +522,9 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                            message : "",
                                                                            data : {
                                                                                mail_count  : mailSentCount,
-                                                                               enq_count : salesEnqCount
+                                                                               already_submitted : alreadySubmitted,
+                                                                               not_verfied : notVerfied,
+                                                                               submitted : submitted
                                                                            },
                                                                            error : null
                                                                        });
@@ -572,7 +588,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
                                                     var saveEnqArrayFn = function(vendorArray){
                                                         var comSaveEnquiryVendor = "";
-                                                        if(_.isArray(vendorArray)){
+                                                        if(vendorArray){
                                                             for(var i = 0; i < vendorArray.length; i++){
 
                                                                 var saveEnqQuery = "CALL psave_enquiry_vendors("+
@@ -593,7 +609,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                             st.db.query(comSaveEnquiryVendor, function (err, EnqVendorResult) {
                                                                 if (!err) {
                                                                     if(EnqVendorResult){
-                                                                        console.log(EnqVendorResult);
+                                                                        console.log(EnqVendorResult,"res");
+                                                                        console.log(EnqVendorResult[2][0].id,"id");
 
                                                                         /**
                                                                          * Vendor List which are registerd on EZEOne Platform
@@ -609,13 +626,16 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
 
                                                                         for(var i=0; i < vendorArray.length; i++){
-                                                                            var count = (i) ? 2+ i  : 0;
+                                                                            var count = (i) ? 2 * i : 0;
+                                                                            console.log(count,"count");
                                                                             if(vendorArray[i].vezeoneid){
                                                                                 vendorIdList.push({
                                                                                     procId : EnqVendorResult[count][0].id,
                                                                                     ezeoneId : vendorArray[i].vezeoneid,
                                                                                     vendorName : vendorArray[i].vn,
-                                                                                    vendorContact : vendorArray[i].cn
+                                                                                    vendorContact : vendorArray[i].cn,
+                                                                                    vendorEmail : vendorArray[i].email,
+                                                                                    vendorPhone : vendorArray[i].phone_no
                                                                                 });
                                                                             }
                                                                             if(vendorArray[i].email){
@@ -855,7 +875,7 @@ Procurement.prototype.procurementSaveVendors = function(req,res,next){
                                 responseMessage.status = true;
                                 responseMessage.error = null;
                                 responseMessage.message = 'vendor details added successfully';
-                                responseMessage.data = req.body;
+                                responseMessage.data = results[0][0];
                                 res.status(200).json(responseMessage);
                             }
                             else {
