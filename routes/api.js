@@ -564,6 +564,8 @@ router.get('/procurement_trans_details',procurementModule.procurementLoadTransDe
 router.get('/procurement_vendor_details',procurementModule.procurementGetVendorDetails);
 router.get('/procurement_po_details',procurementModule.procurementGetPoDetails);
 router.post('/procurement_send_mail',procurementModule.sendPoMail);
+router.get('/proc_all_enq',procurementModule.procurementGetAllEnq);
+router.get('/proc_enq_details',procurementModule.procurementGetEnqDetails);
 
 
 router.get('/api_health',function(req,res){
