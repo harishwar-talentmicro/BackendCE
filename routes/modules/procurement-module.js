@@ -3056,7 +3056,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                     }
                                 }
                             });
-var data_prop='';
+
                             fs.readFile(pro_att , function(err, data_proposal) {
                                 //data_prop = data_proposal;
                                 console.log(data_proposal,"proposal");
