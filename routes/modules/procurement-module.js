@@ -8,7 +8,8 @@
 var util = require('util');
 var validator = require('validator');
 var moment = require('moment');
-
+var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+var fs = require('fs');
 var chalk = require('chalk');
 var st = null;
 function Procurement(db,stdLib){
@@ -1602,7 +1603,8 @@ Procurement.prototype.procurementGetPurchaseTransDetails = function(req,res,next
                                                 result.PO_nu = results[0][i].PO_nu;
                                                 result.PO_date = results[0][i].PO_date;
                                                 result.proposal_document = (results[0][i].proposal_document) ?(results[0][i].proposal_document): '';
-                                                //result.total_count = results[0][i].count;
+                                                result.total_count = results[0][i].count;
+                                                result.vendor_contact_email = results[0][i].vce;
                                                 //result.proposal_document = (results[0][i].proposal_document) ?(results[0][i].proposal_document):
                                                 //req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][i].proposal_document;
                                                 output.push(result);
@@ -2978,5 +2980,399 @@ Procurement.prototype.procurementGetPoDetails = function(req,res,next){
     }
 
 };
+
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ */
+Procurement.prototype.sendPoMail = function(req,res,next){
+    /**
+     * @todo SendMailer
+     */
+
+    try {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+        var Token = req.body.token;
+        var TemplateID = req.body.TemplateID;
+        var poAttachment = req.body.poAttachment;
+        var vendor_id=req.body.vendor_id;
+
+        var toMailID ='';
+        var ccemailid = '';
+        var name='';
+        var fromEmail='';
+        var pro_ref='';
+        var pro_date='';
+        var vendor_cn='';
+        var logedinuser='';
+        var pro_att='';
+
+
+        var RtnResponse = {
+            IsSent: false
+        };
+        //if (toMailID != null) {
+
+            if (Token && TemplateID ) {
+                st.validateToken(Token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
+                            //var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
+                                        //console.log(GetResult[0]
+                            var procParams = st.db.escape(Token);
+                            var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
+                            st.db.query(procQuery, function (err, MailerDetailsResult) {
+                                if (!err) {
+                                    if (MailerDetailsResult) {
+                                        if (MailerDetailsResult.length > 0) {
+                                            var output = MailerDetailsResult[0];
+                                            name = output[0].Name;  //indivdual name business company name
+                                            logedinuser = output[0].logedinuser;
+                                            fromEmail = output[0].FromEmailId;
+                                            console.log(fromEmail,"from");
+                                        }
+                                    }
+                                }
+                            });
+
+                            st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
+                                if (!err) {
+                                    if (vendordetails) {
+                                        if (vendordetails.length > 0) {
+                                            var output = vendordetails[0];
+                                            pro_ref = output[0].pro_ref;
+                                            pro_date = output[0].pro_date;
+                                            vendor_cn= output[0].vendor_cn;
+                                            toMailID=output[0].vendor_emailid;
+                                            ccemailid=output[0].emailid;
+                                            pro_att=output[0].pro_doc;
+                                        }
+                                    }
+                                }
+                            });
+var data_prop='';
+                            fs.readFile(pro_att , function(err, data_proposal) {
+                                //data_prop = data_proposal;
+                                console.log(data_proposal,"proposal");
+                            });
+
+
+                                            var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
+                                            st.db.query(templateQuery, function (err, TemplateResult) {
+                                                if (!err) {
+                                                    if (TemplateResult) {
+                                                        if (TemplateResult.length > 0) {
+                                                            // console.log(TemplateResult);
+                                                            RtnResponse.IsSent = true;
+                                                            for (var i = 0; i < TemplateResult.length; i++) {
+                                                                    var mailOptions = {
+                                                                        replyto: fromEmail,
+                                                                        to: toMailID,
+                                                                        cc:ccemailid,
+                                                                        subject: TemplateResult[0].Subject,
+                                                                        html: TemplateResult[0].Body, // html body
+                                                                        attachment: pro_att // html body
+
+                                                                    };
+                                                                    mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
+                                                                    mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
+                                                                    mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
+                                                                    mailOptions.html = mailOptions.html.replace("[ClientName]", name);
+                                                                    mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
+
+
+                                                                    var email = new sendgrid.Email();
+                                                                    email.from = mailOptions.replyto;
+                                                                    email.to = mailOptions.to;
+                                                                    email.cc=mailOptions.cc;
+                                                                    email.subject = mailOptions.subject;
+                                                                    email.html = mailOptions.html;
+                                                                email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
+                                                                      console.log(email.files);
+                                                                    console.log('send grid......');
+
+                                                                    sendgrid.send(email, function (err, result) {
+                                                                        console.log(err);
+                                                                        if (!err) {
+                                                                            var post = {
+                                                                                MessageType: 9,
+                                                                                Priority: 5,
+                                                                                ToMailID: mailOptions.to,
+                                                                                Subject: mailOptions.subject,
+                                                                                Body: mailOptions.html,
+                                                                                Replyto: mailOptions.replyto,
+                                                                                SentStatus: 1
+                                                                            };
+
+                                                                            //console.log(post);
+                                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                                // Neat!
+                                                                                if (!err) {
+                                                                                    console.log(result);
+                                                                                    console.log('FnSendBulkMailer: Mail saved Successfully');
+
+                                                                                    //CallBack(null, RtnMessage);
+                                                                                }
+                                                                                else {
+                                                                                    console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                                                    // CallBack(null, null);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                        else {
+                                                                            console.log('FnSendBulkMailer: Mail not send Successfully');
+                                                                            // CallBack(null, null);
+                                                                        }
+                                                                    });
+                                                                    //console.log('FnSendBulkMailer:Mail details sent for processing');
+                                                                    //console.log(mailOptions);
+                                                            }
+                                                            res.send(RtnResponse);
+
+                                                        }
+                                                        else {
+                                                            console.log('FnGetTemplateDetails:No Template Details found');
+                                                            res.json(null);
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log('FnGetTemplateDetails:No Template Details found');
+                                                        res.json(null);
+                                                    }
+                                                }
+                                                else {
+                                                    console.log('FnGetTemplateDetails:Error in getting template ' + err);
+                                                    res.json(null);
+                                                }
+                                            });
+                        }
+                        else {
+                            res.statusCode = 401;
+                            res.json(null);
+                            console.log('FnSendBulkMailer: Invalid Token');
+                        }
+                    } else {
+                        res.statusCode = 500;
+                        res.json(null);
+                        console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+                    }
+                });
+            }
+            else{
+                if (!Token) {
+                    console.log('FnSendBulkMailer: Token is empty');
+                }
+                else if (!TID) {
+                    console.log('FnSendBulkMailer: TID is empty');
+                }
+                else if (!TemplateID) {
+                    console.log('FnSendBulkMailer: TemplateID is empty');
+                }
+            }
+        //}
+        //else {
+        //    var fs = require('fs');
+        //
+        //    if (Token && Attachment != null && AttachmentFileName != null && ToMailID != null) {
+        //        st.validateToken(Token, function (err, tokenResult) {
+        //            if (!err) {
+        //                if (tokenResult) {
+        //                    var query = st.db.escape(Token);
+        //                    console.log('CALL pSendMailerDetails(' + query + ')');
+        //                    st.db.query('CALL pSendMailerDetails(' + query + ')', function (err, MailerDetails) {
+        //                        if (!err) {
+        //                            if (MailerDetails) {
+        //                                if (MailerDetails.length > 0) {
+        //                                    var output = MailerDetails[0];
+        //                                    OutputFileName = output[0].Name;
+        //                                    var EZEID = output[0].EZEID;
+        //                                    var fromEmail = output[0].FromEmailId;
+        //
+        //                                    console.log(OutputFileName + '.pdf');
+        //                                    console.log('FnSendBulkMailer:UserDetails found..');
+        //
+        //                                }
+        //                                else{
+        //                                    console.log('FnSendBulkMailer:No EZEID NAME found..');
+        //
+        //                                }
+        //                            }
+        //                            else{
+        //                                console.log('FnSendBulkMailer:No EZEID NAME found..');
+        //
+        //                            }
+        //                        }
+        //                        else{
+        //                            console.log('FnSendBulkMailer:Error in finding EZEID NAME');
+        //
+        //                        }
+        //                        var path = require('path');
+        //                        var file = path.join(__dirname,'../../mail/templates/LocationMapTemplate.html');
+        //
+        //                        fs.readFile(file, "utf8", function (err, data) {
+        //
+        //                            if (!err){
+        //                                data = data.replace("[EZEIDNAME]", OutputFileName);
+        //                                data = data.replace("[EZEID]", EZEID);
+        //                                console.log('FnSendBulkMailer:Replace name send successfully');
+        //
+        //                            }
+        //                            else
+        //                            {
+        //                                console.log('FnSendBulkMailer:Error in getting template file');
+        //                            }
+        //
+        //                            var pdfDocument = require('pdfkit');
+        //                            //var doc = new pdfDocument();
+        //                            var doc = new pdfDocument({
+        //                                size: 'A1',
+        //                                layout: 'portrait'
+        //                            });
+        //
+        //                            //var bufferData = new Buffer(Attachment.replace(/^data:image\/(png|gif|jpeg|jpg);base64,/, ''), 'base64');
+        //                            //var pdfdoc = doc.image(bufferData);
+        //                            //console.log(bufferData);
+        //
+        //                            var ws = fs.createReadStream('./TempMapLocationFile/'+OutputFileName+'.pdf');
+        //                            var stream = doc.pipe(ws);
+        //                            doc.end();
+        //
+        //                            doc.on('end',function(){
+        //                                stream.end();
+        //                            });
+        //
+        //                            stream.on('end',function(){
+        //                                stream.close();
+        //                            });
+        //
+        //                            stream.on('close',function(){
+        //                                fs.exists('./TempMapLocationFile/'+OutputFileName+'.pdf', function (exists) {
+        //
+        //                                    if (exists) {
+        //                                        var bufferPdfDoc = fs.readFileSync('./TempMapLocationFile/' + OutputFileName + '.pdf');
+        //                                        console.log(bufferPdfDoc);
+        //                                        // convert binary data to base64 encoded string
+        //                                        var Base64PdfData = new Buffer(bufferPdfDoc).toString('base64');
+        //                                        //console.log(Base64PdfData);
+        //                                        //fs.writeFileSync('base64.txt', Base64PdfData);
+        //                                        //fs.unlinkSync('TempMapLocationFile/' + OutputFileName + '.pdf');
+        //                                        var file = 'TempMapLocationFile/' + OutputFileName + '.pdf';
+        //                                        console.log('successfully deleted TempMapLocationFile/' + OutputFileName + '.pdf');
+        //
+        //                                        var mailOptions = {
+        //                                            from : 'noreply@ezeone.com',
+        //                                            to: ToMailID,
+        //                                            subject: 'Route Map',
+        //                                            html: data, // html body
+        //                                            Attachment: Base64PdfData,
+        //                                            AttachmentFileName: OutputFileName + '.pdf'
+        //                                        };
+        //
+        //                                        var email = new sendgrid.Email();
+        //                                        email.from = mailOptions.from;
+        //                                        email.to = mailOptions.to;
+        //                                        email.subject = mailOptions.subject;
+        //                                        email.html = mailOptions.html;
+        //                                        email.addFile({
+        //                                            filename: mailOptions.AttachmentFileName,
+        //                                            content:  mailOptions.Attachment
+        //                                        });
+        //                                        //email.files(file);
+        //
+        //                                        sendgrid.send(email, function (err, result) {
+        //                                            console.log(err);
+        //
+        //                                            if (!err) {
+        //
+        //                                                console.log('FnSendBulkMailer: Map send Successfully');
+        //                                                RtnResponse.IsSent = true;
+        //                                                res.send(RtnResponse);
+        //
+        //                                                var post = {
+        //                                                    MessageType: 10,
+        //                                                    Priority: 5,
+        //                                                    ToMailID: mailOptions.to,
+        //                                                    Subject: mailOptions.subject,
+        //                                                    Body: mailOptions.html,
+        //                                                    Attachment: mailOptions.Attachment,
+        //                                                    AttachmentFileName: mailOptions.AttachmentFileName
+        //                                                };
+        //
+        //                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+        //                                                    // Neat!
+        //                                                    if (!err) {
+        //                                                        //console.log(result);
+        //                                                        console.log('FnSendBulkMailer: Mail saved Successfully');
+        //                                                        //RtnResponse.IsSent = true;
+        //                                                        //res.send(RtnResponse);
+        //                                                    }
+        //                                                    else {
+        //                                                        console.log('FnSendBulkMailer: Mail not Saved Successfully');
+        //                                                        res.send(RtnResponse);
+        //                                                    }
+        //                                                });
+        //                                            }
+        //                                            else{
+        //                                                console.log('FnSendBulkMailer: Mail not Saved Successfully');
+        //                                                RtnResponse.IsSent = false;
+        //                                                res.send(RtnResponse);
+        //
+        //                                            }
+        //                                        });
+        //                                    }
+        //                                    else {
+        //                                        res.json(null);
+        //                                    }
+        //                                });
+        //
+        //                            });
+        //                        });
+        //                    });
+        //                }
+        //                else {
+        //                    res.statusCode = 401;
+        //                    res.json(null);
+        //                    console.log('FnSendBulkMailer: Invalid Token');
+        //                }
+        //            } else {
+        //                res.statusCode = 500;
+        //                res.json(null);
+        //                console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+        //
+        //            }
+        //        });
+        //    }
+        //
+        //    else {
+        //        if (!Token) {
+        //            console.log('FnSendBulkMailer: Token is empty');
+        //        }
+        //        else if (ToMailID == null) {
+        //            console.log('FnSendBulkMailer: ToMailID is empty');
+        //        }
+        //        else if (Attachment == null) {
+        //            console.log('FnSendBulkMailer: Attachment is empty');
+        //        }
+        //        else if (AttachmentFileName == null) {
+        //            console.log('FnSendBulkMailer: AttachmentFileName is empty');
+        //        }
+        //        res.statusCode = 400;
+        //        res.json(null);
+        //    }
+        //}
+    }
+    catch (ex) {
+        console.log('FnSendBulkMailer error:' + ex.description);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+};
+
 
 module.exports = Procurement;
