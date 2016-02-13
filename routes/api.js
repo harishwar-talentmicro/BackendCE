@@ -145,6 +145,7 @@ router.get('/m/contact_details',businessManager.getContactDetails);
 router.get('/role',businessManager.getRoles);
 router.get('/m/sales_transaction',businessManager.getTransactionOfSales);
 router.post('/external_sales_request', businessManager.saveExternalsalesRequest);
+router.get('/m/sales_trans_details', businessManager.getSalesTransDetails);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');
@@ -557,6 +558,12 @@ router.delete('/procurement_del_potemplate/:id',procurementModule.procurementDel
 router.get('/procurement_get_potemplate',procurementModule.procurementGetPoTemplate);
 router.post('/procurement_po_details',procurementModule.procurementSavePoDetails);
 router.put('/procurement_proposal_details',procurementModule.procurementUpdateProposalDetails);
+router.get('/procurement_proposal_details',procurementModule.procurementGetProposalDetails);
+router.get('/procurement_vd_eze_details',procurementModule.procurementGetVdEzeDetails);
+router.get('/procurement_trans_details',procurementModule.procurementLoadTransDetails);
+router.get('/procurement_vendor_details',procurementModule.procurementGetVendorDetails);
+router.get('/procurement_po_details',procurementModule.procurementGetPoDetails);
+router.post('/procurement_send_mail',procurementModule.sendPoMail);
 
 
 router.get('/api_health',function(req,res){
