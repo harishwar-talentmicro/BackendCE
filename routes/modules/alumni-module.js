@@ -13,6 +13,7 @@ var uuid = require('node-uuid');
 var stream = require( "stream" );
 var chalk = require( "chalk" );
 var util = require( "util" );
+var validator = require('validator');
 // I turn the given source Buffer into a Readable stream.
 function BufferStream( source ) {
 
@@ -2042,7 +2043,14 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var code = alterEzeoneId(req.body.code);     // college code
     var accesstype = req.body.access_type ? req.body.access_type : 2;  // 0-no relation, 1-is admin, 2-is member
     var ps='';
-
+    var fn = (req.body.fn) ? (req.body.fn) : '';
+    var ln = (req.body.ln) ? (req.body.ln) : '';
+    var email = (req.body.email) ? (req.body.email) : '';
+    var mn = (req.body.mn) ? (req.body.mn) : '';
+    var gender = (req.body.gender) ? (req.body.gender) : 0;
+    var dob = (req.body.DOB) ? (req.body.DOB) : null;
+    var cn = (req.body.cn) ? (req.body.cn) : '';
+    var jt = (req.body.jt) ? (req.body.jt) : '';
     var responseMessage = {
         status: false,
         error: {},
@@ -2060,6 +2068,13 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     if(!education && (isNaN(education))){
         error['education'] = 'Invalid education';
         validateStatus *= false;
+    }
+    if(email){
+        console.log(email,"email");
+        if (!validator.isEmail(email)) {
+            error.email = 'Invalid Email';
+            validateStatus *= false;
+        }
     }
     if(!specialization && (isNaN(specialization))){
         error['specialization'] = 'Invalid specialization';
@@ -2084,7 +2099,9 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                     if (result) {
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(profile) + ',' + st.db.escape(studentID)
                             + ',' + st.db.escape(education) + ',' + st.db.escape(specialization) + ',' + st.db.escape(batch)
-                            + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype);
+                            + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype)+ ',' + st.db.escape(fn)
+                            + ',' + st.db.escape(ln)+ ',' + st.db.escape(email)+ ',' + st.db.escape(mn)
+                            + ',' + st.db.escape(gender)+ ',' + st.db.escape(dob)+ ',' + st.db.escape(cn)+ ',' + st.db.escape(jt);
 
                         var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
                         console.log(query);
@@ -2109,7 +2126,15 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                                         specialization: req.body.specialization,
                                         batch: req.body.batch,
                                         code: req.body.code,
-                                        access_type: req.body.access_type
+                                        access_type: req.body.access_type,
+                                        fn: req.body.fn,
+                                        ln: req.body.ln,
+                                        email: req.body.email,
+                                        mn: req.body.mn,
+                                        gender: req.body.gender,
+                                        dob: req.body.DOB,
+                                        cn: req.body.cn,
+                                        jt: req.body.jt
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveAlumniProfile: Alumni Profile saved successfully');
