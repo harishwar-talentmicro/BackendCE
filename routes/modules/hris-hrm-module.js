@@ -817,14 +817,14 @@ HrisHRM.prototype.hrisGetHRMContactDtl = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM contact details loaded successfully';
-                                            responseMessage.data = results[0];
+                                            responseMessage.data = results[0][0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM contact details are not available';
-                                            responseMessage.data = null;
+                                            responseMessage.data = {};
                                             res.status(200).json(responseMessage);
                                         }
                                     }
