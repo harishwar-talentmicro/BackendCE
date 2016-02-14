@@ -31,7 +31,7 @@ Procurement.prototype.procurementEnquiry = function(req,res,next){
 
     //var vArray = []
     var vendorArray =req.body.vendorArray;
-
+    var attachmentArray = req.body.attachmentArray;
     if(req.is('json')) {
         var validationFlag = true;
         var error = {};
@@ -464,8 +464,50 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                             if (results[0][0]) {
                                                 if (results[0][0].id) {
                                                     var eId = results[0][0].id;
+                                                    var attachQuery='';
+                                                    for(var eCount=0; eCount < req.body.attachmentArray.length; eCount++){
+                                                        var attachParam = st.db.escape(eId) + ',' +
+                                                            st.db.escape(req.body.attachmentArray[eCount].url) + ',' +
+                                                            st.db.escape(req.body.attachmentArray[eCount].fn);
 
+                                                        attachQuery += ("CALL psave_enquiry_attachment("+
+                                                        attachParam + ");");
 
+                                                    }
+                                                    if(attachQuery){
+                                                        st.db.query(attachQuery,function(err,attchResult){
+                                                            if(err){
+                                                                console.log('Error in procedure : psend_Procurement_enquiry');
+                                                                sendResponse(500,{
+                                                                    status : false,
+                                                                    message : "Internal Server Error",
+                                                                    data : null,
+                                                                    error : {
+                                                                        server : "Internal Server Error"
+                                                                    }
+                                                                });
+                                                            }
+
+                                                        });
+                                                    }
+                                                    else{
+                                                        areSalesEnquirySentToVendors = true;
+                                                        if(areSalesEnquirySentToVendors && areMailSentToVendors){
+                                                            sendResponse(200,{
+                                                                status : true,
+                                                                message : "",
+                                                                data : {
+                                                                    mail_count  : mailSentCount,
+                                                                    already_submitted : alreadySubmitted,
+                                                                    not_verified : notVerfied,
+                                                                    submitted : submitted
+                                                                },
+                                                                error : null
+                                                            });
+
+                                                        }
+
+                                                    }
 
                                                     var areMailSentToVendors = false;
                                                     var areSalesEnquirySentToVendors = false;
@@ -2905,7 +2947,6 @@ Procurement.prototype.procurementGetPoDetails = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'Po details loaded successfully';
                                             responseMessage.data = results[0];
-                                            responseMessage.test = results;
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -3027,8 +3068,11 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                         //console.log(GetResult[0]
                             var procParams = st.db.escape(Token);
                             var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
+                            console.log(procQuery);
                             st.db.query(procQuery, function (err, MailerDetailsResult) {
+                                //console.log(MailerDetailsResult,"MailerDetailsResult");
                                 if (!err) {
+                                    console.log(MailerDetailsResult,"MailerDetailsResult");
                                     if (MailerDetailsResult) {
                                         if (MailerDetailsResult.length > 0) {
                                             var output = MailerDetailsResult[0];
@@ -3042,6 +3086,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                             });
 
                             st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
+                                console.log(vendordetails,"vendordetails");
                                 if (!err) {
                                     if (vendordetails) {
                                         if (vendordetails.length > 0) {
@@ -3068,7 +3113,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                                 if (!err) {
                                                     if (TemplateResult) {
                                                         if (TemplateResult.length > 0) {
-                                                            // console.log(TemplateResult);
+                                                             console.log(TemplateResult,"TemplateResult");
                                                             RtnResponse.IsSent = true;
                                                             for (var i = 0; i < TemplateResult.length; i++) {
                                                                     var mailOptions = {
@@ -3375,4 +3420,271 @@ Procurement.prototype.sendPoMail = function(req,res,next){
 };
 
 
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get all enquiries
+ * @param token <string> token of login user
+ * @param filter  <string>
+ *
+ */
+Procurement.prototype.procurementGetAllEnq = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        responseMessage.error = {token : 'Invalid Token'};
+        responseMessage.message = 'Please check all the errors';
+        res.status(401).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.token)+ ',' + st.db.escape(req.query.filter);
+                        var procQuery = 'CALL pget_Allenquires(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'All Enquiry loaded successfully';
+                                            responseMessage.data = results[0];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Enquiries are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Enquiries are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Enquiries are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pget_Allenquires ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('procurementGetAllEnq: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : procurementGetAllEnq ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error procurementGetAllEnq :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get enquiry Details
+ * @param token <string> token of login user
+ * @param enquiry_id  <INT>
+ *
+ */
+Procurement.prototype.procurementGetEnqDetails = function(req,res,next){
+    var eId = parseInt(req.query.enquiry_id);
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.enquiry_id)) || (parseInt(req.query.enquiry_id) <= 0)){
+        error.vendor_id = 'Invalid enquiry id';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.enquiry_id);
+                        var procQuery = 'CALL pget_enquiry_details(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+
+                                            var output =[];
+                                            for (var i = 0; i < results[1].length; i++) {
+                                                var result = {};
+                                                result.a_url = (results[1][i].a_url) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[1][i].a_url:(results[1][i].a_url);
+                                                result.a_name = results[1][i].a_name;
+
+                                                //result.proposal_document = (results[0][i].proposal_document) ?(results[0][i].proposal_document):
+                                                //req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][i].proposal_document;
+                                                output.push(result);
+                                            }
+
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Purchase Transaction details loaded successfully';
+                                            responseMessage.attachment=output;
+                                            responseMessage.details = results[0];
+                                            res.status(200).json(responseMessage);
+
+                                            //responseMessage.status = true;
+                                            //responseMessage.error = null;
+                                            //responseMessage.message = 'All details of Enquiry loaded successfully';
+                                            //responseMessage.data = results[0];
+                                            //res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Enquiry details are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Enquiry details are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Enquiry details are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pget_enquiry_details ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('procurementGetEnqDetails: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : procurementGetEnqDetails ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error procurementGetEnqDetails :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
 module.exports = Procurement;
