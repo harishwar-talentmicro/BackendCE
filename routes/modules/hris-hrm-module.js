@@ -554,7 +554,7 @@ HrisHRM.prototype.hrisGetHRM = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM details loaded successfully';
-                                            responseMessage.data = results[0];
+                                            responseMessage.data = results[0][0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
