@@ -1765,7 +1765,8 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'compensation loaded successfully';
-                                        responseMessage.data = results;
+                                        responseMessage.data = (results[1]) ? results[1] : [];
+                                        responseMessage.count = (results[0][0]) ? results[0][0].count : 0;
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
@@ -1773,6 +1774,7 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
                                         responseMessage.error = null;
                                         responseMessage.message = 'Compensation is not available';
                                         responseMessage.data = null;
+                                        responseMessage.count = (results[0][0]) ? results[0][0].count : 0;
                                         res.status(200).json(responseMessage);
                                     }
                                 }
