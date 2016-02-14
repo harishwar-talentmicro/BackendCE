@@ -13,6 +13,7 @@ var uuid = require('node-uuid');
 var stream = require( "stream" );
 var chalk = require( "chalk" );
 var util = require( "util" );
+var validator = require('validator');
 // I turn the given source Buffer into a Readable stream.
 function BufferStream( source ) {
 
@@ -2067,6 +2068,13 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     if(!education && (isNaN(education))){
         error['education'] = 'Invalid education';
         validateStatus *= false;
+    }
+    if(email){
+        console.log(email,"email");
+        if (!validator.isEmail(email)) {
+            error.email = 'Invalid Email';
+            validateStatus *= false;
+        }
     }
     if(!specialization && (isNaN(specialization))){
         error['specialization'] = 'Invalid specialization';
