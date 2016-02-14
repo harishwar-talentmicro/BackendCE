@@ -324,7 +324,7 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
          */
         req.body.eifn = "";
     }
-    if (!validator.isLength((req.body.fn), 3, 45)) {
+    if (!validator.isLength(req.body.fn, 3, 45)) {
         error.fn = 'First Name can be maximum 45 characters';
         validationFlag *= false;
     }
@@ -554,7 +554,7 @@ HrisHRM.prototype.hrisGetHRM = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM details loaded successfully';
-                                            responseMessage.data = results[0];
+                                            responseMessage.data = results[0][0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
