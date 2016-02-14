@@ -563,9 +563,10 @@ router.get('/procurement_vd_eze_details',procurementModule.procurementGetVdEzeDe
 router.get('/procurement_trans_details',procurementModule.procurementLoadTransDetails);
 router.get('/procurement_vendor_details',procurementModule.procurementGetVendorDetails);
 router.get('/procurement_po_details',procurementModule.procurementGetPoDetails);
-router.post('/procurement_send_mail',procurementModule.sendPoMail);
+router.post('/procurement_send_mail',procurementModule.sendPoDFFMail);
 router.get('/proc_all_enq',procurementModule.procurementGetAllEnq);
 router.get('/proc_enq_details',procurementModule.procurementGetEnqDetails);
+router.post('/proc_test_api',procurementModule.testPdf);
 
 
 router.get('/api_health',function(req,res){
