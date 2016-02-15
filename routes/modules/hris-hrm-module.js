@@ -1592,7 +1592,7 @@ HrisHRM.prototype.hrisGetHRMLeaveAppli = function(req,res,next){
         validationFlag *= false;
     }
     if (req.query.page_size){
-        if (isNaN(req.body.page_size)) {
+        if (isNaN(req.query.page_size)) {
             error.page_size = 'Page size should be a number';
             validationFlag *= false;
         }
@@ -1632,7 +1632,8 @@ HrisHRM.prototype.hrisGetHRMLeaveAppli = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Leave applications details loaded successfully';
-                                            responseMessage.data = results;
+                                            responseMessage.data = results[1];
+                                            responseMessage.count = (results[0][0]) ? results[0][0].count : 0;
                                             res.status(200).json(responseMessage);
                                     }
                                     else {
