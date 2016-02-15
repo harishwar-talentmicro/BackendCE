@@ -932,6 +932,9 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
             error.t_id = 'Invalid template id';
             validationFlag *= false;
         }
+        if (isNaN(parseInt(req.body.compensation)) ) {
+            req.body.compensation = 0.00;
+        }
         if (!validationFlag) {
             responseMessage.error = error;
             responseMessage.message = 'Please check the errors';
@@ -945,7 +948,7 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
                     if (!err) {
                         if (tokenResult) {
                             var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.hrm_id) + ',' + st.db.escape(req.body.ed)
-                                + ',' + st.db.escape(req.body.t_id);
+                                + ',' + st.db.escape(req.body.t_id) +  ',' + st.db.escape(req.body.compensation);
                             var procQuery = 'CALL psave_hrmcompensation(' + procParams + ')';
                             console.log(procQuery);
                             st.db.query(procQuery, function (err, results) {
