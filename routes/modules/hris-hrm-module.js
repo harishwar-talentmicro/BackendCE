@@ -2155,7 +2155,7 @@ HrisHRM.prototype.hrisGetHRMDoc = function(req,res,next){
         validationFlag *= false;
     }
     if (req.query.page_size){
-        if (isNaN(req.body.page_size)) {
+        if (isNaN(req.query.page_size)) {
             error.page_size = 'Page size should be a number';
             validationFlag *= false;
         }
