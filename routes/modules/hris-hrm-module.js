@@ -1135,7 +1135,7 @@ HrisHRM.prototype.hrisGetHRMCompnstnDtl = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'compensation details are not available';
-                                            responseMessage.data = null;
+                                            responseMessage.data = [];
                                             res.status(200).json(responseMessage);
                                         }
                                     }
