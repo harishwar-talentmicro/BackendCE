@@ -2351,10 +2351,13 @@ Alumni.prototype.getAlumniProfile = function(req,res,next){
                                         responseMessage.error = null;
                                         responseMessage.message = 'Alumni profile loaded successfully';
                                         responseMessage.data = getResult[0];
+                                        responseMessage.ezeonedata = getResult[1];
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetAlumniProfile: Alumni profile loaded successfully');
                                     }
                                     else {
+                                        responseMessage.data = null;
+                                        responseMessage.ezeonedata = getResult[1];
                                         responseMessage.message = 'Alumni profile not loaded';
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetAlumniProfile: Alumni profile not loaded');
