@@ -969,6 +969,8 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
                                                         }
                                                     }
 
+                                                    console.log(comQuery);
+
                                                     /**
                                                      * @todo Problem here
                                                      * It should be one single call only to the server and no care of async nature has been taken
