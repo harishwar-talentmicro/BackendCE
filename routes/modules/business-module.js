@@ -301,6 +301,7 @@ BusinessManager.prototype.getSalesTransaction = function(req,res,next){
                                     }
                                 }
                                 else {
+                                    responseMessage.status = true;
                                     responseMessage.message = 'No Transaction details found';
                                     res.status(200).json(responseMessage);
                                     console.log('FnGetSalesTransaction:No Transaction details found');
