@@ -242,31 +242,32 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                          * Mail merge one harcoded template and
                                                          * send mail to the list of vendors passed to this function
                                                          */
-                                                        var email     = new sendgrid.Email({
-                                                            to:       'jain31192@gmail.com',
-                                                            from:     'jain31192@gmail.com',
-                                                            subject:  'Subject goes here',
-                                                            text:     'Hello world'
-                                                        });
-                                                        sendgrid.send(email, function(err, json) {
-                                                            if (err) { return console.error(err); }
-                                                            console.log(json);
-                                                        });
+                                                        console.log(vendorEmailList,"vendorEmailList");
+                                                       for(var i=0;i < vendorEmailList.length;i++){
+                                                           console.log(vendorEmailList[i],"vendorEmailList");
+                                                           var email     = new sendgrid.Email({
+                                                               to:       vendorEmailList[i],
+                                                               from:     'jain31192.bj@gmail.com',
+                                                               subject:  'Subject goes here',
+                                                               text:     'Hello world'
+                                                           });
+                                                           sendgrid.send(email, function(err, json) {
+                                                               if (err) { return console.error(err); }
+                                                               console.log(json);
+                                                           });
+                                                       }
+
+
                                                         areMailSentToVendors = true;
-                                                        //if(areSalesEnquirySentToVendors && areMailSentToVendors){
-                                                        //    sendResponse(200,{
-                                                        //        status : true,
-                                                        //        message : "",
-                                                        //        data : {
-                                                        //            mail_count  : mailSentCount,
-                                                        //            already_submitted : alreadySubmitted,
-                                                        //            not_verified : notVerfied,
-                                                        //            submitted : submitted
-                                                        //        },
-                                                        //        error : null
-                                                        //    });
-                                                        //
-                                                        //}
+                                                        if(areSalesEnquirySentToVendors && areMailSentToVendors){
+                                                            sendResponse(200,{
+                                                                status : true,
+                                                                message : "mail send successfully",
+                                                                data : null,
+                                                                error : null
+                                                            });
+
+                                                        }
                                                     };
 
                                                     var saveEnqArrayFn = function(vendorArray){
@@ -323,11 +324,11 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
                                                                                 });
                                                                             }
-                                                                            if(vendorArray[i].email){
+                                                                            else if(vendorArray[i].email){
                                                                                 /**
                                                                                  * @todo Ask vedha about mail templates
                                                                                  */
-                                                                                vendorEmailList.push(EnqVendorResult[count][0].id);
+                                                                                vendorEmailList.push(vendorArray[i].email);
                                                                             }
                                                                         }
 
