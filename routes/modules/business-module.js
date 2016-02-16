@@ -411,6 +411,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
         var salaryType = (req.body.salary_type) ? (req.body.salary_type) : 3;
         var contactId = (req.body.ctid) ? (req.body.ctid) : 1;
 
+
         var respMsg = {
             status: false,
             message: '',
@@ -452,9 +453,12 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                             + "," + st.db.escape(alarmDuration)+ "," + st.db.escape(targetDate) + "," + st.db.escape(amount)
                             + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId) + ', ' + st.db.escape(specializationId)
                             + ', ' + st.db.escape(salaryType) + ', ' + st.db.escape(contactId);
+                        //console.log(company_id);
+                        //console.log('CALL psendsalesrequest(' + query + ')');
 
+                       var saveTransQuery ='CALL pSaveTrans(' + query + ')';
                         //console.log('CALL pSaveTrans(' + query + ')');
-                        st.db.query('CALL pSaveTrans(' + query + ')', function (err, transResult) {
+                        st.db.query(saveTransQuery, function (err, transResult) {
                             if (!err) {
                                 if (transResult) {
                                     if (transResult[0]) {
@@ -790,8 +794,13 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         var educationId = (req.body.education_id) ? (req.body.education_id) : 0;
         var specializationId = (req.body.specialization_id) ? (req.body.specialization_id) : 0;
         var salaryType = (req.body.salary_type) ? (req.body.salary_type) : 3;
-        var contactId = (req.body.ctid) ? (req.body.ctid) : 1;
-
+        var contactId = (req.body.ctid) ? (req.body.ctid) : 0;
+        var proRef = (req.body.pro_ref) ? (req.body.pro_ref) : '';
+        var proDate = (req.body.pro_date) ? (req.body.pro_date) : '';
+        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0;
+        var proDoc = (req.body.pro_doc) ? (req.body.pro_doc) : '';
+        var ve  = (req.body.ve ) ? (req.body.ve ) : '';
+        var vcn  = (req.body.vcn) ? (req.body.vcn) : '';
         var rtnMessage = {
             IsSuccessfull: false,
             MessageID:0
@@ -833,15 +842,34 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                             + ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType)+ ', ' + st.db.escape(contactId);
                         //console.log(company_id);
                         //console.log('CALL psendsalesrequest(' + query + ')');
-                        st.db.query('CALL psendsalesrequest(' + query + ')', function (err, transResult) {
+                        var salesLeadQuery = 'CALL pSaveTrans(' + query + ')';
+                        var procurementUpdateQuery = "";
+
+                        if((!isNaN(parseInt(TID))) && parseInt(TID) && (!isNaN(parseInt(req.body.vendor_id))) && parseInt(req.body.vendor_id)){
+                            var procurementParams = st.db.escape(Token)+ "," + st.db.escape(TID) + "," + st.db.escape(proRef)
+                                + "," + st.db.escape(proDate) + "," + st.db.escape(req.body.proAmount ) + "," + st.db.escape(req.body.proDoc)+ "," +
+                                st.db.escape(req.body.ve)+ "," + st.db.escape(req.body.vcn);
+
+                            procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
+                        }
+
+                        var combinedQuery = salesLeadQuery + procurementUpdateQuery;
+                        console.log(combinedQuery);
+                        st.db.query(combinedQuery, function (err, transResult) {
                             if (!err) {
                                 //console.log(transResult);
                                 if (transResult) {
                                     if (transResult[0].length > 0) {
+                                        if(transResult[2]){
+                                                var proposal_message = 'proposal deadline is exceded so you can not update data';
+                                        }
 
+                                        var proposal_message='';
                                         rtnMessage.IsSuccessfull = true;
                                         rtnMessage.MessageID = (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0;
-
+                                        rtnMessage.proposal_message = proposal_message;
+                                        //console.log(proposal_message);
+                                        //console.log(transResult,"2");
                                         for (var i = 0; i < ItemsList.length; i++) {
                                             var itemsDetails = ItemsList[i];
                                             var items = {
