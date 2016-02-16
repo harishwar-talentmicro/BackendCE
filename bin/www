@@ -13,11 +13,10 @@ var log = logger.logger;
 var https = require('https');
 var fs = require('fs');
 
-var options = {
+/*var options = {
   pfx: fs.readFileSync('finalcert.pfx'),
   passphrase:'hire'
-};
-
+};*/
 
 
 /**

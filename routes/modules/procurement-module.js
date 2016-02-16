@@ -21,387 +21,6 @@ function Procurement(db,stdLib){
 
 };
 
-Procurement.prototype.procurementEnquiry = function(req,res,next){
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-
-    //var vArray = []
-    var vendorArray =req.body.vendorArray;
-    var attachmentArray = req.body.attachmentArray;
-    if(req.is('json')) {
-        var validationFlag = true;
-        var error = {};
-        if (!req.body.token) {
-            error.token = 'Invalid token';
-            validationFlag *= false;
-        }
-        //if (id) {
-        //    if (isNaN(id)) {
-        //        error.id = 'Invalid id of enquiry';
-        //        validationFlag *= false;
-        //    }
-        //}
-        //else {
-        //    req.body.id = 0;
-        //}
-        if (!validator.isLength((req.body.title), 2, 100)) {
-            error.title = 'Title should be atleast 2 character';
-            validationFlag *= false;
-        }
-        if (!validationFlag) {
-            responseMessage.error = error;
-            responseMessage.message = 'Please check the errors';
-            res.status(400).json(responseMessage);
-            console.log(responseMessage);
-        }
-
-        //if(req.body.s_head){
-        //    if(util.isArray(req.body.s_head)){
-        //        if(req.body.s_head.length){
-        //            for(var count = 0; count < req.body.s_head.length; count++){
-        //                if(typeof(req.body.s_head[count])  == 'object'){
-        //                    console.log('Cond : ',!(isFinite(parseInt(req.body.s_head[count].sid)) && parseInt(req.body.s_head[count].sid) > 0));
-        //                    if(!(isFinite(parseInt(req.body.s_head[count].sid)) && parseInt(req.body.s_head[count].sid) > 0)){
-        //                        continue;
-        //                    }
-        //                    if(!(isFinite(parseInt(req.body.s_head[count].seq)) && parseInt(req.body.s_head[count].seq) > 0)){
-        //                        req.body.s_head[count].seq = 0;
-        //                    }
-        //                    if(!(isFinite(parseInt(req.body.s_head[count].sal_type)) && parseInt(req.body.s_head[count].sal_type) > 0)){
-        //                        /**
-        //                         * Default salary type is 3 (if not defined) i.e. per annum
-        //                         * @type {number}
-        //                         */
-        //                        req.body.s_head[count].sal_type = 3;
-        //                    }
-        //                    salaryHeadArray.push(req.body.s_head[count]);
-        //                }
-        //                else{
-        //                    console.log('missed');
-        //                    continue;
-        //                }
-        //
-        //            }
-        //        }
-        //
-        //    }
-        //    else{
-        //        error.s_head = 'Invalid list of salary_head template';
-        //        validationFlag *= false;
-        //    }
-        //}
-
-        //console.log('salaryHeadArray',salaryHeadArray);
-
-        if (!validationFlag) {
-            responseMessage.error = error;
-            responseMessage.message = 'Please check the errors';
-            res.status(400).json(responseMessage);
-            console.log(responseMessage);
-        }
-
-        else {
-            try {
-                st.validateToken(req.body.token, function (err, tokenResult) {
-                    if (!err) {
-                        if (tokenResult) {
-                            console.log("tokenResult");
-                            var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.title) + ',' + st.db.escape(req.body.refno)
-                                + ',' + st.db.escape(req.body.dd) + ',' + st.db.escape(req.body.details) + ',' + st.db.escape(req.body.cezeone) + ',' +
-                                st.db.escape(req.body.notes) + ',' + st.db.escape(req.body.id);
-                            var procQuery = 'CALL psubmit_enquiry(' + procParams + ')';
-                            console.log(procQuery);
-                            st.db.query(procQuery, function (err, enqResult) {
-                                if (!err) {
-                                    console.log(enqResult);
-                                    if (enqResult) {
-                                        if (enqResult[0]) {
-                                            if (enqResult[0][0]) {
-                                                if (enqResult[0][0].id) {
-                                                    var eId = enqResult[0][0].id;
-                                                    var comSaveEnqQuery = "";
-
-                                                    /**
-                                                     * Saving salary array head list to database
-                                                     * Note: Procedure is written in such a way if any attribute changes
-                                                     * then it updates else it adds up (create a new entry) the salary head details to salary template
-                                                     */
-                                                    var vendor = [];
-                                                    var saveVendorArrayFn = function () {
-                                                        if (vendorArray.length) {
-                                                            console.log("length");
-                                                            var vendorArrayLoop = function (i) {
-
-                                                                if (i < vendorArray.length) {
-                                                                    console.log("vendorarray");
-
-                                                                    var enqQueryParams = st.db.escape(req.body.token) + ',' +
-                                                                        st.db.escape(eId) + ',' +
-                                                                        st.db.escape(vendorArray[i].vezeoneid) + ',' +
-                                                                        st.db.escape(vendorArray[i].vn) + ',' +
-                                                                        st.db.escape(vendorArray[i].cn) + ',' +
-                                                                        st.db.escape(vendorArray[i].phone_no) + ',' +
-                                                                        st.db.escape(vendorArray[i].email) + ',' +
-                                                                        st.db.escape(vendorArray[i].vid);
-                                                                    var saveEnqQuery = "CALL psave_enquiry_vendors(" + enqQueryParams + ");";
-                                                                    //comSaveEnqQuery += saveEnqQuery;
-                                                                    console.log(saveEnqQuery);
-                                                                    st.db.query(saveEnqQuery, function (err, tplDetailsResult) {
-                                                                        if (!err) {
-                                                                            console.log("result",tplDetailsResult);
-
-                                                                            vendor.push(tplDetailsResult[0][0].id);
-                                                                            i = i + 1;
-                                                                            console.log(vendor);
-                                                                            vendorArrayLoop(i);
-
-                                                                        }
-                                                                    });
-                                                                    console.log("ve",vendor);
-                                                                }
-                                                                else {
-                                                                    vendorLoop(vendor);
-                                                                }
-                                                            };
-
-                                                            if (vendorArray.length) {
-                                                                var i = 0;
-                                                                vendorArrayLoop(i);
-                                                            }
-
-                                                            //console.log('comSaveEnqQuery',comSaveEnqQuery);
-
-                                                            //st.db.query(comSaveEnqQuery, function (err, tplDetailsResult) {
-                                                            //    console.log("id",tplDetailsResult);
-                                                            //    if (!err) {
-                                                            //        if(tplDetailsResult){
-                                                            //            console.log(tplDetailsResult);
-                                                            //            responseMessage.status = true;
-                                                            //            responseMessage.error = null;
-                                                            //            responseMessage.message = "Salary template saved successfully";
-                                                            //            responseMessage.data = {
-                                                            //                id : tplDetailsResult[0][0].id,
-                                                            //                s_head : vendorArray
-                                                            //            };
-                                                            //            res.status(200).json(responseMessage);
-                                                            //            //var id = tplDetailsResult[0][0].id;
-                                                            //            //saveVendorArrayFn();
-                                                            //        }
-                                                            //        else{
-                                                            //            responseMessage.data = null;
-                                                            //            console.log('Data not loaded for psave_salary_template_details');
-                                                            //            res.status(500).json(responseMessage);
-                                                            //        }
-                                                            //    }
-                                                            //    else{
-                                                            //        responseMessage.error = {
-                                                            //            server: 'Internal Server Error'
-                                                            //        };
-                                                            //        responseMessage.message = 'An error occurred !';
-                                                            //        res.status(500).json(responseMessage);
-                                                            //        console.log('Error : hrisSaveSalaryTemplate ', err);
-                                                            //        var errorDate = new Date();
-                                                            //        console.log(errorDate.toTimeString() + ' ......... error ...........');
-                                                            //    }
-                                                            //});
-
-                                                        }
-                                                        else {
-                                                            responseMessage.status = true;
-                                                            responseMessage.error = null;
-                                                            responseMessage.message = "Salary template saved successfully";
-                                                            responseMessage.data = {
-                                                                id: salaryTplResult[0][0].id,
-                                                                title: req.body.title,
-                                                                s_head: []
-                                                            };
-                                                            res.status(200).json(responseMessage);
-                                                        }
-                                                    };
-
-                                                    /**
-                                                     * If user is changing salary template, then firtly we have to compare the
-                                                     * salary heads by loading the data and then finding out what to add and what to delete
-                                                     * in salary head list, therefore an extra procedure is required to fetch up the previously
-                                                     * saved data from db
-                                                     */
-                                                    saveVendorArrayFn();
-                                                    var comSendEnqQuery = "";
-
-                                                    var vendorLoop = function (vendor) {
-                                                        //console.log("vid",vendor);
-                                                        if (util.isArray(vendor)) {
-                                                            for (var j = 0; j < vendor.length; j++) {
-                                                                //console.log(vendor[j]);
-                                                                var sendEnqQuery = "CALL psend_Procurement_enquiry(" +
-                                                                    st.db.escape(req.body.token) + ',' +
-                                                                    st.db.escape(vendorArray[j].vezeoneid) + ',' +
-                                                                    st.db.escape(vendorArray[j].vn) + ',' +
-                                                                    st.db.escape(vendorArray[j].cn) + ',' +
-                                                                    st.db.escape(vendorArray[j].email) + ',' +
-                                                                    st.db.escape(vendorArray[j].phone_no) + ',' +
-                                                                    st.db.escape(req.body.msg) + ',' +
-                                                                    st.db.escape(req.body.notes)+ ',' + st.db.escape(vendor[j]) + ");";
-                                                                comSendEnqQuery += sendEnqQuery;
-                                                           }
-                                                            var asub = 0;
-                                                            var ntv = 0;
-                                                            var sub= 0;
-
-                                                            st.db.query(comSendEnqQuery, function (err, enqresult) {
-                                                                if (!err) {
-                                                                    if(enqresult){
-
-                                                                            if(enqresult[0]){
-                                                                                for(var i=0;i<enqresult[0].length+1;i++) {
-                                                                                    if (enqresult[0][i].msg)
-                                                                                        console.log(enqresult,"result1");
-                                                                                        console.log(enqresult[0].length+1, "resultenq");
-                                                                                    console.log("innerloop");
-                                                                                    if (enqresult[0][i].msg == "already submitted") {
-                                                                                        asub = asub + 1;
-                                                                                        console.log("hii");
-                                                                                    }
-                                                                                    else if (enqresult[0][i].msg == "not verified") {
-                                                                                        ntv = ntv + 1;
-                                                                                        console.log("hii1");
-                                                                                    }
-                                                                                    else if(enqresult[0][i].msg == "submitted"){
-                                                                                        sub = sub + 1
-                                                                                        console.log("hii2");
-
-                                                                                    }
-                                                                                }
-                                                                            }
-
-
-                                                                    }
-                                                                    else{
-                                                                        responseMessage.status = false;
-                                                                        responseMessage.error = {
-                                                                            id: 'Salary template not found'
-                                                                        };
-                                                                        responseMessage.message = 'Salary Template not found !';
-                                                                        res.status(200).json(responseMessage);
-                                                                    }
-                                                                    responseMessage.status = true;
-                                                                    responseMessage.error = null;
-                                                                    responseMessage.asub= asub;
-                                                                    responseMessage.ntv= ntv;
-                                                                    responseMessage.sub= sub;
-                                                                    res.status(200).json(responseMessage);
-                                                                }
-                                                                else{
-                                                                    responseMessage.error = {
-                                                                        server: 'Internal Server Error'
-                                                                    };
-                                                                    responseMessage.message = 'An error occurred !';
-                                                                    res.status(500).json(responseMessage);
-                                                                    console.log('Error : hrisSaveSalaryTemplate ', err);
-                                                                    var errorDate = new Date();
-                                                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                                                                }
-                                                            });
-                                                        }
-
-                                                        /**
-                                                         * In case user is creating a new salary template then
-                                                         * we don't have to load the previous salary heads and we can directly insert
-                                                         * the salary head list into db
-                                                         */
-                                                    };
-                                                }
-                                                else {
-                                                    responseMessage.status = false;
-                                                    responseMessage.error = null;
-                                                    responseMessage.message = 'Error in adding Salary template details';
-                                                    responseMessage.data = null;
-                                                    res.status(200).json(responseMessage);
-                                                }
-                                            }
-                                            else {
-                                                responseMessage.status = false;
-                                                responseMessage.error = null;
-                                                responseMessage.message = 'Error in adding Salary template details';
-                                                responseMessage.data = null;
-                                                res.status(200).json(responseMessage);
-                                            }
-                                        }
-                                        else {
-                                            responseMessage.status = false;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Error in adding Salary template details';
-                                            responseMessage.data = null;
-                                            res.status(200).json(responseMessage);
-                                        }
-
-                                    }
-                                    else {
-                                        responseMessage.status = false;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Error in adding Salary template details';
-                                        responseMessage.data = null;
-                                        res.status(200).json(responseMessage);
-                                    }
-                                }
-                                else {
-                                    responseMessage.error = {
-                                        server: 'Internal Server Error'
-                                    };
-                                    responseMessage.message = 'An error occurred !';
-                                    res.status(500).json(responseMessage);
-                                    console.log('Error : hrisSaveSalaryTemplate ', err);
-                                    var errorDate = new Date();
-                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-
-                                }
-                            });
-                        }
-                        else {
-                            responseMessage.message = 'Invalid token';
-                            responseMessage.error = {
-                                token: 'invalid token'
-                            };
-                            responseMessage.data = null;
-                            res.status(401).json(responseMessage);
-                            console.log('hrisSaveSalaryTemplate: Invalid token');
-                        }
-                    }
-                    else {
-                        responseMessage.error = {
-                            server: 'Internal Server Error'
-                        };
-                        responseMessage.message = 'An error occurred !';
-                        res.status(500).json(responseMessage);
-                        console.log('Error : hrisSaveSalaryTemplate ', err);
-                        var errorDate = new Date();
-                        console.log(errorDate.toTimeString() + ' ......... error ...........');
-                    }
-                });
-            }
-            catch (ex) {
-                responseMessage.error = {
-                    server: 'Internal Server Error'
-                };
-                responseMessage.message = 'An error occurred !';
-                res.status(500).json(responseMessage);
-                console.log('Error hrisSaveSalaryTemplate :  ', ex);
-                var errorDate = new Date();
-                console.log(errorDate.toTimeString() + ' ......... error ...........');
-            }
-        }
-    }
-    else{
-        responseMessage.error = "Accepted content type is json only";
-        res.status(400).json(responseMessage);
-    }
-
-};
-
 /**
  * Procurement Submit Enquiry
  * @param req
@@ -549,8 +168,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
 
                                                                    if(saveEnqResult){
-                                                                       console.log(saveEnqResult.length/2,"messaget");
-                                                                       console.log(saveEnqResult[0][0].msg,"messagecount");
+                                                                       //console.log(saveEnqResult.length/2,"messaget");
+                                                                       //console.log(saveEnqResult[0][0].msg,"messagecount");
                                                                        for(var i=0; i < saveEnqResult.length/2; i++) {
                                                                            var count = (i) ? 2 * i : 0;
                                                                            if(saveEnqResult[count][0].msg=="already submitted"){
@@ -623,18 +242,28 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                          * Mail merge one harcoded template and
                                                          * send mail to the list of vendors passed to this function
                                                          */
+                                                        console.log(vendorEmailList,"vendorEmailList");
+                                                       for(var i=0;i < vendorEmailList.length;i++){
+                                                           console.log(vendorEmailList[i],"vendorEmailList");
+                                                           var email     = new sendgrid.Email({
+                                                               to:       vendorEmailList[i],
+                                                               from:     'jain31192.bj@gmail.com',
+                                                               subject:  'Subject goes here',
+                                                               text:     'Hello world'
+                                                           });
+                                                           sendgrid.send(email, function(err, json) {
+                                                               if (err) { return console.error(err); }
+                                                               console.log(json);
+                                                           });
+                                                       }
+
 
                                                         areMailSentToVendors = true;
                                                         if(areSalesEnquirySentToVendors && areMailSentToVendors){
                                                             sendResponse(200,{
                                                                 status : true,
-                                                                message : "",
-                                                                data : {
-                                                                    mail_count  : mailSentCount,
-                                                                    already_submitted : alreadySubmitted,
-                                                                    not_verified : notVerfied,
-                                                                    submitted : submitted
-                                                                },
+                                                                message : "mail send successfully",
+                                                                data : null,
                                                                 error : null
                                                             });
 
@@ -664,8 +293,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                             st.db.query(comSaveEnquiryVendor, function (err, EnqVendorResult) {
                                                                 if (!err) {
                                                                     if(EnqVendorResult){
-                                                                        console.log(EnqVendorResult,"res");
-                                                                        console.log(EnqVendorResult[2][0].id,"id");
+                                                                        //console.log(EnqVendorResult,"res");
+                                                                        //console.log(EnqVendorResult[2][0].id,"id");
 
                                                                         /**
                                                                          * Vendor List which are registerd on EZEOne Platform
@@ -695,11 +324,11 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
                                                                                 });
                                                                             }
-                                                                            if(vendorArray[i].email){
+                                                                            else if(vendorArray[i].email){
                                                                                 /**
                                                                                  * @todo Ask vedha about mail templates
                                                                                  */
-                                                                                vendorEmailList.push(EnqVendorResult[count][0].id);
+                                                                                vendorEmailList.push(vendorArray[i].email);
                                                                             }
                                                                         }
 
@@ -3407,7 +3036,7 @@ Procurement.prototype.procurementGetEnqDetails = function(req,res,next){
                                             var output =[];
                                             for (var i = 0; i < results[1].length; i++) {
                                                 var result = {};
-                                                result.url = (results[1][i].a_url) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[1][i].a_url:(results[1][i].a_url);
+                                                result.url = (results[1][i].a_url) ? results[1][i].a_url: '';
                                                 result.fn = results[1][i].a_name;
 
                                                 //result.proposal_document = (results[0][i].proposal_document) ?(results[0][i].proposal_document):
@@ -3500,6 +3129,213 @@ Procurement.prototype.procurementGetEnqDetails = function(req,res,next){
 
 };
 
+<<<<<<< HEAD
+=======
+
+//Procurement.prototype.sendPoMail = function(req,res,next){
+//    /**
+//     * @todo SendMailer
+//     */
+//
+//    try {
+//
+//        res.setHeader("Access-Control-Allow-Origin", "*");
+//        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//
+//        var Token = req.body.token;
+//        var TemplateID = req.body.TemplateID;
+//        var pro_att = req.body.poAttachment;
+//        var vendor_id=req.body.vendor_id;
+//        var po_temp = req.body.po_template;
+//console.log(vendor_id,"vendor_id");
+//        var toMailID ='';
+//        var ccemailid = '';
+//        var name='';
+//        var fromEmail='';
+//        var pro_ref='';
+//        var pro_date='';
+//        var vendor_cn='';
+//        var logedinuser='';
+//        //var pro_att='';
+//
+//
+//        var RtnResponse = {
+//            IsSent: false
+//        };
+//        //if (toMailID != null) {
+//
+//        if (Token && TemplateID ) {
+//            st.validateToken(Token, function (err, tokenResult) {
+//                if (!err) {
+//                    if (tokenResult) {
+//                        //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
+//                        //var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
+//                        //console.log(GetResult[0]
+//                        var procParams = st.db.escape(Token);
+//                        var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
+//                        st.db.query(procQuery, function (err, MailerDetailsResult) {
+//                            if (!err) {
+//                                console.log(MailerDetailsResult,"MailerDetailsResult");
+//                                if (MailerDetailsResult) {
+//                                    if (MailerDetailsResult.length > 0) {
+//                                        var output = MailerDetailsResult[0];
+//                                        name = output[0].Name;  //indivdual name business company name
+//                                        logedinuser = output[0].logedinuser;
+//                                        fromEmail = output[0].FromEmailId;
+//                                        console.log(fromEmail,"from");
+//                                    }
+//                                }
+//                            }
+//                        });
+//
+//                        st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
+//                            if (!err) {
+//                                if (vendordetails) {
+//                                    if (vendordetails.length > 0) {
+//                                        var output = vendordetails[0];
+//                                        pro_ref = output[0].pro_ref;
+//                                        pro_date = output[0].pro_date;
+//                                        vendor_cn= output[0].vendor_cn;
+//                                        toMailID=output[0].vendor_emailid;
+//                                        ccemailid=output[0].emailid;
+//                                        //pro_att=output[0].pro_doc;
+//                                        console.log(toMailID,"toMailID1");
+//                                    }
+//                                }
+//                            }
+//                        });
+//                        console.log(pro_att,"pro_att");
+//                        var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
+//                        st.db.query(templateQuery, function (err, TemplateResult) {
+//                            if (!err) {
+//                                if (TemplateResult) {
+//                                    if (TemplateResult.length > 0) {
+//                                        // console.log(TemplateResult);
+//                                        RtnResponse.IsSent = true;
+//                                        for (var i = 0; i < TemplateResult.length; i++) {
+//                                            var mailOptions = {
+//                                                replyto: fromEmail,
+//                                                to: toMailID,
+//                                                cc:ccemailid,
+//                                                subject: TemplateResult[0].Subject,
+//                                                html: TemplateResult[0].Body // html body
+//                                                //attachment: pro_att // html body
+//                                            };
+//                                            console.log(toMailID,"toMailID");
+//                                            mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
+//                                            mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
+//                                            mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
+//                                            mailOptions.html = mailOptions.html.replace("[ClientName]", name);
+//                                            mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
+//
+//console.log(mailOptions.to,"mailOptions.to");
+//                                            var email = new sendgrid.Email();
+//                                            email.from = mailOptions.replyto;
+//                                            email.to = mailOptions.to;
+//                                            email.cc=mailOptions.cc;
+//                                            email.subject = mailOptions.subject;
+//                                            email.html = mailOptions.html;
+//                                            //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
+//                                            email.addFile({
+//                                                filename: pro_att,
+//                                                url:  req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+ pro_att
+//                                        });
+//                                            //email.addFile({
+//                                            //    filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
+//                                            //    url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
+//                                            //});
+//
+//                                            console.log(email.files);
+//                                            console.log('send grid......');
+//                                            console.log(email.to,"email.to");
+//                                            sendgrid.send(email, function (err, result) {
+//                                                console.log(err);
+//                                                console.log(result,"result");
+//                                                if (!err) {
+//                                                    var post = {
+//                                                        MessageType: 9,
+//                                                        Priority: 5,
+//                                                        ToMailID: mailOptions.to,
+//                                                        Subject: mailOptions.subject,
+//                                                        Body: mailOptions.html,
+//                                                        Replyto: mailOptions.replyto,
+//                                                        SentStatus: 1
+//                                                    };
+//
+//                                                    console.log(post,"post");
+//                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+//                                                        // Neat!
+//                                                        if (!err) {
+//                                                            console.log(result);
+//                                                            console.log('FnSendBulkMailer: Mail saved Successfully');
+//
+//                                                            //CallBack(null, RtnMessage);
+//                                                        }
+//                                                        else {
+//                                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
+//                                                            // CallBack(null, null);
+//                                                        }
+//                                                    });
+//                                                }
+//                                                else {
+//                                                    console.log('FnSendBulkMailer: Mail not send Successfully');
+//                                                    // CallBack(null, null);
+//                                                }
+//                                            });
+//                                            //console.log('FnSendBulkMailer:Mail details sent for processing');
+//                                            //console.log(mailOptions);
+//                                        }
+//                                        res.send(RtnResponse);
+//
+//                                    }
+//                                    else {
+//                                        console.log('FnGetTemplateDetails:No Template Details found');
+//                                        res.json(null);
+//                                    }
+//                                }
+//                                else {
+//                                    console.log('FnGetTemplateDetails:No Template Details found');
+//                                    res.json(null);
+//                                }
+//                            }
+//                            else {
+//                                console.log('FnGetTemplateDetails:Error in getting template ' + err);
+//                                res.json(null);
+//                            }
+//                        });
+//                    }
+//                    else {
+//                        res.statusCode = 401;
+//                        res.json(null);
+//                        console.log('FnSendBulkMailer: Invalid Token');
+//                    }
+//                } else {
+//                    res.statusCode = 500;
+//                    res.json(null);
+//                    console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+//                }
+//            });
+//        }
+//        else{
+//            if (!Token) {
+//                console.log('FnSendBulkMailer: Token is empty');
+//            }
+//            else if (!TID) {
+//                console.log('FnSendBulkMailer: TID is empty');
+//            }
+//            else if (!TemplateID) {
+//                console.log('FnSendBulkMailer: TemplateID is empty');
+//            }
+//        }
+//    }
+//    catch (ex) {
+//        console.log('FnSendBulkMailer error:' + ex.description);
+//        var errorDate = new Date();
+//        console.log(errorDate.toTimeString() + ' ......... error ...........');
+//    }
+//};
+
+>>>>>>> 458f759145527825104d5582664ed593ab52772d
 Procurement.prototype.sendPoMail = function(req,res,next){
     /**
      * @todo SendMailer
@@ -3515,7 +3351,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
         var pro_att = req.body.poAttachment;
         var vendor_id=req.body.vendor_id;
         var po_temp = req.body.po_template;
-
+        console.log(vendor_id,"vendor_id");
         var toMailID ='';
         var ccemailid = '';
         var name='';
@@ -3552,6 +3388,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                         fromEmail = output[0].FromEmailId;
                                         console.log(fromEmail,"from");
                                     }
+<<<<<<< HEAD
                                 }
                             }
                         });
@@ -3625,48 +3462,132 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                                         Replyto: mailOptions.replyto,
                                                         SentStatus: 1
                                                     };
+=======
 
-                                                    //console.log(post);
-                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                        // Neat!
+>>>>>>> 458f759145527825104d5582664ed593ab52772d
+
+                                    st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
+                                        if (!err) {
+                                            if (vendordetails) {
+                                                if (vendordetails.length > 0) {
+                                                    var output = vendordetails[0];
+                                                    pro_ref = output[0].pro_ref;
+                                                    pro_date = output[0].pro_date;
+                                                    vendor_cn= output[0].vendor_cn;
+                                                    toMailID=output[0].vendor_emailid;
+                                                    ccemailid=output[0].emailid;
+                                                    //pro_att=output[0].pro_doc;
+                                                    console.log(toMailID,"toMailID1");
+                                                    console.log(pro_att,"pro_att");
+                                                    var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
+                                                    st.db.query(templateQuery, function (err, TemplateResult) {
                                                         if (!err) {
-                                                            console.log(result);
-                                                            console.log('FnSendBulkMailer: Mail saved Successfully');
+                                                            if (TemplateResult) {
+                                                                if (TemplateResult.length > 0) {
+                                                                    // console.log(TemplateResult);
+                                                                    RtnResponse.IsSent = true;
+                                                                    for (var i = 0; i < TemplateResult.length; i++) {
+                                                                        var mailOptions = {
+                                                                            replyto: fromEmail,
+                                                                            to: toMailID,
+                                                                            cc:ccemailid,
+                                                                            subject: TemplateResult[0].Subject,
+                                                                            html: TemplateResult[0].Body // html body
+                                                                            //attachment: pro_att // html body
+                                                                        };
+                                                                        console.log(toMailID,"toMailID");
+                                                                        mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
+                                                                        mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
+                                                                        mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
+                                                                        mailOptions.html = mailOptions.html.replace("[ClientName]", name);
+                                                                        mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
 
-                                                            //CallBack(null, RtnMessage);
+                                                                        console.log(mailOptions.to,"mailOptions.to");
+                                                                        var email = new sendgrid.Email();
+                                                                        email.from = mailOptions.replyto;
+                                                                        email.to = mailOptions.to;
+                                                                        email.cc=mailOptions.cc;
+                                                                        email.subject = mailOptions.subject;
+                                                                        email.html = mailOptions.html;
+                                                                        //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
+                                                                        email.addFile({
+                                                                            filename: pro_att,
+                                                                            url:  req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+ pro_att
+                                                                        });
+                                                                        //email.addFile({
+                                                                        //    filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
+                                                                        //    url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
+                                                                        //});
+
+                                                                        console.log(email.files);
+                                                                        console.log('send grid......');
+                                                                        console.log(email.to,"email.to");
+                                                                        sendgrid.send(email, function (err, result) {
+                                                                            console.log(err);
+                                                                            console.log(result,"result");
+                                                                            if (!err) {
+                                                                                var post = {
+                                                                                    MessageType: 9,
+                                                                                    Priority: 5,
+                                                                                    ToMailID: mailOptions.to,
+                                                                                    Subject: mailOptions.subject,
+                                                                                    Body: mailOptions.html,
+                                                                                    Replyto: mailOptions.replyto,
+                                                                                    SentStatus: 1
+                                                                                };
+
+                                                                                console.log(post,"post");
+                                                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                                    // Neat!
+                                                                                    if (!err) {
+                                                                                        console.log(result);
+                                                                                        console.log('FnSendBulkMailer: Mail saved Successfully');
+
+                                                                                        //CallBack(null, RtnMessage);
+                                                                                    }
+                                                                                    else {
+                                                                                        console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                                                        // CallBack(null, null);
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                            else {
+                                                                                console.log('FnSendBulkMailer: Mail not send Successfully');
+                                                                                // CallBack(null, null);
+                                                                            }
+                                                                        });
+                                                                        //console.log('FnSendBulkMailer:Mail details sent for processing');
+                                                                        //console.log(mailOptions);
+                                                                    }
+                                                                    res.send(RtnResponse);
+
+                                                                }
+                                                                else {
+                                                                    console.log('FnGetTemplateDetails:No Template Details found');
+                                                                    res.json(null);
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log('FnGetTemplateDetails:No Template Details found');
+                                                                res.json(null);
+                                                            }
                                                         }
                                                         else {
-                                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
-                                                            // CallBack(null, null);
+                                                            console.log('FnGetTemplateDetails:Error in getting template ' + err);
+                                                            res.json(null);
                                                         }
                                                     });
-                                                }
-                                                else {
-                                                    console.log('FnSendBulkMailer: Mail not send Successfully');
-                                                    // CallBack(null, null);
-                                                }
-                                            });
-                                            //console.log('FnSendBulkMailer:Mail details sent for processing');
-                                            //console.log(mailOptions);
-                                        }
-                                        res.send(RtnResponse);
 
-                                    }
-                                    else {
-                                        console.log('FnGetTemplateDetails:No Template Details found');
-                                        res.json(null);
-                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+
                                 }
-                                else {
-                                    console.log('FnGetTemplateDetails:No Template Details found');
-                                    res.json(null);
-                                }
-                            }
-                            else {
-                                console.log('FnGetTemplateDetails:Error in getting template ' + err);
-                                res.json(null);
                             }
                         });
+
+
                     }
                     else {
                         res.statusCode = 401;
