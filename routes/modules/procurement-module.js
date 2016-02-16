@@ -242,22 +242,31 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                          * Mail merge one harcoded template and
                                                          * send mail to the list of vendors passed to this function
                                                          */
-
+                                                        var email     = new sendgrid.Email({
+                                                            to:       'jain31192@gmail.com',
+                                                            from:     'jain31192@gmail.com',
+                                                            subject:  'Subject goes here',
+                                                            text:     'Hello world'
+                                                        });
+                                                        sendgrid.send(email, function(err, json) {
+                                                            if (err) { return console.error(err); }
+                                                            console.log(json);
+                                                        });
                                                         areMailSentToVendors = true;
-                                                        if(areSalesEnquirySentToVendors && areMailSentToVendors){
-                                                            sendResponse(200,{
-                                                                status : true,
-                                                                message : "",
-                                                                data : {
-                                                                    mail_count  : mailSentCount,
-                                                                    already_submitted : alreadySubmitted,
-                                                                    not_verified : notVerfied,
-                                                                    submitted : submitted
-                                                                },
-                                                                error : null
-                                                            });
-
-                                                        }
+                                                        //if(areSalesEnquirySentToVendors && areMailSentToVendors){
+                                                        //    sendResponse(200,{
+                                                        //        status : true,
+                                                        //        message : "",
+                                                        //        data : {
+                                                        //            mail_count  : mailSentCount,
+                                                        //            already_submitted : alreadySubmitted,
+                                                        //            not_verified : notVerfied,
+                                                        //            submitted : submitted
+                                                        //        },
+                                                        //        error : null
+                                                        //    });
+                                                        //
+                                                        //}
                                                     };
 
                                                     var saveEnqArrayFn = function(vendorArray){
@@ -3168,6 +3177,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                         var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
                         st.db.query(procQuery, function (err, MailerDetailsResult) {
                             if (!err) {
+                                console.log(MailerDetailsResult,"MailerDetailsResult");
                                 if (MailerDetailsResult) {
                                     if (MailerDetailsResult.length > 0) {
                                         var output = MailerDetailsResult[0];
@@ -3209,8 +3219,8 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                                 to: toMailID,
                                                 cc:ccemailid,
                                                 subject: TemplateResult[0].Subject,
-                                                html: TemplateResult[0].Body, // html body
-                                                attachment: pro_att // html body
+                                                html: TemplateResult[0].Body // html body
+                                                //attachment: pro_att // html body
                                             };
                                             mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
                                             mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
@@ -3237,7 +3247,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
 
                                             console.log(email.files);
                                             console.log('send grid......');
-console.log(email.to,"email.to");
+                                            console.log(email.to,"email.to");
                                             sendgrid.send(email, function (err, result) {
                                                 console.log(err);
                                                 console.log(result,"result");
