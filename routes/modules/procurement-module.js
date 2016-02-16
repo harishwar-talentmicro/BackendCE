@@ -167,54 +167,54 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                         console.log('psend_Procurement_enquiry : ',salesEnqComQuery);
                                                         if(salesEnqComQuery){
                                                             st.db.query(salesEnqComQuery,function(err,saveEnqResult){
-                                                               if(!err){
-                                                                   areSalesEnquirySentToVendors = true;
+                                                                if(!err){
+                                                                    areSalesEnquirySentToVendors = true;
 
 
-                                                                   if(saveEnqResult){
-                                                                       //console.log(saveEnqResult.length/2,"messaget");
-                                                                       //console.log(saveEnqResult[0][0].msg,"messagecount");
-                                                                       for(var i=0; i < saveEnqResult.length/2; i++) {
-                                                                           var count = (i) ? 2 * i : 0;
-                                                                           if(saveEnqResult[count][0].msg=="already submitted"){
-                                                                               console.log();
-                                                                               alreadySubmitted = alreadySubmitted+1;
-                                                                           }
-                                                                           else if(saveEnqResult[count][0].msg=="not verified"){
-                                                                               notVerfied = notVerfied+1;
-                                                                           }
-                                                                           else if(saveEnqResult[count][0].msg=="submitted"){
-                                                                               submitted = submitted+1;
-                                                                           }
-                                                                       }
+                                                                    if(saveEnqResult){
+                                                                        //console.log(saveEnqResult.length/2,"messaget");
+                                                                        //console.log(saveEnqResult[0][0].msg,"messagecount");
+                                                                        for(var i=0; i < saveEnqResult.length/2; i++) {
+                                                                            var count = (i) ? 2 * i : 0;
+                                                                            if(saveEnqResult[count][0].msg=="already submitted"){
+                                                                                console.log();
+                                                                                alreadySubmitted = alreadySubmitted+1;
+                                                                            }
+                                                                            else if(saveEnqResult[count][0].msg=="not verified"){
+                                                                                notVerfied = notVerfied+1;
+                                                                            }
+                                                                            else if(saveEnqResult[count][0].msg=="submitted"){
+                                                                                submitted = submitted+1;
+                                                                            }
+                                                                        }
 
-                                                                   }
-                                                                   if(areSalesEnquirySentToVendors && areMailSentToVendors){
-                                                                       sendResponse(200,{
-                                                                           status : true,
-                                                                           message : "",
-                                                                           data : {
-                                                                               mail_count  : mailSentCount,
-                                                                               already_submitted : alreadySubmitted,
-                                                                               not_verified : notVerfied,
-                                                                               submitted : submitted
-                                                                           },
-                                                                           error : null
-                                                                       });
+                                                                    }
+                                                                    if(areSalesEnquirySentToVendors && areMailSentToVendors){
+                                                                        sendResponse(200,{
+                                                                            status : true,
+                                                                            message : "",
+                                                                            data : {
+                                                                                mail_count  : mailSentCount,
+                                                                                already_submitted : alreadySubmitted,
+                                                                                not_verified : notVerfied,
+                                                                                submitted : submitted
+                                                                            },
+                                                                            error : null
+                                                                        });
 
-                                                                   }
-                                                               }
-                                                               else{
-                                                                   console.log('Error in procedure : psend_Procurement_enquiry');
-                                                                   sendResponse(500,{
-                                                                       status : false,
-                                                                       message : "Internal Server Error",
-                                                                       data : null,
-                                                                       error : {
-                                                                           server : "Internal Server Error"
-                                                                       }
-                                                                   });
-                                                               }
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    console.log('Error in procedure : psend_Procurement_enquiry');
+                                                                    sendResponse(500,{
+                                                                        status : false,
+                                                                        message : "Internal Server Error",
+                                                                        data : null,
+                                                                        error : {
+                                                                            server : "Internal Server Error"
+                                                                        }
+                                                                    });
+                                                                }
                                                             });
                                                         }
                                                         else{
@@ -246,6 +246,23 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                          * Mail merge one harcoded template and
                                                          * send mail to the list of vendors passed to this function
                                                          */
+<<<<<<< HEAD
+=======
+                                                        console.log(vendorEmailList,"vendorEmailList");
+                                                        for(var i=0;i < vendorEmailList.length;i++){
+                                                            console.log(vendorEmailList[i],"vendorEmailList");
+                                                            var email     = new sendgrid.Email({
+                                                                to:       vendorEmailList[i],
+                                                                from:     'jain31192.bj@gmail.com',
+                                                                subject:  'Subject goes here',
+                                                                text:     'Hello world'
+                                                            });
+                                                            sendgrid.send(email, function(err, json) {
+                                                                if (err) { return console.error(err); }
+                                                                console.log(json);
+                                                            });
+                                                        }
+>>>>>>> cfe1b13ebaa998c35f0d59c3ad16e0cddfad91f4
 
                                                         //var mailTemplateString = '<p>Dear [Name]<br/></p><p>We have following requirement [RequirementDescription] <br/></p><p><br/></p><p><b><u></u></b></p><p>Please submit your compitative proposal as earliest below</p><p><br/></p><p><br/></p><p></p><p>For [LoggedInName]</p><div>       [<span style=\"color: rgb(51, 51, 51);float: none;background-color: rgb(255, 255, 255);\">[email]</span><br/>       [mobile]<p><br/></p></div>';
 
@@ -574,24 +591,21 @@ Procurement.prototype.procurementSaveVendors = function(req,res,next){
         res.status(400).json(responseMessage);
         console.log(responseMessage);
     }
-  /** if (!validator.isLength((req.body.a1), 3,50)) {
+    /** if (!validator.isLength((req.body.a1), 3,50)) {
         error.a1 = 'Address should be atleast 3 characters';
         validationFlag *= false;
     }
-    if (!req.body.c){
+     if (!req.body.c){
         error.c = 'City name Invalid';
         validationFlag *= false;
-
     }
-    if (!req.body.s){
+     if (!req.body.s){
         error.s = 'State name Invalid';
         validationFlag *= false;
-
     }
-    if (!req.body.cn){
+     if (!req.body.cn){
         error.s = 'Country name Invalid';
         validationFlag *= false;
-
     }*/
     else {
         try {
@@ -603,7 +617,7 @@ Procurement.prototype.procurementSaveVendors = function(req,res,next){
                             + ',' + st.db.escape(req.body.a1)+ ',' + st.db.escape(req.body.a2)+ ',' + st.db.escape(req.body.c)
                             + ',' + st.db.escape(req.body.s)+ ',' + st.db.escape(req.body.ci)+ ',' + st.db.escape(req.body.pc)
                             + ',' + st.db.escape(req.body.ce)+ ',' + st.db.escape(req.body.pn)+ ',' + st.db.escape(req.body.rt)
-                                + ',' + st.db.escape(req.body.id);
+                            + ',' + st.db.escape(req.body.id);
                         var procQuery = 'CALL psave_vendors(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -2326,113 +2340,113 @@ Procurement.prototype.procurementLoadTransDetails = function(req,res,next){
         message: '',
         data: null
     };
-            var validationFlag = true;
-            var error = {};
-            if (!req.query.token) {
-                error.token = 'Invalid token';
-                validationFlag *= false;
-            }
-            if (isNaN(vId) || (vId <= 0)) {
-                error.vendor_id = 'Invalid vendor id';
-                validationFlag *= false;
-            }
-            if (!validationFlag) {
-                responseMessage.error = error;
-                responseMessage.message = 'Please check the errors';
-                res.status(400).json(responseMessage);
-                console.log(responseMessage);
+    var validationFlag = true;
+    var error = {};
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(vId) || (vId <= 0)) {
+        error.vendor_id = 'Invalid vendor id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
 
-            }
-            else {
-                try {
-                    st.validateToken(req.query.token, function (err, tokenResult) {
-                        if (!err) {
-                            if (tokenResult) {
-                                var procParams = st.db.escape(vId)+ ',' + st.db.escape(req.query.token);
-                                var procQuery = 'CALL pload_purchasetrans_details(' + procParams + ')';
-                                console.log(procQuery);
-                                st.db.query(procQuery, function (err, results) {
-                                    if (!err) {
-                                        console.log(results);
-                                        if (results) {
-                                            if (results[0]) {
-                                                if (results[0].length > 0) {
-                                                    responseMessage.status = true;
-                                                    responseMessage.error = null;
-                                                    responseMessage.message = 'Purchase transaction details loaded successfully';
-                                                    responseMessage.data = results[0];
-                                                    res.status(200).json(responseMessage);
-                                                }
-                                                else {
-                                                    responseMessage.status = true;
-                                                    responseMessage.error = null;
-                                                    responseMessage.message = 'Purchase transaction details are not available';
-                                                    responseMessage.data = null;
-                                                    res.status(200).json(responseMessage);
-                                                }
-                                            }
-                                            else {
-                                                responseMessage.status = true;
-                                                responseMessage.error = null;
-                                                responseMessage.message = 'Purchase transaction details are not available';
-                                                responseMessage.data = null;
-                                                res.status(200).json(responseMessage);
-                                            }
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(vId)+ ',' + st.db.escape(req.query.token);
+                        var procQuery = 'CALL pload_purchasetrans_details(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Purchase transaction details loaded successfully';
+                                            responseMessage.data = results[0];
+                                            res.status(200).json(responseMessage);
                                         }
                                         else {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
-                                            responseMessage.message = 'Purchase transaction details  are not available';
+                                            responseMessage.message = 'Purchase transaction details are not available';
                                             responseMessage.data = null;
                                             res.status(200).json(responseMessage);
                                         }
                                     }
                                     else {
-                                        responseMessage.error = {
-                                            server: 'Internal Server Error'
-                                        };
-                                        responseMessage.message = 'An error occurred !';
-                                        res.status(500).json(responseMessage);
-                                        console.log('Error : pload_purchasetrans_details ', err);
-                                        var errorDate = new Date();
-                                        console.log(errorDate.toTimeString() + ' ......... error ...........');
-
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Purchase transaction details are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
                                     }
-                                });
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Purchase transaction details  are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
                             }
                             else {
-                                responseMessage.message = 'Invalid token';
                                 responseMessage.error = {
-                                    token: 'invalid token'
+                                    server: 'Internal Server Error'
                                 };
-                                responseMessage.data = null;
-                                res.status(401).json(responseMessage);
-                                console.log('procurementLoadTransDetails: Invalid token');
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pload_purchasetrans_details ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
                             }
-                        }
-                        else {
-                            responseMessage.error = {
-                                server: 'Internal Server Error'
-                            };
-                            responseMessage.message = 'An error occurred !';
-                            res.status(500).json(responseMessage);
-                            console.log('Error : procurementLoadTransDetails ', err);
-                            var errorDate = new Date();
-                            console.log(errorDate.toTimeString() + ' ......... error ...........');
-                        }
-                    });
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('procurementLoadTransDetails: Invalid token');
+                    }
                 }
-                catch (ex) {
+                else {
                     responseMessage.error = {
                         server: 'Internal Server Error'
                     };
                     responseMessage.message = 'An error occurred !';
                     res.status(500).json(responseMessage);
-                    console.log('Error procurementLoadTransDetails :  ', ex);
+                    console.log('Error : procurementLoadTransDetails ', err);
                     var errorDate = new Date();
                     console.log(errorDate.toTimeString() + ' ......... error ...........');
                 }
-            }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error procurementLoadTransDetails :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
 
 };
 
@@ -2739,172 +2753,172 @@ Procurement.prototype.sendPoDFFMail = function(req,res,next){
         };
         //if (toMailID != null) {
 
-            if (Token && TemplateID ) {
-                st.validateToken(Token, function (err, tokenResult) {
-                    if (!err) {
-                        if (tokenResult) {
-                            //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
-                            //var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
-                                        //console.log(GetResult[0]
-                            var procParams = st.db.escape(Token);
-                            var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
-                            console.log(procQuery);
-                            st.db.query(procQuery, function (err, MailerDetailsResult) {
-                                //console.log(MailerDetailsResult,"MailerDetailsResult");
-                                if (!err) {
-                                    console.log(MailerDetailsResult,"MailerDetailsResult");
-                                    if (MailerDetailsResult) {
-                                        if (MailerDetailsResult.length > 0) {
-                                            var output = MailerDetailsResult[0];
-                                            name = output[0].Name;  //indivdual name business company name
-                                            logedinuser = output[0].logedinuser;
-                                            fromEmail = output[0].FromEmailId;
-                                            console.log(fromEmail,"from");
-                                        }
+        if (Token && TemplateID ) {
+            st.validateToken(Token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
+                        //var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
+                        //console.log(GetResult[0]
+                        var procParams = st.db.escape(Token);
+                        var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, MailerDetailsResult) {
+                            //console.log(MailerDetailsResult,"MailerDetailsResult");
+                            if (!err) {
+                                console.log(MailerDetailsResult,"MailerDetailsResult");
+                                if (MailerDetailsResult) {
+                                    if (MailerDetailsResult.length > 0) {
+                                        var output = MailerDetailsResult[0];
+                                        name = output[0].Name;  //indivdual name business company name
+                                        logedinuser = output[0].logedinuser;
+                                        fromEmail = output[0].FromEmailId;
+                                        console.log(fromEmail,"from");
                                     }
                                 }
-                            });
+                            }
+                        });
 
-                            st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
-                                console.log(vendordetails,"vendordetails");
-                                if (!err) {
-                                    if (vendordetails) {
-                                        if (vendordetails.length > 0) {
-                                            var output = vendordetails[0];
-                                            pro_ref = output[0].pro_ref;
-                                            pro_date = output[0].pro_date;
-                                            vendor_cn= output[0].vendor_cn;
-                                            toMailID=output[0].vendor_emailid;
-                                            ccemailid=output[0].emailid;
-                                            pro_att=output[0].pro_doc;
-                                        }
+                        st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
+                            console.log(vendordetails,"vendordetails");
+                            if (!err) {
+                                if (vendordetails) {
+                                    if (vendordetails.length > 0) {
+                                        var output = vendordetails[0];
+                                        pro_ref = output[0].pro_ref;
+                                        pro_date = output[0].pro_date;
+                                        vendor_cn= output[0].vendor_cn;
+                                        toMailID=output[0].vendor_emailid;
+                                        ccemailid=output[0].emailid;
+                                        pro_att=output[0].pro_doc;
                                     }
                                 }
-                            });
-                            console.log(pro_att,"pro_att");
-                            fs.readFile(pro_att , function(err, data_proposal) {
-                                //data_prop = data_proposal;
-                                console.log(data_proposal,"proposal");
+                            }
+                        });
+                        console.log(pro_att,"pro_att");
+                        fs.readFile(pro_att , function(err, data_proposal) {
+                            //data_prop = data_proposal;
+                            console.log(data_proposal,"proposal");
 
-                            });
+                        });
 
 
-                                            var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
-                                            st.db.query(templateQuery, function (err, TemplateResult) {
+                        var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
+                        st.db.query(templateQuery, function (err, TemplateResult) {
+                            if (!err) {
+                                if (TemplateResult) {
+                                    if (TemplateResult.length > 0) {
+                                        console.log(TemplateResult,"TemplateResult");
+                                        RtnResponse.IsSent = true;
+                                        for (var i = 0; i < TemplateResult.length; i++) {
+                                            var mailOptions = {
+                                                replyto: fromEmail,
+                                                to: toMailID,
+                                                cc:ccemailid,
+                                                subject: TemplateResult[0].Subject,
+                                                html: TemplateResult[0].Body, // html body
+                                                attachment: pro_att // html body
+
+                                            };
+                                            mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
+                                            mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
+                                            mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
+                                            mailOptions.html = mailOptions.html.replace("[ClientName]", name);
+                                            mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
+
+
+                                            var email = new sendgrid.Email();
+                                            email.from = mailOptions.replyto;
+                                            email.to = mailOptions.to;
+                                            email.cc=mailOptions.cc;
+                                            email.subject = mailOptions.subject;
+                                            email.html = mailOptions.html;
+                                            //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
+                                            email.addFile({
+                                                filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
+                                                url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
+                                            });
+                                            console.log(email.files);
+                                            console.log('send grid......');
+
+                                            sendgrid.send(email, function (err, result) {
+                                                console.log(err);
                                                 if (!err) {
-                                                    if (TemplateResult) {
-                                                        if (TemplateResult.length > 0) {
-                                                             console.log(TemplateResult,"TemplateResult");
-                                                            RtnResponse.IsSent = true;
-                                                            for (var i = 0; i < TemplateResult.length; i++) {
-                                                                    var mailOptions = {
-                                                                        replyto: fromEmail,
-                                                                        to: toMailID,
-                                                                        cc:ccemailid,
-                                                                        subject: TemplateResult[0].Subject,
-                                                                        html: TemplateResult[0].Body, // html body
-                                                                        attachment: pro_att // html body
+                                                    var post = {
+                                                        MessageType: 9,
+                                                        Priority: 5,
+                                                        ToMailID: mailOptions.to,
+                                                        Subject: mailOptions.subject,
+                                                        Body: mailOptions.html,
+                                                        Replyto: mailOptions.replyto,
+                                                        SentStatus: 1
+                                                    };
 
-                                                                    };
-                                                                    mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
-                                                                    mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
-                                                                    mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
-                                                                    mailOptions.html = mailOptions.html.replace("[ClientName]", name);
-                                                                    mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
+                                                    //console.log(post);
+                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                        // Neat!
+                                                        if (!err) {
+                                                            console.log(result);
+                                                            console.log('FnSendBulkMailer: Mail saved Successfully');
 
-
-                                                                    var email = new sendgrid.Email();
-                                                                    email.from = mailOptions.replyto;
-                                                                    email.to = mailOptions.to;
-                                                                    email.cc=mailOptions.cc;
-                                                                    email.subject = mailOptions.subject;
-                                                                    email.html = mailOptions.html;
-                                                                    //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
-                                                                email.addFile({
-                                                                    filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
-                                                                    url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
-                                                            });
-                                                                console.log(email.files);
-                                                                    console.log('send grid......');
-
-                                                                    sendgrid.send(email, function (err, result) {
-                                                                        console.log(err);
-                                                                        if (!err) {
-                                                                            var post = {
-                                                                                MessageType: 9,
-                                                                                Priority: 5,
-                                                                                ToMailID: mailOptions.to,
-                                                                                Subject: mailOptions.subject,
-                                                                                Body: mailOptions.html,
-                                                                                Replyto: mailOptions.replyto,
-                                                                                SentStatus: 1
-                                                                            };
-
-                                                                            //console.log(post);
-                                                                            var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                                                // Neat!
-                                                                                if (!err) {
-                                                                                    console.log(result);
-                                                                                    console.log('FnSendBulkMailer: Mail saved Successfully');
-
-                                                                                    //CallBack(null, RtnMessage);
-                                                                                }
-                                                                                else {
-                                                                                    console.log('FnSendBulkMailer: Mail not Saved Successfully');
-                                                                                    // CallBack(null, null);
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                        else {
-                                                                            console.log('FnSendBulkMailer: Mail not send Successfully');
-                                                                            // CallBack(null, null);
-                                                                        }
-                                                                    });
-                                                                    //console.log('FnSendBulkMailer:Mail details sent for processing');
-                                                                    //console.log(mailOptions);
-                                                            }
-                                                            res.send(RtnResponse);
-
+                                                            //CallBack(null, RtnMessage);
                                                         }
                                                         else {
-                                                            console.log('FnGetTemplateDetails:No Template Details found');
-                                                            res.json(null);
+                                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                            // CallBack(null, null);
                                                         }
-                                                    }
-                                                    else {
-                                                        console.log('FnGetTemplateDetails:No Template Details found');
-                                                        res.json(null);
-                                                    }
+                                                    });
                                                 }
                                                 else {
-                                                    console.log('FnGetTemplateDetails:Error in getting template ' + err);
-                                                    res.json(null);
+                                                    console.log('FnSendBulkMailer: Mail not send Successfully');
+                                                    // CallBack(null, null);
                                                 }
                                             });
-                        }
-                        else {
-                            res.statusCode = 401;
-                            res.json(null);
-                            console.log('FnSendBulkMailer: Invalid Token');
-                        }
-                    } else {
-                        res.statusCode = 500;
-                        res.json(null);
-                        console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+                                            //console.log('FnSendBulkMailer:Mail details sent for processing');
+                                            //console.log(mailOptions);
+                                        }
+                                        res.send(RtnResponse);
+
+                                    }
+                                    else {
+                                        console.log('FnGetTemplateDetails:No Template Details found');
+                                        res.json(null);
+                                    }
+                                }
+                                else {
+                                    console.log('FnGetTemplateDetails:No Template Details found');
+                                    res.json(null);
+                                }
+                            }
+                            else {
+                                console.log('FnGetTemplateDetails:Error in getting template ' + err);
+                                res.json(null);
+                            }
+                        });
                     }
-                });
+                    else {
+                        res.statusCode = 401;
+                        res.json(null);
+                        console.log('FnSendBulkMailer: Invalid Token');
+                    }
+                } else {
+                    res.statusCode = 500;
+                    res.json(null);
+                    console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+                }
+            });
+        }
+        else{
+            if (!Token) {
+                console.log('FnSendBulkMailer: Token is empty');
             }
-            else{
-                if (!Token) {
-                    console.log('FnSendBulkMailer: Token is empty');
-                }
-                else if (!TID) {
-                    console.log('FnSendBulkMailer: TID is empty');
-                }
-                else if (!TemplateID) {
-                    console.log('FnSendBulkMailer: TemplateID is empty');
-                }
+            else if (!TID) {
+                console.log('FnSendBulkMailer: TID is empty');
             }
+            else if (!TemplateID) {
+                console.log('FnSendBulkMailer: TemplateID is empty');
+            }
+        }
 
     }
     catch (ex) {
@@ -3602,7 +3616,7 @@ Procurement.prototype.testPdf = function(req,res,next){
         size: 'A1',
         layout: 'portrait'
     });
-var po_temp = '<p> TO: 111  <span>2016-02-13 01:06:56</span><br/></p><p>vim pvt ltd<br/></p><p>19th C Cross,Stage 2, NS Palya, , BTM 2nd Stage,Bengaluru,Karnataka,India,560076<br/></p><p>Subject: Purchaser order with reference to your proposal number 44444 dated 2016-02-13 01:06:56<br/></p><p><br/></p><p>Dear abhi<br/></p><p>With reference to your proposal number 44444 dated 2016-02-13 01:06:56, we are pleased to place order for the same as per the following item details, terms and conditions.<br/></p><p><br/></p><p><b><u>Order Details</u></b><br/></p><p>Item details to be types or copied from Vendor Proposal.<br/></p><p><br/></p><p>For GS Group<br/></p><p><a href="https://www.ezeone.com/" target="">https://www.ezeone.com/</a><br/></p><p>Authorised Signatory<br/></p>';
+    var po_temp = '<p> TO: 111  <span>2016-02-13 01:06:56</span><br/></p><p>vim pvt ltd<br/></p><p>19th C Cross,Stage 2, NS Palya, , BTM 2nd Stage,Bengaluru,Karnataka,India,560076<br/></p><p>Subject: Purchaser order with reference to your proposal number 44444 dated 2016-02-13 01:06:56<br/></p><p><br/></p><p>Dear abhi<br/></p><p>With reference to your proposal number 44444 dated 2016-02-13 01:06:56, we are pleased to place order for the same as per the following item details, terms and conditions.<br/></p><p><br/></p><p><b><u>Order Details</u></b><br/></p><p>Item details to be types or copied from Vendor Proposal.<br/></p><p><br/></p><p>For GS Group<br/></p><p><a href="https://www.ezeone.com/" target="">https://www.ezeone.com/</a><br/></p><p>Authorised Signatory<br/></p>';
     var bufferData = new Buffer(po_temp,'utf8');
     console.log(bufferData);
     //var pdfdoc = doc.html(bufferData);

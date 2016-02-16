@@ -570,7 +570,7 @@ router.post('/proc_test_api',procurementModule.testPdf);
 
 
 router.get('/api_health',function(req,res){
-   res.status(200).json({status : true});
+    res.status(200).json({status : true});
 });
 
 router.get('/error_test',function(req,res,next){
@@ -594,5 +594,3 @@ router.all('*',function(req,res,next){
 });
 
 module.exports = router;
-
-
