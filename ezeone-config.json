@@ -91,6 +91,11 @@
         "file": "reset-password.html",
         "subject": "Forgot Password"
       },
+      "proposal_template" : {
+        "params" : ["Name","RequirementDescription","LoggedInName","email","mobile"],
+        "file" : "proposal_template.html",
+        "subject" : "Proposal Details"
+      },
       "default": {
         "params": ["HTML"],
         "file": "default.html",
