@@ -1571,7 +1571,6 @@ Procurement.prototype.procurementGetPurchaseTrans = function(req,res,next){
 
 };
 
-
 /**
  * @type : GET
  * @param req
@@ -1735,7 +1734,6 @@ Procurement.prototype.procurementGetPurchaseTransDetails = function(req,res,next
 
 };
 
-
 /**
  * @type : POST
  * @param req
@@ -1893,7 +1891,6 @@ Procurement.prototype.procurementSavePoTemplate = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @type : GET
@@ -2256,7 +2253,7 @@ Procurement.prototype.procurementSavePoDetails = function(req,res,next){
  * @param vendor_cn <text> vendor contact name
  * @param notes <text> notes
  */
-Procurement.prototype.procurementUpdateProposalDetails = function(req,res,next)     {
+Procurement.prototype.procurementUpdateProposalDetails = function(req,res,next){
     var vId = parseInt(req.body.vendor_id);
     var proDate = moment(req.body.pro_date,'YYYY-MM-DD HH:mm:ss').format("YYYY-MM-DD HH:mm:ss");
     var responseMessage = {
@@ -2363,7 +2360,6 @@ Procurement.prototype.procurementUpdateProposalDetails = function(req,res,next) 
     }
 
 }
-
 
 /**
  * @type : GET
@@ -2758,7 +2754,6 @@ Procurement.prototype.procurementLoadTransDetails = function(req,res,next){
             }
 
 };
-
 
 /**
  * @type : GET
@@ -3237,7 +3232,6 @@ Procurement.prototype.sendPoDFFMail = function(req,res,next){
     }
 };
 
-
 /**
  * @type : GET
  * @param req
@@ -3360,6 +3354,7 @@ Procurement.prototype.procurementGetAllEnq = function(req,res,next){
     }
 
 };
+
 /**
  * @type : GET
  * @param req
@@ -3505,7 +3500,6 @@ Procurement.prototype.procurementGetEnqDetails = function(req,res,next){
 
 };
 
-
 Procurement.prototype.sendPoMail = function(req,res,next){
     /**
      * @todo SendMailer
@@ -3549,6 +3543,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                         var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
                         st.db.query(procQuery, function (err, MailerDetailsResult) {
                             if (!err) {
+                                console.log(MailerDetailsResult,"MailerDetailsResult");
                                 if (MailerDetailsResult) {
                                     if (MailerDetailsResult.length > 0) {
                                         var output = MailerDetailsResult[0];
@@ -3560,7 +3555,6 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                 }
                             }
                         });
-
                         st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
                             if (!err) {
                                 if (vendordetails) {
@@ -3590,15 +3584,14 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                                 to: toMailID,
                                                 cc:ccemailid,
                                                 subject: TemplateResult[0].Subject,
-                                                html: TemplateResult[0].Body, // html body
-                                                attachment: pro_att // html body
+                                                html: TemplateResult[0].Body // html body
+                                                //attachment: pro_att // html body
                                             };
                                             mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
                                             mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
                                             mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
                                             mailOptions.html = mailOptions.html.replace("[ClientName]", name);
                                             mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
-
 
                                             var email = new sendgrid.Email();
                                             email.from = mailOptions.replyto;
@@ -3607,18 +3600,18 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                             email.subject = mailOptions.subject;
                                             email.html = mailOptions.html;
                                             //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
-                                        //    email.addFile({
-                                        //        filename: pro_att,
-                                        //        url:  req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+ pro_att
-                                        //});
                                             email.addFile({
-                                                filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
-                                                url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
+                                                filename: pro_att,
+                                                url:  req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+ pro_att
                                             });
+                                            //email.addFile({
+                                            //    filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
+                                            //    url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
+                                            //});
 
                                             console.log(email.files);
                                             console.log('send grid......');
-console.log(email.to,"email.to");
+                                            console.log(email.to,"email.to");
                                             sendgrid.send(email, function (err, result) {
                                                 console.log(err);
                                                 console.log(result,"result");
