@@ -451,7 +451,8 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                             + "," + st.db.escape(companyName)+ "," + st.db.escape(company_id) + "," + st.db.escape(attachment)
                             + "," + st.db.escape(proabilities)+ "," + st.db.escape(attachment_name) + "," + st.db.escape(mime_type)
                             + "," + st.db.escape(alarmDuration)+ "," + st.db.escape(targetDate) + "," + st.db.escape(amount)
-                            + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId) + ', ' + st.db.escape(specializationId)
+                            + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)
+                            + ', ' + st.db.escape(specializationId)
                             + ', ' + st.db.escape(salaryType) + ', ' + st.db.escape(contactId);
                         //console.log(company_id);
                         //console.log('CALL psendsalesrequest(' + query + ')');
@@ -847,8 +848,8 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
 
                         if((!isNaN(parseInt(TID))) && parseInt(TID) && (!isNaN(parseInt(req.body.vendor_id))) && parseInt(req.body.vendor_id)){
                             var procurementParams = st.db.escape(Token)+ "," + st.db.escape(TID) + "," + st.db.escape(proRef)
-                                + "," + st.db.escape(proDate) + "," + st.db.escape(req.body.proAmount ) + "," + st.db.escape(req.body.proDoc)+ "," +
-                                st.db.escape(req.body.ve)+ "," + st.db.escape(req.body.vcn);
+                                + "," + st.db.escape(proDate) + "," + st.db.escape(proAmount ) + "," + st.db.escape(proDoc)+ "," +
+                                st.db.escape(ve)+ "," + st.db.escape(vcn);
 
                             procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
                         }
