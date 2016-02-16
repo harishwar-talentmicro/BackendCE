@@ -31,39 +31,59 @@ app.set('port', port);
  * Create HTTP server.
  */
 
-
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
-if (cluster.isMaster) {
-    for (var i = 0; i < numCPUs; i++) {
-        cluster.fork();
-    }
 
-    cluster.on('exit', function(worker, code, signal) {
-        console.log('worker ' + worker.process.pid + ' died');
-        log.error('worker ' + worker.process.pid + ' died')
-    });
+var cluster = require('cluster');
+
+var workers = process.env.WORKERS || require('os').cpus().length;
+
+if (cluster.isMaster) {
+
+  console.log('start cluster with %s workers', workers);
+
+  for (var i = 0; i < workers; ++i) {
+    var worker = cluster.fork().process;
+    console.log('worker %s started.', worker.pid);
+  }
+
+  cluster.on('exit', function(worker) {
+    console.log('worker %s died. restart...', worker.process.pid);
+    cluster.fork();
+  });
+
 } else {
 
-
-
-
-var server = http.createServer(app).listen(app.get('port'), function(){
+  var server = http.createServer(app).listen(app.get('port'), function(){
     console.log('EZEID Server is started successfully, and listening on port ' + app.get('port'));
+  })
+      .on('error', onError)
+      .on('listening', onListening);
+}
+
+process.on('uncaughtException', function (err) {
+  console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
+  console.error(err.stack)
+  process.exit(1)
 });
 
-//    var server = http.createServer(function(req,res){
-//        console.log('EZEID Server is started successfully, and listening on port ' + app.get('port'));
-//        res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-//        res.end();
+//if (cluster.isMaster) {
+//    for (var i = 0; i < numCPUs; i++) {
+//        cluster.fork();
+//    }
 //
-//    }).listen(app.get('port'));
-
-	//var sslserv = https.createServer(options, app).listen(443, function() { console.log('Running HTTPS on 443'); });
-
-    server.on('error', onError);
-    server.on('listening', onListening);
-}
+//    cluster.on('exit', function(worker, code, signal) {
+//        console.log('worker ' + worker.process.pid + ' died');
+//        log.error('worker ' + worker.process.pid + ' died')
+//    });
+//} else {
+//    var server = http.createServer(app).listen(app.get('port'), function(){
+//        console.log('EZEID Server is started successfully, and listening on port ' + app.get('port'));
+//    });
+//
+//    server.on('error', onError);
+//    server.on('listening', onListening);
+//}
 
 /**
  * Normalize a port into a number, string, or false.
@@ -95,8 +115,8 @@ function onError(error) {
   }
 
   var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port
+      ? 'Pipe ' + port
+      : 'Port ' + port
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -120,7 +140,7 @@ function onError(error) {
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
+      ? 'pipe ' + addr
+      : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }

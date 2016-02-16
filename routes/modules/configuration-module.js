@@ -681,7 +681,12 @@ Configuration.prototype.saveStatusType = function(req,res,next){
         var statusValue =req.body.StatusValue;
 
         var rtnMessage = {
-            IsSuccessfull: false
+            status : false,
+            message : "Internal Server error",
+            error : {
+                server : "Internal Server error"
+            },
+            data : null
         };
 
         if (token) {
@@ -693,29 +698,70 @@ Configuration.prototype.saveStatusType = function(req,res,next){
                             + ',' +st.db.escape(notificationMsg) + ',' +st.db.escape(notificationMailMsg)
                             + ',' + st.db.escape(statusValue);
                         var query = 'CALL pSaveStatusTypes(' + queryParams + ')';
+                        console.log(query);
                         st.db.query(query, function (err, result) {
                             if (!err) {
+                                console.log('result : ',result);
                                 if(result){
-                                    if(result.affectedRows > 0){
-                                        console.log('FnSaveStatusType: Status type saved successfully');
-                                        rtnMessage.IsSuccessfull = true;
-                                        res.send(rtnMessage);
+                                    if(result[0]){
+                                        if(result[0][0]){
+                                            if(result[0][0].id){
+                                                rtnMessage.status = true;
+                                                rtnMessage.message = "Status saved successfully";
+                                                rtnMessage.data = {
+                                                    TID : result[0][0].id,
+                                                    saved : true
+                                                }
+                                                rtnMessage.error = null;
+                                                res.status(200).json(rtnMessage);
+                                            }
+                                            else if(result[0][0].deleted == 0){
+                                                rtnMessage.status = true;
+                                                rtnMessage.message = "Stage is used in business manager ! Unable to delete";
+                                                rtnMessage.data = {
+                                                    TID : result[0][0].id,
+                                                    deleted : false
+                                                }
+                                                rtnMessage.error = {
+                                                    TID : "Stage cannot be deleted as it is currently in use"
+                                                };
+                                                res.status(200).json(rtnMessage);
+                                            }
+
+                                            else if(result[0][0].deleted == 1){
+                                                rtnMessage.status = true;
+                                                rtnMessage.message = "Stage deleted successfully";
+                                                rtnMessage.data = {
+                                                    TID : result[0][0].id,
+                                                    deleted : true
+                                                }
+                                                rtnMessage.error = null;
+                                                res.status(200).json(rtnMessage);
+                                            }
+                                            else{
+                                                console.log('FnSaveActionType: Stage Type    not saved');
+                                                res.status(200).json(rtnMessage);
+                                            }
+                                        }
+                                        else{
+                                            console.log('FnSaveActionType: Stage Type   not saved');
+                                            res.status(200).json(rtnMessage);
+                                        }
                                     }
-                                    else
-                                    {
-                                        console.log('FnSaveStatusType: Status type not saved');
-                                        res.send(rtnMessage);
+                                    else{
+                                        console.log('FnSaveActionType: Stage Type  not saved');
+                                        res.status(200).json(rtnMessage);
                                     }
                                 }
                                 else
                                 {
-                                    console.log('FnSaveStatusType: Status type  not saved');
-                                    res.send(rtnMessage);
+                                    console.log('FnSaveStatusType: Stage Type  not saved');
+                                    res.status(200).json(rtnMessage);
                                 }
                             }
                             else {
-                                console.log('FnSaveStatusType: error in saving Status type ' +err);
-                                res.send(rtnMessage);
+                                console.log('FnSaveStatusType: error in saving  Stage Type   ' +err);
+                                res.status(500).json(rtnMessage);
                             }
                         });
                     }
@@ -726,7 +772,7 @@ Configuration.prototype.saveStatusType = function(req,res,next){
                     }
                 }
                 else {
-                    console.log('FnSaveStatusType:Error in processing Token' + err);
+                    console.log('FnSaveStatusType: Error in processing Token' + err);
                     res.statusCode = 500;
                     res.send(rtnMessage);
 
@@ -734,17 +780,20 @@ Configuration.prototype.saveStatusType = function(req,res,next){
             });
         }
         else {
-            if (!token) {
-                console.log('FnSaveStatusType: Token is empty');
-            }
-            res.statusCode=400;
-            res.send(rtnMessage);
+            console.log('FnSaveStatusType: Invalid token');
+            rtnMessage.message = "Please login to continue";
+            rtnMessage.status = false;
+            rtnMessage.error = {
+                token : "Invalid token"
+            };
+            res.status(401).json(rtnMessage);
         }
     }
     catch (ex) {
         console.log('FnSaveStatusType:error ' + ex.description);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
+        res.status(500).json(rtnMessage);
     }
 };
 
@@ -858,38 +907,84 @@ Configuration.prototype.saveActionType = function(req,res,next){
         var status = req.body.Status;
 
         var rtnMessage = {
-            IsSuccessfull: false
+            status : false,
+            message : "Internal Server error",
+            error : {
+                server : "Internal Server error"
+            },
+            data : null
         };
 
         if (token) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var query = st.db.escape(token) + ',' + st.db.escape(tid) + ',' + st.db.escape(ft)
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(tid) + ',' + st.db.escape(ft)
                             + ',' + st.db.escape(actionTitle)+ ',' +st.db.escape(status);
-                        st.db.query('CALL pSaveActionTypes(' + query + ')', function (err, result) {
+                        var query = "CALL pSaveActionTypes("+ queryParams + ")";
+                        st.db.query(query, function (err, result) {
                             if (!err) {
+                                console.log('result : ',result);
                                 if(result){
-                                    if(result.affectedRows > 0){
-                                        console.log('FnSaveActionType: Action types saved successfully');
-                                        rtnMessage.IsSuccessfull = true;
-                                        res.send(rtnMessage);
+                                    if(result[0]){
+                                        if(result[0][0]){
+                                            if(result[0][0].id){
+                                                rtnMessage.status = true;
+                                                rtnMessage.message = "Task type saved successfully";
+                                                rtnMessage.data = {
+                                                    TID : result[0][0].id,
+                                                    saved : true
+                                                }
+                                                rtnMessage.error = null;
+                                                res.status(200).json(rtnMessage);
+                                            }
+                                            else if(result[0][0].deleted == 0){
+                                                rtnMessage.status = true;
+                                                rtnMessage.message = "Task type is currently used in task manager ! Unable to delete";
+                                                rtnMessage.data = {
+                                                    TID : result[0][0].id,
+                                                    deleted : false
+                                                }
+                                                rtnMessage.error = {
+                                                    TID : "Task type is currently used in task manager "
+                                                };
+                                                res.status(200).json(rtnMessage);
+                                            }
+
+                                            else if(result[0][0].deleted == 1){
+                                                rtnMessage.status = true;
+                                                rtnMessage.message = "Task type is currently used in task manager ";
+                                                rtnMessage.data = {
+                                                    TID : result[0][0].id,
+                                                    deleted : true
+                                                }
+                                                rtnMessage.error = null;
+                                                res.status(200).json(rtnMessage);
+                                            }
+                                            else{
+                                                console.log('FnSaveActionType: Action Type (Task Type) type  not saved');
+                                                res.status(200).json(rtnMessage);
+                                            }
+                                        }
+                                        else{
+                                            console.log('FnSaveActionType: Action Type (Task Type) type  not saved');
+                                            res.status(200).json(rtnMessage);
+                                        }
                                     }
-                                    else
-                                    {
-                                        console.log('FnSaveActionType:  Action types not saved');
-                                        res.send(rtnMessage);
+                                    else{
+                                        console.log('FnSaveActionType: Action Type (Task Type) type  not saved');
+                                        res.status(200).json(rtnMessage);
                                     }
                                 }
                                 else
                                 {
-                                    console.log('FnSaveActionType:  Action types not saved');
-                                    res.send(rtnMessage);
+                                    console.log('FnSaveActionType: Action Type (Task Type) type  not saved');
+                                    res.status(200).json(rtnMessage);
                                 }
                             }
                             else {
-                                console.log('FnSaveActionType: error in saving  Action types' +err);
-                                res.send(rtnMessage);
+                                console.log('FnSaveActionType: error in saving  Action Type (Task Type)  ' +err);
+                                res.status(500).json(rtnMessage);
                             }
                         });
                     }

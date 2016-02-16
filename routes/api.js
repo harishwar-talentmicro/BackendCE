@@ -145,6 +145,7 @@ router.get('/m/contact_details',businessManager.getContactDetails);
 router.get('/role',businessManager.getRoles);
 router.get('/m/sales_transaction',businessManager.getTransactionOfSales);
 router.post('/external_sales_request', businessManager.saveExternalsalesRequest);
+router.get('/m/sales_trans_details', businessManager.getSalesTransDetails);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');
@@ -541,11 +542,35 @@ router.post('/hris_hrm_doc',hrisHRMModule.hrisSaveHRMDoc);
 router.get('/hris_hrm_doc',hrisHRMModule.hrisGetHRMDoc);
 router.delete('/hris_hrm_compensation/:cid',hrisHRMModule.hrisDelHRMCompnstn);
 
-
+//procurement-module
+var Procurement = require('./modules/procurement-module.js');
+var procurementModule = new Procurement(db,stdLib);
+router.post('/procurement_submit_enquiry',procurementModule.procurementSubmitEnquiry);
+router.post('/procurement_save_vendors',procurementModule.procurementSaveVendors);
+router.get('/procurement_get_vendor',procurementModule.procurementGetVendors);
+router.delete('/procurement_del_vendor/:id',procurementModule.procurementDelVendor);
+router.get('/procurement_get_attachment',procurementModule.procurementGetEnqAttchment);
+router.delete('/procurement_del_enq_attachment/:id',procurementModule.procurementDelEnqAttachment);
+router.get('/procurement_purchase_trans_details',procurementModule.procurementGetPurchaseTransDetails);
+router.get('/procurement_get_purchase_trans',procurementModule.procurementGetPurchaseTrans);
+router.post('/procurement_save_potemplate',procurementModule.procurementSavePoTemplate);
+router.delete('/procurement_del_potemplate/:id',procurementModule.procurementDelPoTemplate);
+router.get('/procurement_get_potemplate',procurementModule.procurementGetPoTemplate);
+router.post('/procurement_po_details',procurementModule.procurementSavePoDetails);
+router.put('/procurement_proposal_details',procurementModule.procurementUpdateProposalDetails);
+router.get('/procurement_proposal_details',procurementModule.procurementGetProposalDetails);
+router.get('/procurement_vd_eze_details',procurementModule.procurementGetVdEzeDetails);
+router.get('/procurement_trans_details',procurementModule.procurementLoadTransDetails);
+router.get('/procurement_vendor_details',procurementModule.procurementGetVendorDetails);
+router.get('/procurement_po_details',procurementModule.procurementGetPoDetails);
+router.post('/procurement_send_mail',procurementModule.sendPoDFFMail);
+router.get('/proc_all_enq',procurementModule.procurementGetAllEnq);
+router.get('/proc_enq_details',procurementModule.procurementGetEnqDetails);
+router.post('/proc_test_api',procurementModule.testPdf);
 
 
 router.get('/api_health',function(req,res){
-   res.status(200).json({status : true});
+    res.status(200).json({status : true});
 });
 
 router.get('/error_test',function(req,res,next){
@@ -569,5 +594,3 @@ router.all('*',function(req,res,next){
 });
 
 module.exports = router;
-
-

@@ -193,33 +193,42 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
                     if (tokenResult) {
                         console.log(req.files);
                         if (req.files) {
-                            var deleteTempFile = function(){
-                                fs.unlink('../bin/'+req.files.pr.path);
-                                console.log("Image Path is deleted from server");
-                            };
-                            var readStream = fs.createReadStream(req.files.pr.path);
-                            var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : '');
-                            console.log(uniqueFileName);
-                            uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
-                                if (!err) {
-                                    responseMessage.status = true;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Image uploaded successfully';
-                                    responseMessage.data = {
-                                        pic: uniqueFileName
-                                    };
-                                    deleteTempFile();
-                                    res.status(200).json(responseMessage);
-                                }
-                                else {
-                                    responseMessage.status = false;
-                                    responseMessage.error = null;
-                                    responseMessage.message = 'Error in uploading image';
-                                    responseMessage.data = null;
-                                    deleteTempFile();
-                                    res.status(500).json(responseMessage);
-                                }
-                            });
+                            if(req.files){
+                                var deleteTempFile = function(){
+                                    fs.unlink('../bin/'+req.files.pr.path);
+                                    console.log("Image Path is deleted from server");
+                                };
+                                var readStream = fs.createReadStream(req.files.pr.path);
+                                var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : '');
+                                console.log(uniqueFileName);
+                                uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
+                                    if (!err) {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Image uploaded successfully';
+                                        responseMessage.data = {
+                                            pic: uniqueFileName
+                                        };
+                                        deleteTempFile();
+                                        res.status(200).json(responseMessage);
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in uploading image';
+                                        responseMessage.data = null;
+                                        deleteTempFile();
+                                        res.status(500).json(responseMessage);
+                                    }
+                                });
+                            }
+                            else{
+                                responseMessage.status = false;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Invalid input data';
+                                responseMessage.data = null;
+                                res.status(500).json(responseMessage);
+                            }
                         }
                         else{
                             responseMessage.status = false;
@@ -308,10 +317,14 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
         validationFlag *= false;
     }
     if(!req.body.einfn){
-        error.einfn = 'Invalid employee information';
-        validationFlag *= false;
+        //error.einfn = 'Invalid employee information';
+        //validationFlag *= false;
+        /**
+         * Non mandatory parameter
+         */
+        req.body.eifn = "";
     }
-    if (!validator.isLength((req.body.fn), 3, 45)) {
+    if (!validator.isLength(req.body.fn, 3, 45)) {
         error.fn = 'First Name can be maximum 45 characters';
         validationFlag *= false;
     }
@@ -406,7 +419,7 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
                                                 responseMessage.message = 'HRM added successfully';
                                                 responseMessage.data = {
                                                     id : results[0][0].id,
-                                                    pic : uniqueFileName
+                                                    pic : req.body.picpath
                                                 };
                                                 res.status(200).json(responseMessage);
                                             }
@@ -541,7 +554,7 @@ HrisHRM.prototype.hrisGetHRM = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM details loaded successfully';
-                                            responseMessage.data = results[0];
+                                            responseMessage.data = results[0][0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -804,14 +817,14 @@ HrisHRM.prototype.hrisGetHRMContactDtl = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM contact details loaded successfully';
-                                            responseMessage.data = results[0];
+                                            responseMessage.data = results[0][0];
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM contact details are not available';
-                                            responseMessage.data = null;
+                                            responseMessage.data = {};
                                             res.status(200).json(responseMessage);
                                         }
                                     }
@@ -919,6 +932,9 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
             error.t_id = 'Invalid template id';
             validationFlag *= false;
         }
+        if (isNaN(parseInt(req.body.compensation)) ) {
+            req.body.compensation = 0.00;
+        }
         if (!validationFlag) {
             responseMessage.error = error;
             responseMessage.message = 'Please check the errors';
@@ -932,7 +948,7 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
                     if (!err) {
                         if (tokenResult) {
                             var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.hrm_id) + ',' + st.db.escape(req.body.ed)
-                                + ',' + st.db.escape(req.body.t_id);
+                                + ',' + st.db.escape(req.body.t_id) +  ',' + st.db.escape(req.body.compensation);
                             var procQuery = 'CALL psave_hrmcompensation(' + procParams + ')';
                             console.log(procQuery);
                             st.db.query(procQuery, function (err, results) {
@@ -942,48 +958,51 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
                                         if (results[0]) {
                                             if (results[0][0]) {
                                                 if (results[0][0].id) {
+                                                    var comQuery = "";
+
                                                     for (var i = 0; i < e_sal.length; i++) {
-                                                        if (e_sal[i].header_id && e_sal[i].ctc) {
+                                                        if (e_sal[i].header_id && (!isNaN(parseFloat(e_sal[i].ctc)))) {
                                                             var procParams = st.db.escape(results[0][0].id) + ',' + st.db.escape(e_sal[i].header_id)
-                                                                + ',' + st.db.escape(e_sal[i].ctc) ;
-                                                            var procQuery = 'CALL psave_hrmcompensation_details(' + procParams + ')';
-                                                            console.log(procQuery);
-                                                            st.db.query(procQuery, function (err, resultsDetails) {
-                                                                if (!err) {
-                                                                    console.log(resultsDetails);
-                                                                    responseMessage.status = true;
-                                                                    responseMessage.error = null;
-                                                                    responseMessage.message = 'Employe salary details added successfully';
-                                                                    responseMessage.data = null;
-                                                                    res.status(200).json(responseMessage);
-                                                                }
-                                                                else {
-                                                                    responseMessage.error = {
-                                                                        server: 'Internal Server Error'
-                                                                    };
-                                                                    responseMessage.message = 'An error occurred !';
-                                                                    res.status(500).json(responseMessage);
-                                                                    console.log('Error : pget_hrmcompensation_details ', err);
-                                                                    var errorDate = new Date();
-                                                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                                                                }
-                                                            });
-                                                        }
-                                                        else{
-                                                            responseMessage.status = false;
-                                                            responseMessage.error = null;
-                                                            responseMessage.message = 'Invalid header id or ctc';
-                                                            responseMessage.data = null;
-                                                            res.status(400).json(responseMessage);
+                                                                + ',' + st.db.escape(e_sal[i].ctc);
+                                                            var procQuery = 'CALL psave_hrmcompensation_details(' + procParams + ');';
+                                                            comQuery += procQuery;
                                                         }
                                                     }
+
+                                                    console.log(comQuery);
+
+                                                    /**
+                                                     * @todo Problem here
+                                                     * It should be one single call only to the server and no care of async nature has been taken
+                                                     */
+                                                    st.db.query(comQuery, function (err, resultsDetails) {
+                                                        if (!err) {
+                                                            console.log(resultsDetails);
+                                                            responseMessage.status = true;
+                                                            responseMessage.error = null;
+                                                            responseMessage.message = 'Employe salary details added successfully';
+                                                            responseMessage.data = null;
+                                                            res.status(200).json(responseMessage);
+                                                        }
+                                                        else {
+                                                            responseMessage.error = {
+                                                                server: 'Internal Server Error'
+                                                            };
+                                                            responseMessage.message = 'An error occurred !';
+                                                            res.status(500).json(responseMessage);
+                                                            console.log('Error : pget_hrmcompensation_details ', err);
+                                                            var errorDate = new Date();
+                                                            console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                                        }
+                                                    });
+
                                                 }
-                                                else {
+                                                else{
                                                     responseMessage.status = false;
                                                     responseMessage.error = null;
-                                                    responseMessage.message = 'Error in adding employe salary details';
+                                                    responseMessage.message = 'Invalid header id or ctc';
                                                     responseMessage.data = null;
-                                                    res.status(200).json(responseMessage);
+                                                    res.status(400).json(responseMessage);
                                                 }
                                             }
                                             else {
@@ -1122,7 +1141,7 @@ HrisHRM.prototype.hrisGetHRMCompnstnDtl = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'compensation details are not available';
-                                            responseMessage.data = null;
+                                            responseMessage.data = [];
                                             res.status(200).json(responseMessage);
                                         }
                                     }
@@ -1573,7 +1592,7 @@ HrisHRM.prototype.hrisGetHRMLeaveAppli = function(req,res,next){
         validationFlag *= false;
     }
     if (req.query.page_size){
-        if (isNaN(req.body.page_size)) {
+        if (isNaN(req.query.page_size)) {
             error.page_size = 'Page size should be a number';
             validationFlag *= false;
         }
@@ -1613,7 +1632,8 @@ HrisHRM.prototype.hrisGetHRMLeaveAppli = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Leave applications details loaded successfully';
-                                            responseMessage.data = results;
+                                            responseMessage.data = results[1];
+                                            responseMessage.count = (results[0][0]) ? results[0][0].count : 0;
                                             res.status(200).json(responseMessage);
                                     }
                                     else {
@@ -1712,7 +1732,7 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
         validationFlag *= false;
     }
     if (req.query.page_size){
-        if (isNaN(req.body.page_size)) {
+        if (isNaN(req.query.page_size)) {
             error.page_size = 'Page size should be a number';
             validationFlag *= false;
         }
@@ -1752,7 +1772,8 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'compensation loaded successfully';
-                                        responseMessage.data = results;
+                                        responseMessage.data = (results[1]) ? results[1] : [];
+                                        responseMessage.count = (results[0][0]) ? results[0][0].count : 0;
                                         res.status(200).json(responseMessage);
                                     }
                                     else {
@@ -1760,6 +1781,7 @@ HrisHRM.prototype.hrisGetHRMCompnstn = function(req,res,next){
                                         responseMessage.error = null;
                                         responseMessage.message = 'Compensation is not available';
                                         responseMessage.data = null;
+                                        responseMessage.count = (results[0][0]) ? results[0][0].count : 0;
                                         res.status(200).json(responseMessage);
                                     }
                                 }
@@ -1845,9 +1867,8 @@ HrisHRM.prototype.hrisGetHRMEmpList = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if(!req.query.st){
-        error.st = 'Invalid status';
-        validationFlag *= false;
+    if(isNaN(parseInt(req.query.st)) || parseInt(req.query.st) < 1){
+        req.query.st = null;
     }
     if(!validationFlag){
         responseMessage.error = error;
@@ -1874,6 +1895,7 @@ HrisHRM.prototype.hrisGetHRMEmpList = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'HRM Employe list loaded successfully';
                                             responseMessage.data = results[0];
+                                            responseMessage.g_url = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET;
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
@@ -2133,7 +2155,7 @@ HrisHRM.prototype.hrisGetHRMDoc = function(req,res,next){
         validationFlag *= false;
     }
     if (req.query.page_size){
-        if (isNaN(req.body.page_size)) {
+        if (isNaN(req.query.page_size)) {
             error.page_size = 'Page size should be a number';
             validationFlag *= false;
         }

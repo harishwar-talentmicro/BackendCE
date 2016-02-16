@@ -3287,7 +3287,11 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
                                                         reldata.nadate = transResult[1][i].nadate,
                                                         reldata.Proabilities = transResult[1][i].Proabilities,
                                                         reldata.nid = transResult[1][i].nid,
-                                                        reldata.td = transResult[1][i].td
+                                                        reldata.td = transResult[1][i].td,
+                                                        reldata.da = transResult[1][i].da,
+                                                        reldata.amount = transResult[1][i].Amount,
+                                                        reldata.folderTitle = transResult[1][i].FolderTitle,
+
                                                     output.push(reldata);
                                                 }
 
@@ -3497,6 +3501,132 @@ BusinessManager.prototype.saveExternalsalesRequest = function(req,res,next){
 };
 
 
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get sales transaction details
+ * @param token <string> token of login user
+ * @param id <int> tid of sales
+ *
+ */
+BusinessManager.prototype.getSalesTransDetails = function(req,res,next){
+    var id = parseInt(req.query.id);
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(id) || (id <= 0)){
+        error.id = 'Invalid id of Sales';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(id);
+                        var procQuery = 'CALL pMGetSalesTransaction_details(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Sales Transacrion details loaded successfully';
+                                            responseMessage.data = results[0];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Sales Transacrion details are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Sales Transacrion details are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Sales Transacrion details  are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pMGetSalesTransaction_details ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('getSalesTransDetails: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : getSalesTransDetails ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error getSalesTransDetails :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
 
 
 module.exports = BusinessManager;
