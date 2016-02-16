@@ -2051,6 +2051,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var dob = (req.body.DOB) ? (req.body.DOB) : null;
     var cn = (req.body.cn) ? (req.body.cn) : '';
     var jt = (req.body.jt) ? (req.body.jt) : '';
+    var bg = parseInt(req.body.bg) ? parseInt(req.body.bg) : 0;
     var responseMessage = {
         status: false,
         error: {},
@@ -2101,7 +2102,8 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                             + ',' + st.db.escape(education) + ',' + st.db.escape(specialization) + ',' + st.db.escape(batch)
                             + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype)+ ',' + st.db.escape(fn)
                             + ',' + st.db.escape(ln)+ ',' + st.db.escape(email)+ ',' + st.db.escape(mn)
-                            + ',' + st.db.escape(gender)+ ',' + st.db.escape(dob)+ ',' + st.db.escape(cn)+ ',' + st.db.escape(jt);
+                            + ',' + st.db.escape(gender)+ ',' + st.db.escape(dob)+ ',' + st.db.escape(cn)+ ',' + st.db.escape(jt)
+                            + ',' + st.db.escape(bg);
 
                         var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
                         console.log(query);
@@ -2134,7 +2136,8 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                                         gender: req.body.gender,
                                         dob: req.body.DOB,
                                         cn: req.body.cn,
-                                        jt: req.body.jt
+                                        jt: req.body.jt,
+                                        bg: req.body.bg
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveAlumniProfile: Alumni Profile saved successfully');
