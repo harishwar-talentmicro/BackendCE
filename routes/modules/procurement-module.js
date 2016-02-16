@@ -3129,8 +3129,7 @@ Procurement.prototype.procurementGetEnqDetails = function(req,res,next){
 
 };
 
-<<<<<<< HEAD
-=======
+
 
 //Procurement.prototype.sendPoMail = function(req,res,next){
 //    /**
@@ -3335,7 +3334,6 @@ Procurement.prototype.procurementGetEnqDetails = function(req,res,next){
 //    }
 //};
 
->>>>>>> 458f759145527825104d5582664ed593ab52772d
 Procurement.prototype.sendPoMail = function(req,res,next){
     /**
      * @todo SendMailer
@@ -3388,83 +3386,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                         fromEmail = output[0].FromEmailId;
                                         console.log(fromEmail,"from");
                                     }
-<<<<<<< HEAD
-                                }
-                            }
-                        });
-                        st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
-                            if (!err) {
-                                if (vendordetails) {
-                                    if (vendordetails.length > 0) {
-                                        var output = vendordetails[0];
-                                        pro_ref = output[0].pro_ref;
-                                        pro_date = output[0].pro_date;
-                                        vendor_cn= output[0].vendor_cn;
-                                        toMailID=output[0].vendor_emailid;
-                                        ccemailid=output[0].emailid;
-                                        //pro_att=output[0].pro_doc;
-                                    }
-                                }
-                            }
-                        });
-                        console.log(pro_att,"pro_att");
-                        var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
-                        st.db.query(templateQuery, function (err, TemplateResult) {
-                            if (!err) {
-                                if (TemplateResult) {
-                                    if (TemplateResult.length > 0) {
-                                        // console.log(TemplateResult);
-                                        RtnResponse.IsSent = true;
-                                        for (var i = 0; i < TemplateResult.length; i++) {
-                                            var mailOptions = {
-                                                replyto: fromEmail,
-                                                to: toMailID,
-                                                cc:ccemailid,
-                                                subject: TemplateResult[0].Subject,
-                                                html: TemplateResult[0].Body // html body
-                                                //attachment: pro_att // html body
-                                            };
-                                            mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
-                                            mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
-                                            mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
-                                            mailOptions.html = mailOptions.html.replace("[ClientName]", name);
-                                            mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
 
-                                            var email = new sendgrid.Email();
-                                            email.from = mailOptions.replyto;
-                                            email.to = mailOptions.to;
-                                            email.cc=mailOptions.cc;
-                                            email.subject = mailOptions.subject;
-                                            email.html = mailOptions.html;
-                                            //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
-                                            email.addFile({
-                                                filename: pro_att,
-                                                url:  req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+ pro_att
-                                            });
-                                            //email.addFile({
-                                            //    filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
-                                            //    url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
-                                            //});
-
-                                            console.log(email.files);
-                                            console.log('send grid......');
-                                            console.log(email.to,"email.to");
-                                            sendgrid.send(email, function (err, result) {
-                                                console.log(err);
-                                                console.log(result,"result");
-                                                if (!err) {
-                                                    var post = {
-                                                        MessageType: 9,
-                                                        Priority: 5,
-                                                        ToMailID: mailOptions.to,
-                                                        Subject: mailOptions.subject,
-                                                        Body: mailOptions.html,
-                                                        Replyto: mailOptions.replyto,
-                                                        SentStatus: 1
-                                                    };
-=======
-
->>>>>>> 458f759145527825104d5582664ed593ab52772d
 
                                     st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
                                         if (!err) {
@@ -3628,7 +3550,7 @@ Procurement.prototype.testPdf = function(req,res,next){
         size: 'A1',
         layout: 'portrait'
     });
-var po_temp = '<p> TO: 111  <span>2016-02-13 01:06:56</span><br/></p><p>vim pvt ltd<br/></p><p>19th C Cross,Stage 2, NS Palya, , BTM 2nd Stage,Bengaluru,Karnataka,India,560076<br/></p><p>Subject: Purchaser order with reference to your proposal number 44444 dated 2016-02-13 01:06:56<br/></p><p><br/></p><p>Dear abhi<br/></p><p>With reference to your proposal number 44444 dated 2016-02-13 01:06:56, we are pleased to place order for the same as per the following item details, terms and conditions.<br/></p><p><br/></p><p><b><u>Order Details</u></b><br/></p><p>Item details to be types or copied from Vendor Proposal.<br/></p><p><br/></p><p>For GS Group<br/></p><p><a href="https://www.ezeone.com/" target="">https://www.ezeone.com/</a><br/></p><p>Authorised Signatory<br/></p>';
+    var po_temp = '<p> TO: 111  <span>2016-02-13 01:06:56</span><br/></p><p>vim pvt ltd<br/></p><p>19th C Cross,Stage 2, NS Palya, , BTM 2nd Stage,Bengaluru,Karnataka,India,560076<br/></p><p>Subject: Purchaser order with reference to your proposal number 44444 dated 2016-02-13 01:06:56<br/></p><p><br/></p><p>Dear abhi<br/></p><p>With reference to your proposal number 44444 dated 2016-02-13 01:06:56, we are pleased to place order for the same as per the following item details, terms and conditions.<br/></p><p><br/></p><p><b><u>Order Details</u></b><br/></p><p>Item details to be types or copied from Vendor Proposal.<br/></p><p><br/></p><p>For GS Group<br/></p><p><a href="https://www.ezeone.com/" target="">https://www.ezeone.com/</a><br/></p><p>Authorised Signatory<br/></p>';
     var bufferData = new Buffer(po_temp,'utf8');
     console.log(bufferData);
     //var pdfdoc = doc.html(bufferData);
