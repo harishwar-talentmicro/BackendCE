@@ -82,8 +82,16 @@ ContactManager.prototype.getClientList = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
+
+                        var endRecord = pageSize * pageSize;
+                        var startRecord = endRecord - pageSize;
+
+                        if (startRecord <= 1) {
+                            startRecord = 0;
+                        }
+
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(title)+ ',' + st.db.escape(pageSize)
-                            + ',' + st.db.escape(pageCount)+ ',' + st.db.escape(functionType);
+                            + ',' + st.db.escape(startRecord)+ ',' + st.db.escape(functionType);
                         var query = 'CALL pGetClientList(' + queryParams + ')';
                         //console.log(query);
                         st.db.query(query, function (err, clientList) {
