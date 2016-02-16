@@ -541,10 +541,7 @@ router.post('/hris_hrm_doc',hrisHRMModule.hrisSaveHRMDoc);
 router.get('/hris_hrm_doc',hrisHRMModule.hrisGetHRMDoc);
 router.delete('/hris_hrm_compensation/:cid',hrisHRMModule.hrisDelHRMCompnstn);
 
-//procurement-module
-var Procurement = require('./modules/procurement-module.js');
-var procurementModule = new Procurement(db,stdLib);
-router.post('/procurement_submit_enquiry',procurementModule.procurementSubmitEnquiry);
+
 
 
 router.get('/api_health',function(req,res){
