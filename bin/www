@@ -31,6 +31,7 @@ app.set('port', port);
  * Create HTTP server.
  */
 
+
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 if (cluster.isMaster) {
@@ -43,9 +44,13 @@ if (cluster.isMaster) {
         log.error('worker ' + worker.process.pid + ' died')
     });
 } else {
-    var server = http.createServer(app).listen(app.get('port'), function(){
-        console.log('EZEID Server is started successfully, and listening on port ' + app.get('port'));
-    });
+
+
+
+
+var server = http.createServer(app).listen(app.get('port'), function(){
+    console.log('EZEID Server is started successfully, and listening on port ' + app.get('port'));
+});
 
 //    var server = http.createServer(function(req,res){
 //        console.log('EZEID Server is started successfully, and listening on port ' + app.get('port'));
