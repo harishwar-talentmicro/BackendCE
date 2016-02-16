@@ -168,8 +168,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
 
                                                                    if(saveEnqResult){
-                                                                       console.log(saveEnqResult.length/2,"messaget");
-                                                                       console.log(saveEnqResult[0][0].msg,"messagecount");
+                                                                       //console.log(saveEnqResult.length/2,"messaget");
+                                                                       //console.log(saveEnqResult[0][0].msg,"messagecount");
                                                                        for(var i=0; i < saveEnqResult.length/2; i++) {
                                                                            var count = (i) ? 2 * i : 0;
                                                                            if(saveEnqResult[count][0].msg=="already submitted"){
@@ -3135,6 +3135,209 @@ Procurement.prototype.procurementGetEnqDetails = function(req,res,next){
 };
 
 
+//Procurement.prototype.sendPoMail = function(req,res,next){
+//    /**
+//     * @todo SendMailer
+//     */
+//
+//    try {
+//
+//        res.setHeader("Access-Control-Allow-Origin", "*");
+//        res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//
+//        var Token = req.body.token;
+//        var TemplateID = req.body.TemplateID;
+//        var pro_att = req.body.poAttachment;
+//        var vendor_id=req.body.vendor_id;
+//        var po_temp = req.body.po_template;
+//console.log(vendor_id,"vendor_id");
+//        var toMailID ='';
+//        var ccemailid = '';
+//        var name='';
+//        var fromEmail='';
+//        var pro_ref='';
+//        var pro_date='';
+//        var vendor_cn='';
+//        var logedinuser='';
+//        //var pro_att='';
+//
+//
+//        var RtnResponse = {
+//            IsSent: false
+//        };
+//        //if (toMailID != null) {
+//
+//        if (Token && TemplateID ) {
+//            st.validateToken(Token, function (err, tokenResult) {
+//                if (!err) {
+//                    if (tokenResult) {
+//                        //var query = st.db.escape(Token) + ', ' +st.db.escape(TID);
+//                        //var query = 'Select FirstName, LastName, CompanyName,ifnull(SalesMailID," ") as SalesMailID from tmaster where TID in (' + TID + ')';
+//                        //console.log(GetResult[0]
+//                        var procParams = st.db.escape(Token);
+//                        var procQuery = 'CALL pSendMailerDetails(' + procParams + ')';
+//                        st.db.query(procQuery, function (err, MailerDetailsResult) {
+//                            if (!err) {
+//                                console.log(MailerDetailsResult,"MailerDetailsResult");
+//                                if (MailerDetailsResult) {
+//                                    if (MailerDetailsResult.length > 0) {
+//                                        var output = MailerDetailsResult[0];
+//                                        name = output[0].Name;  //indivdual name business company name
+//                                        logedinuser = output[0].logedinuser;
+//                                        fromEmail = output[0].FromEmailId;
+//                                        console.log(fromEmail,"from");
+//                                    }
+//                                }
+//                            }
+//                        });
+//
+//                        st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
+//                            if (!err) {
+//                                if (vendordetails) {
+//                                    if (vendordetails.length > 0) {
+//                                        var output = vendordetails[0];
+//                                        pro_ref = output[0].pro_ref;
+//                                        pro_date = output[0].pro_date;
+//                                        vendor_cn= output[0].vendor_cn;
+//                                        toMailID=output[0].vendor_emailid;
+//                                        ccemailid=output[0].emailid;
+//                                        //pro_att=output[0].pro_doc;
+//                                        console.log(toMailID,"toMailID1");
+//                                    }
+//                                }
+//                            }
+//                        });
+//                        console.log(pro_att,"pro_att");
+//                        var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
+//                        st.db.query(templateQuery, function (err, TemplateResult) {
+//                            if (!err) {
+//                                if (TemplateResult) {
+//                                    if (TemplateResult.length > 0) {
+//                                        // console.log(TemplateResult);
+//                                        RtnResponse.IsSent = true;
+//                                        for (var i = 0; i < TemplateResult.length; i++) {
+//                                            var mailOptions = {
+//                                                replyto: fromEmail,
+//                                                to: toMailID,
+//                                                cc:ccemailid,
+//                                                subject: TemplateResult[0].Subject,
+//                                                html: TemplateResult[0].Body // html body
+//                                                //attachment: pro_att // html body
+//                                            };
+//                                            console.log(toMailID,"toMailID");
+//                                            mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
+//                                            mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
+//                                            mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
+//                                            mailOptions.html = mailOptions.html.replace("[ClientName]", name);
+//                                            mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
+//
+//console.log(mailOptions.to,"mailOptions.to");
+//                                            var email = new sendgrid.Email();
+//                                            email.from = mailOptions.replyto;
+//                                            email.to = mailOptions.to;
+//                                            email.cc=mailOptions.cc;
+//                                            email.subject = mailOptions.subject;
+//                                            email.html = mailOptions.html;
+//                                            //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
+//                                            email.addFile({
+//                                                filename: pro_att,
+//                                                url:  req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+ pro_att
+//                                        });
+//                                            //email.addFile({
+//                                            //    filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
+//                                            //    url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
+//                                            //});
+//
+//                                            console.log(email.files);
+//                                            console.log('send grid......');
+//                                            console.log(email.to,"email.to");
+//                                            sendgrid.send(email, function (err, result) {
+//                                                console.log(err);
+//                                                console.log(result,"result");
+//                                                if (!err) {
+//                                                    var post = {
+//                                                        MessageType: 9,
+//                                                        Priority: 5,
+//                                                        ToMailID: mailOptions.to,
+//                                                        Subject: mailOptions.subject,
+//                                                        Body: mailOptions.html,
+//                                                        Replyto: mailOptions.replyto,
+//                                                        SentStatus: 1
+//                                                    };
+//
+//                                                    console.log(post,"post");
+//                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+//                                                        // Neat!
+//                                                        if (!err) {
+//                                                            console.log(result);
+//                                                            console.log('FnSendBulkMailer: Mail saved Successfully');
+//
+//                                                            //CallBack(null, RtnMessage);
+//                                                        }
+//                                                        else {
+//                                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
+//                                                            // CallBack(null, null);
+//                                                        }
+//                                                    });
+//                                                }
+//                                                else {
+//                                                    console.log('FnSendBulkMailer: Mail not send Successfully');
+//                                                    // CallBack(null, null);
+//                                                }
+//                                            });
+//                                            //console.log('FnSendBulkMailer:Mail details sent for processing');
+//                                            //console.log(mailOptions);
+//                                        }
+//                                        res.send(RtnResponse);
+//
+//                                    }
+//                                    else {
+//                                        console.log('FnGetTemplateDetails:No Template Details found');
+//                                        res.json(null);
+//                                    }
+//                                }
+//                                else {
+//                                    console.log('FnGetTemplateDetails:No Template Details found');
+//                                    res.json(null);
+//                                }
+//                            }
+//                            else {
+//                                console.log('FnGetTemplateDetails:Error in getting template ' + err);
+//                                res.json(null);
+//                            }
+//                        });
+//                    }
+//                    else {
+//                        res.statusCode = 401;
+//                        res.json(null);
+//                        console.log('FnSendBulkMailer: Invalid Token');
+//                    }
+//                } else {
+//                    res.statusCode = 500;
+//                    res.json(null);
+//                    console.log('FnSendBulkMailer: Error in validating token:  ' + err);
+//                }
+//            });
+//        }
+//        else{
+//            if (!Token) {
+//                console.log('FnSendBulkMailer: Token is empty');
+//            }
+//            else if (!TID) {
+//                console.log('FnSendBulkMailer: TID is empty');
+//            }
+//            else if (!TemplateID) {
+//                console.log('FnSendBulkMailer: TemplateID is empty');
+//            }
+//        }
+//    }
+//    catch (ex) {
+//        console.log('FnSendBulkMailer error:' + ex.description);
+//        var errorDate = new Date();
+//        console.log(errorDate.toTimeString() + ' ......... error ...........');
+//    }
+//};
+
 Procurement.prototype.sendPoMail = function(req,res,next){
     /**
      * @todo SendMailer
@@ -3150,7 +3353,7 @@ Procurement.prototype.sendPoMail = function(req,res,next){
         var pro_att = req.body.poAttachment;
         var vendor_id=req.body.vendor_id;
         var po_temp = req.body.po_template;
-
+        console.log(vendor_id,"vendor_id");
         var toMailID ='';
         var ccemailid = '';
         var name='';
@@ -3187,123 +3390,130 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                         fromEmail = output[0].FromEmailId;
                                         console.log(fromEmail,"from");
                                     }
-                                }
-                            }
-                        });
-
-                        st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
-                            if (!err) {
-                                if (vendordetails) {
-                                    if (vendordetails.length > 0) {
-                                        var output = vendordetails[0];
-                                        pro_ref = output[0].pro_ref;
-                                        pro_date = output[0].pro_date;
-                                        vendor_cn= output[0].vendor_cn;
-                                        toMailID=output[0].vendor_emailid;
-                                        ccemailid=output[0].emailid;
-                                        //pro_att=output[0].pro_doc;
-                                    }
-                                }
-                            }
-                        });
-                        console.log(pro_att,"pro_att");
-                        var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
-                        st.db.query(templateQuery, function (err, TemplateResult) {
-                            if (!err) {
-                                if (TemplateResult) {
-                                    if (TemplateResult.length > 0) {
-                                        // console.log(TemplateResult);
-                                        RtnResponse.IsSent = true;
-                                        for (var i = 0; i < TemplateResult.length; i++) {
-                                            var mailOptions = {
-                                                replyto: fromEmail,
-                                                to: toMailID,
-                                                cc:ccemailid,
-                                                subject: TemplateResult[0].Subject,
-                                                html: TemplateResult[0].Body // html body
-                                                //attachment: pro_att // html body
-                                            };
-                                            mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
-                                            mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
-                                            mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
-                                            mailOptions.html = mailOptions.html.replace("[ClientName]", name);
-                                            mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
 
 
-                                            var email = new sendgrid.Email();
-                                            email.from = mailOptions.replyto;
-                                            email.to = mailOptions.to;
-                                            email.cc=mailOptions.cc;
-                                            email.subject = mailOptions.subject;
-                                            email.html = mailOptions.html;
-                                            //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
-                                            email.addFile({
-                                                filename: pro_att,
-                                                url:  req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+ pro_att
-                                        });
-                                            //email.addFile({
-                                            //    filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
-                                            //    url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
-                                            //});
-
-                                            console.log(email.files);
-                                            console.log('send grid......');
-                                            console.log(email.to,"email.to");
-                                            sendgrid.send(email, function (err, result) {
-                                                console.log(err);
-                                                console.log(result,"result");
-                                                if (!err) {
-                                                    var post = {
-                                                        MessageType: 9,
-                                                        Priority: 5,
-                                                        ToMailID: mailOptions.to,
-                                                        Subject: mailOptions.subject,
-                                                        Body: mailOptions.html,
-                                                        Replyto: mailOptions.replyto,
-                                                        SentStatus: 1
-                                                    };
-
-                                                    //console.log(post);
-                                                    var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
-                                                        // Neat!
+                                    st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
+                                        if (!err) {
+                                            if (vendordetails) {
+                                                if (vendordetails.length > 0) {
+                                                    var output = vendordetails[0];
+                                                    pro_ref = output[0].pro_ref;
+                                                    pro_date = output[0].pro_date;
+                                                    vendor_cn= output[0].vendor_cn;
+                                                    toMailID=output[0].vendor_emailid;
+                                                    ccemailid=output[0].emailid;
+                                                    //pro_att=output[0].pro_doc;
+                                                    console.log(toMailID,"toMailID1");
+                                                    console.log(pro_att,"pro_att");
+                                                    var templateQuery = 'Select * from mmailtemplate where TID = ' + st.db.escape(TemplateID);
+                                                    st.db.query(templateQuery, function (err, TemplateResult) {
                                                         if (!err) {
-                                                            console.log(result);
-                                                            console.log('FnSendBulkMailer: Mail saved Successfully');
+                                                            if (TemplateResult) {
+                                                                if (TemplateResult.length > 0) {
+                                                                    // console.log(TemplateResult);
+                                                                    RtnResponse.IsSent = true;
+                                                                    for (var i = 0; i < TemplateResult.length; i++) {
+                                                                        var mailOptions = {
+                                                                            replyto: fromEmail,
+                                                                            to: toMailID,
+                                                                            cc:ccemailid,
+                                                                            subject: TemplateResult[0].Subject,
+                                                                            html: TemplateResult[0].Body // html body
+                                                                            //attachment: pro_att // html body
+                                                                        };
+                                                                        console.log(toMailID,"toMailID");
+                                                                        mailOptions.html = mailOptions.html.replace("[ContactName]", vendor_cn);
+                                                                        mailOptions.html = mailOptions.html.replace("[ProposalNumber]", pro_ref);
+                                                                        mailOptions.html = mailOptions.html.replace("[ProposalDate]", pro_date);
+                                                                        mailOptions.html = mailOptions.html.replace("[ClientName]", name);
+                                                                        mailOptions.html = mailOptions.html.replace("[LoginUserName]", logedinuser);
 
-                                                            //CallBack(null, RtnMessage);
+                                                                        console.log(mailOptions.to,"mailOptions.to");
+                                                                        var email = new sendgrid.Email();
+                                                                        email.from = mailOptions.replyto;
+                                                                        email.to = mailOptions.to;
+                                                                        email.cc=mailOptions.cc;
+                                                                        email.subject = mailOptions.subject;
+                                                                        email.html = mailOptions.html;
+                                                                        //email.files   = [{filename: 'proposal_document.jpg', content: data_proposal}],
+                                                                        email.addFile({
+                                                                            filename: pro_att,
+                                                                            url:  req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET +'/'+ pro_att
+                                                                        });
+                                                                        //email.addFile({
+                                                                        //    filename: '73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt',
+                                                                        //    url: 'https://storage.googleapis.com/ezeone/73d5a90d-1e7b-4373-a7ab-f9abcc26437f.txt'
+                                                                        //});
+
+                                                                        console.log(email.files);
+                                                                        console.log('send grid......');
+                                                                        console.log(email.to,"email.to");
+                                                                        sendgrid.send(email, function (err, result) {
+                                                                            console.log(err);
+                                                                            console.log(result,"result");
+                                                                            if (!err) {
+                                                                                var post = {
+                                                                                    MessageType: 9,
+                                                                                    Priority: 5,
+                                                                                    ToMailID: mailOptions.to,
+                                                                                    Subject: mailOptions.subject,
+                                                                                    Body: mailOptions.html,
+                                                                                    Replyto: mailOptions.replyto,
+                                                                                    SentStatus: 1
+                                                                                };
+
+                                                                                console.log(post,"post");
+                                                                                var query = st.db.query('INSERT INTO tMailbox SET ?', post, function (err, result) {
+                                                                                    // Neat!
+                                                                                    if (!err) {
+                                                                                        console.log(result);
+                                                                                        console.log('FnSendBulkMailer: Mail saved Successfully');
+
+                                                                                        //CallBack(null, RtnMessage);
+                                                                                    }
+                                                                                    else {
+                                                                                        console.log('FnSendBulkMailer: Mail not Saved Successfully');
+                                                                                        // CallBack(null, null);
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                            else {
+                                                                                console.log('FnSendBulkMailer: Mail not send Successfully');
+                                                                                // CallBack(null, null);
+                                                                            }
+                                                                        });
+                                                                        //console.log('FnSendBulkMailer:Mail details sent for processing');
+                                                                        //console.log(mailOptions);
+                                                                    }
+                                                                    res.send(RtnResponse);
+
+                                                                }
+                                                                else {
+                                                                    console.log('FnGetTemplateDetails:No Template Details found');
+                                                                    res.json(null);
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log('FnGetTemplateDetails:No Template Details found');
+                                                                res.json(null);
+                                                            }
                                                         }
                                                         else {
-                                                            console.log('FnSendBulkMailer: Mail not Saved Successfully');
-                                                            // CallBack(null, null);
+                                                            console.log('FnGetTemplateDetails:Error in getting template ' + err);
+                                                            res.json(null);
                                                         }
                                                     });
-                                                }
-                                                else {
-                                                    console.log('FnSendBulkMailer: Mail not send Successfully');
-                                                    // CallBack(null, null);
-                                                }
-                                            });
-                                            //console.log('FnSendBulkMailer:Mail details sent for processing');
-                                            //console.log(mailOptions);
-                                        }
-                                        res.send(RtnResponse);
 
-                                    }
-                                    else {
-                                        console.log('FnGetTemplateDetails:No Template Details found');
-                                        res.json(null);
-                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+
                                 }
-                                else {
-                                    console.log('FnGetTemplateDetails:No Template Details found');
-                                    res.json(null);
-                                }
-                            }
-                            else {
-                                console.log('FnGetTemplateDetails:Error in getting template ' + err);
-                                res.json(null);
                             }
                         });
+
+
                     }
                     else {
                         res.statusCode = 401;
