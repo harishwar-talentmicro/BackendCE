@@ -3252,7 +3252,13 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var parameters = st.db.escape(token) + ',' + st.db.escape(pageCount)
+                        var endRecord = pageCount * pageSize;
+                        var startRecord = endRecord - pageSize;
+
+                        if (startRecord <= 1) {
+                            startRecord = 0;
+                        }
+                        var parameters = st.db.escape(token) + ',' + st.db.escape(startRecord)
                             + ',' + st.db.escape(pageSize) + ',' + st.db.escape(stage) + ',' + st.db.escape(probability)
                             + ',' + st.db.escape(folder) + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate);
                         var query = 'CALL pMGetSalesTransaction(' + parameters + ')';
