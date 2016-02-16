@@ -958,48 +958,51 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
                                         if (results[0]) {
                                             if (results[0][0]) {
                                                 if (results[0][0].id) {
+                                                    var comQuery = "";
+
                                                     for (var i = 0; i < e_sal.length; i++) {
-                                                        if (e_sal[i].header_id && e_sal[i].ctc) {
+                                                        if (e_sal[i].header_id && (!isNaN(parseFloat(e_sal[i].ctc)))) {
                                                             var procParams = st.db.escape(results[0][0].id) + ',' + st.db.escape(e_sal[i].header_id)
-                                                                + ',' + st.db.escape(e_sal[i].ctc) ;
-                                                            var procQuery = 'CALL psave_hrmcompensation_details(' + procParams + ')';
-                                                            console.log(procQuery);
-                                                            st.db.query(procQuery, function (err, resultsDetails) {
-                                                                if (!err) {
-                                                                    console.log(resultsDetails);
-                                                                    responseMessage.status = true;
-                                                                    responseMessage.error = null;
-                                                                    responseMessage.message = 'Employe salary details added successfully';
-                                                                    responseMessage.data = null;
-                                                                    res.status(200).json(responseMessage);
-                                                                }
-                                                                else {
-                                                                    responseMessage.error = {
-                                                                        server: 'Internal Server Error'
-                                                                    };
-                                                                    responseMessage.message = 'An error occurred !';
-                                                                    res.status(500).json(responseMessage);
-                                                                    console.log('Error : pget_hrmcompensation_details ', err);
-                                                                    var errorDate = new Date();
-                                                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                                                                }
-                                                            });
-                                                        }
-                                                        else{
-                                                            responseMessage.status = false;
-                                                            responseMessage.error = null;
-                                                            responseMessage.message = 'Invalid header id or ctc';
-                                                            responseMessage.data = null;
-                                                            res.status(400).json(responseMessage);
+                                                                + ',' + st.db.escape(e_sal[i].ctc);
+                                                            var procQuery = 'CALL psave_hrmcompensation_details(' + procParams + ');';
+                                                            comQuery += procQuery;
                                                         }
                                                     }
+
+                                                    console.log(comQuery);
+
+                                                    /**
+                                                     * @todo Problem here
+                                                     * It should be one single call only to the server and no care of async nature has been taken
+                                                     */
+                                                    st.db.query(comQuery, function (err, resultsDetails) {
+                                                        if (!err) {
+                                                            console.log(resultsDetails);
+                                                            responseMessage.status = true;
+                                                            responseMessage.error = null;
+                                                            responseMessage.message = 'Employe salary details added successfully';
+                                                            responseMessage.data = null;
+                                                            res.status(200).json(responseMessage);
+                                                        }
+                                                        else {
+                                                            responseMessage.error = {
+                                                                server: 'Internal Server Error'
+                                                            };
+                                                            responseMessage.message = 'An error occurred !';
+                                                            res.status(500).json(responseMessage);
+                                                            console.log('Error : pget_hrmcompensation_details ', err);
+                                                            var errorDate = new Date();
+                                                            console.log(errorDate.toTimeString() + ' ......... error ...........');
+                                                        }
+                                                    });
+
                                                 }
-                                                else {
+                                                else{
                                                     responseMessage.status = false;
                                                     responseMessage.error = null;
-                                                    responseMessage.message = 'Error in adding employe salary details';
+                                                    responseMessage.message = 'Invalid header id or ctc';
                                                     responseMessage.data = null;
-                                                    res.status(200).json(responseMessage);
+                                                    res.status(400).json(responseMessage);
                                                 }
                                             }
                                             else {
@@ -1589,7 +1592,7 @@ HrisHRM.prototype.hrisGetHRMLeaveAppli = function(req,res,next){
         validationFlag *= false;
     }
     if (req.query.page_size){
-        if (isNaN(req.body.page_size)) {
+        if (isNaN(req.query.page_size)) {
             error.page_size = 'Page size should be a number';
             validationFlag *= false;
         }
@@ -1629,7 +1632,8 @@ HrisHRM.prototype.hrisGetHRMLeaveAppli = function(req,res,next){
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Leave applications details loaded successfully';
-                                            responseMessage.data = results;
+                                            responseMessage.data = results[1];
+                                            responseMessage.count = (results[0][0]) ? results[0][0].count : 0;
                                             res.status(200).json(responseMessage);
                                     }
                                     else {
@@ -2151,7 +2155,7 @@ HrisHRM.prototype.hrisGetHRMDoc = function(req,res,next){
         validationFlag *= false;
     }
     if (req.query.page_size){
-        if (isNaN(req.body.page_size)) {
+        if (isNaN(req.query.page_size)) {
             error.page_size = 'Page size should be a number';
             validationFlag *= false;
         }
