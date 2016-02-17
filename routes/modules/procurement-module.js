@@ -8,10 +8,14 @@
 var util = require('util');
 var validator = require('validator');
 var moment = require('moment');
+//var Mailer = require('../../mail/mailer.js');
+//var mailerApi = new Mailer();
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 var fs = require('fs');
 var chalk = require('chalk');
 var st = null;
+var _ = require('underscore');
+var CONFIG = require('../../ezeone-config.json');
 function Procurement(db,stdLib){
 
     if(stdLib){
@@ -146,14 +150,14 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                         var salesEnqComQuery = "";
                                                         for(var vCount=0; vCount < vendorList.length; vCount++){
                                                             var salesEnqParam = st.db.escape(req.body.token) + ',' +
-                                                                st.db.escape(vendorList[vCount].ezeoneId) + ',' +
-                                                                st.db.escape(vendorList[vCount].vendorContactName) + ',' +
-                                                                st.db.escape(vendorList[vCount].vendorEmail) + ',' +
-                                                                st.db.escape(vendorList[vCount].vendorPhone) + ',' +
-                                                                st.db.escape(req.body.message) + ',' +
-                                                                st.db.escape(req.body.notes) + ',' +
-                                                                st.db.escape(vendorList[vCount].procId) + ',' +
-                                                                st.db.escape(eId);
+                                                            st.db.escape(vendorList[vCount].ezeoneId) + ',' +
+                                                            st.db.escape(vendorList[vCount].vendorContactName) + ',' +
+                                                            st.db.escape(vendorList[vCount].vendorEmail) + ',' +
+                                                            st.db.escape(vendorList[vCount].vendorPhone) + ',' +
+                                                            st.db.escape(req.body.message) + ',' +
+                                                            st.db.escape(req.body.notes) + ',' +
+                                                            st.db.escape(vendorList[vCount].procId) + ',' +
+                                                            st.db.escape(eId);
 
                                                             salesEnqComQuery += ("CALL psend_Procurement_enquiry("+
                                                             salesEnqParam +
@@ -242,6 +246,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                          * Mail merge one harcoded template and
                                                          * send mail to the list of vendors passed to this function
                                                          */
+<<<<<<< HEAD
+=======
                                                         console.log(vendorEmailList,"vendorEmailList");
                                                         for(var i=0;i < vendorEmailList.length;i++){
                                                             console.log(vendorEmailList[i],"vendorEmailList");
@@ -256,7 +262,66 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 console.log(json);
                                                             });
                                                         }
+>>>>>>> cfe1b13ebaa998c35f0d59c3ad16e0cddfad91f4
 
+                                                        //var mailTemplateString = '<p>Dear [Name]<br/></p><p>We have following requirement [RequirementDescription] <br/></p><p><br/></p><p><b><u></u></b></p><p>Please submit your compitative proposal as earliest below</p><p><br/></p><p><br/></p><p></p><p>For [LoggedInName]</p><div>       [<span style=\"color: rgb(51, 51, 51);float: none;background-color: rgb(255, 255, 255);\">[email]</span><br/>       [mobile]<p><br/></p></div>';
+
+
+                                                        //fs.readFile(file, "utf8", function (err, data) {
+                                                        //    for (var i = 0; i < vendorEmailList.length; i++) {
+                                                        //        fs.unlinkSync('jobseeker.html');
+                                                        //        console.log(vendorEmailList[i], "vendorEmailList111");
+                                                        //        String.prototype.replaceAll = function (str1, str2, ignore) {
+                                                        //            return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"), (ignore ? "gi" : "g")), (typeof(str2) == "string") ? str2.replace(/\$/g, "$$$$") : str2);
+                                                        //        };
+                                                        //        //var mailOptions = {
+                                                        //        //    html: mailTemplateString // html body
+                                                        //        //    //attachment: pro_att // html body
+                                                        //        //};
+                                                        //        console.log(vendorEmailList[i], "vendorEmailList[i]");
+                                                        //        data = data.replaceAll("[Name]", 'Bhavya');
+                                                        //        data = data.replaceAll("[RequirementDescription]", req.body.message);
+                                                        //        data = data.replaceAll("[LoggedInName]", 'Pooja');
+                                                        //        data = data.replaceAll("[email]", vendorEmailList[i]);
+                                                        //        data = data.replaceAll("[mobile]", '9900687881');
+                                                        //
+                                                        //        //_.templateSettings = {
+                                                        //        //    interpolate: /\[(.+?)\]/g
+                                                        //        //};
+                                                        //        //
+                                                        //        //var template = _.template("'<p>Dear [Name]<br/></p><p>We have following requirement [RequirementDescription] <br/></p><p><br/></p><p><b><u></u></b></p><p>Please submit your compitative proposal as earliest below</p><p><br/></p><p><br/></p><p></p><p>For [LoggedInName]</p><div>       [<span style=\"color: rgb(51, 51, 51);float: none;background-color: rgb(255, 255, 255);\">[email]</span><br/>       [mobile]<p><br/></p></div>';")
+                                                        //        //template({Name: "Bhavya"});
+                                                        //        //template({RequirementDescription: "10 chairs"});
+                                                        //        //template({LoggedInName: "Sgowri"});
+                                                        //
+                                                        //        var email = new sendgrid.Email({
+                                                        //            to: vendorEmailList[i],
+                                                        //            from: 'jain31192.bj@gmail.com',
+                                                        //            subject: 'Subject goes here',
+                                                        //            text: data
+                                                        //        });
+                                                        //
+                                                        //        sendgrid.send(email, function (err, json) {
+                                                        //            if (err) {
+                                                        //                return console.error(err);
+                                                        //                console.log("eroorrrr");
+                                                        //            }
+                                                        //            console.log(json);
+                                                        //            console.log("eroorrrr111");
+                                                        //        });
+                                                        //    }
+                                                        //});
+
+                                                        for (var i = 0; i < vendorEmailList.length; i++) {
+                                                            mailerApi.sendMail('proposal_template', {
+                                                                Name : 'Bhavya',
+                                                                RequirementDescription : req.body.message,
+                                                                LoggedInName : 'Bhavya Jain',
+                                                                email : 'jain31192@gmail.com',
+                                                                mobile : '9900687881'
+
+                                                            }, '', vendorEmailList[i]);
+                                                        }
 
                                                         areMailSentToVendors = true;
                                                         if(areSalesEnquirySentToVendors && areMailSentToVendors){
