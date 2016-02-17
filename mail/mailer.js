@@ -14,7 +14,7 @@ if(os.platform == 'win32'){
 }
 
 try{
-    var conf = fs.readFileSync(__dirname + separator + '..'+separator+'..'+separator+'ezeone-config.json');
+    var conf = fs.readFileSync(__dirname + separator + '..'+separator+'ezeone-config.json');
     if(conf){
         var jConf = JSON.parse(conf);
         if(typeof(jConf) == 'object'){
