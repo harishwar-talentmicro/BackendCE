@@ -19,6 +19,7 @@ function alterEzeoneId(ezeoneId){
 
 var st = null;
 var Notification = require('./notification/notification-master.js');
+
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notification = null;
 var notificationQmManager = null;

@@ -246,8 +246,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                          * Mail merge one harcoded template and
                                                          * send mail to the list of vendors passed to this function
                                                          */
-<<<<<<< HEAD
-=======
+
+
                                                         console.log(vendorEmailList,"vendorEmailList");
                                                         for(var i=0;i < vendorEmailList.length;i++){
                                                             console.log(vendorEmailList[i],"vendorEmailList");
@@ -262,7 +262,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 console.log(json);
                                                             });
                                                         }
->>>>>>> cfe1b13ebaa998c35f0d59c3ad16e0cddfad91f4
+
 
                                                         //var mailTemplateString = '<p>Dear [Name]<br/></p><p>We have following requirement [RequirementDescription] <br/></p><p><br/></p><p><b><u></u></b></p><p>Please submit your compitative proposal as earliest below</p><p><br/></p><p><br/></p><p></p><p>For [LoggedInName]</p><div>       [<span style=\"color: rgb(51, 51, 51);float: none;background-color: rgb(255, 255, 255);\">[email]</span><br/>       [mobile]<p><br/></p></div>';
 

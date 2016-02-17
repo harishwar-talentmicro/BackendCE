@@ -555,8 +555,6 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                             salaryType: salaryType,
                                                             contactId: contactId
                                                         };
-
-
                                                         for (var i = 0; i < ItemsList.length; i++) {
                                                             var itemsDetails = ItemsList[i];
                                                             var items = {
