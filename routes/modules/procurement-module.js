@@ -8,13 +8,13 @@
 var util = require('util');
 var validator = require('validator');
 var moment = require('moment');
-//var Mailer = require('../../mail/mailer.js');
-//var mailerApi = new Mailer();
+var Mailer = require('../../mail/mailer.js');
+var mailerApi = new Mailer();
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 var fs = require('fs');
 var chalk = require('chalk');
 var st = null;
-var _ = require('underscore');
+//var _ = require('underscore');
 var CONFIG = require('../../ezeone-config.json');
 function Procurement(db,stdLib){
 
@@ -246,23 +246,21 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                          * Mail merge one harcoded template and
                                                          * send mail to the list of vendors passed to this function
                                                          */
-<<<<<<< HEAD
-=======
+
                                                         console.log(vendorEmailList,"vendorEmailList");
-                                                        for(var i=0;i < vendorEmailList.length;i++){
-                                                            console.log(vendorEmailList[i],"vendorEmailList");
-                                                            var email     = new sendgrid.Email({
-                                                                to:       vendorEmailList[i],
-                                                                from:     'jain31192.bj@gmail.com',
-                                                                subject:  'Subject goes here',
-                                                                text:     'Hello world'
-                                                            });
-                                                            sendgrid.send(email, function(err, json) {
-                                                                if (err) { return console.error(err); }
-                                                                console.log(json);
-                                                            });
-                                                        }
->>>>>>> cfe1b13ebaa998c35f0d59c3ad16e0cddfad91f4
+                                                        //for(var i=0;i < vendorEmailList.length;i++){
+                                                        //    console.log(vendorEmailList[i],"vendorEmailList");
+                                                        //    var email     = new sendgrid.Email({
+                                                        //        to:       vendorEmailList[i],
+                                                        //        from:     'jain31192.bj@gmail.com',
+                                                        //        subject:  'Subject goes here',
+                                                        //        text:     'Hello world'
+                                                        //    });
+                                                        //    sendgrid.send(email, function(err, json) {
+                                                        //        if (err) { return console.error(err); }
+                                                        //        console.log(json);
+                                                        //    });
+                                                        //}
 
                                                         //var mailTemplateString = '<p>Dear [Name]<br/></p><p>We have following requirement [RequirementDescription] <br/></p><p><br/></p><p><b><u></u></b></p><p>Please submit your compitative proposal as earliest below</p><p><br/></p><p><br/></p><p></p><p>For [LoggedInName]</p><div>       [<span style=\"color: rgb(51, 51, 51);float: none;background-color: rgb(255, 255, 255);\">[email]</span><br/>       [mobile]<p><br/></p></div>';
 

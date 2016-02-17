@@ -2765,6 +2765,12 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
         var clientId = parseInt(req.body.cid);
         var contactId = parseInt(req.body.ct_id);
         var targetdate = req.body.targetdate ? req.body.targetdate : null;
+        var proRef = (req.body.pro_ref) ? (req.body.pro_ref) : '';
+        var proDate = (req.body.pro_date) ? (req.body.pro_date) : '';
+        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0;
+        var proDoc = (req.body.pro_doc) ? (req.body.pro_doc) : '';
+        var ve  = (req.body.ve ) ? (req.body.ve ) : '';
+        var vcn  = (req.body.vcn) ? (req.body.vcn) : '';
 
         if (!token) {
             error['token'] = 'token is Mandatory';
@@ -2807,17 +2813,33 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                             + "," + st.db.escape(id)+ "," + st.db.escape(clientId)+ "," + st.db.escape(contactId)
                             + "," + st.db.escape(targetdate);
 
-                        var query = 'CALL pMSavesalesRequest(' + queryParams + ')';
-                        console.log(query);
+                        var salesLeadQuery = 'CALL pMSavesalesRequest(' + queryParams + ')';
+                        var procurementUpdateQuery = "";
 
-                        st.db.query(query, function (err, transResult) {
+                        if((!isNaN(parseInt(id))) && parseInt(id) && (!isNaN(parseInt(req.body.vendor_id))) && parseInt(req.body.vendor_id)){
+                            var procurementParams = st.db.escape(token)+ "," + st.db.escape(id) + "," + st.db.escape(proRef)
+                                + "," + st.db.escape(proDate) + "," + st.db.escape(req.body.proAmount ) + "," + st.db.escape(req.body.proDoc)+ "," +
+                                st.db.escape(req.body.ve)+ "," + st.db.escape(req.body.vcn);
+
+                            procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
+                        }
+
+                        var combinedQuery = salesLeadQuery + procurementUpdateQuery;
+                        console.log(combinedQuery);
+                        st.db.query(combinedQuery, function (err, transResult) {
                             //console.log(transResult);
                             if (!err) {
                                 if (transResult) {
-                                    if (transResult[0]) {
-                                        if (transResult[0][0]) {
+                                    if (transResult[0].length>0) {
+                                        //if (transResult[0][0]) {
+                                        if(transResult[2]){
+                                            var proposal_message = 'proposal deadline is exceded so you can not update data';
+                                        }
+
+                                        var proposal_message='';
                                             responseMessage.status = true;
                                             responseMessage.message = 'Sales request save sucessfully';
+                                            responseMessage.proposal_message = proposal_message;
                                             responseMessage.data = {
                                                 id: transResult[0][0].id,
                                                 to_ezeid: alterEzeoneId(req.body.to_ezeid),
@@ -2834,12 +2856,12 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                                             res.status(200).json(responseMessage);
                                             console.log('FnSaveSalesRequest: Sales request save sucessfully');
 
-                                        }
-                                        else {
-                                            responseMessage.message = 'Sales request not save';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveSalesRequest:Sales request not save');
-                                        }
+                                        //}
+                                        //else {
+                                        //    responseMessage.message = 'Sales request not save';
+                                        //    res.status(200).json(responseMessage);
+                                        //    console.log('FnSaveSalesRequest:Sales request not save');
+                                        //}
                                     }
                                     else {
                                         responseMessage.message = 'Sales request not save';
