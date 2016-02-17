@@ -54,7 +54,7 @@ ContactManager.prototype.getClientList = function(req,res,next){
     var token = req.query.token;
     var title = (req.query.s) ? (req.query.s) : '';   // title
     var pageSize = (req.query.ps) ? (parseInt(req.query.ps)) : 1000;       // no of records per page (constant value) eg: 10
-    var pageCount = (req.query.pc) ? (parseInt(req.query.pc)) : 0;     // first time its 0
+    var pageCount = (req.query.pc) ? (parseInt(req.query.pc)) : 1;     // first time its 0
     var functionType = (req.query.ft) ? (parseInt(req.query.ft)) : 0;
     var responseMessage = {
         status: false,
@@ -63,7 +63,6 @@ ContactManager.prototype.getClientList = function(req,res,next){
         message: '',
         error: {}
     };
-
     var validateStatus = true;
     var  error = {};
 
@@ -71,12 +70,15 @@ ContactManager.prototype.getClientList = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
+    if(req.query.pc == 0){
+        error['pc'] = 'Page count can not be less then 1';
+        validateStatus *= false;
+    }
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
         res.status(400).json(responseMessage);
     }
-
     else {
         try {
             st.validateToken(token, function (err, result) {
@@ -200,7 +202,7 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
     var token = req.query.token;
     var cid = parseInt(req.query.cid);
     var pageSize = (req.query.ps) ? (parseInt(req.query.ps)) : 1000;       // no of records per page (constant value) eg: 10
-    var pageCount = (req.query.pc) ? (parseInt(req.query.pc)) : 0;     // first time its 0
+    var pageCount = (req.query.pc) ? (parseInt(req.query.pc)) : 1;     // first time its 0
 
     var responseMessage = {
         status: false,
@@ -221,12 +223,14 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
+    if(req.query.pc == 0){
+        error['pc'] = 'Page count can not be less then 1';
+        validateStatus *= false;
+    }
     if(!cid){
         error['cid'] = 'Invalid client id';
         validateStatus *= false;
     }
-
-
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors below';
@@ -253,7 +257,6 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
                                     if (contactList[0]) {
                                         if (contactList[0][0]) {
                                             if (contactList[1]) {
-
                                                 responseMessage.status = true;
                                                 responseMessage.count = contactList[0][0].count;
                                                 responseMessage.cid = contactList[0][0].cid;

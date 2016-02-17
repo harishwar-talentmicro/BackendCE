@@ -3216,7 +3216,7 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
      */
 
     var token = req.query.token;
-    var pageCount = (!isNaN(parseInt(req.query.pc))) ?  parseInt(req.query.pc): 0;      // no of records per page
+    var pageCount = (!isNaN(parseInt(req.query.pc))) ?  parseInt(req.query.pc): 1;      // no of records per page
     var pageSize = (!isNaN(parseInt(req.query.ps))) ?  parseInt(req.query.ps): 10;   //  page size
     var stage = (req.query.stage) ? (req.query.stage) : '';
     var probability = (req.query.probability) ? (req.query.probability) : '';
@@ -3240,7 +3240,10 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-
+    if(req.query.pc == 0){
+        error['pc'] = 'Page count can not be less then 1';
+        validateStatus *= false;
+    }
     if(!validateStatus){
         responseMessage.error = error ;
         responseMessage.message = 'Please check the errors below';
