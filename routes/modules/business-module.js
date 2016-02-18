@@ -17,12 +17,15 @@ var validator = require('validator');
 var st = null;
 var mailModule = require('./mail-module.js');
 var mail = null;
+var Notification = require('./notification/notification-master.js');
+var notification = null;
 
 function BusinessManager(db,stdLib){
 
     if(stdLib){
         st = stdLib;
         mail = new mailModule(db,stdLib);
+        notification = new Notification(db,stdLib);
     }
 };
 
@@ -851,14 +854,77 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
 
                             procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
                         }
-
                         var combinedQuery = salesLeadQuery + procurementUpdateQuery;
                         console.log(combinedQuery);
                         st.db.query(combinedQuery, function (err, transResult) {
                             if (!err) {
                                 //console.log(transResult);
                                 if (transResult) {
-                                    if (transResult[0].length > 0) {
+                                    if (transResult[0]) {
+                                        if (transResult[0].length > 0) {
+                                            var notiQueryParam = st.db.escape(Token);
+                                            var notiQuery = 'CALL get_user_ezeid(' + notiQueryParam + ')';
+                                            console.log(notiQuery);
+                                            st.db.query(notiQuery, function (err, getDetails) {
+                                                console.log(getDetails);
+                                                if (getDetails) {
+                                                    if (getDetails[0]) {
+                                                        if (getDetails[0][0]){
+                                                            if (getDetails[0][0].EZEID){
+                                                                if (getDetails[0][0].EZEID != ToEZEID){
+                                                                    var notificationQueryParams = st.db.escape(req.body.vendor_id) + "," + st.db.escape(Token);
+                                                                    var notificationQuery = 'CALL get_subuser_enquiry(' + notificationQueryParams + ')';
+                                                                    console.log(notificationQuery);
+                                                                    st.db.query(notificationQuery, function (err, getNotDetails) {
+                                                                        console.log(getNotDetails);
+                                                                        if (getNotDetails) {
+                                                                            if (getNotDetails[0]){
+                                                                                for (var count = 0; count < getNotDetails[0].length; count++) {
+                                                                                    var receiverId = getNotDetails[0][count].receiverId;
+                                                                                    var senderTitle = getNotDetails[0][count].sendertitle;
+                                                                                    var groupTitle = getNotDetails[0][count].groupTitle;
+                                                                                    var groupId = getNotDetails[0][count].GroupID;
+                                                                                    var messageText = 'you have received a lead.';
+                                                                                    var messageType = 1;
+                                                                                    var operationType = 0;
+                                                                                    var iphoneId = null;
+                                                                                    var messageId = 0;
+                                                                                    var masterid = '';
+                                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                console.log('get_subuser_enquiry:user details not loaded');
+                                                                            }
+                                                                        }
+                                                                        else {
+                                                                            console.log('get_subuser_enquiry:user details not loaded');
+                                                                        }
+                                                                    });
+                                                                }
+                                                                else {
+                                                                    console.log("Lead received for vendor's own product");
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log("get_user_ezeid : Invalid EZEID");
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log("get_user_ezeid : Invalid EZEID");
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log("get_user_ezeid : Invalid EZEID");
+                                                    }
+                                                }
+                                                else {
+                                                    console.log("get_user_ezeid : Invalid EZEID");
+                                                }
+
+                                            });
+
                                         if(transResult[2]){
                                                 var proposal_message = 'proposal deadline is exceded so you can not update data';
                                         }
@@ -973,6 +1039,12 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                 //res.send(rtnMessage);
                                             }
                                         });
+                                    }
+                                        else
+                                        {
+                                            console.log('FnSaveTranscation:No Save Transaction');
+                                            res.send(rtnMessage);
+                                        }
                                     }
                                     else
                                     {
@@ -2530,7 +2602,6 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                             if (historyResult[0][0].id) {
                                                 tid = historyResult[0][0].id;
                                             }
-
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Transaction history created successfully';
@@ -2829,13 +2900,14 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                             //console.log(transResult);
                             if (!err) {
                                 if (transResult) {
-                                    if (transResult[0].length>0) {
-                                        //if (transResult[0][0]) {
-                                        if(transResult[2]){
-                                            var proposal_message = 'proposal deadline is exceded so you can not update data';
-                                        }
+                                    if (transResult[0]){
+                                        if (transResult[0].length>0) {
+                                            //if (transResult[0][0]) {
+                                            if(transResult[2]){
+                                                var proposal_message = 'proposal deadline is exceded so you can not update data';
+                                            }
 
-                                        var proposal_message='';
+                                            var proposal_message='';
                                             responseMessage.status = true;
                                             responseMessage.message = 'Sales request save sucessfully';
                                             responseMessage.proposal_message = proposal_message;
@@ -2855,18 +2927,25 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                                             res.status(200).json(responseMessage);
                                             console.log('FnSaveSalesRequest: Sales request save sucessfully');
 
-                                        //}
-                                        //else {
-                                        //    responseMessage.message = 'Sales request not save';
-                                        //    res.status(200).json(responseMessage);
-                                        //    console.log('FnSaveSalesRequest:Sales request not save');
-                                        //}
+                                            //}
+                                            //else {
+                                            //    responseMessage.message = 'Sales request not save';
+                                            //    res.status(200).json(responseMessage);
+                                            //    console.log('FnSaveSalesRequest:Sales request not save');
+                                            //}
+                                        }
+                                        else {
+                                            responseMessage.message = 'Sales request not save';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveSalesRequest:Sales request not save');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'Sales request not save';
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveSalesRequest:Sales request not save');
                                     }
+
                                 }
                                 else {
                                     responseMessage.message = 'Sales request not save';

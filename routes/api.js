@@ -122,7 +122,7 @@ router.post('/sales_transaction',businessManager.saveSalesTransaction);
 router.get('/sales_transaction',businessManager.getSalesTransaction);
 router.put('/update_transaction',businessManager.updateTransaction);
 router.get('/ewtGetTranscationItems',businessManager.getTransactionItems);
-router.post('/ewtSaveTranscationItems',businessManager.saveTransactionItems);
+//router.post('/ewtSaveTranscationItems',businessManager.saveTransactionItems);
 router.get('/get_outbox_messages',businessManager.getOutboxTransactions);
 router.get('/transaction_autocomplete',businessManager.getTransAutoComplete);
 router.get('/ewtGetItemListForEZEID',businessManager.getItemListForEZEID);
