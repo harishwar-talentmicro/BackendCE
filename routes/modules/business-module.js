@@ -451,8 +451,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                             + "," + st.db.escape(companyName)+ "," + st.db.escape(company_id) + "," + st.db.escape(attachment)
                             + "," + st.db.escape(proabilities)+ "," + st.db.escape(attachment_name) + "," + st.db.escape(mime_type)
                             + "," + st.db.escape(alarmDuration)+ "," + st.db.escape(targetDate) + "," + st.db.escape(amount)
-                            + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)
-                            + ', ' + st.db.escape(specializationId)
+                            + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId) + ', ' + st.db.escape(specializationId)
                             + ', ' + st.db.escape(salaryType) + ', ' + st.db.escape(contactId);
                         //console.log(company_id);
                         //console.log('CALL psendsalesrequest(' + query + ')');
@@ -798,7 +797,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         var contactId = (req.body.ctid) ? (req.body.ctid) : 0;
         var proRef = (req.body.pro_ref) ? (req.body.pro_ref) : '';
         var proDate = (req.body.pro_date) ? (req.body.pro_date) : '';
-        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0;
+        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0.00;
         var proDoc = (req.body.pro_doc) ? (req.body.pro_doc) : '';
         var ve  = (req.body.ve ) ? (req.body.ve ) : '';
         var vcn  = (req.body.vcn) ? (req.body.vcn) : '';
@@ -848,7 +847,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
 
                         if((!isNaN(parseInt(TID))) && parseInt(TID) && (!isNaN(parseInt(req.body.vendor_id))) && parseInt(req.body.vendor_id)){
                             var procurementParams = st.db.escape(Token)+ "," + st.db.escape(TID) + "," + st.db.escape(proRef)
-                                + "," + st.db.escape(proDate) + "," + st.db.escape(proAmount ) + "," + st.db.escape(proDoc)+ "," +
+                                + "," + st.db.escape(proDate) + "," + st.db.escape(proAmount) + "," + st.db.escape(proDoc)+ "," +
                                 st.db.escape(ve)+ "," + st.db.escape(vcn);
 
                             procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
@@ -2768,11 +2767,10 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
         var targetdate = req.body.targetdate ? req.body.targetdate : null;
         var proRef = (req.body.pro_ref) ? (req.body.pro_ref) : '';
         var proDate = (req.body.pro_date) ? (req.body.pro_date) : '';
-        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0;
+        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0.00;
         var proDoc = (req.body.pro_doc) ? (req.body.pro_doc) : '';
         var ve  = (req.body.ve ) ? (req.body.ve ) : '';
         var vcn  = (req.body.vcn) ? (req.body.vcn) : '';
-
         if (!token) {
             error['token'] = 'token is Mandatory';
             validateStatus *= false;
@@ -2819,8 +2817,8 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
 
                         if((!isNaN(parseInt(id))) && parseInt(id) && (!isNaN(parseInt(req.body.vendor_id))) && parseInt(req.body.vendor_id)){
                             var procurementParams = st.db.escape(token)+ "," + st.db.escape(id) + "," + st.db.escape(proRef)
-                                + "," + st.db.escape(proDate) + "," + st.db.escape(req.body.proAmount ) + "," + st.db.escape(req.body.proDoc)+ "," +
-                                st.db.escape(req.body.ve)+ "," + st.db.escape(req.body.vcn);
+                                + "," + st.db.escape(proDate) + "," + st.db.escape(proAmount) + "," + st.db.escape(proDoc)+ "," +
+                                st.db.escape(ve)+ "," + st.db.escape(vcn);
 
                             procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
                         }
@@ -2828,16 +2826,21 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                         var combinedQuery = salesLeadQuery + procurementUpdateQuery;
                         console.log(combinedQuery);
                         st.db.query(combinedQuery, function (err, transResult) {
-                            //console.log(transResult);
+                            console.log(transResult);
                             if (!err) {
                                 if (transResult) {
                                     if (transResult[0].length>0) {
                                         //if (transResult[0][0]) {
-                                        if(transResult[2]){
-                                            var proposal_message = 'proposal deadline is exceded so you can not update data';
-                                        }
-
                                         var proposal_message='';
+                                        if(transResult[2]){
+                                            //console.log(transResult[2],"firsy");
+                                            //console.log(transResult[2].message,"message");
+                                            //if(transResult[2][0].message){
+                                                //console.log(transResult[2][0].message,"bhavya");
+                                                var proposal_message = 'proposal deadline is exceded so you can not update data';
+                                            //}
+
+                                        }
                                             responseMessage.status = true;
                                             responseMessage.message = 'Sales request save sucessfully';
                                             responseMessage.proposal_message = proposal_message;
