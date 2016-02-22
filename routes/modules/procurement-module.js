@@ -391,69 +391,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                                  */
                                                                                 vendorEmailList.push(vendorArray[i].email);
                                                                             }
-                                                                            var notiQueryParam = st.db.escape(token);
-                                                                            var notiQuery = 'CALL get_user_ezeid(' + notiQueryParam + ')';
-                                                                            console.log(notiQuery);
-                                                                            st.db.query(notiQuery, function (err, getDetails) {
-                                                                                console.log(getDetails);
-                                                                                if (getDetails) {
-                                                                                    if (getDetails[0]) {
-                                                                                        if (getDetails[0][0]){
-                                                                                            if (getDetails[0][0].EZEID){
-                                                                                                if (getDetails[0][0].EZEID != ToEZEID){
-                                                                                                    var notificationQueryParams = st.db.escape(vendorArray[i].vid) + "," + st.db.escape(token);
-                                                                                                    var notificationQuery = 'CALL get_subuser_enquiry(' + notificationQueryParams + ')';
-                                                                                                    console.log(notificationQuery);
-                                                                                                    st.db.query(notificationQuery, function (err, getNotDetails) {
-                                                                                                        console.log(getNotDetails);
-                                                                                                        if (getNotDetails) {
-                                                                                                            if (getNotDetails[0]){
-                                                                                                                for (var count = 0; count < getNotDetails[0].length; count++) {
-                                                                                                                    var receiverId = getNotDetails[0][count].receiverId;
-                                                                                                                    var senderTitle = getNotDetails[0][count].sendertitle;
-                                                                                                                    var groupTitle = getNotDetails[0][count].groupTitle;
-                                                                                                                    var groupId = getNotDetails[0][count].GroupID;
-                                                                                                                    var messageText = 'you have received a lead.';
-                                                                                                                    var messageType = 1;
-                                                                                                                    var operationType = 0;
-                                                                                                                    var iphoneId = null;
-                                                                                                                    var messageId = 0;
-                                                                                                                    var masterid = '';
-                                                                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                                    console.log("Notification Send");
-                                                                                                                }
-                                                                                                            }
-                                                                                                            else {
-                                                                                                                console.log('get_subuser_enquiry:user details not loaded');
-                                                                                                            }
-                                                                                                        }
-                                                                                                        else {
-                                                                                                            console.log('get_subuser_enquiry:user details not loaded');
-                                                                                                        }
-                                                                                                    });
-                                                                                                }
-                                                                                                else {
-                                                                                                    console.log("Lead received for vendor's own product");
-                                                                                                }
-                                                                                            }
-                                                                                            else {
-                                                                                                console.log("get_user_ezeid : Invalid EZEID");
-                                                                                            }
-                                                                                        }
-                                                                                        else {
-                                                                                            console.log("get_user_ezeid : Invalid EZEID");
-                                                                                        }
-                                                                                    }
-                                                                                    else {
-                                                                                        console.log("get_user_ezeid : Invalid EZEID");
-                                                                                    }
-                                                                                }
-                                                                                else {
-                                                                                    console.log("get_user_ezeid : Invalid EZEID");
-                                                                                }
 
-                                                                            });
 
                                                                         }
 
@@ -505,9 +443,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 }
                                                             })
                                                         }
-
-
-
+                                                        
                                                     };
 
                                                     saveEnqArrayFn(req.body.vendorArray);
