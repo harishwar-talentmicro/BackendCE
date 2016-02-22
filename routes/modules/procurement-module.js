@@ -168,8 +168,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                             st.db.query(salesEnqComQuery,function(err,saveEnqResult){
                                                                 if(!err){
                                                                     areSalesEnquirySentToVendors = true;
-
-
                                                                     if(saveEnqResult){
                                                                         //console.log(saveEnqResult.length/2,"messaget");
                                                                         //console.log(saveEnqResult[0][0].msg,"messagecount");
@@ -443,7 +441,7 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 }
                                                             })
                                                         }
-                                                        
+
                                                     };
 
                                                     saveEnqArrayFn(req.body.vendorArray);

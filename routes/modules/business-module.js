@@ -861,10 +861,10 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                 if (transResult) {
                                     if (transResult[0]) {
                                         if (transResult[0].length > 0) {
+                                            
                                             if (transResult[2]) {
                                                 var proposal_message = 'proposal deadline is exceded so you can not update data';
                                             }
-
                                             var proposal_message = '';
                                             rtnMessage.IsSuccessfull = true;
                                             rtnMessage.MessageID = (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0;

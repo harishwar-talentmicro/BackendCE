@@ -935,6 +935,7 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
         if (isNaN(parseInt(req.body.compensation)) ) {
             req.body.compensation = 0.00;
         }
+        var tid = req.body.tid ? req.body.tid : 0;
         if (!validationFlag) {
             responseMessage.error = error;
             responseMessage.message = 'Please check the errors';
@@ -948,7 +949,7 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
                     if (!err) {
                         if (tokenResult) {
                             var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.hrm_id) + ',' + st.db.escape(req.body.ed)
-                                + ',' + st.db.escape(req.body.t_id) +  ',' + st.db.escape(req.body.compensation);
+                                + ',' + st.db.escape(req.body.t_id) +  ',' + st.db.escape(req.body.compensation)+ ',' + st.db.escape(tid);
                             var procQuery = 'CALL psave_hrmcompensation(' + procParams + ')';
                             console.log(procQuery);
                             st.db.query(procQuery, function (err, results) {
@@ -961,9 +962,10 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
                                                     var comQuery = "";
 
                                                     for (var i = 0; i < e_sal.length; i++) {
+                                                        var eSalTid = e_sal[i].tid ? e_sal[i].tid : 0 ;
                                                         if (e_sal[i].header_id && (!isNaN(parseFloat(e_sal[i].ctc)))) {
                                                             var procParams = st.db.escape(results[0][0].id) + ',' + st.db.escape(e_sal[i].header_id)
-                                                                + ',' + st.db.escape(e_sal[i].ctc);
+                                                                + ',' + st.db.escape(e_sal[i].ctc) + ',' + st.db.escape(eSalTid);
                                                             var procQuery = 'CALL psave_hrmcompensation_details(' + procParams + ');';
                                                             comQuery += procQuery;
                                                         }
@@ -971,10 +973,6 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
 
                                                     console.log(comQuery);
 
-                                                    /**
-                                                     * @todo Problem here
-                                                     * It should be one single call only to the server and no care of async nature has been taken
-                                                     */
                                                     st.db.query(comQuery, function (err, resultsDetails) {
                                                         if (!err) {
                                                             console.log(resultsDetails);
