@@ -3460,6 +3460,10 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                                     pro_ref = output[0].pro_ref;
                                                     pro_date = output[0].pro_date;
                                                     vendor_cn= output[0].vendor_cn;
+                                                    if(!output[0].vendor_emailid){
+                                                    output[0].vendor_emailid=output[0].emailid;
+                                                    output[0].emailid='';
+                                                    }
                                                     toMailID=output[0].vendor_emailid;
                                                     ccemailid=output[0].emailid;
                                                     //pro_att=output[0].pro_doc;
