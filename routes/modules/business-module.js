@@ -17,15 +17,12 @@ var validator = require('validator');
 var st = null;
 var mailModule = require('./mail-module.js');
 var mail = null;
-var Notification = require('./notification/notification-master.js');
-var notification = null;
 
 function BusinessManager(db,stdLib){
 
     if(stdLib){
         st = stdLib;
         mail = new mailModule(db,stdLib);
-        notification = new Notification(db,stdLib);
     }
 };
 
@@ -454,8 +451,7 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                             + "," + st.db.escape(companyName)+ "," + st.db.escape(company_id) + "," + st.db.escape(attachment)
                             + "," + st.db.escape(proabilities)+ "," + st.db.escape(attachment_name) + "," + st.db.escape(mime_type)
                             + "," + st.db.escape(alarmDuration)+ "," + st.db.escape(targetDate) + "," + st.db.escape(amount)
-                            + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)
-                            + ', ' + st.db.escape(specializationId)
+                            + ', ' + st.db.escape(instituteId) + ', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId) + ', ' + st.db.escape(specializationId)
                             + ', ' + st.db.escape(salaryType) + ', ' + st.db.escape(contactId);
                         //console.log(company_id);
                         //console.log('CALL psendsalesrequest(' + query + ')');
@@ -558,6 +554,8 @@ BusinessManager.prototype.saveSalesTransaction = function(req,res,next){
                                                             salaryType: salaryType,
                                                             contactId: contactId
                                                         };
+
+
                                                         for (var i = 0; i < ItemsList.length; i++) {
                                                             var itemsDetails = ItemsList[i];
                                                             var items = {
@@ -799,7 +797,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
         var contactId = (req.body.ctid) ? (req.body.ctid) : 0;
         var proRef = (req.body.pro_ref) ? (req.body.pro_ref) : '';
         var proDate = (req.body.pro_date) ? (req.body.pro_date) : '';
-        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0;
+        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0.00;
         var proDoc = (req.body.pro_doc) ? (req.body.pro_doc) : '';
         var ve  = (req.body.ve ) ? (req.body.ve ) : '';
         var vcn  = (req.body.vcn) ? (req.body.vcn) : '';
@@ -849,91 +847,19 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
 
                         if((!isNaN(parseInt(TID))) && parseInt(TID) && (!isNaN(parseInt(req.body.vendor_id))) && parseInt(req.body.vendor_id)){
                             var procurementParams = st.db.escape(Token)+ "," + st.db.escape(TID) + "," + st.db.escape(proRef)
-                                + "," + st.db.escape(proDate) + "," + st.db.escape(proAmount ) + "," + st.db.escape(proDoc)+ "," +
+                                + "," + st.db.escape(proDate) + "," + st.db.escape(proAmount) + "," + st.db.escape(proDoc)+ "," +
                                 st.db.escape(ve)+ "," + st.db.escape(vcn);
 
                             procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
                         }
+
                         var combinedQuery = salesLeadQuery + procurementUpdateQuery;
                         console.log(combinedQuery);
                         st.db.query(combinedQuery, function (err, transResult) {
                             if (!err) {
                                 //console.log(transResult);
                                 if (transResult) {
-                                    if (transResult[0]) {
-                                        if (transResult[0].length > 0) {
-                                            /**
-                                             * From first procedure we are getting ezeid then compairing EZEID with TOEZEID
-                                             * if EZEID's are not same then we are calling anothor procedure for fetch the
-                                             * list of all subusers and send notifications.
-                                             */
-                                            var notiQueryParam = st.db.escape(Token);
-                                            var notiQuery = 'CALL get_user_ezeid(' + notiQueryParam + ')';
-                                            console.log(notiQuery);
-                                            st.db.query(notiQuery, function (err, getDetails) {
-                                                console.log(getDetails);
-                                                if (getDetails) {
-                                                    if (getDetails[0]) {
-                                                        if (getDetails[0][0]){
-                                                            if (getDetails[0][0].EZEID){
-                                                                var eqCreationMasterEzeid = (getDetails[0][0].EZEID) ? getDetails[0][0].EZEID.split('.')[0] : '';
-                                                                if (eqCreationMasterEzeid != ToEZEID){
-                                                                    var notificationQueryParams = st.db.escape(req.body.vendor_id) + "," + st.db.escape(Token);
-                                                                    var notificationQuery = 'CALL get_subuser_enquiry(' + notificationQueryParams + ')';
-                                                                    console.log(notificationQuery);
-                                                                    st.db.query(notificationQuery, function (err, getNotDetails) {
-                                                                        console.log(getNotDetails);
-                                                                        if (getNotDetails) {
-                                                                            if (getNotDetails[0]){
-                                                                                for (var count = 0; count < getNotDetails[0].length; count++) {
-                                                                                    var receiverId = getNotDetails[0][count].receiverId;
-                                                                                    var senderTitle = getNotDetails[0][count].sendertitle;
-                                                                                    var groupTitle = getNotDetails[0][count].groupTitle;
-                                                                                    var groupId = getNotDetails[0][count].GroupID;
-                                                                                    var messageText = 'you have received a lead.';
-                                                                                    var messageType = 1;
-                                                                                    var operationType = 0;
-                                                                                    var iphoneId = null;
-                                                                                    var messageId = 0;
-                                                                                    var masterid = '';
-                                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-
-                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId,
-                                                                                        messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                    console.log("Notification Send");
-                                                                                }
-                                                                            }
-                                                                            else {
-                                                                                console.log('get_subuser_enquiry:user details not loaded');
-                                                                            }
-                                                                        }
-                                                                        else {
-                                                                            console.log('get_subuser_enquiry:user details not loaded');
-                                                                        }
-                                                                    });
-                                                                }
-                                                                else {
-                                                                    console.log("Lead received for vendor's own product");
-                                                                }
-                                                            }
-                                                            else {
-                                                                console.log("get_user_ezeid : Invalid EZEID");
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log("get_user_ezeid : Invalid EZEID");
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log("get_user_ezeid : Invalid EZEID");
-                                                    }
-                                                }
-                                                else {
-                                                    console.log("get_user_ezeid : Invalid EZEID");
-                                                }
-
-                                            });
-
+                                    if (transResult[0].length > 0) {
                                         if(transResult[2]){
                                                 var proposal_message = 'proposal deadline is exceded so you can not update data';
                                         }
@@ -1048,12 +974,6 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                 //res.send(rtnMessage);
                                             }
                                         });
-                                    }
-                                        else
-                                        {
-                                            console.log('FnSaveTranscation:No Save Transaction');
-                                            res.send(rtnMessage);
-                                        }
                                     }
                                     else
                                     {
@@ -2611,6 +2531,7 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                             if (historyResult[0][0].id) {
                                                 tid = historyResult[0][0].id;
                                             }
+
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Transaction history created successfully';
@@ -2846,11 +2767,10 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
         var targetdate = req.body.targetdate ? req.body.targetdate : null;
         var proRef = (req.body.pro_ref) ? (req.body.pro_ref) : '';
         var proDate = (req.body.pro_date) ? (req.body.pro_date) : '';
-        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0;
+        var proAmount = (req.body.pro_amount) ? (req.body.pro_amount) : 0.00;
         var proDoc = (req.body.pro_doc) ? (req.body.pro_doc) : '';
         var ve  = (req.body.ve ) ? (req.body.ve ) : '';
         var vcn  = (req.body.vcn) ? (req.body.vcn) : '';
-
         if (!token) {
             error['token'] = 'token is Mandatory';
             validateStatus *= false;
@@ -2897,8 +2817,8 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
 
                         if((!isNaN(parseInt(id))) && parseInt(id) && (!isNaN(parseInt(req.body.vendor_id))) && parseInt(req.body.vendor_id)){
                             var procurementParams = st.db.escape(token)+ "," + st.db.escape(id) + "," + st.db.escape(proRef)
-                                + "," + st.db.escape(proDate) + "," + st.db.escape(req.body.proAmount ) + "," + st.db.escape(req.body.proDoc)+ "," +
-                                st.db.escape(req.body.ve)+ "," + st.db.escape(req.body.vcn);
+                                + "," + st.db.escape(proDate) + "," + st.db.escape(proAmount) + "," + st.db.escape(proDoc)+ "," +
+                                st.db.escape(ve)+ "," + st.db.escape(vcn);
 
                             procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
                         }
@@ -2906,17 +2826,21 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                         var combinedQuery = salesLeadQuery + procurementUpdateQuery;
                         console.log(combinedQuery);
                         st.db.query(combinedQuery, function (err, transResult) {
-                            //console.log(transResult);
+                            console.log(transResult);
                             if (!err) {
                                 if (transResult) {
-                                    if (transResult[0]){
-                                        if (transResult[0].length>0) {
-                                            //if (transResult[0][0]) {
-                                            if(transResult[2]){
+                                    if (transResult[0].length>0) {
+                                        //if (transResult[0][0]) {
+                                        var proposal_message='';
+                                        if(transResult[2]){
+                                            //console.log(transResult[2],"firsy");
+                                            //console.log(transResult[2].message,"message");
+                                            //if(transResult[2][0].message){
+                                                //console.log(transResult[2][0].message,"bhavya");
                                                 var proposal_message = 'proposal deadline is exceded so you can not update data';
-                                            }
+                                            //}
 
-                                            var proposal_message='';
+                                        }
                                             responseMessage.status = true;
                                             responseMessage.message = 'Sales request save sucessfully';
                                             responseMessage.proposal_message = proposal_message;
@@ -2936,25 +2860,18 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                                             res.status(200).json(responseMessage);
                                             console.log('FnSaveSalesRequest: Sales request save sucessfully');
 
-                                            //}
-                                            //else {
-                                            //    responseMessage.message = 'Sales request not save';
-                                            //    res.status(200).json(responseMessage);
-                                            //    console.log('FnSaveSalesRequest:Sales request not save');
-                                            //}
-                                        }
-                                        else {
-                                            responseMessage.message = 'Sales request not save';
-                                            res.status(200).json(responseMessage);
-                                            console.log('FnSaveSalesRequest:Sales request not save');
-                                        }
+                                        //}
+                                        //else {
+                                        //    responseMessage.message = 'Sales request not save';
+                                        //    res.status(200).json(responseMessage);
+                                        //    console.log('FnSaveSalesRequest:Sales request not save');
+                                        //}
                                     }
                                     else {
                                         responseMessage.message = 'Sales request not save';
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveSalesRequest:Sales request not save');
                                     }
-
                                 }
                                 else {
                                     responseMessage.message = 'Sales request not save';
@@ -3353,7 +3270,7 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
      */
 
     var token = req.query.token;
-    var pageCount = (!isNaN(parseInt(req.query.pc))) ?  parseInt(req.query.pc): 1;      // no of records per page
+    var pageCount = (!isNaN(parseInt(req.query.pc))) ?  parseInt(req.query.pc): 0;      // no of records per page
     var pageSize = (!isNaN(parseInt(req.query.ps))) ?  parseInt(req.query.ps): 10;   //  page size
     var stage = (req.query.stage) ? (req.query.stage) : '';
     var probability = (req.query.probability) ? (req.query.probability) : '';
@@ -3377,10 +3294,7 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
         error['token'] = 'Invalid token';
         validateStatus *= false;
     }
-    if(req.query.pc == 0){
-        error['pc'] = 'Page count can not be less then 1';
-        validateStatus *= false;
-    }
+
     if(!validateStatus){
         responseMessage.error = error ;
         responseMessage.message = 'Please check the errors below';
