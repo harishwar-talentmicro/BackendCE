@@ -3614,6 +3614,7 @@ BusinessManager.prototype.getSalesTransDetails = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'Sales Transacrion details loaded successfully';
                                             responseMessage.data = results[0];
+                                            responseMessage.Attachment = (results[0][0].Attachment) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +results[0][0].Attachment: '' ,
                                             res.status(200).json(responseMessage);
                                         }
                                         else {
