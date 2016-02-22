@@ -861,7 +861,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                 if (transResult) {
                                     if (transResult[0]) {
                                         if (transResult[0].length > 0) {
-                                            
+
                                             if (transResult[2]) {
                                                 var proposal_message = 'proposal deadline is exceded so you can not update data';
                                             }
@@ -2835,7 +2835,7 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                             if (!err) {
                                 if (transResult) {
                                     if (transResult[0]){
-                                        if (transResult[0].length>0) {
+                                        if (transResult[0].length > 0) {
                                             //if (transResult[0][0]) {
                                             var proposal_message='';
                                             if(transResult[2]){
