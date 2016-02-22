@@ -862,6 +862,11 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                 if (transResult) {
                                     if (transResult[0]) {
                                         if (transResult[0].length > 0) {
+                                            /**
+                                             * From first procedure we are getting ezeid then compairing EZEID with TOEZEID
+                                             * if EZEID's are not same then we are calling anothor procedure for fetch the
+                                             * list of all subusers and send notifications.
+                                             */
                                             var notiQueryParam = st.db.escape(Token);
                                             var notiQuery = 'CALL get_user_ezeid(' + notiQueryParam + ')';
                                             console.log(notiQuery);
@@ -871,7 +876,8 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                     if (getDetails[0]) {
                                                         if (getDetails[0][0]){
                                                             if (getDetails[0][0].EZEID){
-                                                                if (getDetails[0][0].EZEID != ToEZEID){
+                                                                var eqCreationMasterEzeid = (getDetails[0][0].EZEID) ? getDetails[0][0].EZEID.split('.')[0] : '';
+                                                                if (eqCreationMasterEzeid != ToEZEID){
                                                                     var notificationQueryParams = st.db.escape(req.body.vendor_id) + "," + st.db.escape(Token);
                                                                     var notificationQuery = 'CALL get_subuser_enquiry(' + notificationQueryParams + ')';
                                                                     console.log(notificationQuery);
@@ -891,7 +897,10 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                                                     var messageId = 0;
                                                                                     var masterid = '';
                                                                                     console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+
+                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId,
+                                                                                        messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                    console.log("Notification Send");
                                                                                 }
                                                                             }
                                                                             else {

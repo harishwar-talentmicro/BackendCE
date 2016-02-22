@@ -341,7 +341,6 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnSaveClient
  * Method : POST

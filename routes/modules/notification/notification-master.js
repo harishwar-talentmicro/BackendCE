@@ -50,10 +50,13 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
     //    validationStatus = false;
     //    error.groupId = "Error parameter 3  :  \" "+groupId + "\"";
     //}
-    if(!message){
-        validationStatus = false;
-        error.message = "Error parameter 4  :  \""+message + "\"";
+    if(!aUrl){
+        if(!message){
+            validationStatus = false;
+            error.message = "Error parameter 4  :  \""+message + "\"";
+        }
     }
+
 
     if(parseInt(messageType) < 0 && parseInt(messageType) > 3){
         validationStatus = false;
@@ -128,7 +131,12 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
          * If IPhone ID is there for this user then send notification to his iphone id also
          */
         if(iphoneId){
-            _apnsNotification.sendAppleNS(iphoneId,messagePayload);
+            try{
+                _apnsNotification.sendAppleNS(iphoneId,messagePayload);
+            }
+            catch(ex){
+                console.log('APNS Notification error',ex);
+            }
         }
     }
 
