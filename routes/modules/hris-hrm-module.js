@@ -935,7 +935,7 @@ HrisHRM.prototype.hrisSaveHRMCompnstn = function(req,res,next){
         if (isNaN(parseInt(req.body.compensation)) ) {
             req.body.compensation = 0.00;
         }
-        var tid = req.body.tid ? req.body.tid : 0;
+        var tid = (req.body.tid) ? req.body.tid : 0;
         if (!validationFlag) {
             responseMessage.error = error;
             responseMessage.message = 'Please check the errors';
