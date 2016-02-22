@@ -145,7 +145,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                     var sendResponse = function(respCode,respObj){
                                                         res.status(respCode).json(respObj);
                                                     };
-
                                                     var sendSalesEnquiryToVendors = function(vendorList){
                                                         var salesEnqComQuery = "";
                                                         for(var vCount=0; vCount < vendorList.length; vCount++){
@@ -169,8 +168,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                             st.db.query(salesEnqComQuery,function(err,saveEnqResult){
                                                                 if(!err){
                                                                     areSalesEnquirySentToVendors = true;
-
-
                                                                     if(saveEnqResult){
                                                                         //console.log(saveEnqResult.length/2,"messaget");
                                                                         //console.log(saveEnqResult[0][0].msg,"messagecount");
@@ -238,7 +235,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
 
                                                     };
-
 
                                                     var sendMailToVendors = function(vendorEmailList){
                                                         /**
@@ -343,8 +339,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                                     vendorContact : vendorArray[i].cn,
                                                                                     vendorEmail : vendorArray[i].email,
                                                                                     vendorPhone : vendorArray[i].phone_no,
-                                                                                    vendorContactName : vendorArray[i].cezeone
-
+                                                                                    vendorContactName : vendorArray[i].cezeone,
+                                                                                    vendorId : vendorArray[i].vid
                                                                                 });
                                                                             }
                                                                             else if(vendorArray[i].email){
@@ -353,6 +349,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                                  */
                                                                                 vendorEmailList.push(vendorArray[i].email);
                                                                             }
+
+
                                                                         }
 
                                                                         /**
@@ -403,8 +401,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 }
                                                             })
                                                         }
-
-
 
                                                     };
 
@@ -3410,8 +3406,6 @@ Procurement.prototype.sendPoMail = function(req,res,next){
                                         fromEmail = output[0].FromEmailId;
                                         console.log(fromEmail,"from");
                                     }
-
-
                                     st.db.query('CALL pGet_proposaldetails(' + vendor_id + ')', function (err, vendordetails) {
                                         if (!err) {
                                             if (vendordetails) {

@@ -1257,6 +1257,7 @@ var uploadDocumentToCloud = function(uniqueName,bufferData,callback){
     });
 
 };
+
 /**
  * @todo FnComposeMessage
  * Method : POST
@@ -1296,14 +1297,12 @@ MessageBox.prototype.composeMessage = function(req,res,next){
         //console.log(toIds.length);
         //console.log(toIds);
     }
-
     var responseMessage = {
         status: false,
         error: {},
         message: '',
         data: null
     };
-
     var validateStatus = true, error = {};
 
     if(!token){
@@ -1382,7 +1381,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                 + ',' + st.db.escape(istask);
                             var query = 'CALL pComposeMessage(' + queryParams + ')';
 
-                            //console.log(query);
+                            console.log(query);
 
                             st.db.query(query, function (err, insertResult) {
                                 console.log(insertResult);
@@ -1392,7 +1391,6 @@ MessageBox.prototype.composeMessage = function(req,res,next){
                                             if (insertResult[0][0]) {
                                                 if (insertResult[0][0].messageids) {
                                                     if (insertResult[0][0].mesguserid) {
-
                                                         responseMessage.status = true;
                                                         responseMessage.error = null;
                                                         responseMessage.message = 'Message Composed successfully';

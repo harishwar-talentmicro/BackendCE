@@ -19,6 +19,7 @@ function alterEzeoneId(ezeoneId){
 
 var st = null;
 var Notification = require('./notification/notification-master.js');
+
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notification = null;
 var notificationQmManager = null;
@@ -59,7 +60,7 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
 
                     if (gid) {
                         var iosDetailsQuery = 'select ezeid,IPhoneDeviceID as iosId from tmaster where tid=' + gid;
-                        //console.log(iosDetailsQuery);
+                        console.log(iosDetailsQuery);
                         st.db.query(iosDetailsQuery, function (err, iosResult) {
                             if (iosResult) {
                                 if (iosResult[0]) {
@@ -69,11 +70,12 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
                                     iosId = '';
                                 }
                             }
-                            //console.log(iosId);
+                            console.log(iosId);
                             var memberQueryParams = st.db.escape(msgContent.token) + ',' + st.db.escape(id_type) + ',' + st.db.escape(gid);
                             var memberDetailsQuery = 'CALL PgetGroupDetails(' + memberQueryParams + ')';
-                            //console.log(memberDetailsQuery);
+                            console.log(memberDetailsQuery);
                             st.db.query(memberDetailsQuery, function (err, groupDetails) {
+                                console.log(groupDetails);
                                 if (groupDetails) {
                                     if (groupDetails[0]) {
                                         if (groupDetails[0].length > 0) {
@@ -81,8 +83,9 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
                                                 if (groupDetails[1].length > 0) {
                                                     var queryParams1 = st.db.escape(gid) + ',' + st.db.escape(id_type) + ',' + st.db.escape(msgContent.token);
                                                     var memberDetailsQuery1 = 'CALL pGetGroupInfn(' + queryParams1 + ')';
-                                                    //console.log(memberDetailsQuery1);
+                                                    console.log(memberDetailsQuery1);
                                                     st.db.query(memberDetailsQuery1, function (err, groupInfo) {
+                                                        console.log(groupInfo);
                                                         if (groupInfo) {
                                                             if (groupInfo[0]) {
                                                                 if (groupInfo[0][0]) {
@@ -117,7 +120,7 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
                                                                             var latitude = 0.00;
                                                                             var longitude = 0.00;
                                                                             var jobId = 0;
-                                                                            //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
+                                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
                                                                             notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, priority, datetime, a_name, msgUserid, jobId, a_url);
                                                                         }
                                                                     }
@@ -199,7 +202,6 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
-
 
 msgNotification.prototype.updateStatus= function(details, callBack) {
 
@@ -1074,6 +1076,7 @@ msgNotification.prototype.sendForwardNotification = function(msgContent, callBac
         console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
+
 
 
 module.exports = msgNotification;

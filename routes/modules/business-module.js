@@ -859,124 +859,129 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                             if (!err) {
                                 //console.log(transResult);
                                 if (transResult) {
-                                    if (transResult[0].length > 0) {
-                                        if(transResult[2]){
+                                    if (transResult[0]) {
+                                        if (transResult[0].length > 0) {
+                                            
+                                            if (transResult[2]) {
                                                 var proposal_message = 'proposal deadline is exceded so you can not update data';
-                                        }
-
-                                        var proposal_message='';
-                                        rtnMessage.IsSuccessfull = true;
-                                        rtnMessage.MessageID = (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0;
-                                        rtnMessage.proposal_message = proposal_message;
-                                        //console.log(proposal_message);
-                                        //console.log(transResult,"2");
-                                        for (var i = 0; i < ItemsList.length; i++) {
-                                            var itemsDetails = ItemsList[i];
-                                            var items = {
-                                                MessageID: (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0,
-                                                ItemID: itemsDetails.ItemID,
-                                                Qty: itemsDetails.Qty,
-                                                Rate: itemsDetails.Rate,
-                                                Amount: itemsDetails.Amount,
-                                                Duration: itemsDetails.Durations
-                                            };
-                                            //console.log(items);
-                                            //console.log('TID:' + itemsDetails.TID);
-                                            if (itemsDetails.TID == 0) {
-                                                var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
-                                                    // Neat!
-                                                    if (!err) {
-                                                        if (result) {
-                                                            if (result.affectedRows > 0) {
-                                                                console.log('FnSaveFolderRules: Folder rules saved successfully');
-                                                            }
-                                                            else {
-                                                                console.log('FnSaveFolderRules: Folder rule not saved');
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnSaveFolderRules: Folder rule not saved');
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log('FnSaveFolderRules: error in saving folder rules' + err);
-                                                    }
-                                                });
-
                                             }
-
-                                            else {
+                                            var proposal_message = '';
+                                            rtnMessage.IsSuccessfull = true;
+                                            rtnMessage.MessageID = (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0;
+                                            rtnMessage.proposal_message = proposal_message;
+                                            //console.log(proposal_message);
+                                            //console.log(transResult,"2");
+                                            for (var i = 0; i < ItemsList.length; i++) {
+                                                var itemsDetails = ItemsList[i];
                                                 var items = {
-
+                                                    MessageID: (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0,
                                                     ItemID: itemsDetails.ItemID,
                                                     Qty: itemsDetails.Qty,
                                                     Rate: itemsDetails.Rate,
                                                     Amount: itemsDetails.Amount,
                                                     Duration: itemsDetails.Durations
                                                 };
+                                                //console.log(items);
                                                 //console.log('TID:' + itemsDetails.TID);
-                                                var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
-                                                    // Neat!
-                                                    //console.log(result);
-                                                    if (!err) {
-                                                        if (result) {
-                                                            if (result.affectedRows > 0) {
-
-                                                                console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                if (itemsDetails.TID == 0) {
+                                                    var query = st.db.query('INSERT INTO titems SET ?', items, function (err, result) {
+                                                        // Neat!
+                                                        if (!err) {
+                                                            if (result) {
+                                                                if (result.affectedRows > 0) {
+                                                                    console.log('FnSaveFolderRules: Folder rules saved successfully');
+                                                                }
+                                                                else {
+                                                                    console.log('FnSaveFolderRules: Folder rule not saved');
+                                                                }
                                                             }
                                                             else {
-                                                                console.log('FnSaveFolderRules: Folder rule not updated');
+                                                                console.log('FnSaveFolderRules: Folder rule not saved');
                                                             }
                                                         }
                                                         else {
-                                                            console.log('FnSaveFolderRules: Folder rule not updated')
+                                                            console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                        }
+                                                    });
+
+                                                }
+
+                                                else {
+                                                    var items = {
+
+                                                        ItemID: itemsDetails.ItemID,
+                                                        Qty: itemsDetails.Qty,
+                                                        Rate: itemsDetails.Rate,
+                                                        Amount: itemsDetails.Amount,
+                                                        Duration: itemsDetails.Durations
+                                                    };
+                                                    //console.log('TID:' + itemsDetails.TID);
+                                                    var query = st.db.query("UPDATE titems set ? WHERE TID = ? ", [items, itemsDetails.TID], function (err, result) {
+                                                        // Neat!
+                                                        //console.log(result);
+                                                        if (!err) {
+                                                            if (result) {
+                                                                if (result.affectedRows > 0) {
+
+                                                                    console.log('FnSaveFolderRules: Folder rules Updated successfully');
+                                                                }
+                                                                else {
+                                                                    console.log('FnSaveFolderRules: Folder rule not updated');
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log('FnSaveFolderRules: Folder rule not updated')
+                                                            }
+                                                        }
+                                                        else {
+                                                            console.log('FnSaveFolderRules: error in saving folder rules' + err);
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                            res.send(rtnMessage);
+                                            console.log('FnSaveTranscation: Transaction details save successfully');
+
+                                            var messageContent = {
+                                                token: req.body.Token,
+                                                LocId: LocID,
+                                                messageType: parseInt(req.body.FunctionType),
+                                                message: MessageText,
+                                                ezeid: EZEID,
+                                                toEzeid: ToEZEID
+                                            };
+
+                                            /*sending sales enquiry mail*/
+                                            mail.fnMessageMail(messageContent, function (err, statusResult) {
+                                                //console.log(statusResult);
+                                                if (!err) {
+                                                    if (statusResult) {
+                                                        if (statusResult.status == true) {
+                                                            console.log('FnSendMail: Mail Sent Successfully');
+                                                            //res.send(rtnMessage);
+                                                        }
+                                                        else {
+                                                            console.log('FnSendMail: Mail not Sent...1');
+                                                            //res.send(rtnMessage);
                                                         }
                                                     }
                                                     else {
-                                                        console.log('FnSaveFolderRules: error in saving folder rules' + err);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                        res.send(rtnMessage);
-                                        console.log('FnSaveTranscation: Transaction details save successfully');
-
-                                        var messageContent = {
-                                            token : req.body.Token,
-                                            LocId : LocID,
-                                            messageType: parseInt(req.body.FunctionType),
-                                            message: MessageText,
-                                            ezeid : EZEID,
-                                            toEzeid :ToEZEID
-                                        };
-
-                                        /*sending sales enquiry mail*/
-                                        mail.fnMessageMail(messageContent, function (err, statusResult) {
-                                            //console.log(statusResult);
-                                            if (!err) {
-                                                if (statusResult) {
-                                                    if (statusResult.status == true) {
-                                                        console.log('FnSendMail: Mail Sent Successfully');
-                                                        //res.send(rtnMessage);
-                                                    }
-                                                    else {
-                                                        console.log('FnSendMail: Mail not Sent...1');
+                                                        console.log('FnSendMail: Mail not Sent..2');
                                                         //res.send(rtnMessage);
                                                     }
                                                 }
                                                 else {
-                                                    console.log('FnSendMail: Mail not Sent..2');
+                                                    console.log('FnSendMail:Error in sending mails' + err);
                                                     //res.send(rtnMessage);
                                                 }
-                                            }
-                                            else {
-                                                console.log('FnSendMail:Error in sending mails' + err);
-                                                //res.send(rtnMessage);
-                                            }
-                                        });
+                                            });
+                                        }
+                                        else {
+                                            console.log('FnSaveTranscation:No Save Transaction');
+                                            res.send(rtnMessage);
+                                        }
                                     }
-                                    else
-                                    {
+                                    else {
                                         console.log('FnSaveTranscation:No Save Transaction');
                                         res.send(rtnMessage);
                                     }
@@ -2829,18 +2834,19 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                             console.log(transResult);
                             if (!err) {
                                 if (transResult) {
-                                    if (transResult[0].length>0) {
-                                        //if (transResult[0][0]) {
-                                        var proposal_message='';
-                                        if(transResult[2]){
-                                            //console.log(transResult[2],"firsy");
-                                            //console.log(transResult[2].message,"message");
-                                            //if(transResult[2][0].message){
+                                    if (transResult[0]){
+                                        if (transResult[0].length>0) {
+                                            //if (transResult[0][0]) {
+                                            var proposal_message='';
+                                            if(transResult[2]){
+                                                //console.log(transResult[2],"firsy");
+                                                //console.log(transResult[2].message,"message");
+                                                //if(transResult[2][0].message){
                                                 //console.log(transResult[2][0].message,"bhavya");
                                                 var proposal_message = 'proposal deadline is exceded so you can not update data';
-                                            //}
+                                                //}
 
-                                        }
+                                            }
                                             responseMessage.status = true;
                                             responseMessage.message = 'Sales request save sucessfully';
                                             responseMessage.proposal_message = proposal_message;
@@ -2860,12 +2866,18 @@ BusinessManager.prototype.saveSalesRequest = function(req,res,next){
                                             res.status(200).json(responseMessage);
                                             console.log('FnSaveSalesRequest: Sales request save sucessfully');
 
-                                        //}
-                                        //else {
-                                        //    responseMessage.message = 'Sales request not save';
-                                        //    res.status(200).json(responseMessage);
-                                        //    console.log('FnSaveSalesRequest:Sales request not save');
-                                        //}
+                                            //}
+                                            //else {
+                                            //    responseMessage.message = 'Sales request not save';
+                                            //    res.status(200).json(responseMessage);
+                                            //    console.log('FnSaveSalesRequest:Sales request not save');
+                                            //}
+                                        }
+                                        else {
+                                            responseMessage.message = 'Sales request not save';
+                                            res.status(200).json(responseMessage);
+                                            console.log('FnSaveSalesRequest:Sales request not save');
+                                        }
                                     }
                                     else {
                                         responseMessage.message = 'Sales request not save';
