@@ -312,6 +312,7 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
     var validationFlag = true;
     var error = {};
 
+    var ezeOneID = alterEzeoneId(req.body.ezeoneid);
     if(!req.body.token){
         error.token = 'Invalid token';
         validationFlag *= false;
@@ -403,7 +404,7 @@ HrisHRM.prototype.hrisSaveHRM = function(req,res,next){
                             + ',' + st.db.escape(req.body.ln)+ ',' + st.db.escape(req.body.blocid)+ ',' + st.db.escape(req.body.bloc)
                             + ',' + st.db.escape(req.body.deptid)+ ',' + st.db.escape(req.body.dept)+ ',' + st.db.escape(req.body.jdate)
                             + ',' + st.db.escape(req.body.gradeid)+ ',' + st.db.escape(req.body.grade)+ ',' + st.db.escape(req.body.rmid)
-                            + ',' + st.db.escape(req.body.ezeoneid)+ ',' + st.db.escape(req.body.st)+ ',' + st.db.escape(req.body.exitdate)
+                            + ',' + st.db.escape(ezeOneID)+ ',' + st.db.escape(req.body.st)+ ',' + st.db.escape(req.body.exitdate)
                             + ',' + st.db.escape(req.body.einfn)+ ',' + st.db.escape(req.body.picpath);
                         var procQuery = 'CALL psaveHRM(' + procParams + ')';
                         console.log(procQuery);

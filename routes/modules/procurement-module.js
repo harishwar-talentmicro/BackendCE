@@ -10,6 +10,8 @@ var validator = require('validator');
 var moment = require('moment');
 var Mailer = require('../../mail/mailer.js');
 var mailerApi = new Mailer();
+var Notification = require('./notification/notification-master.js');
+var notification = null;
 var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
 var fs = require('fs');
 var chalk = require('chalk');
@@ -19,11 +21,115 @@ var CONFIG = require('../../ezeone-config.json');
 function Procurement(db,stdLib){
 
     if(stdLib){
-
         st = stdLib;
+        notification = new Notification(db,stdLib);
     }
 
 };
+
+/**
+ *
+ * @param token
+ * @param toEZEID
+ * @param functionType
+ * @param folderRuleID
+ *
+ * @discription send notification for new sales enquity to all subusers
+ */
+
+var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
+    /**
+     * We are getting ezeid then compairing EZEID with TOEZEID
+     * if EZEID's are not same then only notifications will be sent.
+     */
+
+    var notiQueryParam = st.db.escape(token);
+    var notiQuery = 'CALL get_user_ezeid(' + notiQueryParam + ')';
+    console.log(notiQuery);
+    st.db.query(notiQuery, function (err, userDetailsRes) {
+        console.log(userDetailsRes);
+        if (userDetailsRes) {
+            if (userDetailsRes[0]) {
+                if (userDetailsRes[0][0]){
+                    if (userDetailsRes[0][0].EZEID){
+                        var eqCreationMasterEzeid = (userDetailsRes[0][0].EZEID) ? userDetailsRes[0][0].EZEID.split('.')[0] : '';
+                        if (eqCreationMasterEzeid != toEZEID){
+                            /**
+                             * From bellow procedure we are getting list of all subusers of ToEZEID after then checking for
+                             * user access, and then folder rights if all conditions will match then only notification
+                             * will be sent
+                             */
+                            var notificationQueryParams = st.db.escape(toEZEID) + ',' + st.db.escape(functionType);
+                            var notificationQuery = 'CALL get_subuser_list(' + notificationQueryParams + ')';
+                            console.log(notificationQuery);
+                            st.db.query(notificationQuery, function (err, notDetailsRes) {
+                                console.log(notDetailsRes);
+                                if (notDetailsRes) {
+                                    if (notDetailsRes[0]){
+                                        for (var count = 0; count < notDetailsRes[0].length; count++) {
+                                            if (notDetailsRes[0][count].userRights){
+                                                if ((!isNaN(parseInt(notDetailsRes[0][count].userRights.split()[0]))) &&
+                                                    parseInt(notDetailsRes[0][count].userRights.split()[0]) > 0 ){
+
+                                                    var foldRIDSubuser = notDetailsRes[0][count].rid.split(',');
+                                                    console.log(foldRIDSubuser);
+                                                    /**
+                                                     * to match string with string
+                                                     */
+                                                    if (foldRIDSubuser.indexOf((folderRuleID) ? folderRuleID.toString() : null ) != -1){
+                                                        var receiverId = notDetailsRes[0][count].receiverId;
+                                                        var senderTitle = userDetailsRes[0][0].EZEID;
+                                                        var groupTitle = notDetailsRes[0][count].groupTitle;
+                                                        var groupId = notDetailsRes[0][count].groupId;
+                                                        var messageText = 'You have received a lead.';
+                                                        var messageType = 1;
+                                                        var operationType = 0;
+                                                        var iphoneId = null;
+                                                        var messageId = 0;
+                                                        var masterid = notDetailsRes[0][count].masterid;
+                                                        console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+
+                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId,
+                                                            messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                        console.log("Notification Send");
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                    else {
+                                        console.log('get_subuser_enquiry:user details not loaded');
+                                    }
+                                }
+                                else {
+                                    console.log('get_subuser_enquiry:user details not loaded');
+                                }
+                            });
+                        }
+                        else {
+                            console.log("Lead received for vendor's own product");
+                        }
+                    }
+                    else {
+                        console.log("get_user_ezeid : Invalid EZEID");
+                    }
+                }
+                else {
+                    console.log("get_user_ezeid : Invalid EZEID");
+                }
+            }
+            else {
+                console.log("get_user_ezeid : Invalid EZEID");
+            }
+        }
+        else {
+            console.log("get_user_ezeid : Invalid EZEID");
+        }
+
+    });
+};
+
 
 /**
  * Procurement Submit Enquiry
@@ -34,6 +140,8 @@ function Procurement(db,stdLib){
  * @service-param message <string>
  * @service-param notes <string>
  */
+
+
 Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
     console.log("test");
     var id = parseInt(req.body.id);
@@ -88,14 +196,16 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                 if (results[0][0].id) {
                                                     var eId = results[0][0].id;
                                                     var attachQuery='';
-                                                    for(var eCount=0; eCount < req.body.attachmentArray.length; eCount++){
-                                                        var attachParam = st.db.escape(eId) + ',' +
-                                                            st.db.escape(req.body.attachmentArray[eCount].url) + ',' +
-                                                            st.db.escape(req.body.attachmentArray[eCount].fn);
+                                                    if (req.body.attachmentArray) {
+                                                        for (var eCount = 0; eCount < req.body.attachmentArray.length; eCount++) {
+                                                            var attachParam = st.db.escape(eId) + ',' +
+                                                                st.db.escape(req.body.attachmentArray[eCount].url) + ',' +
+                                                                st.db.escape(req.body.attachmentArray[eCount].fn);
 
-                                                        attachQuery += ("CALL psave_enquiry_attachment("+
-                                                        attachParam + ");");
+                                                            attachQuery += ("CALL psave_enquiry_attachment(" +
+                                                            attachParam + ");");
 
+                                                        }
                                                     }
                                                     if(attachQuery){
                                                         st.db.query(attachQuery,function(err,attchResult){
@@ -157,7 +267,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                             st.db.escape(req.body.notes) + ',' +
                                                             st.db.escape(vendorList[vCount].procId) + ',' +
                                                             st.db.escape(eId);
-
                                                             salesEnqComQuery += ("CALL psend_Procurement_enquiry("+
                                                             salesEnqParam +
                                                             ");");
@@ -173,6 +282,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                         //console.log(saveEnqResult[0][0].msg,"messagecount");
                                                                         for(var i=0; i < saveEnqResult.length/2; i++) {
                                                                             var count = (i) ? 2 * i : 0;
+                                                                            console.log(vendorList[i].ezeoneId);
+                                                                            console.log(saveEnqResult);
                                                                             if(saveEnqResult[count][0].msg=="already submitted"){
                                                                                 console.log();
                                                                                 alreadySubmitted = alreadySubmitted+1;
@@ -182,6 +293,13 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                             }
                                                                             else if(saveEnqResult[count][0].msg=="submitted"){
                                                                                 submitted = submitted+1;
+
+                                                                                /**
+                                                                                 * to send notification to subusers
+                                                                                 */
+                                                                                var functionType = 0;
+                                                                                sendNotiToSubuser(req.body.token,vendorList[i].ezeoneId,
+                                                                                    functionType,saveEnqResult[count][0].rid);
                                                                             }
                                                                         }
 
@@ -233,7 +351,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
 
                                                         }
 
-
                                                     };
 
                                                     var sendMailToVendors = function(vendorEmailList){
@@ -258,8 +375,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                         var fromEmail = output[0].FromEmailId;
                                                                         var mn = output[0].mn;
                                                                         console.log(fromEmail, "from");
-
-
                                                         for (var i = 0; i < vendorEmailList.length; i++) {
                                                             mailerApi.sendMail('proposal_template', {
                                                                 Name : name,
