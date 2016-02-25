@@ -87,7 +87,7 @@ var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
                                                     var foldRIDSubuser = notDetailsRes[0][count].rid.split(',');
                                                     console.log(foldRIDSubuser);
                                                     /**
-                                                     * to match string with string
+                                                     * to match string with string using toString
                                                      */
                                                     if (foldRIDSubuser.indexOf((folderRuleID) ? folderRuleID.toString() : null ) != -1){
                                                         var receiverId = notDetailsRes[0][count].receiverId;
@@ -95,7 +95,11 @@ var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
                                                         var groupTitle = notDetailsRes[0][count].groupTitle;
                                                         var groupId = notDetailsRes[0][count].groupId;
                                                         var messageText = 'You have received a lead.';
-                                                        var messageType = 1;
+                                                        /**
+                                                         * messageType 13 is  for sales enquiry
+                                                         *
+                                                         */
+                                                        var messageType = 13;
                                                         var operationType = 0;
                                                         var iphoneId = null;
                                                         var messageId = 0;
@@ -942,7 +946,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                             + "," + st.db.escape(companyName) + "," + st.db.escape(company_id) + "," + st.db.escape(attachment)+ ","
                             + st.db.escape(proabilities)+ "," + st.db.escape(attachment_name)+ "," + st.db.escape(mime_type)
                             + "," + st.db.escape(alarmDuration) + "," + st.db.escape(targetDate)+ "," + st.db.escape(amount)
-                            + ', ' + st.db.escape(instituteId)+', ' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)
+                            + ', ' + st.db.escape(instituteId)+ ',' + st.db.escape(jobId) + ', ' + st.db.escape(educationId)
                             + ', ' + st.db.escape(specializationId)+ ', ' + st.db.escape(salaryType)+ ', ' + st.db.escape(contactId);
                         //console.log(company_id);
                         //console.log('CALL psendsalesrequest(' + query + ')');
@@ -970,50 +974,18 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                 /**
                                                  * passing folder rule id to check folder access
                                                  */
-                                                sendNotiToSubuser(Token,ToEZEID,FunctionType,transResult[0][0].rid);
-                                                if (transResult[2]) {
-                                                    var proposal_message = 'proposal deadline is exceded so you can not update data';
+                                                if (!TID) {
+                                                    sendNotiToSubuser(Token, ToEZEID, FunctionType, transResult[0][0].rid);
                                                 }
                                                 var proposal_message = '';
+                                                if (transResult[2]) {
+                                                    proposal_message = 'proposal deadline is exceded so you can not update data';
+                                                }
                                                 rtnMessage.IsSuccessfull = true;
                                                 rtnMessage.MessageID = (transResult[0][0].MessageID) ? (transResult[0][0].MessageID) : 0;
                                                 rtnMessage.proposal_message = proposal_message;
                                                 res.send(rtnMessage);
                                                 console.log('FnSaveTranscation: Transaction details save successfully');
-
-                                                var messageContent = {
-                                                    token: req.body.Token,
-                                                    LocId: LocID,
-                                                    messageType: parseInt(req.body.FunctionType),
-                                                    message: MessageText,
-                                                    ezeid: EZEID,
-                                                    toEzeid: ToEZEID
-                                                };
-
-                                                /*sending sales enquiry mail*/
-                                                mail.fnMessageMail(messageContent, function (err, statusResult) {
-                                                    //console.log(statusResult);
-                                                    if (!err) {
-                                                        if (statusResult) {
-                                                            if (statusResult.status == true) {
-                                                                console.log('FnSendMail: Mail Sent Successfully');
-                                                                //res.send(rtnMessage);
-                                                            }
-                                                            else {
-                                                                console.log('FnSendMail: Mail not Sent...1');
-                                                                //res.send(rtnMessage);
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnSendMail: Mail not Sent..2');
-                                                            //res.send(rtnMessage);
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log('FnSendMail:Error in sending mails' + err);
-                                                        //res.send(rtnMessage);
-                                                    }
-                                                });
                                             }
                                             else {
                                                 console.log('FnSaveTranscation: Permission denied');
@@ -2582,6 +2554,7 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                                 tid = historyResult[0][0].id;
                                             }
 
+
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Transaction history created successfully';
@@ -2765,7 +2738,6 @@ BusinessManager.prototype.getTransactionHistory = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnSaveSalesRequest
@@ -3091,7 +3063,6 @@ BusinessManager.prototype.getCompanyName = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnGetContactDetails
@@ -3511,7 +3482,7 @@ BusinessManager.prototype.getTransactionOfSales = function(req,res,next){
  * @param address <string> address
  * @param notes <string> information of that request
  * @param aurl <string>  attachment url (random path node will generate)
- * @param  aname <string> attachment file name
+ * @param aname <string> attachment file name
  *
  */
 BusinessManager.prototype.saveExternalsalesRequest = function(req,res,next){

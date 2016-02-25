@@ -356,6 +356,7 @@ var recruitmentModule = new Recruitment(db,stdLib);
 router.get('/recruitment_masters',recruitmentModule.getRecruitmentMasters);
 router.get('/recruitment/institute',recruitmentModule.getInstitutesList);
 router.get('/sales_masters',recruitmentModule.getSalesMasters);
+router.get('/recruitment/recent_candidate',recruitmentModule.getLatestCV);
 
 //Gingerbite module
 var Gingerbite = require('./modules/gingerbite-module.js');

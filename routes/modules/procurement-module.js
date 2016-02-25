@@ -82,7 +82,11 @@ var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
                                                         var groupTitle = notDetailsRes[0][count].groupTitle;
                                                         var groupId = notDetailsRes[0][count].groupId;
                                                         var messageText = 'You have received a lead.';
-                                                        var messageType = 1;
+                                                        /**
+                                                         * messageType 13 is for sales enquiry
+                                                         *
+                                                         */
+                                                        var messageType = 13;
                                                         var operationType = 0;
                                                         var iphoneId = null;
                                                         var messageId = 0;
@@ -348,11 +352,8 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                 });
 
                                                             }
-
                                                         }
-
                                                     };
-
                                                     var sendMailToVendors = function(vendorEmailList){
                                                         /**
                                                          * @todo

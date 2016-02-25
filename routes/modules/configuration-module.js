@@ -1239,12 +1239,13 @@ Configuration.prototype.getFolders = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var token = req.query.Token;
         var ft = req.query.FunctionType;
+        var flag =  (req.query.flag) ? req.query.flag : 0 ;
         if (token && ft) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
 
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(ft);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(ft)+ ',' + st.db.escape(flag);
                         var query = 'CALL pGetFolderList(' + queryParams + ')';
 
                         st.db.query(query, function (err, folderList) {

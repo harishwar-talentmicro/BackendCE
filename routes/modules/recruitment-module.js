@@ -40,6 +40,7 @@ function Recruitment(db,stdLib){
 };
 
 
+
 /**
  * @todo FnGetRecruitmentMasters
  * Method : Get
@@ -87,7 +88,8 @@ Recruitment.prototype.getRecruitmentMasters = function(req,res,next){
 
                         //get folder list
                         var queryParams = st.db.escape(token) + ',' + st.db.escape(functionType);
-                        var query1 = 'CALL pGetFolderList('+ queryParams + ');';
+                        var nCombQuery = queryParams + ',' + st.db.escape(flag);
+                        var query1 = 'CALL pGetFolderList('+ nCombQuery + ');';
 
                         //specialization
                         var query2 = 'CALL pGetSpecialization(' + st.db.escape('') + ');';
@@ -194,6 +196,7 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
 
     var token = req.query.token;
     var functionType = req.query.function_type;
+    var flag =  (req.query.flag) ? req.query.flag : 0 ;
 
     var responseMessage = {
         status: false,
@@ -226,7 +229,9 @@ Recruitment.prototype.getSalesMasters = function(req,res,next){
                         var query = 'CALL pGetCompanyDetails(' + queryParams + ');';
 
                         //get folder list
-                        var query1 = 'CALL pGetFolderList('+ queryParams + ');';
+                        //var newQueryParam = st.db.escape(flag);
+                        var nCombQuery = queryParams + ',' + st.db.escape(flag);
+                        var query1 = 'CALL pGetFolderList('+ nCombQuery + ');';
 
                         //get subuser list
                         var queryParams1 = st.db.escape(token);
@@ -393,6 +398,132 @@ Recruitment.prototype.getInstitutesList = function(req,res,next){
         console.log(ex);
         var errorDate = new Date();
         console.log(errorDate.toTimeString() + ' ......... error ...........');
+    }
+
+};
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get last 100 CV
+ * @accepts json
+ * @param token <string> token of login user
+ * @param limit <int> limit of data
+ *
+ */
+Recruitment.prototype.getLatestCV = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    var limit = (!isNaN(parseInt(req.query.limit))) ? parseInt(req.query.limit) : 10 ;
+    limit = (limit > 100) ? 100 : limit ;
+
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(limit);
+                        var procQuery = 'CALL get_last_candidate(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'CV loaded successfully';
+                                            responseMessage.data = results[0];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'CV are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'CV are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'CV are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : get_last_candidate ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('getLatestCV: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : getLatestCV ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error getLatestCV :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
     }
 
 };
