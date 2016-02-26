@@ -3016,6 +3016,7 @@ var FnGetRedirectLink = function(ezeid,tag,redirectCallback) {
  * @param next
  */
 User.prototype.webLinkRedirect = function(req,res,next) {
+    console.log('\nComing to redirection block\n');
     /**
      * @todo FnWebLinkRedirect
      */
@@ -3049,7 +3050,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
             pin = arr[2];
         }
         else
-        { pin = null ; }
+        { pin = '' ; }
 
         if(arr.length > 1){
             if(arr[1].toUpperCase() == 'MAP'){
@@ -3070,9 +3071,8 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                     if (!err) {
                         if (results) {
                             if (results[0]) {
-                                console.log('----results.length-----');
                                 //console.log(results[0].length);
-                               // console.log(results);
+                                console.log(results[0]);
 
                                 if(results[0][0]){
                                     /**
