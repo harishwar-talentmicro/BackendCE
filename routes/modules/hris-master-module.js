@@ -6,10 +6,8 @@
  */
 "use strict";
 
-
 var util = require('util');
 var validator = require('validator');
-
 
 
 var st = null;

@@ -1143,7 +1143,6 @@ function FnRandomPassword() {
     }
 }
 
-
 /**
  * Method : GET
  * @param req
@@ -4765,7 +4764,6 @@ User.prototype.getindustrycategory = function(req,res,next){
 
 };
 
-
 /**
  * @todo FnProfilePicForEzeid
  * Method : GET
@@ -4880,5 +4878,6 @@ User.prototype.profilePicForEzeid = function(req,res,next){
         }
     }
 };
+
 
 module.exports = User;

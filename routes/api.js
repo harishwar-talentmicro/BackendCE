@@ -83,6 +83,7 @@ router.get('/industry_category',userModule.getindustrycategory);
 router.get('/pic_for_ezeid',userModule.profilePicForEzeid);
 
 
+
 //Audit module methods
 var Audit = require('./modules/audit-module.js');
 var auditModule = new Audit(db,stdLib);
@@ -390,6 +391,7 @@ router.post('/v1/tag',tagModule.saveTags);
 router.get('/v1/tag',tagModule.getTags);
 router.delete('/v1/tag',tagModule.deleteTag);
 router.post('/save_pictures',tagModule.savePictures);
+router.put('/v1/tag',tagModule.updatePin);
 
 //Sos Module
 var Sos = require('./modules/sos-module.js');
@@ -569,6 +571,17 @@ router.get('/proc_all_enq',procurementModule.procurementGetAllEnq);
 router.get('/proc_enq_details',procurementModule.procurementGetEnqDetails);
 router.post('/proc_test_api',procurementModule.testPdf);
 
+//profile-branch-module
+var ProfileBranch = require('./modules/profile-branch-module.js');
+var ProfileBranchModule = new ProfileBranch(db,stdLib);
+router.post('/branch',ProfileBranchModule.saveBranch);
+router.delete('/branch/:id',ProfileBranchModule.deleteBranch);
+router.get('/branch',ProfileBranchModule.getBranch);
+
+//ezeone-attribute-module
+var EzeoneAttrbt = require('./modules/ezeone-attribute-module.js');
+var EzeoneAttrbtModule = new EzeoneAttrbt(db,stdLib);
+router.get('/signup_data',EzeoneAttrbtModule.signUpData);
 
 router.get('/api_health',function(req,res){
     res.status(200).json({status : true});

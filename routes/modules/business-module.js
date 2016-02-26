@@ -18,6 +18,8 @@ var notification = null;
 var st = null;
 var mailModule = require('./mail-module.js');
 var mail = null;
+var Mailer = require('../../mail/mailer.js');
+var mailerApi = new Mailer();
 
 function BusinessManager(db,stdLib){
 
@@ -2184,7 +2186,7 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                     req.socket.remoteAddress || req.connection.socket.remoteAddress);
 
                     var queryParams = st.db.escape(token) + ',' + st.db.escape(dateTime) + ',' + st.db.escape(ip) +
-                        ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq) + ',' + st.db.escape(pin);
+                        ',' +st.db.escape(ezeoneId) + ',' + st.db.escape(locationSeq);
                     st.db.query('CALL pSearchinfnPinbased('+queryParams+')',function(err,result){
                         if(err){
                             console.log('Error FnGetEZEOneIDInfo :  '+err);
@@ -2201,19 +2203,39 @@ BusinessManager.prototype.getEZEOneIDInfo = function(req,res,next){
                             if(result) {
                                 if (result.length > 0) {
                                     if (result[0].length > 0) {
-                                        respMsg.status = true;
-                                        respMsg.data = result[0][0];
-                                        respMsg.message = 'EZEOne ID found';
-                                        respMsg.error = null;
-                                        res.status(200).json(respMsg);
-                                        return;
+                                        if (result[0][0].pin){
+                                            if (pin == result[0][0].pin){
+                                                respMsg.status = true;
+                                                respMsg.data = result[0][0];
+                                                respMsg.message = 'EZEOne ID found';
+                                                respMsg.error = null;
+                                                res.status(200).json(respMsg);
+                                                return;
+                                            }
+                                            else {
+                                                respMsg.status = false;
+                                                respMsg.data = null;
+                                                respMsg.message = 'Nothing found';
+                                                respMsg.error = {ezeoneid: 'No results found'};
+                                                res.status(404).json(respMsg);
+                                            }
+                                        }
+                                        else{
+                                            respMsg.status = true;
+                                            respMsg.data = result[0][0];
+                                            respMsg.message = 'EZEOne ID found';
+                                            respMsg.error = null;
+                                            res.status(200).json(respMsg);
+                                            return;
+                                        }
+
                                     }
                                     else {
-                                        respMsg.status = false;
-                                        respMsg.data = null;
-                                        respMsg.message = 'Nothing found';
-                                        respMsg.error = {ezeoneid: 'No results found'};
-                                        res.status(404).json(respMsg);
+                                            respMsg.status = false;
+                                            respMsg.data = null;
+                                            respMsg.message = 'Nothing found';
+                                            respMsg.error = {ezeoneid: 'No results found'};
+                                            res.status(404).json(respMsg);
                                     }
 
                                 }
@@ -2576,6 +2598,7 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                                 if (historyResult[0][0].fgid){
                                                     var receiverId = historyResult[0][0].fe;
                                                     var senderTitle = historyResult[0][0].se;
+                                                    var groupTitle = historyResult[0][0].se;
                                                     var groupId = historyResult[0][0].fgid;
                                                     var messageText = 'Your transaction history is added.';
                                                     /**
@@ -2584,28 +2607,37 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                                     var messageType = 14;
                                                     var operationType = 0;
                                                     var iphoneId = null;
-                                                    var senderCompany = historyResult[0][0].sc;
-                                                    var requirementMsg = historyResult[0][0].req;
-                                                    var stageTitle = historyResult[0][0].stitle;
-                                                    console.log(receiverId, senderTitle, groupId, messageText, messageType,
-                                                        operationType, iphoneId, senderCompany, requirementMsg, stageTitle);
+                                                    var txId = historyResult[0][0].id
 
-                                                    notification.publish(receiverId, senderTitle, groupId, messageText, messageType,
-                                                        operationType, iphoneId,senderCompany, requirementMsg, stageTitle);
+                                                    console.log(receiverId, senderTitle, groupId, messageText, messageType,
+                                                        operationType, iphoneId, txId);
+
+                                                    notification.publish(receiverId, senderTitle,groupTitle, groupId, messageText, messageType,
+                                                        operationType, iphoneId, txId);
                                                     console.log("Notification Send");
                                                 }
 
                                             }
                                             if (historyResult[0][0].nmm){
-                                                if(historyResult[0][0].nmm || historyResult[0][0].cemail){
+                                                if(historyResult[0][0].femail){
                                                     mailerApi.sendMail('proposal_template', {
-                                                        Name : name,
-                                                        RequirementDescription : req.body.message,
-                                                        LoggedInName : logedinuser,
-                                                        email : fromEmail,
-                                                        mobile : mn
+                                                        Name : "name",
+                                                        RequirementDescription : "hello",
+                                                        LoggedInName : "bname",
+                                                        email : "tinipandya19.@gmail.com",
+                                                        mobile : 9900622531
 
-                                                    }, '',historyResult[0][0].cemail,historyResult[0][0].femail);
+                                                    }, '',historyResult[0][0].femail);
+                                                }
+                                                if(historyResult[0][0].cemail){
+                                                    mailerApi.sendMail('proposal_template', {
+                                                        Name : "name",
+                                                        RequirementDescription : "hello",
+                                                        LoggedInName : "bname",
+                                                        email : "tinipandya19.@gmail.com",
+                                                        mobile : 9900622531
+
+                                                    }, '',historyResult[0][0].cemail);
                                                 }
                                             }
                                         }
