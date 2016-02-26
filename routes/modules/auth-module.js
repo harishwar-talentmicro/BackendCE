@@ -282,6 +282,7 @@ Auth.prototype.register = function(req,res,next){
                                             if (registerResult[0][0].TID != 0) {
                                                 rtnMessage.IsAuthenticate = true;
                                                 rtnMessage.tid = registerResult[0][0].TID;
+                                                rtnMessage.TID = registerResult[0][0].TID;
                                                 rtnMessage.group_id = registerResult[0][0].group_id;
                                                 rtnMessage.Token = token;
                                                 rtnMessage.FirstName = registerResult[0][0].FirstName;
