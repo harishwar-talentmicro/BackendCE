@@ -2596,6 +2596,18 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                                 }
 
                                             }
+                                            if (historyResult[0][0].nmm){
+                                                if(historyResult[0][0].nmm || historyResult[0][0].cemail){
+                                                    mailerApi.sendMail('proposal_template', {
+                                                        Name : name,
+                                                        RequirementDescription : req.body.message,
+                                                        LoggedInName : logedinuser,
+                                                        email : fromEmail,
+                                                        mobile : mn
+
+                                                    }, '',historyResult[0][0].cemail,historyResult[0][0].femail);
+                                                }
+                                            }
                                         }
                                         else {
                                             responseMessage.message = 'Transaction history not created';
