@@ -597,7 +597,7 @@ User.prototype.changePassword = function(req,res,next){
                                 res.status(400).json(RtnMessage);
                             }
                             else{
-
+                                console.log(oldPassResult);
                                 if(oldPassResult){
                                     if(oldPassResult[0]){
                                         if(oldPassResult[0][0]){
@@ -626,7 +626,7 @@ User.prototype.changePassword = function(req,res,next){
                                                         }
                                                         else{
                                                             if(passChangeResult){
-                                                                //console.log(passChangeResult);
+                                                                console.log(passChangeResult);
                                                                 RtnMessage.IsChanged = true;
                                                                 res.status(200).json(RtnMessage);
                                                             }

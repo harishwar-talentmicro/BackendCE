@@ -1239,12 +1239,13 @@ Configuration.prototype.getFolders = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         var token = req.query.Token;
         var ft = req.query.FunctionType;
+        var flag =  (req.query.flag) ? req.query.flag : 0 ;
         if (token && ft) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
 
-                        var queryParams = st.db.escape(token) + ',' + st.db.escape(ft);
+                        var queryParams = st.db.escape(token) + ',' + st.db.escape(ft)+ ',' + st.db.escape(flag);
                         var query = 'CALL pGetFolderList(' + queryParams + ')';
 
                         st.db.query(query, function (err, folderList) {
@@ -1551,9 +1552,11 @@ Configuration.prototype.createSubuser = function(req,res,next){
                         + ',' + st.db.escape(serviceRules) + ',' + st.db.escape(resumeRules) + ',' + st.db.escape(masterId)
                         + ',' + st.db.escape(templateId);
                     var query = 'CALL pCreateSubUser(' + queryParams + ')';
+                    console.log(query);
                     st.db.query(query, function (err, subuserResult) {
                         if (!err){
                             if (subuserResult) {
+                                console.log(subuserResult);
                                 if(subuserResult[0]) {
                                     var result = subuserResult[0];
                                     if (result[0]) {
@@ -1564,7 +1567,16 @@ Configuration.prototype.createSubuser = function(req,res,next){
                                             console.log('FnCreateSubUser: Sub User details save successfully');
                                         }
                                         else {
+                                            var qMsg ;
+                                            switch (subuserResult[0][0].message ) {
+                                                case 'Duplicate EZEOneID' :
+                                                    qMsg = 'Duplicate EZEOneID';
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
                                             console.log('FnCreateSubUser:No Save Sub User details');
+                                            rtnMessage.error = qMsg;
                                             res.send(rtnMessage);
                                         }
                                     }
