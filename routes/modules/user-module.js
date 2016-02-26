@@ -3064,7 +3064,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                 console.log('Document Loading....');
                 console.log('--------------------');
 
-                var query = st.db.escape(ezeid) + ',' + st.db.escape(pin) + ',' + st.db.escape(tag);
+                var query = st.db.escape(ezeid) + ',' + st.db.escape(tag);
                 console.log('CALL  PGetSearchDocuments(' + query + ')');
                 st.db.query('CALL  PGetSearchDocuments(' + query + ')', function (err, results) {
 
@@ -3079,19 +3079,41 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                      * This is a weblink redirect to this weblink
                                      */
                                     if(results[0][0].type){
-                                        res.redirect(results[0][0].path);
+                                        if(results[0][0].pin){
+                                            if(pin == results[0][0].pin){
+                                                res.redirect(results[0][0].path);
+                                            }
+                                            else{
+                                                next();
+                                            }
+                                        }
+                                        else{
+                                            res.redirect(results[0][0].path);
+                                        }
+
                                     }
                                     else{
                                         /**
                                          * This is a document saved on google cloud ! Creating dynamic google storage bucket link
                                          * and redirecting the user to there
                                          */
+
                                         var s_url = (results[0][0].path) ?
                                             (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[0][0].path) : 'https://www.ezeone.com';
                                         console.log('redirecting url..');
                                         console.log(s_url);
-                                        res.redirect(s_url);
 
+                                        if(results[0][0].pin) {
+                                            if (pin == results[0][0].pin) {
+                                                res.redirect(s_url);
+                                            }
+                                            else{
+                                                next();
+                                            }
+                                        }
+                                        else{
+                                            res.redirect(s_url);
+                                        }
 
                                     }
                                 }
