@@ -31,7 +31,7 @@ function Notification(db,stdLib){
  * @param longitude (longitude of location)
 _ */
 Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId,
-                                          messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl){
+                                          messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId){
 
     console.log('It is coming to publish block of Notification');
     var validationStatus = true;
@@ -117,7 +117,8 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             a_filename : a_name,
             msgUserid : msgUserid,
             job_id : jobId,
-            a_url : aUrl
+            a_url : aUrl,
+            tx_id : txId
         };
         //console.log(messagePayload);
         console.log('Actual receiver Id : '+receiverId);
