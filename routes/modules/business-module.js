@@ -2616,29 +2616,9 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                                         operationType, iphoneId, txId);
                                                     console.log("Notification Send");
                                                 }
-
-                                            }
-                                            if (historyResult[0][0].nmm){
-                                                if(historyResult[0][0].femail){
-                                                    mailerApi.sendMail('proposal_template', {
-                                                        Name : "name",
-                                                        RequirementDescription : "hello",
-                                                        LoggedInName : "bname",
-                                                        email : "tinipandya19.@gmail.com",
-                                                        mobile : 9900622531
-
-                                                    }, '',historyResult[0][0].femail);
-                                                }
-                                                if(historyResult[0][0].cemail){
-                                                    mailerApi.sendMail('proposal_template', {
-                                                        Name : "name",
-                                                        RequirementDescription : "hello",
-                                                        LoggedInName : "bname",
-                                                        email : "tinipandya19.@gmail.com",
-                                                        mobile : 9900622531
-
-                                                    }, '',historyResult[0][0].cemail);
-                                                }
+                                                /**
+                                                 * @TODO Send Mail
+                                                 */
                                             }
                                         }
                                         else {
