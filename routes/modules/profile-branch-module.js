@@ -71,15 +71,11 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
         error.cn = 'Invalid Company Name';
         validationFlag *= false;
     }
-    if(!req.body.lat){
-        error.lat = 'Invalid latitude';
+    if((!req.body.lat) && (!req.body.long)){
+        error.lat = 'Invalid latitude or longitute';
         validationFlag *= false;
     }
-    if(!req.body.long){
-        error.long = 'Invalid longitude';
-        validationFlag *= false;
-    }
-    if (!validator.isLength((req.body.address), 3, 250)) {
+    if (!validator.isLength(req.body.address, 3, 250)) {
         error.address = 'Address can be maximum 250 characters';
         validationFlag *= false;
     }
