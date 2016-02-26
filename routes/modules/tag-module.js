@@ -1632,12 +1632,13 @@ Tag.prototype.updatePin = function(req,res,next){
                                 if(updateRes) {
                                     if(updateRes[0]){
                                         if(updateRes[0][0]){
-                                            if(updateRes[0][0].message){
+                                        console.log('update PIN proc ',updateRes[0][0]);
+                                            if(updateRes[0][0].e_code){
 
-                                                if(updateRes[0][0].message == "ACCESS_DENIED"){
+                                                if(updateRes[0][0].e_code == "ACCESS_DENIED"){
                                                     responseMessage.error = {tid : "You do not have permission to update this document"};
                                                 }
-                                                if(updateRes[0][0].message == "NOT_FOUND"){
+                                                if(updateRes[0][0].e_code == "NOT_FOUND"){
                                                     responseMessage.error = {tid : "Document does not exists"};
                                                 }
                                                 responseMessage.status = false;
