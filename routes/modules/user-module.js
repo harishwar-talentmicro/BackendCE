@@ -3079,7 +3079,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                      */
                                     if(results[0][0].type){
                                         if(results[0][0].pin){
-                                            if(pin == results[0][0].pin){
+                                            if(pin && pin == results[0][0].pin){
                                                 res.redirect(results[0][0].path);
                                             }
                                             else{
@@ -3103,7 +3103,7 @@ User.prototype.webLinkRedirect = function(req,res,next) {
                                         console.log(s_url);
 
                                         if(results[0][0].pin) {
-                                            if (pin == results[0][0].pin) {
+                                            if (pin && pin == results[0][0].pin) {
                                                 res.redirect(s_url);
                                             }
                                             else{
