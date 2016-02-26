@@ -2502,6 +2502,11 @@ BusinessManager.prototype.salesStatistics = function(req,res,next){
  * @param req
  * @param res
  * @param next
+ * @service-param stageType <int>
+ * @service-param transactionId <int>
+ * @service-param stage <int>
+ * @service-param reason <string>
+ * @service-param comments <string>
  * @description api code for create transaction history
  */
 BusinessManager.prototype.createTransactionHistory = function(req,res,next){
@@ -2544,8 +2549,9 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                             + ',' + st.db.escape(transactionId) + ',' + st.db.escape(stage) + ',' + st.db.escape(reason)
                             + ',' + st.db.escape(comments);
                         var query = 'CALL pcreatetranshistory(' + queryParams + ')';
+                            console.log(query);
                         st.db.query(query, function (err, historyResult) {
-                            //console.log(historyResult);
+                            console.log(historyResult);
                             if (!err) {
                                 if (historyResult) {
                                     if (historyResult[0]) {
@@ -2553,8 +2559,6 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                             if (historyResult[0][0].id) {
                                                 tid = historyResult[0][0].id;
                                             }
-
-
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Transaction history created successfully';
@@ -2568,6 +2572,30 @@ BusinessManager.prototype.createTransactionHistory = function(req,res,next){
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnCreateTransactionHistory: Transaction history created successfully');
+                                            if (historyResult[0][0].nm){
+                                                if (historyResult[0][0].fgid){
+                                                    var receiverId = historyResult[0][0].fe;
+                                                    var senderTitle = historyResult[0][0].se;
+                                                    var groupId = historyResult[0][0].fgid;
+                                                    var messageText = 'Your transaction history is added.';
+                                                    /**
+                                                     * messageType 14 is  for stage update
+                                                     */
+                                                    var messageType = 14;
+                                                    var operationType = 0;
+                                                    var iphoneId = null;
+                                                    var senderCompany = historyResult[0][0].sc;
+                                                    var requirementMsg = historyResult[0][0].req;
+                                                    var stageTitle = historyResult[0][0].stitle;
+                                                    console.log(receiverId, senderTitle, groupId, messageText, messageType,
+                                                        operationType, iphoneId, senderCompany, requirementMsg, stageTitle);
+
+                                                    notification.publish(receiverId, senderTitle, groupId, messageText, messageType,
+                                                        operationType, iphoneId,senderCompany, requirementMsg, stageTitle);
+                                                    console.log("Notification Send");
+                                                }
+
+                                            }
                                         }
                                         else {
                                             responseMessage.message = 'Transaction history not created';
