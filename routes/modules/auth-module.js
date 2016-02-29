@@ -141,7 +141,7 @@ Auth.prototype.register = function(req,res,next){
     var picture = req.body.Picture;
     var pictureFileName = (req.body.PictureFileName) ? req.body.PictureFileName : '';
     var webSite = req.body.Website ? req.body.Website : '';
-    var aboutCompany = req.body.AboutCompany;
+    var aboutCompany = req.body.AboutCompany; //tag line of company
     var token = req.body.Token ? req.body.Token : '';
     var operation = "I";
     if (token) {
@@ -173,6 +173,7 @@ Auth.prototype.register = function(req,res,next){
     var businessKeywords = (req.body.keywords) ?  req.body.keywords : '';
     var encryptPwd = '';
     var fullName='';
+    var companyDetails = (req.body.company_details) ?  req.body.company_details : ''; // about company details
 
     var rtnMessage = {
         error:{},
@@ -268,7 +269,8 @@ Auth.prototype.register = function(req,res,next){
                         + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus) + ',' + st.db.escape(templateId)
                         + ',' + st.db.escape(categoryId) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
+                        + ',' + st.db.escape(companyDetails);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);
@@ -513,7 +515,8 @@ Auth.prototype.register = function(req,res,next){
                         + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus) + ',' + st.db.escape(templateId)
                         + ',' + st.db.escape(categoryId) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
+                        + ',' + st.db.escape(companyDetails);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);

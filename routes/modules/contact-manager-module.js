@@ -104,8 +104,8 @@ ContactManager.prototype.getClientList = function(req,res,next){
                                         if (clientList[0][0]) {
                                             if (clientList[1]) {
                                                 responseMessage.status = true;
-                                                responseMessage.count = clientList[0][0].count;
-                                                responseMessage.data = clientList[1];
+                                                responseMessage.count = clientList[1][0].count;
+                                                responseMessage.data = clientList[0];
                                                 responseMessage.message = 'Client List loaded successfully';
                                                 responseMessage.error = null;
                                                 res.status(200).json(responseMessage);
@@ -258,12 +258,12 @@ ContactManager.prototype.getClientContacts = function(req,res,next){
                                         if (contactList[0][0]) {
                                             if (contactList[1]) {
                                                 responseMessage.status = true;
-                                                responseMessage.count = contactList[0][0].count;
-                                                responseMessage.cid = contactList[0][0].cid;
-                                                responseMessage.cn = contactList[0][0].cn;
-                                                responseMessage.cc = contactList[0][0].cc;
-                                                responseMessage.page = contactList[0][0].page;
-                                                responseMessage.data = contactList[1];
+                                                responseMessage.count = contactList[1][0].count;
+                                                responseMessage.cid = contactList[1][0].cid;
+                                                responseMessage.cn = contactList[1][0].cn;
+                                                responseMessage.cc = contactList[1][0].cc;
+                                                responseMessage.page = contactList[1][0].page;
+                                                responseMessage.data = contactList[0];
                                                 responseMessage.message = 'Contact List loaded successfully';
                                                 responseMessage.error = null;
                                                 res.status(200).json(responseMessage);

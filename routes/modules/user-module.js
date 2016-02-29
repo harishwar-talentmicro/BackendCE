@@ -1814,7 +1814,7 @@ User.prototype.saveResume = function(req,res,next){
         var gender = (!isNaN(parseInt(req.body.gender))) ? parseInt(req.body.gender) : 3;
         var ids = req.body.skillsTid;
         var FunctionID = req.body.FunctionID;
-        var KeySkills = req.body.KeySkills;
+        var KeySkills = (req.body.KeySkills) ? req.body.KeySkills : '' ;
         var Status = parseInt(req.body.Status);
         var Pin = req.body.Pin;
         var Token = req.body.TokenNo;
@@ -1908,7 +1908,8 @@ User.prototype.saveResume = function(req,res,next){
                                 + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID)
                                 +',' + st.db.escape(expectedSalary)+ ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName)
                                 +',' + st.db.escape(email)+',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
-                                +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath)+',' + st.db.escape(gender);
+                                +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath)+',' + st.db.escape(gender)
+                                +',' + st.db.escape(KeySkills);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {
@@ -4873,6 +4874,99 @@ User.prototype.profilePicForEzeid = function(req,res,next){
             res.status(400).json(responseMessage);
             console.log('Error : FnProfilePicForEzeid ' + ex.description);
             console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+User.prototype.getAlumniEducations = function(req,res,next) {
+
+    var token = req.query.token;
+    var responseMsg = {
+        status: false,
+        data: [],
+        message: 'Unable to load educations',
+        error: {}
+    };
+    if(!req.query.alumni_code){
+        error['alumni_code'] = 'Invalid Alumni code';
+        validateStatus *= false;
+    }
+    else {
+        var alumniCode = alterEzeoneId(req.query.alumni_code);
+    }
+    var validateStatus = true;
+    var error = {};
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+
+    if (!validateStatus) {
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors below';
+        res.status(400).json(responseMsg);
+    }
+    else {
+        try {
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var parameters = st.db.escape(alumniCode);
+                        st.db.query('CALL pGetAlumni_Educations('+ parameters +')', function (err, educationResult) {
+                            if (err) {
+                                console.log('Error : pGetAlumni_Educations :' + err);
+                                res.status(400).json(responseMsg);
+                            }
+                            else {
+                                if(educationResult) {
+                                    if(educationResult[0]) {
+                                        responseMsg.status = true;
+                                        responseMsg.message = 'Educations loaded successfully';
+                                        responseMsg.error = null;
+                                        responseMsg.data = geteducationResult[0];
+                                        res.status(200).json(responseMsg);
+                                    }
+                                    else{
+                                        console.log('getAlumniEducations:Unable to load educations');
+                                        res.status(200).json(responseMsg);
+                                    }
+                                }
+                                else{
+                                    console.log('getAlumniEducations:Unable to load educations');
+                                    res.status(200).json(responseMsg);
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        responseMsg.message = 'Invalid token';
+                        responseMsg.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMsg.data = null;
+                        res.status(401).json(responseMsg);
+                        console.log('getAlumniEducations: Invalid token');
+                    }
+                }
+                else {
+                    responseMsg.error = {};
+                    responseMsg.message = 'Error in validating Token';
+                    res.status(500).json(responseMsg);
+                    console.log('getAlumniEducations:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            res.status(500).json(responseMsg);
+            console.log('Error : getAlumniEducations ' + ex.description);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
