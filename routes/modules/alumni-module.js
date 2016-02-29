@@ -4229,10 +4229,11 @@ Alumni.prototype.getClientList = function(req,res,next){
                         //console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
+                                console.log(getResult);
                                 if (getResult[0]) {
                                     responseMessage.status = true;
-                                    responseMessage.count = getResult[0][0].count;
-                                    responseMessage.data = getResult[1];
+                                    responseMessage.count = getResult[1][0].count;
+                                    responseMessage.data = getResult[0];
                                     responseMessage.message = 'Client List loaded successfully';
                                     responseMessage.error = null;
                                     res.status(200).json(responseMessage);
@@ -4353,7 +4354,7 @@ Alumni.prototype.getClientContacts = function(req,res,next){
                                     responseMessage.cn = getResult[0][0].cn;
                                     responseMessage.cc = getResult[0][0].cc;
                                     responseMessage.page = getResult[0][0].page;
-                                    responseMessage.data = getResult[1];
+                                    responseMessage.data = getResult[0];
                                     responseMessage.message = 'Contact List loaded successfully';
                                     responseMessage.error = null;
                                     res.status(200).json(responseMessage);
@@ -6533,7 +6534,6 @@ Alumni.prototype.deleteTenAttachment = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnDeleteTenEvent
  * Method : Delete
@@ -6644,6 +6644,217 @@ Alumni.prototype.deleteEvent = function(req,res,next){
         }
     }
 };
+
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Alumni.prototype.getAlumniEducations = function(req,res,next) {
+
+    var token = req.query.token;
+    var responseMsg = {
+        status: false,
+        data: [],
+        message: 'Unable to load educations',
+        error: {}
+    };
+
+    var validateStatus = true;
+    var error = {};
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!req.query.alumni_code){
+        error['alumni_code'] = 'Invalid Alumni code';
+        validateStatus *= false;
+    }
+    if (!validateStatus) {
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors below';
+        res.status(400).json(responseMsg);
+    }
+    else {
+        try {
+            var alumniCode = alterEzeoneId(req.query.alumni_code);
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var parameters = st.db.escape(alumniCode);
+                        var procQuery = 'CALL pGetAlumni_Educations('+ parameters +')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, educationResult) {
+                            if (err) {
+                                console.log('Error : pGetAlumni_Educations :' + err);
+                                res.status(400).json(responseMsg);
+                            }
+                            else {
+                                if(educationResult) {
+                                    console.log(educationResult);
+                                    if(educationResult[0]) {
+                                        if(educationResult[0].length > 0){
+                                            responseMsg.status = true;
+                                            responseMsg.message = 'Educations loaded successfully';
+                                            responseMsg.error = null;
+                                            responseMsg.data = educationResult[0];
+                                            res.status(200).json(responseMsg);
+                                        }
+                                        else {
+                                            responseMsg.status = true;
+                                            responseMsg.message = 'Unable to load educations';
+                                            responseMsg.error = null;
+                                            responseMsg.data = [];
+                                            res.status(200).json(responseMsg);
+                                        }
+                                    }
+                                    else{
+                                        console.log('getAlumniEducations:Unable to load educations');
+                                        res.status(200).json(responseMsg);
+                                    }
+                                }
+                                else{
+                                    console.log('getAlumniEducations:Unable to load educations');
+                                    res.status(200).json(responseMsg);
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        responseMsg.message = 'Invalid token';
+                        responseMsg.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMsg.data = null;
+                        res.status(401).json(responseMsg);
+                        console.log('getAlumniEducations: Invalid token');
+                    }
+                }
+                else {
+                    responseMsg.error = {};
+                    responseMsg.message = 'Error in validating Token';
+                    res.status(500).json(responseMsg);
+                    console.log('getAlumniEducations:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            res.status(500).json(responseMsg);
+            console.log('Error : getAlumniEducations ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Alumni.prototype.getAlumniSpecialization = function(req,res,next) {
+
+    var token = req.query.token;
+    var responseMsg = {
+        status: false,
+        data: [],
+        message: 'Unable to load Specialization',
+        error: {}
+    };
+    req.query.education_id = (req.query.education_id) ? req.query.education_id : '';
+
+    var validateStatus = true;
+    var error = {};
+    if (!token) {
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!req.query.alumni_code){
+        error['alumni_code'] = 'Invalid Alumni code';
+        validateStatus *= false;
+    }
+    if (!validateStatus) {
+        responseMsg.error = error;
+        responseMsg.message = 'Please check the errors below';
+        res.status(400).json(responseMsg);
+    }
+    else {
+        try {
+            var alumniCode = alterEzeoneId(req.query.alumni_code);
+            st.validateToken(token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var parameters = st.db.escape(req.query.education_id) + ',' + st.db.escape(alumniCode) ;
+                        var procQuery = 'CALL pGetAlumni_Specialization('+ parameters +')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, spResult) {
+                            if (err) {
+                                console.log('Error : pGetAlumni_Specialization :' + err);
+                                res.status(400).json(responseMsg);
+                            }
+                            else {
+                                if(spResult) {
+                                    console.log(spResult);
+                                    if(spResult[0]) {
+                                        if(spResult[0].length > 0){
+                                            responseMsg.status = true;
+                                            responseMsg.message = 'Educations loaded successfully';
+                                            responseMsg.error = null;
+                                            responseMsg.data = spResult[0];
+                                            res.status(200).json(responseMsg);
+                                        }
+                                        else {
+                                            responseMsg.status = true;
+                                            responseMsg.message = 'Unable to load Specialization';
+                                            responseMsg.error = null;
+                                            responseMsg.data = [];
+                                            res.status(200).json(responseMsg);
+                                        }
+                                    }
+                                    else{
+                                        console.log('getAlumniEducations:Unable to load Specialization');
+                                        res.status(200).json(responseMsg);
+                                    }
+                                }
+                                else{
+                                    console.log('getAlumniEducations:Unable to load Specialization');
+                                    res.status(200).json(responseMsg);
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        responseMsg.message = 'Invalid token';
+                        responseMsg.error = {
+                            token: 'Invalid token'
+                        };
+                        responseMsg.data = null;
+                        res.status(401).json(responseMsg);
+                        console.log('getAlumniEducations: Invalid token');
+                    }
+                }
+                else {
+                    responseMsg.error = {};
+                    responseMsg.message = 'Error in validating Token';
+                    res.status(500).json(responseMsg);
+                    console.log('getAlumniEducations:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            res.status(500).json(responseMsg);
+            console.log('Error : getAlumniEducations ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+
 
 
 
