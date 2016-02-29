@@ -29,7 +29,7 @@ function ProfileBranch(db,stdLib){
  *
  * @param token <string> token of login user
  * @param id <int>  id=0 for new branch else id of branch
- * @param eid  <string>  ezeone id of brach ex: @hirecraft/HSR
+ * @param eid  <string>  ezeone id of brach ex: @HIRECRAFT_HSR
  * @param address  <string>  address of branch
  * @param cn  <string> company name
  * @param lat  <string> lattitude
@@ -39,6 +39,8 @@ function ProfileBranch(db,stdLib){
  * @param phone <string>  phone number
  * @param ws <string> website
  * @param int <string> mobile
+ * @param ISDPhone <string> Phone ISD Code
+ * @param ISDMobile <string> Mobile ISD Code
  *
  */
 ProfileBranch.prototype.saveBranch = function(req,res,next){
@@ -71,6 +73,12 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
         error.cn = 'Invalid Company Name';
         validationFlag *= false;
     }
+    if(!req.body.ISDPhone){
+        req.body.ISDPhone = "";
+    }
+    if(!req.body.ISDMobile){
+        req.body.ISDMobile = "";
+    }
     if((!req.body.lat) && (!req.body.long)){
         error.lat = 'Invalid latitude or longitute';
         validationFlag *= false;
@@ -93,7 +101,8 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
                         var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.id) + ',' + st.db.escape(req.body.eid)
                             + ',' + st.db.escape(req.body.address) + ',' + st.db.escape(req.body.cn) + ',' + st.db.escape(req.body.lat)
                             + ',' + st.db.escape(req.body.long) + ',' + st.db.escape(req.body.hcalid) + ',' + st.db.escape(req.body.phone)
-                            + ',' + st.db.escape(req.body.email) + ',' + st.db.escape(req.body.ws) + ',' + st.db.escape(req.body.mobile);
+                            + ',' + st.db.escape(req.body.email) + ',' + st.db.escape(req.body.ws) + ',' + st.db.escape(req.body.mobile)
+                            + ',' + st.db.escape(req.body.ISDPhone) +  ',' + st.db.escape(req.body.ISDMobile);
                         var procQuery = 'CALL psaveBranches(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
