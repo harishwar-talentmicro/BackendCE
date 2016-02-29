@@ -285,7 +285,6 @@ Alumni.prototype.registerAlumni = function(req,res,next){
     if (token) {
         operation = "U";
     }
-
     var isdPhoneNumber =  req.body.ISDPhoneNumber ? req.body.ISDPhoneNumber : '';
     var isdMobileNumber = req.body.ISDMobileNumber ? req.body.ISDMobileNumber : '';
     var parkingStatus = req.body.ParkingStatus ? req.body.ParkingStatus : 0;
@@ -304,7 +303,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
     var businessKeywords = (req.body.keywords) ?  req.body.keywords : '';
     var encryptPwd = '';
     var fullName='';
-
+    var companyDetails = (req.body.company_details) ?  req.body.company_details : ''; // about company details
     var rtnMessage = {
         error:{},
         Token: '',
@@ -376,7 +375,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                         + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus) + ',' + st.db.escape(templateId)
                         + ',' + st.db.escape(categoryId) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
+                        + ',' + st.db.escape(companyDetails);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     //console.log(InsertQuery);
@@ -600,7 +600,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                         + ',' + st.db.escape(selectionType) + ',' + st.db.escape(parkingStatus) + ',' + st.db.escape(templateId)
                         + ',' + st.db.escape(categoryId) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
-                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords);
+                        + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
+                        + ',' + st.db.escape(companyDetails);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);
@@ -4349,11 +4350,11 @@ Alumni.prototype.getClientContacts = function(req,res,next){
                             if (!err) {
                                 if (getResult[0]) {
                                     responseMessage.status = true;
-                                    responseMessage.count = getResult[0][0].count;
-                                    responseMessage.cid = getResult[0][0].cid;
-                                    responseMessage.cn = getResult[0][0].cn;
-                                    responseMessage.cc = getResult[0][0].cc;
-                                    responseMessage.page = getResult[0][0].page;
+                                    responseMessage.count = getResult[1][0].count;
+                                    responseMessage.cid = getResult[1][0].cid;
+                                    responseMessage.cn = getResult[1][0].cn;
+                                    responseMessage.cc = getResult[1][0].cc;
+                                    responseMessage.page = getResult[1][0].page;
                                     responseMessage.data = getResult[0];
                                     responseMessage.message = 'Contact List loaded successfully';
                                     responseMessage.error = null;

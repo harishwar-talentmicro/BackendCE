@@ -1814,7 +1814,7 @@ User.prototype.saveResume = function(req,res,next){
         var gender = (!isNaN(parseInt(req.body.gender))) ? parseInt(req.body.gender) : 3;
         var ids = req.body.skillsTid;
         var FunctionID = req.body.FunctionID;
-        var KeySkills = req.body.KeySkills;
+        var KeySkills = (req.body.KeySkills) ? req.body.KeySkills : '' ;
         var Status = parseInt(req.body.Status);
         var Pin = req.body.Pin;
         var Token = req.body.TokenNo;
@@ -1908,7 +1908,8 @@ User.prototype.saveResume = function(req,res,next){
                                 + ',' + st.db.escape(jobType) + ','+ st.db.escape(location_id) + ',' + st.db.escape(categoryID)
                                 +',' + st.db.escape(expectedSalary)+ ','+ st.db.escape(firstName)+ ','+ st.db.escape(lastName)
                                 +',' + st.db.escape(email)+',' + st.db.escape(mobile)+',' + st.db.escape(tid)+',' + st.db.escape(salarytype)
-                                +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath)+',' + st.db.escape(gender);
+                                +',' + st.db.escape(expectedSalarytype) + ',' + st.db.escape(resumeFilePath)+',' + st.db.escape(gender)
+                                +',' + st.db.escape(KeySkills);
                             var query = 'CALL pSaveCVInfo(' + queryParams + ')';
                             //console.log(query);
                             st.db.query(query, function (err, InsertResult) {

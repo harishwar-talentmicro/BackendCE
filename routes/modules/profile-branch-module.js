@@ -29,7 +29,7 @@ function ProfileBranch(db,stdLib){
  *
  * @param token <string> token of login user
  * @param id <int>  id=0 for new branch else id of branch
- * @param eid  <string>  ezeone id of brach ex: @HIRECRAFT_HSR
+ * @param ezeoneid  <string>  ezeone id of brach ex: @HIRECRAFT_HSR
  * @param address  <string>  address of branch
  * @param cn  <string> company name
  * @param lat  <string> lattitude
@@ -65,8 +65,8 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if(!req.body.eid){
-        error.eid = 'Invalid EZEID';
+    if(!req.body.ezeoneid){
+        error.ezeoneid = 'Invalid EZEID';
         validationFlag *= false;
     }
     if(!req.body.cn){
@@ -98,7 +98,7 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
             st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.id) + ',' + st.db.escape(req.body.eid)
+                        var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.id) + ',' + st.db.escape(req.body.ezeoneid)
                             + ',' + st.db.escape(req.body.address) + ',' + st.db.escape(req.body.cn) + ',' + st.db.escape(req.body.lat)
                             + ',' + st.db.escape(req.body.long) + ',' + st.db.escape(req.body.hcalid) + ',' + st.db.escape(req.body.phone)
                             + ',' + st.db.escape(req.body.email) + ',' + st.db.escape(req.body.ws) + ',' + st.db.escape(req.body.mobile)
