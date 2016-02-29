@@ -111,12 +111,14 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
                                 if (results) {
                                     if (results[0]) {
                                         if (results[0][0]) {
+                                            console.log ('Branchlist result ', results[0][0]);
                                             if (results[0][0].id){
                                                 responseMessage.status = true;
                                                 responseMessage.error = null;
                                                 responseMessage.message = 'Branch added successfully';
                                                 responseMessage.data = {
-                                                    id : results[0][0].id
+                                                    id : results[0][0].id,
+                                                    hcalid : (results[0][0].hcalid) ? results[0][0].hcalid : 0 // Holdiay calendar template ID
                                                 };
                                                 res.status(200).json(responseMessage);
                                             }
