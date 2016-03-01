@@ -4484,8 +4484,8 @@ Alumni.prototype.getAll = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs send successfully';
                                             responseMessage.data = {
-                                                total_count: getresult[0][0].count,
-                                                result : getresult[1]
+                                                total_count: getresult[1][0].count,
+                                                result : getresult[0]
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetJobs: Jobs send successfully');
@@ -6857,12 +6857,10 @@ Alumni.prototype.getAlumniSpecialization = function(req,res,next) {
 };
 
 /**
- *
  * Method : PUT
  * @param req
  * @param res
  * @param next
- * @description api code for change alumni type
  */
 Alumni.prototype.changeAlumniMemberType = function(req,res,next){
 

@@ -121,8 +121,6 @@ Loc.prototype.saveLocMap = function(req,res,next){
                                     type: locMap[i].type
                                 };
                                 console.log("locDetails :"+locDetails);
-
-
                                 var queryParams = st.db.escape(req.body.token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
                                     + ',' + st.db.escape(locDetails.internshipCount) + ',' + st.db.escape(locDetails.fresherCtc)
                                     + ',' + st.db.escape(locDetails.fresherCount) + ',' + st.db.escape(locDetails.lateralCount)

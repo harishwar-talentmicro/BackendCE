@@ -37,10 +37,9 @@ function ProfileBranch(db,stdLib){
  * @param hcalid <int>  holiday calender id
  * @param email <string> email
  * @param phone <string>  phone number
- * @param ws <string> website
- * @param int <string> mobile
+ * @param ws <string> websitel
  * @param ISDPhone <string> Phone ISD Code
- * @param ISDMobile <string> Mobile ISD Code
+ * @param parking_status <int> parking status
  *
  */
 ProfileBranch.prototype.saveBranch = function(req,res,next){
@@ -59,7 +58,7 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
     req.body.hcalid = (!isNaN(parseInt(req.body.hcalid))) ? parseInt(req.body.hcalid) : 0;
     req.body.phone = (req.body.phone) ? req.body.phone : '';
     req.body.ws = (req.body.ws) ? req.body.ws : '';
-    req.body.mobile = (req.body.mobile) ? (req.body.mobile) : '' ;
+    req.body.parking_status = (req.body.parking_status) ? (req.body.parking_status) : 0 ;
 
     if(!req.body.token){
         error.token = 'Invalid token';
@@ -75,9 +74,6 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
     }
     if(!req.body.ISDPhone){
         req.body.ISDPhone = "";
-    }
-    if(!req.body.ISDMobile){
-        req.body.ISDMobile = "";
     }
     if((!req.body.lat) && (!req.body.long)){
         error.lat = 'Invalid latitude or longitute';
@@ -101,8 +97,8 @@ ProfileBranch.prototype.saveBranch = function(req,res,next){
                         var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.id) + ',' + st.db.escape(req.body.ezeoneid)
                             + ',' + st.db.escape(req.body.address) + ',' + st.db.escape(req.body.cn) + ',' + st.db.escape(req.body.lat)
                             + ',' + st.db.escape(req.body.long) + ',' + st.db.escape(req.body.hcalid) + ',' + st.db.escape(req.body.phone)
-                            + ',' + st.db.escape(req.body.email) + ',' + st.db.escape(req.body.ws) + ',' + st.db.escape(req.body.mobile)
-                            + ',' + st.db.escape(req.body.ISDPhone) +  ',' + st.db.escape(req.body.ISDMobile);
+                            + ',' + st.db.escape(req.body.email) + ',' + st.db.escape(req.body.ws) + ',' + st.db.escape(req.body.ISDPhone)
+                            + ',' + st.db.escape(req.body.parking_status);
                         var procQuery = 'CALL psaveBranches(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -347,7 +343,6 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
     }
     else {
         try {
-
             st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {

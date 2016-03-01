@@ -804,8 +804,8 @@ Job.prototype.getAll = function(req,res,next){
                                             responseMessage.error = null;
                                             responseMessage.message = 'Jobs loaded successfully';
                                             responseMessage.data = {
-                                                total_count: getresult[0][0].count,
-                                                result : (getresult[1]) ? (getresult[1]) :[]
+                                                total_count: getresult[1][0].count,
+                                                result : (getresult[0]) ? (getresult[0]) :[]
                                             };
                                             res.status(200).json(responseMessage);
                                             console.log('FnGetJobs: Jobs loaded successfully');
@@ -942,7 +942,7 @@ Job.prototype.searchJobs = function(req,res,next){
         var restrictToInstitue = (req.query.restrict) ? req.query.restrict : 0;
         var type = req.query.type ? parseInt(req.query.type) : 0;  //0-normal job search, 1-Show my institue jobs, 2-for matching jobs of my cv and Default is 0
         var toEzeid = (req.query.to_ezeone) ? alterEzeoneId(req.query.to_ezeone) : '';
-        var isAlumniSearch = (req.query.isalumni_search) ? req.query.isalumni_search : 0;
+        var isAlumniSearch = (req.query.isalumni_search) ? alterEzeoneId(req.query.isalumni_search) : '';
 
         var responseMessage = {
             status: false,
@@ -970,8 +970,8 @@ Job.prototype.searchJobs = function(req,res,next){
                                 responseMessage.message = 'Jobs Search result loaded successfully';
                                 if (filter == 0) {
                                     responseMessage.data = {
-                                        total_count: getResult[0][0].count,
-                                        result: getResult[1],
+                                        total_count: getResult[1][0].count,
+                                        result: getResult[0],
                                         job_location: getResult[2],
                                         salary: getResult[3],
                                         category: getResult[4],
@@ -980,8 +980,8 @@ Job.prototype.searchJobs = function(req,res,next){
                                 }
                                 else {
                                     responseMessage.data = {
-                                        total_count: getResult[0][0].count,
-                                        result: getResult[1]
+                                        total_count: getResult[1][0].count,
+                                        result: getResult[0]
                                     };
                                 }
                                 res.status(200).json(responseMessage);
@@ -1779,13 +1779,13 @@ Job.prototype.jobs = function(req,res,next){
                                 if (getresult) {
                                     if (getresult[0]) {
                                         if (getresult[0][0]) {
-                                            if (getresult[1]) {
+                                            if (getresult[0][0].length > 0) {
 
-                                                for (var i = 0; i < getresult[1].length; i++) {
+                                                for (var i = 0; i < getresult[0].length; i++) {
                                                     var data = {
-                                                        tid: getresult[1][i].tid,
-                                                        jobcode: getresult[1][i].jobcode,
-                                                        jobtitle: getresult[1][i].jobtitle
+                                                        tid: getresult[0][i].tid,
+                                                        jobcode: getresult[0][i].jobcode,
+                                                        jobtitle: getresult[0][i].jobtitle
                                                     };
                                                     output.push(data);
                                                 }
@@ -3495,7 +3495,6 @@ Job.prototype.jobNotification = function(req,res,next) {
     }
 };
 
-
 /**
  * @todo FnFindInstitute
  * Method : GET
@@ -3746,7 +3745,6 @@ Job.prototype.addtoSelectedJob = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnSaveJobLocation
  * Method : POST
@@ -3856,7 +3854,6 @@ Job.prototype.saveJobLocation = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnGetCandidatesList
@@ -4298,6 +4295,7 @@ Job.prototype.applicantStatus = function(req,res,next){
  * @service-param job_list
  * @api /jobs_to_applicants
  */
+
 Job.prototype.assignJobsToApplicants = function(req,res,next){
     var responseMessage = {
         status: false,

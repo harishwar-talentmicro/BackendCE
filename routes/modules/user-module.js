@@ -1898,8 +1898,6 @@ User.prototype.saveResume = function(req,res,next){
 
                         var locCount = 0;
                         var locationDetails = locationsList[locCount];
-
-
                         var saveResumeDetails = function(){
                             location_id = location_id.substr(0,location_id.length - 1);
                             var queryParams = st.db.escape(FunctionID) + ',' + st.db.escape(Status) + ',' + st.db.escape(Pin)
