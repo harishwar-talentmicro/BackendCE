@@ -97,6 +97,7 @@ Loc.prototype.saveLocMap = function(req,res,next){
                         console.log(query1);
                         st.db.query(query1, function (err, deleteResult) {
                             if (!err) {
+                                console.log(deleteResult);
                                 console.log('LocMap Deleted Sucessfully');
                             }
                             else {
@@ -107,7 +108,7 @@ Loc.prototype.saveLocMap = function(req,res,next){
                         if(isJson){
 
                             for (var i = 0; i < locMap.length; i++) {
-
+                                console.log("locMap :"+locMap);
                                 var locDetails = {
 
                                     fid: locMap[i].fid,
@@ -119,7 +120,7 @@ Loc.prototype.saveLocMap = function(req,res,next){
                                     lateralCount: locMap[i].lateral_count,
                                     type: locMap[i].type
                                 };
-                                console.log(locDetails);
+                                console.log("locDetails :"+locDetails);
 
 
                                 var queryParams = st.db.escape(req.body.token) + ',' + st.db.escape(locDetails.locId) + ',' + st.db.escape(locDetails.type)
@@ -130,6 +131,7 @@ Loc.prototype.saveLocMap = function(req,res,next){
                                 console.log(query);
                                 st.db.query(query, function (err, insertResult) {
                                     if (!err) {
+                                        console.log(insertResult);
                                         if (insertResult) {
                                             id = insertResult[0][0] ? insertResult[0][0].id : 0;
                                             console.log('FnSaveLocMap: LocMap saved successfully');

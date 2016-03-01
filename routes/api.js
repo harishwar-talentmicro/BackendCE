@@ -343,6 +343,7 @@ router.put('/alumni_member', alumniModule.approveAlumnimembers);
 router.delete('/ten_attachment',alumniModule.deleteTenAttachment);
 router.get('/alumni_education',alumniModule.getAlumniEducations);
 router.get('/alumni_specialization',alumniModule.getAlumniSpecialization);
+router.put('/alumni_change_member_type',alumniModule.changeAlumniMemberType);
 
 
 //new url's

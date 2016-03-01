@@ -6152,6 +6152,7 @@ Alumni.prototype.leaveAlumni = function(req,res,next){
         }
     }
 };
+
 /**
  * @todo FnTestTagsDocs
  * Method : POST
@@ -6855,7 +6856,110 @@ Alumni.prototype.getAlumniSpecialization = function(req,res,next) {
     }
 };
 
+/**
+ *
+ * Method : PUT
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for change alumni type
+ */
+Alumni.prototype.changeAlumniMemberType = function(req,res,next){
 
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true;
+    var error = {};
+
+    if(!req.body.token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!req.body.alumni_code){
+        error['alumni_code'] = 'Invalid alumni code';
+        validateStatus *= false;
+    }
+    if(!req.body.ids){
+        error['ids'] = 'Invalid tids';
+        validateStatus *= false;
+    }
+    if(!req.body.member_type){
+        error['member_type'] = 'Invalid member type';
+        validateStatus *= false;
+    }
+
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            var alumniCode = alterEzeoneId(req.body.alumni_code);
+            st.validateToken(req.body.token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(alumniCode)+','+st.db.escape(req.body.ids)+','+st.db.escape(req.body.member_type);
+                        var query = 'CALL pchange_alumni_membertype(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, getresult) {
+                            console.log(getresult);
+                            if (!err) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Alumni member type updated successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('pchange_alumni_membertype: Alumni member type not updated:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('changeAlumniMemberType: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('changeAlumniMemberType:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : changeAlumniMemberType ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
 
 
 

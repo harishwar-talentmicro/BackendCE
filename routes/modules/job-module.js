@@ -942,6 +942,7 @@ Job.prototype.searchJobs = function(req,res,next){
         var restrictToInstitue = (req.query.restrict) ? req.query.restrict : 0;
         var type = req.query.type ? parseInt(req.query.type) : 0;  //0-normal job search, 1-Show my institue jobs, 2-for matching jobs of my cv and Default is 0
         var toEzeid = (req.query.to_ezeone) ? alterEzeoneId(req.query.to_ezeone) : '';
+        var isAlumniSearch = (req.query.isalumni_search) ? req.query.isalumni_search : 0;
 
         var responseMessage = {
             status: false,
@@ -954,7 +955,7 @@ Job.prototype.searchJobs = function(req,res,next){
             + ',' + st.db.escape(exp) + ',' + st.db.escape(keywords)+',' + st.db.escape(token)+',' + st.db.escape(pageSize)
             +',' + st.db.escape(pageCount)+',' + st.db.escape(locations)+',' + st.db.escape(category)
             +',' + st.db.escape(salary)+',' + st.db.escape(filter)+',' + st.db.escape(restrictToInstitue)+',' + st.db.escape(type)
-            +',' + st.db.escape(toEzeid);
+            +',' + st.db.escape(toEzeid)+',' + st.db.escape(isAlumniSearch);
         console.log('CALL psearchjobs(' + query + ')');
         st.db.query('CALL psearchjobs(' + query + ')', function (err, getResult) {
             //console.log(getResult);
