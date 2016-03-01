@@ -58,39 +58,7 @@ Location.prototype.getAll = function(req,res,next){
         if (Token) {
             st.validateToken(Token, function (err, tokenResult) {
                 if (!err) {
-                    if (tokenResult) {
-                        st.db.query('CALL pGetSecondaryLocationDetails(' + st.db.escape(Token) + ')', function (err, SecondaryResult) {
-                            if (!err) {
-                                // console.log(UserDetailsResult);
-                                if (SecondaryResult) {
-                                    if (SecondaryResult[0]) {
-                                        // console.log('FnGetSecondaryLocation: Token: ' + Token);
-                                        console.log('FnGetSecondaryLocation : tmaster: Secondary User details sent successfully');
-                                        res.send(SecondaryResult[0]);
-                                    }
-                                    else {
-                                        res.json(null);
-                                        console.log('FnGetSecondaryLocation : tmaster: No secondary location available');
-                                    }
-                                }
-                                else {
-                                    res.json(null);
-                                    console.log('FnGetSecondaryLocation : tmaster: No secondary location found');
-                                }
-
-                            }
-                            else {
-                                res.json(null);
-                                res.statusCode = 500;
-                                console.log('FnGetSecondaryLocation : tmaster:' + err);
-                            }
-                        });
-                    }
-                    else {
-                        console.log('FnGetSecondaryLocation: Invalid token');
-                        res.statusCode = 401;
-                        res.json(null);
-                    }
+                    res.statusCode = 200;
                 }
                 else {
                     console.log('FnGetSecondaryLocation: ' + err);
