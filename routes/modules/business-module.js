@@ -230,8 +230,8 @@ BusinessManager.prototype.getApplicantTransaction = function(req,res,next){
                                         if (transResult[0][0]) {
                                             if (transResult[1]) {
                                                 responseMessage.status = true;
-                                                responseMessage.total_count = transResult[0][0].count;
-                                                responseMessage.data = transResult[1];
+                                                responseMessage.total_count = transResult[1][0].count;
+                                                responseMessage.data = transResult[0];
                                                 responseMessage.message = 'Transaction details Send successfully';
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnGetTransaction: Transaction details Send successfully');

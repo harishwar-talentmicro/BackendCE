@@ -4295,7 +4295,6 @@ Job.prototype.applicantStatus = function(req,res,next){
  * @service-param job_list
  * @api /jobs_to_applicants
  */
-
 Job.prototype.assignJobsToApplicants = function(req,res,next){
     var responseMessage = {
         status: false,
@@ -4447,6 +4446,98 @@ Job.prototype.assignJobsToApplicants = function(req,res,next){
     else{
         responseMessage.error = "Accepted content type is json only";
         res.status(400).json(responseMessage);
+    }
+};
+
+/**
+ * Method : PUT
+ * @param req
+ * @param res
+ * @param next
+ */
+Job.prototype.activateJobPO = function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    var validateStatus = true;
+    var error = {};
+
+    if(!req.body.token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!req.body.jobid){
+        error['jobid'] = 'Invalid job tids';
+        validateStatus *= false;
+    }
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors below';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.body.token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(req.body.token)+','+st.db.escape(req.body.jobid);
+                        var query = 'CALL pActivatejobPO(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, jobResult) {
+                            if (!err) {
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Job activated successfully';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
+                            }
+                            else {
+                                responseMessage.message = 'An error occured in query ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('activateJobPO: Error in activate job:' + err);
+                            }
+
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'Invalid Token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('activateJobPO: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('activateJobPO:Error in processing Token' + err);
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(400).json(responseMessage);
+            console.log('Error : activateJobPO ' + ex.description);
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
     }
 };
 

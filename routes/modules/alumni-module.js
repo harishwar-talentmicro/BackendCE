@@ -2053,6 +2053,7 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
     var cn = (req.body.cn) ? (req.body.cn) : '';
     var jt = (req.body.jt) ? (req.body.jt) : '';
     var bg = parseInt(req.body.bg) ? parseInt(req.body.bg) : 0;
+    var ISDmobile = (req.body.ISDmobile) ? req.body.ISDmobile : '';
     var responseMessage = {
         status: false,
         error: {},
@@ -2104,12 +2105,12 @@ Alumni.prototype.saveAlumniProfile = function(req,res,next) {
                             + ',' + st.db.escape(code) + ',' + st.db.escape(accesstype)+ ',' + st.db.escape(fn)
                             + ',' + st.db.escape(ln)+ ',' + st.db.escape(email)+ ',' + st.db.escape(mn)
                             + ',' + st.db.escape(gender)+ ',' + st.db.escape(dob)+ ',' + st.db.escape(cn)+ ',' + st.db.escape(jt)
-                            + ',' + st.db.escape(bg);
+                            + ',' + st.db.escape(bg)+ ',' + st.db.escape(ISDmobile);
 
                         var query = 'CALL pSaveAlumniProfile(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, insertresult) {
-                            //console.log(insertresult);
+                            console.log(insertresult);
                             if (!err) {
                                 if (insertresult) {
                                     responseMessage.status = true;
@@ -6958,8 +6959,6 @@ Alumni.prototype.changeAlumniMemberType = function(req,res,next){
         }
     }
 };
-
-
 
 module.exports = Alumni;
 
