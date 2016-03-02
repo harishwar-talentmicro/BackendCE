@@ -256,6 +256,7 @@ router.get('/candidates_list',jobModule.getCandidatesList);
 router.post('/candidates_status',jobModule.updateCandidateStatus);
 router.get('/auto_search',jobModule.autoSearchJobs);
 router.post('/applicant_status',jobModule.applicantStatus);
+router.put('/activate_job',jobModule.activateJobPO);
 
 /**
  * Link multiple candidates to multiple jobs at once
