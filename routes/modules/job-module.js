@@ -4541,4 +4541,243 @@ Job.prototype.activateJobPO = function(req,res,next){
     }
 };
 
+/**
+ * Method : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description api code for get notify RelevantStudent
+ */
+Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var receiverId;
+    var senderTitle;
+    var groupTitle;
+    var groupId;
+    var messageText;
+    var messageType;
+    var operationType;
+    var iphoneId;
+    var userId;
+    var iphoneID='';
+    var jobtype;
+
+    var validateStatus = true;
+    var error = {};
+
+    if(!req.body.token){
+        error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if (isNaN(parseInt(req.body.job_id))){
+        error['job_id'] = 'Invalid job id';
+        validateStatus *= false;
+    }
+    if(!validateStatus){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+    }
+    else {
+        try {
+            var jobID = req.body.job_id;
+            var token = req.body.token
+            st.validateToken(token, function (err, result) {
+                if (!err) {
+                    if (result) {
+                        var queryParams = st.db.escape(jobID) + ',' + st.db.escape(token);
+                        var query = 'CALL PNotifyRelevantStudent(' + queryParams + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, NotificationResult) {
+                            if (!err) {
+                                console.log(NotificationResult);
+                                if (NotificationResult) {
+                                    if (NotificationResult[0]) {
+                                        //send push notification
+                                        console.log('job post notification...');
+                                            var mIds = ' ';
+
+                                            for(var c=0; c < results[0].length; c++){
+                                                var mIds = results[0][c].MasterID + ',' + mIds;
+                                            }
+                                            console.log(mIds);
+
+                                            var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
+
+                                            var jobQuery = 'CALL psavejobnotification(' + jobqueryParameters + ')';
+                                            console.log(jobQuery);
+                                            st.db.query(jobQuery, function (err, queryResult) {
+                                                if (!err) {
+                                                    console.log('no error in psavejobnotification');
+                                                }
+                                                else {
+                                                    console.log('error in psavejobnotification');
+                                                }
+                                            });
+
+                                            for (var i = 0; i < results[0].length; i++) {
+                                                userId = results[0][i].MasterID;
+                                                var queryParams2 = st.db.escape(ezeoneId) + ',' + st.db.escape(userId)+ ',' + st.db.escape(1);
+                                                var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
+                                                st.db.query(query2, function (err, getResult) {
+                                                    if (!err) {
+                                                        if (getResult) {
+
+                                                            var path = require('path');
+                                                            var file = path.join(__dirname,'../../mail/templates/job_post.html');
+
+                                                            fs.readFile(file, "utf8", function (err, data) {
+                                                                var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeoneId);
+                                                                st.db.query(name, function (err, companyResult) {
+                                                                    if (companyResult) {
+                                                                        var cn= '';
+                                                                        if(companyResult[0]){
+                                                                            cn = companyResult[0].CompanyName;
+                                                                        }
+
+                                                                        data = data.replace("[JobType]", jobtype);
+                                                                        data = data.replace("[JobTitle]", jobTitle);
+                                                                        data = data.replace("[JobCode]", jobCode);
+                                                                        data = data.replace("[CompanyName]", cn);
+
+                                                                        var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                                            + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId)
+                                                                            + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape(0);
+                                                                        var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
+                                                                        st.db.query(query3, function (err, messageResult) {
+                                                                            if (!err) {
+                                                                                if (messageResult) {
+                                                                                    console.log('FnComposeMessage:Message Composed successfully');
+                                                                                    var query4 = 'select tid from tmgroups where GroupType=1 and adminID=' + userId;
+                                                                                    st.db.query(query4, function (err, getDetails) {
+                                                                                        if (getDetails) {
+                                                                                            if (getDetails[0]) {
+
+                                                                                                var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userId;
+                                                                                                console.log(queryParameters);
+                                                                                                st.db.query(queryParameters, function (err, iosResult) {
+                                                                                                    if (iosResult) {
+                                                                                                        if (iosResult[0]) {
+                                                                                                            iphoneID = iosResult[0].iphoneID;
+                                                                                                        }
+                                                                                                        else {
+                                                                                                            iphoneID = '';
+                                                                                                        }
+                                                                                                    }
+                                                                                                    receiverId = getDetails[0].tid;
+                                                                                                    senderTitle = ezeoneId;
+                                                                                                    groupTitle = ezeoneId;
+                                                                                                    groupId = companyResult[0].tid;
+                                                                                                    messageText = data;
+                                                                                                    messageType = 8;
+                                                                                                    operationType = 0;
+                                                                                                    iphoneId = iphoneID;
+                                                                                                    var messageId = 0,masterid = 0,latitude = 0.00, longitude = 0.00,prioritys =1, dateTime = '';
+                                                                                                    var msgUserid = 0, a_name = '';
+                                                                                                    var jid = jobID;
+                                                                                                    console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                                                    notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude, prioritys, dateTime, a_name, msgUserid,jid);
+                                                                                                    console.log('Job Post Notification Send Successfully');
+                                                                                                });
+                                                                                            }
+                                                                                            else {
+                                                                                                console.log('FnjobNotification:user details not loaded');
+                                                                                            }
+                                                                                        }
+                                                                                        else {
+                                                                                            console.log('FnjobNotification:user details not loaded');
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                                else {
+                                                                                    console.log("FnComposeMessage:Message Result not loaded");
+                                                                                }
+                                                                            }
+                                                                            else {
+                                                                                console.log("FnSaveJobs:Error in loading Message Result:" + err);
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                });
+                                                            });
+                                                        }
+                                                        else {
+                                                            console.log("FnSaveJobs:Result not loaded");
+                                                        }
+                                                    }
+                                                    else {
+                                                        console.log("FnSaveJobs:Error:" + err);
+                                                    }
+                                                });
+                                            }
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.data = null;
+                                        responseMessage.message = 'Result loaded successfully';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnNotifyRelevantStudent: Result loaded successfully');
+                                    }
+                                    else {
+                                        responseMessage.message = 'Result not loaded';
+                                        res.status(200).json(responseMessage);
+                                        console.log('FnNotifyRelevantStudent:Result not loaded');
+                                    }
+                                }
+                                else {
+                                    responseMessage.message = 'Result not loaded';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnNotifyRelevantStudent:Result not loaded');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnNotifyRelevantStudent: error :' + err);
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('FnNotifyRelevantStudent: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server : 'Internal server error'
+                    };
+                    responseMessage.message = 'Error in validating Token';
+                    res.status(500).json(responseMessage);
+                    console.log('FnNotifyRelevantStudent:Error in processing Token' + err);
+                }
+            });
+        }
+
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error : FnNotifyRelevantStudent ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
 module.exports = Job;
