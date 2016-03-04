@@ -3547,30 +3547,36 @@ Configuration.prototype.getInstituteConfig = function(req,res,next){
         console.log(responseMessage);
     }
 
-    try {
-        if (req.query.token) {
-            st.validateToken(req.query.token, function (err, tokenResult) {
-                if (!err) {
-                    if (tokenResult) {
-                        var queryParams = st.db.escape(req.query.lat) + ',' + st.db.escape(req.query.long)+ ',' + st.db.escape(req.query.keywords);
-                        var query = 'CALL pFindInstituteconfig(' + queryParams + ')';
-                        console.log(query);
-                        st.db.query(query, function (err, institudeDetails) {
+    else{
+        try {
+            if (req.query.token) {
+                st.validateToken(req.query.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var queryParams = st.db.escape(req.query.lat) + ',' + st.db.escape(req.query.long)+ ',' + st.db.escape(req.query.keywords);
+                            var query = 'CALL pFindInstituteconfig(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, institudeDetails) {
 
-                            if (!err) {
-                                console.log(institudeDetails);
-                                if (institudeDetails) {
-                                    if (institudeDetails[0]) {
-                                        if (institudeDetails[0].length > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.data = institudeDetails[0];
-                                            responseMessage.error = null;
-                                            responseMessage.message = ' Institude details Send successfully';
-                                            res.status(200).json(responseMessage);
+                                if (!err) {
+                                    console.log(institudeDetails);
+                                    if (institudeDetails) {
+                                        if (institudeDetails[0]) {
+                                            if (institudeDetails[0].length > 0) {
+                                                responseMessage.status = true;
+                                                responseMessage.data = institudeDetails[0];
+                                                responseMessage.error = null;
+                                                responseMessage.message = ' Institude details Send successfully';
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else {
+                                                responseMessage.message = 'Institude details are not sent';
+                                                responseMessage.status = true;
+                                                res.json(responseMessage);
+                                            }
                                         }
                                         else {
                                             responseMessage.message = 'Institude details are not sent';
-                                            responseMessage.status = true;
                                             res.json(responseMessage);
                                         }
                                     }
@@ -3578,61 +3584,57 @@ Configuration.prototype.getInstituteConfig = function(req,res,next){
                                         responseMessage.message = 'Institude details are not sent';
                                         res.json(responseMessage);
                                     }
+
                                 }
                                 else {
-                                    responseMessage.message = 'Institude details are not sent';
-                                    res.json(responseMessage);
+                                    responseMessage.data = null;
+                                    responseMessage.message = 'Error in getting Institude details';
+                                    console.log('getInstituteConfig: Error in getting Institude details' + err);
+                                    res.status(500).json(responseMessage);
                                 }
-
-                            }
-                            else {
-                                responseMessage.data = null;
-                                responseMessage.message = 'Error in getting Institude details';
-                                console.log('getInstituteConfig: Error in getting Institude details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'Invalid Token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('getInstituteConfig: Invalid token');
+                        }
                     }
                     else {
-                        responseMessage.message = 'Invalid token';
                         responseMessage.error = {
-                            token: 'Invalid Token'
+                            server: 'Internal Server Error'
                         };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('getInstituteConfig: Invalid token');
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('getInstituteConfig:Error in processing Token' + err);
                     }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('getInstituteConfig:Error in processing Token' + err);
-                }
-            });
-        }
-
-        else {
-            if (!token) {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {
-                    Token : 'Invalid Token'
-                };
-                console.log('getInstituteConfig: Token is mandatory field');
+                });
             }
 
-            res.status(401).json(responseMessage);
+            else {
+                if (!req.query.token) {
+                    responseMessage.message = 'Invalid Token';
+                    responseMessage.error = {
+                        Token : 'Invalid Token'
+                    };
+                    console.log('getInstituteConfig: Token is mandatory field');
+                }
+
+                res.status(401).json(responseMessage);
+            }
         }
-    }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !';
-        console.log('getInstituteConfig:error ' + ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        res.status(400).json(responseMessage);
+        catch (ex) {
+            responseMessage.error = {};
+            responseMessage.message = 'An error occured !';
+            console.log('getInstituteConfig:error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
+        }
     }
 };
 
@@ -3671,32 +3673,37 @@ Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
         res.status(400).json(responseMessage);
         console.log(responseMessage);
     }
+    else {
+        try {
+            if (req.query.token) {
+                st.validateToken(req.query.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var queryParams = st.db.escape(req.query.groupid) + ',' + st.db.escape(req.query.lat)
+                                + ',' + st.db.escape(req.query.long);
+                            var query = 'CALL pgetinstituegroupdetails(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, institudeDetails) {
 
-    try {
-        if (req.query.token) {
-            st.validateToken(req.query.token, function (err, tokenResult) {
-                if (!err) {
-                    if (tokenResult) {
-                        var queryParams = st.db.escape(req.query.groupid) + ',' + st.db.escape(req.query.lat)
-                            + ',' + st.db.escape(req.query.long);
-                        var query = 'CALL pgetinstituegroupdetails(' + queryParams + ')';
-                        console.log(query);
-                        st.db.query(query, function (err, institudeDetails) {
-
-                            if (!err) {
-                                console.log(institudeDetails);
-                                if (institudeDetails) {
-                                    if (institudeDetails[0]) {
-                                        if (institudeDetails[0].length > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.data = institudeDetails[0];
-                                            responseMessage.error = null;
-                                            responseMessage.message = ' Institude group details Send successfully';
-                                            res.status(200).json(responseMessage);
+                                if (!err) {
+                                    console.log(institudeDetails);
+                                    if (institudeDetails) {
+                                        if (institudeDetails[0]) {
+                                            if (institudeDetails[0].length > 0) {
+                                                responseMessage.status = true;
+                                                responseMessage.data = institudeDetails[0];
+                                                responseMessage.error = null;
+                                                responseMessage.message = ' Institude group details Send successfully';
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else {
+                                                responseMessage.message = 'Institude details are not sent';
+                                                responseMessage.status = true;
+                                                res.json(responseMessage);
+                                            }
                                         }
                                         else {
                                             responseMessage.message = 'Institude details are not sent';
-                                            responseMessage.status = true;
                                             res.json(responseMessage);
                                         }
                                     }
@@ -3704,62 +3711,59 @@ Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
                                         responseMessage.message = 'Institude details are not sent';
                                         res.json(responseMessage);
                                     }
+
                                 }
                                 else {
-                                    responseMessage.message = 'Institude details are not sent';
-                                    res.json(responseMessage);
+                                    responseMessage.data = null;
+                                    responseMessage.message = 'Error in getting Institude details';
+                                    console.log('getInstituteGroupDetails: Error in getting Institude details' + err);
+                                    res.status(500).json(responseMessage);
                                 }
-
-                            }
-                            else {
-                                responseMessage.data = null;
-                                responseMessage.message = 'Error in getting Institude details';
-                                console.log('getInstituteGroupDetails: Error in getting Institude details' + err);
-                                res.status(500).json(responseMessage);
-                            }
-                        });
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'Invalid Token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('getInstituteGroupDetails: Invalid token');
+                        }
                     }
                     else {
-                        responseMessage.message = 'Invalid token';
                         responseMessage.error = {
-                            token: 'Invalid Token'
+                            server: 'Internal Server Error'
                         };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('getInstituteGroupDetails: Invalid token');
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('getInstituteGroupDetails : Error in processing Token' + err);
                     }
-                }
-                else {
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'Error in validating Token';
-                    res.status(500).json(responseMessage);
-                    console.log('getInstituteGroupDetails : Error in processing Token' + err);
-                }
-            });
-        }
-
-        else {
-            if (!token) {
-                responseMessage.message = 'Invalid Token';
-                responseMessage.error = {
-                    Token : 'Invalid Token'
-                };
-                console.log('getInstituteGroupDetails : Token is mandatory field');
+                });
             }
 
-            res.status(401).json(responseMessage);
+            else {
+                if (!req.query.token) {
+                    responseMessage.message = 'Invalid Token';
+                    responseMessage.error = {
+                        Token : 'Invalid Token'
+                    };
+                    console.log('getInstituteGroupDetails : Token is mandatory field');
+                }
+
+                res.status(401).json(responseMessage);
+            }
+        }
+        catch (ex) {
+            responseMessage.error = {};
+            responseMessage.message = 'An error occured !';
+            console.log('getInstituteGroupDetails : error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
         }
     }
-    catch (ex) {
-        responseMessage.error = {};
-        responseMessage.message = 'An error occured !';
-        console.log('getInstituteGroupDetails : error ' + ex.description);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        res.status(400).json(responseMessage);
-    }
+
 };
 
 

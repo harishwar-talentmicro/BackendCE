@@ -27,6 +27,7 @@ var Notification = require('./notification/notification-master.js');
 var NotificationQueryManager = require('./notification/notification-query.js');
 var notification = null;
 var notificationQmManager = null;
+var fs = require('fs');
 
 
 var st = null;
@@ -4587,7 +4588,8 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
     else {
         try {
             var jobID = req.body.job_id;
-            var token = req.body.token
+            var token = req.body.token;
+            var ezeoneId = req.body.ezeoneId;
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
@@ -4603,8 +4605,8 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                         console.log('job post notification...');
                                             var mIds = ' ';
 
-                                            for(var c=0; c < results[0].length; c++){
-                                                var mIds = results[0][c].MasterID + ',' + mIds;
+                                            for(var c=0; c < NotificationResult[0].length; c++){
+                                                var mIds = NotificationResult[0][c].ids + ',' + mIds;
                                             }
                                             console.log(mIds);
 
@@ -4613,6 +4615,7 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                             var jobQuery = 'CALL psavejobnotification(' + jobqueryParameters + ')';
                                             console.log(jobQuery);
                                             st.db.query(jobQuery, function (err, queryResult) {
+                                                console.log(queryResult);
                                                 if (!err) {
                                                     console.log('no error in psavejobnotification');
                                                 }
@@ -4621,30 +4624,24 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                                 }
                                             });
 
-                                            for (var i = 0; i < results[0].length; i++) {
-                                                userId = results[0][i].MasterID;
-                                                var queryParams2 = st.db.escape(ezeoneId) + ',' + st.db.escape(userId)+ ',' + st.db.escape(1);
+                                            for (var i = 0; i < NotificationResult[0].length; i++) {
+                                                userId = NotificationResult[0][i].ids;
+                                                var queryParams2 = st.db.escape(ezeoneId) + ',' + st.db.escape(userId)+ ',' + st.db.escape(0);
                                                 var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
+                                                console.log(query2);
                                                 st.db.query(query2, function (err, getResult) {
                                                     if (!err) {
+                                                        console.log(getResult);
                                                         if (getResult) {
-
                                                             var path = require('path');
                                                             var file = path.join(__dirname,'../../mail/templates/job_post.html');
 
                                                             fs.readFile(file, "utf8", function (err, data) {
-                                                                var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeoneId);
-                                                                st.db.query(name, function (err, companyResult) {
-                                                                    if (companyResult) {
-                                                                        var cn= '';
-                                                                        if(companyResult[0]){
-                                                                            cn = companyResult[0].CompanyName;
-                                                                        }
 
-                                                                        data = data.replace("[JobType]", jobtype);
-                                                                        data = data.replace("[JobTitle]", jobTitle);
-                                                                        data = data.replace("[JobCode]", jobCode);
-                                                                        data = data.replace("[CompanyName]", cn);
+                                                                        data = data.replace("[JobType]", "[JobType]");
+                                                                        data = data.replace("[JobTitle]", "[JobType]");
+                                                                        data = data.replace("[JobCode]","[JobType]");
+                                                                        data = data.replace("[CompanyName]", "[JobType]");
 
                                                                         var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                                             + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
@@ -4705,7 +4702,7 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                                                             }
                                                                         });
                                                                     }
-                                                                });
+
                                                             });
                                                         }
                                                         else {
