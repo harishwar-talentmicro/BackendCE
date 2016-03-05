@@ -246,7 +246,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                         }
 
                                                     }
-
                                                     var areMailSentToVendors = false;
                                                     var areSalesEnquirySentToVendors = false;
 
@@ -254,8 +253,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                     var alreadySubmitted = 0;
                                                     var notVerfied = 0;
                                                     var submitted = 0;
-
-
                                                     var sendResponse = function(respCode,respObj){
                                                         res.status(respCode).json(respObj);
                                                     };
@@ -306,7 +303,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                                     functionType,saveEnqResult[count][0].rid);
                                                                             }
                                                                         }
-
                                                                     }
                                                                     if(areSalesEnquirySentToVendors && areMailSentToVendors){
                                                                         sendResponse(200,{
@@ -465,7 +461,6 @@ Procurement.prototype.procurementSubmitEnquiry = function(req,res,next){
                                                                                  */
                                                                                 vendorEmailList.push(vendorArray[i].email);
                                                                             }
-
 
                                                                         }
 

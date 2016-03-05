@@ -5176,7 +5176,8 @@ Alumni.prototype.viewJobDetails = function(req,res,next){
                                         responseMessage.data = {
                                             result: getResult[0],
                                             location : getResult[1],
-                                            skill:getResult[2]
+                                            skill:getResult[2],
+                                            institute :  getResult[5]
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnViewJobDetails: Job Details loaded successfully');
