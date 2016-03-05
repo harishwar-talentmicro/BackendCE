@@ -442,8 +442,8 @@ Job.prototype.create = function(req,res,next){
                                 + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to)
                                 + ',' + st.db.escape(req.body.salaryFrom)+ ',' + st.db.escape(req.body.salaryTo)
                                 + ',' + st.db.escape(req.body.salaryType);
-                            console.log('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')');
-                            st.db.query('CALL PNotifyForCVsAfterJobPosted(' + queryParams1 + ')', function (err, results) {
+                            console.log('CALL PNotifyForCVsAfterJobPostedNew(' + queryParams1 + ')');
+                            st.db.query('CALL PNotifyForCVsAfterJobPostedNew(' + queryParams1 + ')', function (err, results) {
                                 if (!err) {
                                     if (results) {
                                         if (results[0]) {
@@ -4569,13 +4569,16 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
     var iphoneId;
     var userId = [];
     var iphoneID='';
-    var jobtype;
 
     var validateStatus = true;
     var error = {};
 
     if(!req.body.token){
         error['token'] = 'Invalid token';
+        validateStatus *= false;
+    }
+    if(!req.body.ezeoneId){
+        error['ezeoneId'] = 'Invalid EZEone Id';
         validateStatus *= false;
     }
     if (isNaN(parseInt(req.body.job_id))){
@@ -4605,13 +4608,12 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                     if (notificationResult[0]) {
                                         //send push notification
                                         console.log('job post notification...');
-                                        var mIds = ' ';
-                                        for(var c=0; c < notificationResult[0].length; c++){
-                                            var mIds = notificationResult[0][c].ids + ',' + mIds;
-                                        }
-                                        console.log(mIds);
                                         for (var i = 0; i < notificationResult[0].length; i++) {
                                             userId = notificationResult[0][i].ids.split(',');
+                                        }
+                                        var mIds = ' ';
+                                        for (var c = 0; c < notificationResult[0].length; c++) {
+                                            var mIds = notificationResult[0][c].ids + ',' + mIds;
                                         }
                                         var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
 
@@ -4629,8 +4631,6 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                         console.log(userId);
                                         var combineQuery = "";
                                         for (var k = 0; k < userId.length; k++) {
-
-                                            console.log("userId[k]: " + userId[k]);
                                             var gidQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId[k];
                                             var iosIdQuery = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userId[k];
                                             var sendMsgParams = st.db.escape(ezeoneId) + ',' + st.db.escape(userId[k]) + ',' + st.db.escape(0);
@@ -4655,57 +4655,64 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
 
                                             combineQuery += 'CALL pSendMsgRequestbyPO(' + sendMsgParams + ');' +
                                                 'CALL pComposeMessage(' + composeMsgParams + '); '
-                                                + gidQuery +' ;'
-                                                + iosIdQuery +';'
+                                                + gidQuery + ' ;'
+                                                + iosIdQuery + ';'
                                             console.log(combineQuery);
-                                        }
 
-                                        st.db.query(combineQuery, function (err, messageResult) {
-                                            if (!err) {
-                                                if (messageResult) {
-                                                console.log(messageResult);
-                                                    /**
-                                                     * @todo For Loop over messageResult
-                                                     */
-                                                    console.log(messageResult.length);
-                                                    for (var j = 0; j < messageResult.length; j++){
-                                                        receiverId = messageResult[3].tid;
-                                                        senderTitle = ezeoneId;
-                                                        groupTitle = ezeoneId;
-                                                        groupId = notificationResult[1][0].tid;
-                                                        messageText = data;
-                                                        messageType = 8;
-                                                        operationType = 0;
-                                                        iphoneId = iphoneID;
-                                                        var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
-                                                        var msgUserid = 0, a_name = '';
-                                                        var jid = jobID;
-                                                        console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jid);
-                                                        console.log('Job Post Notification Send Successfully');
+                                        }
+                                            st.db.query(combineQuery, function (err, messageResult) {
+                                                if (!err) {
+                                                    if (messageResult) {
+                                                        console.log(messageResult);
+                                                        console.log(messageResult[4][0].iphoneID);
+                                                        console.log(messageResult[9][0].iphoneID);
+                                                        for( var j = 0; j < userId.length; j++){
+                                                            receiverId = messageResult[j*(5)+3][0].tid;
+                                                            senderTitle = ezeoneId;
+                                                            groupTitle = ezeoneId;
+                                                            groupId = notificationResult[1][0].tid;
+                                                            messageText = data;
+                                                            messageType = 8;
+                                                            operationType = 0;
+                                                            iphoneId = iphoneID; //messageResult[j*(5)+4][0]) ? messageResult[j*(5)+4][0] : null ;
+                                                            var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
+                                                            var msgUserid = 0, a_name = '';
+                                                            var jid = jobID;
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jid);
+                                                            console.log('Job Post Notification Send Successfully');
+
+                                                        }
+                                                        responseMessage.status = true;
+                                                        responseMessage.error = null;
+                                                        responseMessage.data = null;
+                                                        responseMessage.message = 'Job Post Notification Send Successfully';
+                                                        res.status(200).json(responseMessage);
+
                                                     }
-                                                    responseMessage.status = true;
-                                                    responseMessage.error = null;
-                                                    responseMessage.data = null;
-                                                    responseMessage.message = 'Result loaded successfully';
-                                                    res.status(200).json(responseMessage);
-                                                    console.log('FnNotifyRelevantStudent: Result loaded successfully');
+                                                    else {
+                                                        responseMessage.status = false;
+                                                        responseMessage.error = null;
+                                                        responseMessage.data = null;
+                                                        responseMessage.message = 'Error in sending notifications';
+                                                        res.status(200).json(responseMessage);
+                                                    }
                                                 }
                                                 else {
-                                                    console.log("FnSaveJobs:Error in loading Message Result:" + err);
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.data = null;
+                                                    responseMessage.message = 'Error in sending notifications';
+                                                    res.status(200).json(responseMessage);
                                                 }
-                                            }
-                                            else {
-                                                console.log("FnSaveJobs:Error in loading Message Result:" + err);
-                                            }
-                                        });
-
+                                            });
                                     }
                                     else {
                                         responseMessage.message = 'Result not loaded';
                                         res.status(200).json(responseMessage);
                                         console.log('FnNotifyRelevantStudent:Result not loaded');
                                     }
+
                                 }
                                 else {
                                     responseMessage.message = 'Result not loaded';
@@ -4743,7 +4750,6 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                 }
             });
         }
-
         catch (ex) {
             responseMessage.error = {
                 server: 'Internal Server Error'
