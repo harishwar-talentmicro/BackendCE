@@ -182,6 +182,8 @@ router.delete('/ewtHolidayList',configurationModule.deleteHoliday);
 router.get('/get_workinghours_details',configurationModule.getWorkingHoursDetails);
 router.post('/institute_group',configurationModule.saveInstituteGroup);
 router.get('/institute_group',configurationModule.getInstituteGroup);
+router.get('/institute_details',configurationModule.getInstituteConfig);
+router.get('/institute_group_details',configurationModule.getInstituteGroupDetails);
 
 //Search module methods
 var Search = require('./modules/search-module.js');
@@ -257,6 +259,7 @@ router.post('/candidates_status',jobModule.updateCandidateStatus);
 router.get('/auto_search',jobModule.autoSearchJobs);
 router.post('/applicant_status',jobModule.applicantStatus);
 router.put('/activate_job',jobModule.activateJobPO);
+router.post('/notify_job_seekers',jobModule.notifyRelevantJobSeekers);
 
 /**
  * Link multiple candidates to multiple jobs at once
