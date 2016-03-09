@@ -3872,6 +3872,7 @@ User.prototype.saveUserDetails = function(req,res,next){
     var aboutCompany = (req.body.about_company) ? req.body.about_company : '';
 
 
+
     var responseMessage = {
         status: false,
         error: {},
@@ -3957,7 +3958,8 @@ User.prototype.saveUserDetails = function(req,res,next){
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveUserDetails: UserDetails save successfully');
 
-                                        var queryParams1 = st.db.escape(pin) + ',' + st.db.escape('') + ',' + st.db.escape(token);
+                                        var queryParams1 = st.db.escape(pin) + ',' + st.db.escape('') + ',' + st.db.escape(token)
+                                            + ',' + st.db.escape(address1);
                                         var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
                                         //console.log(query1);
                                         st.db.query(query1, function (err, getResult) {
