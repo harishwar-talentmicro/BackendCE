@@ -2065,8 +2065,8 @@ User.prototype.saveResume = function(req,res,next){
                                                 var educationData = {
 
                                                     cvid: InsertResult[0][0].ID,
-                                                    eduId: educations[j].edu_id,
-                                                    spcId: educations[j].spc_id,
+                                                    eduId: (educations[j].edu_id) ? educations[j].edu_id : 0,
+                                                    spcId: (educations[j].spc_id) ? educations[j].spc_id : 0,
                                                     score: educations[j].score,
                                                     yearofpassing: educations[j].yp,
                                                     level: educations[j].expertiseLevel, // 0-ug, 1-pg
