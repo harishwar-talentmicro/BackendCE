@@ -907,7 +907,7 @@ Tag.prototype.saveTags = function(req,res,next){
                         }
                     }
                     else{
-                        respMsg.error['token'] = 'Invalid token';
+                        respMsg.error = 'Invalid token';
                         res.status(400).json(respMsg);
                     }
                 }

@@ -2610,7 +2610,6 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                             var queryParams1 = st.db.escape(token);
                                             var query1 = 'CALL PGetUnreadMessageCountofGroup(' + queryParams1 + ')';
                                             st.db.query(query1, function (err, get_result) {
-
                                                 if (!err) {
                                                     if (get_result) {
                                                         if (get_result[0]) {
@@ -3532,7 +3531,6 @@ MessageBox.prototype.viewMessageNew = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnChangeGroupAdmin
  * Method : PUT
@@ -3765,7 +3763,6 @@ MessageBox.prototype.updateTaskStatus = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnGetLastMsgOfGroup
  * Method : Get
@@ -3886,7 +3883,6 @@ MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
         }
     }
 };
-
 
 /**
  * @todo FnForwardMessage
@@ -4031,5 +4027,129 @@ MessageBox.prototype.forwardMessage = function(req,res,next){
     }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @param token <string> token of login user
+ * @param datetime <datetime>
+ */
+MessageBox.prototype.getMessageList = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+
+    else{
+        try {
+            req.query.datetime = (req.query.datetime) ? req.query.datetime : null ;
+            if (req.query.token) {
+                st.validateToken(req.query.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var queryParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.datetime);
+                            var queryParams1 = st.db.escape(req.query.token);
+                            var query = 'CALL pGetlatestGroupAndIndividuals(' + queryParams + '); ' +
+                                'CALL PGetUnreadMessageCountofGroup(' + queryParams1 + '); CALL pGetPendingRequest(' + queryParams1 + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, result) {
+                                if (!err) {
+                                    console.log(result);
+                                    if (result) {
+                                        if (result.length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.data = {
+                                                groupdetails : result[0],
+                                                unreadmsg : result[2],
+                                                pendingreq : result[4]
+                                            };
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Message details Send successfully';
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.data = [];
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Message details are not sent';
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.data = [];
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Message details are not sent';
+                                        res.status(200).json(responseMessage);
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.data = null;
+                                    responseMessage.message = 'Error in getting Message details';
+                                    console.log('getInstituteConfig: Error in getting Message details' + err);
+                                    res.status(500).json(responseMessage);
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'Invalid Token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('getInstituteConfig: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('getInstituteConfig:Error in processing Token' + err);
+                    }
+                });
+            }
+
+            else {
+                if (!req.query.token) {
+                    responseMessage.message = 'Invalid Token';
+                    responseMessage.error = {
+                        Token : 'Invalid Token'
+                    };
+                    console.log('getInstituteConfig: Token is mandatory field');
+                }
+
+                res.status(401).json(responseMessage);
+            }
+        }
+        catch (ex) {
+            responseMessage.error = {};
+            responseMessage.message = 'An error occured !';
+            console.log('getInstituteConfig:error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
 
 module.exports = MessageBox;

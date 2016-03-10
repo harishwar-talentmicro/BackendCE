@@ -184,6 +184,7 @@ router.post('/institute_group',configurationModule.saveInstituteGroup);
 router.get('/institute_group',configurationModule.getInstituteGroup);
 router.get('/institute_details',configurationModule.getInstituteConfig);
 router.get('/institute_group_details',configurationModule.getInstituteGroupDetails);
+router.delete('/job_institute/:job_id/:institute_id',configurationModule.deleteJobInstitute);
 
 //Search module methods
 var Search = require('./modules/search-module.js');
@@ -258,7 +259,7 @@ router.get('/candidates_list',jobModule.getCandidatesList);
 router.post('/candidates_status',jobModule.updateCandidateStatus);
 router.get('/auto_search',jobModule.autoSearchJobs);
 router.post('/applicant_status',jobModule.applicantStatus);
-router.put('/activate_job',jobModule.activateJobPO);
+router.put('/job/status',jobModule.activateJobPO);
 router.post('/notify_job_seekers',jobModule.notifyRelevantJobSeekers);
 
 /**
@@ -299,6 +300,7 @@ router.put('/change_group_admin',messageBox.changeGroupAdmin);
 router.put('/change_task_status',messageBox.updateTaskStatus);
 router.get('/chat',messageBox.getLastMsgOfGroup);
 router.post('/forward_message',messageBox.forwardMessage);
+router.get('/message_list',messageBox.getMessageList);
 
 //Planner module
 var Planner = require('./modules/planner-module.js');

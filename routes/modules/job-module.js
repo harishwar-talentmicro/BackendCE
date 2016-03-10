@@ -6,7 +6,6 @@
  */
 "use strict";
 
-
 var util = require('util');
 
 function alterEzeoneId(ezeoneId){
@@ -51,7 +50,6 @@ function Job(db,stdLib){
  */
 Job.prototype.create = function(req,res,next){
     var fs = require("fs");
-
     var token = req.body.token;
     var tid = req.body.tid;
     var ezeoneId = alterEzeoneId(req.body.ezeone_id);
@@ -93,8 +91,7 @@ Job.prototype.create = function(req,res,next){
     educations= JSON.parse(JSON.stringify(educations));
     var iphoneID='';
     var jobID;
-    var m= 0;
-    var jobtype;
+    var m = 0;
     var receiverId;
     var senderTitle;
     var groupTitle;
@@ -104,33 +101,6 @@ Job.prototype.create = function(req,res,next){
     var operationType;
     var iphoneId;
     var userId;
-
-
-
-    if (jobType == 0){
-        jobtype = 'Full Time';
-    }
-    else if (jobType == 1){
-        jobtype = 'Part Time';
-    }
-    else if (jobType == 2){
-        jobtype = 'Work from Home';
-    }
-    else if (jobType == 3){
-        jobtype = 'Internship';
-    }
-    else if (jobType == 4){
-        jobtype = 'Apprenticeship';
-    }
-    else if (jobType == 5){
-        jobtype = 'Job Oriented Training';
-    }
-    else if (jobType == 6){
-        jobtype = 'Consultant';
-    }
-    else if (jobType == 7){
-        jobtype = 'Freelancer';
-    }
 
     var responseMessage = {
         status: false,
@@ -185,7 +155,6 @@ Job.prototype.create = function(req,res,next){
         error['jobType'] = 'Invalid jobType';
         validateStatus *= false;
     }
-
     if(isNaN(parseInt(status))){
         error['status'] = 'Invalid status';
         validateStatus *= false;
@@ -201,8 +170,6 @@ Job.prototype.create = function(req,res,next){
         error['conatctId'] = 'Invalid conatctId';
         validateStatus *= false;
     }
-
-
     if(!validateStatus){
         responseMessage.status = false;
         responseMessage.message = 'Please check the errors below';
@@ -431,35 +398,37 @@ Job.prototype.create = function(req,res,next){
                                 });
                             }
                             else {
-                                postNotification(jobID);
+                                if (instituteIdStr){
+                                    postNotification(jobID);
+                                }
+
                             }
                         };
 
                         //send push notification
-                        var postNotification = function (jobID) {
-                            console.log('job post notification...');
-                            var queryParams1 = st.db.escape(jobID) + ',' + st.db.escape(location_id)
-                                + ',' + st.db.escape(req.body.exp_from) + ',' + st.db.escape(req.body.exp_to)
-                                + ',' + st.db.escape(req.body.salaryFrom)+ ',' + st.db.escape(req.body.salaryTo)
-                                + ',' + st.db.escape(req.body.salaryType);
-                            console.log('CALL PNotifyForCVsAfterJobPostedNew(' + queryParams1 + ')');
-                            st.db.query('CALL PNotifyForCVsAfterJobPostedNew(' + queryParams1 + ')', function (err, results) {
+                        var postNotification = function(jobID){
+                            var queryParams = st.db.escape(jobID) + ',' + st.db.escape(token);
+                            var query = 'CALL PNotifyForCVsAfterJobPostedNew(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, notificationResult) {
                                 if (!err) {
-                                    if (results) {
-                                        if (results[0]) {
-                                            if (results[0][0]) {
-                                                var mIds = ' ';
-
-                                                for(var c=0; c < results[0].length; c++){
-                                                    var mIds = results[0][c].MasterID + ',' + mIds;
+                                    console.log(notificationResult);
+                                    if (notificationResult) {
+                                        if (notificationResult[0]) {
+                                            console.log('job post notification...');
+                                            for (var i = 0; i < notificationResult[0].length; i++) {
+                                                userId = notificationResult[0][i].ids.split(',');
+                                            }
+                                            var mIds = ' ';
+                                                for (var c = 0; c < notificationResult[0].length; c++) {
+                                                    var mIds = notificationResult[0][c].ids + ',' + mIds;
                                                 }
-                                                console.log(mIds);
-
                                                 var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
 
                                                 var jobQuery = 'CALL psavejobnotification(' + jobqueryParameters + ')';
                                                 console.log(jobQuery);
                                                 st.db.query(jobQuery, function (err, queryResult) {
+                                                    console.log(queryResult);
                                                     if (!err) {
                                                         console.log('no error in psavejobnotification');
                                                     }
@@ -467,118 +436,81 @@ Job.prototype.create = function(req,res,next){
                                                         console.log('error in psavejobnotification');
                                                     }
                                                 });
+                                                console.log(userId);
+                                                var combineQuery = "";
+                                                for (var k = 0; k < userId.length; k++) {
+                                                    var gidQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId[k];
+                                                    var iosIdQuery = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userId[k];
+                                                    var sendMsgParams = st.db.escape(ezeoneId) + ',' + st.db.escape(userId[k]) + ',' + st.db.escape(0);
 
-                                                for (var i = 0; i < results[0].length; i++) {
-                                                    userId = results[0][i].MasterID;
-                                                    var queryParams2 = st.db.escape(ezeoneId) + ',' + st.db.escape(userId)+ ',' + st.db.escape(0);
-                                                    var query2 = 'CALL pSendMsgRequestbyPO(' + queryParams2 + ')';
-                                                    st.db.query(query2, function (err, getResult) {
-                                                        if (!err) {
-                                                            if (getResult) {
+                                                    /**
+                                                     * Make connection of student(contact connected in messagebox) with this College ID
+                                                     * which is sending the notification (so that  it will appear in student contact list)
+                                                     */
+                                                    var path = require('path');
+                                                    var file = path.join(__dirname, '../../mail/templates/job_post.html');
+                                                    var data = fs.readFileSync(file, "utf8");
 
-                                                                var path = require('path');
-                                                                var file = path.join(__dirname,'../../mail/templates/job_post.html');
+                                                    data = data.replace("[JobType]", notificationResult[1][0].jobtype);
+                                                    data = data.replace("[JobTitle]", notificationResult[1][0].jobTitle);
+                                                    data = data.replace("[JobCode]", notificationResult[1][0].jobCode);
+                                                    data = data.replace("[CompanyName]", notificationResult[1][0].cn);
+                                                    var composeMsgParams = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                        + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId[k])
+                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0);
 
-                                                                fs.readFile(file, "utf8", function (err, data) {
-                                                                    var name = 'select tid,CompanyName from tmaster where EZEID=' + st.db.escape(ezeoneId);
-                                                                    st.db.query(name, function (err, companyResult) {
-                                                                        if (companyResult) {
-                                                                            var cn= '';
-                                                                            if(companyResult[0]){
-                                                                                cn = companyResult[0].CompanyName;
-                                                                            }
+                                                    combineQuery += 'CALL pSendMsgRequestbyPO(' + sendMsgParams + ');' +
+                                                        'CALL pComposeMessage(' + composeMsgParams + '); '
+                                                        + gidQuery + ' ;'
+                                                        + iosIdQuery + ';'
+                                                    console.log(combineQuery);
+                                                }
+                                                st.db.query(combineQuery, function (err, messageResult) {
+                                                    if (!err) {
+                                                        if (messageResult) {
+                                                            console.log(messageResult);
+                                                            for( var j = 0; j < userId.length; j++){
+                                                                receiverId = messageResult[j*(5)+3][0].tid;
+                                                                senderTitle = ezeoneId;
+                                                                groupTitle = ezeoneId;
+                                                                groupId = notificationResult[1][0].tid;
+                                                                messageText = data;
+                                                                messageType = 8;
+                                                                operationType = 0;
+                                                                iphoneId = iphoneID; //messageResult[j*(5)+4][0]) ? messageResult[j*(5)+4][0] : null ;
+                                                                var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
+                                                                var msgUserid = 0, a_name = '';
+                                                                var jid = jobID;
+                                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                    operationType, iphoneId, messageId, masterid);
+                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                    messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jid);
+                                                                console.log('Job Post Notification Send Successfully');
 
-                                                                            data = data.replace("[JobType]", jobtype);
-                                                                            data = data.replace("[JobTitle]", jobTitle);
-                                                                            data = data.replace("[JobCode]", jobCode);
-                                                                            data = data.replace("[CompanyName]", cn);
-
-                                                                            var queryParams3 = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                                                + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId)
-                                                                                + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape(0);
-                                                                            var query3 = 'CALL pComposeMessage(' + queryParams3 + ')';
-                                                                            st.db.query(query3, function (err, messageResult) {
-                                                                                if (!err) {
-                                                                                    if (messageResult) {
-                                                                                        console.log('FnComposeMessage:Message Composed successfully');
-                                                                                        var query4 = 'select tid from tmgroups where GroupType=1 and adminID=' + userId;
-                                                                                        st.db.query(query4, function (err, getDetails) {
-                                                                                            if (getDetails) {
-                                                                                                if (getDetails[0]) {
-
-                                                                                                    var queryParameters = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userId;
-                                                                                                    console.log(queryParameters);
-                                                                                                    st.db.query(queryParameters, function (err, iosResult) {
-                                                                                                        if (iosResult) {
-                                                                                                            if (iosResult[0]) {
-                                                                                                                iphoneID = iosResult[0].iphoneID;
-                                                                                                            }
-                                                                                                            else {
-                                                                                                                iphoneID = '';
-                                                                                                            }
-                                                                                                        }
-                                                                                                        receiverId = getDetails[0].tid;
-                                                                                                        senderTitle = ezeoneId;
-                                                                                                        groupTitle = ezeoneId;
-                                                                                                        groupId = companyResult[0].tid;
-                                                                                                        messageText = data;
-                                                                                                        messageType = 8;
-                                                                                                        operationType = 0;
-                                                                                                        iphoneId = iphoneID;
-                                                                                                        var messageId = 0,masterid = 0,latitude = 0.00, longitude = 0.00,prioritys =1, dateTime = '';
-                                                                                                        var msgUserid = 0, a_name = '';
-                                                                                                        var jid = jobID;
-                                                                                                        //console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                                                                        notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid,latitude, longitude, prioritys, dateTime, a_name, msgUserid,jid);
-                                                                                                        console.log('Job Post Notification Send Successfully');
-                                                                                                    });
-                                                                                                }
-                                                                                                else {
-                                                                                                    console.log('FnjobNotification:user details not loaded');
-                                                                                                }
-                                                                                            }
-                                                                                            else {
-                                                                                                console.log('FnjobNotification:user details not loaded');
-                                                                                            }
-                                                                                        });
-                                                                                    }
-                                                                                    else {
-                                                                                        console.log("FnComposeMessage:Message Result not loaded");
-                                                                                    }
-                                                                                }
-                                                                                else {
-                                                                                    console.log("FnSaveJobs:Error in loading Message Result:" + err);
-                                                                                }
-                                                                            });
-                                                                        }
-                                                                    });
-                                                                });
                                                             }
-                                                            else {
-                                                                console.log("FnSaveJobs:Result not loaded");
-                                                            }
+                                                            console.log('postNotification : Job Post Notification Send Successfully');
+
                                                         }
                                                         else {
-                                                            console.log("FnSaveJobs:Error:" + err);
+                                                            console.log('postNotification : Error in sending notifications');
                                                         }
-                                                    });
-                                                }
+                                                    }
+                                                    else {
+                                                        console.log('postNotification : Error in sending notifications');
+                                                    }
+                                                });
                                             }
                                             else {
-                                                console.log("FnSaveJobs:MasterId not loaded");
+                                                console.log('postNotification : Result not loaded');
                                             }
                                         }
-                                        else {
-                                            console.log("FnSaveJobs:MasterId not loaded");
-                                        }
-                                    }
                                     else {
-                                        console.log("FnSaveJobs:MasterId not loaded");
+                                        console.log('postNotification : Result not loaded');
                                     }
                                 }
                                 else {
-                                    console.log("FnSaveJobs:Error:" + err);
+                                    console.log('postNotification : Result not loaded');
                                 }
                             });
                         };
@@ -638,7 +570,6 @@ Job.prototype.create = function(req,res,next){
                             }
 
                         }
-
                         else {
                             location_id = '';
                             createJobPosting();
@@ -4495,7 +4426,7 @@ Job.prototype.activateJobPO = function(req,res,next){
                             if (!err) {
                                 responseMessage.status = true;
                                 responseMessage.error = null;
-                                responseMessage.message = 'Job activated successfully';
+                                responseMessage.message = 'Job status updated successfully';
                                 responseMessage.data = null;
                                 res.status(200).json(responseMessage);
                             }
@@ -4505,7 +4436,7 @@ Job.prototype.activateJobPO = function(req,res,next){
                                     server: 'Internal Server Error'
                                 };
                                 res.status(500).json(responseMessage);
-                                console.log('activateJobPO: Error in activate job:' + err);
+                                console.log('activateJobPO: Error in update job status:' + err);
                             }
 
                         });
@@ -4549,7 +4480,10 @@ Job.prototype.activateJobPO = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description api code for get notify RelevantStudent
+ * @description api code for get notify Relevant Student
+ * @param token <string> token of login user
+ * @param ezeoneId <string> ezeone id of company who want to send notifications
+ * @param job_id <int> job id
  */
 Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
 
@@ -4647,7 +4581,6 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                             data = data.replace("[JobTitle]", notificationResult[1][0].jobTitle);
                                             data = data.replace("[JobCode]", notificationResult[1][0].jobCode);
                                             data = data.replace("[CompanyName]", notificationResult[1][0].cn);
-
                                             var composeMsgParams = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                 + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                 + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId[k])
@@ -4664,8 +4597,6 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                                 if (!err) {
                                                     if (messageResult) {
                                                         console.log(messageResult);
-                                                        console.log(messageResult[4][0].iphoneID);
-                                                        console.log(messageResult[9][0].iphoneID);
                                                         for( var j = 0; j < userId.length; j++){
                                                             receiverId = messageResult[j*(5)+3][0].tid;
                                                             senderTitle = ezeoneId;
@@ -4678,8 +4609,10 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
                                                             var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
                                                             var msgUserid = 0, a_name = '';
                                                             var jid = jobID;
-                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
-                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jid);
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                operationType, iphoneId, messageId, masterid);
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jid);
                                                             console.log('Job Post Notification Send Successfully');
 
                                                         }
@@ -4762,5 +4695,6 @@ Job.prototype.notifyRelevantJobSeekers = function(req,res,next){
         }
     }
 };
+
 
 module.exports = Job;
