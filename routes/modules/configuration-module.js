@@ -3285,7 +3285,6 @@ Configuration.prototype.getWorkingHoursDetails = function(req,res,next){
     }
 };
 
-
 /**
  * @todo FnSaveInstituteGroup
  * Method : POST
@@ -3512,7 +3511,425 @@ Configuration.prototype.getInstituteGroup = function(req,res,next){
     }
 };
 
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Configuration.prototype.getInstituteConfig = function(req,res,next){
 
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if((!req.query.lat) && (!req.query.long)){
+        error.lat = 'Invalid latitude or longitute';
+        validationFlag *= false;
+    }
+    if(!req.query.keywords){
+        error.keywords = 'Keywords can not be empty';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+
+    else{
+        try {
+            if (req.query.token) {
+                st.validateToken(req.query.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var queryParams = st.db.escape(req.query.lat) + ',' + st.db.escape(req.query.long)+ ',' + st.db.escape(req.query.keywords);
+                            var query = 'CALL pFindInstituteconfig(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, institudeDetails) {
+
+                                if (!err) {
+                                    console.log(institudeDetails);
+                                    if (institudeDetails) {
+                                        if (institudeDetails[0]) {
+                                            if (institudeDetails[0].length > 0) {
+                                                responseMessage.status = true;
+                                                responseMessage.data = institudeDetails[0];
+                                                responseMessage.error = null;
+                                                responseMessage.message = ' Institude details Send successfully';
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else {
+                                                responseMessage.message = 'Institude details are not sent';
+                                                responseMessage.status = true;
+                                                res.json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.message = 'Institude details are not sent';
+                                            res.json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'Institude details are not sent';
+                                        res.json(responseMessage);
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.data = null;
+                                    responseMessage.message = 'Error in getting Institude details';
+                                    console.log('getInstituteConfig: Error in getting Institude details' + err);
+                                    res.status(500).json(responseMessage);
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'Invalid Token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('getInstituteConfig: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('getInstituteConfig:Error in processing Token' + err);
+                    }
+                });
+            }
+
+            else {
+                if (!req.query.token) {
+                    responseMessage.message = 'Invalid Token';
+                    responseMessage.error = {
+                        Token : 'Invalid Token'
+                    };
+                    console.log('getInstituteConfig: Token is mandatory field');
+                }
+
+                res.status(401).json(responseMessage);
+            }
+        }
+        catch (ex) {
+            responseMessage.error = {};
+            responseMessage.message = 'An error occured !';
+            console.log('getInstituteConfig:error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
+        }
+    }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ */
+Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if((!req.query.lat) && (!req.query.long)){
+        error.lat = 'Invalid latitude or longitute';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.groupid))){
+        error.groupid = 'Invalid group Id';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            if (req.query.token) {
+                st.validateToken(req.query.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var queryParams = st.db.escape(req.query.groupid) + ',' + st.db.escape(req.query.lat)
+                                + ',' + st.db.escape(req.query.long);
+                            var query = 'CALL pgetinstituegroupdetails(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, institudeDetails) {
+
+                                if (!err) {
+                                    console.log(institudeDetails);
+                                    if (institudeDetails) {
+                                        if (institudeDetails[0]) {
+                                            if (institudeDetails[0].length > 0) {
+                                                responseMessage.status = true;
+                                                responseMessage.data = institudeDetails[0];
+                                                responseMessage.error = null;
+                                                responseMessage.message = ' Institude group details Send successfully';
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else {
+                                                responseMessage.message = 'Institude details are not sent';
+                                                responseMessage.status = true;
+                                                res.json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.message = 'Institude details are not sent';
+                                            res.json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'Institude details are not sent';
+                                        res.json(responseMessage);
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.data = null;
+                                    responseMessage.message = 'Error in getting Institude details';
+                                    console.log('getInstituteGroupDetails: Error in getting Institude details' + err);
+                                    res.status(500).json(responseMessage);
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'Invalid Token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('getInstituteGroupDetails: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('getInstituteGroupDetails : Error in processing Token' + err);
+                    }
+                });
+            }
+
+            else {
+                if (!req.query.token) {
+                    responseMessage.message = 'Invalid Token';
+                    responseMessage.error = {
+                        Token : 'Invalid Token'
+                    };
+                    console.log('getInstituteGroupDetails : Token is mandatory field');
+                }
+
+                res.status(401).json(responseMessage);
+            }
+        }
+        catch (ex) {
+            responseMessage.error = {};
+            responseMessage.message = 'An error occured !';
+            console.log('getInstituteGroupDetails : error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
+        }
+    }
+
+};
+
+/**
+ * @type : DELETE
+ * @param req
+ * @param res
+ * @param next
+ * @description DELETE job of institute
+ * @accepts json
+ * @param token <string> token of login user
+ * @param job_id <int> job id
+ * @param institute_id <string> institute id(comma seprated)
+ *
+ */
+Configuration.prototype.deleteJobInstitute = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.params.job_id)) || (req.params.job_id <= 0)){
+        error.job_id = 'Invalid job id';
+        validationFlag *= false;
+    }
+    if(!req.params.institute_id){
+        error.institute_id = 'Invalid institute id';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            var combProcQuery = "";
+            var instituteId = req.params.institute_id.split(',');
+            console.log(instituteId);
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        for (var i = 0; i < instituteId.length; i++ ) {
+                            var procParams = st.db.escape(req.params.job_id) + ',' + st.db.escape(instituteId[i]) ;
+                            var procQuery = 'CALL pdeletejobinstitue(' + procParams + ');';
+                            combProcQuery += procQuery;
+                        }
+                        console.log("combProcQuery :"+combProcQuery);
+                        st.db.query(combProcQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+                                            var intituteInUse = [];
+                                            var deletedInstitute = [];
+                                            for (var k = 0; k < results.length/2; k++ ){
+                                                var count = (k) ? 2 * k : 0;
+                                                if (results[count][0].error_code == 'in_use') {
+                                                    intituteInUse.push(results[count][0].institue_id);
+                                                    console.log(intituteInUse);
+                                                }
+                                                else {
+                                                    deletedInstitute.push(results[count][0].institue_id);
+                                                    console.log(deletedInstitute);
+                                                }
+                                            }
+                                            var respMsg = '';
+                                            if ((intituteInUse.length > 0) && (deletedInstitute.length > 0)){
+                                                respMsg = 'Some institutes are deleted and some are in use';
+                                            }
+                                            else if (intituteInUse.length > 0){
+                                                respMsg = 'Institutes are in use';
+                                            }
+                                            else if (deletedInstitute.length > 0){
+                                                respMsg = 'Institutes deleted successfully';
+                                            }
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = respMsg;
+                                            responseMessage.data = {
+                                                intituteInUse : intituteInUse,
+                                                deletedInstitute : deletedInstitute
+                                            };
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in deleting job of institute';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in deleting job of institute';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in deleting job of institute';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : pdeletejobinstitue ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('deleteJobInstitute: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : deleteJobInstitute ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error deleteJobInstitute :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
 
 module.exports = Configuration;
 

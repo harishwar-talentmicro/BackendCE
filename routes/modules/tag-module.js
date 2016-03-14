@@ -180,9 +180,6 @@ Tag.prototype.saveStandardTags = function(req,res,next){
     else {
         tagType = 1;
     }
-
-
-
     var responseMessage = {
         status: false,
         error: {},
@@ -209,10 +206,7 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var originalFileName = '';
-
                         if (req.files.image) {
-
-
                             var uniqueId = uuid.v4();
                             randomName = uniqueId + '.' + req.files.image.extension;
                             originalFileName = req.files.image.name;
@@ -248,7 +242,7 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                                     scale: true,
                                     crop: true
                                 };
-                                //console.log(imageParams);
+                                console.log(imageParams);
                                 FnCropImage(imageParams, function (err, bufferData) {
 
                                     if (bufferData) {
@@ -277,11 +271,10 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                                                         scale: true,
                                                         crop: true
                                                     };
-                                                    //console.log(imageParams);
+                                                    console.log(imageParams);
                                                     FnCropImage(imageParams, function (err, bufferData) {
 
                                                         if (bufferData) {
-
                                                             imageBuffer = bufferData;
                                                             uploadtoServer(imageBuffer);
                                                         }
@@ -914,7 +907,7 @@ Tag.prototype.saveTags = function(req,res,next){
                         }
                     }
                     else{
-                        respMsg.error['token'] = 'Invalid token';
+                        respMsg.error = 'Invalid token';
                         res.status(400).json(respMsg);
                     }
                 }

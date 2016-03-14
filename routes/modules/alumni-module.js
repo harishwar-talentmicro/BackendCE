@@ -7,8 +7,6 @@
 
 "use strict";
 
-
-
 var uuid = require('node-uuid');
 var stream = require( "stream" );
 var chalk = require( "chalk" );
@@ -2534,9 +2532,7 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                     //upload to cloud server
                                     if(req.files) {
                                         for (var prop in req.files) {
-
                                             if (req.files.hasOwnProperty(prop)) {
-
                                                 var uniqueId = uuid.v4();
                                                 var filetype = (req.files[prop].extension) ? req.files[prop].extension : 'jpg';
                                                 randomName = uniqueId + '.' + filetype;
@@ -2625,7 +2621,6 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
 function fnsavepic(picContent, callback) {
 
     try {
-
         var localStream = picContent.readStream;
         var remoteWriteStream = bucket.file(picContent.randomName).createWriteStream();
         localStream.pipe(remoteWriteStream);
@@ -5176,7 +5171,8 @@ Alumni.prototype.viewJobDetails = function(req,res,next){
                                         responseMessage.data = {
                                             result: getResult[0],
                                             location : getResult[1],
-                                            skill:getResult[2]
+                                            skill:getResult[2],
+                                            institute :  getResult[5]
                                         };
                                         res.status(200).json(responseMessage);
                                         console.log('FnViewJobDetails: Job Details loaded successfully');

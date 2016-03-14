@@ -50,12 +50,12 @@ TaskManager.prototype.saveTaskManager = function(req,res,next) {
     var token = req.body.token;
     var id = parseInt(req.body.id);            // task id
     var status = parseInt(req.body.s);
-    var transactionId = parseInt(req.body.tx);   // Transaction id
+    var transactionId = (isNaN(parseInt(req.body.tx))) ? parseInt(req.body.tx) : 0;   // Transaction id
     var c_particulars = req.body.cp;           // Conveyance Particulars <string>
     var c_amount = req.body.ca;             // Conveyance Amount <float>
     var userIDs = req.body.au;              // Additional User IDs (Comma separted MasterIDs of users) <string>
     var taskDate = req.body.ts;            // Task Date and Time (YYYY-MM-DD HH:mm:ss)
-    var ownerId = parseInt(req.body.ow);   // Owner ID (Master ID of the task owner)
+    var ownerId = (isNaN(parseInt(req.body.ow))) ? parseInt(req.body.ow) : 0;   // Owner ID (Master ID of the task owner)
     var nextActionId = (isNaN(parseInt(req.body.nxid))) ? 0 : parseInt(req.body.nxid);
     var taskParticulars = (req.body.tp) ? req.body.tp  : ''; // Task particulars
     var tid,cd;

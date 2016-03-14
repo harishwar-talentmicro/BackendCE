@@ -2065,8 +2065,8 @@ User.prototype.saveResume = function(req,res,next){
                                                 var educationData = {
 
                                                     cvid: InsertResult[0][0].ID,
-                                                    eduId: educations[j].edu_id,
-                                                    spcId: educations[j].spc_id,
+                                                    eduId: (educations[j].edu_id) ? educations[j].edu_id : 0,
+                                                    spcId: (educations[j].spc_id) ? educations[j].spc_id : 0,
                                                     score: educations[j].score,
                                                     yearofpassing: educations[j].yp,
                                                     level: educations[j].expertiseLevel, // 0-ug, 1-pg
@@ -3872,6 +3872,7 @@ User.prototype.saveUserDetails = function(req,res,next){
     var aboutCompany = (req.body.about_company) ? req.body.about_company : '';
 
 
+
     var responseMessage = {
         status: false,
         error: {},
@@ -3957,7 +3958,8 @@ User.prototype.saveUserDetails = function(req,res,next){
                                         res.status(200).json(responseMessage);
                                         console.log('FnSaveUserDetails: UserDetails save successfully');
 
-                                        var queryParams1 = st.db.escape(pin) + ',' + st.db.escape('') + ',' + st.db.escape(token);
+                                        var queryParams1 = st.db.escape(pin) + ',' + st.db.escape('') + ',' + st.db.escape(token)
+                                            + ',' + st.db.escape(address1);
                                         var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
                                         //console.log(query1);
                                         st.db.query(query1, function (err, getResult) {

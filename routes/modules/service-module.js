@@ -278,7 +278,7 @@ Service.prototype.getServices = function(req,res,next){
 
     var token = req.query.token;
     var masterId = parseInt(req.query.master_id);
-    var status = parseInt(req.query.s);
+    //var status = parseInt(req.query.s);
 
     var responseMessage = {
         status: false,
@@ -293,8 +293,8 @@ Service.prototype.getServices = function(req,res,next){
         error['token'] = 'token is mandatory';
         validateStatus *= false;
     }
-    if(isNaN(status)){
-        error['status'] = 'status is a integer value';
+    if(!(req.query.s)){
+        error['status'] = 'status is invalid';
         validateStatus *= false;
     }
     if(isNaN(masterId)){
@@ -312,7 +312,7 @@ Service.prototype.getServices = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status);
+                        var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token)+ ',' + st.db.escape(req.query.s);
                         var query = 'CALL ploadservices(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {
@@ -1648,5 +1648,7 @@ Service.prototype.isCommunityMember = function(req,res,next){
         res.status(401).json(respMsg);
     }
 };
+
+
 
 module.exports = Service;

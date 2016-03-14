@@ -6,7 +6,6 @@
  */
 "use strict";
 
-var util = require('util');
 var validator = require('validator');
 
 var uuid = require('node-uuid');
@@ -16,7 +15,6 @@ var path = require('path');
 
 
 var stream = require( "stream" );
-var chalk = require( "chalk" );
 var util = require( "util" );
 
 var appConfig = require('../../ezeone-config.json');
@@ -193,42 +191,33 @@ HrisHRM.prototype.hrisSaveHRMimg = function(req,res,next){
                     if (tokenResult) {
                         console.log(req.files);
                         if (req.files) {
-                            if(req.files){
-                                var deleteTempFile = function(){
-                                    fs.unlink('../bin/'+req.files.pr.path);
-                                    console.log("Image Path is deleted from server");
-                                };
-                                var readStream = fs.createReadStream(req.files.pr.path);
-                                var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : '');
-                                console.log(uniqueFileName);
-                                uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
-                                    if (!err) {
-                                        responseMessage.status = true;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Image uploaded successfully';
-                                        responseMessage.data = {
-                                            pic: uniqueFileName
-                                        };
-                                        deleteTempFile();
-                                        res.status(200).json(responseMessage);
-                                    }
-                                    else {
-                                        responseMessage.status = false;
-                                        responseMessage.error = null;
-                                        responseMessage.message = 'Error in uploading image';
-                                        responseMessage.data = null;
-                                        deleteTempFile();
-                                        res.status(500).json(responseMessage);
-                                    }
-                                });
-                            }
-                            else{
-                                responseMessage.status = false;
-                                responseMessage.error = null;
-                                responseMessage.message = 'Invalid input data';
-                                responseMessage.data = null;
-                                res.status(500).json(responseMessage);
-                            }
+                            var deleteTempFile = function(){
+                                fs.unlink('../bin/'+req.files.pr.path);
+                                console.log("Image Path is deleted from server");
+                            };
+                            var readStream = fs.createReadStream(req.files.pr.path);
+                            var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : '');
+                            console.log(uniqueFileName);
+                            uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
+                                if (!err) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Image uploaded successfully';
+                                    responseMessage.data = {
+                                        pic: uniqueFileName
+                                    };
+                                    deleteTempFile();
+                                    res.status(200).json(responseMessage);
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in uploading image';
+                                    responseMessage.data = null;
+                                    deleteTempFile();
+                                    res.status(500).json(responseMessage);
+                                }
+                            });
                         }
                         else{
                             responseMessage.status = false;
@@ -2120,6 +2109,159 @@ HrisHRM.prototype.hrisSaveHRMDoc = function(req,res,next){
                 console.log(errorDate.toTimeString() + ' ......... error ...........');
             }
         }
+};
+
+/**
+ * @type : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save HRM document
+ * @accepts json
+ * @param token <string> token of login user
+ * @param hrm_id <int> tid of hrm primary details
+ * @param dtid <int> document type id
+ * @param dt <int> document type like 1-Document ,2-Link
+ * @param path <array> random path of document u generated
+ */
+HrisHRM.prototype.hrisSaveHRMDoc = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.body.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.body.path) {
+        error.token = 'Invalid Doc Path';
+        validationFlag *= false;
+    }
+    if (isNaN(req.body.hrm_id) || (req.body.hrm_id) < 0 ) {
+        error.hrm_id = 'Invalid HRM id';
+        validationFlag *= false;
+    }
+    if (isNaN(req.body.dt) || (req.body.dt) < 0 ) {
+        error.dt = 'Invalid document type';
+        validationFlag *= false;
+    }
+    if (isNaN(req.body.dtid) || (req.body.dtid) < 0 ) {
+        error.dtid = 'Invalid Document type id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.hrm_id) + ',' + st.db.escape(req.body.dtid)
+                            + ',' + st.db.escape(req.body.dt)+ ',' + st.db.escape(req.body.path);
+                        var procQuery = 'CALL psave_hrmdocument(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+                                            if (results[0][0].id) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'HRM document added successfully';
+                                                responseMessage.data = {
+                                                    id : results[0][0].id
+                                                };
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in adding HRM document';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in adding HRM document';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in adding HRM document';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in adding HRM document';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : psave_hrmdocument ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisSaveHRMDoc: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisSaveHRMDoc ', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisSaveHRMDoc :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
 };
 
 /**
