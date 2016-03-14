@@ -19,7 +19,7 @@ exports.getDBContext = function () {
     console.log("TEST TEST TEST ");
 
 
-    var pool = mysql.createPool({
+    var pool = mysql.createConnection({
         host: db_server,
         port: db_port,
         database: db_collection,

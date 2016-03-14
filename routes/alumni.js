@@ -38,7 +38,7 @@ router.get('*',function(req,res,next){
             if(hostNameParsed.length){
 
                 var alumniName = alterEzeoneId(hostNameParsed[0]);
-                if(alumniName !== 'www'){
+                if(!(alumniName == 'www' || alumniName == '@www')){
                     /**
                      * Call procedure to fetch out alumniName
                      * If result is greater than 0, then serve alumni content else redirect him to ezeone
