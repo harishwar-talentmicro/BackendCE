@@ -9,7 +9,6 @@
 var express = require('express');
 var router = express.Router();
 
-
 var DbHelper = require('./../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
@@ -81,8 +80,6 @@ router.get('/conveyance_report', userModule.getConveyanceReport);
 router.get('/industry_type_list',userModule.getindustryType);
 router.get('/industry_category',userModule.getindustrycategory);
 router.get('/pic_for_ezeid',userModule.profilePicForEzeid);
-
-
 
 //Audit module methods
 var Audit = require('./modules/audit-module.js');
@@ -441,6 +438,7 @@ router.post('/service_attachment',serviceModule.saveServiceAttachment);
 router.post('/service_video',serviceModule.saveServiceVideo);
 
 
+
 /**
  * @service-param
  * token <string>
@@ -591,6 +589,20 @@ router.get('/branch',ProfileBranchModule.getBranch);
 var EzeoneAttrbt = require('./modules/ezeone-attribute-module.js');
 var EzeoneAttrbtModule = new EzeoneAttrbt(db,stdLib);
 router.get('/signup_data',EzeoneAttrbtModule.signUpData);
+
+//association-module
+var Association = require('./modules/association-module.js');
+var AssociationtModule = new Association(db,stdLib);
+router.get('/association_details',AssociationtModule.associGetEventDtl);
+router.post('/association_comments',AssociationtModule.associSaveComments);
+router.post('/test_abc',AssociationtModule.testXYZ);
+router.get('/asscociation_service',AssociationtModule.getAsscociationServices);
+
+////test-module
+//var Test = require('./modules/test-module.js');
+//var TestModule = new Test(db,stdLib);
+//router.post('/test',TestModule.test);
+
 
 router.get('/api_health',function(req,res){
     res.status(200).json({status : true});
