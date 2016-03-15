@@ -1158,11 +1158,11 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     //(FIND_IN_SET(d.Functionid,array) AND FIND_IN_SET(d.LOCid,array) AND FIND_IN_SET(d.Level,array) AND d.Exp>=array AND d.Exp<=array )
                     if (loc == ' ') {
 
-                        loc = ' and (FIND_IN_SET(d.Functionid,' + '\'' + locSkills.fid + '\') ' +
-                            'AND FIND_IN_SET(d.LOCid,' + '\'' + locSkills.locIds + '\') ' +
-                            'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
-                            'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
-                            ' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
+                        loc = //' and (FIND_IN_SET(d.Functionid,' + '\'' + locSkills.fid + '\') ' +
+                            'AND FIND_IN_SET(d.LOCid,' + '\'' + locSkills.locIds + '\') '; //+
+                            //'AND FIND_IN_SET(d.Level,' + '\'' + locSkills.level + '\') ' +
+                            //'AND d.Exp>=' + locSkills.exp_from + ' AND d.Exp<=' + locSkills.exp_to +
+                            //' AND d.Score >=' + locSkills.scoreFrom + ' AND d.Score <=' + locSkills.scoreTo + ')';
                     }
 
                 }
