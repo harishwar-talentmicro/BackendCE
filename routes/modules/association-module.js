@@ -9,7 +9,7 @@
 
 var util = require('util');
 var validator = require('validator');
-var gm = require('gm');
+var gm = require('gm').subClass({ imageMagick: true });
 
 var st = null;
 function Association(db,stdLib){
@@ -88,6 +88,7 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
         }
     });
 };
+
 /**
  * @type : GET
  * @param req
@@ -318,15 +319,29 @@ Association.prototype.testXYZ = function(req,res,next){
     try {
         console.log(req.files);
         if (req.files) {
-            //var readStream = '';
+            //var readStream;
             //gm(req.files.pr.path)
-            //    .resize('200', '200')
+            //    .resize('128', '128')
             //    .stream(function (err, stdout, stderr) {
             //        readStream = fs.createReadStream(req.files.pr.path);
             //        stdout.pipe(readStream);
-            //        console.log(readStream);
             //    });
-            var resizereadStream = gm(req.files.pr.path).resize(40, 50);
+            //console.log(readStream);
+            //var writeStream ;
+            //gm(req.files.pr.path)
+            //    .resize(53, 57)
+            //    .autoOrient()
+            //    .write(req.files, function (err) {
+            //        console.log("hello");
+            //        if(!err){
+            //         console.log(' hooray! ');
+            //        }
+            //        else{
+            //            console.log(' error! '+err);
+            //        };
+            //    });
+            var resizereadStream = gm(req.files.pr.path).resize(128, 128);
+            console.log(resizereadStream);
             var readStream = fs.createReadStream(resizereadStream.source);
             var uniqueFileName = "tn_" + uuid.v4() + ".jpg";
             console.log(uniqueFileName);
@@ -338,7 +353,6 @@ Association.prototype.testXYZ = function(req,res,next){
                     responseMessage.data = {
                         pic: uniqueFileName
                     };
-                    //deleteTempFile();
                     res.status(200).json(responseMessage);
                 }
                 else {
@@ -346,7 +360,6 @@ Association.prototype.testXYZ = function(req,res,next){
                     responseMessage.error = null;
                     responseMessage.message = 'Error in uploading image';
                     responseMessage.data = null;
-                    //deleteTempFile();
                     res.status(500).json(responseMessage);
                 }
             });
@@ -418,7 +431,7 @@ Association.prototype.associSaveComments = function(req,res,next){
                 if (!err) {
                     if (tokenResult) {
                         var procParams = st.db.escape(req.body.tid) + ',' + st.db.escape(req.body.ten_id)
-                            + ',' + st.db.escape(req.body.comment);
+                            + ',' + st.db.escape(req.body.comment)+ ',' + st.db.escape(req.body.token);
                         var procQuery = 'CALL pSave_comments(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -517,7 +530,6 @@ Association.prototype.associSaveComments = function(req,res,next){
 };
 
 /**
- * @todo FnGetServices
  * Method : GET
  * @param req
  * @param res
@@ -563,7 +575,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams =   st.db.escape(masterId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status);
-                        var query = 'CALL test_service(' + queryParams + ')';
+                        var query = 'CALL get_service_list(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {
                             if (!err) {
@@ -630,19 +642,19 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                             result.earned_points = serviceResult[0][i].earned_points;
                                             result.isattachment = serviceResult[0][i].isattachment;
                                             result.isvideo = serviceResult[0][i].isvideo;
-                                            result.ae = serviceResult[0][i].ae;
-                                            result.an = serviceResult[0][i].an;
+                                            result.ae = (serviceResult[0][i].ae) ? serviceResult[0][i].ae : '' ;
+                                            result.an = (serviceResult[0][i].an)? serviceResult[0][i].an : '';
                                             //result.pic = serviceResult[0][i].picture;
                                             var picArray =[];
+                                            result.picCount = 0;
                                             if(serviceResult[0][i].picture){
                                                 var picArrayNew= serviceResult[0][i].picture;
                                                 picArray = picArrayNew.split(',');
-                                                result.picCount = picArray.length;
+                                                result.picCount = (picArray.length) ? picArray.length : 0;
                                                 /**
                                                  * to add full image url with comma saprated images
                                                  */
                                                 var imgArray = [];
-                                                var tnImgArray = [];
                                                 if(picArray.length <= 3){
                                                     for (var j = 0; j < picArray.length; j++) {
                                                         var attachment = (picArray[j]) ? req.CONFIG.CONSTANT.GS_URL +
@@ -674,19 +686,18 @@ Association.prototype.getAsscociationServices = function(req,res,next){
 
                                             var b =[];
                                             var a = serviceResult[0][i].replay;
-                                            b = a.split('^');
-
+                                            b = (a) ? a.split('^') : [];
                                             var c =[];
                                             var d = serviceResult[0][i].cd;
-                                            c = d.split('^');
+                                            c = (d) ? d.split('^') : [];
                                             var statusArray =[];
                                             var statusArrayNew = serviceResult[0][i].status;
-                                            statusArray = statusArrayNew.split('^');
+                                            statusArray = (statusArrayNew) ? statusArrayNew.split('^') : [];
 
                                             var replyArray =[];
                                             if(serviceResult[0][i].replyname){
                                                 var replyArraynew = serviceResult[0][i].replyname;
-                                                replyArray = replyArraynew.split('^');
+                                                replyArray = (replyArraynew) ? replyArraynew.split('^') : [];
                                                 //result.replyname = replyArray;
                                             }
                                             else{
@@ -793,6 +804,451 @@ Association.prototype.getAsscociationServices = function(req,res,next){
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
+};
+
+/**
+ * @type : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save association services
+ * @accepts json
+ * @param token <string> token of login user
+ * @param service_mid <int> service_mid is service master id
+ * @param message <string> message
+ * @param cid <int> category id
+ * @param service_id <int> service_id is id of service if updating
+ * @param status <int> status (1-submitted,2-closed)
+ * @param reply <int> reply from admin
+ * @param prop is json object of image
+ */
+Association.prototype.saveAssociationServices = function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    var randomName = '';
+    var randomNameTN = '';
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.message) {
+        error.message = 'Message can not be null';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.service_mid)) || (req.query.service_mid) < 0 ) {
+        error.service_mid = 'Invalid service master id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.cid)) || (req.query.cid) < 0 ) {
+        error.cid = 'Invalid category id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.query.status = (req.query.status) ? req.query.status : 0;
+            req.query.service_id = (req.query.service_id) ? req.query.service_id : 0;
+            req.query.reply = req.query.reply ? req.query.reply : '';
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
+                            + ',' + st.db.escape(req.query.message)+ ',' + st.db.escape(req.query.cid)
+                            + ',' + st.db.escape(req.query.service_id)+ ',' + st.db.escape(req.query.status)
+                            + ',' + st.db.escape(req.query.reply);
+                        var procQuery = 'CALL post_community_service(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]) {
+                                        if (results[0][0]) {
+                                            if (results[0][0]._i) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Service posted successfully';
+                                                responseMessage.data = {
+                                                    id : results[0][0]._i
+                                                };
+                                                res.status(200).json(responseMessage);
+
+                                                //upload to cloud server
+                                                if(req.files) {
+                                                    for (var prop in req.files) {
+                                                        if (req.files.hasOwnProperty(prop)) {
+                                                            var uniqueId = uuid.v4();
+                                                            var filetype = (req.files[prop].extension) ? req.files[prop].extension : 'jpg';
+                                                            randomName = uniqueId + '.' + filetype;
+                                                            randomNameTN = "tn_" + uniqueId + '.' + filetype;
+                                                            console.log(randomName);
+                                                            var readStream = fs.createReadStream(req.files[prop].path);
+                                                            var picContent = {
+                                                                randomName: randomName,
+                                                                readStream: readStream,
+                                                                service_id: req.query.service_id
+                                                            };
+                                                            var resizeReadStream = gm(req.files[prop].path).resize(128,128).quality(0).stream(filetype);
+                                                            var thumbNailContent = {
+                                                                randomNameTN: randomNameTN,
+                                                                resizeReadStream: resizeReadStream
+                                                            };
+                                                            serviceSavePic(picContent, function (err, picResult) {
+                                                                if (!err) {
+                                                                    if (picResult) {
+                                                                        console.log(picResult);
+                                                                    }
+                                                                    else {
+                                                                        console.log('result not load');
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('error in save multiple pic');
+                                                                    console.log(err);
+                                                                }
+                                                            });
+
+                                                            // upload thumbnail of image to cloud server
+                                                            saveThumbnail(thumbNailContent, function (err, thumbNailResult) {
+                                                                if (!err) {
+                                                                    if (thumbNailResult) {
+                                                                        console.log(thumbNailResult);
+                                                                    }
+                                                                    else {
+                                                                        console.log('result not loaded');
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('error in save multiple thumbnail');
+                                                                    console.log(err);
+                                                                }
+                                                            });
+                                                        }
+                                                        else {
+                                                            console.log('attachment is empty');
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    console.log('attachment is empty');
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in posting service';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in posting service';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in posting service';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in posting service';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : post_community_service ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('saveAssociationServices: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : saveAssociationServices ', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error saveAssociationServices :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+/**
+ *
+ * @param picContent
+ * @param callback
+ * @returns {string}
+ * function to upload multiple image to serever
+ */
+function serviceSavePic(picContent, callback) {
+    try {
+        var localStream = picContent.readStream;
+        var remoteWriteStream = bucket.file(picContent.randomName).createWriteStream();
+        localStream.pipe(remoteWriteStream);
+        remoteWriteStream.on('finish', function () {
+            var imgQueryParams = st.db.escape(picContent.service_id) + ',' + st.db.escape(picContent.randomName);
+            var procQuery = 'CALL post_community_service_picture(' + imgQueryParams + ')';
+            console.log(procQuery);
+            st.db.query(procQuery, function (err, attachmentResult) {
+                if (!err) {
+                    if (attachmentResult) {
+                        console.log('attachment file saved');
+                        var url = appConfig.CONSTANT.GS_URL + appConfig.CONSTANT.STORAGE_BUCKET + '/' + picContent.randomName;
+                        callback(null, url);
+                    }
+                    else {
+                        console.log('attachment file not save');
+                        callback(null, null);
+                    }
+                }
+                else {
+                    console.log('attachment file not save');
+                    console.log(err);
+                    callback(null, null);
+                }
+            });
+        });
+        remoteWriteStream.on('error', function () {
+            console.log('FnSavePictures: Image upload error to google cloud');
+            callback(null, null);
+        });
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
+        return 'error'
+    }
+};
+/**
+ *
+ * @param thumbNailContent
+ * @param callback
+ * @returns {string}
+ * function to upload multiple thumbnail to server
+ */
+function saveThumbnail(thumbNailContent, callback) {
+    try {
+        var localStream = thumbNailContent.resizeReadStream;
+        var remoteWriteStream = bucket.file(thumbNailContent.randomNameTN).createWriteStream();
+        localStream.pipe(remoteWriteStream);
+        remoteWriteStream.on('finish', function (err) {
+            if (!err) {
+                console.log('attachment file saved');
+                var thumbnail_url = appConfig.CONSTANT.GS_URL + appConfig.CONSTANT.STORAGE_BUCKET + '/' + thumbNailContent.randomNameTN;
+                callback(null, thumbnail_url);
+            }
+            else {
+                console.log('attachment file not save');
+                console.log(err);
+                callback(null, null);
+            }
+        });
+        remoteWriteStream.on('error', function () {
+            console.log('saveThumbnail: Thumbnail upload error to google cloud');
+            callback(null, null);
+        });
+    }
+    catch (ex) {
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ......... error ...........');
+        console.log(ex);
+        return 'error'
+    }
+};
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get all images of service
+ * @accepts json
+ * @param token <string> token of login user
+ * @param service_id <int> service id
+ *
+ */
+Association.prototype.associationGetServiceImg = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.service_id))){
+        error.service_id = 'Invalid service id';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.service_id) ;
+                        var procQuery = 'CALL get_service_picture(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]){
+                                        if (results[0].length > 0) {
+                                            var tnImgArray = [];
+                                            /**
+                                             * to add full image url with comma saprated images
+                                             */
+                                            if (results[0][0].pic) {
+                                                var imagePath = results[0][0].pic.split(',');
+                                                for (var j = 0; j < imagePath.length; j++) {
+                                                    var attachment = (imagePath[j]) ? req.CONFIG.CONSTANT.GS_URL +
+                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imagePath[j] : ''
+                                                    imgArray.push(attachment);
+                                                }
+                                            }
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Image name loaded successfully';
+                                            responseMessage.data = {
+                                            }
+                                            res.status(200).json(responseMessage);
+
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Images are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Images are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Images are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : associationGetServiceImg ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('get_service_picture: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : associationGetServiceImg ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error aassociationGetServiceImg  :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
 };
 
 module.exports = Association;

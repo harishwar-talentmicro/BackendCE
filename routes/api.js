@@ -597,11 +597,13 @@ router.get('/association_details',AssociationtModule.associGetEventDtl);
 router.post('/association_comments',AssociationtModule.associSaveComments);
 router.post('/test_abc',AssociationtModule.testXYZ);
 router.get('/asscociation_service',AssociationtModule.getAsscociationServices);
+router.post('/association_service',AssociationtModule.saveAssociationServices);
+router.get('/association_service_img',AssociationtModule.associationGetServiceImg);
 
 ////test-module
 //var Test = require('./modules/test-module.js');
 //var TestModule = new Test(db,stdLib);
-//router.post('/test',TestModule.test);
+//router.post('/_test',TestModule.imageResizeTest);
 
 
 router.get('/api_health',function(req,res){

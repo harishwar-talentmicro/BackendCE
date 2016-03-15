@@ -1970,6 +1970,7 @@ HrisHRM.prototype.hrisGetHRMEmpList = function(req,res,next){
  * @param dtid <int> document type id
  * @param dt <int> document type like 1-Document ,2-Link
  * @param path <array> random path of document u generated
+ * @param tid <array> tid of document table
  */
 HrisHRM.prototype.hrisSaveHRMDoc = function(req,res,next){
     var responseMessage = {
@@ -2009,11 +2010,12 @@ HrisHRM.prototype.hrisSaveHRMDoc = function(req,res,next){
         }
         else {
             try {
+                req.body.tid = (req.body.tid) ? req.body.tid : 0;
                 st.validateToken(req.body.token, function (err, tokenResult) {
                     if (!err) {
                         if (tokenResult) {
                             var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.hrm_id) + ',' + st.db.escape(req.body.dtid)
-                                + ',' + st.db.escape(req.body.dt)+ ',' + st.db.escape(req.body.path);
+                                + ',' + st.db.escape(req.body.dt)+ ',' + st.db.escape(req.body.path)+ ',' + st.db.escape(req.body.tid);
                             var procQuery = 'CALL psave_hrmdocument(' + procParams + ')';
                             console.log(procQuery);
                             st.db.query(procQuery, function (err, results) {
@@ -2162,11 +2164,12 @@ HrisHRM.prototype.hrisSaveHRMDoc = function(req,res,next){
     }
     else {
         try {
+            req.body.tid = (req.body.tid) ? req.body.tid : 0;
             st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
                         var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.hrm_id) + ',' + st.db.escape(req.body.dtid)
-                            + ',' + st.db.escape(req.body.dt)+ ',' + st.db.escape(req.body.path);
+                            + ',' + st.db.escape(req.body.dt)+ ',' + st.db.escape(req.body.path)+ ',' + st.db.escape(req.body.tid);
                         var procQuery = 'CALL psave_hrmdocument(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
