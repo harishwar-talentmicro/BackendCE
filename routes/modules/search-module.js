@@ -513,17 +513,17 @@ Search.prototype.searchInformation = function(req,res,next){
                 //checking the fisrt condition
                 if (FindArray.length > 1) {
                     if (FindArray[1] != '') {
-                        if (FindArray[1].charAt(0).toUpperCase() == 'L') {
-                            LocSeqNo = FindArray[1].toString().substring(1, FindArray[1].length);
-                        }
+                        //if (FindArray[1].charAt(0).toUpperCase() == 'L') {
+                        //    LocSeqNo = FindArray[1].toString().substring(1, FindArray[1].length);
+                        //}
 
-                        else {
+                        //else {
                             Pin = FindArray[1];
-                        }
+                        //}
                         //checking the second condition
-                        if (typeof FindArray[2] != 'undefined') {
-                            Pin = FindArray[2];
-                        }
+                        //if (typeof FindArray[2] != 'undefined') {
+                        //    Pin = FindArray[2];
+                        //}
                         //checking the final condition
                     }
                 }
