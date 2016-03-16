@@ -3766,6 +3766,49 @@ Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
 
 };
 
+
+Configuration.prototype.saveWorkingHoursNew = function(req,res,next){
+    /**
+     * Sample data structure you will get from Client(Web)
+     * It will be accessible through req.body and req type will always be json
+     */
+    var dataFromClient = [
+        {
+            id : 0,
+            days : [0,1,2],
+            st : "09:00",
+            et : "19:00"
+        },
+        {
+            id : 0,
+            days : [0,1,3],
+            st : "10:00",
+            et : "13:00"
+        }
+    ];
+
+    for(var i = 0; i < dataFromClient.length; i++){
+        var queryParams = [
+            st.db.escape(req.query.token),
+            st.db.escape(dataFromClient[i].id),
+            st.db.escape(dataFromClient[i].days),
+            st.db.escape(dataFromClient[i].st),
+            st.db.escape(dataFromClient[i].et)
+        ];
+
+    }
+
+
+
+
+    /**
+     * @todo This service has to be wrtitten
+     *
+     * Insert them as one single object as one slot
+     */
+
+};
+
 /**
  * @type : DELETE
  * @param req
