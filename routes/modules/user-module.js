@@ -3030,9 +3030,6 @@ User.prototype.webLinkRedirect = function(req,res,next) {
         data: null,
         error: null
     };
-
-    var allowedDocs = ['ID','DL','PASSPORT','BROCHURE','CV','D1','D2'];
-    var allowedDocTypes = {ID : 3, DL : 7, PP : 4,BR : 1 ,CV : 2,D1 : 5,D2 :6};
     if(req.params.id) {
         var link = req.params.id;
         var arr = link.split('.');

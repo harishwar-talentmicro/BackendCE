@@ -227,10 +227,17 @@ Job.prototype.create = function(req,res,next){
                                             acode : alumniCode,
                                             institute_id : req.body.institute_id
                                         };
-                                        res.status(200).json(responseMessage);
+                                        //res.status(200).json(responseMessage);
 
-                                        if(locMatrix.length) {
-                                            for(var i=0; i < locMatrix.length; i++){
+                                        var bigCombinedQuery = "";
+
+
+                                        /**
+                                         * Preparing LOC Matrix insertion query and adding it to bigCombinedQuery
+                                         */
+                                        if(locMatrix) {
+                                            var locInsertQuery = "";
+                                            for(var i=0; i < locMatrix.length; i++) {
                                                 //async.each(locMatrix, function iterator(locDetails, callback) {
 
 
@@ -250,79 +257,79 @@ Job.prototype.create = function(req,res,next){
                                                     + ',' + st.db.escape(locSkills.expertiseLevel) + ',' + st.db.escape(locSkills.careerId)
                                                     + ',' + st.db.escape(locSkills.scoreFrom) + ',' + st.db.escape(locSkills.scoreTo);
 
-                                                var query = 'CALL pSaveJobLOC(' + queryParams + ')';
-                                                console.log(query);
-                                                st.db.query(query, function (err, result) {
-                                                    if (!err) {
-                                                        if (result) {
-                                                            if (result.affectedRows > 0) {
-                                                                console.log('FnupdateSkill: locMatrix: skill matrix Updated successfully');
-                                                            }
-                                                            else {
-                                                                console.log('FnupdateSkill: locMatrix: skill matrix not updated');
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnupdateSkill: locMatrix: skill matrix not updated')
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log('FnupdateSkill: locMatrix ; error in saving  skill matrix:' + err);
-                                                    }
-                                                });
+                                                locInsertQuery += 'CALL pSaveJobLOC(' + queryParams + ');';
+
                                             }
-                                        }
-                                        else{
-                                            locMatrix='';
+                                            console.log(locInsertQuery);
+                                            bigCombinedQuery += locInsertQuery;
                                         }
 
-                                        if(educations.length) {
+                                        /**
+                                         * Prepare education insertion query and adding it to bigCombinedQuery
+                                         */
+                                        if(educations) {
+                                            var educationInsertQuery = "";
 
-                                            for(var j=0; j < educations.length; j++){
+                                            for(var j=0; j < educations.length; j++) {
                                                 //async.each(educations, function iterator(eduDetails,callback) {
 
                                                 var educationData = {
 
                                                     jobId: insertResult[0][0].jobid,
-                                                    eduId :educations[j].edu_id,
-                                                    spcId : educations[j].spc_id,
-                                                    scoreFrom:educations[j].score_from,
-                                                    scoreTo:educations[j].score_to,
-                                                    level : educations[j].expertiseLevel   // 0-ug, 1-pg
+                                                    eduId: educations[j].edu_id,
+                                                    /**
+                                                     * Error from front end side handled on server end
+                                                     */
+                                                    spcId: (educations[j].spc_id) ? educations[j].spc_id.toString() : "",
+                                                    scoreFrom: educations[j].score_from,
+                                                    scoreTo: educations[j].score_to,
+                                                    level: educations[j].expertiseLevel   // 0-ug, 1-pg
                                                 };
 
-                                                var queryParams = st.db.escape(educationData.jobId) + ',' +st.db.escape(educationData.eduId)
-                                                    + ',' +st.db.escape(educationData.spcId) + ',' +st.db.escape(educationData.scoreFrom)
-                                                    + ',' +st.db.escape(educationData.scoreTo)+ ',' +st.db.escape(educationData.level);
+                                                console.log(educationData);
+                                                var queryParams = st.db.escape(educationData.jobId) + ',' + st.db.escape(educationData.eduId)
+                                                    + ',' + st.db.escape(educationData.spcId) + ',' + st.db.escape(educationData.scoreFrom)
+                                                    + ',' + st.db.escape(educationData.scoreTo) + ',' + st.db.escape(educationData.level);
 
-                                                var query = 'CALL psavejobeducation(' + queryParams + ')';
-                                                console.log(query);
-                                                st.db.query(query, function (err, result) {
-                                                    if (!err) {
-                                                        if (result) {
-                                                            if (result.affectedRows > 0) {
-                                                                console.log('FnupdateSkill:educations: skill matrix Updated successfully');
-                                                            }
-                                                            else {
-                                                                console.log('FnupdateSkill: educations: skill matrix not updated');
-                                                            }
-                                                        }
-                                                        else {
-                                                            console.log('FnupdateSkill:  educations:skill matrix not updated')
-                                                        }
-                                                    }
-                                                    else {
-                                                        console.log('FnupdateSkill: educations:error in saving  skill matrix:' + err);
-                                                    }
-                                                });
+                                                educationInsertQuery += 'CALL psavejobeducation(' + queryParams + ');';
                                             }
-                                        }
-                                        else {
-                                            educations='';
+                                            console.log(educationInsertQuery);
+                                            bigCombinedQuery += educationInsertQuery;
                                         }
 
-                                        matrix(insertResult[0][0].jobid);
+                                        /**
+                                         * There is no SkillMatrix currently in front end so removing it from backend too
+                                         */
+                                        //matrix(insertResult[0][0].jobid);
+
                                         console.log('FnSaveJobs: Jobs save successfully');
+
+                                        if(bigCombinedQuery){
+                                            st.db.query(bigCombinedQuery, function (err, notificationResult) {
+                                                if (!err) {
+                                                    res.status(200).json(responseMessage);
+                                                    /**
+                                                     * As notifications can be sent afterwards also by providing response as response
+                                                     * doesn't get altered throught this process
+                                                     */
+                                                    postNotification(insertResult[0][0].jobid);
+                                                }
+                                                else{
+                                                    responseMessage.message = 'An error occured ! Please try again';
+                                                    res.status(500).json(responseMessage);
+                                                    console.log('FnSaveJobs: error in saving jobs details:' + err);
+                                                }
+                                            });
+                                        }
+                                        else{
+                                            res.status(200).json(responseMessage);
+                                            postNotification(insertResult[0][0].jobid);
+                                        }
+
+
+
+
+
                                     }
                                     else {
                                         responseMessage.message = 'No save Jobs details';
@@ -338,72 +345,72 @@ Job.prototype.create = function(req,res,next){
                             });
                         };
 
-                        var matrix = function(jobId_Result){
-                            jobID = jobId_Result;
-                            var count = skillMatrix1.length;
-
-                            if(m < skillMatrix1.length) {
-                                var skills = {
-                                    skillname: skillMatrix1[m].skillname,
-                                    expertiseLevel: skillMatrix1[m].expertiseLevel,
-                                    expFrom: skillMatrix1[m].exp_from,
-                                    expTo: skillMatrix1[m].exp_to,
-                                    active_status: skillMatrix1[m].active_status,
-                                    jobId: jobID,
-                                    fid: skillMatrix1[m].fid,
-                                    type : skillMatrix1[m].type
-                                };
-                                FnSaveSkills(skills, function (err, Result) {
-                                    if (!err) {
-                                        if (Result) {
-                                            resultvalue = Result.SkillID;
-                                            var SkillItems = {
-                                                skillId: resultvalue,
-                                                expertlevel: skills.expertiseLevel,
-                                                expFrom: skills.expFrom,
-                                                expTo: skills.expTo,
-                                                skillStatusId: skills.active_status,
-                                                jobId: skills.jobId,
-                                                type : skills.type,
-                                                fid:skills.fid
-                                            };
-
-                                            var queryParams = st.db.escape(SkillItems.jobId) + ',' + st.db.escape(SkillItems.skillId)
-                                                + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
-                                                + ',' + st.db.escape(SkillItems.skillStatusId) + ',' + st.db.escape(SkillItems.expertlevel)
-                                                + ',' + st.db.escape(parseInt(SkillItems.fid))+ ',' + st.db.escape(SkillItems.type);
-                                            var query = 'CALL pSaveJobSkill(' + queryParams + ')';
-
-                                            console.log(query);
-                                            st.db.query(query, function (err, result) {
-                                                if (!err) {
-                                                    console.log('FnupdateSkill: skill matrix Updated successfully');
-                                                    m = m + 1;
-                                                    matrix(jobID);
-                                                }
-                                                else {
-                                                    console.log('FnupdateSkill:  skill matrix not updated:'+err);
-                                                }
-                                            });
-                                        }
-                                        else {
-                                            console.log('FnSaveMessage: skillID not loaded');
-                                            //res.send(RtnMessage);
-                                        }
-                                    }
-                                    else {
-                                        console.log('FnSaveMessage:Error in getting skillID' + err);
-                                        //res.send(RtnMessage);
-                                    }
-                                });
-                            }
-                            else {
-                                if (instituteIdStr){
-                                    postNotification(jobID);
-                                }
-
-                            }
-                        };
+                        //var matrix = function(jobId_Result){
+                        //    jobID = jobId_Result;
+                        //    var count = skillMatrix1.length;
+                        //
+                        //    if(m < skillMatrix1.length) {
+                        //        var skills = {
+                        //            skillname: skillMatrix1[m].skillname,
+                        //            expertiseLevel: skillMatrix1[m].expertiseLevel,
+                        //            expFrom: skillMatrix1[m].exp_from,
+                        //            expTo: skillMatrix1[m].exp_to,
+                        //            active_status: skillMatrix1[m].active_status,
+                        //            jobId: jobID,
+                        //            fid: skillMatrix1[m].fid,
+                        //            type : skillMatrix1[m].type
+                        //        };
+                        //        FnSaveSkills(skills, function (err, Result) {
+                        //            if (!err) {
+                        //                if (Result) {
+                        //                    resultvalue = Result.SkillID;
+                        //                    var SkillItems = {
+                        //                        skillId: resultvalue,
+                        //                        expertlevel: skills.expertiseLevel,
+                        //                        expFrom: skills.expFrom,
+                        //                        expTo: skills.expTo,
+                        //                        skillStatusId: skills.active_status,
+                        //                        jobId: skills.jobId,
+                        //                        type : skills.type,
+                        //                        fid:skills.fid
+                        //                    };
+                        //
+                        //                    var queryParams = st.db.escape(SkillItems.jobId) + ',' + st.db.escape(SkillItems.skillId)
+                        //                        + ',' + st.db.escape(SkillItems.expFrom) + ',' + st.db.escape(SkillItems.expTo)
+                        //                        + ',' + st.db.escape(SkillItems.skillStatusId) + ',' + st.db.escape(SkillItems.expertlevel)
+                        //                        + ',' + st.db.escape(parseInt(SkillItems.fid))+ ',' + st.db.escape(SkillItems.type);
+                        //                    var query = 'CALL pSaveJobSkill(' + queryParams + ')';
+                        //
+                        //                    console.log(query);
+                        //                    st.db.query(query, function (err, result) {
+                        //                        if (!err) {
+                        //                            console.log('FnupdateSkill: skill matrix Updated successfully');
+                        //                            m = m + 1;
+                        //                            matrix(jobID);
+                        //                        }
+                        //                        else {
+                        //                            console.log('FnupdateSkill:  skill matrix not updated:'+err);
+                        //                        }
+                        //                    });
+                        //                }
+                        //                else {
+                        //                    console.log('FnSaveMessage: skillID not loaded');
+                        //                    //res.send(RtnMessage);
+                        //                }
+                        //            }
+                        //            else {
+                        //                console.log('FnSaveMessage:Error in getting skillID' + err);
+                        //                //res.send(RtnMessage);
+                        //            }
+                        //        });
+                        //    }
+                        //    else {
+                        //        if (instituteIdStr){
+                        //            postNotification(jobID);
+                        //        }
+                        //
+                        //    }
+                        //};
 
                         //send push notification
                         var postNotification = function(jobID){
@@ -420,91 +427,92 @@ Job.prototype.create = function(req,res,next){
                                                 userId = notificationResult[0][i].ids.split(',');
                                             }
                                             var mIds = ' ';
-                                                for (var c = 0; c < notificationResult[0].length; c++) {
-                                                    var mIds = notificationResult[0][c].ids + ',' + mIds;
+                                            for (var c = 0; c < notificationResult[0].length; c++) {
+                                                var mIds = notificationResult[0][c].ids + ',' + mIds;
+                                            }
+                                            var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
+
+                                            var jobQuery = 'CALL psavejobnotification(' + jobqueryParameters + ')';
+                                            console.log(jobQuery);
+                                            st.db.query(jobQuery, function (err, queryResult) {
+                                                console.log(queryResult);
+                                                if (!err) {
+                                                    console.log('no error in psavejobnotification');
                                                 }
-                                                var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
-
-                                                var jobQuery = 'CALL psavejobnotification(' + jobqueryParameters + ')';
-                                                console.log(jobQuery);
-                                                st.db.query(jobQuery, function (err, queryResult) {
-                                                    console.log(queryResult);
-                                                    if (!err) {
-                                                        console.log('no error in psavejobnotification');
-                                                    }
-                                                    else {
-                                                        console.log('error in psavejobnotification');
-                                                    }
-                                                });
-                                                console.log(userId);
-                                                var combineQuery = "";
-                                                for (var k = 0; k < userId.length; k++) {
-                                                    var gidQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId[k];
-                                                    var iosIdQuery = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userId[k];
-                                                    var sendMsgParams = st.db.escape(ezeoneId) + ',' + st.db.escape(userId[k]) + ',' + st.db.escape(0);
-
-                                                    /**
-                                                     * Make connection of student(contact connected in messagebox) with this College ID
-                                                     * which is sending the notification (so that  it will appear in student contact list)
-                                                     */
-                                                    var path = require('path');
-                                                    var file = path.join(__dirname, '../../mail/templates/job_post.html');
-                                                    var data = fs.readFileSync(file, "utf8");
-
-                                                    data = data.replace("[JobType]", notificationResult[1][0].jobtype);
-                                                    data = data.replace("[JobTitle]", notificationResult[1][0].jobTitle);
-                                                    data = data.replace("[JobCode]", notificationResult[1][0].jobCode);
-                                                    data = data.replace("[CompanyName]", notificationResult[1][0].cn);
-                                                    var composeMsgParams = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
-                                                        + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId[k])
-                                                        + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0);
-
-                                                    combineQuery += 'CALL pSendMsgRequestbyPO(' + sendMsgParams + ');' +
-                                                        'CALL pComposeMessage(' + composeMsgParams + '); '
-                                                        + gidQuery + ' ;'
-                                                        + iosIdQuery + ';'
-                                                    console.log(combineQuery);
+                                                else {
+                                                    console.log('error in psavejobnotification');
                                                 }
-                                                st.db.query(combineQuery, function (err, messageResult) {
-                                                    if (!err) {
-                                                        if (messageResult) {
-                                                            console.log(messageResult);
-                                                            for( var j = 0; j < userId.length; j++){
-                                                                receiverId = messageResult[j*(5)+3][0].tid;
-                                                                senderTitle = ezeoneId;
-                                                                groupTitle = ezeoneId;
-                                                                groupId = notificationResult[1][0].tid;
-                                                                messageText = data;
-                                                                messageType = 8;
-                                                                operationType = 0;
-                                                                iphoneId = iphoneID; //messageResult[j*(5)+4][0]) ? messageResult[j*(5)+4][0] : null ;
-                                                                var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
-                                                                var msgUserid = 0, a_name = '';
-                                                                var jid = jobID;
-                                                                console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                    operationType, iphoneId, messageId, masterid);
-                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
-                                                                    messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jid);
-                                                                console.log('Job Post Notification Send Successfully');
+                                            });
+                                            console.log(userId);
+                                            var combineQuery = "";
+                                            var path = require('path');
+                                            for (var k = 0; k < userId.length; k++) {
+                                                var gidQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId[k];
+                                                var iosIdQuery = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userId[k];
+                                                var sendMsgParams = st.db.escape(ezeoneId) + ',' + st.db.escape(userId[k]) + ',' + st.db.escape(0);
 
-                                                            }
-                                                            console.log('postNotification : Job Post Notification Send Successfully');
+                                                /**
+                                                 * Make connection of student(contact connected in messagebox) with this College ID
+                                                 * which is sending the notification (so that  it will appear in student contact list)
+                                                 */
+
+                                                var file = path.join(__dirname, '../../mail/templates/job_post.html');
+                                                var data = fs.readFileSync(file, "utf8");
+
+                                                data = data.replace("[JobType]", notificationResult[1][0].jobtype);
+                                                data = data.replace("[JobTitle]", notificationResult[1][0].jobTitle);
+                                                data = data.replace("[JobCode]", notificationResult[1][0].jobCode);
+                                                data = data.replace("[CompanyName]", notificationResult[1][0].cn);
+                                                var composeMsgParams = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                    + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
+                                                    + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId[k])
+                                                    + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0);
+
+                                                combineQuery += 'CALL pSendMsgRequestbyPO(' + sendMsgParams + ');' +
+                                                    'CALL pComposeMessage(' + composeMsgParams + '); '
+                                                    + gidQuery + ' ;'
+                                                    + iosIdQuery + ';'
+                                                console.log(combineQuery);
+                                            }
+                                            st.db.query(combineQuery, function (err, messageResult) {
+                                                if (!err) {
+                                                    if (messageResult) {
+                                                        console.log(messageResult);
+                                                        for( var j = 0; j < userId.length; j++){
+                                                            receiverId = messageResult[j*(5)+3][0].tid;
+                                                            senderTitle = ezeoneId;
+                                                            groupTitle = ezeoneId;
+                                                            groupId = notificationResult[1][0].tid;
+                                                            messageText = data;
+                                                            messageType = 8;
+                                                            operationType = 0;
+                                                            iphoneId = iphoneID; //messageResult[j*(5)+4][0]) ? messageResult[j*(5)+4][0] : null ;
+                                                            var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
+                                                            var msgUserid = 0, a_name = '';
+                                                            var jid = jobID;
+                                                            console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                operationType, iphoneId, messageId, masterid);
+                                                            notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jid);
+                                                            console.log('Job Post Notification Send Successfully');
 
                                                         }
-                                                        else {
-                                                            console.log('postNotification : Error in sending notifications');
-                                                        }
+                                                        console.log('postNotification : Job Post Notification Send Successfully');
+
                                                     }
                                                     else {
                                                         console.log('postNotification : Error in sending notifications');
                                                     }
-                                                });
-                                            }
-                                            else {
-                                                console.log('postNotification : Result not loaded');
-                                            }
+                                                }
+                                                else {
+                                                    console.log('postNotification : Error in sending notifications');
+                                                }
+                                            });
                                         }
+                                        else {
+                                            console.log('postNotification : Result not loaded');
+                                        }
+                                    }
                                     else {
                                         console.log('postNotification : Result not loaded');
                                     }
