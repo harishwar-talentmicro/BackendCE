@@ -182,6 +182,7 @@ router.get('/institute_group',configurationModule.getInstituteGroup);
 router.get('/institute_details',configurationModule.getInstituteConfig);
 router.get('/institute_group_details',configurationModule.getInstituteGroupDetails);
 router.delete('/job_institute/:job_id/:institute_id',configurationModule.deleteJobInstitute);
+//router.post('/configuration/working_schedule',configurationModule.saveWorkingSchedule);
 
 //Search module methods
 var Search = require('./modules/search-module.js');
@@ -595,10 +596,13 @@ var Association = require('./modules/association-module.js');
 var AssociationtModule = new Association(db,stdLib);
 router.get('/association_details',AssociationtModule.associGetEventDtl);
 router.post('/association_comments',AssociationtModule.associSaveComments);
-router.post('/test_abc',AssociationtModule.testXYZ);
 router.get('/asscociation_service',AssociationtModule.getAsscociationServices);
 router.post('/association_service',AssociationtModule.saveAssociationServices);
+router.put('/association_service',AssociationtModule.updateAssociationServices);
 router.get('/association_service_img',AssociationtModule.associationGetServiceImg);
+router.post('/image_with_thumbnail',AssociationtModule.imageUploadWithThumbnail);
+router.get('/association_ten_details',AssociationtModule.associationGetEventInfo);
+router.post('/association_ten_details',AssociationtModule.saveAssociationTenMaster);
 
 ////test-module
 //var Test = require('./modules/test-module.js');

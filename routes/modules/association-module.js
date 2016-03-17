@@ -4,12 +4,15 @@
  *  @title Association module
  *  @description Association  functions
  */
-
 "use strict";
 
-var util = require('util');
 var validator = require('validator');
 var gm = require('gm').subClass({ imageMagick: true });
+var uuid = require('node-uuid');
+var gcloud = require('gcloud');
+var fs = require('fs');
+var path = require('path');
+var util = require( "util" );
 
 var st = null;
 function Association(db,stdLib){
@@ -31,11 +34,6 @@ function alterEzeoneId(ezeoneId){
     }
     return alteredEzeoneId;
 }
-var uuid = require('node-uuid');
-var gcloud = require('gcloud');
-var fs = require('fs');
-var path = require('path');
-var util = require( "util" );
 
 var appConfig = require('../../ezeone-config.json');
 
@@ -43,10 +41,8 @@ var gcs = gcloud.storage({
     projectId: appConfig.CONSTANT.GOOGLE_PROJECT_ID,
     keyFilename: appConfig.CONSTANT.GOOGLE_KEYFILE_PATH // Location to be changed
 });
-
 // Reference an existing bucket.
 var bucket = gcs.bucket(appConfig.CONSTANT.STORAGE_BUCKET);
-
 bucket.acl.default.add({
     entity: 'allUsers',
     role: gcs.acl.READER_ROLE
@@ -98,6 +94,8 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
  * @accepts json
  * @param token <string> token of login user
  * @param service_mid <int> service master id
+ * @param pg_no <int> page number
+ * @param limit <int> limit
  *
  */
 Association.prototype.associGetEventDtl = function(req,res,next){
@@ -125,10 +123,13 @@ Association.prototype.associGetEventDtl = function(req,res,next){
     }
     else {
         try {
+            req.query.pg_no = (req.query.pg_no) ? req.query.pg_no : 1;
+            req.query.limit = (req.query.limit) ? req.query.limit : 10;
             st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid);
+                        var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
+                            + ',' + st.db.escape(req.query.pg_no)+ ',' + st.db.escape(req.query.limit);
                         var procQuery = 'CALL pGetAlumni_eventdetails(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -137,98 +138,13 @@ Association.prototype.associGetEventDtl = function(req,res,next){
                                 if (results) {
                                     if (results[0]){
                                         if (results[0].length > 0) {
-                                            if (results[2]) {
-                                                var output = [];
-                                                for (var i = 0; i < results[2].length; i++) {
-                                                    var imgArray = [];
-                                                    var tnImgArray = [];
-                                                    /**
-                                                     * to add full image url with comma saprated images
-                                                     */
-                                                    if (results[2][i].attach) {
-                                                        var imagePath = results[2][i].attach.split(',');
-                                                        for (var j = 0; j < imagePath.length; j++) {
-                                                            var attachment = (imagePath[j]) ? req.CONFIG.CONSTANT.GS_URL +
-                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imagePath[j] : ''
-                                                            imgArray.push(attachment);
-                                                        }
-                                                    }
-                                                    var imgString = imgArray.join();
-
-                                                    if (results[2][i].tn_attach) {
-                                                        var imagePath = results[2][i].tn_attach.split(',');
-                                                        for (var j = 0; j < imagePath.length; j++) {
-                                                            var attachment = (imagePath[j]) ? req.CONFIG.CONSTANT.GS_URL +
-                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imagePath[j] : ''
-                                                            tnImgArray.push(attachment);
-                                                        }
-                                                    }
-                                                    var tnImgString = tnImgArray.join();
-                                                    var noticDetails = {};
-                                                        noticDetails.countattch = results[2][i].countattch,
-                                                        noticDetails.tenid = results[2][i].tenid,
-                                                        noticDetails.title = results[2][i].title,
-                                                        noticDetails.comments = results[2][i].comments,
-                                                        noticDetails.likes = results[2][i].likes,
-                                                        noticDetails.startdate = results[2][i].startdate,
-                                                        noticDetails.attach = imgString,
-                                                        noticDetails.tn_attach = tnImgString
-                                                        output.push(noticDetails);
-                                                }
-                                                var output1 = [];
-                                                for(var i = 0; i < results[1].length; i++){
-                                                    var imgArray = [];
-                                                    var tnImgArray = [];
-                                                    /**
-                                                     * to add full image url with comma saprated images
-                                                     */
-                                                    if (results[1][i].attach) {
-                                                        var imagePath = results[1][i].attach.split(',');
-                                                        for (var j = 0; j < imagePath.length; j++) {
-                                                            var attachment = (imagePath[j]) ? req.CONFIG.CONSTANT.GS_URL +
-                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imagePath[j] : ''
-                                                            imgArray.push(attachment);
-                                                        }
-                                                    }
-                                                    var imgString = imgArray.join();
-
-                                                    if (results[1][i].tn_attach) {
-                                                        var imagePath = results[1][i].tn_attach.split(',');
-                                                        for (var j = 0; j < imagePath.length; j++) {
-                                                            var attachment = (imagePath[j]) ? req.CONFIG.CONSTANT.GS_URL +
-                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imagePath[j] : ''
-                                                            tnImgArray.push(attachment);
-                                                        }
-                                                    }
-                                                    var tnImgString = tnImgArray.join();
-                                                    var eventDetails = {};
-                                                    eventDetails.countattch = results[1][i].countattch,
-                                                        eventDetails.tenid = results[1][i].tenid,
-                                                        eventDetails.title = results[1][i].title,
-                                                        eventDetails.startdate = results[1][i].startdate,
-                                                        eventDetails.comments = results[1][i].comments,
-                                                        eventDetails.likes = results[1][i].likes,
-                                                        eventDetails.attach = imgString,
-                                                        eventDetails.tn_attach = tnImgString
-                                                        output1.push(eventDetails);
-                                                }
-                                            }
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Association details loaded successfully';
                                             responseMessage.data = {
-                                                userDetails : {
-                                                    tid : results[0][0].tid,
-                                                    banner_pic : (results[0][0].banner_pic) ? req.CONFIG.CONSTANT.GS_URL +
-                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' +results[0][0].banner_pic : '' ,
-                                                    cn : results[0][0].cn,
-                                                    id_no : results[0][0].id_no,
-                                                    pt : results[0][0].pt,
-                                                    ptStr : "You are well paid off,no payment due",
-                                                    IDName : results[0][0].IDName
-                                                },
-                                                eventDetails : output1,
-                                                noticDetails : output
+                                                userDetails : results[0],
+                                                eventDetails : results[1],
+                                                totalCount : results[2][0].tc
                                             }
                                             res.status(200).json(responseMessage);
 
@@ -302,85 +218,6 @@ Association.prototype.associGetEventDtl = function(req,res,next){
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
-    }
-
-};
-
-Association.prototype.testXYZ = function(req,res,next){
-    console.log("req.files hello");
-    //console.log("req.files :"+req.files);
-
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-    try {
-        console.log(req.files);
-        if (req.files) {
-            //var readStream;
-            //gm(req.files.pr.path)
-            //    .resize('128', '128')
-            //    .stream(function (err, stdout, stderr) {
-            //        readStream = fs.createReadStream(req.files.pr.path);
-            //        stdout.pipe(readStream);
-            //    });
-            //console.log(readStream);
-            //var writeStream ;
-            //gm(req.files.pr.path)
-            //    .resize(53, 57)
-            //    .autoOrient()
-            //    .write(req.files, function (err) {
-            //        console.log("hello");
-            //        if(!err){
-            //         console.log(' hooray! ');
-            //        }
-            //        else{
-            //            console.log(' error! '+err);
-            //        };
-            //    });
-            var resizereadStream = gm(req.files.pr.path).resize(128, 128);
-            console.log(resizereadStream);
-            var readStream = fs.createReadStream(resizereadStream.source);
-            var uniqueFileName = "tn_" + uuid.v4() + ".jpg";
-            console.log(uniqueFileName);
-            uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
-                if (!err) {
-                    responseMessage.status = true;
-                    responseMessage.error = null;
-                    responseMessage.message = 'Image uploaded successfully';
-                    responseMessage.data = {
-                        pic: uniqueFileName
-                    };
-                    res.status(200).json(responseMessage);
-                }
-                else {
-                    responseMessage.status = false;
-                    responseMessage.error = null;
-                    responseMessage.message = 'Error in uploading image';
-                    responseMessage.data = null;
-                    res.status(500).json(responseMessage);
-                }
-            });
-        }
-        else{
-            responseMessage.status = false;
-            responseMessage.error = null;
-            responseMessage.message = 'Invalid input data';
-            responseMessage.data = null;
-            res.status(500).json(responseMessage);
-        }
-    }
-    catch(ex) {
-        responseMessage.error = {
-            server: 'Internal Server Error'
-        };
-        responseMessage.message = 'An error occurred !';
-        res.status(500).json(responseMessage);
-        console.log('Error hrisSaveHRMimg :  ',ex);
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
     }
 };
 
@@ -701,7 +538,8 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                                 //result.replyname = replyArray;
                                             }
                                             else{
-                                                result.replyname=serviceResult[0][i].replyname;
+                                                replyArray = [];
+                                                //result.replyname = [];
                                             }
                                             var companyArray =[];
                                             if(serviceResult[0][i].companyname) {
@@ -710,7 +548,8 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                                 //result.companyname = companyArray;
                                             }
                                             else{
-                                                result.companyname=serviceResult[0][i].companyname;
+                                                //result.companyname=serviceResult[0][i].companyname;
+                                                companyArray = [];
                                             }
                                             var replayObject = [];
                                             console.log(b.length,"length iof b");
@@ -818,9 +657,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
  * @param message <string> message
  * @param cid <int> category id
  * @param service_id <int> service_id is id of service if updating
- * @param status <int> status (1-submitted,2-closed)
- * @param reply <int> reply from admin
- * @param prop is json object of image
+ * @param image_path <string> image_path comma saprated strings of image
  */
 Association.prototype.saveAssociationServices = function(req,res,next){
 
@@ -832,22 +669,19 @@ Association.prototype.saveAssociationServices = function(req,res,next){
     };
     var validationFlag = true;
     var error = {};
-    var randomName = '';
-    var randomNameTN = '';
-
-    if (!req.query.token) {
+    if (!req.body.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.query.message) {
+    if (!req.body.message) {
         error.message = 'Message can not be null';
         validationFlag *= false;
     }
-    if (isNaN(parseInt(req.query.service_mid)) || (req.query.service_mid) < 0 ) {
+    if (isNaN(parseInt(req.body.service_mid)) || (req.body.service_mid) < 0 ) {
         error.service_mid = 'Invalid service master id';
         validationFlag *= false;
     }
-    if (isNaN(parseInt(req.query.cid)) || (req.query.cid) < 0 ) {
+    if (isNaN(parseInt(req.body.cid)) || (req.body.cid) < 0 ) {
         error.cid = 'Invalid category id';
         validationFlag *= false;
     }
@@ -859,16 +693,15 @@ Association.prototype.saveAssociationServices = function(req,res,next){
     }
     else {
         try {
-            req.query.status = (req.query.status) ? req.query.status : 0;
-            req.query.service_id = (req.query.service_id) ? req.query.service_id : 0;
-            req.query.reply = req.query.reply ? req.query.reply : '';
-            st.validateToken(req.query.token, function (err, tokenResult) {
+            req.body.service_id = (req.body.service_id) ? req.body.service_id : 0;
+            req.body.tid = (req.body.tid) ? req.body.tid : 0;
+            req.body.image_path = (req.body.image_path) ? req.body.image_path : '';
+            st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
-                            + ',' + st.db.escape(req.query.message)+ ',' + st.db.escape(req.query.cid)
-                            + ',' + st.db.escape(req.query.service_id)+ ',' + st.db.escape(req.query.status)
-                            + ',' + st.db.escape(req.query.reply);
+                        var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.service_mid)
+                            + ',' + st.db.escape(req.body.message)+ ',' + st.db.escape(req.body.cid)
+                            + ',' + st.db.escape(req.body.service_id);
                         var procQuery = 'CALL post_community_service(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -878,74 +711,68 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                     if (results[0]) {
                                         if (results[0][0]) {
                                             if (results[0][0]._i) {
-                                                responseMessage.status = true;
-                                                responseMessage.error = null;
-                                                responseMessage.message = 'Service posted successfully';
-                                                responseMessage.data = {
-                                                    id : results[0][0]._i
-                                                };
-                                                res.status(200).json(responseMessage);
+                                                var outputArray = [];
+                                                if(req.body.image_path){
+                                                    var imgPath = req.body.image_path.split(',');
+                                                    var combQuery = '';
+                                                    /**
+                                                     * preparing query to insert multiple image path
+                                                     */
+                                                    for (var i = 0; i < imgPath.length; i++ ){
+                                                        var imgQueryParams = st.db.escape(results[0][0]._i) + ',' + st.db.escape(imgPath[i])+ ',' + st.db.escape(req.body.tid);
+                                                        combQuery +=  ('CALL post_community_service_picture(' + imgQueryParams + ');');
+                                                    }
+                                                    console.log(combQuery);
+                                                    st.db.query(combQuery, function (err, attachmentResult) {
+                                                        if (!err) {
+                                                            if (attachmentResult) {
+                                                                console.log(attachmentResult);
+                                                                if (attachmentResult.length > 0){
+                                                                    for(var i=0; i < attachmentResult.length/2; i++){
+                                                                        var result = {};
+                                                                        result.tid = attachmentResult[i*2][0].tid;
+                                                                        result.pic = attachmentResult[i*2][0].pic;
+                                                                        outputArray.push(result);
+                                                                    }
+                                                                    console.log("output",outputArray);
+                                                                    responseMessage.status = true;
+                                                                    responseMessage.error = null;
+                                                                    responseMessage.message = 'Service posted successfully';
+                                                                    responseMessage.data = {
+                                                                        id : results[0][0]._i,
+                                                                        imageData : outputArray
+                                                                    };
+                                                                    res.status(200).json(responseMessage);
+                                                                    console.log("output",outputArray);
+                                                                    console.log('attachment file saved');
 
-                                                //upload to cloud server
-                                                if(req.files) {
-                                                    for (var prop in req.files) {
-                                                        if (req.files.hasOwnProperty(prop)) {
-                                                            var uniqueId = uuid.v4();
-                                                            var filetype = (req.files[prop].extension) ? req.files[prop].extension : 'jpg';
-                                                            randomName = uniqueId + '.' + filetype;
-                                                            randomNameTN = "tn_" + uniqueId + '.' + filetype;
-                                                            console.log(randomName);
-                                                            var readStream = fs.createReadStream(req.files[prop].path);
-                                                            var picContent = {
-                                                                randomName: randomName,
-                                                                readStream: readStream,
-                                                                service_id: req.query.service_id
-                                                            };
-                                                            var resizeReadStream = gm(req.files[prop].path).resize(128,128).quality(0).stream(filetype);
-                                                            var thumbNailContent = {
-                                                                randomNameTN: randomNameTN,
-                                                                resizeReadStream: resizeReadStream
-                                                            };
-                                                            serviceSavePic(picContent, function (err, picResult) {
-                                                                if (!err) {
-                                                                    if (picResult) {
-                                                                        console.log(picResult);
-                                                                    }
-                                                                    else {
-                                                                        console.log('result not load');
-                                                                    }
                                                                 }
                                                                 else {
-                                                                    console.log('error in save multiple pic');
-                                                                    console.log(err);
+                                                                    console.log('attachment file not save');
                                                                 }
-                                                            });
-
-                                                            // upload thumbnail of image to cloud server
-                                                            saveThumbnail(thumbNailContent, function (err, thumbNailResult) {
-                                                                if (!err) {
-                                                                    if (thumbNailResult) {
-                                                                        console.log(thumbNailResult);
-                                                                    }
-                                                                    else {
-                                                                        console.log('result not loaded');
-                                                                    }
-                                                                }
-                                                                else {
-                                                                    console.log('error in save multiple thumbnail');
-                                                                    console.log(err);
-                                                                }
-                                                            });
+                                                            }
+                                                            else {
+                                                                console.log('attachment file not save');
+                                                            }
                                                         }
                                                         else {
-                                                            console.log('attachment is empty');
+                                                            console.log('attachment file not save');
+                                                            console.log(err);
                                                         }
-                                                    }
+                                                    });
                                                 }
-                                                else
-                                                {
-                                                    console.log('attachment is empty');
+                                                else {
+                                                    console.log("output",outputArray);
+                                                    responseMessage.status = true;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Service posted successfully';
+                                                    responseMessage.data = {
+                                                        id : results[0][0]._i,
+                                                        imageData : outputArray
+                                                    };
+                                                    res.status(200).json(responseMessage);
                                                 }
+
                                             }
                                             else {
                                                 responseMessage.status = false;
@@ -1026,87 +853,226 @@ Association.prototype.saveAssociationServices = function(req,res,next){
         }
     }
 };
+
 /**
+ * @type : PUT
+ * @param req
+ * @param res
+ * @param next
+ * @description update association services
+ * @accepts json
+ * @param token <string> token of login user
+ * @param service_id <int> service_id is id of service if updating
+ * @param ep <string> earned points
+ * @param rp <string> redeem points
+ * @param reply <int> reply from admin
+ * @param status <int> status (1-submitted,2-closed)
+ * @param service_mid <int> service_mid is service master id
+ * @param image_details <json> image_details array of image object (tid and pic)
  *
- * @param picContent
- * @param callback
- * @returns {string}
- * function to upload multiple image to serever
  */
-function serviceSavePic(picContent, callback) {
-    try {
-        var localStream = picContent.readStream;
-        var remoteWriteStream = bucket.file(picContent.randomName).createWriteStream();
-        localStream.pipe(remoteWriteStream);
-        remoteWriteStream.on('finish', function () {
-            var imgQueryParams = st.db.escape(picContent.service_id) + ',' + st.db.escape(picContent.randomName);
-            var procQuery = 'CALL post_community_service_picture(' + imgQueryParams + ')';
-            console.log(procQuery);
-            st.db.query(procQuery, function (err, attachmentResult) {
-                if (!err) {
-                    if (attachmentResult) {
-                        console.log('attachment file saved');
-                        var url = appConfig.CONSTANT.GS_URL + appConfig.CONSTANT.STORAGE_BUCKET + '/' + picContent.randomName;
-                        callback(null, url);
+Association.prototype.updateAssociationServices = function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    if(req.is('json')){
+        var validationFlag = true;
+        var error = {};
+        if (!req.body.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.body.reply) {
+            error.reply = 'Reply can not be null';
+            validationFlag *= false;
+        }
+        if (isNaN(parseInt(req.body.service_mid)) || (req.body.service_mid) < 0 ) {
+            error.service_mid = 'Invalid service master id';
+            validationFlag *= false;
+        }
+        if (isNaN(parseInt(req.body.service_id)) || (req.body.service_id) < 0 ) {
+            error.service_mid = 'Invalid service id';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                req.body.status = (req.body.status) ? req.body.status : 0;
+                req.body.ep = (req.body.ep) ? req.body.ep : 0;
+                req.body.rp = (req.body.rp) ? req.body.rp : 0;
+                var imgObject = (req.body.image_details) ? req.body.image_details : '';
+                st.validateToken(req.body.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var procParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.service_id)
+                                + ',' + st.db.escape(req.body.ep)+ ',' + st.db.escape(req.body.rp)+ ',' + st.db.escape(req.body.reply)
+                                + ',' + st.db.escape(req.body.status)+ ',' + st.db.escape(req.body.service_mid);
+                            var procQuery = 'CALL update_community_service(' + procParams + ')';
+                            console.log(procQuery);
+                            st.db.query(procQuery, function (err, results) {
+                                if (!err) {
+                                    console.log(results);
+                                    if (results) {
+                                        if (results[0]) {
+                                            if (results[0][0]) {
+                                                if (results[0][0].tid) {
+                                                    var outputArray = [];
+                                                    console.log("imgObject.length", imgObject.length);
+                                                    if (imgObject.length > 0){
+                                                        var combQuery = '';
+                                                        /**
+                                                         * preparing query to update multiple image path
+                                                         */
+                                                        var imgArray = [];
+                                                        var tidArray = [];
+                                                        for (var j = 0; j < imgObject.length; j++){
+                                                            if (imgObject[j].tid){
+                                                                tidArray.push(imgObject[j].tid);
+                                                                imgArray.push(imgObject[j].pic)
+                                                            }
+                                                        }
+                                                        for (var i = 0; i < tidArray.length; i++ ){
+                                                            var imgQueryParams = st.db.escape(results[0][0].tid) + ',' + st.db.escape(imgArray[i])+ ',' + st.db.escape(tidArray[i]);
+                                                            combQuery +=  ('CALL post_community_service_picture(' + imgQueryParams + ');');
+                                                        }
+                                                        console.log(combQuery);
+                                                        st.db.query(combQuery, function (err, attachmentResult) {
+                                                            if (!err) {
+                                                                if (attachmentResult) {
+                                                                    console.log(attachmentResult);
+                                                                    if (attachmentResult.length > 0){
+                                                                        for(var i=0; i < attachmentResult.length/2; i++){
+                                                                            var result = {};
+                                                                            result.tid = attachmentResult[i*2][0].tid;
+                                                                            result.pic = attachmentResult[i*2][0].pic;
+                                                                            outputArray.push(result);
+                                                                        }
+                                                                        responseMessage.status = true;
+                                                                        responseMessage.error = null;
+                                                                        responseMessage.message = 'Service updated successfully';
+                                                                        responseMessage.data = {
+                                                                            id : results[0][0].tid,
+                                                                            imageData : outputArray
+                                                                        };
+                                                                        res.status(200).json(responseMessage);
+                                                                        console.log('attachment file saved');
+                                                                    }
+                                                                    else {
+                                                                        console.log('attachment file not save');
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('attachment file not save');
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log('attachment file not save');
+                                                                console.log(err);
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        responseMessage.status = true;
+                                                        responseMessage.error = null;
+                                                        responseMessage.message = 'Service updated successfully';
+                                                        responseMessage.data = {
+                                                            id : results[0][0].tid,
+                                                            imageData : outputArray
+                                                        };
+                                                        res.status(200).json(responseMessage);
+                                                    }
+                                                }
+                                                else {
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Error in updating service';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in updating service';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in updating service';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in updating service';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : post_community_service ', err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('saveAssociationServices: Invalid token');
+                        }
                     }
                     else {
-                        console.log('attachment file not save');
-                        callback(null, null);
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error : saveAssociationServices ', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
                     }
-                }
-                else {
-                    console.log('attachment file not save');
-                    console.log(err);
-                    callback(null, null);
-                }
-            });
-        });
-        remoteWriteStream.on('error', function () {
-            console.log('FnSavePictures: Image upload error to google cloud');
-            callback(null, null);
-        });
-    }
-    catch (ex) {
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log(ex);
-        return 'error'
-    }
-};
-/**
- *
- * @param thumbNailContent
- * @param callback
- * @returns {string}
- * function to upload multiple thumbnail to server
- */
-function saveThumbnail(thumbNailContent, callback) {
-    try {
-        var localStream = thumbNailContent.resizeReadStream;
-        var remoteWriteStream = bucket.file(thumbNailContent.randomNameTN).createWriteStream();
-        localStream.pipe(remoteWriteStream);
-        remoteWriteStream.on('finish', function (err) {
-            if (!err) {
-                console.log('attachment file saved');
-                var thumbnail_url = appConfig.CONSTANT.GS_URL + appConfig.CONSTANT.STORAGE_BUCKET + '/' + thumbNailContent.randomNameTN;
-                callback(null, thumbnail_url);
+                });
             }
-            else {
-                console.log('attachment file not save');
-                console.log(err);
-                callback(null, null);
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error saveAssociationServices :  ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
             }
-        });
-        remoteWriteStream.on('error', function () {
-            console.log('saveThumbnail: Thumbnail upload error to google cloud');
-            callback(null, null);
-        });
+        }
     }
-    catch (ex) {
-        var errorDate = new Date();
-        console.log(errorDate.toTimeString() + ' ......... error ...........');
-        console.log(ex);
-        return 'error'
+    else{
+        responseMessage.error = "Accepted content type is json only";
+        res.status(400).json(responseMessage);
     }
 };
 
@@ -1158,23 +1124,10 @@ Association.prototype.associationGetServiceImg = function(req,res,next){
                                 if (results) {
                                     if (results[0]){
                                         if (results[0].length > 0) {
-                                            var tnImgArray = [];
-                                            /**
-                                             * to add full image url with comma saprated images
-                                             */
-                                            if (results[0][0].pic) {
-                                                var imagePath = results[0][0].pic.split(',');
-                                                for (var j = 0; j < imagePath.length; j++) {
-                                                    var attachment = (imagePath[j]) ? req.CONFIG.CONSTANT.GS_URL +
-                                                    req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + imagePath[j] : ''
-                                                    imgArray.push(attachment);
-                                                }
-                                            }
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Image name loaded successfully';
-                                            responseMessage.data = {
-                                            }
+                                            responseMessage.data = results[0];
                                             res.status(200).json(responseMessage);
 
                                         }
@@ -1249,6 +1202,517 @@ Association.prototype.associationGetServiceImg = function(req,res,next){
         }
     }
 
+};
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get all images of service
+ * @accepts json
+ * @param token <string> token of login user
+ * @param service_mid <int> service id
+ * @param ten_id <int> ten_id of (event,postor or opinion id)
+ * @param flag <int> (1-previous and 2 for next)
+ *
+ */
+Association.prototype.associationGetEventInfo = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.service_mid))){
+        error.service_id = 'Invalid service id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.ten_id))){
+        error.ten_id = 'Invalid service id';
+        validationFlag *= false;
+    }
+
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            req.query.flag = (req.query.flag) ? req.query.flag : 0;
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
+                            + ',' + st.db.escape(req.query.ten_id) + ',' + st.db.escape(req.query.flag);
+                        var procQuery = 'CALL get_event_details(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]){
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Ten details loaded successfully';
+                                            responseMessage.data = results[0];
+                                            res.status(200).json(responseMessage);
+
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Ten details are not available';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Ten details are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Ten details are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : associationGetServiceImg ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('get_service_picture: Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : associationGetServiceImg ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error aassociationGetServiceImg  :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
+};
+
+/**
+ * @type : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description Save HRM contact details
+ * @accepts json
+ * @param token <string> token of login user
+ * @param pr <string> image file (multipart)
+ */
+Association.prototype.imageUploadWithThumbnail = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        console.log(req.files);
+                        if (req.files) {
+                            var deleteTempFile = function(){
+                                fs.unlink('../bin/'+req.files.pr.path);
+                                console.log("Image Path is deleted from server");
+                            };
+                            var readStream = fs.createReadStream(req.files.pr.path);
+                            var resizedReadStream = gm(req.files['pr'].path).resize(128,128).quality(0).stream(req.files.pr.extension);
+                            var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : 'jpg');
+                            var tnUniqueFileName = "tn_" + uniqueFileName;
+                            console.log(uniqueFileName);
+                            uploadDocumentToCloud(uniqueFileName, readStream, function (err) {
+                                if (!err) {
+                                    deleteTempFile();
+                                    uploadDocumentToCloud(tnUniqueFileName, resizedReadStream, function (err) {
+                                        if (!err) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Image and thumbnail uploaded successfully';
+                                            responseMessage.data = {
+                                                pic: uniqueFileName,
+                                                thumnail : tnUniqueFileName
+                                            };
+                                            deleteTempFile();
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in uploading thumbnail';
+                                            responseMessage.data = null;
+                                            deleteTempFile();
+                                            res.status(500).json(responseMessage);
+                                        }
+                                    });
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in uploading image';
+                                    responseMessage.data = null;
+                                    deleteTempFile();
+                                    res.status(500).json(responseMessage);
+                                }
+                            });
+                        }
+                        else{
+                            responseMessage.status = false;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Invalid input data';
+                            responseMessage.data = null;
+                            res.status(500).json(responseMessage);
+                        }
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('hrisSaveHRMimg: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : hrisSaveHRMimg ', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error hrisSaveHRMimg :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @type : POST
+ * @param req
+ * @param res
+ * @param next
+ * @description save ten master details
+ * @accepts json
+ * @param token <string> token of login user
+ * @param ten_id <int> ten_id (insert 0, update ten id)
+ * @param title <string> title
+ * @param description <int> description
+ * @param startDate <int> startDate
+ * @param endDate <string> endDate
+ * @param regLastDate <string> regLastDate
+ * @param status <string> status (1(pending),2=closed,3=on-hold,4=canceled)
+ * @param type <string> type (1-training, 2-event, 3-news,4-knowledge,5-opinion-poll)
+ * @param note <string> note
+ * @param venueId <string> venueId
+ * @param code <string> code
+ * @param capacity <string> capacity
+ * @param image_details <json> image_details array of image object (tid and pic)
+ */
+Association.prototype.saveAssociationTenMaster = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+    if(req.is('json')){
+        if (!req.body.token) {
+            error['token'] = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.body.status) {
+            error['status'] = 'Invalid status';
+            validationFlag *= false;
+        }
+        if (!req.body.type) {
+            error['type'] = 'Invalid type';
+            validationFlag *= false;
+        }
+        if (!req.body.code) {
+            error['code'] = 'Invalid code';
+            validationFlag *= false;
+        }
+        if (!req.body.note) {
+            error['note'] = 'Invalid code';
+            validationFlag *= false;
+        }
+        if (!req.body.venueId) {
+            error['venueId'] = 'Invalid code';
+            validationFlag *= false;
+        }
+        if (!req.body.title) {
+            error['title'] = 'Invalid code';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                req.body.ten_id = (req.body.ten_id) ? req.body.ten_id : 0;      // while saving time 0 else id of user
+                req.body.s_date = (req.body.s_date) ? (req.body.s_date) : null;
+                req.body.e_date = (req.body.e_date) ? (req.body.e_date) : null;
+                req.body.reg_lastdate = (req.body.reg_lastdate) ? (req.body.reg_lastdate) : null;
+                req.body.code = alterEzeoneId(req.body.code);
+                req.body.capacity = (req.body.capacity) ? (req.body.capacity) : 0;
+                var imgObject = (req.body.image_details) ? req.body.image_details : '';
+                st.validateToken(req.body.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var queryParams = st.db.escape(req.body.ten_id) + ',' + st.db.escape(req.body.title)
+                                + ',' + st.db.escape(req.body.description) + ',' + st.db.escape(req.body.startDate)
+                                + ',' + st.db.escape(req.body.endDate) + ',' + st.db.escape(req.body.status)
+                                + ',' + st.db.escape(req.body.regLastDate) + ',' + st.db.escape(req.body.type)
+                                + ',' + st.db.escape(req.body.token) + ',' + st.db.escape(req.body.note)
+                                + ',' + st.db.escape(req.body.venueId) + ',' + st.db.escape(req.body.code)
+                                + ',' + st.db.escape(req.body.capacity);
+                            var procQuery = 'CALL pSaveTENMaster(' + queryParams + ')';
+                            console.log(procQuery);
+                            st.db.query(procQuery, function (err, results) {
+                                if (!err) {
+                                    console.log(results);
+                                    if (results) {
+                                        if (results[0]) {
+                                            if (results[0][0]) {
+                                                if (results[0][0].id) {
+                                                    var outputArray = [];
+                                                    console.log("imgObject.length", imgObject.length);
+                                                    if (imgObject.length > 0){
+                                                        var combQuery = '';
+                                                        /**
+                                                         * preparing query to update multiple image path
+                                                         */
+                                                        var imgArray = [];
+                                                        var tidArray = [];
+                                                        for (var j = 0; j < imgObject.length; j++){
+                                                                tidArray.push(imgObject[j].tid);
+                                                                imgArray.push(imgObject[j].pic);
+                                                        }
+                                                        for (var i = 0; i < tidArray.length; i++ ){
+                                                            var imgQueryParams = st.db.escape(tidArray[i]) + ',' + st.db.escape(results[0][0].id)
+                                                                + ',' + st.db.escape(imgArray[i]) + ',' + st.db.escape('jpg');
+                                                            combQuery +=  ('CALL save_ten_master_attach(' + imgQueryParams + ');');
+                                                        }
+                                                        console.log(combQuery);
+                                                        st.db.query(combQuery, function (err, attachmentResult) {
+                                                            if (!err) {
+                                                                if (attachmentResult) {
+                                                                    console.log(attachmentResult);
+                                                                    if (attachmentResult.length > 0){
+                                                                        for(var i=0; i < attachmentResult.length/2; i++){
+                                                                            var result = {};
+                                                                            result.tid = attachmentResult[i*2][0].tid;
+                                                                            result.pic = attachmentResult[i*2][0].aurl;
+                                                                            result.tn_pic = attachmentResult[i*2][0].tn_aurl;
+                                                                            outputArray.push(result);
+                                                                        }
+                                                                        console.log("output",outputArray);
+                                                                        responseMessage.status = true;
+                                                                        responseMessage.error = null;
+                                                                        responseMessage.message = 'Ten Master posted successfully';
+                                                                        responseMessage.data = {
+                                                                            id : results[0][0].id,
+                                                                            imageData : outputArray
+                                                                        };
+                                                                        res.status(200).json(responseMessage);
+                                                                        console.log("output",outputArray);
+                                                                        console.log('attachment file saved');
+
+                                                                    }
+                                                                    else {
+                                                                        console.log('attachment file not save');
+                                                                    }
+                                                                }
+                                                                else {
+                                                                    console.log('attachment file not save');
+                                                                }
+                                                            }
+                                                            else {
+                                                                console.log('attachment file not save');
+                                                                console.log(err);
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        console.log("output",outputArray);
+                                                        responseMessage.status = true;
+                                                        responseMessage.error = null;
+                                                        responseMessage.message = 'Service posted successfully';
+                                                        responseMessage.data = {
+                                                            id : results[0][0].id,
+                                                            imageData : outputArray
+                                                        };
+                                                        res.status(200).json(responseMessage);
+                                                    }
+
+                                                }
+                                                else {
+                                                    responseMessage.status = false;
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = 'Error in posting service';
+                                                    responseMessage.data = null;
+                                                    res.status(200).json(responseMessage);
+                                                }
+                                            }
+                                            else {
+                                                responseMessage.status = false;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Error in posting service';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.status = false;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Error in posting service';
+                                            responseMessage.data = null;
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = false;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Error in posting service';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : post_community_service ', err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('saveAssociationServices: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error : saveAssociationServices ', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    }
+                });
+            }
+            catch (ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error saveAssociationServices :  ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+    }
+    else{
+        responseMessage.error = "Accepted content type is json only";
+        res.status(400).json(responseMessage);
+    }
 };
 
 module.exports = Association;

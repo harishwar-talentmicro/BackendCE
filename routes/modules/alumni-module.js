@@ -448,7 +448,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
 
                                                 console.log('FnRegistration:tmaster: Registration success');
 
-                                                var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
+                                                var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(token)+ ',' + st.db.escape('');
                                                 var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
                                                 st.db.query(query1, function (err, updateResult) {
                                                     if (!err) {
@@ -518,7 +518,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
 
                                             else {
                                                 console.log('FnRegistration: tmaster: Update operation success');
-                                                var queryParams3 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
+                                                var queryParams3 = st.db.escape(pin) + ',' + st.db.escape(ezeid)+ ',' + st.db.escape(token) + ',' + st.db.escape('');
                                                 var query3 = 'CALL pupdateEZEoneKeywords(' + queryParams3 + ')';
                                                 st.db.query(query3, function (err, updateResult) {
                                                     if (!err) {
@@ -642,7 +642,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
 
                                                     console.log('FnRegistration:tmaster: Registration success');
 
-                                                    var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
+                                                    var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(token)+ ',' + st.db.escape('');
                                                     var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
                                                     st.db.query(query1, function (err, updateResult) {
                                                         if (!err) {
@@ -700,7 +700,7 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                                     }
                                                 }
                                                 else {
-                                                    var queryParams2 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape('');
+                                                    var queryParams2 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(token)+ ',' + st.db.escape('');
                                                     var query2 = 'CALL pupdateEZEoneKeywords(' + queryParams2 + ')';
                                                     console.log(query2);
                                                     st.db.query(query2, function (err, getResult) {
@@ -2490,15 +2490,12 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-
                         var queryParams = st.db.escape(tid) + ',' + st.db.escape(title) + ',' + st.db.escape(description)
                             + ',' + st.db.escape(startDate) + ',' + st.db.escape(endDate) + ',' + st.db.escape(status)
                             + ',' + st.db.escape(regLastDate) + ',' + st.db.escape(type) + ',' + st.db.escape(token)
                             + ',' + st.db.escape(note) + ',' + st.db.escape(venueId) + ',' + st.db.escape(code) + ',' + st.db.escape(capacity);
                         var query = 'CALL pSaveTENMaster(' + queryParams + ')';
-
                         console.log(query);
-
                         st.db.query(query, function (err, insertresult) {
                             console.log(insertresult);
                             if (!err) {
@@ -2520,6 +2517,10 @@ Alumni.prototype.saveTENMaster = function(req,res,next) {
                                         venue_id: req.query.venue_id,
                                         code: alterEzeoneId(req.query.code)
                                     };
+                                    /**
+                                     * @TODO change in image uploading code, response should
+                                     * not be sent before completion of proccess
+                                     */
                                     res.status(200).json(responseMessage);
                                     console.log('FnSaveTENMaster: Data saved successfully');
 
