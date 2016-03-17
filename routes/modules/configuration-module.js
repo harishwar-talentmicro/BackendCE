@@ -3767,7 +3767,37 @@ Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
 };
 
 
-Configuration.prototype.saveWorkingHoursNew = function(req,res,next){
+/**
+ * New working hour API
+ * Working Schedule for Businesses and Institutes
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @service-param token <string>
+ * @service-body <json>
+    [
+     {
+         id : 0,
+         days : [0,1,2],
+         st : "09:00",
+         et : "19:00"
+     },
+     {
+         id : 0,
+         days : [0,1,3],
+         st : "10:00",
+         et : "13:00"
+     }
+    ]
+ */
+Configuration.prototype.saveWorkingSchedule = function(req,res,next){
+    try{
+
+    }
+    catch(ex){
+
+    }
     /**
      * Sample data structure you will get from Client(Web)
      * It will be accessible through req.body and req type will always be json
@@ -3787,25 +3817,152 @@ Configuration.prototype.saveWorkingHoursNew = function(req,res,next){
         }
     ];
 
+    var error = {
+    };
+    var validationFlag = true;
+
+    /**
+     * Slots which should not be deleted for working hours
+     */
+    var excludedIdList = [];
+
+    var combSaveQuery = "";
     for(var i = 0; i < dataFromClient.length; i++){
+        var startMoment = moment(dataFromClient.st,"HH:mm");
+        var endMoment = moment(dataFromClient.et,"HH:mm");
+        error[i] = null;
+
+        /**
+         * Validating start time
+         */
+        if(startMoment){
+            if(!startMoment.isValid()){
+                error[i] = { st : 'Invalid time format'};
+                validationFlag *= false;
+            }
+        }
+        else{
+            error[i] = { st : 'Invalid time format'};
+            validationFlag *= false;
+        }
+        /**
+         * Validating end time
+         */
+        if(endMoment){
+            if(!endMoment.isValid()){
+                error[i] = { et : 'Invalid time format'};
+                validationFlag *= false;
+            }
+        }
+        else{
+            error[i] = { et : 'Invalid time format'};
+            validationFlag *= false;
+        }
+
+        /**
+         * Validating days
+         */
+        if(dataFromClient[i].days){
+            if(dataFromClient[i].days.length < 1) {
+                error[i] = {days: 'Days are empty'};
+                validationFlag *= false;
+            }
+            else{
+                for(var j = 0; j < dataFromClient[i].days.length; j++){
+                    dataFromClient[i].days = parseInt(dataFromClient[i].days);
+                    if(dataFromClient[i].days[j] > 6 || dataFromClient[i].days[j] < 0 || isNaN(dataFromClient[i].days[j])){
+                        if(dataFromClient[i].days[j] > 6){
+                            dataFromClient[i].days[j] = dataFromClient[i].days[j] % 6;
+                        }
+                        if(isNaN(dataFromClient[i].days[j]) || dataFromClient[i].days[j] < 0){
+                            dataFromClient[i].days.splice(j,1);
+                        }
+                    }
+                }
+
+                if(!dataFromClient[i].days.length){
+                    error[i] = { days : 'Days are empty'};
+                    validationFlag *= false;
+                }
+            }
+        }
+        else {
+            error[i] = { days : 'Days are empty'};
+            validationFlag *= false;
+        }
+        dataFromClient[i].id = parseInt(dataFromClient[i].id);
+        if(isNaN(dataFromClient[i].id) || dataFromClient[i].id < 1){
+            error[i] = { days : 'Invalid slot id'};
+            validationFlag *= false;
+        }
+
+        if(error[i]){
+            continue;
+        }
+
+        if(dataFromClient[i].id){
+            excludedIdList.push(dataFromClient[i].id);
+        }
+
         var queryParams = [
             st.db.escape(req.query.token),
             st.db.escape(dataFromClient[i].id),
-            st.db.escape(dataFromClient[i].days),
-            st.db.escape(dataFromClient[i].st),
-            st.db.escape(dataFromClient[i].et)
+            st.db.escape(dataFromClient[i].days.join(',')),
+            st.db.escape((startMoment.hours() * 60)+startMoment.minutes()),
+            st.db.escape((endMoment.hours() * 60)+endMoment.minutes())
         ];
+
+
+        combSaveQuery += "CALL post_working_hour("+ queryParams.join(',')+");";
 
     }
 
-
-
-
     /**
-     * @todo This service has to be wrtitten
-     *
-     * Insert them as one single object as one slot
+     * The slots which are not to be deleted are pushed into excluded list
      */
+    if(excludedIdList.length){
+        var delQueryParams = [
+            st.db.escape(req.query.token),
+            st.db.escape(excludedIdList.join(','))
+        ];
+        /**
+         * The slots other than the passed slots will get deleted with this procedure
+         */
+        combSaveQuery += "CALL delete_working_hours("+ delQueryParams.join(',')+");";
+    }
+
+    if(!validationFlag){
+        res.status(200).json({
+            status : false,
+            message : "Please check the errors",
+            error : error,
+            data : null
+        });
+    }
+    else{
+        st.db.query(combSaveQuery,function(err,results){
+           if(err){
+               console.debug('Error ',' In saving new working hours slot');
+               console.debug('Error message',err);
+               res.status(500).json({
+                   status: false,
+                   message : 'Internal Server error',
+                   error : {
+                       server : 'Internal Server error'
+                   },
+                   data : null
+               });
+           }
+           else{
+               res.status(200).json({
+                   status : true,
+                   message : "Working hours updated successfully",
+                   error : null,
+                   data : dataFromClient
+               });
+           }
+        });
+    }
 
 };
 
