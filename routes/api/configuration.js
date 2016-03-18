@@ -5,6 +5,7 @@
 var express = require('express');
 var router = express.Router();
 var moment = require('moment');
+
 /**
  * New working hour API
  * Working Schedule for Businesses and Institutes
@@ -305,33 +306,41 @@ router.get('/working_schedule', function(req,res,next){
                                     if (results) {
                                         if (results[0]) {
                                             if (results[0].length > 0) {
-                                                for(var i = 0; i < results[0].length; i++){
-                                                    results[0][i].days = results[0][i].days.split(',');
-                                                    for(var j = 0; j < results[0][i].days.length; j++){
-                                                        results[0][i].days[j] = parseInt(results[0][i].days[j]);
-                                                    }
-                                                    /**
-                                                     * Code that
-                                                     */
-                                                    results[0][i].et = (((parseInt(results[0][i].et) / 60) < 10) ?
-                                                    '0'+(parseInt(results[0][i].et / 60)).toString() :
-                                                    parseInt(results[0][i].et / 60)) + ':'+
-                                                    (((results[0][i].et % 60) < 10) ?
-                                                    '0'+(results[0][i].et % 60).toString() :
-                                                        parseInt(results[0][i].et % 60));
+                                                if (!results[0][0].error){
+                                                    for(var i = 0; i < results[0].length; i++){
+                                                        results[0][i].days = results[0][i].days.split(',');
+                                                        for(var j = 0; j < results[0][i].days.length; j++){
+                                                            results[0][i].days[j] = parseInt(results[0][i].days[j]);
+                                                        }
+                                                        /**
+                                                         * Code that
+                                                         */
+                                                        results[0][i].et = (((parseInt(results[0][i].et) / 60) < 10) ?
+                                                            '0'+(parseInt(results[0][i].et / 60)).toString() :
+                                                                parseInt(results[0][i].et / 60)) + ':'+
+                                                            (((results[0][i].et % 60) < 10) ?
+                                                            '0'+(results[0][i].et % 60).toString() :
+                                                                parseInt(results[0][i].et % 60));
 
-                                                    results[0][i].st = (((parseInt(results[0][i].st) / 60) < 10) ?
-                                                        '0'+(parseInt(results[0][i].st / 60)).toString() :
-                                                            parseInt(results[0][i].st / 60)) + ':'+
-                                                        (((results[0][i].st % 60) < 10) ?
-                                                        '0'+(results[0][i].st % 60).toString() :
-                                                            parseInt(results[0][i].st % 60));
+                                                        results[0][i].st = (((parseInt(results[0][i].st) / 60) < 10) ?
+                                                            '0'+(parseInt(results[0][i].st / 60)).toString() :
+                                                                parseInt(results[0][i].st / 60)) + ':'+
+                                                            (((results[0][i].st % 60) < 10) ?
+                                                            '0'+(results[0][i].st % 60).toString() :
+                                                                parseInt(results[0][i].st % 60));
+                                                    }
+                                                    responseMessage.status = true;
+                                                    responseMessage.data = results[0];
+                                                    responseMessage.error = null;
+                                                    responseMessage.message = ' working schedule Send successfully';
+                                                    res.status(200).json(responseMessage);
                                                 }
-                                                responseMessage.status = true;
-                                                responseMessage.data = results[0];
-                                                responseMessage.error = null;
-                                                responseMessage.message = ' working schedule Send successfully';
-                                                res.status(200).json(responseMessage);
+                                                else {
+                                                    responseMessage.message = 'working schedule are not sent';
+                                                    responseMessage.status = true;
+                                                    res.json(responseMessage);
+                                                }
+
                                             }
                                             else {
                                                 responseMessage.message = 'working schedule are not sent';
@@ -401,5 +410,6 @@ router.get('/working_schedule', function(req,res,next){
         }
     }
 });
+
 
 module.exports = router;

@@ -63,14 +63,16 @@ Job.prototype.create = function(req,res,next){
     var salaryType = req.body.salaryType;
     var keySkills = req.body.keySkills ? req.body.keySkills : '';
     var openings = req.body.openings;
-    var jobType = req.body.jobType;
+    var jobType = (req.body.jobType) ? parseInt(req.body.jobType) : 0;
+    if(isNaN(jobType)){
+        jobType = 0;
+    }
     var status = req.body.status;
     var contactName = req.body.contactName;
     var email =req.body.email_id ? req.body.email_id : '';
     var mobileNo =req.body.mobileNo ? req.body.mobileNo : '';
     var locationsList = req.body.locationsList;
     var instituteIdStr = (req.body.institute_id) ? req.body.institute_id : '';
-
     if(typeof(locationsList) == "string") {
         locationsList = JSON.parse(locationsList);
     }
@@ -80,7 +82,6 @@ Job.prototype.create = function(req,res,next){
     if (!skillMatrix1){
         skillMatrix1=[];
     }
-
     var cid = req.body.cid ? parseInt(req.body.cid) : 0;   // client id
     var conatctId = req.body.ctid ? parseInt(req.body.ctid) : 0;     // contact id
     var isconfidential = req.body.isconfi ? parseInt(req.body.isconfi) : 0;
@@ -101,14 +102,21 @@ Job.prototype.create = function(req,res,next){
     var operationType;
     var iphoneId;
     var userId;
-
+    var jobTypeList =  [
+        "Full Time",
+        "Part Time",
+        "Work from Home",
+        "Internship",
+        "Apprenticeship",
+        "Job Oriented Training",
+        "Freelancer"
+    ];
     var responseMessage = {
         status: false,
         error: {},
         message: '',
         data: null
     };
-
     var error = {};
     var validateStatus = true;
 
@@ -185,7 +193,6 @@ Job.prototype.create = function(req,res,next){
                         var locCount = 0;
                         var locationDetails = locationsList[locCount];
                         location_id = location_id.substr(0,location_id.length - 1);
-
                         var createJobPosting = function(){
                             var query = st.db.escape(tid) + ',' + st.db.escape(ezeoneId) + ',' + st.db.escape(jobCode)
                                 + ',' + st.db.escape(jobTitle) + ',' + st.db.escape(expFrom) + ',' + st.db.escape(expTo)
@@ -230,8 +237,6 @@ Job.prototype.create = function(req,res,next){
                                         //res.status(200).json(responseMessage);
 
                                         var bigCombinedQuery = "";
-
-
                                         /**
                                          * Preparing LOC Matrix insertion query and adding it to bigCombinedQuery
                                          */
@@ -239,8 +244,6 @@ Job.prototype.create = function(req,res,next){
                                             var locInsertQuery = "";
                                             for(var i=0; i < locMatrix.length; i++) {
                                                 //async.each(locMatrix, function iterator(locDetails, callback) {
-
-
                                                 var locSkills = {
                                                     expertiseLevel: locMatrix[i].expertiseLevel,
                                                     jobId: insertResult[0][0].jobid,
@@ -258,23 +261,18 @@ Job.prototype.create = function(req,res,next){
                                                     + ',' + st.db.escape(locSkills.scoreFrom) + ',' + st.db.escape(locSkills.scoreTo);
 
                                                 locInsertQuery += 'CALL pSaveJobLOC(' + queryParams + ');';
-
                                             }
                                             console.log(locInsertQuery);
                                             bigCombinedQuery += locInsertQuery;
                                         }
-
                                         /**
                                          * Prepare education insertion query and adding it to bigCombinedQuery
                                          */
                                         if(educations) {
                                             var educationInsertQuery = "";
-
                                             for(var j=0; j < educations.length; j++) {
                                                 //async.each(educations, function iterator(eduDetails,callback) {
-
                                                 var educationData = {
-
                                                     jobId: insertResult[0][0].jobid,
                                                     eduId: educations[j].edu_id,
                                                     /**
@@ -285,7 +283,6 @@ Job.prototype.create = function(req,res,next){
                                                     scoreTo: educations[j].score_to,
                                                     level: educations[j].expertiseLevel   // 0-ug, 1-pg
                                                 };
-
                                                 console.log(educationData);
                                                 var queryParams = st.db.escape(educationData.jobId) + ',' + st.db.escape(educationData.eduId)
                                                     + ',' + st.db.escape(educationData.spcId) + ',' + st.db.escape(educationData.scoreFrom)
@@ -296,14 +293,11 @@ Job.prototype.create = function(req,res,next){
                                             console.log(educationInsertQuery);
                                             bigCombinedQuery += educationInsertQuery;
                                         }
-
                                         /**
                                          * There is no SkillMatrix currently in front end so removing it from backend too
                                          */
                                         //matrix(insertResult[0][0].jobid);
-
                                         console.log('FnSaveJobs: Jobs save successfully');
-
                                         if(bigCombinedQuery){
                                             st.db.query(bigCombinedQuery, function (err, notificationResult) {
                                                 if (!err) {
@@ -325,11 +319,6 @@ Job.prototype.create = function(req,res,next){
                                             res.status(200).json(responseMessage);
                                             postNotification(insertResult[0][0].jobid);
                                         }
-
-
-
-
-
                                     }
                                     else {
                                         responseMessage.message = 'No save Jobs details';
@@ -344,7 +333,6 @@ Job.prototype.create = function(req,res,next){
                                 }
                             });
                         };
-
                         //var matrix = function(jobId_Result){
                         //    jobID = jobId_Result;
                         //    var count = skillMatrix1.length;
@@ -412,9 +400,12 @@ Job.prototype.create = function(req,res,next){
                         //    }
                         //};
 
-                        //send push notification
                         var postNotification = function(jobID){
                             var queryParams = st.db.escape(jobID) + ',' + st.db.escape(token);
+                            /**
+                             * send notification to eligible students
+                             * @type {string}
+                             */
                             var query = 'CALL PNotifyForCVsAfterJobPostedNew(' + queryParams + ')';
                             console.log(query);
                             st.db.query(query, function (err, notificationResult) {
@@ -431,7 +422,11 @@ Job.prototype.create = function(req,res,next){
                                                 var mIds = notificationResult[0][c].ids + ',' + mIds;
                                             }
                                             var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
-
+                                            /**
+                                             * to create group of institute and studens for send notification and messages
+                                             * and save data
+                                             * @type {string}
+                                             */
                                             var jobQuery = 'CALL psavejobnotification(' + jobqueryParameters + ')';
                                             console.log(jobQuery);
                                             st.db.query(jobQuery, function (err, queryResult) {
@@ -458,11 +453,10 @@ Job.prototype.create = function(req,res,next){
 
                                                 var file = path.join(__dirname, '../../mail/templates/job_post.html');
                                                 var data = fs.readFileSync(file, "utf8");
-
-                                                data = data.replace("[JobType]", notificationResult[1][0].jobtype);
-                                                data = data.replace("[JobTitle]", notificationResult[1][0].jobTitle);
-                                                data = data.replace("[JobCode]", notificationResult[1][0].jobCode);
-                                                data = data.replace("[CompanyName]", notificationResult[1][0].cn);
+                                                    data = data.replace("[JobType]", jobTypeList[jobType]);
+                                                    data = data.replace("[JobTitle]", jobTitle);
+                                                    data = data.replace("[JobCode]", jobCode);
+                                                    data = data.replace("[CompanyName]", notificationResult[1][0].cn);
                                                 var composeMsgParams = st.db.escape(data) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                     + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape('')
                                                     + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId[k])
@@ -522,7 +516,6 @@ Job.prototype.create = function(req,res,next){
                                 }
                             });
                         };
-
                         var insertLocations = function(locationDetails){
                             var list = {
                                 location_title: locationDetails.location_title,
@@ -531,10 +524,8 @@ Job.prototype.create = function(req,res,next){
                                 country: locationDetails.country,
                                 maptype : locationDetails.maptype
                             };
-
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
-                            // console.log('CALL psavejoblocation(' + queryParams + ')');
                             st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
                                 if (results) {
                                     if (results[0]) {
@@ -1022,6 +1013,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
         var locMatrix = req.body.locMatrix;
         locMatrix = JSON.parse(JSON.stringify(locMatrix));
 
+        req.body.skillKeywords = (req.body.skillKeywords) ? req.body.skillKeywords : '';
+
         var skillMatrix = ' ';
         var eduMatrix = ' ';
         var count;
@@ -1186,7 +1179,8 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     + ',' + st.db.escape(experienceFrom) + ',' + st.db.escape(experienceTo) + ',' + st.db.escape(instituteId)
                     + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(loc)
-                    + ',' + st.db.escape(filterType)+',' + st.db.escape(gender)+',' + st.db.escape(locSkills.locIds);
+                    + ',' + st.db.escape(filterType)+',' + st.db.escape(gender)+',' + st.db.escape(locSkills.locIds) + ','+
+                    st.db.escape(req.body.skillKeywords);
 
                 var query = 'CALL pGetjobseekers(' + queryParams + ')';
                 console.log(query);

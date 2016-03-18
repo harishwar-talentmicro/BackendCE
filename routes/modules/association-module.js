@@ -226,12 +226,12 @@ Association.prototype.associGetEventDtl = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description save association comments
+ * @description save association comments and opinion poll
  * @accepts json
- * @param token <string> token of login user
- * @param tid <int> tid of comment table
- * @param ten_id <int> id of a event or notice
+ * @param ten_id <int> id of a ten master (event, opinion poll etc.)
  * @param comments <string> comments from user
+ * @param token <string> token of login user
+ * @param poll_opt_id <int> opinion poll option id
  */
 Association.prototype.associSaveComments = function(req,res,next){
     var responseMessage = {
@@ -247,10 +247,6 @@ Association.prototype.associSaveComments = function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.comment) {
-        error.comment = 'Comment can not be null';
-        validationFlag *= false;
-    }
     if (isNaN(parseInt(req.body.ten_id)) || (req.body.ten_id) < 0 ) {
         error.ten_id = 'Invalid event id';
         validationFlag *= false;
@@ -263,12 +259,13 @@ Association.prototype.associSaveComments = function(req,res,next){
     }
     else {
         try {
-            req.body.tid = (parseInt(req.body.tid)) ? req.body.tid : 0;
+            req.body.poll_opt_id = (req.body.poll_opt_id) ? req.body.poll_opt_id : 0;
+            req.body.comments = (req.body.comments) ? req.body.comments : '';
             st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.body.tid) + ',' + st.db.escape(req.body.ten_id)
-                            + ',' + st.db.escape(req.body.comment)+ ',' + st.db.escape(req.body.token);
+                        var procParams = st.db.escape(req.body.ten_id)+ ',' + st.db.escape(req.body.comment)
+                            + ',' + st.db.escape(req.body.token)+ ',' + st.db.escape(req.body.poll_opt_id);
                         var procQuery = 'CALL pSave_comments(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -551,6 +548,18 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                                 //result.companyname=serviceResult[0][i].companyname;
                                                 companyArray = [];
                                             }
+
+                                            var statusArray =[];
+                                            if(serviceResult[0][i].status) {
+                                                var statusArrayArraynew = serviceResult[0][i].status;
+                                                statusArray = statusArrayArraynew.split('^');
+                                                //result.companyname = companyArray;
+                                            }
+                                            else{
+                                                //result.companyname=serviceResult[0][i].companyname;
+                                                companyArray = [];
+                                            }
+
                                             var replayObject = [];
                                             console.log(b.length,"length iof b");
                                             for(var j = 0; j< b.length;j++){
@@ -569,11 +578,11 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                                 else{
                                                     robject.Uname = '';
                                                 }
-                                                if(replyArray[j]){
+                                                if(statusArray[j]){
                                                     robject.status =  statusArray[j];
                                                 }
                                                 else{
-                                                    robject.status = '';
+                                                    robject.status = '0';
                                                 }
 
                                                 replayObject[j]= robject;
@@ -937,10 +946,8 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                         var imgArray = [];
                                                         var tidArray = [];
                                                         for (var j = 0; j < imgObject.length; j++){
-                                                            if (imgObject[j].tid){
-                                                                tidArray.push(imgObject[j].tid);
-                                                                imgArray.push(imgObject[j].pic)
-                                                            }
+                                                            tidArray.push(imgObject[j].tid);
+                                                            imgArray.push(imgObject[j].pic)
                                                         }
                                                         for (var i = 0; i < tidArray.length; i++ ){
                                                             var imgQueryParams = st.db.escape(results[0][0].tid) + ',' + st.db.escape(imgArray[i])+ ',' + st.db.escape(tidArray[i]);
@@ -1263,10 +1270,39 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
                                 if (results) {
                                     if (results[0]){
                                         if (results[0].length > 0) {
+                                            var output = [];
+                                            var imgArray = [];
+                                            var idArray = [];
+                                            if (results[0][0].attach){
+                                                imgArray = results[0][0].attach.split(',');
+                                                idArray = results[0][0].attachid.split(',');
+                                            }
+                                            for (var i = 0; i < idArray.length; i++ ){
+                                                var imjObject = {};
+                                                    imjObject.path = imgArray[i],
+                                                    imjObject.tid = idArray[i]
+                                                output.push(imjObject);
+                                            }
+                                            var tenData = {
+                                                type : results[0][0].type,
+                                                like_st : results[0][0].like_st,
+                                                countattch : results[0][0].countattch,
+                                                tenid : results[0][0].tenid,
+                                                title : results[0][0].title,
+                                                startdate : results[0][0].startdate,
+                                                comments : results[0][0].comments,
+                                                likes : results[0][0].likes,
+                                                id : results[0][0].id,
+                                                tn_attach : results[0][0].tn_attach,
+                                            };
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Ten details loaded successfully';
-                                            responseMessage.data = results[0];
+                                            responseMessage.data = {
+                                                tenDetails : tenData,
+                                                comments : results[1],
+                                                imageDetails : output
+                                            };
                                             res.status(200).json(responseMessage);
 
                                         }
@@ -2131,6 +2167,220 @@ Association.prototype.associationUpdateLiks = function(req,res,next){
             responseMessage.message = 'An error occurred !';
             res.status(500).json(responseMessage);
             console.log('Error associationLiks :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @type : DELETE
+ * @param req
+ * @param res
+ * @param next
+ * @description DELETE Ten Master Image
+ * @accepts json
+ * @param token* <int> token of login user
+ * @param id* <int> id of picture
+ */
+Association.prototype.associationDeleteTenImg = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.params.id)) || (req.params.id) < 1 ) {
+        error.id = 'Invalid Image id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.params.id);
+                        var procQuery = 'CALL delete_ten_master_attachment(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Image deleted successfully';
+                                    responseMessage.data = {};
+                                    res.status(200).json(responseMessage);
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in deleting img';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error :', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error:', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error:', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @type : DELETE
+ * @param req
+ * @param res
+ * @param next
+ * @description DELETE service image
+ * @accepts json
+ * @param token* <int> token of login user
+ * @param id* <int> id of picture
+ */
+Association.prototype.associationDeleteServiceImg = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.params.id)) || (req.params.id) < 1 ) {
+        error.id = 'Invalid Image id';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.params.id);
+                        var procQuery = 'CALL delete_service_picture(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Image deleted successfully';
+                                    responseMessage.data = {};
+                                    res.status(200).json(responseMessage);
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in deleting img';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error :', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error:', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error:', ex);
             var errorDate = new Date();
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }

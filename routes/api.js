@@ -21,10 +21,9 @@ router.all('*',function(req,res,next){
     next();
 });
 var minorVersion1Api = require('./api/minor-api.js');
-var configurationV1 =  require('./api/configuration.js');
 
 router.use('/v1.1',minorVersion1Api);
-router.use('/v1.1/configuration',configurationV1);
+
 /**
  * Services for MQTT Messaging Server Interface
  */
@@ -615,6 +614,8 @@ router.get('/association_ten_details',AssociationtModule.associationGetEventInfo
 router.post('/association_ten_details',AssociationtModule.saveAssociationTenMaster);
 router.put('/association_like',AssociationtModule.associationUpdateLiks);
 router.post('/association_opinion_poll',AssociationtModule.saveAssociationOpinionPoll);
+router.delete('/association_ten_img/:id',AssociationtModule.associationDeleteTenImg);
+router.delete('/association_service_img/:id',AssociationtModule.associationDeleteServiceImg);
 
 ////test-module
 //var Test = require('./modules/test-module.js');
