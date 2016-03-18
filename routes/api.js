@@ -15,6 +15,16 @@ var DbHelper = require('./../helpers/DatabaseHandler'),
 var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
 
+router.all('*',function(req,res,next){
+    req.db = db;
+    req.st = stdLib;
+    next();
+});
+var minorVersion1Api = require('./api/minor-api.js');
+var configurationV1 =  require('./api/configuration.js');
+
+router.use('/v1.1',minorVersion1Api);
+router.use('/v1.1/configuration',configurationV1);
 /**
  * Services for MQTT Messaging Server Interface
  */
@@ -182,7 +192,7 @@ router.get('/institute_group',configurationModule.getInstituteGroup);
 router.get('/institute_details',configurationModule.getInstituteConfig);
 router.get('/institute_group_details',configurationModule.getInstituteGroupDetails);
 router.delete('/job_institute/:job_id/:institute_id',configurationModule.deleteJobInstitute);
-//router.post('/configuration/working_schedule',configurationModule.saveWorkingSchedule);
+router.post('/configuration/working_schedule',configurationModule.saveWorkingSchedule);
 
 //Search module methods
 var Search = require('./modules/search-module.js');
@@ -603,6 +613,8 @@ router.get('/association_service_img',AssociationtModule.associationGetServiceIm
 router.post('/image_with_thumbnail',AssociationtModule.imageUploadWithThumbnail);
 router.get('/association_ten_details',AssociationtModule.associationGetEventInfo);
 router.post('/association_ten_details',AssociationtModule.saveAssociationTenMaster);
+router.put('/association_like',AssociationtModule.associationUpdateLiks);
+router.post('/association_opinion_poll',AssociationtModule.saveAssociationOpinionPoll);
 
 ////test-module
 //var Test = require('./modules/test-module.js');
