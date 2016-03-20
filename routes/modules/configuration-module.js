@@ -3766,7 +3766,6 @@ Configuration.prototype.getInstituteGroupDetails = function(req,res,next){
 
 };
 
-
 /**
  * New working hour API
  * Working Schedule for Businesses and Institutes
@@ -3982,6 +3981,128 @@ Configuration.prototype.saveWorkingSchedule = function(req,res,next){
             },
             data : null
         });
+    }
+};
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ * @discription : API to get working hour schedule for business and branches
+ * @param token <string> token of login user
+ * @param tid <int> (TID of login user or TID of branch depending upon whose working hours you want to update
+ */
+Configuration.prototype.getWorkingSchedule = function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+
+    else{
+        try {
+            if (req.query.token) {
+                st.validateToken(req.query.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var queryParams = st.db.escape(req.query.lat) + ',' + st.db.escape(req.query.long)+ ',' + st.db.escape(req.query.keywords);
+                            var query = 'CALL pFindInstituteconfig(' + queryParams + ')';
+                            console.log(query);
+                            st.db.query(query, function (err, institudeDetails) {
+
+                                if (!err) {
+                                    console.log(institudeDetails);
+                                    if (institudeDetails) {
+                                        if (institudeDetails[0]) {
+                                            if (institudeDetails[0].length > 0) {
+                                                responseMessage.status = true;
+                                                responseMessage.data = institudeDetails[0];
+                                                responseMessage.error = null;
+                                                responseMessage.message = ' Institude details Send successfully';
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else {
+                                                responseMessage.message = 'Institude details are not sent';
+                                                responseMessage.status = true;
+                                                res.json(responseMessage);
+                                            }
+                                        }
+                                        else {
+                                            responseMessage.message = 'Institude details are not sent';
+                                            res.json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.message = 'Institude details are not sent';
+                                        res.json(responseMessage);
+                                    }
+
+                                }
+                                else {
+                                    responseMessage.data = null;
+                                    responseMessage.message = 'Error in getting Institude details';
+                                    console.log('getInstituteConfig: Error in getting Institude details' + err);
+                                    res.status(500).json(responseMessage);
+                                }
+                            });
+                        }
+                        else {
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'Invalid Token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('getInstituteConfig: Invalid token');
+                        }
+                    }
+                    else {
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'Error in validating Token';
+                        res.status(500).json(responseMessage);
+                        console.log('getInstituteConfig:Error in processing Token' + err);
+                    }
+                });
+            }
+
+            else {
+                if (!req.query.token) {
+                    responseMessage.message = 'Invalid Token';
+                    responseMessage.error = {
+                        Token : 'Invalid Token'
+                    };
+                    console.log('getInstituteConfig: Token is mandatory field');
+                }
+
+                res.status(401).json(responseMessage);
+            }
+        }
+        catch (ex) {
+            responseMessage.error = {};
+            responseMessage.message = 'An error occured !';
+            console.log('getInstituteConfig:error ' + ex.description);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            res.status(400).json(responseMessage);
+        }
     }
 };
 

@@ -19,14 +19,16 @@ exports.getDBContext = function () {
     console.log("TEST TEST TEST ");
 
 
-    var pool = mysql.createConnection({
+    var pool = mysql.createPool({
         host: db_server,
         port: db_port,
         database: db_collection,
         user: 'root',
         //password: 'ezeid',
         password: 'Test_Ezeid2015#db',
-        multipleStatements: true
+        multipleStatements: true,
+        waitForConnection : true,
+        queueLimit : 0
     });
     return pool;
 

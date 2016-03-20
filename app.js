@@ -23,7 +23,7 @@ app.use(multer({
     limits: {
         fieldNameSize: 200,
         files: 10,
-        fields: 1,
+        fields: 50,
         fileSize : (1024*1024*5)
     }
 }));

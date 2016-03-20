@@ -15,6 +15,15 @@ var DbHelper = require('./../helpers/DatabaseHandler'),
 var StdLib = require('./modules/std-lib.js');
 var stdLib = new StdLib(db);
 
+router.all('*',function(req,res,next){
+    req.db = db;
+    req.st = stdLib;
+    next();
+});
+var minorVersion1Api = require('./api/minor-api.js');
+
+router.use('/v1.1',minorVersion1Api);
+
 /**
  * Services for MQTT Messaging Server Interface
  */
@@ -182,6 +191,7 @@ router.get('/institute_group',configurationModule.getInstituteGroup);
 router.get('/institute_details',configurationModule.getInstituteConfig);
 router.get('/institute_group_details',configurationModule.getInstituteGroupDetails);
 router.delete('/job_institute/:job_id/:institute_id',configurationModule.deleteJobInstitute);
+router.post('/configuration/working_schedule',configurationModule.saveWorkingSchedule);
 
 //Search module methods
 var Search = require('./modules/search-module.js');
@@ -595,13 +605,22 @@ var Association = require('./modules/association-module.js');
 var AssociationtModule = new Association(db,stdLib);
 router.get('/association_details',AssociationtModule.associGetEventDtl);
 router.post('/association_comments',AssociationtModule.associSaveComments);
-router.post('/test_abc',AssociationtModule.testXYZ);
 router.get('/asscociation_service',AssociationtModule.getAsscociationServices);
+router.post('/association_service',AssociationtModule.saveAssociationServices);
+router.put('/association_service',AssociationtModule.updateAssociationServices);
+router.get('/association_service_img',AssociationtModule.associationGetServiceImg);
+router.post('/image_with_thumbnail',AssociationtModule.imageUploadWithThumbnail);
+router.get('/association_ten_details',AssociationtModule.associationGetEventInfo);
+router.post('/association_ten_details',AssociationtModule.saveAssociationTenMaster);
+router.put('/association_like',AssociationtModule.associationUpdateLiks);
+router.post('/association_opinion_poll',AssociationtModule.saveAssociationOpinionPoll);
+router.delete('/association_ten_img/:id',AssociationtModule.associationDeleteTenImg);
+router.delete('/association_service_img/:id',AssociationtModule.associationDeleteServiceImg);
 
 ////test-module
 //var Test = require('./modules/test-module.js');
 //var TestModule = new Test(db,stdLib);
-//router.post('/test',TestModule.test);
+//router.post('/_test',TestModule.imageResizeTest);
 
 
 router.get('/api_health',function(req,res){
