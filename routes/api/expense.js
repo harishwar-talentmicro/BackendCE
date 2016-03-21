@@ -389,14 +389,14 @@ router.delete('/expense_type/:id', function(req,res,next){
  * @param res
  * @param next
  * @param token* <string> token of login user
- * @param date <date> date
+ * @param date* <date> date
  * @param exp_id* <int> expense type id
- * @param description* <varchar> description
- * @param bill_no <string> bill_no
+ * @param description <varchar> description
+ * @param bill_no* <string> bill_no
  * @param payment_ref <string> payment refernece no
- * @param amount <double> amount
+ * @param amount* <double> amount
  * @param notes <string> notes
- * @param service_mid <int> service_mid is service master id
+ * @param service_mid* <int> service_mid is service master id
  *
  * @discription : API to save amount of expense type
  */
@@ -414,8 +414,20 @@ router.post('/expense_type_amount', function(req,res,next){
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if (!req.body.expense_type) {
-        error.expense_type = 'Expense type can not be null';
+    if (!req.body.date) {
+        error.date = 'Date can not be null';
+        validationFlag *= false;
+    }
+    if (!req.body.bill_no) {
+        error.bill_no = 'Bill Number can not be null';
+        validationFlag *= false;
+    }
+    if (!req.body.exp_id) {
+        error.exp_id = 'Expense type can not be null';
+        validationFlag *= false;
+    }
+    if (!req.body.amount) {
+        error.amount = 'Amount can not be null';
         validationFlag *= false;
     }
     if (isNaN(parseInt(req.body.service_mid)) || (req.body.service_mid) < 0 ) {
@@ -568,6 +580,10 @@ router.get('/expense_type_amount', function(req,res,next){
         error.service_mid = 'Invalid service master id';
         validationFlag *= false;
     }
+    if (isNaN(parseInt(req.query.exp_typ_id)) || (req.query.exp_typ_id) < 0 ) {
+        error.exp_typ_id = 'Invalid expense type id';
+        validationFlag *= false;
+    }
     if (!validationFlag) {
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -576,6 +592,8 @@ router.get('/expense_type_amount', function(req,res,next){
     }
     else {
         try {
+            req.query.f_date = (req.query.f_date) ? req.query.f_date : '';
+            req.query.t_date = (req.query.t_date) ? req.query.t_date : '';
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
@@ -675,7 +693,7 @@ router.get('/expense_type_amount', function(req,res,next){
  * @param id* <int> expense type id
  * @param token* <string> token of login user
  *
- * @discription : API to save expense type amount
+ * @discription : API to delete expense type amount
  */
 router.delete('/expense_type_amount/:id', function(req,res,next){
     var responseMessage = {
@@ -707,7 +725,7 @@ router.delete('/expense_type_amount/:id', function(req,res,next){
                 if (!err) {
                     if (tokenResult) {
                         var procParams = req.db.escape(req.params.id);
-                        var procQuery = 'CALL delete_expense_type(' + procParams + ')';
+                        var procQuery = 'CALL delete_expense_type_amt(' + procParams + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
                             if (!err) {
