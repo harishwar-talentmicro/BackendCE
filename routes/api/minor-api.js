@@ -5,11 +5,13 @@ var configurationV1 =  require('./configuration.js');
 var recruitmentV1 =  require('./recruitment/recruitment-master.js');
 var infoV1 =  require('./info/info.js');
 var expenseV1 =  require('./expense.js');
+var utilities =  require('./utilities/utilities.js');
 
 router.use('/configuration',configurationV1);
 router.use('/recruitment',recruitmentV1);
 router.use('/info',infoV1);
 router.use('/expense',expenseV1);
+router.use('/utilities',utilities);
 
 router.get('/test',function(req,res,next){
     var query = 'select * from tmaster WHERE EZEID = ' + req.db.escape("@SGOWRI2");
