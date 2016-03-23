@@ -448,7 +448,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
 
                                                 console.log('FnRegistration:tmaster: Registration success');
 
-                                                var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(token)+ ',' + st.db.escape('');
+                                                var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid)
+                                                    + ',' + st.db.escape(token)+ ',' + st.db.escape('');
                                                 var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
                                                 st.db.query(query1, function (err, updateResult) {
                                                     if (!err) {
@@ -518,7 +519,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
 
                                             else {
                                                 console.log('FnRegistration: tmaster: Update operation success');
-                                                var queryParams3 = st.db.escape(pin) + ',' + st.db.escape(ezeid)+ ',' + st.db.escape(token) + ',' + st.db.escape('');
+                                                var queryParams3 = st.db.escape(pin) + ',' + st.db.escape(ezeid)
+                                                    + ',' + st.db.escape(token) + ',' + st.db.escape('');
                                                 var query3 = 'CALL pupdateEZEoneKeywords(' + queryParams3 + ')';
                                                 st.db.query(query3, function (err, updateResult) {
                                                     if (!err) {
@@ -642,7 +644,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
 
                                                     console.log('FnRegistration:tmaster: Registration success');
 
-                                                    var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(token)+ ',' + st.db.escape('');
+                                                    var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid)
+                                                        + ',' + st.db.escape(token)+ ',' + st.db.escape('');
                                                     var query1 = 'CALL pupdateEZEoneKeywords(' + queryParams1 + ')';
                                                     st.db.query(query1, function (err, updateResult) {
                                                         if (!err) {
@@ -700,7 +703,8 @@ Alumni.prototype.registerAlumni = function(req,res,next){
                                                     }
                                                 }
                                                 else {
-                                                    var queryParams2 = st.db.escape(pin) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(token)+ ',' + st.db.escape('');
+                                                    var queryParams2 = st.db.escape(pin) + ',' + st.db.escape(ezeid)
+                                                        + ',' + st.db.escape(token)+ ',' + st.db.escape('');
                                                     var query2 = 'CALL pupdateEZEoneKeywords(' + queryParams2 + ')';
                                                     console.log(query2);
                                                     st.db.query(query2, function (err, getResult) {

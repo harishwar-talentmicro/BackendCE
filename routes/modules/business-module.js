@@ -55,6 +55,7 @@ function alterEzeoneId(ezeoneId){
 var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
     /**
      * We are getting ezeid then compairing EZEID with TOEZEID
+     * We are getting ezeid then compairing EZEID with TOEZEID
      * if EZEID's are not same then only notifications will be sent.
      */
 
