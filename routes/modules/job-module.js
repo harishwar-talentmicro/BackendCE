@@ -1180,7 +1180,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
                     + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount) + ',' + st.db.escape(source)
                     + ',' + st.db.escape(token) + ',' + st.db.escape(educationMatrix) + ',' + st.db.escape(loc)
                     + ',' + st.db.escape(filterType)+',' + st.db.escape(gender)+',' + st.db.escape(locSkills.locIds) + ','+
-                    st.db.escape(req.body.skillKeywords);
+                    st.db.escape(req.body.skillKeywords)+','+st.db.escape(req.body.flag);
 
                 var query = 'CALL pGetjobseekers(' + queryParams + ')';
                 console.log(query);

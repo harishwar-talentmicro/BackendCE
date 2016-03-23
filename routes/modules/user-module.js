@@ -3049,8 +3049,30 @@ User.prototype.webLinkRedirect = function(req,res,next) {
 
         if(arr.length > 1){
             if(arr[1].toUpperCase() == 'MAP'){
-                res.redirect('/'+alterEzeoneId(arr[0]) + req.CONFIG.CONSTANT.MAP_REDIRECT_LINK);
+                //res.redirect('/'+alterEzeoneId(arr[0]) + req.CONFIG.CONSTANT.MAP_REDIRECT_LINK);
 
+                var geolocationQuery = "SELECT Latitude, Longitude FROM tmaster WHERE ezeid = " + st.db.escape(alterEzeoneId(arr[0]));
+
+                st.db.query(geolocationQuery,function(err,geoResult){
+                   if(err){
+                        console.log('Error','Weblink redirect function error');
+                        res.redirect("https://www.ezeone.com");
+                   }
+                   else {
+                       var GOOGLE_MAP_URL = " https://www.google.com/maps/place/";
+                       if (geoResult && geoResult[0]) {
+                           res.redirect(GOOGLE_MAP_URL + geoResult[0].Latitude +
+                               "+" + geoResult[0].Longitude + "/@" + geoResult[0].Latitude + "," + geoResult[0].Longitude + "," + "16z")
+                       }
+                       else {
+                           res.redirect("https://www.ezeone.com");
+                       }
+                   }
+                });
+                //var GOOGLE_MAP_URL = " https://www.google.com/maps/place/";
+                //res.redirect(GOOGLE_MAP_URL + latitute +  "+" + longitude + "/@"+latitude+","+longitude+","+"16z")
+
+                //https://www.google.com/maps/place/40.7028722+-73.9868281/@40.7028722,-73.9868281,15z
             }
 
             else {
