@@ -111,21 +111,24 @@ NotificationMqtt.prototype.limitMessage = function(message,limit){
 
 
 
-        var bufsize = Buffer.byteLength(msgStr);
-        console.log('original message buffer size : '+bufsize);
-        console.log(typeof(bufsize));
-        if (bufsize > 1024){
-            var buf = new Buffer(1024);
-            buf.write(msgStr);
-            var stringMessage = buf.toString('utf8');
-            var stringbufsize = Buffer.byteLength(stringMessage);
-            msgStr = stringMessage;
-        }
+        //var bufsize = Buffer.byteLength(msgStr);
+        //console.log('original message buffer size : '+bufsize);
+        //console.log(typeof(bufsize));
+        //if (bufsize > 1024){
+        //    var buf = new Buffer(1024);
+        //    buf.write(msgStr);
+        //    var stringMessage = buf.toString('utf8');
+        //    var stringbufsize = Buffer.byteLength(stringMessage);
+        //    msgStr = stringMessage;
+        //}
 
         return msgStr;
     };
-
-    var withoutHtml =  cutMessage(convertHtmlToText(message));
+    console.log('message ',message);
+    var withoutHtml =  (message) ? cutMessage(convertHtmlToText(message)) : '';
+    if(!withoutHtml){
+        console.log('message is empty');
+    }
     return withoutHtml;
 };
 

@@ -616,6 +616,8 @@ router.put('/association_like',AssociationtModule.associationUpdateLiks);
 router.post('/association_opinion_poll',AssociationtModule.saveAssociationOpinionPoll);
 router.delete('/association_ten_img/:id',AssociationtModule.associationDeleteTenImg);
 router.delete('/association_service_img/:id',AssociationtModule.associationDeleteServiceImg);
+router.put('/association_ten_status',AssociationtModule.associationUpdateTenStatus);
+router.get('/association_op_option',AssociationtModule.associationGetOPoptions);
 
 ////test-module
 //var Test = require('./modules/test-module.js');
