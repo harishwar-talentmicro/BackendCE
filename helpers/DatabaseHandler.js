@@ -28,7 +28,8 @@ exports.getDBContext = function () {
         password: 'Test_Ezeid2015#db',
         multipleStatements: true,
         waitForConnection : true,
-        queueLimit : 0
+        queueLimit : 0,
+        dateStrings : true
     });
     return pool;
 

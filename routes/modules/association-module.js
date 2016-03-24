@@ -13,13 +13,15 @@ var gcloud = require('gcloud');
 var fs = require('fs');
 var path = require('path');
 var util = require( "util" );
+var Notification = require('./notification/notification-master.js');
+var notification = null;
 
 var st = null;
 function Association(db,stdLib){
 
     if(stdLib){
         st = stdLib;
-
+        notification = new Notification(db,stdLib);
     }
 };
 function alterEzeoneId(ezeoneId){
@@ -83,7 +85,7 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
             console.log('callback is required for uploadDocumentToCloud');
         }
     });
-};
+    };
 
 /**
  * @type : GET
@@ -96,6 +98,7 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
  * @param service_mid <int> service master id
  * @param pg_no <int> page number
  * @param limit <int> limit
+ * @param status <int> status (in case of admin)
  *
  */
 Association.prototype.associGetEventDtl = function(req,res,next){
@@ -125,11 +128,13 @@ Association.prototype.associGetEventDtl = function(req,res,next){
         try {
             req.query.pg_no = (req.query.pg_no) ? req.query.pg_no : 1;
             req.query.limit = (req.query.limit) ? req.query.limit : 10;
+            req.query.status = (req.query.status) ? req.query.status : null;
             st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
                         var procParams = st.db.escape(req.query.token) + ',' + st.db.escape(req.query.service_mid)
-                            + ',' + st.db.escape(req.query.pg_no)+ ',' + st.db.escape(req.query.limit);
+                            + ',' + st.db.escape(req.query.pg_no)+ ',' + st.db.escape(req.query.limit)
+                            + ',' + st.db.escape(req.query.status);
                         var procQuery = 'CALL pGetAlumni_eventdetails(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -264,7 +269,7 @@ Association.prototype.associSaveComments = function(req,res,next){
             st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.body.ten_id)+ ',' + st.db.escape(req.body.comment)
+                        var procParams = st.db.escape(req.body.ten_id)+ ',' + st.db.escape(req.body.comments)
                             + ',' + st.db.escape(req.body.token)+ ',' + st.db.escape(req.body.poll_opt_id);
                         var procQuery = 'CALL pSave_comments(' + procParams + ')';
                         console.log(procQuery);
@@ -414,6 +419,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                         st.db.query(query, function (err, serviceResult) {
                             if (!err) {
                                 if (serviceResult) {
+                                    console.log(serviceResult);
                                     if(serviceResult[0]){
                                         if(serviceResult[1]){
                                             responseMessage.data1 = serviceResult[0];
@@ -783,7 +789,41 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                     };
                                                     res.status(200).json(responseMessage);
                                                 }
-
+                                                var notiQueryParams = st.db.escape(req.body.service_mid) + ',' + st.db.escape(req.body.token);
+                                                var notiQuery = 'CALL get_admin_notif_details(' + notiQueryParams + ')';
+                                                console.log("notiQuery",notiQuery);
+                                                st.db.query(notiQuery, function (err, notiResult) {
+                                                    if (!err) {
+                                                        if (notiResult) {
+                                                            console.log(notiResult);
+                                                            if (notiResult[0]){
+                                                               if (notiResult[0].length > 0){
+                                                                   var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                   for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                       var receiverId = notiResult[0][i].g_title;
+                                                                       var senderTitle = notiResult[1][0].s_title;
+                                                                       var groupTitle = notiResult[0][i].g_title;
+                                                                       var groupId = notiResult[0][i].gid;
+                                                                       var messageText ='New support request from ' + fn + '.';
+                                                                       var data = {
+                                                                           ten_id : results[0][0]._i,
+                                                                           sm_id : req.body.service_mid
+                                                                       };
+                                                                       /**
+                                                                        * messageType 14 is for helpdesk request to admin
+                                                                        */
+                                                                       var messageType = 14;
+                                                                       var operationType = 0;
+                                                                       var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                       console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                       notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                       console.log("Notification Send");
+                                                                   }
+                                                               }
+                                                            }
+                                                        }
+                                                    }
+                                                });
                                             }
                                             else {
                                                 responseMessage.status = false;
@@ -1279,7 +1319,7 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
                                             }
                                             for (var i = 0; i < idArray.length; i++ ){
                                                 var imjObject = {};
-                                                    imjObject.path = imgArray[i],
+                                                    imjObject.pic=imgArray[i],
                                                     imjObject.tid = idArray[i]
                                                 output.push(imjObject);
                                             }
@@ -1290,10 +1330,14 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
                                                 tenid : results[0][0].tenid,
                                                 title : results[0][0].title,
                                                 startdate : results[0][0].startdate,
+                                                enddate : results[0][0].enddate,
                                                 comments : results[0][0].comments,
                                                 likes : results[0][0].likes,
                                                 id : results[0][0].id,
                                                 tn_attach : results[0][0].tn_attach,
+                                                posted_by : results[0][0].posted_by,
+                                                description : results[0][0].description,
+                                                status : results[0][0].status
                                             };
                                             responseMessage.status = true;
                                             responseMessage.error = null;
@@ -1301,6 +1345,7 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
                                             responseMessage.data = {
                                                 tenDetails : tenData,
                                                 comments : results[1],
+                                                opinion_poll : results[2],
                                                 imageDetails : output
                                             };
                                             res.status(200).json(responseMessage);
@@ -1539,28 +1584,16 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
             error['token'] = 'Invalid token';
             validationFlag *= false;
         }
-        if (!req.body.status) {
-            error['status'] = 'Invalid status';
-            validationFlag *= false;
-        }
         if (!req.body.type) {
             error['type'] = 'Invalid type';
             validationFlag *= false;
         }
+        if (!req.body.title) {
+            error['title'] = 'Invalid title';
+            validationFlag *= false;
+        }
         if (!req.body.code) {
             error['code'] = 'Invalid code';
-            validationFlag *= false;
-        }
-        if (!req.body.note) {
-            error['note'] = 'Invalid code';
-            validationFlag *= false;
-        }
-        if (!req.body.venueId) {
-            error['venueId'] = 'Invalid code';
-            validationFlag *= false;
-        }
-        if (!req.body.title) {
-            error['title'] = 'Invalid code';
             validationFlag *= false;
         }
         if (!validationFlag) {
@@ -1571,11 +1604,16 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
         }
         else {
             try {
+                var tenType = ['training','event','news','knowledge','opinion-poll'];
                 req.body.ten_id = (req.body.ten_id) ? req.body.ten_id : 0;      // while saving time 0 else id of user
                 req.body.s_date = (req.body.s_date) ? (req.body.s_date) : null;
                 req.body.e_date = (req.body.e_date) ? (req.body.e_date) : null;
                 req.body.reg_lastdate = (req.body.reg_lastdate) ? (req.body.reg_lastdate) : null;
-                req.body.code = alterEzeoneId(req.body.code);
+                req.body.code = (req.body.code) ? alterEzeoneId(req.body.code) : '';
+                req.body.venueId = (req.body.venueId) ? req.body.venueId : 0;
+                req.body.status = (req.body.status) ? req.body.status : 1;
+                req.body.note = (req.body.note) ? req.body.note : '';
+                req.body.description = (req.body.description) ? req.body.description : '';
                 req.body.capacity = (req.body.capacity) ? (req.body.capacity) : 0;
                 var imgObject = (req.body.image_details) ? req.body.image_details : '';
                 st.validateToken(req.body.token, function (err, tokenResult) {
@@ -1656,7 +1694,6 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                         });
                                                     }
                                                     else {
-                                                        console.log("output",outputArray);
                                                         responseMessage.status = true;
                                                         responseMessage.error = null;
                                                         responseMessage.message = 'Service posted successfully';
@@ -1666,7 +1703,41 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                         };
                                                         res.status(200).json(responseMessage);
                                                     }
-
+                                                    var notiQueryParams = st.db.escape(req.body.code) + ',' + st.db.escape(req.body.token);
+                                                    var notiQuery = 'CALL get_admin_ten_notify(' + notiQueryParams + ')';
+                                                    console.log("notiQuery",notiQuery);
+                                                    st.db.query(notiQuery, function (err, notiResult) {
+                                                        if (!err) {
+                                                            if (notiResult) {
+                                                                console.log(notiResult);
+                                                                if (notiResult[0]){
+                                                                    if (notiResult[0].length > 0){
+                                                                        var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                            var receiverId = notiResult[0][i].g_title;
+                                                                            var senderTitle = notiResult[1][0].s_title;
+                                                                            var groupTitle = notiResult[0][i].g_title;
+                                                                            var groupId = notiResult[0][i].gid;
+                                                                            var messageText = 'New '+ tenType[req.body.type]+ ' from ' + fn +' for Approval.';
+                                                                            var data = {
+                                                                                ten_id : results[0][0].id,
+                                                                                sm_id : notiResult[2][0].sm_id
+                                                                            };
+                                                                            /**
+                                                                             * messageType 16 is for helpdesk request to admin
+                                                                             */
+                                                                            var messageType = 16;
+                                                                            var operationType = 0;
+                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                            console.log("Notification Send");
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    });
                                                 }
                                                 else {
                                                     responseMessage.status = false;
@@ -1794,24 +1865,12 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
             error['token'] = 'Invalid token';
             validationFlag *= false;
         }
-        if (!req.body.status) {
-            error['status'] = 'Invalid status';
-            validationFlag *= false;
-        }
         if (!req.body.type) {
             error['type'] = 'Invalid type';
             validationFlag *= false;
         }
         if (!req.body.code) {
             error['code'] = 'Invalid code';
-            validationFlag *= false;
-        }
-        if (!req.body.note) {
-            error['note'] = 'Invalid code';
-            validationFlag *= false;
-        }
-        if (!req.body.venueId) {
-            error['venueId'] = 'Invalid code';
             validationFlag *= false;
         }
         if (!req.body.title) {
@@ -1834,7 +1893,11 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                 req.body.s_date = (req.body.s_date) ? (req.body.s_date) : null;
                 req.body.e_date = (req.body.e_date) ? (req.body.e_date) : null;
                 req.body.reg_lastdate = (req.body.reg_lastdate) ? (req.body.reg_lastdate) : null;
-                req.body.code = alterEzeoneId(req.body.code);
+                req.body.code = (req.body.code) ? alterEzeoneId(req.body.code) : '';
+                req.body.venueId = (req.body.venueId) ? req.body.venueId : 0;
+                req.body.status = (req.body.status) ? req.body.status : 1;
+                req.body.note = (req.body.note) ? req.body.note : '';
+                req.body.description = (req.body.description) ? req.body.description : '';
                 req.body.capacity = (req.body.capacity) ? (req.body.capacity) : 0;
                 var imgObject = (req.body.image_details) ? req.body.image_details : '';
                 var optionObj = req.body.option_details;
@@ -1870,7 +1933,7 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                             optionArray.push(optionObj[k].option);
                                                         }
                                                         for (var i = 0; i < optionArray.length; i++ ){
-                                                            var optionQueryParams = st.db.escape(optionArray[i]) + ',' + st.db.escape(results[0][0].id);
+                                                            var optionQueryParams =  st.db.escape(results[0][0].id) + ',' +st.db.escape(optionArray[i]);
                                                             combOptionQuery +=  ('CALL post_opinion_poll_option(' + optionQueryParams + ');');
                                                         }
                                                         console.log(combOptionQuery);
@@ -1976,6 +2039,41 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                         };
                                                         res.status(200).json(responseMessage);
                                                     }
+                                                    var notiQueryParams = st.db.escape(req.body.code) + ',' + st.db.escape(req.body.token);
+                                                    var notiQuery = 'CALL get_admin_ten_notify(' + notiQueryParams + ')';
+                                                    console.log("notiQuery",notiQuery);
+                                                    st.db.query(notiQuery, function (err, notiResult) {
+                                                        if (!err) {
+                                                            if (notiResult) {
+                                                                console.log(notiResult);
+                                                                if (notiResult[0]){
+                                                                    if (notiResult[0].length > 0){
+                                                                        var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                            var receiverId = notiResult[0][i].g_title;
+                                                                            var senderTitle = notiResult[1][0].s_title;
+                                                                            var groupTitle = notiResult[0][i].g_title;
+                                                                            var groupId = notiResult[0][i].gid;
+                                                                            var messageText = 'New opinion-poll from ' + fn +' for Approval.';
+                                                                            var data = {
+                                                                                ten_id : results[0][0].id,
+                                                                                sm_id : notiResult[2][0].sm_id
+                                                                            };
+                                                                            /**
+                                                                             * messageType 16 is for helpdesk request to admin
+                                                                             */
+                                                                            var messageType = 16;
+                                                                            var operationType = 0;
+                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                            console.log("Notification Send");
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    });
 
                                                 }
                                                 else {
@@ -2385,6 +2483,286 @@ Association.prototype.associationDeleteServiceImg = function(req,res,next){
             console.log(errorDate.toTimeString() + ' ......... error ...........');
         }
     }
+};
+
+/**
+ * @type : PUT
+ * @param req
+ * @param res
+ * @param next
+ * @description update association likes
+ * @accepts json
+ * @param token <string> token of login user
+ * @param ten_id <int> id of a event or notice
+ * @param status <int> status given by admin
+ */
+Association.prototype.associationUpdateTenStatus = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.body.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.ten_id)) || (req.body.ten_id) < 1 ) {
+        error.ten_id = 'Invalid ten id';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.body.status)) || (req.body.status) < 0 ) {
+        error.status = 'Invalid status';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            var tenType = ['training','event','news','knowledge','opinion-poll'];
+            st.validateToken(req.body.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.body.ten_id) + ',' + st.db.escape(req.body.status);
+                        var procQuery = 'CALL pupdate_ten_status(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Status updated successfully';
+                                    responseMessage.data = null
+                                    res.status(200).json(responseMessage);
+                                    //if (parseInt(req.body.status) == 3){
+                                    //    var notiQueryParams = st.db.escape(req.body.code) + ',' + st.db.escape(req.body.token);
+                                    //    var notiQuery = 'CALL get_admin_ten_notify(' + notiQueryParams + ')';
+                                    //    console.log("notiQuery",notiQuery);
+                                    //    st.db.query(notiQuery, function (err, notiResult) {
+                                    //        if (!err) {
+                                    //            if (notiResult) {
+                                    //                console.log(notiResult);
+                                    //                if (notiResult[0]){
+                                    //                    if (notiResult[0].length > 0){
+                                    //                        var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                    //                        for (var i = 0; i < notiResult[0].length; i++ ){
+                                    //                            var receiverId = notiResult[0][i].g_title;
+                                    //                            var senderTitle = notiResult[1][0].s_title;
+                                    //                            var groupTitle = notiResult[0][i].g_title;
+                                    //                            var groupId = notiResult[0][i].gid;
+                                    //                            var messageText = 'New '+tenType[notiResult[2][0].type]+ ':'+ notiResult[2][0].title+' published.';
+                                    //                            var data = {
+                                    //                                ten_id : results[0][0].id,
+                                    //                                sm_id : notiResult[2][0].sm_id
+                                    //                            };
+                                    //                            /**
+                                    //                             * messageType 16 is for helpdesk request to admin
+                                    //                             */
+                                    //                            var messageType = 16;
+                                    //                            var operationType = 0;
+                                    //                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                    //                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                    //                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                    //                            console.log("Notification Send");
+                                    //                        }
+                                    //                    }
+                                    //                }
+                                    //            }
+                                    //        }
+                                    //    });
+                                    //}
+                                }
+                                else {
+                                    responseMessage.status = false;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Error in updating status';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : save_ten_likes ', err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else {
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log('associationLiks: Invalid token');
+                    }
+                }
+                else {
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error : associationLiks ', err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch (ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error associationLiks :  ', ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+};
+
+/**
+ * @type : GET
+ * @param req
+ * @param res
+ * @param next
+ * @description get all options of opinion poll
+ * @accepts json
+ *
+ * @param token <string> token of login user
+ * @param ten_id <int> ten_id id of opinion poll
+ *
+ */
+Association.prototype.associationGetOPoptions = function(req,res,next){
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if(!req.query.token){
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (isNaN(parseInt(req.query.ten_id))){
+        error.ten_id = 'Invalid service id';
+        validationFlag *= false;
+    }
+    if(!validationFlag){
+        responseMessage.error = error;
+        responseMessage.message = 'Please check the errors';
+        res.status(400).json(responseMessage);
+        console.log(responseMessage);
+    }
+    else {
+        try {
+            st.validateToken(req.query.token, function (err, tokenResult) {
+                if (!err) {
+                    if (tokenResult) {
+                        var procParams = st.db.escape(req.query.ten_id) ;
+                        var procQuery = 'CALL get_op_poll_options(' + procParams + ')';
+                        console.log(procQuery);
+                        st.db.query(procQuery, function (err, results) {
+                            if (!err) {
+                                console.log(results);
+                                if (results) {
+                                    if (results[0]){
+                                        if (results[0].length > 0) {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Options loaded successfully';
+                                            responseMessage.data = results[0];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                        else {
+                                            responseMessage.status = true;
+                                            responseMessage.error = null;
+                                            responseMessage.message = 'Option are not available';
+                                            responseMessage.data = [];
+                                            res.status(200).json(responseMessage);
+                                        }
+                                    }
+                                    else {
+                                        responseMessage.status = true;
+                                        responseMessage.error = null;
+                                        responseMessage.message = 'Option are not available';
+                                        responseMessage.data = null;
+                                        res.status(200).json(responseMessage);
+                                    }
+                                }
+                                else {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Option are not available';
+                                    responseMessage.data = null;
+                                    res.status(200).json(responseMessage);
+                                }
+                            }
+                            else {
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                responseMessage.message = 'An error occurred !';
+                                res.status(500).json(responseMessage);
+                                console.log('Error : ',err);
+                                var errorDate = new Date();
+                                console.log(errorDate.toTimeString() + ' ......... error ...........');
+
+                            }
+                        });
+                    }
+                    else{
+                        responseMessage.message = 'Invalid token';
+                        responseMessage.error = {
+                            token: 'invalid token'
+                        };
+                        responseMessage.data = null;
+                        res.status(401).json(responseMessage);
+                        console.log(': Invalid token');
+                    }
+                }
+                else{
+                    responseMessage.error = {
+                        server: 'Internal Server Error'
+                    };
+                    responseMessage.message = 'An error occurred !';
+                    res.status(500).json(responseMessage);
+                    console.log('Error :  ',err);
+                    var errorDate = new Date();
+                    console.log(errorDate.toTimeString() + ' ......... error ...........');
+                }
+            });
+        }
+        catch(ex) {
+            responseMessage.error = {
+                server: 'Internal Server Error'
+            };
+            responseMessage.message = 'An error occurred !';
+            res.status(500).json(responseMessage);
+            console.log('Error :  ',ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+        }
+    }
+
 };
 
 module.exports = Association;
