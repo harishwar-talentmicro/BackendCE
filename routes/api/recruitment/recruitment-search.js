@@ -158,4 +158,140 @@ router.get('/institute',function(req,res,next){
     }
 });
 
+
+router.post('/job_seeker',function(req,res,next){
+
+    //var token = "1e505ef5-f1ab-11e5-9ed2-42010af0ea4e";
+    var token = req.body.token;
+// 1 means internal (own db)
+// 2 means ezeone db
+//    var source = "1";
+    var source = (req.body.source) ? req.body.source : "1,2";
+    var skillKeywords = req.body.skillKeywords;
+    //var skillKeywords = "";
+    var start = req.body.page_count;
+    var limit = req.body.page_size;
+
+    //var gender = "0";
+    var gender = req.body.gender;
+
+
+
+    var source1GenderQuery = "";
+    if(gender){
+        source1GenderQuery = " AND FIND_IN_SET(tcv.Gender,"+gender+") ";
+    }
+
+    /**
+     * @login_tid TID of a user who is logged in (from tmaster)
+     */
+    var jobSeekerQuery =
+        "SET @user_ids = (SELECT get_account_users("+req.db.escape(token)+"));";
+
+    if(source){
+        switch (source){
+            case "1,2" :
+                jobSeekerQuery +=
+                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
+                     CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
+                tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
+                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
+                jobSeekerQuery += (skillKeywords) ? "AND MATCH (tcv.KeySkills) AGAINST ("+req.db.escape(skillKeywords) +")" : "";
+                jobSeekerQuery +=
+                    "UNION " +
+                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
+                    tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
+                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv \
+                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
+                jobSeekerQuery += (skillKeywords) ? "AND MATCH (tcv.KeySkills) AGAINST ("+req.db.escape(skillKeywords) +")" : "";
+                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+";"
+
+                jobSeekerQuery += "SELECT FOUND_ROWS() AS count;";
+
+                break;
+
+            case "2,1":
+                jobSeekerQuery +=
+                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
+                     CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
+                tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
+                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
+                    + source2GenderQuery;
+                jobSeekerQuery += (skillKeywords) ? "AND MATCH (tcv.KeySkills) AGAINST ("+req.db.escape(skillKeywords) +")" : "";
+                jobSeekerQuery +=
+                    "UNION " +
+                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
+                    tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
+                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv \
+                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery;
+                jobSeekerQuery += (skillKeywords) ? "AND MATCH (tcv.KeySkills) AGAINST ("+req.db.escape(skillKeywords) +")" : "";
+                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+";"
+
+                jobSeekerQuery += "SELECT FOUND_ROWS() AS count;";
+
+                break;
+
+            case "2":
+                jobSeekerQuery +=
+                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
+                    tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
+                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv \
+                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
+                jobSeekerQuery += (skillKeywords) ? "AND MATCH (tcv.KeySkills) AGAINST ("+req.db.escape(skillKeywords) +")" : "";
+                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+";"
+
+                jobSeekerQuery += "SELECT FOUND_ROWS() AS count;";
+
+                break;
+
+            default :
+
+                jobSeekerQuery +=
+                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
+                     CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
+                tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
+                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)"
+                jobSeekerQuery += (skillKeywords) ? "AND MATCH (tcv.KeySkills) AGAINST ("+req.db.escape(skillKeywords) +")" : "";
+                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+";"
+
+                jobSeekerQuery += "SELECT FOUND_ROWS() AS count; ";
+                break;
+        }
+    }
+
+    jobSeekerQuery += "SELECT @user_ids AS users;"
+
+//console.log(jobSeekerQuery);
+
+    req.db.query(jobSeekerQuery,function(err,results){
+        if(err){
+            console.log('err',err);
+            res.status(400).json(err);
+        }
+        else{
+            console.error('results',results);
+            var respMsg = {
+                status : true,
+                message : "Job seeker result loaded successfully",
+                data : [],
+                count : 0
+            };
+            if(results[1]){
+                for(var i=0; i < results[1].length; i++){
+                    results[1][i].surl = (results[1][i].CVDoc) ?
+                    req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[1][i].CVDoc : '';
+                }
+                respMsg.data = results[1];
+            }
+            if(results[2]){
+                respMsg.count = (results[2][0]) ? ((results[2][0].count) ? results[2][0].count : 0) : 0;
+            }
+            res.json(respMsg);
+        }
+    });
+});
+
 module.exports = router;

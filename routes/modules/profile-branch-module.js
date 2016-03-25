@@ -10,6 +10,19 @@ var util = require('util');
 var validator = require('validator');
 
 
+function alterEzeoneId(ezeoneId){
+    var alteredEzeoneId = '';
+    if(ezeoneId){
+        if(ezeoneId.toString().substr(0,1) == '@'){
+            alteredEzeoneId = ezeoneId;
+        }
+        else{
+            alteredEzeoneId = '@' + ezeoneId.toString();
+        }
+    }
+    return alteredEzeoneId;
+}
+
 var st = null;
 function ProfileBranch(db,stdLib){
 
@@ -319,47 +332,58 @@ ProfileBranch.prototype.deleteBranch = function(req,res,next){
  *
  */
 ProfileBranch.prototype.getBranch = function(req,res,next){
-    var responseMessage = {
-        status: false,
-        error: {},
-        message: '',
-        data: null
-    };
-    var validationFlag = true;
+    req.query.ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid) : ''
 
-    var error = {};
+    if(req.query.ezeid){
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: null
+        };
+        var validationFlag = true;
+
+        var error = {};
 
 
-    if(!req.query.token){
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
+        if(!req.query.token){
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
-    if(!validationFlag){
-        responseMessage.error = error;
-        responseMessage.message = 'Please check the errors';
-        res.status(400).json(responseMessage);
-        console.log(responseMessage);
-    }
-    else {
-        try {
-            st.validateToken(req.query.token, function (err, tokenResult) {
-                if (!err) {
-                    if (tokenResult) {
-                        var procParams = st.db.escape(req.query.token);
-                        var procQuery = 'CALL pgetbranches(' + procParams + ')';
-                        console.log(procQuery);
-                        st.db.query(procQuery, function (err, results) {
-                            if (!err) {
-                                console.log(results);
-                                if (results) {
-                                    if (results[0]) {
-                                        if (results[0].length > 0) {
-                                            responseMessage.status = true;
-                                            responseMessage.error = null;
-                                            responseMessage.message = 'Branch loaded successfully';
-                                            responseMessage.data = results[0];
-                                            res.status(200).json(responseMessage);
+        if(!validationFlag){
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+                st.validateToken(req.query.token, function (err, tokenResult) {
+                    if (!err) {
+                        if (tokenResult) {
+                            var procParams = st.db.escape(req.query.token);
+                            var procQuery = 'CALL pgetbranches(' + procParams + ')';
+                            console.log(procQuery);
+                            st.db.query(procQuery, function (err, results) {
+                                if (!err) {
+                                    console.log(results);
+                                    if (results) {
+                                        if (results[0]) {
+                                            if (results[0].length > 0) {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Branch loaded successfully';
+                                                responseMessage.data = results[0];
+                                                res.status(200).json(responseMessage);
+                                            }
+                                            else {
+                                                responseMessage.status = true;
+                                                responseMessage.error = null;
+                                                responseMessage.message = 'Branch is not available';
+                                                responseMessage.data = null;
+                                                res.status(200).json(responseMessage);
+                                            }
                                         }
                                         else {
                                             responseMessage.status = true;
@@ -368,6 +392,7 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
                                             responseMessage.data = null;
                                             res.status(200).json(responseMessage);
                                         }
+
                                     }
                                     else {
                                         responseMessage.status = true;
@@ -376,7 +401,97 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
                                         responseMessage.data = null;
                                         res.status(200).json(responseMessage);
                                     }
+                                }
+                                else {
+                                    responseMessage.error = {
+                                        server: 'Internal Server Error'
+                                    };
+                                    responseMessage.message = 'An error occurred !';
+                                    res.status(500).json(responseMessage);
+                                    console.log('Error : pgetbranches ',err);
+                                    var errorDate = new Date();
+                                    console.log(errorDate.toTimeString() + ' ......... error ...........');
 
+                                }
+                            });
+                        }
+                        else{
+                            responseMessage.message = 'Invalid token';
+                            responseMessage.error = {
+                                token: 'invalid token'
+                            };
+                            responseMessage.data = null;
+                            res.status(401).json(responseMessage);
+                            console.log('getBranch: Invalid token');
+                        }
+                    }
+                    else{
+                        responseMessage.error = {
+                            server: 'Internal Server Error'
+                        };
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error : getBranch ',err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+                    }
+                });
+            }
+            catch(ex) {
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error getBranch :  ',ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
+        }
+
+    }
+    else{
+        var responseMessage = {
+            status: false,
+            error: {},
+            message: '',
+            data: null
+        };
+        var validationFlag = true;
+
+        req.query.ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid) : ''
+
+        var error = {};
+
+
+        if (!req.query.ezeid) {
+            error.token = 'Invalid EZEID';
+            validationFlag *= false;
+        }
+
+        if (!validationFlag) {
+            responseMessage.error = error;
+            responseMessage.message = 'Please check the errors';
+            res.status(400).json(responseMessage);
+            console.log(responseMessage);
+        }
+        else {
+            try {
+
+                var procParams = st.db.escape(req.query.token);
+                var procQuery = 'CALL pgetbranchesByEzeid(' + procParams + ')';
+                console.log(procQuery);
+                st.db.query(procQuery, function (err, results) {
+                    if (!err) {
+                        console.log(results);
+                        if (results) {
+                            if (results[0]) {
+                                if (results[0].length > 0) {
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Branch loaded successfully';
+                                    responseMessage.data = results[0];
+                                    res.status(200).json(responseMessage);
                                 }
                                 else {
                                     responseMessage.status = true;
@@ -387,52 +502,51 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
                                 }
                             }
                             else {
-                                responseMessage.error = {
-                                    server: 'Internal Server Error'
-                                };
-                                responseMessage.message = 'An error occurred !';
-                                res.status(500).json(responseMessage);
-                                console.log('Error : pgetbranches ',err);
-                                var errorDate = new Date();
-                                console.log(errorDate.toTimeString() + ' ......... error ...........');
-
+                                responseMessage.status = true;
+                                responseMessage.error = null;
+                                responseMessage.message = 'Branch is not available';
+                                responseMessage.data = null;
+                                res.status(200).json(responseMessage);
                             }
-                        });
+
+                        }
+                        else {
+                            responseMessage.status = true;
+                            responseMessage.error = null;
+                            responseMessage.message = 'Branch is not available';
+                            responseMessage.data = null;
+                            res.status(200).json(responseMessage);
+                        }
                     }
-                    else{
-                        responseMessage.message = 'Invalid token';
+                    else {
                         responseMessage.error = {
-                            token: 'invalid token'
+                            server: 'Internal Server Error'
                         };
-                        responseMessage.data = null;
-                        res.status(401).json(responseMessage);
-                        console.log('getBranch: Invalid token');
+                        responseMessage.message = 'An error occurred !';
+                        res.status(500).json(responseMessage);
+                        console.log('Error : pgetbranches ', err);
+                        var errorDate = new Date();
+                        console.log(errorDate.toTimeString() + ' ......... error ...........');
+
                     }
-                }
-                else{
-                    responseMessage.error = {
-                        server: 'Internal Server Error'
-                    };
-                    responseMessage.message = 'An error occurred !';
-                    res.status(500).json(responseMessage);
-                    console.log('Error : getBranch ',err);
-                    var errorDate = new Date();
-                    console.log(errorDate.toTimeString() + ' ......... error ...........');
-                }
-            });
-        }
-        catch(ex) {
-            responseMessage.error = {
-                server: 'Internal Server Error'
-            };
-            responseMessage.message = 'An error occurred !';
-            res.status(500).json(responseMessage);
-            console.log('Error getBranch :  ',ex);
-            var errorDate = new Date();
-            console.log(errorDate.toTimeString() + ' ......... error ...........');
+                });
+
+
+            } catch (ex){
+                responseMessage.error = {
+                    server: 'Internal Server Error'
+                };
+                responseMessage.message = 'An error occurred !';
+                res.status(500).json(responseMessage);
+                console.log('Error getBranch :  ', ex);
+                var errorDate = new Date();
+                console.log(errorDate.toTimeString() + ' ......... error ...........');
+            }
         }
     }
 
+
 };
+
 
 module.exports = ProfileBranch;
