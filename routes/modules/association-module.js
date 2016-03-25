@@ -1039,6 +1039,41 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                         };
                                                         res.status(200).json(responseMessage);
                                                     }
+                                                    var notiQueryParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.ten_id)
+                                                        + ',' + st.db.escape(req.body.ten_id);
+                                                    var notiQuery = 'CALL get_service_notify_details(' + notiQueryParams + ')';
+                                                    console.log("notiQuery",notiQuery);
+                                                    st.db.query(notiQuery, function (err, notiResult) {
+                                                        if (!err) {
+                                                            if (notiResult) {
+                                                                console.log(notiResult);
+                                                                if (notiResult[0]){
+                                                                    if (notiResult[0].length > 0){
+                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                            var receiverId = notiResult[0][i].g_title;
+                                                                            var senderTitle = notiResult[1][0].s_title;
+                                                                            var groupTitle = notiResult[0][i].g_title;
+                                                                            var groupId = notiResult[0][i].gid;
+                                                                            var messageText = 'Response received from Helpdesk';
+                                                                            var data = {
+                                                                                ten_id : req.body.service_id,
+                                                                                sm_id : req.body.service_mid
+                                                                            };
+                                                                            /**
+                                                                             * messageType 16 is helpdesk admin response to user
+                                                                             */
+                                                                            var messageType = 15;
+                                                                            var operationType = 0;
+                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                            console.log("Notification Send");
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    });
                                                 }
                                                 else {
                                                     responseMessage.status = false;
@@ -2542,43 +2577,43 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                     responseMessage.message = 'Status updated successfully';
                                     responseMessage.data = null
                                     res.status(200).json(responseMessage);
-                                    //if (parseInt(req.body.status) == 3){
-                                    //    var notiQueryParams = st.db.escape(req.body.code) + ',' + st.db.escape(req.body.token);
-                                    //    var notiQuery = 'CALL get_admin_ten_notify(' + notiQueryParams + ')';
-                                    //    console.log("notiQuery",notiQuery);
-                                    //    st.db.query(notiQuery, function (err, notiResult) {
-                                    //        if (!err) {
-                                    //            if (notiResult) {
-                                    //                console.log(notiResult);
-                                    //                if (notiResult[0]){
-                                    //                    if (notiResult[0].length > 0){
-                                    //                        var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
-                                    //                        for (var i = 0; i < notiResult[0].length; i++ ){
-                                    //                            var receiverId = notiResult[0][i].g_title;
-                                    //                            var senderTitle = notiResult[1][0].s_title;
-                                    //                            var groupTitle = notiResult[0][i].g_title;
-                                    //                            var groupId = notiResult[0][i].gid;
-                                    //                            var messageText = 'New '+tenType[notiResult[2][0].type]+ ':'+ notiResult[2][0].title+' published.';
-                                    //                            var data = {
-                                    //                                ten_id : results[0][0].id,
-                                    //                                sm_id : notiResult[2][0].sm_id
-                                    //                            };
-                                    //                            /**
-                                    //                             * messageType 16 is for helpdesk request to admin
-                                    //                             */
-                                    //                            var messageType = 16;
-                                    //                            var operationType = 0;
-                                    //                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                    //                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                    //                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                    //                            console.log("Notification Send");
-                                    //                        }
-                                    //                    }
-                                    //                }
-                                    //            }
-                                    //        }
-                                    //    });
-                                    //}
+                                    if (parseInt(req.body.status) == 3){
+                                        var notiQueryParams = st.db.escape(req.body.ten_id) + ',' + st.db.escape(req.body.token);
+                                        var notiQuery = 'CALL get_ten_notify_user_details(' + notiQueryParams + ')';
+                                        console.log("notiQuery",notiQuery);
+                                        st.db.query(notiQuery, function (err, notiResult) {
+                                            if (!err) {
+                                                if (notiResult) {
+                                                    console.log(notiResult);
+                                                    if (notiResult[0]){
+                                                        if (notiResult[0].length > 0){
+                                                            var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                            for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                var receiverId = notiResult[0][i].g_title;
+                                                                var senderTitle = notiResult[1][0].s_title;
+                                                                var groupTitle = notiResult[0][i].g_title;
+                                                                var groupId = notiResult[0][i].gid;
+                                                                var messageText = 'New '+tenType[notiResult[2][0].type]+ ' : '+ notiResult[2][0].title+' published.';
+                                                                var data = {
+                                                                    ten_id : req.body.ten_id,
+                                                                    sm_id : notiResult[2][0].sm_id
+                                                                };
+                                                                /**
+                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                 */
+                                                                var messageType = 16;
+                                                                var operationType = 0;
+                                                                var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                //notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                console.log("Notification Send");
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
                                 }
                                 else {
                                     responseMessage.status = false;
