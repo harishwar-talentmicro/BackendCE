@@ -545,7 +545,6 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
         }
     }
 
-
 };
 
 
