@@ -1039,8 +1039,8 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                         };
                                                         res.status(200).json(responseMessage);
                                                     }
-                                                    var notiQueryParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.ten_id)
-                                                        + ',' + st.db.escape(req.body.ten_id);
+                                                    var notiQueryParams = st.db.escape(req.body.token) + ',' + st.db.escape(req.body.service_mid)
+                                                        + ',' + st.db.escape(req.body.service_id);
                                                     var notiQuery = 'CALL get_service_notify_details(' + notiQueryParams + ')';
                                                     console.log("notiQuery",notiQuery);
                                                     st.db.query(notiQuery, function (err, notiResult) {
@@ -1060,7 +1060,7 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                 sm_id : req.body.service_mid
                                                                             };
                                                                             /**
-                                                                             * messageType 16 is helpdesk admin response to user
+                                                                             * messageType 15 is helpdesk admin response to user
                                                                              */
                                                                             var messageType = 15;
                                                                             var operationType = 0;
@@ -1759,7 +1759,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                                 sm_id : notiResult[2][0].sm_id
                                                                             };
                                                                             /**
-                                                                             * messageType 16 is for helpdesk request to admin
+                                                                             * messageType 16 is event/poster/poll/ posted after approval of admin
                                                                              */
                                                                             var messageType = 16;
                                                                             var operationType = 0;
@@ -2095,7 +2095,7 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 sm_id : notiResult[2][0].sm_id
                                                                             };
                                                                             /**
-                                                                             * messageType 16 is for helpdesk request to admin
+                                                                             * messageType 16 is event/poster/poll/ posted after approval of admin
                                                                              */
                                                                             var messageType = 16;
                                                                             var operationType = 0;
@@ -2561,7 +2561,7 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
     }
     else {
         try {
-            var tenType = ['training','event','news','knowledge','opinion-poll'];
+            var tenType = ['poster','event','poster','poster','opinion-poll','poster'];
             st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
@@ -2599,13 +2599,13 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                                     sm_id : notiResult[2][0].sm_id
                                                                 };
                                                                 /**
-                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                 * messageType 17 is event/poster/poll/ posted after approval of admin
                                                                  */
-                                                                var messageType = 16;
+                                                                var messageType = 17;
                                                                 var operationType = 0;
                                                                 var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
                                                                 console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                //notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
                                                                 console.log("Notification Send");
                                                             }
                                                         }
