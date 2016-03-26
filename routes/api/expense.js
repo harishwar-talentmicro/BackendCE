@@ -793,25 +793,3 @@ router.delete('/expense_type_amount/:id', function(req,res,next){
 
 module.exports = router;
 
-
-
-
-//SELECT (SELECT GROUP_CONCAT(tn_picture)
-//FROM service_picture
-//WHERE service_id = tservices.tid) AS picture,
-//    GROUP_CONCAT(b.replay SEPARATOR '^') AS replay,
-//    GROUP_CONCAT(b.status SEPARATOR '^') AS status,
-//    GROUP_CONCAT(b.created_date SEPARATOR '^') AS cd,
-//    tservices.tid,ref_no,
-//    @ser_type as servicetype,
-//    ezeoneid,
-//    ifnull((SELECT cat_title FROM tservicecat WHERE tid=catid),'') as cat_title,
-//    ifnull((SELECT IDName FROM tservicemembers WHERE service_masterid=tsmasterid AND masterid=tservices.masterid AND `status`=1),'') as name,
-//    DATE_FORMAT(transdatetime,'%Y-%m-%d %T') as 'date',
-//    DATE_FORMAT(tservices.LUDate,'%Y-%m-%d %T') as LUDate,message,
-//    earned_points,
-//    IF(tservices.picture='',0,tservices.picture) as isimage,
-//    IF(attachmenturl='',0,attachmenturl) as isattachment,
-//    IF(videourl='',0,videourl) as isvideo,(SELECT ezeid FROM tmaster WHERE TID=LUUserid) as 'ae',
-//    (SELECT CONCAT(firstname,' ',lastname) FROM tmaster WHERE TID=LUUserid) as 'an' FROM tservices LEFT OUTER JOIN tservice_replay b ON b.service_id = tservices.tid  LEFT OUTER JOIN service_picture c ON c.service_id = tservices.tid WHERE service_masterid=tsmasterid  AND find_in_set(tservices.status,tstatus) AND find_in_set(catid,(SELECT GROUP_CONCAT(tadmincats.catid) FROM tadmincats WHERE tadmincats.service_memberid=tsmasterid AND tadmincats.masterid=@imasterid)) group by tservices.tid ORDER BY tid DESC;
-//ELSE
