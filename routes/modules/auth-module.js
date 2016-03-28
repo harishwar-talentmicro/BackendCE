@@ -722,6 +722,7 @@ Auth.prototype.login = function(req,res,next){
         IsAuthenticate: false,
         ezeone_id:'',
         FirstName: '',
+        LastName: '',
         Type: 0,
         Verified: 0,
         SalesModuleTitle: '',
@@ -802,6 +803,7 @@ Auth.prototype.login = function(req,res,next){
                                                         responseMessage.SalesItemListType = loginDetails[0].SalesItemListType;
                                                         responseMessage.RefreshInterval = loginDetails[0].RefreshInterval;
                                                         responseMessage.UserModuleRights = loginDetails[0].UserModuleRights;
+                                                        responseMessage.LastName = loginDetails[0].LastName;
                                                         if (loginDetails[0].ParentMasterID == 0) {
                                                             responseMessage.MasterID = loginDetails[0].TID;
                                                         }
