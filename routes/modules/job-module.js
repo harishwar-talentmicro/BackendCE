@@ -415,11 +415,11 @@ Job.prototype.create = function(req,res,next){
                                         if (notificationResult[0]) {
                                             console.log('job post notification...');
                                             for (var i = 0; i < notificationResult[0].length; i++) {
-                                                userId = notificationResult[0][i].ids.split(',');
+                                                userId = (notificationResult[0][i].ids) ? notificationResult[0][i].ids.split(',') : '';
                                             }
-                                            var mIds = ' ';
+                                            var mIds = '';
                                             for (var c = 0; c < notificationResult[0].length; c++) {
-                                                var mIds = notificationResult[0][c].ids + ',' + mIds;
+                                                var mIds =  (notificationResult[0][c].ids) ? notificationResult[0][c].ids + ',' + mIds : '';
                                             }
                                             var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
                                             /**
@@ -526,7 +526,9 @@ Job.prototype.create = function(req,res,next){
                             };
                             var queryParams = st.db.escape(list.location_title) + ',' + st.db.escape(list.latitude)
                                 + ',' + st.db.escape(list.longitude) + ',' + st.db.escape(list.country)+ ',' + st.db.escape(list.maptype);
-                            st.db.query('CALL psavejoblocation(' + queryParams + ')', function (err, results) {
+                            var locationInsertQuery = 'CALL psavejoblocation(' + queryParams + ')';
+                            console.log('locationInsertQuery',locationInsertQuery);
+                            st.db.query(locationInsertQuery, function (err, results) {
                                 if (results) {
                                     if (results[0]) {
                                         if (results[0][0]) {
@@ -559,6 +561,8 @@ Job.prototype.create = function(req,res,next){
                             });
                         };
                         //calling function at first time
+
+                        console.log('locationList',locationsList);
                         if (locationsList) {
                             if (locationsList.length > 0) {
                                 insertLocations(locationDetails);
