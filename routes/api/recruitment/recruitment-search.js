@@ -178,9 +178,8 @@ router.post('/job_seeker',function(req,res,next){
 
 
     var source1GenderQuery = "";
-    if(gender){
-        source1GenderQuery = " AND FIND_IN_SET(tcv.Gender,"+gender+") ";
-    }
+    gender = (gender == 2) ? "'0,1,2'" : ((gender) ? "'"+gender+ "'": "'0,1,2'");
+    source1GenderQuery = " AND FIND_IN_SET(tcv.Gender,"+gender+") ";
 
     /**
      * @login_tid TID of a user who is logged in (from tmaster)
@@ -217,7 +216,7 @@ router.post('/job_seeker',function(req,res,next){
                      CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
                 tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
-                    + source2GenderQuery;
+                    + source1GenderQuery;
                 jobSeekerQuery += (skillKeywords) ? "AND MATCH (tcv.KeySkills) AGAINST ("+req.db.escape(skillKeywords) +")" : "";
                 jobSeekerQuery +=
                     "UNION " +
@@ -264,7 +263,7 @@ router.post('/job_seeker',function(req,res,next){
 
     jobSeekerQuery += "SELECT @user_ids AS users;"
 
-//console.log(jobSeekerQuery);
+console.log(jobSeekerQuery);
 
     req.db.query(jobSeekerQuery,function(err,results){
         if(err){

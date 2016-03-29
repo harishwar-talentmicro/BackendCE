@@ -334,7 +334,7 @@ ProfileBranch.prototype.deleteBranch = function(req,res,next){
 ProfileBranch.prototype.getBranch = function(req,res,next){
     req.query.ezeid = (req.query.ezeid) ? alterEzeoneId(req.query.ezeid) : ''
 
-    if(req.query.ezeid){
+    if(!req.query.ezeid){
         var responseMessage = {
             status: false,
             error: {},
@@ -464,10 +464,7 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
         var error = {};
 
 
-        if (!req.query.ezeid) {
-            error.token = 'Invalid EZEID';
-            validationFlag *= false;
-        }
+
 
         if (!validationFlag) {
             responseMessage.error = error;
@@ -478,7 +475,7 @@ ProfileBranch.prototype.getBranch = function(req,res,next){
         else {
             try {
 
-                var procParams = st.db.escape(req.query.token);
+                var procParams = st.db.escape(req.query.ezeid);
                 var procQuery = 'CALL pgetbranchesByEzeid(' + procParams + ')';
                 console.log(procQuery);
                 st.db.query(procQuery, function (err, results) {
