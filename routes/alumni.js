@@ -81,20 +81,21 @@ router.get('*',function(req,res,next){
                                      * User has requested for a file or a path
                                      * By default we assume he haven't requested for any file
                                      */
+                                    console.log('calling next');
 
                                     next();
 
 
                                 }
-                                /**
-                                 * Loads custom web portal for verified companies
-                                 */
-                                else if(results[0][0].verified == 2){
-                                    /**
-                                     * @TODO Please change this code to render company website
-                                     */
-                                    res.redirect(req.CONFIG.EZEONE_URL + parsedUrl.pathname);
-                                }
+                                ///**
+                                // * Loads custom web portal for verified companies
+                                // */
+                                //else if(results[0][0].verified == 2){
+                                //    alumniName = alumniName.replace('@','');
+                                //    console.log('Coming to alumni block');
+                                //    console.log('Redirecting to '+ alumniName + req.CONFIG.EZEONE_DOMAIN + parsedUrl.pathname);
+                                //    res.redirect('https://'+alumniName + req.CONFIG.EZEONE_DOMAIN + parsedUrl.pathname);
+                                //}
                                 /**
                                  * Loads ezeone portal
                                  */
