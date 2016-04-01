@@ -52,7 +52,7 @@ function alterEzeoneId(ezeoneId){
  *
  * @discription send notification for new sales enquity to all subusers
  */
-var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folderRuleID){
+var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folderRuleID,salesEnquiryMessage){
     /**
      * We are getting ezeid then compairing EZEID with TOEZEID
      * We are getting ezeid then compairing EZEID with TOEZEID
@@ -121,7 +121,7 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
 
                                                         mailerApi.sendMail('sales_lead_template', {
                                                             ezeoneId : userDetailsRes[0][0].EZEID,
-                                                            message : req.body.message
+                                                            message : salesEnquiryMessage
 
                                                         }, '', notDetailsRes[0][count].SalesMailID);
 
@@ -997,7 +997,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                  * passing folder rule id to check folder access
                                                  */
                                                 if (!TID) {
-                                                    sendNotificationAndMailToSubuser(Token, ToEZEID, FunctionType, transResult[0][0].rid);
+                                                    sendNotificationAndMailToSubuser(Token, ToEZEID, FunctionType, transResult[0][0].rid,MessageText);
                                                 }
                                                 var proposal_message = '';
                                                 if (transResult[2]) {
