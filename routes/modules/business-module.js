@@ -52,7 +52,7 @@ function alterEzeoneId(ezeoneId){
  *
  * @discription send notification for new sales enquity to all subusers
  */
-var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
+var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folderRuleID){
     /**
      * We are getting ezeid then compairing EZEID with TOEZEID
      * We are getting ezeid then compairing EZEID with TOEZEID
@@ -87,7 +87,8 @@ var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
                                                 if ((!isNaN(parseInt(notDetailsRes[0][count].userRights.split()[0]))) &&
                                                     parseInt(notDetailsRes[0][count].userRights.split()[0]) > 0 ){
 
-                                                    var foldRIDSubuser = notDetailsRes[0][count].rid.split(',');
+                                                    var foldRIDSubuser = (notDetailsRes[0][count].rid) ?
+                                                        notDetailsRes[0][count].rid.split(',') : '';
                                                     console.log(foldRIDSubuser);
                                                     /**
                                                      * to match string with string using toString
@@ -109,9 +110,27 @@ var sendNotiToSubuser = function(token,toEZEID,functionType,folderRuleID){
                                                         var masterid = notDetailsRes[0][count].masterid;
                                                         console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, messageId, masterid);
 
+                                                        /**
+                                                         * Send notification to those users who are falling under the category of the folder
+                                                         * which is assigned to this lead
+                                                         */
                                                         notification.publish(receiverId, senderTitle, groupTitle, groupId,
                                                             messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                         console.log("Notification Send");
+
+
+                                                        mailerApi.sendMail('sales_lead_template', {
+                                                            ezeoneId : userDetailsRes[0][0].EZEID,
+                                                            message : req.body.message
+
+                                                        }, '', notDetailsRes[0][count].SalesMailID);
+
+                                                        /**
+                                                         * Send mail to those users who are falling under the category of the folder
+                                                         * which is assigned to this lead
+                                                         */
+
+
                                                     }
                                                 }
                                             }
@@ -978,7 +997,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                  * passing folder rule id to check folder access
                                                  */
                                                 if (!TID) {
-                                                    sendNotiToSubuser(Token, ToEZEID, FunctionType, transResult[0][0].rid);
+                                                    sendNotificationAndMailToSubuser(Token, ToEZEID, FunctionType, transResult[0][0].rid);
                                                 }
                                                 var proposal_message = '';
                                                 if (transResult[2]) {
