@@ -2830,68 +2830,43 @@ Configuration.prototype.getHolidays = function(req,res,next){
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-        var token = req.query.Token;
+        //var token = req.query.Token;
         var locId = (req.query.LocID) ? req.query.LocID : 0;
-        var templateId = req.query.TemplateID;
-
-        if (token) {
-            st.validateToken(token, function (err, tokenResult) {
-                if (!err) {
-                    if (tokenResult) {
-                        var queryParams = st.db.escape(locId) + ',' + st.db.escape(templateId);
-                        var query = 'CALL pGetHolidayList(' + queryParams + ')';
-
-                        st.db.query(query, function (err, holidayList) {
-                            if (!err) {
-                                if (holidayList) {
-                                    if (holidayList[0]) {
-                                        if (holidayList[0].length > 0) {
-                                            console.log('FnGetHolidayList: Holiday list Send successfully');
-                                            res.send(holidayList[0]);
-                                        }
-                                        else {
-                                            console.log('FnGetHolidayList:No Holiday list found');
-                                            res.json(null);
-                                        }
-                                    }
-                                    else {
-                                        console.log('FnGetHolidayList:No Holiday list found');
-                                        res.json(null);
-                                    }
-                                }
-                                else {
-                                    console.log('FnGetHolidayList:No Holiday list found');
-                                    res.json(null);
-                                }
-
-                            }
-                            else {
-                                console.log('FnGetHolidayList: error in getting Holiday list' + err);
-                                res.statusCode = 500;
-                                res.json(null);
-                            }
-                        });
+        var templateId = (req.query.TemplateID) ? req.query.TemplateID : 0;
+        var queryParams = st.db.escape(locId) + ',' + st.db.escape(templateId) ;
+        var query = 'CALL pGetHolidayList(' + queryParams + ')';
+        console.log(query);
+        st.db.query(query, function (err, holidayList) {
+            if (!err) {
+                if (holidayList) {
+                    console.log(holidayList);
+                    if (holidayList[0]) {
+                        if (holidayList[0].length > 0) {
+                            console.log('FnGetHolidayList: Holiday list Send successfully');
+                            res.json(holidayList[0]);
+                        }
+                        else {
+                            console.log('FnGetHolidayList:No Holiday list found');
+                            res.json(null);
+                        }
                     }
                     else {
-                        res.statusCode = 401;
+                        console.log('FnGetHolidayList:No Holiday list found');
                         res.json(null);
-                        console.log('FnGetHolidayList: Invalid Token');
                     }
-                } else {
-                    res.statusCode = 500;
-                    res.json(null);
-                    console.log('FnGetHolidayList: Error in validating token:  ' + err);
                 }
-            });
-        }
-        else {
-            if (!token) {
-                console.log('FnGetHolidayList: Token is empty');
-            }
+                else {
+                    console.log('FnGetHolidayList:No Holiday list found');
+                    res.json(null);
+                }
 
-            res.statusCode=400;
-            res.json(null);
-        }
+            }
+            else {
+                console.log('FnGetHolidayList: error in getting Holiday list' + err);
+                res.statusCode = 500;
+                res.json(null);
+            }
+        });
     }
     catch (ex) {
         console.log('FnGetHolidayList error:' + ex.description);

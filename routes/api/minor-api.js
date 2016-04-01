@@ -8,6 +8,7 @@ var expenseV1 =  require('./expense.js');
 var utilities =  require('./utilities/utilities.js');
 var cvTempGenrate =  require('./cv_temp_genrate.js');
 var itemGroupV1 =  require('./item-group/item-group-master.js');
+var associationV1 =  require('./association/association-master.js');
 
 router.use('/configuration',configurationV1);
 router.use('/recruitment',recruitmentV1);
@@ -16,6 +17,7 @@ router.use('/expense',expenseV1);
 router.use('/utilities',utilities);
 router.use('/cv_temp_genrate',cvTempGenrate);
 router.use('/item',itemGroupV1);
+router.use('/association',associationV1);
 
 router.get('/test',function(req,res,next){
     var query = 'select * from tmaster WHERE EZEID = ' + req.db.escape("@SGOWRI2");
