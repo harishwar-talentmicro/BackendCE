@@ -480,7 +480,7 @@ Job.prototype.create = function(req,res,next){
                                                             messageText = data;
                                                             messageType = 8;
                                                             operationType = 0;
-                                                            iphoneId = iphoneID; //messageResult[j*(5)+4][0]) ? messageResult[j*(5)+4][0] : null ;
+                                                            iphoneId = (messageResult[j*(5)+4][0]) ? messageResult[j*(5)+4][0] : null ;
                                                             var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
                                                             var msgUserid = 0, a_name = '';
                                                             var jid = jobID;

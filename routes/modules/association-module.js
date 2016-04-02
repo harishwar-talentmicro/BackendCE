@@ -742,26 +742,28 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                             console.log(notiResult);
                                                             if (notiResult[0]){
                                                                if (notiResult[0].length > 0){
-                                                                   var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
-                                                                   for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                       var receiverId = notiResult[0][i].g_title;
-                                                                       var senderTitle = notiResult[1][0].s_title;
-                                                                       var groupTitle = notiResult[0][i].g_title;
-                                                                       var groupId = notiResult[0][i].gid;
-                                                                       var messageText ='New support request from ' + fn + '.';
-                                                                       var data = {
-                                                                           ten_id : results[0][0]._i,
-                                                                           sm_id : req.body.service_mid
-                                                                       };
-                                                                       /**
-                                                                        * messageType 14 is for helpdesk request to admin
-                                                                        */
-                                                                       var messageType = 14;
-                                                                       var operationType = 0;
-                                                                       var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                       console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                       notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                       console.log("Notification Send");
+                                                                   if (notiResult[1]){
+                                                                       var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                       for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                           var receiverId = notiResult[0][i].g_title;
+                                                                           var senderTitle = notiResult[1][0].s_title;
+                                                                           var groupTitle = notiResult[0][i].g_title;
+                                                                           var groupId = notiResult[0][i].gid;
+                                                                           var messageText ='New support request from ' + fn + '.';
+                                                                           var data = {
+                                                                               ten_id : results[0][0]._i,
+                                                                               sm_id : req.body.service_mid
+                                                                           };
+                                                                           /**
+                                                                            * messageType 14 is for helpdesk request to admin
+                                                                            */
+                                                                           var messageType = 14;
+                                                                           var operationType = 0;
+                                                                           var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                           console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                           notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                           console.log("Notification Send");
+                                                                       }
                                                                    }
                                                                }
                                                             }
@@ -998,25 +1000,27 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                            var receiverId = notiResult[0][i].g_title;
-                                                                            var senderTitle = notiResult[1][0].s_title;
-                                                                            var groupTitle = notiResult[0][i].g_title;
-                                                                            var groupId = notiResult[0][i].gid;
-                                                                            var messageText = 'Response received from Helpdesk';
-                                                                            var data = {
-                                                                                ten_id : req.body.service_id,
-                                                                                sm_id : req.body.service_mid
-                                                                            };
-                                                                            /**
-                                                                             * messageType 15 is helpdesk admin response to user
-                                                                             */
-                                                                            var messageType = 15;
-                                                                            var operationType = 0;
-                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            console.log("Notification Send");
+                                                                        if (notiResult[1]){
+                                                                            for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                                var receiverId = notiResult[0][i].g_title;
+                                                                                var senderTitle = notiResult[1][0].s_title;
+                                                                                var groupTitle = notiResult[0][i].g_title;
+                                                                                var groupId = notiResult[0][i].gid;
+                                                                                var messageText = 'Response received from Helpdesk';
+                                                                                var data = {
+                                                                                    ten_id : req.body.service_id,
+                                                                                    sm_id : req.body.service_mid
+                                                                                };
+                                                                                /**
+                                                                                 * messageType 15 is helpdesk admin response to user
+                                                                                 */
+                                                                                var messageType = 15;
+                                                                                var operationType = 0;
+                                                                                var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                console.log("Notification Send");
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -1702,26 +1706,28 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
-                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                            var receiverId = notiResult[0][i].g_title;
-                                                                            var senderTitle = notiResult[1][0].s_title;
-                                                                            var groupTitle = notiResult[0][i].g_title;
-                                                                            var groupId = notiResult[0][i].gid;
-                                                                            var messageText = 'New '+ tenType[req.body.type]+ ' from ' + fn +' for Approval.';
-                                                                            var data = {
-                                                                                ten_id : results[0][0].id,
-                                                                                sm_id : notiResult[2][0].sm_id
-                                                                            };
-                                                                            /**
-                                                                             * messageType 16 is event/poster/poll/ posted after approval of admin
-                                                                             */
-                                                                            var messageType = 16;
-                                                                            var operationType = 0;
-                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            console.log("Notification Send");
+                                                                        if (notiResult[2]){
+                                                                            var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                            for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                                var receiverId = notiResult[0][i].g_title;
+                                                                                var senderTitle = notiResult[1][0].s_title;
+                                                                                var groupTitle = notiResult[0][i].g_title;
+                                                                                var groupId = notiResult[0][i].gid;
+                                                                                var messageText = 'New '+ tenType[req.body.type]+ ' from ' + fn +' for Approval.';
+                                                                                var data = {
+                                                                                    ten_id : results[0][0].id,
+                                                                                    sm_id : notiResult[2][0].sm_id
+                                                                                };
+                                                                                /**
+                                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                                 */
+                                                                                var messageType = 16;
+                                                                                var operationType = 0;
+                                                                                var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                console.log("Notification Send");
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -2044,33 +2050,35 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        var fn = (notiResult[1][0].fn) ? notiResult[1][0].fn
-                                                                            : ((notiResult[1][0].ln) ? notiResult[1][0].ln : notiResult[1][0].s_title);                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                            var receiverId = notiResult[0][i].g_title;
-                                                                            var senderTitle = notiResult[1][0].s_title;
-                                                                            var groupTitle = notiResult[0][i].g_title;
-                                                                            var groupId = notiResult[0][i].gid;
-                                                                            var messageText = 'New opinion-poll from ' + fn +' for Approval.';
-                                                                            var data = {
-                                                                                ten_id : results[0][0].id,
-                                                                                sm_id : notiResult[2][0].sm_id
-                                                                            };
-                                                                            /**
-                                                                             * messageType 16 is event/poster/poll/ posted after approval of admin
-                                                                             */
-                                                                            var messageType = 16;
-                                                                            var operationType = 0;
-                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            console.log("Notification Send");
+                                                                        if (notiResult[2] && notiResult[2]){
+                                                                            for (var i = 0; i < notiResult[0].length; i++ ) {
+                                                                                var fn = (notiResult[1][0].fn) ? notiResult[1][0].fn :
+                                                                                    ((notiResult[1][0].ln) ? notiResult[1][0].ln : notiResult[1][0].s_title);
+                                                                                var receiverId = notiResult[0][i].g_title;
+                                                                                var senderTitle = notiResult[1][0].s_title;
+                                                                                var groupTitle = notiResult[0][i].g_title;
+                                                                                var groupId = notiResult[0][i].gid;
+                                                                                var messageText = 'New opinion-poll from ' + fn + ' for Approval.';
+                                                                                var data = {
+                                                                                    ten_id: results[0][0].id,
+                                                                                    sm_id: notiResult[2][0].sm_id
+                                                                                };
+                                                                                /**
+                                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                                 */
+                                                                                var messageType = 16;
+                                                                                var operationType = 0;
+                                                                                var iphoneId = (notiResult[0][i].iphoneId) ? notiResult[0][i].iphoneId : null;
+                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, data);
+                                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, data);
+                                                                                console.log("Notification Send");
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
                                                             }
                                                         }
                                                     });
-
                                                 }
                                                 else {
                                                     responseMessage.status = false;
@@ -2548,26 +2556,28 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                     console.log(notiResult);
                                                     if (notiResult[0]){
                                                         if (notiResult[0].length > 0){
-                                                            var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
-                                                            for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                var receiverId = notiResult[0][i].gid;
-                                                                var senderTitle = notiResult[1][0].s_title;
-                                                                var groupTitle = notiResult[0][i].g_title;
-                                                                var groupId = notiResult[0][i].gid;
-                                                                var messageText = 'New '+tenType[notiResult[2][0].type]+ ' : '+ notiResult[2][0].title+' published.';
-                                                                var data = {
-                                                                    ten_id : req.body.ten_id,
-                                                                    sm_id : notiResult[2][0].sm_id
-                                                                };
-                                                                /**
-                                                                 * messageType 17 is event/poster/poll/ posted after approval of admin
-                                                                 */
-                                                                var messageType = 17;
-                                                                var operationType = 0;
-                                                                var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                //console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                console.log("Notification Send");
+                                                            if (notiResult[2]){
+                                                                var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                    var receiverId = notiResult[0][i].gid;
+                                                                    var senderTitle = notiResult[1][0].s_title;
+                                                                    var groupTitle = notiResult[0][i].g_title;
+                                                                    var groupId = notiResult[0][i].gid;
+                                                                    var messageText = 'New '+tenType[notiResult[2][0].type]+ ' : '+ notiResult[2][0].title+' published.';
+                                                                    var data = {
+                                                                        ten_id : req.body.ten_id,
+                                                                        sm_id : notiResult[2][0].sm_id
+                                                                    };
+                                                                    /**
+                                                                     * messageType 17 is event/poster/poll/ posted after approval of admin
+                                                                     */
+                                                                    var messageType = 17;
+                                                                    var operationType = 0;
+                                                                    var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                    //console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                    console.log("Notification Send");
+                                                                }
                                                             }
                                                         }
                                                     }
