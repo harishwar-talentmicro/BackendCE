@@ -3775,8 +3775,8 @@ MessageBox.prototype.getLastMsgOfGroup = function(req,res,next){
     var _this = this;
 
     var token = req.query.token;
-    var msgId = parseInt(req.query.id);   // id of message
-    var groupId = parseInt(req.query.gid);
+    var msgId = (req.query.id) ? parseInt(req.query.id) : 0;  // id of message
+    var groupId = (req.query.gid) ? parseInt(req.query.gid) : 0;
     var groupType = req.query.group_type;
 
 

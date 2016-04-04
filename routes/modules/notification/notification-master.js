@@ -122,6 +122,8 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
         };
         //console.log(messagePayload);
         console.log('Actual receiver Id : '+receiverId);
+
+
         if(receiverId){
             _notificationMqtt.publish(receiverId,messagePayload);
         }

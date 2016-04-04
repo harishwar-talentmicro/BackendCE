@@ -251,7 +251,10 @@ Auth.prototype.register = function(req,res,next){
                 console.log('----------Operation type 1--------------');
                 if (idtypeId && ezeid && password) {
                     if (password) {
+                        console.log(password);
                         encryptPwd = hashPassword(password);
+                        console.log("encryptPwd",encryptPwd);
+
                     }
 
                     var queryParams = st.db.escape(idtypeId) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(encryptPwd)

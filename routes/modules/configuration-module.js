@@ -167,7 +167,6 @@ Configuration.prototype.save = function(req,res,next){
         var rtnMessage = {
             IsSuccessfull: false
         };
-
         if (token && category) {
             st.validateToken(token, function (err, tokenResult) {
                 if (!err) {
@@ -201,10 +200,11 @@ Configuration.prototype.save = function(req,res,next){
                                     + ',' + st.db.escape(homeDeliveryURL) + ',' + st.db.escape(serviceURL)
                                     + ',' + st.db.escape(resumeURL)+ ',' + st.db.escape(deal_enable) + ',' + st.db.escape(randomName)
                                     + ',' + st.db.escape(deal_title)+ ',' + st.db.escape(deal_desc);
-
+                                    console.log('CALL pSaveConfig(' + query + ')');
                                 st.db.query('CALL pSaveConfig(' + query + ')', function (err, configResult) {
                                     if (!err) {
                                         if (configResult) {
+                                            console.log(configResult);
                                             if (configResult.affectedRows > 0) {
                                                 rtnMessage.IsSuccessfull = true;
                                                 res.send(rtnMessage);
