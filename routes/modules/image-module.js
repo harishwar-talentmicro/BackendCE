@@ -108,7 +108,6 @@ Image.prototype.cropImage = function(req,res,next){
         if (!err) {
             if (Result != null) {
                 try {
-
                     if (req.files) {
                         var type = req.files.image.mimetype;
                         if (type == 'image/jpeg' || type == 'image/jpg' || type == 'image/gif' || type == 'image/png') {

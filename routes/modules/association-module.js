@@ -387,9 +387,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
         message: '',
         data: null
     };
-
     var validateStatus = true, error = {};
-
     if(!token){
         error['token'] = 'token is mandatory';
         validateStatus *= false;
@@ -402,7 +400,6 @@ Association.prototype.getAsscociationServices = function(req,res,next){
         error['master_id'] = 'master_id is a integer value';
         validateStatus *= false;
     }
-
     if(!validateStatus){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -424,49 +421,9 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                         if(serviceResult[1]){
                                             responseMessage.data1 = serviceResult[0];
                                         }
-
-                                        //var arr =[];
-                                        //arr.push(serviceResult[0]);
-                                        //console.log(arr,"arr1");
-                                        //arr.forEach(function(data){
-                                        //    for(var key in data	)
-                                        //    {
-                                        //        var tid = data[key].tid;
-                                        //        //console.log(tid,"tid");
-                                        //        //arr.forEach(function(data) {
-                                        //        //    if(data[key].tid= tid){
-                                        //        //        arr.push(arr.reply);
-                                        //        //        console.log(arr);
-                                        //        //    }
-                                        //        //});
-                                        //        for(var i =0;i<data[key].length;i++){
-                                        //            if(data[key].tid= tid){
-                                        //                arr.push(arr.reply);
-                                        //                console.log(arr,"teste");
-                                        //            }
-                                        //        }
-                                        //}
-                                        //
-                                        //
-                                        //
-                                        //});
-
-                                        //var array = string.split(',');
-                                        //for(var i = 0; i < str_array.length; i++) {
-                                        //    // Trim the excess whitespace.
-                                        //    str_array[i] = str_array[i].replace(/^\s*/, "").replace(/\s*$/, "");
-                                        //    // Add additional code here, such as:
-                                        //    alert(str_array[i]);
-                                        //}
-
                                         responseMessage.status = true;
                                         responseMessage.error = null;
                                         responseMessage.message = 'services loaded successfully';
-                                        //for(var i=0;i<serviceResult[0].length;i++){
-                                        //    serviceResult[0][i].isimage = (serviceResult[0][i].isimage != 0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isimage :0;
-                                        //    serviceResult[0][i].isattachment = (serviceResult[0][i].isattachment !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isattachment :0;
-                                        //    serviceResult[0][i].isvideo = (serviceResult[0][i].isvideo !=0) ? req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[0][i].isvideo :0;
-                                        //}
                                         var output =[];
                                         for( var i=0; i < serviceResult[0].length;i++){
                                             var result = {};
@@ -484,7 +441,6 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                             result.isvideo = serviceResult[0][i].isvideo;
                                             result.ae = (serviceResult[0][i].ae) ? serviceResult[0][i].ae : '' ;
                                             result.an = (serviceResult[0][i].an)? serviceResult[0][i].an : '';
-                                            //result.pic = serviceResult[0][i].picture;
                                             var picArray =[];
                                             result.picCount = 0;
                                             if(serviceResult[0][i].picture){
@@ -515,15 +471,6 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                             else{
                                                 result.pic = null;
                                             }
-                                            //console.log(serviceResult[0][i].replay,"repl");
-                                            //for(var i = 0; i <serviceResult[0].length; i++) {
-                                            //    var str = serviceResult[0][i].replay;
-                                            //    var str2 = serviceResult[0][i].cd;
-                                            //    var array = str.split('^');
-                                            //    var array1 = str2.split('^');
-                                            //}
-                                            ////console.log(array,"arr");
-
                                             var b =[];
                                             var a = serviceResult[0][i].replay;
                                             b = (a) ? a.split('^') : [];
@@ -538,20 +485,16 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                             if(serviceResult[0][i].replyname){
                                                 var replyArraynew = serviceResult[0][i].replyname;
                                                 replyArray = (replyArraynew) ? replyArraynew.split('^') : [];
-                                                //result.replyname = replyArray;
                                             }
                                             else{
                                                 replyArray = [];
-                                                //result.replyname = [];
                                             }
                                             var companyArray =[];
                                             if(serviceResult[0][i].companyname) {
                                                 var companyArraynew = serviceResult[0][i].companyname;
                                                 companyArray = companyArraynew.split('^');
-                                                //result.companyname = companyArray;
                                             }
                                             else{
-                                                //result.companyname=serviceResult[0][i].companyname;
                                                 companyArray = [];
                                             }
 
@@ -559,10 +502,8 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                             if(serviceResult[0][i].status) {
                                                 var statusArrayArraynew = serviceResult[0][i].status;
                                                 statusArray = statusArrayArraynew.split('^');
-                                                //result.companyname = companyArray;
                                             }
                                             else{
-                                                //result.companyname=serviceResult[0][i].companyname;
                                                 companyArray = [];
                                             }
 
@@ -594,11 +535,9 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                                 replayObject[j]= robject;
 
                                             }
-                                            result.replayObject = replayObject;//push(replayObject);
-
+                                            result.replayObject = replayObject;
                                             output.push(result);
                                         }
-                                        //responseMessage.data = serviceResult[0];
                                         responseMessage.data1 = output;
                                         res.status(200).json(responseMessage);
                                         console.log('FnGetServices: services loaded successfully');
@@ -744,25 +683,30 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                         if (!err) {
                                                             if (attachmentResult) {
                                                                 console.log(attachmentResult);
-                                                                if (attachmentResult.length > 0){
-                                                                    for(var i=0; i < attachmentResult.length/2; i++){
-                                                                        var result = {};
-                                                                        result.tid = attachmentResult[i*2][0].tid;
-                                                                        result.pic = attachmentResult[i*2][0].pic;
-                                                                        outputArray.push(result);
-                                                                    }
-                                                                    console.log("output",outputArray);
-                                                                    responseMessage.status = true;
-                                                                    responseMessage.error = null;
-                                                                    responseMessage.message = 'Service posted successfully';
-                                                                    responseMessage.data = {
-                                                                        id : results[0][0]._i,
-                                                                        imageData : outputArray
-                                                                    };
-                                                                    res.status(200).json(responseMessage);
-                                                                    console.log("output",outputArray);
-                                                                    console.log('attachment file saved');
+                                                                if (attachmentResult[0]){
+                                                                    if (attachmentResult[0].length > 0){
+                                                                        for(var i=0; i < attachmentResult.length/2; i++){
+                                                                            var result = {};
+                                                                            result.tid = attachmentResult[i*2][0].tid;
+                                                                            result.pic = attachmentResult[i*2][0].pic;
+                                                                            outputArray.push(result);
+                                                                        }
+                                                                        console.log("output",outputArray);
+                                                                        responseMessage.status = true;
+                                                                        responseMessage.error = null;
+                                                                        responseMessage.message = 'Service posted successfully';
+                                                                        responseMessage.data = {
+                                                                            id : results[0][0]._i,
+                                                                            imageData : outputArray
+                                                                        };
+                                                                        res.status(200).json(responseMessage);
+                                                                        console.log("output",outputArray);
+                                                                        console.log('attachment file saved');
 
+                                                                    }
+                                                                    else {
+                                                                        console.log('attachment file not save');
+                                                                    }
                                                                 }
                                                                 else {
                                                                     console.log('attachment file not save');
@@ -798,26 +742,28 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                             console.log(notiResult);
                                                             if (notiResult[0]){
                                                                if (notiResult[0].length > 0){
-                                                                   var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
-                                                                   for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                       var receiverId = notiResult[0][i].g_title;
-                                                                       var senderTitle = notiResult[1][0].s_title;
-                                                                       var groupTitle = notiResult[0][i].g_title;
-                                                                       var groupId = notiResult[0][i].gid;
-                                                                       var messageText ='New support request from ' + fn + '.';
-                                                                       var data = {
-                                                                           ten_id : results[0][0]._i,
-                                                                           sm_id : req.body.service_mid
-                                                                       };
-                                                                       /**
-                                                                        * messageType 14 is for helpdesk request to admin
-                                                                        */
-                                                                       var messageType = 14;
-                                                                       var operationType = 0;
-                                                                       var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                       console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                       notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                       console.log("Notification Send");
+                                                                   if (notiResult[1]){
+                                                                       var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                       for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                           var receiverId = notiResult[0][i].g_title;
+                                                                           var senderTitle = notiResult[1][0].s_title;
+                                                                           var groupTitle = notiResult[0][i].g_title;
+                                                                           var groupId = notiResult[0][i].gid;
+                                                                           var messageText ='New support request from ' + fn + '.';
+                                                                           var data = {
+                                                                               ten_id : results[0][0]._i,
+                                                                               sm_id : req.body.service_mid
+                                                                           };
+                                                                           /**
+                                                                            * messageType 14 is for helpdesk request to admin
+                                                                            */
+                                                                           var messageType = 14;
+                                                                           var operationType = 0;
+                                                                           var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                           console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                           notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                           console.log("Notification Send");
+                                                                       }
                                                                    }
                                                                }
                                                             }
@@ -998,22 +944,27 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                             if (!err) {
                                                                 if (attachmentResult) {
                                                                     console.log(attachmentResult);
-                                                                    if (attachmentResult.length > 0){
-                                                                        for(var i=0; i < attachmentResult.length/2; i++){
-                                                                            var result = {};
-                                                                            result.tid = attachmentResult[i*2][0].tid;
-                                                                            result.pic = attachmentResult[i*2][0].pic;
-                                                                            outputArray.push(result);
+                                                                    if (attachmentResult[0]){
+                                                                        if (attachmentResult[0].length > 0){
+                                                                            for(var i=0; i < attachmentResult.length/2; i++){
+                                                                                var result = {};
+                                                                                result.tid = attachmentResult[i*2][0].tid;
+                                                                                result.pic = attachmentResult[i*2][0].pic;
+                                                                                outputArray.push(result);
+                                                                            }
+                                                                            responseMessage.status = true;
+                                                                            responseMessage.error = null;
+                                                                            responseMessage.message = 'Service updated successfully';
+                                                                            responseMessage.data = {
+                                                                                id : results[0][0].tid,
+                                                                                imageData : outputArray
+                                                                            };
+                                                                            res.status(200).json(responseMessage);
+                                                                            console.log('attachment file saved');
                                                                         }
-                                                                        responseMessage.status = true;
-                                                                        responseMessage.error = null;
-                                                                        responseMessage.message = 'Service updated successfully';
-                                                                        responseMessage.data = {
-                                                                            id : results[0][0].tid,
-                                                                            imageData : outputArray
-                                                                        };
-                                                                        res.status(200).json(responseMessage);
-                                                                        console.log('attachment file saved');
+                                                                        else {
+                                                                            console.log('attachment file not save');
+                                                                        }
                                                                     }
                                                                     else {
                                                                         console.log('attachment file not save');
@@ -1049,25 +1000,27 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                            var receiverId = notiResult[0][i].g_title;
-                                                                            var senderTitle = notiResult[1][0].s_title;
-                                                                            var groupTitle = notiResult[0][i].g_title;
-                                                                            var groupId = notiResult[0][i].gid;
-                                                                            var messageText = 'Response received from Helpdesk';
-                                                                            var data = {
-                                                                                ten_id : req.body.service_id,
-                                                                                sm_id : req.body.service_mid
-                                                                            };
-                                                                            /**
-                                                                             * messageType 15 is helpdesk admin response to user
-                                                                             */
-                                                                            var messageType = 15;
-                                                                            var operationType = 0;
-                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            console.log("Notification Send");
+                                                                        if (notiResult[1]){
+                                                                            for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                                var receiverId = notiResult[0][i].g_title;
+                                                                                var senderTitle = notiResult[1][0].s_title;
+                                                                                var groupTitle = notiResult[0][i].g_title;
+                                                                                var groupId = notiResult[0][i].gid;
+                                                                                var messageText = 'Response received from Helpdesk';
+                                                                                var data = {
+                                                                                    ten_id : req.body.service_id,
+                                                                                    sm_id : req.body.service_mid
+                                                                                };
+                                                                                /**
+                                                                                 * messageType 15 is helpdesk admin response to user
+                                                                                 */
+                                                                                var messageType = 15;
+                                                                                var operationType = 0;
+                                                                                var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                console.log("Notification Send");
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -1684,8 +1637,9 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                 imgArray.push(imgObject[j].pic);
                                                         }
                                                         for (var i = 0; i < tidArray.length; i++ ){
+                                                            var fileType = imgArray[i].split('.');
                                                             var imgQueryParams = st.db.escape(tidArray[i]) + ',' + st.db.escape(results[0][0].id)
-                                                                + ',' + st.db.escape(imgArray[i]) + ',' + st.db.escape('jpg');
+                                                                + ',' + st.db.escape(imgArray[i]) + ',' + st.db.escape(fileType[fileType.length - 1]);
                                                             combQuery +=  ('CALL save_ten_master_attach(' + imgQueryParams + ');');
                                                         }
                                                         console.log(combQuery);
@@ -1693,26 +1647,31 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                             if (!err) {
                                                                 if (attachmentResult) {
                                                                     console.log(attachmentResult);
-                                                                    if (attachmentResult.length > 0){
-                                                                        for(var i=0; i < attachmentResult.length/2; i++){
-                                                                            var result = {};
-                                                                            result.tid = attachmentResult[i*2][0].tid;
-                                                                            result.pic = attachmentResult[i*2][0].aurl;
-                                                                            result.tn_pic = attachmentResult[i*2][0].tn_aurl;
-                                                                            outputArray.push(result);
-                                                                        }
-                                                                        console.log("output",outputArray);
-                                                                        responseMessage.status = true;
-                                                                        responseMessage.error = null;
-                                                                        responseMessage.message = 'Ten Master posted successfully';
-                                                                        responseMessage.data = {
-                                                                            id : results[0][0].id,
-                                                                            imageData : outputArray
-                                                                        };
-                                                                        res.status(200).json(responseMessage);
-                                                                        console.log("output",outputArray);
-                                                                        console.log('attachment file saved');
+                                                                    if (attachmentResult[0]){
+                                                                        if (attachmentResult[0].length > 0){
+                                                                            for(var i=0; i < attachmentResult.length/2; i++){
+                                                                                var result = {};
+                                                                                result.tid = attachmentResult[i*2][0].tid;
+                                                                                result.pic = attachmentResult[i*2][0].aurl;
+                                                                                result.tn_pic = attachmentResult[i*2][0].tn_aurl;
+                                                                                outputArray.push(result);
+                                                                            }
+                                                                            console.log("output",outputArray);
+                                                                            responseMessage.status = true;
+                                                                            responseMessage.error = null;
+                                                                            responseMessage.message = 'Ten Master posted successfully';
+                                                                            responseMessage.data = {
+                                                                                id : results[0][0].id,
+                                                                                imageData : outputArray
+                                                                            };
+                                                                            res.status(200).json(responseMessage);
+                                                                            console.log("output",outputArray);
+                                                                            console.log('attachment file saved');
 
+                                                                        }
+                                                                        else {
+                                                                            console.log('attachment file not save');
+                                                                        }
                                                                     }
                                                                     else {
                                                                         console.log('attachment file not save');
@@ -1747,26 +1706,28 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
-                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                            var receiverId = notiResult[0][i].g_title;
-                                                                            var senderTitle = notiResult[1][0].s_title;
-                                                                            var groupTitle = notiResult[0][i].g_title;
-                                                                            var groupId = notiResult[0][i].gid;
-                                                                            var messageText = 'New '+ tenType[req.body.type]+ ' from ' + fn +' for Approval.';
-                                                                            var data = {
-                                                                                ten_id : results[0][0].id,
-                                                                                sm_id : notiResult[2][0].sm_id
-                                                                            };
-                                                                            /**
-                                                                             * messageType 16 is event/poster/poll/ posted after approval of admin
-                                                                             */
-                                                                            var messageType = 16;
-                                                                            var operationType = 0;
-                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            console.log("Notification Send");
+                                                                        if (notiResult[2]){
+                                                                            var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                            for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                                var receiverId = notiResult[0][i].g_title;
+                                                                                var senderTitle = notiResult[1][0].s_title;
+                                                                                var groupTitle = notiResult[0][i].g_title;
+                                                                                var groupId = notiResult[0][i].gid;
+                                                                                var messageText = 'New '+ tenType[req.body.type]+ ' from ' + fn +' for Approval.';
+                                                                                var data = {
+                                                                                    ten_id : results[0][0].id,
+                                                                                    sm_id : notiResult[2][0].sm_id
+                                                                                };
+                                                                                /**
+                                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                                 */
+                                                                                var messageType = 16;
+                                                                                var operationType = 0;
+                                                                                var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                console.log("Notification Send");
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -1995,8 +1956,9 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 imgArray.push(imgObject[j].pic);
                                                                             }
                                                                             for (var i = 0; i < tidArray.length; i++ ){
+                                                                                var fileType = imgArray[i].split('.');
                                                                                 var imgQueryParams = st.db.escape(tidArray[i]) + ',' + st.db.escape(results[0][0].id)
-                                                                                    + ',' + st.db.escape(imgArray[i]) + ',' + st.db.escape('jpg');
+                                                                                    + ',' + st.db.escape(imgArray[i]) + ',' + st.db.escape(fileType[fileType.length - 1]);
                                                                                 combQuery +=  ('CALL save_ten_master_attach(' + imgQueryParams + ');');
                                                                             }
                                                                             console.log(combQuery);
@@ -2004,24 +1966,29 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 if (!err) {
                                                                                     if (attachmentResult) {
                                                                                         console.log(attachmentResult);
-                                                                                        if (attachmentResult.length > 0){
-                                                                                            var imgResult = {};
-                                                                                            for(var i=0; i < attachmentResult.length/2; i++){
-                                                                                                imgResult.tid = attachmentResult[i*2][0].tid;
-                                                                                                imgResult.pic = attachmentResult[i*2][0].aurl;
-                                                                                                imgResult.tn_pic = attachmentResult[i*2][0].tn_aurl;
-                                                                                                outputArray.push(imgResult);
+                                                                                        if (attachmentResult[0]){
+                                                                                            if (attachmentResult[0].length > 0){
+                                                                                                var imgResult = {};
+                                                                                                for(var i=0; i < attachmentResult.length/2; i++){
+                                                                                                    imgResult.tid = attachmentResult[i*2][0].tid;
+                                                                                                    imgResult.pic = attachmentResult[i*2][0].aurl;
+                                                                                                    imgResult.tn_pic = attachmentResult[i*2][0].tn_aurl;
+                                                                                                    outputArray.push(imgResult);
+                                                                                                }
+                                                                                                console.log('attachment file saved');
+                                                                                                responseMessage.status = true;
+                                                                                                responseMessage.error = null;
+                                                                                                responseMessage.message = 'Service posted successfully';
+                                                                                                responseMessage.data = {
+                                                                                                    id : results[0][0].id,
+                                                                                                    imageData : outputArray,
+                                                                                                    optionID : outputArray1
+                                                                                                };
+                                                                                                res.status(200).json(responseMessage);
                                                                                             }
-                                                                                            console.log('attachment file saved');
-                                                                                            responseMessage.status = true;
-                                                                                            responseMessage.error = null;
-                                                                                            responseMessage.message = 'Service posted successfully';
-                                                                                            responseMessage.data = {
-                                                                                                id : results[0][0].id,
-                                                                                                imageData : outputArray,
-                                                                                                optionID : outputArray1
-                                                                                            };
-                                                                                            res.status(200).json(responseMessage);
+                                                                                            else {
+                                                                                                console.log('attachment file not save');
+                                                                                            }
                                                                                         }
                                                                                         else {
                                                                                             console.log('attachment file not save');
@@ -2083,33 +2050,35 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
-                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                            var receiverId = notiResult[0][i].g_title;
-                                                                            var senderTitle = notiResult[1][0].s_title;
-                                                                            var groupTitle = notiResult[0][i].g_title;
-                                                                            var groupId = notiResult[0][i].gid;
-                                                                            var messageText = 'New opinion-poll from ' + fn +' for Approval.';
-                                                                            var data = {
-                                                                                ten_id : results[0][0].id,
-                                                                                sm_id : notiResult[2][0].sm_id
-                                                                            };
-                                                                            /**
-                                                                             * messageType 16 is event/poster/poll/ posted after approval of admin
-                                                                             */
-                                                                            var messageType = 16;
-                                                                            var operationType = 0;
-                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                            console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                            console.log("Notification Send");
+                                                                        if (notiResult[2] && notiResult[2]){
+                                                                            for (var i = 0; i < notiResult[0].length; i++ ) {
+                                                                                var fn = (notiResult[1][0].fn) ? notiResult[1][0].fn :
+                                                                                    ((notiResult[1][0].ln) ? notiResult[1][0].ln : notiResult[1][0].s_title);
+                                                                                var receiverId = notiResult[0][i].g_title;
+                                                                                var senderTitle = notiResult[1][0].s_title;
+                                                                                var groupTitle = notiResult[0][i].g_title;
+                                                                                var groupId = notiResult[0][i].gid;
+                                                                                var messageText = 'New opinion-poll from ' + fn + ' for Approval.';
+                                                                                var data = {
+                                                                                    ten_id: results[0][0].id,
+                                                                                    sm_id: notiResult[2][0].sm_id
+                                                                                };
+                                                                                /**
+                                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                                 */
+                                                                                var messageType = 16;
+                                                                                var operationType = 0;
+                                                                                var iphoneId = (notiResult[0][i].iphoneId) ? notiResult[0][i].iphoneId : null;
+                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, data);
+                                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, data);
+                                                                                console.log("Notification Send");
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
                                                             }
                                                         }
                                                     });
-
                                                 }
                                                 else {
                                                     responseMessage.status = false;
@@ -2587,26 +2556,28 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                     console.log(notiResult);
                                                     if (notiResult[0]){
                                                         if (notiResult[0].length > 0){
-                                                            var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
-                                                            for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                var receiverId = notiResult[0][i].g_title;
-                                                                var senderTitle = notiResult[1][0].s_title;
-                                                                var groupTitle = notiResult[0][i].g_title;
-                                                                var groupId = notiResult[0][i].gid;
-                                                                var messageText = 'New '+tenType[notiResult[2][0].type]+ ' : '+ notiResult[2][0].title+' published.';
-                                                                var data = {
-                                                                    ten_id : req.body.ten_id,
-                                                                    sm_id : notiResult[2][0].sm_id
-                                                                };
-                                                                /**
-                                                                 * messageType 17 is event/poster/poll/ posted after approval of admin
-                                                                 */
-                                                                var messageType = 17;
-                                                                var operationType = 0;
-                                                                var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                console.log("Notification Send");
+                                                            if (notiResult[2]){
+                                                                var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                for (var i = 0; i < notiResult[0].length; i++ ){
+                                                                    var receiverId = notiResult[0][i].gid;
+                                                                    var senderTitle = notiResult[1][0].s_title;
+                                                                    var groupTitle = notiResult[0][i].g_title;
+                                                                    var groupId = notiResult[0][i].gid;
+                                                                    var messageText = 'New '+tenType[notiResult[2][0].type]+ ' : '+ notiResult[2][0].title+' published.';
+                                                                    var data = {
+                                                                        ten_id : req.body.ten_id,
+                                                                        sm_id : notiResult[2][0].sm_id
+                                                                    };
+                                                                    /**
+                                                                     * messageType 17 is event/poster/poll/ posted after approval of admin
+                                                                     */
+                                                                    var messageType = 17;
+                                                                    var operationType = 0;
+                                                                    var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                    //console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                    console.log("Notification Send");
+                                                                }
                                                             }
                                                         }
                                                     }
