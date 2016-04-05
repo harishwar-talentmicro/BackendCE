@@ -8,7 +8,7 @@ var ImageModule = require('docxtemplater-image-module');
 var gm = require('gm').subClass({ imageMagick: true });
 
 
-router.post('/',function(req,res,next){
+router.post('/cv_generate',function(req,res,next){
     var if_not_ref = '';
     var imageFullPath = 'https://storage.googleapis.com/ezeone/';
     var imagePath = (req.body.imagePath) ? imageFullPath + req.body.imagePath : imageFullPath;

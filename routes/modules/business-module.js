@@ -3642,7 +3642,6 @@ BusinessManager.prototype.saveExternalsalesRequest = function(req,res,next){
     }
 };
 
-
 /**
  * @type : GET
  * @param req
