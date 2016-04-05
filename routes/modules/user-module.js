@@ -2070,13 +2070,14 @@ User.prototype.saveResume = function(req,res,next){
                                                     score: educations[j].score,
                                                     yearofpassing: educations[j].yp,
                                                     level: educations[j].expertiseLevel, // 0-ug, 1-pg
-                                                    instituteId : educations[j].institute_id
+                                                    instituteId : educations[j].institute_id,
+                                                    instituteEnrollmentNumber : (educations[j].enrollment_no) ? educationData[j].enrollment_no : null
                                                 };
 
                                                 var queryParams = st.db.escape(educationData.cvid) + ',' + st.db.escape(educationData.eduId)
                                                     + ',' + st.db.escape(educationData.spcId) + ',' + st.db.escape(educationData.score)
                                                     + ',' + st.db.escape(educationData.yearofpassing) + ',' + st.db.escape(educationData.level)
-                                                    + ',' + st.db.escape(educationData.instituteId);
+                                                    + ',' + st.db.escape(educationData.instituteId)+ ',' + st.db.escape(educationData.instituteEnrollmentNumber);
 
                                                 var query = 'CALL psavecveducation(' + queryParams + ')';
                                                 console.log(query);
