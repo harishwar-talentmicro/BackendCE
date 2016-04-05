@@ -870,6 +870,7 @@ Procurement.prototype.procurementGetVendors = function(req,res,next){
     }
 
 };
+
 /**
  * @type : DELETE
  * @param req
@@ -2118,7 +2119,6 @@ Procurement.prototype.procurementUpdateProposalDetails = function(req,res,next) 
     }
 
 }
-
 
 /**
  * @type : GET

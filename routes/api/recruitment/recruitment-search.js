@@ -183,9 +183,6 @@ router.post('/job_seeker',function(req,res,next){
     //var gender = "0";
     var gender = req.body.gender;
 
-
-
-
     gender = (gender == 2) ? "0,1,2" : ((gender) ? ""+gender+ "": "0,1,2");
     var source1GenderQuery = " AND FIND_IN_SET(tcv.Gender,"+req.db.escape(gender)+") ";
 

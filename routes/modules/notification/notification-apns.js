@@ -9,7 +9,7 @@ function AppleNotification(){
  * @param iphoneId
  * @param payload (JSON Object)
  */
-AppleNotification.prototype.sendAppleNS = function(iphoneId,payload){
+AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
     var http = require('http');
     var apn = require('apn');
 
@@ -21,8 +21,15 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload){
 
 
         var note = new apn.Notification();
+        if (issos){
+            note.sound = "sirens_x.wav";
+        }
+        else {
+            note.sound = "notification-beep.wav";
+        }
+
         note.badge = 0;
-        note.sound = "notification-beep.wav";
+        //note.sound = "notification-beep.wav";
         note.alert = { "body" : payload.g_title +' : ' +payload.message, "action-loc-key" : "Play" ,
             "launch-image" :
                 "mysplash.png","JsonResult":JSON.stringify(payload)};

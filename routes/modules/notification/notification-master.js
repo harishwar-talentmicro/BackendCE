@@ -31,7 +31,7 @@ function Notification(db,stdLib){
  * @param longitude (longitude of location)
 _ */
 Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,groupId,message,messageType,operationType,iphoneId,
-                                          messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data){
+                                          messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos){
 
     console.log('It is coming to publish block of Notification');
     var validationStatus = true;
@@ -118,7 +118,8 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
             msgUserid : msgUserid,
             job_id : jobId,
             a_url : aUrl,
-            tx_id : txId
+            tx_id : txId,
+            data : data
         };
         //console.log(messagePayload);
         console.log('Actual receiver Id : '+receiverId);
@@ -135,7 +136,7 @@ Notification.prototype.publish = function(receiverId, senderTitle,groupTitle,gro
          */
         if(iphoneId){
             try{
-                _apnsNotification.sendAppleNS(iphoneId,messagePayload);
+                _apnsNotification.sendAppleNS(iphoneId,messagePayload,issos);
             }
             catch(ex){
                 console.log('APNS Notification error',ex);

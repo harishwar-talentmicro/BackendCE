@@ -879,7 +879,8 @@ Reservation.prototype.getFeedback = function(req,res,next){
             try {
                 var queryParams = st.db.escape(ezeone_id) + ',' + st.db.escape(moduleType) + ',' + st.db.escape(transId)
                     + ',' + st.db.escape(resourceId) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
-                var query = 'CALL pgetfeedbackDetails(' + queryParams + ')';
+                var query = 'CALL ' +
+                    '(' + queryParams + ')';
                 st.db.query(query, function (err, getResult) {
                     //console.log(getResult);
                     if (!err) {

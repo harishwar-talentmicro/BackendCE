@@ -174,6 +174,10 @@ Auth.prototype.register = function(req,res,next){
     var encryptPwd = '';
     var fullName='';
     var companyDetails = (req.body.company_details) ?  req.body.company_details : ''; // about company details
+    var businesssize = (req.body.businesssize) ? req.body.businesssize : 0;
+    var headcount = (req.body.headcount) ? req.body.headcount : 0;
+    var branch = (req.body.branch) ? req.body.branch : 0;
+    var ismnc = (req.body.ismnc) ? req.body.ismnc : 0;
 
     var rtnMessage = {
         error:{},
@@ -210,7 +214,11 @@ Auth.prototype.register = function(req,res,next){
         isAddressSaved:'',
         isinstitute_admin : '',
         cvid : '',
-        profile_status:''
+        profile_status:'',
+        businesssize:'',
+        headcount:'',
+        branch:'',
+        ismnc:''
 
     };
 
@@ -273,7 +281,8 @@ Auth.prototype.register = function(req,res,next){
                         + ',' + st.db.escape(categoryId) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                         + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
-                        + ',' + st.db.escape(companyDetails);
+                        + ',' + st.db.escape(companyDetails)+ ',' + st.db.escape(businesssize)+ ',' + st.db.escape(headcount)
+                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);
@@ -521,7 +530,8 @@ Auth.prototype.register = function(req,res,next){
                         + ',' + st.db.escape(categoryId) + ',' + st.db.escape(visibleEmail) + ',' + st.db.escape(visibleMobile)
                         + ',' + st.db.escape(visiblePhone) + ',' + st.db.escape(locTitle) + ',' + st.db.escape(visibleAddress)
                         + ',' + st.db.escape(statusId) + ',' + st.db.escape(apUserid) + ',' + st.db.escape(businessKeywords)
-                        + ',' + st.db.escape(companyDetails);
+                        + ',' + st.db.escape(companyDetails)+ ',' + st.db.escape(businesssize)+ ',' + st.db.escape(headcount)
+                        + ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc);
 
                     var query = 'CALL pSaveEZEIDData(' + queryParams + ')';
                     console.log(query);
