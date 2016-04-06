@@ -1,4 +1,4 @@
-
+var CONFIG = require('../../../ezeone-config.json');
 function AppleNotification(){
 
 };
@@ -42,13 +42,15 @@ AppleNotification.prototype.sendAppleNS = function(iphoneId,payload,issos){
             console.log("Note " + notification);
         };
         var options = {
-            gateway: 'gateway.sandbox.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+
+            //gateway: 'gateway.sandbox.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
             //gateway: 'gateway.push.apple.com', // this URL is different for Apple's Production Servers and changes when you go to production
+            gateway : (CONFIG.APNS.GATEWAY) ? CONFIG.APNS.GATEWAY : 'gateway.sandbox.push.apple.com',
             errorCallback: callback,
             cert: 'cert.pem',
             key:  'key.pem',
-            passphrase: 'hire@123',
-            port: 2195,
+            passphrase: (CONFIG.APNS.PASSPHRASE) ? CONFIG.APNS.PASSPHRASE : 'hire@123',
+            port: (CONFIG.APNS.PORT) ? CONFIG.APNS.PORT : 2195,
             enhanced: true,
             cacheLength: 100
         };

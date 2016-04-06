@@ -16,6 +16,15 @@
   "PASS_RESET_PAGE_LINK" : "reset_password",
   "DB_PASS" : "",
   "DB_HOST" : "",
+  "PDF_SERVER" : {
+    "HOST" : "127.0.0.1",
+    "PORT" : 9111
+  },
+  "APNS" : {
+    "GATEWAY" : "gateway.sandbox.push.apple.com",
+    "PASSPHRASE" : "hire@123",
+    "PORT" : 2195
+  },
   "MQTT" : {
     "ADMIN" : ["@indrajeet", "@hvj", "@ind1","@sandeep"],
     "HOST" : "104.199.128.226",
