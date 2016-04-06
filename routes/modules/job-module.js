@@ -1050,7 +1050,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
     }
     else {
         try {
-
             var locationDetails = locationsList[locCount];
 
             var job = function (m, locationIds) {
@@ -1194,7 +1193,6 @@ Job.prototype.searchJobSeekers = function(req,res) {
                         if (getResult) {
                             if (getResult[0]) {
                                 if (getResult[0].length > 0) {
-
                                     if (getResult[1]) {
                                         if (getResult[1].length > 0) {
                                             for (var ct = 0; ct < getResult[1].length; ct++) {
