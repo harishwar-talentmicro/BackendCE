@@ -242,7 +242,6 @@ router.post('/details', function(req,res,next){
         try {
             req.body.desc = (req.body.desc) ? req.body.desc : '';
             req.body.tid = parseInt(req.body.tid) ? req.body.tid : 0 ;
-            req.body.st = parseInt(req.body.st) ? req.body.st : 1 ;
             req.body.pic = (req.body.pic) ? req.body.pic : '';
             req.st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {

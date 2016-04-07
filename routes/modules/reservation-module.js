@@ -874,15 +874,14 @@ Reservation.prototype.getFeedback = function(req,res,next){
             responseMessage.message = 'Please check the errors below';
             res.status(400).json(responseMessage);
         }
-
         else {
             try {
                 var queryParams = st.db.escape(ezeone_id) + ',' + st.db.escape(moduleType) + ',' + st.db.escape(transId)
                     + ',' + st.db.escape(resourceId) + ',' + st.db.escape(pageSize) + ',' + st.db.escape(pageCount);
-                var query = 'CALL ' +
-                    '(' + queryParams + ')';
+                var query = 'CALL pgetfeedbackDetails(' + queryParams + ')';
+                console.log(query);
                 st.db.query(query, function (err, getResult) {
-                    //console.log(getResult);
+                    console.log(getResult);
                     if (!err) {
                         if (getResult) {
                             if (getResult[0]) {
