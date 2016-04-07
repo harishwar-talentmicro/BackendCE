@@ -733,7 +733,8 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                     };
                                                     res.status(200).json(responseMessage);
                                                 }
-                                                var notiQueryParams = st.db.escape(req.body.service_mid) + ',' + st.db.escape(req.body.token);
+                                                var notiQueryParams = st.db.escape(req.body.service_mid) + ',' + st.db.escape(req.body.token)
+                                                    + ',' + st.db.escape(req.body.cid);
                                                 var notiQuery = 'CALL get_admin_notif_details(' + notiQueryParams + ')';
                                                 console.log("notiQuery",notiQuery);
                                                 st.db.query(notiQuery, function (err, notiResult) {
@@ -1706,7 +1707,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        if (notiResult[2]){
+                                                                        if (notiResult[1] && notiResult[2]){
                                                                             var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
                                                                             for (var i = 0; i < notiResult[0].length; i++ ){
                                                                                 var receiverId = notiResult[0][i].g_title;
@@ -2050,7 +2051,7 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        if (notiResult[2] && notiResult[2]){
+                                                                        if (notiResult[1] && notiResult[2]){
                                                                             for (var i = 0; i < notiResult[0].length; i++ ) {
                                                                                 var fn = (notiResult[1][0].fn) ? notiResult[1][0].fn :
                                                                                     ((notiResult[1][0].ln) ? notiResult[1][0].ln : notiResult[1][0].s_title);
@@ -2556,7 +2557,7 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                     console.log(notiResult);
                                                     if (notiResult[0]){
                                                         if (notiResult[0].length > 0){
-                                                            if (notiResult[2]){
+                                                            if (notiResult[1] && notiResult[2]){
                                                                 var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
                                                                 for (var i = 0; i < notiResult[0].length; i++ ){
                                                                     var receiverId = notiResult[0][i].gid;

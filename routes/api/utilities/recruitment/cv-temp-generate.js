@@ -7,6 +7,8 @@ var Docxtemplater = require('docxtemplater');
 var ImageModule = require('docxtemplater-image-module');
 var gm = require('gm').subClass({ imageMagick: true });
 
+var PDFClient = require('../pdf-client.js');
+
 
 router.post('/cv_generate',function(req,res,next){
     var if_not_ref = '';
@@ -66,14 +68,28 @@ router.post('/cv_generate',function(req,res,next){
                     });
                     doc.render();
                     var buf = doc.getZip().generate({type: "nodebuffer"});
-                    var buffer = new Buffer('testbuffer');
+
+                    //var pdfClient = new PDFClient(req.CONFIG);
+                    //pdfClient.convertToPdf(buf,function(err,pdfBuffer){
+                    //    if(err){
+                    //        console.log(err);
+                    //        res.status(500).send('');
+                    //        return;
+                    //    }
+                    //    var bufferStream = new stream.PassThrough();
+                    //    bufferStream.end(pdfBuffer);
+                    //    res.setHeader('Content-disposition', 'attachment; filename=resume.pdf');
+                    //    res.setHeader('Content-type', "application/pdf");
+                    //    bufferStream.pipe(res);
+                    //});
+
                     var bufferStream = new stream.PassThrough();
                     bufferStream.end(buf);
-                    res.setHeader('Content-disposition', 'attachment; filename=resume');
-                    res.setHeader('Content-type', "application/msword");
+                    res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                    res.setHeader('Content-type', "application/octet-stream");
                     bufferStream.pipe(res);
-                    //fs.writeFileSync(__dirname+"/output.docx",buf);
-                    //res.status(200).json("Success");
+
+
                 }
                 else{
                     console.log("imagePath4",imagePath);
@@ -108,12 +124,26 @@ router.post('/cv_generate',function(req,res,next){
                     });
                     doc.render();
                     var buf = doc.getZip().generate({type: "nodebuffer"});
-                    var buffer = new Buffer('testbuffer');
+                    console.log(buf.length);
                     var bufferStream = new stream.PassThrough();
                     bufferStream.end(buf);
-                    res.setHeader('Content-disposition', 'attachment; filename=resume');
-                    res.setHeader('Content-type', "application/msword");
+                    res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                    res.setHeader('Content-type', "application/octet-stream");
                     bufferStream.pipe(res);
+                    //var pdfClient = new PDFClient(req.CONFIG);
+                    //pdfClient.convertToPdf(buf,function(err,pdfBuffer){
+                    //    if(err){
+                    //        console.log(err);
+                    //        res.status(500).send('');
+                    //        return;
+                    //    }
+                    //    var bufferStream = new stream.PassThrough();
+                    //    bufferStream.end(pdfBuffer);
+                    //    res.setHeader('Content-disposition', 'attachment; filename=resume.pdf');
+                    //    res.setHeader('Content-type', "application/pdf");
+                    //    bufferStream.pipe(res);
+                    //});
+
                     //fs.writeFileSync(__dirname+"/output.docx",buf);
                     //res.status(200).json("Success");
                 }
@@ -150,12 +180,26 @@ router.post('/cv_generate',function(req,res,next){
             });
             doc.render();
             var buf = doc.getZip().generate({type: "nodebuffer"});
-            var buffer = new Buffer('testbuffer');
+            console.log(buf.length);
             var bufferStream = new stream.PassThrough();
             bufferStream.end(buf);
-            res.setHeader('Content-disposition', 'attachment; filename=resume');
-            res.setHeader('Content-type', "application/msword");
+            res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+            res.setHeader('Content-type', "application/octet-stream");
             bufferStream.pipe(res);
+            //var pdfClient = new PDFClient(req.CONFIG);
+            //pdfClient.convertToPdf(buf,function(err,pdfBuffer){
+            //    if(err){
+            //        console.log(err);
+            //        res.status(500).send('');
+            //        return;
+            //    }
+            //    var bufferStream = new stream.PassThrough();
+            //    bufferStream.end(pdfBuffer);
+            //    res.setHeader('Content-disposition', 'attachment; filename=resume.pdf');
+            //    res.setHeader('Content-type', "application/pdf");
+            //    bufferStream.pipe(res);
+            //});
+
             //fs.writeFileSync(__dirname+"/output.docx",buf);
             //res.status(200).json("Success");
         });

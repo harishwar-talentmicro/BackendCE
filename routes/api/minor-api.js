@@ -7,7 +7,7 @@ var infoV1 =  require('./info/info.js');
 var expenseV1 =  require('./expense.js');
 var utilities =  require('./utilities/utilities.js');
 var cvTempGenrate =  require('./cv_temp_genrate.js');
-var itemGroupV1 =  require('./item_group/item_group_master.js');
+var itemGroupV1 =  require('./item-group/item-group-master.js');
 
 router.use('/configuration',configurationV1);
 router.use('/recruitment',recruitmentV1);
