@@ -168,7 +168,6 @@ router.get('/working_schedule', function(req,res,next){
     }
 });
 
-
 router.get('/testbhavya',function(req,res,next){
 
     var responseMessage = {
@@ -249,6 +248,42 @@ router.get('/testbhavya',function(req,res,next){
             responseMessage.message = 'id is empty';
             res.status(400).json(responseMessage);
         }
+    //}
+    //catch (ex) {
+    //    var errorDate = new Date();
+    //    console.log(errorDate.toTimeString() + ' ......... error ...........');
+    //    console.log('FnGetCVInfo error:' + ex.description);
+    //
+    //    res.status(400).json(responseMessage);
+    //}
+});
+
+router.get('/testnew',function(req,res,next){
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: []
+    };
+    var validationFlag = true;
+    var error = {};
+
+    //try {
+    var id = parseInt(req.query.id);
+    //var ownerId = req.query.owner_id;   // id=masterid when ownerid=0 and id=jobid when ownerid!=0
+
+    var responseMessage = {
+        status: false,
+        data: null,
+        skillMatrix : [],
+        job_location : [],
+        line_of_career : [],
+        education : [],
+        error:{},
+        message:''
+    };
+
     //}
     //catch (ex) {
     //    var errorDate = new Date();
