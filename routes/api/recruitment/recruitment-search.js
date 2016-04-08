@@ -170,12 +170,9 @@ router.post('/job_seeker',function(req,res,next){
     var skillKeywordsList = (req.body.skillKeywords) ? req.body.skillKeywords.split(',') : [];
 
     var skillKeywordsQueryParts = [];
-
-    for(var i = 0; i < skillKeywordsList.length; i++){
-        skillKeywordsQueryParts.push(" MATCH (tcv.KeySkills) AGAINST ("+ req.db.escape(skillKeywordsList[i]) + "  IN BOOLEAN MODE ) ");
+    if(skillKeywordsList.length){
+        skillKeywordsQueryParts.push(" MATCH (tcv.KeySkills) AGAINST ("+ req.db.escape(skillKeywordsList.join(' ')) + "  IN BOOLEAN MODE ) ");
     }
-
-
     //var skillKeywords = "";
     var start = req.body.page_count;
     var limit = req.body.page_size;
@@ -186,123 +183,242 @@ router.post('/job_seeker',function(req,res,next){
     gender = (gender == 2) ? "0,1,2" : ((gender) ? ""+gender+ "": "0,1,2");
     var source1GenderQuery = " AND FIND_IN_SET(tcv.Gender,"+req.db.escape(gender)+") ";
 
+    var expQuery = '';
+    var salQuery  = '';
+    var instituteQuery = '';
+    var eduMatrixArray = [];
+    var eduMatrix = '';
+    var edujoin = '';
+    var locMatrixArray = [];
+    var locdata = '';
+    var locjoin = '';
+
+    if(req.body.experience_from && req.body.experience_to){
+        expQuery = " AND tcv.Exp>=" + req.db.escape(req.body.experience_from) + "AND tcv.Exp <= " + req.db.escape(req.body.experience_to);
+    }
+    /**
+     * converting salary to annual bases
+     */
+    if (req.body.salary_from && req.body.salary_to){
+        if (parseInt(req.body.salary_type) == 1){
+            req.body.salary_from = Math.round( (req.body.salary_from) * 2112.00) ;
+            req.body.salary_to = Math.round( (req.body.salary_to) * 2112.00 );
+        }
+        if (parseInt(req.body.salary_type) == 2){
+            req.body.salary_from = Math.round( ((req.body.salary_from) * 2112.00)/176);
+            req.body.salary_to = Math.round( ((req.body.salary_to) * 2112.00)/176) ;
+        }
+        salQuery = " AND tcv.salary >= " + req.db.escape(req.body.salary_from)+ " AND tcv.salary <=" +req.db.escape(req.body.salary_to);
+    }
+    if (req.body.institute_id) {
+        instituteQuery = ' AND (SELECT concat(",(",GROUP_CONCAT(Instituteid),"),") FROM tcv_education WHERE CVID=tcv.TID) ' +
+            ' REGEXP ' + '"' + req.db.escape(req.body.institute_id) + '"';
+    }
+
+    /**
+     * preparing query for education
+     */
+    var educations = req.body.jobEducations;
+    if (educations){
+        if (educations.length > 0){
+            for ( var j = 0; j < educations.length; j++){
+                var eduSkills = {
+                    education: (educations[j].edu_id) ? educations[j].edu_id.toString() : '',
+                    spc: educations[j].spc_id ? educations[j].spc_id.toString() : '',
+                    score_from: educations[j].score_from ? educations[j].score_from.toString() : '',
+                    score_to: educations[j].score_to ? educations[j].score_to.toString() : ''
+                };
+                eduMatrixArray.push(' (FIND_IN_SET(edu.Educationid,' + req.db.escape(eduSkills.education) + ') ' +
+                     ' AND FIND_IN_SET(edu.Specializationids,' +  req.db.escape(eduSkills.spc) + ') ' +
+                     ' AND edu.Score>=' + req.db.escape(eduSkills.score_from) + ' AND edu.Score<=' + req.db.escape(eduSkills.score_to) + ')');
+            }
+            eduMatrix += (eduMatrixArray.length) ? " AND ( "+ eduMatrixArray.join(" OR ") +") " : "";
+            edujoin = ' LEFT OUTER JOIN tcv_education edu ON edu.cvid=tcv.tid ';
+        }
+    }
+    /**
+     * preparing query for Line of career
+     */
+    var locMatrix = req.body.locMatrix;
+    if (locMatrix){
+        if (locMatrix.length > 0){
+            for ( var k = 0; k < locMatrix.length; k++){
+                var locSkills = {
+                    fid: locMatrix[k].fid  ? locMatrix[k].fid.toString() : '',
+                    locIds: locMatrix[k].career_id ? locMatrix[k].career_id.toString() : '',
+                    exp_from: locMatrix[k].exp_from ? locMatrix[k].exp_from.toString() : '',
+                    exp_to: locMatrix[k].exp_to ? locMatrix[k].exp_to.toString() : '',
+                    level: locMatrix[k].expertiseLevel ? locMatrix[k].expertiseLevel.toString() : '',
+                    scoreFrom: locMatrix[k].score_from ? locMatrix[k].score_from.toString() : '',
+                    scoreTo: locMatrix[k].score_to ? locMatrix[k].score_to.toString() : ''
+                };
+                locMatrixArray.push(' (FIND_IN_SET(loc.LOCid,' + req.db.escape(locSkills.locIds) + ') '+
+                ' AND FIND_IN_SET(loc.Level,' + req.db.escape(locSkills.level) + ') ' +
+                ' AND loc.Exp>=' + req.db.escape(locSkills.exp_from) + ' AND loc.Exp<=' + req.db.escape(locSkills.exp_to) +
+                ' AND loc.Score >=' + req.db.escape(locSkills.scoreFrom) + ' AND loc.Score <=' + req.db.escape(locSkills.scoreTo) + ')');
+            }
+            locdata += (locMatrixArray.length) ? " AND ( "+ locMatrixArray.join(" OR ") +") " : "";
+            locjoin = ' LEFT OUTER JOIN tcv_loc loc ON loc.cvid=tcv.tid ';
+        }
+    }
+
+    /**
+     * checking condition for status (hidden or visible)
+     */
+
+    var filterQuery = '';
+    var status;
+    var filterQuery1='';
+
+    var masterID = "SET @masterid = (SELECT masterid FROM tloginout WHERE token =" +req.db.escape(token)+");";
+
+    if (parseInt(req.body.filter_type) == 0){
+        filterQuery = " AND NOT FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
+        status = "," + 1 +" as status";
+    }
+    if (parseInt(req.body.filter_type) == 1){
+         filterQuery1 = " left outer join tapplicant_hidden z on z.cvid=tcv.tid";
+        filterQuery = " or z.cvid=tcv.tid";
+        status = " ,if(z.tid is null," + 1 + "," + 0 + ") as status";
+    }
+    else {
+        filterQuery = " AND NOT FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
+        status = ","+ 0 + " as status";
+    }
+
+    /**
+     * concatenating all above prepared query
+     */
+    var subQuery = expQuery + salQuery + instituteQuery + eduMatrix + locdata + filterQuery;
+    //console.log("subQuery",subQuery);
+
+
     /**
      * @login_tid TID of a user who is logged in (from tmaster)
      */
     var jobSeekerQuery =
         "SET @user_ids = (SELECT get_account_users("+req.db.escape(token)+"));";
+    jobSeekerQuery+=masterID;
 
     if(source){
         switch (source){
             case "1,2" :
                 jobSeekerQuery +=
-                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
+                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
                      CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
+                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +
+                    "   WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
+                jobSeekerQuery+=subQuery   ;
                 jobSeekerQuery +=
-                    "UNION " +
-                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    " UNION " +
+                    " SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv \
-                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
+                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +"  \
+                    WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0 AND OID = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
-                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+";"
+                jobSeekerQuery+=subQuery ;
 
+                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+")  data;"
 
-                var countQuery = "SELECT COUNT(*) AS count FROM (SELECT TID FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
-                countQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
-                countQuery +=
-                    "UNION " +
-                    "SELECT TID FROM tcv AS tcv \
-                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
-                countQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
-                countQuery += ") AS tmp;"
+                jobSeekerQuery+=" select FOUND_ROWS() as count; ";
+
+                //var countQuery = "SELECT COUNT(*) AS count FROM (SELECT TID FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
+                //countQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
+                //countQuery +=
+                //    "UNION " +
+                //    "SELECT TID FROM tcv AS tcv \
+                //    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
+                //countQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
+                //countQuery += ") AS tmp;"
 
                 //jobSeekerQuery += "SELECT FOUND_ROWS() AS count;";
 
-                jobSeekerQuery += countQuery;
+                //jobSeekerQuery += countQuery;
 
                 break;
 
             case "2,1":
                 jobSeekerQuery +=
-                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
+                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
                      CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
-                    + source1GenderQuery;
-                jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ": "";
+                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +
+                    "   WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
+                jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
+                jobSeekerQuery+=subQuery   ;
                 jobSeekerQuery +=
-                    "UNION " +
-                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    " UNION " +
+                    " SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv \
-                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery;
-                jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
-                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+";"
+                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +"  \
+                    WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0 AND OID = 0 " + source1GenderQuery ;
+                jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
+                jobSeekerQuery+=subQuery ;
 
-                var countQuery = "SELECT COUNT(*) AS count FROM (SELECT TID FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)" + source1GenderQuery ;
-                countQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
-                countQuery +=
-                    "UNION " +
-                    "SELECT TID FROM tcv AS tcv \
-                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
-                countQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
-                countQuery += ") AS tmp;"
+                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+")  data;"
 
-
-                //jobSeekerQuery += "SELECT FOUND_ROWS() AS count;";
-
-                jobSeekerQuery +=  countQuery;
+                jobSeekerQuery+=" select FOUND_ROWS() as count; ";
 
                 break;
 
             case "2":
                 jobSeekerQuery +=
-                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv \
-                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
+                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +" \
+                    WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0  AND OID = 0  " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
-                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+";"
+                jobSeekerQuery+=subQuery ;
 
-                var countQuery =     "SELECT COUNT(*) AS count FROM tcv AS tcv \
-                    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
-                countQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ;" : ";";
+                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+") data;"
 
-                //jobSeekerQuery += "SELECT FOUND_ROWS() AS count;";
+                jobSeekerQuery+=" select FOUND_ROWS() as count; ";
 
-                jobSeekerQuery += countQuery;
+                //var countQuery =     "SELECT COUNT(*) AS count FROM tcv AS tcv \
+                //    WHERE MasterID > 0 AND (OID = 0 OR  FIND_IN_SET(tcv.OID,@user_ids)) " + source1GenderQuery ;
+                //countQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ;" : ";";
+                //
+                ////jobSeekerQuery += "SELECT FOUND_ROWS() AS count;";
+                //
+                //jobSeekerQuery += countQuery;
 
                 break;
 
             default :
 
                 jobSeekerQuery +=
-                    "SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
+                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
                      CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc, tcv.Status FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)"
+                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv " + edujoin + locjoin + filterQuery1 +
+                    " WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ": "";
-                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+";"
+                jobSeekerQuery+=subQuery   ;
+                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+") data;"
 
-                var countQuery = "SELECT COUNT(*) AS count FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)"
-                countQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ;": ";";
+                jobSeekerQuery+=" select FOUND_ROWS() as count; ";
 
-                //jobSeekerQuery += "SELECT FOUND_ROWS() AS count; ";
-                jobSeekerQuery += countQuery;
+                //var countQuery = "SELECT COUNT(*) AS count FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)"
+                //countQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ;": ";";
+                //
+                ////jobSeekerQuery += "SELECT FOUND_ROWS() AS count; ";
+                //jobSeekerQuery += countQuery;
                 break;
         }
     }
 
-    jobSeekerQuery += "SELECT @user_ids AS users;"
+    jobSeekerQuery += " SELECT @user_ids AS users;";
 
-console.log(jobSeekerQuery);
+
+
+console.log('jobSeekerQuery',jobSeekerQuery);
+    //res.send(jobSeekerQuery);
+    //return;
 
     req.db.query(jobSeekerQuery,function(err,results){
         if(err){
@@ -310,22 +426,22 @@ console.log(jobSeekerQuery);
             res.status(400).json(err);
         }
         else{
-            //console.error('results',results);
+            console.error('results',results);
             var respMsg = {
                 status : true,
                 message : "Job seeker result loaded successfully",
                 data : [],
                 count : 0
             };
-            if(results[1]){
-                for(var i=0; i < results[1].length; i++){
-                    results[1][i].surl = (results[1][i].CVDoc) ?
-                    req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[1][i].CVDoc : '';
-                }
-                respMsg.data = results[1];
-            }
             if(results[2]){
-                respMsg.count = (results[2][0]) ? ((results[2][0].count) ? results[2][0].count : 0) : 0;
+                for(var i=0; i < results[2].length; i++){
+                    results[2][i].surl = (results[2][i].CVDoc) ?
+                    req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + results[2][i].CVDoc : '';
+                }
+                respMsg.data = results[2];
+            }
+            if(results[3]){
+                respMsg.count = (results[3][0]) ? ((results[3][0].count) ? results[3][0].count : 0) : 0;
             }
             res.json(respMsg);
         }
