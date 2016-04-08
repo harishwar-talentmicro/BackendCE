@@ -465,8 +465,9 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                                         imgArray.push(attachment);
                                                     }
                                                 }
-                                                console.log("imgArray : "+imgArray);
+                                                //console.log("imgArray : "+imgArray);
                                                 result.pic = imgArray.join();
+                                                //console.log(result.pic,"result.pic");
                                             }
                                             else{
                                                 result.pic = null;
@@ -508,7 +509,6 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                             }
 
                                             var replayObject = [];
-                                            console.log(b.length,"length iof b");
                                             for(var j = 0; j< b.length;j++){
                                                 var robject = {};
                                                 robject.replaytext = b[j];
@@ -896,6 +896,7 @@ Association.prototype.updateAssociationServices = function(req,res,next){
             error.service_mid = 'Invalid service id';
             validationFlag *= false;
         }
+
         if (!validationFlag) {
             responseMessage.error = error;
             responseMessage.message = 'Please check the errors';
@@ -1306,6 +1307,10 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
                                                 imgArray = results[0][0].attach.split(',');
                                                 idArray = results[0][0].attachid.split(',');
                                             }
+                                             var opnion_poll_result ='';
+                                            if (results[2][0]){
+                                                opnion_poll_result = results[2][0];
+                                            }
                                             for (var i = 0; i < idArray.length; i++ ){
                                                 var imjObject = {};
                                                     imjObject.pic=imgArray[i],
@@ -1334,7 +1339,7 @@ Association.prototype.associationGetEventInfo = function(req,res,next){
                                             responseMessage.data = {
                                                 tenDetails : tenData,
                                                 comments : results[1],
-                                                opinion_poll : results[2],
+                                                opinion_poll : opnion_poll_result,
                                                 imageDetails : output
                                             };
                                             res.status(200).json(responseMessage);
