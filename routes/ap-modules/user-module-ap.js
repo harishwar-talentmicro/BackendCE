@@ -50,13 +50,14 @@ User_AP.prototype.getUserDetailsAP = function(req,res,next){
 
         var EZEID = alterEzeoneId(req.query.EZEID);
         if (EZEID) {
+            console.log("EZEID",EZEID);
             var query = 'Call pgetUserProfileAP('+st.db.escape(EZEID)+')';
-            console.log(query);
+            console.log("query",query);
             st.db.query(query, function (err, UserDetailsResult) {
                 if (!err) {
+                    console.log(UserDetailsResult);
                     if (UserDetailsResult != null) {
                         if (UserDetailsResult[0].length > 0) {
-                            //console.log(UserDetailsResult[0]);
                             UserDetailsResult[0][0].Picture = (UserDetailsResult[0][0].Picture) ?
                                 (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + UserDetailsResult[0][0].Picture) : '';
                             console.log('FnGetUserDetailsAP : pgetUserProfileAP: User details sent successfully');

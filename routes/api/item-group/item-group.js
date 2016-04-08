@@ -13,9 +13,6 @@ var router = express.Router();
  *
  * @discription : API to get group keyword details
  */
-
-var express = require('express');
-var router = express.Router();
 function alterEzeoneId(ezeoneId){
     var alteredEzeoneId = '';
     if(ezeoneId){
@@ -200,7 +197,7 @@ router.get('/details', function(req,res,next){
 
 
 /**
-* Method : GET
+* Method : POST
 * @param req
 * @param res
 * @param next
