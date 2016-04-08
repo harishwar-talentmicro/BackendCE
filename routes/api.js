@@ -587,6 +587,7 @@ router.post('/procurement_send_mail',procurementModule.sendPoMail);
 router.get('/proc_all_enq',procurementModule.procurementGetAllEnq);
 router.get('/proc_enq_details',procurementModule.procurementGetEnqDetails);
 router.post('/proc_test_api',procurementModule.testPdf);
+router.post('/proc_test_register',procurementModule.testRegister);
 
 //profile-branch-module
 var ProfileBranch = require('./modules/profile-branch-module.js');
