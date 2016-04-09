@@ -31,7 +31,7 @@
     "ADMIN_HOST" : "104.199.128.226",
     "ADMIN_PORT" : "12345",
     "ADMIN_PROTOCOL" : "http",
-    "PORT" : "61612",
+    "PORT" : 61612,
     "USERNAME" : "indrajeet",
     "PASSWORD" : "indrajeet"
   },
