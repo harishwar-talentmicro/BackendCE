@@ -105,6 +105,11 @@
         "file" : "proposal_template.html",
         "subject" : "Proposal Details"
       },
+      "sales_lead_template" : {
+        "params" : ["ezeoneId", "message"],
+        "file" : "sales_enquiry_mail.html",
+        "subject" : "Sales Enquiry"
+      },
       "default": {
         "params": ["HTML"],
         "file": "default.html",

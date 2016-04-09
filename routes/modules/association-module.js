@@ -706,19 +706,23 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                     }
                                                                     else {
                                                                         console.log('attachment file not save');
+                                                                        res.status(200).json(responseMessage);
                                                                     }
                                                                 }
                                                                 else {
                                                                     console.log('attachment file not save');
+                                                                    res.status(200).json(responseMessage);
                                                                 }
                                                             }
                                                             else {
                                                                 console.log('attachment file not save');
+                                                                res.status(200).json(responseMessage);
                                                             }
                                                         }
                                                         else {
                                                             console.log('attachment file not save');
                                                             console.log(err);
+                                                            res.status(200).json(responseMessage);
                                                         }
                                                     });
                                                 }
@@ -743,7 +747,7 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                             console.log(notiResult);
                                                             if (notiResult[0]){
                                                                if (notiResult[0].length > 0){
-                                                                   if (notiResult[1]){
+                                                                   if (notiResult[2]){
                                                                        var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
                                                                            var receiverId = notiResult[0][i].g_title;
@@ -961,24 +965,28 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                 id : results[0][0].tid,
                                                                                 imageData : outputArray
                                                                             };
-                                                                            res.status(200).json(responseMessage);
                                                                             console.log('attachment file saved');
+                                                                            res.status(200).json(responseMessage);
                                                                         }
                                                                         else {
                                                                             console.log('attachment file not save');
+                                                                            res.status(200).json(responseMessage);
                                                                         }
                                                                     }
                                                                     else {
                                                                         console.log('attachment file not save');
+                                                                        res.status(200).json(responseMessage);
                                                                     }
                                                                 }
                                                                 else {
                                                                     console.log('attachment file not save');
+                                                                    res.status(200).json(responseMessage);
                                                                 }
                                                             }
                                                             else {
                                                                 console.log('attachment file not save');
                                                                 console.log(err);
+                                                                res.status(200).json(responseMessage);
                                                             }
                                                         });
                                                     }
@@ -1002,7 +1010,7 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        if (notiResult[1]){
+                                                                        if (notiResult[2]){
                                                                             for (var i = 0; i < notiResult[0].length; i++ ){
                                                                                 var receiverId = notiResult[0][i].g_title;
                                                                                 var senderTitle = notiResult[1][0].s_title;
@@ -1677,19 +1685,23 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                         }
                                                                         else {
                                                                             console.log('attachment file not save');
+                                                                            res.status(200).json(responseMessage);
                                                                         }
                                                                     }
                                                                     else {
                                                                         console.log('attachment file not save');
+                                                                        res.status(200).json(responseMessage);
                                                                     }
                                                                 }
                                                                 else {
                                                                     console.log('attachment file not save');
+                                                                    res.status(200).json(responseMessage);
                                                                 }
                                                             }
                                                             else {
                                                                 console.log('attachment file not save');
                                                                 console.log(err);
+                                                                res.status(200).json(responseMessage);
                                                             }
                                                         });
                                                     }
@@ -1712,7 +1724,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        if (notiResult[1] && notiResult[2]){
+                                                                        if (notiResult[3]){
                                                                             var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
                                                                             for (var i = 0; i < notiResult[0].length; i++ ){
                                                                                 var receiverId = notiResult[0][i].g_title;
@@ -1994,19 +2006,23 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                             }
                                                                                             else {
                                                                                                 console.log('attachment file not save');
+                                                                                                res.status(200).json(responseMessage);
                                                                                             }
                                                                                         }
                                                                                         else {
                                                                                             console.log('attachment file not save');
+                                                                                            res.status(200).json(responseMessage);
                                                                                         }
                                                                                     }
                                                                                     else {
                                                                                         console.log('attachment file not save');
+                                                                                        res.status(200).json(responseMessage);
                                                                                     }
                                                                                 }
                                                                                 else {
                                                                                     console.log('attachment file not save');
                                                                                     console.log(err);
+                                                                                    res.status(200).json(responseMessage);
                                                                                 }
                                                                             });
                                                                         }
@@ -2024,15 +2040,18 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                     }
                                                                     else {
                                                                         console.log('opinoion poll option save');
+                                                                        res.status(200).json(responseMessage);
                                                                     }
                                                                 }
                                                                 else {
                                                                     console.log('opinoion poll option save');
+                                                                    res.status(200).json(responseMessage);
                                                                 }
                                                             }
                                                             else {
                                                                 console.log('opinoion poll option not save');
                                                                 console.log(err);
+                                                                res.status(200).json(responseMessage);
                                                             }
                                                         });
                                                     }
@@ -2053,10 +2072,12 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                     st.db.query(notiQuery, function (err, notiResult) {
                                                         if (!err) {
                                                             if (notiResult) {
-                                                                console.log(notiResult);
+                                                                console.log(notiResult,"notiResult");
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        if (notiResult[1] && notiResult[2]){
+                                                                        console.log(notiResult[1],"notiResult[1]");
+                                                                        console.log(notiResult[0],"notiResult[3]");
+                                                                        if (notiResult[3]){
                                                                             for (var i = 0; i < notiResult[0].length; i++ ) {
                                                                                 var fn = (notiResult[1][0].fn) ? notiResult[1][0].fn :
                                                                                     ((notiResult[1][0].ln) ? notiResult[1][0].ln : notiResult[1][0].s_title);
@@ -2065,10 +2086,12 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 var groupTitle = notiResult[0][i].g_title;
                                                                                 var groupId = notiResult[0][i].gid;
                                                                                 var messageText = 'New opinion-poll from ' + fn + ' for Approval.';
+                                                                                console.log(notiResult[2][0].sm_id,"notiResult[2][0].sm_id");
                                                                                 var data = {
                                                                                     ten_id: results[0][0].id,
                                                                                     sm_id: notiResult[2][0].sm_id
                                                                                 };
+
                                                                                 /**
                                                                                  * messageType 16 is event/poster/poll/ posted after approval of admin
                                                                                  */
@@ -2562,7 +2585,7 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                     console.log(notiResult);
                                                     if (notiResult[0]){
                                                         if (notiResult[0].length > 0){
-                                                            if (notiResult[1] && notiResult[2]){
+                                                            if (notiResult[3]){
                                                                 var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
                                                                 for (var i = 0; i < notiResult[0].length; i++ ){
                                                                     var receiverId = notiResult[0][i].gid;

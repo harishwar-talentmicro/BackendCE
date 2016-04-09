@@ -1264,6 +1264,7 @@ Service.prototype.addMembersToService = function(req,res,next){
                         st.db.query(query, function (err, memberResult) {
                             if (!err) {
                                 if (memberResult) {
+                                    console.log(memberResult);
                                     if (memberResult.affectedRows > 0) {
                                         responseMessage.status = true;
                                         responseMessage.message = 'Member added successfully';

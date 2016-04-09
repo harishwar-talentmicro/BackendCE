@@ -18,12 +18,6 @@ router.post('/cv_generate',function(req,res,next){
     if (req.body.reference.length < 1){
         if_not_ref = 'References available on request.';
     }
-    var abc = req.body.flag;
-    var exp;
-    for (var a = 0; a > length.flag; a++){
-        exp = (parseInt(flag[a].total_exp) <= 1) ? flag[a].total_exp+' Year' : flag[a].total_exp+' Years';
-        console.log(exp);
-    }
     http.get(imagePath, function(response){
         var bufs = [];
         response.on('data', function(d){ bufs.push(d); });
@@ -61,7 +55,8 @@ router.post('/cv_generate',function(req,res,next){
                         "hobbies": req.body.hobbies,
                         "full_name": req.body.full_name,
                         "address": req.body.address,
-                        "passport": (req.body.passport) ? req.body.passport : '',
+                        "passport_no": req.body.passport_no,
+                        "pass_exp_date": req.body.pass_exp_date,
                         "other_info": (req.body.other_info) ? req.body.other_info : '',
                         "dob": req.body.dob,
                         "gender": req.body.gender,
@@ -94,6 +89,7 @@ router.post('/cv_generate',function(req,res,next){
                     res.setHeader('Content-type', "application/octet-stream");
                     bufferStream.pipe(res);
 
+
                 }
                 else{
                     console.log("imagePath4",imagePath);
@@ -113,28 +109,27 @@ router.post('/cv_generate',function(req,res,next){
                         "additional_info": req.body.additional_info,
                         "work_exp": req.body.work_exp,
                         "hobbies": req.body.hobbies,
-                        "full_name": req.body.full_name,
+                        "full_name": req.body.name,
                         "address": req.body.address,
-                        "passport": (req.body.passport) ? req.body.passport : '',
+                        "passport_no": req.body.passport_no,
+                        "pass_exp_date": req.body.pass_exp_date,
                         "other_info": (req.body.other_info) ? req.body.other_info : '',
                         "dob": req.body.dob,
                         "gender": req.body.gender,
                         "if_not_ref": if_not_ref,
-                        "%image": req.body.imagePath,
+                        "%image": ' ',
                         "reference": req.body.reference,
                         "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
-                        "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin,
-                        "flag": exp
-
+                        "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin
                     });
                     doc.render();
                     var buf = doc.getZip().generate({type: "nodebuffer"});
                     console.log(buf.length);
-                    //var bufferStream = new stream.PassThrough();
-                    //bufferStream.end(buf);
-                    //res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
-                    //res.setHeader('Content-type', "application/octet-stream");
-                    //bufferStream.pipe(res);
+                    var bufferStream = new stream.PassThrough();
+                    bufferStream.end(buf);
+                    res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                    res.setHeader('Content-type', "application/octet-stream");
+                    bufferStream.pipe(res);
                     //var pdfClient = new PDFClient(req.CONFIG);
                     //pdfClient.convertToPdf(buf,function(err,pdfBuffer){
                     //    if(err){
@@ -149,8 +144,8 @@ router.post('/cv_generate',function(req,res,next){
                     //    bufferStream.pipe(res);
                     //});
 
-                    fs.writeFileSync(__dirname+"/output.docx",buf);
-                    res.status(200).json("Success");
+                    //fs.writeFileSync(__dirname+"/output.docx",buf);
+                    //res.status(200).json("Success");
                 }
             });
         });
@@ -170,18 +165,18 @@ router.post('/cv_generate',function(req,res,next){
                 "additional_info": req.body.additional_info,
                 "work_exp": req.body.work_exp,
                 "hobbies": req.body.hobbies,
-                "full_name": req.body.full_name,
+                "full_name": req.body.name,
                 "address": req.body.address,
-                "passport": (req.body.passport) ? req.body.passport : '',
+                "passport_no": req.body.passport_no,
+                "pass_exp_date": req.body.pass_exp_date,
                 "other_info": (req.body.other_info) ? req.body.other_info : '',
                 "dob": req.body.dob,
                 "gender": req.body.gender,
                 "if_not_ref": if_not_ref,
-                "%image": req.body.imagePath,
+                "%image": ' ',
                 "reference": req.body.reference,
                 "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
                 "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin
-
             });
             doc.render();
             var buf = doc.getZip().generate({type: "nodebuffer"});
@@ -264,9 +259,10 @@ router.post('/test_code',function(req,res,next){
                 "additional_info": req.body.additional_info,
                 "work_exp": req.body.work_exp,
                 "hobbies": req.body.hobbies,
-                "full_name": req.body.full_name,
+                "full_name": req.body.name,
                 "address": req.body.address,
-                "passport_no": req.body.passport,
+                "passport_no": req.body.passport_no,
+                "pass_exp_date": req.body.pass_exp_date,
                 "other_info": (req.body.other_info) ? req.body.other_info : '',
                 "dob": req.body.dob,
                 "gender": req.body.gender,
