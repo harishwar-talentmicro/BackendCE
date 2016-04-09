@@ -1913,7 +1913,7 @@ User.prototype.saveResume = function(req,res,next){
                             st.db.query(query, function (err, InsertResult) {
                                 console.log(InsertResult);
                                 if (!err) {
-                                    if (InsertResult[0]) {
+                                    if (InsertResult && InsertResult[0] && InsertResult[0][0]) {
                                         var async = require('async');
                                         var count = skillMatrix1.length;
 
