@@ -983,7 +983,6 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                             procurementUpdateQuery = "; CALL pupdate_Sales_proposaldetails("+procurementParams + ");";
                             console.log(procurementUpdateQuery);
                         }
-
                         var combinedQuery = salesLeadQuery + procurementUpdateQuery;
                         console.log(combinedQuery);
                         st.db.query(combinedQuery, function (err, transResult) {
@@ -993,6 +992,7 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                     if (transResult[0]) {
                                         if (transResult[0][0]){
                                             if (transResult[0][0].MessageID) {
+
                                                 /**
                                                  * passing folder rule id to check folder access
                                                  */

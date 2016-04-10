@@ -12,15 +12,11 @@ var PDFClient = require('../pdf-client.js');
 
 router.post('/cv_generate',function(req,res,next){
     var if_not_ref = '';
-    var hob = false;
     var imageFullPath = 'https://storage.googleapis.com/ezeone/';
     var imagePath = (req.body.imagePath) ? imageFullPath + req.body.imagePath : imageFullPath;
     console.log("imagePath",imagePath);
     if (req.body.reference.length < 1){
         if_not_ref = 'References available on request.';
-    }
-    if (req.body.hobbies){
-        hob = true;
     }
     //var abc = req.body.flag;
     //var exp;
@@ -128,16 +124,17 @@ router.post('/cv_generate',function(req,res,next){
                         "reference": req.body.reference,
                         "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
                         "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin,
-                        "hob":hob
+                        "flag": exp
+
                     });
                     doc.render();
                     var buf = doc.getZip().generate({type: "nodebuffer"});
                     console.log(buf.length);
-                    var bufferStream = new stream.PassThrough();
-                    bufferStream.end(buf);
-                    res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
-                    res.setHeader('Content-type', "application/octet-stream");
-                    bufferStream.pipe(res);
+                    //var bufferStream = new stream.PassThrough();
+                    //bufferStream.end(buf);
+                    //res.setHeader('Content-disposition', 'attachment; filename=resume.docx');
+                    //res.setHeader('Content-type', "application/octet-stream");
+                    //bufferStream.pipe(res);
                     //var pdfClient = new PDFClient(req.CONFIG);
                     //pdfClient.convertToPdf(buf,function(err,pdfBuffer){
                     //    if(err){
@@ -152,8 +149,8 @@ router.post('/cv_generate',function(req,res,next){
                     //    bufferStream.pipe(res);
                     //});
 
-                    //fs.writeFileSync(__dirname+"/output.docx",buf);
-                    //res.status(200).json("Success");
+                    fs.writeFileSync(__dirname+"/output.docx",buf);
+                    res.status(200).json("Success");
                 }
             });
         });
@@ -184,6 +181,7 @@ router.post('/cv_generate',function(req,res,next){
                 "reference": req.body.reference,
                 "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
                 "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin
+
             });
             doc.render();
             var buf = doc.getZip().generate({type: "nodebuffer"});

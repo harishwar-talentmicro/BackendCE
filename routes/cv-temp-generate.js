@@ -12,22 +12,12 @@ var PDFClient = require('../pdf-client.js');
 
 router.post('/cv_generate',function(req,res,next){
     var if_not_ref = '';
-    var hob = false;
     var imageFullPath = 'https://storage.googleapis.com/ezeone/';
     var imagePath = (req.body.imagePath) ? imageFullPath + req.body.imagePath : imageFullPath;
     console.log("imagePath",imagePath);
     if (req.body.reference.length < 1){
         if_not_ref = 'References available on request.';
     }
-    if (req.body.hobbies){
-        hob = true;
-    }
-    //var abc = req.body.flag;
-    //var exp;
-    //for (var a = 0; a > abc.length; a++){
-    //    exp = (parseInt(abc[a].total_exp) <= 1) ? abc[a].total_exp+' Year' : abc[a].total_exp+' Years';
-    //    console.log(exp);
-    //}
     http.get(imagePath, function(response){
         var bufs = [];
         response.on('data', function(d){ bufs.push(d); });
@@ -65,7 +55,8 @@ router.post('/cv_generate',function(req,res,next){
                         "hobbies": req.body.hobbies,
                         "full_name": req.body.full_name,
                         "address": req.body.address,
-                        "passport": (req.body.passport) ? req.body.passport : '',
+                        "passport_no": req.body.passport_no,
+                        "pass_exp_date": req.body.pass_exp_date,
                         "other_info": (req.body.other_info) ? req.body.other_info : '',
                         "dob": req.body.dob,
                         "gender": req.body.gender,
@@ -98,6 +89,7 @@ router.post('/cv_generate',function(req,res,next){
                     res.setHeader('Content-type', "application/octet-stream");
                     bufferStream.pipe(res);
 
+
                 }
                 else{
                     console.log("imagePath4",imagePath);
@@ -117,18 +109,18 @@ router.post('/cv_generate',function(req,res,next){
                         "additional_info": req.body.additional_info,
                         "work_exp": req.body.work_exp,
                         "hobbies": req.body.hobbies,
-                        "full_name": req.body.full_name,
+                        "full_name": req.body.name,
                         "address": req.body.address,
-                        "passport": (req.body.passport) ? req.body.passport : '',
+                        "passport_no": req.body.passport_no,
+                        "pass_exp_date": req.body.pass_exp_date,
                         "other_info": (req.body.other_info) ? req.body.other_info : '',
                         "dob": req.body.dob,
                         "gender": req.body.gender,
                         "if_not_ref": if_not_ref,
-                        "%image": req.body.imagePath,
+                        "%image": ' ',
                         "reference": req.body.reference,
                         "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
-                        "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin,
-                        "hob":hob
+                        "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin
                     });
                     doc.render();
                     var buf = doc.getZip().generate({type: "nodebuffer"});
@@ -173,14 +165,15 @@ router.post('/cv_generate',function(req,res,next){
                 "additional_info": req.body.additional_info,
                 "work_exp": req.body.work_exp,
                 "hobbies": req.body.hobbies,
-                "full_name": req.body.full_name,
+                "full_name": req.body.name,
                 "address": req.body.address,
-                "passport": (req.body.passport) ? req.body.passport : '',
+                "passport_no": req.body.passport_no,
+                "pass_exp_date": req.body.pass_exp_date,
                 "other_info": (req.body.other_info) ? req.body.other_info : '',
                 "dob": req.body.dob,
                 "gender": req.body.gender,
                 "if_not_ref": if_not_ref,
-                "%image": req.body.imagePath,
+                "%image": ' ',
                 "reference": req.body.reference,
                 "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
                 "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin
@@ -266,9 +259,10 @@ router.post('/test_code',function(req,res,next){
                 "additional_info": req.body.additional_info,
                 "work_exp": req.body.work_exp,
                 "hobbies": req.body.hobbies,
-                "full_name": req.body.full_name,
+                "full_name": req.body.name,
                 "address": req.body.address,
-                "passport_no": req.body.passport,
+                "passport_no": req.body.passport_no,
+                "pass_exp_date": req.body.pass_exp_date,
                 "other_info": (req.body.other_info) ? req.body.other_info : '',
                 "dob": req.body.dob,
                 "gender": req.body.gender,
