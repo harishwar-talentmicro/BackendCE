@@ -231,13 +231,6 @@ router.post('/test_code',function(req,res,next){
             doc.render();
             var buf = doc.getZip().generate({type: "nodebuffer"});
             fs.writeFileSync(__dirname+"/output.docx",buf);
-            //unoconv.convert('/cv_template.docx','pdf', function(err,buffer){
-            //    console.log("err",err);
-            //    console.log("buffer",buffer);
-            //    fs.writeFileSync(__dirname+"/output.pdf",buffer);
-            //    res.status(200).json("Success");
-            //});
-            //fs.writeFileSync(__dirname+"/output.pdf",buf);
             res.status(200).json("Success");
         });
     });
