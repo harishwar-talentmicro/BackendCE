@@ -143,6 +143,9 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
         var Size = req.body.Size;
         var IDTypeId = req.body.IDTypeID;
         var SelectionType = req.body.SelectionType;
+        var headcount = (req.body.headcount) ? req.body.headcount : 0;
+        var branch = (req.body.branch) ? req.body.branch : 0;
+        var ismnc = (req.body.ismnc) ? req.body.ismnc : 0;
         var RtnMessage = {
             IsSuccessful: false
         };
@@ -155,7 +158,9 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
                             var InsertQuery = st.db.escape(0) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' +
                                 st.db.escape(EZEIDVerifiedID) + ',' + st.db.escape(Token) + ',' + st.db.escape('') + ',' + st.db.escape('') + ',' + st.db.escape('') + ',' +
                                 st.db.escape('') + ',' + st.db.escape('') + ',' + st.db.escape(EZEID) + ',' +
-                                st.db.escape('') + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape('')+ ',' + st.db.escape(0) + ',' + st.db.escape(0)+ ',' + st.db.escape(IDTypeId) + ',' + st.db.escape(SelectionType);
+                                st.db.escape('') + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape('')
+                                + ',' + st.db.escape(0) + ',' + st.db.escape(0)+ ',' + st.db.escape(IDTypeId) + ',' + st.db.escape(SelectionType)
+                                + ',' + st.db.escape(headcount)+ ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc);
                             // console.log(InsertQuery);
                             st.db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
                                 if (!err) {
@@ -184,7 +189,9 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
                             var InsertQuery = st.db.escape(CategoryID) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' +
                                 st.db.escape(EZEIDVerifiedID) + ',' + st.db.escape(Token) + ',' + st.db.escape(Keywords) + ',' + st.db.escape(Picture) + ',' + st.db.escape(PictureFileName) + ',' +
                                 st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(EZEID) + ',' +
-                                st.db.escape(BrochureDoc) + ',' + st.db.escape(BrochureDocFile) + ',' + st.db.escape(ActiveInactive)+ ',' + st.db.escape(BRContentType)+ ',' + st.db.escape(Rating) + ',' + st.db.escape(Size)+ ',' + st.db.escape(IDTypeId)  + ',' + st.db.escape(SelectionType);
+                                st.db.escape(BrochureDoc) + ',' + st.db.escape(BrochureDocFile) + ',' + st.db.escape(ActiveInactive)
+                                + ',' + st.db.escape(BRContentType)+ ',' + st.db.escape(Rating) + ',' + st.db.escape(Size)+ ',' + st.db.escape(IDTypeId)
+                                + ',' + st.db.escape(SelectionType)+ ',' + st.db.escape(headcount)+ ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc);
                             // console.log('InsertQuery: ' + InsertQuery);
                             st.db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
                                 if (!err) {
