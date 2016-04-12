@@ -24,6 +24,8 @@ function alterEzeoneId(ezeoneId){
 
 var Notification = require('./notification/notification-master.js');
 var NotificationQueryManager = require('./notification/notification-query.js');
+var Mailer = require('../../mail/mailer.js');
+var mailerApi = new Mailer();
 var notification = null;
 var notificationQmManager = null;
 var fs = require('fs');
@@ -1357,7 +1359,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
  * @param next
  * @description api code for apply job
  */
-Job.prototype.applyJob = function(req,res,next){
+    Job.prototype.applyJob = function(req,res,next){
 
     var token = req.body.token;
     var jobId = req.body.job_id;
@@ -1393,9 +1395,10 @@ Job.prototype.applyJob = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var query = st.db.escape(jobId) + ',' + st.db.escape(token)+ ',' + st.db.escape(status);
-                        //console.log('CALL pApplyjob(' + query + ')');
+                        console.log('CALL pApplyjob(' + query + ')');
                         st.db.query('CALL pApplyjob(' + query + ')', function (err, insertResult) {
                             if (!err) {
+                                console.log(insertResult);
                                 if (insertResult[0]) {
                                     if (insertResult[0][0]) {
                                         responseMessage.status = true;
@@ -1404,12 +1407,12 @@ Job.prototype.applyJob = function(req,res,next){
                                         responseMessage.data = insertResult[0][0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnApplyJob: Job apply successfully');
+
                                     }
                                     else {
                                         responseMessage.message = 'Job not apply';
                                         res.status(200).json(responseMessage);
                                         console.log('FnApplyJob:Job not apply');
-
                                     }
                                 }
                                 else {

@@ -35,7 +35,6 @@ var notification = new Notification();
     if(isNaN(req.query.cvid) || req.query.cvid < 1){
         req.query.cvid = 0;
     }
-
     if(!validationFlag){
         responseMessage.error = error;
         responseMessage.message = 'Please check the errors';
@@ -107,8 +106,6 @@ var notification = new Notification();
                                         res.status(500).json(responseMessage);
                                     }
                                 });
-
-
                         }
                         else {
                             responseMessage.message = 'Invalid token';

@@ -130,7 +130,6 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
                                                          * which is assigned to this lead
                                                          */
 
-
                                                     }
                                                 }
                                             }

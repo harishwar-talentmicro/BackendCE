@@ -1,6 +1,10 @@
 /**
- * Created by Hirecraft on 07-04-2016.
+ *  @author Anjali Pandya
+ *  @since April 07,2016  10:46AM
+ *  @title Association Master module (for admin api's)
+ *  @description Handles association admin functions
  */
+"use strict";
 
 var express = require('express');
 var router = express.Router();
@@ -25,7 +29,7 @@ function alterEzeoneId(ezeoneId){
  * @param next
  * @param token* <string> token of login user
  *
- * @discription : API to get group keyword details
+ * @discription : API to get type of any member of association (ex 2 BHK 3 BHK or based on sqrft)
  */
 router.get('/type', function(req,res,next){
 
@@ -80,7 +84,7 @@ router.get('/type', function(req,res,next){
                                         responseMessage.status = false;
                                         responseMessage.error = null;
                                         responseMessage.message = 'Member type details not available';
-                                        responseMessage.data = null;
+                                        responseMessage.data = [];
                                         res.status(200).json(responseMessage);
                                     }
                                 }
@@ -88,7 +92,7 @@ router.get('/type', function(req,res,next){
                                     responseMessage.status = false;
                                     responseMessage.error = null;
                                     responseMessage.message = 'Member type details not available';
-                                    responseMessage.data = null;
+                                    responseMessage.data = [];
                                     res.status(200).json(responseMessage);
                                 }
                             }
@@ -147,7 +151,7 @@ router.get('/type', function(req,res,next){
  * @param next
  * @param token* <string> token of login user
  *
- * @discription : API to get group keyword details
+ * @discription : API to get approval list of members for admin
  */
 router.get('/approval_list', function(req,res,next){
 
@@ -208,7 +212,7 @@ router.get('/approval_list', function(req,res,next){
                             responseMessage.status = false;
                             responseMessage.error = null;
                             responseMessage.message = 'Member type details not available';
-                            responseMessage.data = null;
+                            responseMessage.data = [];
                             res.status(200).json(responseMessage);
                         }
                     }
@@ -216,7 +220,7 @@ router.get('/approval_list', function(req,res,next){
                         responseMessage.status = false;
                         responseMessage.error = null;
                         responseMessage.message = 'Member type details not available';
-                        responseMessage.data = null;
+                        responseMessage.data = [];
                         res.status(200).json(responseMessage);
                     }
                 }
@@ -253,7 +257,7 @@ router.get('/approval_list', function(req,res,next){
  * @param next
  * @param token* <string> token of login user
  * @param service_mid <int> service_mid is service master id
- * @param member_id <int> is association member id of user
+ * @param member_id <int> is association-ap member id of user
  * @param status <int> status of member (1-approve,2-reject)
  * @param pa <int> pa Posting admin
  * @param sa <int> sa SOS admin
@@ -261,7 +265,7 @@ router.get('/approval_list', function(req,res,next){
  * @param ba <int> ba Billing admin
  * @param type <int> type of member type
  *
- * @discription : API to get group keyword details
+ * @discription : API to update status of member of association
  */
 router.put('/status', function(req,res,next){
 
