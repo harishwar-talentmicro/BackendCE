@@ -398,8 +398,11 @@ Auth.prototype.register = function(req,res,next){
                                                         if (firstName && lastName) {
                                                             fullName = firstName + ' ' + lastName;
                                                         }
-                                                        else {
+                                                        else if(firstName) {
                                                             fullName = firstName;
+                                                        }
+                                                        else{
+                                                            fullName = companyName;
                                                         }
 
                                                         var mailContent = {
@@ -590,10 +593,12 @@ Auth.prototype.register = function(req,res,next){
                                                     if (firstName && lastName) {
                                                         fullName = firstName + ' ' + lastName;
                                                     }
-                                                    else {
+                                                    else if(firstName) {
                                                         fullName = firstName;
                                                     }
-
+                                                    else{
+                                                        fullName = companyName;
+                                                    }
                                                     var mailContent = {
                                                         type: 'register',
                                                         fullname: fullName,
