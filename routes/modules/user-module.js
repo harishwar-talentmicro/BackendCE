@@ -2059,6 +2059,7 @@ User.prototype.saveResume = function(req,res,next){
 
                                         //educations
                                         if (educations.length) {
+                                            console.log(educations);
                                             for(var j=0; j < educations.length; j++){
                                                 //async.each(educations, function iterator(eduDetails, callback) {
 
@@ -2071,7 +2072,7 @@ User.prototype.saveResume = function(req,res,next){
                                                     yearofpassing: educations[j].yp,
                                                     level: educations[j].expertiseLevel, // 0-ug, 1-pg
                                                     instituteId : educations[j].institute_id,
-                                                    instituteEnrollmentNumber : (educations[j].enrollment_no) ? educationData[j].enrollment_no : null
+                                                    instituteEnrollmentNumber : (educations[j].enrollment_no) ? educations[j].enrollment_no : null
                                                 };
 
                                                 var queryParams = st.db.escape(educationData.cvid) + ',' + st.db.escape(educationData.eduId)

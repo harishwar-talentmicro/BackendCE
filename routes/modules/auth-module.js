@@ -124,7 +124,7 @@ Auth.prototype.register = function(req,res,next){
     var functionId = (!isNaN(parseInt(req.body.FunctionID))) ?  parseInt(req.body.FunctionID) : 0;
     var roleId = (!isNaN(parseInt(req.body.RoleID))) ?  parseInt(req.body.RoleID) : 0;
     var languageId = (!isNaN(parseInt(req.body.LanguageID))) ?  parseInt(req.body.LanguageID) : 0;
-    var nameTitleId = req.body.NameTitleID;
+    var nameTitleId = (req.body.NameTitleID) ? req.body.NameTitleID : 0;
     var latitude = req.body.Latitude ? req.body.Latitude : 0.00;
     var longitude = req.body.Longitude ? req.body.Longitude : 0.00;
     var altitude = req.body.Altitude ? req.body.Altitude : 0.00;
@@ -178,7 +178,7 @@ Auth.prototype.register = function(req,res,next){
     var headcount = (req.body.headcount) ? req.body.headcount : 0;
     var branch = (req.body.branch) ? req.body.branch : 0;
     var ismnc = (req.body.ismnc) ? req.body.ismnc : 0;
-    var rating = (req.body.rating) ? req.body.rating : 0;
+    var rating = (req.body.rating) ? req.body.rating : 1;
 
     var rtnMessage = {
         error:{},
@@ -354,7 +354,6 @@ Auth.prototype.register = function(req,res,next){
                                                             res.send(rtnMessage);
                                                         }
                                                     });
-
                                                     console.log('FnRegistration:tmaster: Registration success');
 
                                                     var queryParams1 = st.db.escape(pin) + ',' + st.db.escape(ezeid)
@@ -607,7 +606,6 @@ Auth.prototype.register = function(req,res,next){
                                                         toEmail: email
 
                                                     };
-
                                                     mail.sendRegMail(mailContent, function (err, statusResult) {
                                                         if (!err) {
                                                             if (statusResult) {

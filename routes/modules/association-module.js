@@ -231,7 +231,7 @@ Association.prototype.associGetEventDtl = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description save association comments and opinion poll
+ * @description save association-ap comments and opinion poll
  * @accepts json
  * @param ten_id <int> id of a ten master (event, opinion poll etc.)
  * @param comments <string> comments from user
@@ -604,7 +604,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description save association services
+ * @description save association-ap services
  * @accepts json
  * @param token <string> token of login user
  * @param service_mid <int> service_mid is service master id
@@ -861,7 +861,7 @@ Association.prototype.saveAssociationServices = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description update association services
+ * @description update association-ap services
  * @accepts json
  * @param token <string> token of login user
  * @param service_id <int> service_id is id of service if updating
@@ -2199,7 +2199,7 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description update association likes
+ * @description update association-ap likes
  * @accepts json
  * @param token <string> token of login user
  * @param ten_id <int> id of a event or notice
@@ -2523,7 +2523,7 @@ Association.prototype.associationDeleteServiceImg = function(req,res,next){
  * @param req
  * @param res
  * @param next
- * @description update association likes
+ * @description update association-ap likes
  * @accepts json
  * @param token <string> token of login user
  * @param ten_id <int> id of a event or notice

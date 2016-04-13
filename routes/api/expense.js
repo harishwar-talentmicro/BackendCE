@@ -1,6 +1,11 @@
 /**
- * Created by Hirecraft on 18-03-2016.
+ *  @author Anjali Pandya
+ *  @since March 18,2016  10:46AM
+ *  @title Association expense type
+ *  @description Handles expense type and billing function
  */
+"use strict";
+
 var express = require('express');
 var router = express.Router();
 

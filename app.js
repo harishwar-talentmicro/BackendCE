@@ -17,7 +17,7 @@ var app = express();
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
-var alumni = require('./routes/alumni.js');
+//var alumni = require('./routes/alumni.js');
 app.use(multer({
     dest: './uploads/',
     limits: {
