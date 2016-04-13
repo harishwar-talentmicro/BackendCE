@@ -1,6 +1,10 @@
 /**
- * Created by Hirecraft on 04-04-2016.
+ *  @author Anjali Pandya
+ *  @since April 04,2016  10:46AM
+ *  @title group item module
+ *  @description Handles item group functions
  */
+"use strict";
 
 var express = require('express');
 var router = express.Router();
@@ -26,6 +30,16 @@ function alterEzeoneId(ezeoneId){
     return alteredEzeoneId;
 }
 
+
+
+/**
+ * Method : GET
+ * @param req
+ * @param res
+ * @param next
+ *
+ * @discription : API to get group keyword details (No need of token validation)
+ */
 router.get('/keyword', function(req,res,next){
 
     var responseMessage = {
@@ -105,7 +119,7 @@ router.get('/keyword', function(req,res,next){
  * @param next
  * @param token* <string> token of login user
  *
- * @discription : API to get group keyword details
+ * @discription : API to get details of item group
  */
 router.get('/details', function(req,res,next){
     var responseMessage = {
@@ -209,7 +223,7 @@ router.get('/details', function(req,res,next){
  * @param pic <string> pic is path of image
  * @param itemId <string> itemId is comma saprated ids of items
 *
-* @discription : API to get group keyword details
+* @discription : API to create group with item
 */
 
 router.post('/details', function(req,res,next){
@@ -256,12 +270,13 @@ router.post('/details', function(req,res,next){
                                     if (results[0]) {
                                         if (results[0][0]) {
                                             if (results[0][0].id) {
+                                                /**
+                                                 * preparing query to update multiple items of group
+                                                 * getting comma separated item ids
+                                                 */
                                                 var itemArray = (req.body.itemId).split(',');
                                                 if (itemArray.length > 0){
                                                     var combQuery = '';
-                                                    /**
-                                                     * preparing query to update multiple item of group
-                                                     */
                                                     for (var i = 0; i < itemArray.length; i++ ){
                                                         var itemQueryParams = req.db.escape(results[0][0].id) + ',' + req.db.escape(itemArray[i]);
                                                         combQuery +=  ('CALL psave_group_items(' + itemQueryParams + ');');
