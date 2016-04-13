@@ -42,7 +42,7 @@ router.get('/tag/:tag', function(req,res,next){
                     if (results && results[0] && results[0][0] && results[0][0].image) {
                         responseMessage.status = true;
                         results[0][0].GS_URL = req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET;
-                        responseMessage.data = results[0];
+                        responseMessage.data = results[0][0];
                         responseMessage.error = null;
                         responseMessage.message = ' tag result loaded successfully';
                         res.status(200).json(responseMessage);
@@ -51,7 +51,6 @@ router.get('/tag/:tag', function(req,res,next){
                         responseMessage.message = 'No data available';
                         res.json(responseMessage);
                     }
-
                 }
                 else {
                     responseMessage.data = null;
@@ -71,6 +70,7 @@ router.get('/tag/:tag', function(req,res,next){
         }
     }
 });
+
 
 
 router.get('/working_schedule', function(req,res,next){

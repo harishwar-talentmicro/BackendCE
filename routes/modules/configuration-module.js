@@ -2831,9 +2831,12 @@ Configuration.prototype.getHolidays = function(req,res,next){
         res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
         //var token = req.query.Token;
-        var locId = (req.query.LocID) ? req.query.LocID : 0;
-        var templateId = (req.query.TemplateID) ? req.query.TemplateID : 0;
-        var queryParams = st.db.escape(locId) + ',' + st.db.escape(templateId) ;
+        /**
+         * because of mobile compatibility we have not changed name of LocID
+         */
+        var masterId = (req.query.LocID) ? req.query.LocID : 0;
+        //var templateId = (req.query.TemplateID) ? req.query.TemplateID : 0;
+        var queryParams = st.db.escape(masterId);
         var query = 'CALL pGetHolidayList(' + queryParams + ')';
         console.log(query);
         st.db.query(query, function (err, holidayList) {
