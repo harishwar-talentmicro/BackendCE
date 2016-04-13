@@ -10,6 +10,7 @@ var gcloud = require('gcloud');
 var fs = require('fs');
 var uuid = require('node-uuid');
 var path = require('path');
+var moment = require('moment');
 
 var appConfig = require('../../ezeone-config.json');
 
@@ -2580,6 +2581,30 @@ MessageBox.prototype.getGroupList = function(req,res,next){
         data: null
     };
 
+    req.query.dateObjectFlag = (req.query.dateObjectFlag) ? 1 : 0;
+
+    var getFormattedDate = function(date,flag){
+        console.log('calling formatted date');
+        var dMom = null;
+        try{
+            dMom = moment(date,"YYYY-MM-DD HH:mm:ss");
+        }
+        catch(ex){
+            console.log(ex);
+        }
+        if(date && dMom && dMom.isValid()){
+            var x = date;
+            if(flag){
+                return x;
+            }
+            x = dMom.toDate();
+            return x;
+        }
+        return date;
+
+    };
+
+
     var validateStatus = true;
     var error = {};
 
@@ -2601,14 +2626,21 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                 if (!err) {
                     if (result) {
                         var queryParams = st.db.escape(token);
-                        var query = 'CALL pGetGroupAndIndividuals(' + queryParams + ')';
+                        var query = 'CALL pGetGroupAndIndividuals(' + queryParams + ')';4
+                        console.log(query);
                         st.db.query(query, function (err, getResult) {
                             if (!err) {
                                 if (getResult) {
                                     if (getResult[0]) {
                                         if (getResult[0].length > 0) {
+                                            for(var i = 0; i < getResult[0].length; i++){
+                                                getResult[0][i].CreatedDate = getFormattedDate(getResult[0][i].CreatedDate,req.query.dateObjectFlag);
+                                                getResult[0][i].LUDate = getFormattedDate(getResult[0][i].LUDate,req.query.dateObjectFlag);
+                                                getResult[0][i].date = getFormattedDate(getResult[0][i].date,req.query.dateObjectFlag);
+                                            }
                                             var queryParams1 = st.db.escape(token);
                                             var query1 = 'CALL PGetUnreadMessageCountofGroup(' + queryParams1 + ')';
+                                            console.log(query1);
                                             st.db.query(query1, function (err, get_result) {
                                                 if (!err) {
                                                     if (get_result) {
@@ -2619,7 +2651,7 @@ MessageBox.prototype.getGroupList = function(req,res,next){
                                                                     for (var j = 0; j < get_result[0].length; j++) {
                                                                         if (groupId == get_result[0][j].GroupID) {
                                                                             getResult[0][i].unreadcount = get_result[0][j].count;
-                                                                            getResult[0][i].date = get_result[0][j].CreatedDate;
+                                                                            getResult[0][i].date = getFormattedDate(get_result[0][j].CreatedDate,req.query.dateObjectFlag);
                                                                             //res.status(200).json(responseMessage);
                                                                         }
                                                                     }

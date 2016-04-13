@@ -178,7 +178,7 @@ Auth.prototype.register = function(req,res,next){
     var headcount = (req.body.headcount) ? req.body.headcount : 0;
     var branch = (req.body.branch) ? req.body.branch : 0;
     var ismnc = (req.body.ismnc) ? req.body.ismnc : 0;
-    var rating = (req.body.rating) ? req.body.rating : 0;
+    var rating = (req.body.rating) ? req.body.rating : 1;
 
     var rtnMessage = {
         error:{},
