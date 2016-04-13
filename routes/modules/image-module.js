@@ -252,14 +252,12 @@ Image.prototype.cropImage = function(req,res,next){
                                             }
                                         }
                                         else {
-                                            throw new Error('FnCropImage : Invalid image file. Unable to find image size');
                                             res.status(400).json(respMsg);
                                         }
                                     });
                                 }
                                 else {
                                     res.status(400).json(respMsg);
-                                    throw new Error('FnCropImage : Error in reading file ' + ex.description);
                                 }
                             });
                         }
@@ -287,11 +285,9 @@ Image.prototype.cropImage = function(req,res,next){
                     Token : 'Token is invalid'
                 };
                 res.status(401).json(respMsg);
-                throw new Error('FnCropImage : '+ 'Invalid Token');
             }
         }
         else{
-            throw new Error('FnCropImage : '+ 'Error in query execution while validating token');
             res.status(400).json(respMsg);
         }
     });
