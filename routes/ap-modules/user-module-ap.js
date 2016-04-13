@@ -113,9 +113,8 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
         res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
         res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
 
-        var EZEID = alterEzeoneId(req.body.EZEID);
-        var EZEIDVerifiedID = req.body.EZEIDVerifiedID;
-        // var TID = parseInt(req.body.TID);
+        var EZEID = (req.body.EZEID) ? alterEzeoneId(req.body.EZEID) : '';
+        var EZEIDVerifiedID = (req.body.EZEIDVerifiedID) ? (req.body.EZEIDVerifiedID) : '';
         var CategoryID = req.body.CategoryID;
         if (CategoryID == null || CategoryID == '') {
             CategoryID = 0;
@@ -129,20 +128,13 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
             Longitude = 0.0;
         }
 
-        var Keywords = req.body.Keywords;
-        var Picture = req.body.Picture;
-        var PictureFileName = req.body.PictureFileName;
-        var Icon = req.body.Icon;
-        var IconFileName = req.body.IconFileName;
-        var BrochureDoc = req.body.BrochureDoc;
-        var BrochureDocFile = req.body.BrochureDocFile;
-        var ActiveInactive = req.body.ActiveInactive;
-        var BRContentType = req.body.BRContentType;
+        var Keywords = (req.body.Keywords) ? req.body.Keywords : '';
+        var ActiveInactive = (req.body.ActiveInactive) ? req.body.ActiveInactive : 0;
         var Token = req.body.Token;
-        var Rating = req.body.Rating;
-        var Size = req.body.Size;
-        var IDTypeId = req.body.IDTypeID;
-        var SelectionType = req.body.SelectionType;
+        var Rating = (req.body.Rating) ? req.body.Rating : 0;
+        var Size = (req.body.Size) ? req.body.Size : 0;
+        var IDTypeId = (req.body.IDTypeID) ? req.body.IDTypeID : 0;
+        var SelectionType = (req.body.SelectionType) ? req.body.SelectionType : 0;
         var headcount = (req.body.headcount) ? req.body.headcount : 0;
         var branch = (req.body.branch) ? req.body.branch : 0;
         var ismnc = (req.body.ismnc) ? req.body.ismnc : 0;
@@ -155,11 +147,10 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
                 if (!err) {
                     if (Result != null) {
                         if(IDTypeId == 1){
-                            var InsertQuery = st.db.escape(0) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' +
-                                st.db.escape(EZEIDVerifiedID) + ',' + st.db.escape(Token) + ',' + st.db.escape('') + ',' + st.db.escape('') + ',' + st.db.escape('') + ',' +
-                                st.db.escape('') + ',' + st.db.escape('') + ',' + st.db.escape(EZEID) + ',' +
-                                st.db.escape('') + ',' + st.db.escape('') + ',' + st.db.escape(0)+ ',' + st.db.escape('')
-                                + ',' + st.db.escape(0) + ',' + st.db.escape(0)+ ',' + st.db.escape(IDTypeId) + ',' + st.db.escape(SelectionType)
+                            var InsertQuery = st.db.escape(CategoryID) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude)
+                                + ',' + st.db.escape(EZEIDVerifiedID) + ',' + st.db.escape(Token) + ',' + st.db.escape(Keywords)
+                                + ',' + st.db.escape(EZEID) + ',' + st.db.escape(ActiveInactive) + ',' + st.db.escape(Rating)
+                                + ',' + st.db.escape(Size)+ ',' + st.db.escape(IDTypeId) + ',' + st.db.escape(SelectionType)
                                 + ',' + st.db.escape(headcount)+ ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc);
                             // console.log(InsertQuery);
                             st.db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
@@ -186,13 +177,11 @@ User_AP.prototype.updateUserProfileAP = function(req,res,next){
                         }
                         else
                         {
-                            var InsertQuery = st.db.escape(CategoryID) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude) + ',' +
-                                st.db.escape(EZEIDVerifiedID) + ',' + st.db.escape(Token) + ',' + st.db.escape(Keywords) + ',' + st.db.escape(Picture) + ',' + st.db.escape(PictureFileName) + ',' +
-                                st.db.escape(Icon) + ',' + st.db.escape(IconFileName) + ',' + st.db.escape(EZEID) + ',' +
-                                st.db.escape(BrochureDoc) + ',' + st.db.escape(BrochureDocFile) + ',' + st.db.escape(ActiveInactive)
-                                + ',' + st.db.escape(BRContentType)+ ',' + st.db.escape(Rating) + ',' + st.db.escape(Size)+ ',' + st.db.escape(IDTypeId)
-                                + ',' + st.db.escape(SelectionType)+ ',' + st.db.escape(headcount)+ ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc);
-                            // console.log('InsertQuery: ' + InsertQuery);
+                            var InsertQuery = st.db.escape(CategoryID) + ',' + st.db.escape(Latitude) + ',' + st.db.escape(Longitude)
+                                + ',' + st.db.escape(EZEIDVerifiedID) + ',' + st.db.escape(Token) + ',' + st.db.escape(Keywords)
+                                + ',' + st.db.escape(EZEID) + ',' + st.db.escape(ActiveInactive) + ',' + st.db.escape(Rating)
+                                + ',' + st.db.escape(Size)+ ',' + st.db.escape(IDTypeId) + ',' + st.db.escape(SelectionType)
+                                + ',' + st.db.escape(headcount)+ ',' + st.db.escape(branch)+ ',' + st.db.escape(ismnc);
                             st.db.query('CALL pUpdateUserProfileAP(' + InsertQuery + ')', function (err, InsertResult) {
                                 if (!err) {
                                     console.log(InsertResult);
