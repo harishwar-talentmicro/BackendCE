@@ -1468,7 +1468,7 @@ Association.prototype.imageUploadWithThumbnail = function(req,res,next){
                                 console.log("Image Path is deleted from server");
                             };
                             var readStream = fs.createReadStream(req.files.pr.path);
-                            var resizedReadStream = gm(req.files['pr'].path).resize(100,100).quality(0).stream(req.files.pr.extension);
+                            var resizedReadStream = gm(req.files['pr'].path).resize(100,100).autoOrient().quality(0).stream(req.files.pr.extension);
                             var uniqueFileName = uuid.v4() + ((req.files.pr.extension) ? ('.' + req.files.pr.extension) : 'jpg');
                             var tnUniqueFileName = "tn_" + uniqueFileName;
                             console.log(uniqueFileName);
@@ -1606,7 +1606,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
         }
         else {
             try {
-                var tenType = ['training','event','news','knowledge','opinion-poll'];
+                var tenType = ['poster','event','poster','poster','opinion-poll','poster'];
                 req.body.ten_id = (req.body.ten_id) ? req.body.ten_id : 0;      // while saving time 0 else id of user
                 req.body.s_date = (req.body.s_date) ? (req.body.s_date) : null;
                 req.body.e_date = (req.body.e_date) ? (req.body.e_date) : null;
@@ -1731,7 +1731,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                                 var senderTitle = notiResult[1][0].s_title;
                                                                                 var groupTitle = notiResult[0][i].g_title;
                                                                                 var groupId = notiResult[0][i].gid;
-                                                                                var messageText = 'New '+ tenType[req.body.type]+ ' from ' + fn +' for Approval.';
+                                                                                var messageText = 'New '+ tenType[(req.body.type) - 1]+ ' from ' + fn +' for Approval.';
                                                                                 var data = {
                                                                                     ten_id : results[0][0].id,
                                                                                     sm_id : notiResult[2][0].sm_id
@@ -2592,7 +2592,7 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                                     var senderTitle = notiResult[1][0].s_title;
                                                                     var groupTitle = notiResult[0][i].g_title;
                                                                     var groupId = notiResult[0][i].gid;
-                                                                    var messageText = 'New '+tenType[notiResult[2][0].type]+ ' : '+ notiResult[2][0].title+' published.';
+                                                                    var messageText = 'New '+tenType[(notiResult[2][0].type)-1]+ ' : '+ notiResult[2][0].title+' published.';
                                                                     var data = {
                                                                         ten_id : req.body.ten_id,
                                                                         sm_id : notiResult[2][0].sm_id
