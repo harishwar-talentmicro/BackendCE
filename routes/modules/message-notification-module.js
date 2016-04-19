@@ -60,9 +60,10 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
 
                     if (gid) {
                         var iosDetailsQuery = 'select ezeid,IPhoneDeviceID as iosId from tmaster where tid=' + gid;
-                        console.log(iosDetailsQuery);
+                        console.log("iosDetailsQuery",iosDetailsQuery);
                         st.db.query(iosDetailsQuery, function (err, iosResult) {
                             if (iosResult) {
+                                console.log(iosResult);
                                 if (iosResult[0]) {
                                     iosId = (iosResult[0].iosId) ? (iosResult[0].iosId) : '';
                                 }

@@ -441,6 +441,7 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                             result.isvideo = serviceResult[0][i].isvideo;
                                             result.ae = (serviceResult[0][i].ae) ? serviceResult[0][i].ae : '' ;
                                             result.an = (serviceResult[0][i].an)? serviceResult[0][i].an : '';
+                                            result.totalPoints = (serviceResult[0][i].total_points)? serviceResult[0][i].total_points : 0;
                                             var picArray =[];
                                             result.picCount = 0;
                                             if(serviceResult[0][i].picture){
@@ -454,14 +455,14 @@ Association.prototype.getAsscociationServices = function(req,res,next){
                                                 if(picArray.length <= 3){
                                                     for (var j = 0; j < picArray.length; j++) {
                                                         var attachment = (picArray[j]) ? req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + picArray[j] : ''
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + picArray[j] : '';
                                                         imgArray.push(attachment);
                                                     }
                                                 }
                                                 else {
                                                     for (var j = 0; j < 3; j++) {
                                                         var attachment = (picArray[j]) ? req.CONFIG.CONSTANT.GS_URL +
-                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + picArray[j] : ''
+                                                        req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + picArray[j] : '';
                                                         imgArray.push(attachment);
                                                     }
                                                 }
@@ -738,7 +739,7 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                     res.status(200).json(responseMessage);
                                                 }
                                                 var notiQueryParams = st.db.escape(req.body.service_mid) + ',' + st.db.escape(req.body.token)
-                                                    + ',' + st.db.escape(req.body.cid);
+                                                    + ',' + st.db.escape(req.body.cid)+ ',' + st.db.escape(results[0][0]._i);
                                                 var notiQuery = 'CALL get_admin_notif_details(' + notiQueryParams + ')';
                                                 console.log("notiQuery",notiQuery);
                                                 st.db.query(notiQuery, function (err, notiResult) {
@@ -747,27 +748,66 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                             console.log(notiResult);
                                                             if (notiResult[0]){
                                                                if (notiResult[0].length > 0){
-                                                                   if (notiResult[2]){
-                                                                       var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
+                                                                   if (notiResult[4]){
+                                                                       var fn = notiResult[3][0].fn ? notiResult[3][0].fn : notiResult[3][0].s_title;
                                                                        for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                           var receiverId = notiResult[0][i].g_title;
-                                                                           var senderTitle = notiResult[1][0].s_title;
+                                                                           var receiverId = notiResult[0][i].gid;
+                                                                           var senderTitle = notiResult[3][0].s_title;
                                                                            var groupTitle = notiResult[0][i].g_title;
                                                                            var groupId = notiResult[0][i].gid;
                                                                            var messageText ='New support request from ' + fn + '.';
                                                                            var data = {
                                                                                ten_id : results[0][0]._i,
-                                                                               sm_id : req.body.service_mid
+                                                                               sm_id : req.body.service_mid,
+                                                                               tid : notiResult[1][0].tid,
+                                                                               ref_no : notiResult[1][0].ref_no,
+                                                                               servicetype : notiResult[1][0].servicetype,
+                                                                               ezeoneid : notiResult[1][0].ezeoneid,
+                                                                               cat_title : notiResult[1][0].cat_title,
+                                                                               name : notiResult[1][0].name,
+                                                                               date : notiResult[1][0].date,
+                                                                               LUDate : notiResult[1][0].LUDate,
+                                                                               message : notiResult[1][0].message,
+                                                                               isimage : notiResult[1][0].isimage,
+                                                                               isattachment : notiResult[1][0].isattachment,
+                                                                               isvideo : notiResult[1][0].isvideo,
+                                                                               ae : notiResult[1][0].ae,
+                                                                               an : notiResult[1][0].an,
+                                                                               replyObject : notiResult[2],
+                                                                               communityEzeId : notiResult[1][0].ae,
+                                                                               ha : 1
                                                                            };
+                                                                           var messageId = 0;
+                                                                           var masterId = 0;
+                                                                           var latitude = '';
+                                                                           var longitude = '';
+                                                                           var priority = '';
+                                                                           var dateTime = '';
+                                                                           var a_name = '';
+                                                                           var msgUserid = '';
+                                                                           var jobId = 0;
+                                                                           var aUrl = '';
+                                                                           var txId = 0;
+                                                                           var issos = false;
                                                                            /**
                                                                             * messageType 14 is for helpdesk request to admin
                                                                             */
                                                                            var messageType = 14;
                                                                            var operationType = 0;
                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                           console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                           notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                           console.log("Notification Send");
+                                                                           if(iphoneId){
+                                                                               console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                               notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                               console.log("Notification Send");
+                                                                           }
+                                                                           else {
+                                                                               console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                   operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                               notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                   operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                               console.log("Notification Send");
+                                                                           }
+
                                                                        }
                                                                    }
                                                                }
@@ -1010,26 +1050,65 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                 console.log(notiResult);
                                                                 if (notiResult[0]){
                                                                     if (notiResult[0].length > 0){
-                                                                        if (notiResult[2]){
+                                                                        if (notiResult[4]){
                                                                             for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                                var receiverId = notiResult[0][i].g_title;
-                                                                                var senderTitle = notiResult[1][0].s_title;
+                                                                                var receiverId = notiResult[0][i].gid;
+                                                                                var senderTitle = notiResult[3][0].s_title;
                                                                                 var groupTitle = notiResult[0][i].g_title;
                                                                                 var groupId = notiResult[0][i].gid;
                                                                                 var messageText = 'Response received from Helpdesk';
                                                                                 var data = {
                                                                                     ten_id : req.body.service_id,
-                                                                                    sm_id : req.body.service_mid
+                                                                                    sm_id : req.body.service_mid,
+                                                                                    tid : notiResult[1][0].tid,
+                                                                                    ref_no : notiResult[1][0].ref_no,
+                                                                                    servicetype : notiResult[1][0].servicetype,
+                                                                                    ezeoneid : notiResult[1][0].ezeoneid,
+                                                                                    cat_title : notiResult[1][0].cat_title,
+                                                                                    name : notiResult[1][0].name,
+                                                                                    date : notiResult[1][0].date,
+                                                                                    LUDate : notiResult[1][0].LUDate,
+                                                                                    message : notiResult[1][0].message,
+                                                                                    isimage : notiResult[1][0].isimage,
+                                                                                    isattachment : notiResult[1][0].isattachment,
+                                                                                    isvideo : notiResult[1][0].isvideo,
+                                                                                    ae : notiResult[1][0].ae,
+                                                                                    an : notiResult[1][0].an,
+                                                                                    replyObject : notiResult[2],
+                                                                                    communtyEzeId : notiResult[1][0].ae,
+                                                                                    ha : notiResult[0][i].ha
                                                                                 };
+                                                                                console.log(data);
+                                                                                var messageId = 0;
+                                                                                var masterId = 0;
+                                                                                var latitude = '';
+                                                                                var longitude = '';
+                                                                                var priority = '';
+                                                                                var dateTime = '';
+                                                                                var a_name = '';
+                                                                                var msgUserid = '';
+                                                                                var jobId = 0;
+                                                                                var aUrl = '';
+                                                                                var txId = 0;
+                                                                                var issos = false;
                                                                                 /**
                                                                                  * messageType 15 is helpdesk admin response to user
                                                                                  */
                                                                                 var messageType = 15;
                                                                                 var operationType = 0;
                                                                                 var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                console.log("Notification Send");
+                                                                                if (iphoneId){
+                                                                                    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                    console.log("Notification Send");
+                                                                                }
+                                                                                else {
+                                                                                    console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    console.log("Notification Send");
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -1617,6 +1696,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                 req.body.note = (req.body.note) ? req.body.note : '';
                 req.body.description = (req.body.description) ? req.body.description : '';
                 req.body.capacity = (req.body.capacity) ? (req.body.capacity) : 0;
+                console.log("req.body.image_details",req.body.image_details);
                 var imgObject = (req.body.image_details) ? req.body.image_details : '';
                 st.validateToken(req.body.token, function (err, tokenResult) {
                     if (!err) {
@@ -1727,24 +1807,47 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                         if (notiResult[3]){
                                                                             var fn = notiResult[1][0].fn ? notiResult[1][0].fn : notiResult[1][0].s_title;
                                                                             for (var i = 0; i < notiResult[0].length; i++ ){
-                                                                                var receiverId = notiResult[0][i].g_title;
+                                                                                var receiverId = notiResult[0][i].gid;
                                                                                 var senderTitle = notiResult[1][0].s_title;
                                                                                 var groupTitle = notiResult[0][i].g_title;
                                                                                 var groupId = notiResult[0][i].gid;
                                                                                 var messageText = 'New '+ tenType[(req.body.type) - 1]+ ' from ' + fn +' for Approval.';
                                                                                 var data = {
                                                                                     ten_id : results[0][0].id,
-                                                                                    sm_id : notiResult[2][0].sm_id
+                                                                                    sm_id : notiResult[2][0].sm_id,
+                                                                                    communityEzeId : req.body.code,
+                                                                                    pa : notiResult[0][i].pa
                                                                                 };
+                                                                                var messageId = 0;
+                                                                                var masterId = 0;
+                                                                                var latitude = '';
+                                                                                var longitude = '';
+                                                                                var priority = '';
+                                                                                var dateTime = '';
+                                                                                var a_name = '';
+                                                                                var msgUserid = '';
+                                                                                var jobId = 0;
+                                                                                var aUrl = '';
+                                                                                var txId = 0;
+                                                                                var issos = false;
                                                                                 /**
                                                                                  * messageType 16 is event/poster/poll/ posted after approval of admin
                                                                                  */
                                                                                 var messageType = 16;
                                                                                 var operationType = 0;
                                                                                 var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                console.log("Notification Send");
+                                                                                if (iphoneId){
+                                                                                    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                    console.log("Notification Send");
+                                                                                }
+                                                                                else {
+                                                                                    console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    console.log("Notification Send");
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -2089,18 +2192,44 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 console.log(notiResult[2][0].sm_id,"notiResult[2][0].sm_id");
                                                                                 var data = {
                                                                                     ten_id: results[0][0].id,
-                                                                                    sm_id: notiResult[2][0].sm_id
+                                                                                    sm_id: notiResult[2][0].sm_id,
+                                                                                    communityEzeId : req.body.code,
+                                                                                    pa : notiResult[0][i].pa
                                                                                 };
 
                                                                                 /**
                                                                                  * messageType 16 is event/poster/poll/ posted after approval of admin
                                                                                  */
+                                                                                var messageId = 0;
+                                                                                var masterId = 0;
+                                                                                var latitude = '';
+                                                                                var longitude = '';
+                                                                                var priority = '';
+                                                                                var dateTime = '';
+                                                                                var a_name = '';
+                                                                                var msgUserid = '';
+                                                                                var jobId = 0;
+                                                                                var aUrl = '';
+                                                                                var txId = 0;
+                                                                                var issos = false;
+                                                                                /**
+                                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                                 */
                                                                                 var messageType = 16;
                                                                                 var operationType = 0;
-                                                                                var iphoneId = (notiResult[0][i].iphoneId) ? notiResult[0][i].iphoneId : null;
-                                                                                console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, data);
-                                                                                notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId, data);
-                                                                                console.log("Notification Send");
+                                                                                var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
+                                                                                if (iphoneId){
+                                                                                    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                    console.log("Notification Send");
+                                                                                }
+                                                                                else {
+                                                                                    console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                    console.log("Notification Send");
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -2343,7 +2472,7 @@ Association.prototype.associationDeleteTenImg = function(req,res,next){
             st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.params.id);
+                        var procParams = st.db.escape(req.params.id) + ',' + st.db.escape(req.query.token);
                         var procQuery = 'CALL delete_ten_master_attachment(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -2450,7 +2579,7 @@ Association.prototype.associationDeleteServiceImg = function(req,res,next){
             st.validateToken(req.query.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.params.id);
+                        var procParams = st.db.escape(req.params.id) + ',' + st.db.escape(req.query.token);
                         var procQuery = 'CALL delete_service_picture(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -2595,17 +2724,44 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                                     var messageText = 'New '+tenType[(notiResult[2][0].type)-1]+ ' : '+ notiResult[2][0].title+' published.';
                                                                     var data = {
                                                                         ten_id : req.body.ten_id,
-                                                                        sm_id : notiResult[2][0].sm_id
+                                                                        sm_id : notiResult[2][0].sm_id,
+                                                                        communityEzeId : '',
+                                                                        pa : ''
+
                                                                     };
+                                                                    /**
+                                                                     * messageType 17 is event/poster/poll/ posted after approval of admin
+                                                                     */
+                                                                    var messageId = 0;
+                                                                    var masterId = 0;
+                                                                    var latitude = '';
+                                                                    var longitude = '';
+                                                                    var priority = '';
+                                                                    var dateTime = '';
+                                                                    var a_name = '';
+                                                                    var msgUserid = '';
+                                                                    var jobId = 0;
+                                                                    var aUrl = '';
+                                                                    var txId = 0;
+                                                                    var issos = false;
                                                                     /**
                                                                      * messageType 17 is event/poster/poll/ posted after approval of admin
                                                                      */
                                                                     var messageType = 17;
                                                                     var operationType = 0;
                                                                     var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                    //console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                    console.log("Notification Send");
+                                                                    if (iphoneId){
+                                                                        console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                        notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                        console.log("Notification Send");
+                                                                    }
+                                                                    else {
+                                                                        console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                            operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                        notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                            operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                        console.log("Notification Send");
+                                                                    }
                                                                 }
                                                             }
                                                         }

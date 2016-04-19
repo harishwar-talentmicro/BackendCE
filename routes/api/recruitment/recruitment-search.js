@@ -244,13 +244,13 @@ router.post('/job_seeker',function(req,res,next){
         if (locMatrix.length > 0){
             for ( var k = 0; k < locMatrix.length; k++){
                 var locSkills = {
-                    fid: locMatrix[k].fid  ? locMatrix[k].fid.toString() : '',
+
                     locIds: locMatrix[k].career_id ? locMatrix[k].career_id.toString() : '',
-                    exp_from: locMatrix[k].exp_from ? locMatrix[k].exp_from.toString() : '',
-                    exp_to: locMatrix[k].exp_to ? locMatrix[k].exp_to.toString() : '',
+                    exp_from: locMatrix[k].exp_from ? locMatrix[k].exp_from.toString() : 0,
+                    exp_to: locMatrix[k].exp_to ? locMatrix[k].exp_to.toString() : 50,
                     level: locMatrix[k].expertiseLevel ? locMatrix[k].expertiseLevel.toString() : '',
-                    scoreFrom: locMatrix[k].score_from ? locMatrix[k].score_from.toString() : '',
-                    scoreTo: locMatrix[k].score_to ? locMatrix[k].score_to.toString() : ''
+                    scoreFrom: locMatrix[k].score_from ? locMatrix[k].score_from.toString() : 0,
+                    scoreTo: locMatrix[k].score_to ? locMatrix[k].score_to.toString() : 100
                 };
                 locMatrixArray.push(' (FIND_IN_SET(loc.LOCid,' + req.db.escape(locSkills.locIds) + ') '+
                 ' AND FIND_IN_SET(loc.Level,' + req.db.escape(locSkills.level) + ') ' +
@@ -271,18 +271,18 @@ router.post('/job_seeker',function(req,res,next){
     var filterQuery1='';
 
     var masterID = "SET @masterid = (SELECT masterid FROM tloginout WHERE token =" +req.db.escape(token)+");";
-
+    console.log("req.body.filter_type",req.body.filter_type);
     if (parseInt(req.body.filter_type) == 0){
         filterQuery = " AND NOT FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
         status = "," + 1 +" as status";
     }
-    if (parseInt(req.body.filter_type) == 1){
+    else if (parseInt(req.body.filter_type) == 1){
          filterQuery1 = " left outer join tapplicant_hidden z on z.cvid=tcv.tid";
         filterQuery = " or z.cvid=tcv.tid";
         status = " ,if(z.tid is null," + 1 + "," + 0 + ") as status";
     }
     else {
-        filterQuery = " AND NOT FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
+        filterQuery = " AND FIND_IN_SET(tcv.tid,ifnull((SELECT GROUP_CONCAT(cvid) FROM tapplicant_hidden WHERE masterid=" + '@masterid' + "),''))";
         status = ","+ 0 + " as status";
     }
 
@@ -321,7 +321,7 @@ router.post('/job_seeker',function(req,res,next){
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
                 jobSeekerQuery+=subQuery ;
 
-                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+")  data;"
+                jobSeekerQuery +=    " ORDER BY cvid DESC )  data  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
 
                 jobSeekerQuery+=" select FOUND_ROWS() as count; ";
 
@@ -359,7 +359,7 @@ router.post('/job_seeker',function(req,res,next){
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
                 jobSeekerQuery+=subQuery ;
 
-                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+")  data;"
+                jobSeekerQuery +=    " ORDER BY cvid DESC )  data  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
 
                 jobSeekerQuery+=" select FOUND_ROWS() as count; ";
 
@@ -375,8 +375,7 @@ router.post('/job_seeker',function(req,res,next){
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
                 jobSeekerQuery+=subQuery ;
 
-                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+") data;"
-
+                jobSeekerQuery +=    " ORDER BY cvid DESC )  data  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
                 jobSeekerQuery+=" select FOUND_ROWS() as count; ";
 
                 //var countQuery =     "SELECT COUNT(*) AS count FROM tcv AS tcv \
@@ -399,8 +398,7 @@ router.post('/job_seeker',function(req,res,next){
                     " WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ": "";
                 jobSeekerQuery+=subQuery   ;
-                jobSeekerQuery +=    " ORDER BY cvid DESC LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+") data;"
-
+                jobSeekerQuery +=    " ORDER BY cvid DESC )  data  LIMIT "+req.db.escape(start)+","+req.db.escape(limit)+" ;"
                 jobSeekerQuery+=" select FOUND_ROWS() as count; ";
 
                 //var countQuery = "SELECT COUNT(*) AS count FROM tcv AS tcv WHERE  FIND_IN_SET(tcv.OID,@user_ids)"

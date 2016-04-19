@@ -11,16 +11,38 @@ var PDFClient = require('../pdf-client.js');
 
 
 router.post('/cv_generate',function(req,res,next){
-    var if_not_ref = '';
+    var if_not_ref = 'References available on request.';
     var hob = false;
+    var we = false;
+    var ad = false;
+    var ref = false;
+    var ks = false;
+    var edu = false;
+    var aoc = false;
+    var reference = req.body.reference;
     var imageFullPath = 'https://storage.googleapis.com/ezeone/';
     var imagePath = (req.body.imagePath) ? imageFullPath + req.body.imagePath : imageFullPath;
-    console.log("imagePath",imagePath);
-    if (req.body.reference.length < 1){
-        if_not_ref = 'References available on request.';
-    }
     if (req.body.hobbies){
         hob = true;
+    }
+    if (req.body.key_skills){
+        ks = true;
+    }
+    if (req.body.work_exp.length > 0){
+        we = true;
+    }
+    if (req.body.education.length > 0){
+        edu = true;
+    }
+    if (req.body.additional_info.length > 0){
+        ad = true;
+    }
+    if (req.body.career.length > 0){
+        aoc = true;
+    }
+    if (reference.ref_name && reference.ref_name1){
+        ref = true;
+        if_not_ref = '';
     }
     //var abc = req.body.flag;
     //var exp;
@@ -72,8 +94,15 @@ router.post('/cv_generate',function(req,res,next){
                         "if_not_ref": if_not_ref,
                         "image": req.body.imagePath,
                         "reference": req.body.reference,
-                        "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
-                        "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin
+                        "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' YEAR' : req.body.total_exp+' YEARS',
+                        "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin,
+                        "hob":hob,
+                        "we":we,
+                        "ad":ad,
+                        "edu":edu,
+                        "ks":ks,
+                        "ref":ref,
+                        "aoc":aoc
                     });
                     doc.render();
                     var buf = doc.getZip().generate({type: "nodebuffer"});
@@ -124,11 +153,17 @@ router.post('/cv_generate',function(req,res,next){
                         "dob": req.body.dob,
                         "gender": req.body.gender,
                         "if_not_ref": if_not_ref,
-                        "%image": req.body.imagePath,
+                        "%image": '',
                         "reference": req.body.reference,
                         "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
                         "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin,
-                        "hob":hob
+                        "hob":hob,
+                        "we":we,
+                        "ad":ad,
+                        "edu":edu,
+                        "ks":ks,
+                        "ref":ref,
+                        "aoc":aoc
                     });
                     doc.render();
                     var buf = doc.getZip().generate({type: "nodebuffer"});
@@ -180,10 +215,17 @@ router.post('/cv_generate',function(req,res,next){
                 "dob": req.body.dob,
                 "gender": req.body.gender,
                 "if_not_ref": if_not_ref,
-                "%image": req.body.imagePath,
+                "%image": '',
                 "reference": req.body.reference,
                 "total_exp": (parseInt(req.body.total_exp) <= 1) ? req.body.total_exp+' Year' : req.body.total_exp+' Years',
-                "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin
+                "ezeone_pin":req.body.ezeoneid+'.CV.'+req.body.pin,
+                "hob":hob,
+                "we":we,
+                "ad":ad,
+                "edu":edu,
+                "ks":ks,
+                "ref":ref,
+                "aoc":aoc
             });
             doc.render();
             var buf = doc.getZip().generate({type: "nodebuffer"});

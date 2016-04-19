@@ -9,7 +9,8 @@
     "MAP_REDIRECT_LINK" : "/map",
     "STATIC_URL": "/",
     "STORAGE_BUCKET":"ezeone",
-    "GS_URL":"https://storage.googleapis.com/"
+    "GS_URL":"https://storage.googleapis.com/",
+    "ANDROID_AP_VERSION_CODE":1
   },
   "SCHEME" : "https",
   "DOMAIN" : "www.ezeone.com",
