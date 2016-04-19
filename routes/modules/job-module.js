@@ -103,7 +103,8 @@ Job.prototype.create = function(req,res,next){
     var messageType;
     var operationType;
     var iphoneId;
-    var userId;
+    var userId = [];
+    var emailArray = [];
     var jobTypeList =  [
         "Full Time",
         "Part Time",
@@ -416,14 +417,17 @@ Job.prototype.create = function(req,res,next){
                                     if (notificationResult) {
                                         if (notificationResult[0]) {
                                             console.log('job post notification...');
-                                            for (var i = 0; i < notificationResult[0].length; i++) {
-                                                userId = (notificationResult[0][i].ids) ? notificationResult[0][i].ids.split(',') : '';
-                                            }
-                                            var mIds = '';
-                                            for (var c = 0; c < notificationResult[0].length; c++) {
-                                                var mIds =  (notificationResult[0][c].ids) ? notificationResult[0][c].ids + ',' + mIds : '';
-                                            }
-                                            var jobqueryParameters = st.db.escape(mIds) + ',' + st.db.escape(jobID);
+                                            userId = (notificationResult[0][0].ids) ? notificationResult[0][0].ids.split(',') : '';
+                                            emailArray = (notificationResult[0][0].emailids) ? notificationResult[0][0].emailids.split(',') : '';
+
+                                            //for (var i = 0; i < notificationResult[0].length; i++) {
+                                            //    userId = (notificationResult[0][i].ids) ? notificationResult[0][i].ids.split(',') : '';
+                                            //}
+                                            //var mIds = '';
+                                            //for (var c = 0; c < notificationResult[0].length; c++) {
+                                            //    var mIds =  (notificationResult[0][c].ids) ? notificationResult[0][c].ids + ',' + mIds : '';
+                                            //}
+                                            var jobqueryParameters = st.db.escape(notificationResult[0][0].ids) + ',' + st.db.escape(jobID);
                                             /**
                                              * to create group of institute and studens for send notification and messages
                                              * and save data
@@ -464,6 +468,14 @@ Job.prototype.create = function(req,res,next){
                                                     + ',' + st.db.escape(token) + ',' + st.db.escape(0) + ',' + st.db.escape(userId[k])
                                                     + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0);
 
+                                                for (var e = 0; e < emailArray.length; e++){
+                                                    mailerApi.sendMail('sales_lead_template', {
+                                                        ezeoneId : 'email',
+                                                        message : 'message'
+
+                                                    }, '', emailArray[e]);
+
+                                                }
                                                 combineQuery += 'CALL pSendMsgRequestbyPO(' + sendMsgParams + ');' +
                                                     'CALL pComposeMessage(' + composeMsgParams + '); '
                                                     + gidQuery + ' ;'
@@ -482,14 +494,15 @@ Job.prototype.create = function(req,res,next){
                                                             messageText = data;
                                                             messageType = 8;
                                                             operationType = 0;
-                                                            iphoneId = (messageResult[j*(5)+4][0]) ? messageResult[j*(5)+4][0] : null ;
+                                                            iphoneId = (messageResult[j*(5)+4][0].iphoneID) ? messageResult[j*(5)+4][0].iphoneID : null ;
                                                             var messageId = 0, masterid = 0, latitude = 0.00, longitude = 0.00, prioritys = 1, dateTime = '';
                                                             var msgUserid = 0, a_name = '';
                                                             var jid = jobID;
                                                             console.log(receiverId, senderTitle, groupTitle, groupId, messageText, messageType,
                                                                 operationType, iphoneId, messageId, masterid);
                                                             notification.publish(receiverId, senderTitle, groupTitle, groupId, messageText,
-                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys, dateTime, a_name, msgUserid, jid);
+                                                                messageType, operationType, iphoneId, messageId, masterid, latitude, longitude, prioritys,
+                                                                dateTime, a_name, msgUserid, jid);
                                                             console.log('Job Post Notification Send Successfully');
 
                                                         }
@@ -1359,7 +1372,7 @@ Job.prototype.searchJobSeekers = function(req,res) {
  * @param next
  * @description api code for apply job
  */
-    Job.prototype.applyJob = function(req,res,next){
+Job.prototype.applyJob = function(req,res,next){
 
     var token = req.body.token;
     var jobId = req.body.job_id;
@@ -1407,7 +1420,110 @@ Job.prototype.searchJobSeekers = function(req,res) {
                                         responseMessage.data = insertResult[0][0];
                                         res.status(200).json(responseMessage);
                                         console.log('FnApplyJob: Job apply successfully');
+                                        if (insertResult[0][0].Status == 0){
+                                           var notificationQueryParams = st.db.escape(token) + ',' + st.db.escape(jobId);
+                                           var notificationQuery = 'CALL pnotify_jobcreator_afterApply(' + notificationQueryParams + ')';
+                                           console.log(notificationQuery);
+                                           st.db.query(notificationQuery, function (err, notDetailsRes) {
+                                               console.log(notDetailsRes);
+                                               if (notDetailsRes && notDetailsRes[0]) {
+                                                   console.log("hello");
+                                                   for (var count = 0; count < notDetailsRes[0].length; count++) {
+                                                       if (notDetailsRes[0][count].userRights){
+                                                           if ((!isNaN(parseInt(notDetailsRes[0][count].userRights.split('')[4]))) &&
+                                                               parseInt(notDetailsRes[0][count].userRights.split('')[4]) > 0 ){
+                                                               if (notDetailsRes[0][count].ispo){
+                                                                   var receiverId = notDetailsRes[0][count].receiverId;
+                                                                   var senderTitle = insertResult[0][0].EZEID;
+                                                                   var groupTitle = notDetailsRes[0][count].groupTitle;
+                                                                   var groupId = notDetailsRes[0][count].groupId;
+                                                                   var messageText = 'Name has applied to job';
+                                                                   /**
+                                                                    * messageType 19 when student will apply to job who has posted
+                                                                    * job and placement officer if verified college will get notification
+                                                                    *
+                                                                    */
+                                                                   var messageType = 19;
+                                                                   var operationType = 0;
+                                                                   var iphoneId = notDetailsRes[0][count].iphoneId;
+                                                                   var messageId = 0;
+                                                                   var masterid = notDetailsRes[0][count].masterid;
+                                                                   console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                       messageType, operationType, iphoneId, messageId, masterid);
 
+                                                                   /**
+                                                                    * Send notification to those users who are falling under the category of the folder
+                                                                    * which is assigned to this lead
+                                                                    */
+                                                                   notification.publish(receiverId, senderTitle, groupTitle, groupId,
+                                                                       messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                   console.log("Notification Send");
+
+                                                                   /**
+                                                                    * Send mail to those users who are falling under the category of the folder
+                                                                    * which is assigned to this lead
+                                                                    */
+
+                                                                   if (notDetailsRes[0][count].CVMailID){
+                                                                       mailerApi.sendMail('sales_lead_template', {
+                                                                           ezeoneId : insertResult[0][0].EZEID,
+                                                                           message : 'salesEnquiryMessage'
+
+                                                                       }, '', notDetailsRes[0][count].CVMailID);
+                                                                   }
+
+                                                               }
+                                                               else {
+                                                                   console.log("comming to this block");
+                                                                   var receiverId = notDetailsRes[0][count].receiverId;
+                                                                   var senderTitle = insertResult[0][0].EZEID;
+                                                                   var groupTitle = notDetailsRes[0][count].groupTitle;
+                                                                   var groupId = notDetailsRes[0][count].groupId;
+                                                                   var messageText = 'Name has applied to job';
+                                                                   /**
+                                                                    * messageType 19 when student will apply to job who has posted
+                                                                    * job and placement officer if verified college will get notification
+                                                                    *
+                                                                    */
+                                                                   var messageType = 19;
+                                                                   var operationType = 0;
+                                                                   var iphoneId = notDetailsRes[0][count].iphoneId;
+                                                                   var messageId = 0;
+                                                                   var masterid = notDetailsRes[0][count].masterid;
+                                                                   console.log(receiverId, senderTitle, groupTitle, groupId, messageText,
+                                                                       messageType, operationType, iphoneId, messageId, masterid);
+
+                                                                   /**
+                                                                    * Send notification to those users who are falling under the category of the folder
+                                                                    * which is assigned to this lead
+                                                                    */
+                                                                   notification.publish(receiverId, senderTitle, groupTitle, groupId,
+                                                                       messageText, messageType, operationType, iphoneId, messageId, masterid);
+                                                                   console.log("Notification Send");
+
+                                                                   /**
+                                                                    * Send mail to those users who are falling under the category of the folder
+                                                                    * which is assigned to this lead
+                                                                    */
+                                                                   if (notDetailsRes[0][count].CVMailID){
+                                                                       mailerApi.sendMail('sales_lead_template', {
+                                                                           ezeoneId : insertResult[0][0].EZEID,
+                                                                           message : 'salesEnquiryMessage'
+
+                                                                       }, '', notDetailsRes[0][count].CVMailID);
+                                                                   }
+                                                               }
+
+                                                           }
+                                                       }
+                                                   }
+                                               }
+                                               else {
+                                                   console.log('get_subuser_enquiry:user details not loaded');
+                                               }
+                                           });
+
+                                       }
                                     }
                                     else {
                                         responseMessage.message = 'Job not apply';

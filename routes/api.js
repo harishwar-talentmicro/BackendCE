@@ -601,7 +601,7 @@ var EzeoneAttrbt = require('./modules/ezeone-attribute-module.js');
 var EzeoneAttrbtModule = new EzeoneAttrbt(db,stdLib);
 router.get('/signup_data',EzeoneAttrbtModule.signUpData);
 
-//association-module
+//association-ap-module
 var Association = require('./modules/association-module.js');
 var AssociationtModule = new Association(db,stdLib);
 router.get('/association_details',AssociationtModule.associGetEventDtl);

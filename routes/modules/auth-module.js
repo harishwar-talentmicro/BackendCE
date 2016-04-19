@@ -263,7 +263,6 @@ Auth.prototype.register = function(req,res,next){
                         console.log(password);
                         encryptPwd = hashPassword(password);
                         console.log("encryptPwd",encryptPwd);
-
                     }
 
                     var queryParams = st.db.escape(idtypeId) + ',' + st.db.escape(ezeid) + ',' + st.db.escape(encryptPwd)
@@ -560,8 +559,7 @@ Auth.prototype.register = function(req,res,next){
 
                                                 var ip = req.headers['x-forwarded-for'] ||
                                                     req.connection.remoteAddress ||
-                                                    req.socket.remoteAddress ||
-                                                    req.connection.socket.remoteAddress;
+                                                    req.socket.remoteAddress;
                                                 var userAgent = (req.headers['user-agent']) ? req.headers['user-agent'] : '';
 
                                                 st.generateToken(ip, userAgent, ezeid, function (err, token) {

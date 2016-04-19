@@ -86,7 +86,9 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
                                             if (notDetailsRes[0][count].userRights){
                                                 if ((!isNaN(parseInt(notDetailsRes[0][count].userRights.split()[0]))) &&
                                                     parseInt(notDetailsRes[0][count].userRights.split()[0]) > 0 ){
-
+                                                    /**
+                                                     * rid is folder rule id
+                                                     */
                                                     var foldRIDSubuser = (notDetailsRes[0][count].rid) ?
                                                         notDetailsRes[0][count].rid.split(',') : '';
                                                     console.log(foldRIDSubuser);
@@ -991,7 +993,6 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                     if (transResult[0]) {
                                         if (transResult[0][0]){
                                             if (transResult[0][0].MessageID) {
-
                                                 /**
                                                  * passing folder rule id to check folder access
                                                  */
