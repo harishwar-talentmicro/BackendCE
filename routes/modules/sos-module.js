@@ -40,6 +40,7 @@ function Sos(db,stdLib){
  * @description api code for save sos
  */
 Sos.prototype.saveSos = function(req,res,next) {
+
     var ezeid = (req.body.ezeid) ? alterEzeoneId(req.body.ezeid) : '';
     var b1 = (req.body.b1) ? req.body.b1 : 0;   // 0-unselect 1-select
     var b2 = (req.body.b2) ? req.body.b2 : 0;
@@ -50,6 +51,9 @@ Sos.prototype.saveSos = function(req,res,next) {
     var longitude = req.body.lng;
     var deviceId = req.body.device_id;
     var iphoneID='';
+    var request = (req.body.request) ? req.body.request : '';
+    var mobile = (req.body.mobile) ? req.body.mobile : '';
+
     req.body.service_mid = parseInt(req.body.service_mid) ? req.body.service_mid : 0;
 
     var responseMessage = {
@@ -69,12 +73,36 @@ Sos.prototype.saveSos = function(req,res,next) {
             if (!err) {
                 if (insertResult) {
                     if (insertResult[0]) {
-                        responseMessage.status = true;
-                        responseMessage.error = null;
-                        responseMessage.message = 'Sos saved successfully';
-                        res.status(200).json(responseMessage);
-                        console.log('FnSaveSosRequest: Sos saved successfully');
+                        var queryParams1 = st.db.escape(request) + ',' + st.db.escape(mobile)+ ',' + st.db.escape(latitude)
+                            + ',' + st.db.escape(longitude)+ ',' + st.db.escape(deviceId);
+                        var query = 'CALL pPostSOSrequest(' + queryParams1 + ')';
+                        console.log(query);
+                        st.db.query(query, function (err, reqResult) {
+                            if (!err) {
+                                if (reqResult) {
+                                    console.log(reqResult);
+                                    responseMessage.status = true;
+                                    responseMessage.error = null;
+                                    responseMessage.message = 'Sos saved successfully';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnPostSosRequest: Sos Posted successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'Sos not Posted';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnPostSosRequest:Sos not Posted');
+                                }
+                            }
+                            else {
+                                responseMessage.message = 'An error occured ! Please try again';
+                                responseMessage.error = {
+                                    server: 'Internal Server Error'
+                                };
+                                res.status(500).json(responseMessage);
+                                console.log('FnPostSosRequest: error in saving Sos  :' + err);
+                            }
 
+                        });
                         /**
                          * send push notification for sos request
                          */
@@ -95,16 +123,10 @@ Sos.prototype.saveSos = function(req,res,next) {
                                             if (userDetails) {
                                                 if (userDetails[0]) {
                                                     var receiverId = userDetails[0].tid;
-                                                    var senderTitle = {
-                                                        b1: (req.body.b1) ? req.body.b1 : 0,
-                                                        b2: (req.body.b2) ? req.body.b2 : 0,
-                                                        b3: (req.body.b3) ? req.body.b3 : 0,
-                                                        b4: (req.body.b4) ? req.body.b4 : 0,
-                                                        b5: (req.body.b5) ? req.body.b5 : 0
-                                                    };
+                                                    var senderTitle = ezeid;
                                                     var groupId = '';
                                                     var groupTitle = userDetails[0].GroupName;
-                                                    var messageText = 'sos request';
+                                                    var messageText = 'SOS request';
                                                     var messageType = 10;
                                                     var operationType = 0;
                                                     var iphoneId =  details[0].iphoneID;
@@ -181,14 +203,12 @@ Sos.prototype.saveSos = function(req,res,next) {
  */
 Sos.prototype.postSos = function(req,res,next) {
 
-
     var request = (req.body.request) ? req.body.request : '';
     var mobile = req.body.mobile;
     var latitude = req.body.lat;
     var longitude = req.body.lng;
     var deviceId = req.body.device_id;
     var iphoneID='';
-
 
     var responseMessage = {
         status: false,
@@ -198,7 +218,6 @@ Sos.prototype.postSos = function(req,res,next) {
     };
 
     try {
-
         var queryParams = st.db.escape(request) + ',' + st.db.escape(mobile)+ ',' + st.db.escape(latitude)
             + ',' + st.db.escape(longitude)+ ',' + st.db.escape(deviceId);
 
@@ -325,15 +344,13 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
 
     var id = req.body.id;    // tid
     var token = req.body.token;
-    var iphoneID='';
-
+    var iphoneID = '';
     var responseMessage = {
         status: false,
         error: {},
         message: '',
         data: null
     };
-
     try {
         var queryParams = st.db.escape(id) + ',' + st.db.escape(token)+ ',' + st.db.escape(req.body.service_mid);
         var query = 'CALL pUpdateSOSstatus(' + queryParams + ')';
@@ -352,15 +369,15 @@ Sos.prototype.updateSosRequest = function(req,res,next) {
                             /**
                              * send push notification for sos request
                              */
-                            var receiverId = updateResult[0][0].deviceid;
-                            var senderTitle = '';
+                            var receiverId = updateResult[0][0].gid;
+                            var senderTitle = updateResult[0][0].ezeoneId;
                             var groupId = '';
                             var contact = updateResult[0][0].contactnu + ',' + updateResult[0][0].name;
                             var groupTitle = contact;
-                            var messageText = 'accepted by ';
+                            var messageText = 'has accepted your SOS request ';
                             var messageType = 11;
                             var operationType = 0;
-                            var iphoneId = updateResult[0][0].deviceid;
+                            var iphoneId = (updateResult[0][0].deviceid) ? updateResult[0][0].deviceid : '';
                             var messageId = '';
                             var msgUserid = '';
                             var masterId = '';

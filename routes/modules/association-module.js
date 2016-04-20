@@ -761,7 +761,6 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                                sm_id : req.body.service_mid,
                                                                                tid : notiResult[1][0].tid,
                                                                                ref_no : notiResult[1][0].ref_no,
-                                                                               servicetype : notiResult[1][0].servicetype,
                                                                                ezeoneid : notiResult[1][0].ezeoneid,
                                                                                cat_title : notiResult[1][0].cat_title,
                                                                                name : notiResult[1][0].name,
@@ -774,8 +773,10 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                                ae : notiResult[1][0].ae,
                                                                                an : notiResult[1][0].an,
                                                                                replyObject : notiResult[2],
-                                                                               communityEzeId : notiResult[1][0].ae,
-                                                                               ha : 1
+                                                                               communityEzeId : notiResult[1][0].communtyEzeId,
+                                                                               ha : 1,
+                                                                               totalPoints : notiResult[1][0].total_points,
+                                                                               por : notiResult[1][0].por
                                                                            };
                                                                            var messageId = 0;
                                                                            var masterId = 0;
@@ -1062,7 +1063,6 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                     sm_id : req.body.service_mid,
                                                                                     tid : notiResult[1][0].tid,
                                                                                     ref_no : notiResult[1][0].ref_no,
-                                                                                    servicetype : notiResult[1][0].servicetype,
                                                                                     ezeoneid : notiResult[1][0].ezeoneid,
                                                                                     cat_title : notiResult[1][0].cat_title,
                                                                                     name : notiResult[1][0].name,
@@ -1075,8 +1075,10 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                     ae : notiResult[1][0].ae,
                                                                                     an : notiResult[1][0].an,
                                                                                     replyObject : notiResult[2],
-                                                                                    communtyEzeId : notiResult[1][0].ae,
-                                                                                    ha : notiResult[0][i].ha
+                                                                                    communtyEzeId : notiResult[1][0].communtyEzeId,
+                                                                                    ha : notiResult[0][i].ha,
+                                                                                    totalPoints : notiResult[1][0].total_points,
+                                                                                    por : notiResult[1][0].por
                                                                                 };
                                                                                 console.log(data);
                                                                                 var messageId = 0;
@@ -2692,7 +2694,8 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
             st.validateToken(req.body.token, function (err, tokenResult) {
                 if (!err) {
                     if (tokenResult) {
-                        var procParams = st.db.escape(req.body.ten_id) + ',' + st.db.escape(req.body.status);
+                        var procParams = st.db.escape(req.body.ten_id) + ',' + st.db.escape(req.body.status)
+                            + ',' + st.db.escape(req.body.token);
                         var procQuery = 'CALL pupdate_ten_status(' + procParams + ')';
                         console.log(procQuery);
                         st.db.query(procQuery, function (err, results) {
@@ -2725,9 +2728,8 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                                     var data = {
                                                                         ten_id : req.body.ten_id,
                                                                         sm_id : notiResult[2][0].sm_id,
-                                                                        communityEzeId : '',
-                                                                        pa : ''
-
+                                                                        communityEzeId : notiResult[2][0].communityEzeid,
+                                                                        pa : notiResult[0][i].PA
                                                                     };
                                                                     /**
                                                                      * messageType 17 is event/poster/poll/ posted after approval of admin

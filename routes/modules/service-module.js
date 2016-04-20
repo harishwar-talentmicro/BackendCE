@@ -65,7 +65,6 @@ function BufferStream( source ) {
 
 util.inherits( BufferStream, stream.Readable );
 
-
 // I attempt to clean up variable references once the stream has been ended.
 // --
 // NOTE: I am not sure this is necessary. But, I'm trying to be more cognizant of memory
@@ -77,7 +76,6 @@ BufferStream.prototype._destroy = function() {
     this._length = null;
 
 };
-
 
 // I read chunks from the source buffer into the underlying stream buffer.
 // --
@@ -163,7 +161,6 @@ var uploadDocumentToCloud = function(uniqueName,readStream,callback){
         }
     });
 };
-
 
 /**
  * @todo FnGetServiceProviders
@@ -819,7 +816,6 @@ Service.prototype.saveServiceVideo = function(req,res,next) {
     }
 };
 
-
 /**
  * @todo FnCreateService
  * Method : POST
@@ -1294,13 +1290,18 @@ Service.prototype.addMembersToService = function(req,res,next){
                                                 }
                                             }
                                             else {
-                                                responseMessage.message = 'Member not add';
+                                                responseMessage.status = true;
+                                                responseMessage.message = 'Member added successfully';
+                                                responseMessage.data = {
+                                                    ezeid: ezeid,
+                                                    identify_name: req.body.identify_name
+                                                };
                                                 res.status(200).json(responseMessage);
-                                                console.log('FnAddMembersToService:Member not add');
+                                                console.log('FnAddMembersToService: Member added successfully');
                                             }
                                         }
                                         else {
-                                            responseMessage.message = 'Member not add';
+                                            responseMessage.message = 'Member added successfully';
                                             res.status(200).json(responseMessage);
                                             console.log('FnAddMembersToService:Member not add');
                                         }

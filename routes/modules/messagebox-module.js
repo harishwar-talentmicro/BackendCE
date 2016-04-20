@@ -1323,6 +1323,7 @@ MessageBox.prototype.composeMessage = function(req,res,next){
     }
     else {
         try {
+            console.log("toid",toID);
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {

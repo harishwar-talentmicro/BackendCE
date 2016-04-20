@@ -449,7 +449,7 @@ Job.prototype.create = function(req,res,next){
                                             var path = require('path');
                                             for (var k = 0; k < userId.length; k++) {
                                                 var gidQuery = 'select tid from tmgroups where GroupType=1 and adminID=' + userId[k];
-                                                var iosIdQuery = 'select EZEID,IPhoneDeviceID as iphoneID from tmaster where tid=' + userId[k];
+                                                var iosIdQuery = 'select EZEID,IPhoneDeviceID as iphoneID, FirstName as fn from tmaster where tid=' + userId[k];
                                                 var sendMsgParams = st.db.escape(ezeoneId) + ',' + st.db.escape(userId[k]) + ',' + st.db.escape(0);
 
                                                 /**
@@ -469,9 +469,12 @@ Job.prototype.create = function(req,res,next){
                                                     + ',' + st.db.escape(1) + ',' + st.db.escape('') + ',' + st.db.escape(0) + ',' + st.db.escape(0);
 
                                                 for (var e = 0; e < emailArray.length; e++){
-                                                    mailerApi.sendMail('sales_lead_template', {
-                                                        ezeoneId : 'email',
-                                                        message : 'message'
+                                                    mailerApi.sendMail('job_post_template', {
+                                                        userName : 'abc',
+                                                        JobType : jobTypeList[jobType],
+                                                        JobTitle : jobTitle,
+                                                        JobCode : jobCode,
+                                                        CompanyName : notificationResult[1][0].cn
 
                                                     }, '', emailArray[e]);
 

@@ -111,6 +111,11 @@
         "file" : "sales_enquiry_mail.html",
         "subject" : "Sales Enquiry"
       },
+      "job_post_template" : {
+        "params" : ["userName", "JobType", "JobTitle", "JobCode", "CompanyName"],
+        "file" : "job_post_mail.html",
+        "subject" : "New Job"
+      },
       "default": {
         "params": ["HTML"],
         "file": "default.html",
