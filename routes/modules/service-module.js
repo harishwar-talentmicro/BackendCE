@@ -1294,13 +1294,13 @@ Service.prototype.addMembersToService = function(req,res,next){
                                                 }
                                             }
                                             else {
-                                                responseMessage.message = 'Member not add';
+                                                responseMessage.message = 'Member added successfully';
                                                 res.status(200).json(responseMessage);
                                                 console.log('FnAddMembersToService:Member not add');
                                             }
                                         }
                                         else {
-                                            responseMessage.message = 'Member not add';
+                                            responseMessage.message = 'Member added successfully';
                                             res.status(200).json(responseMessage);
                                             console.log('FnAddMembersToService:Member not add');
                                         }
