@@ -773,10 +773,10 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                                ae : notiResult[1][0].ae,
                                                                                an : notiResult[1][0].an,
                                                                                replyObject : notiResult[2],
-                                                                               communityEzeId : notiResult[1][0].ae,
+                                                                               communityEzeId : notiResult[1][0].communtyEzeId,
                                                                                ha : 1,
-                                                                               totalPoints : notiResult[0][i].total_points,
-                                                                               por : notiResult[0][i].por
+                                                                               totalPoints : notiResult[1][0].total_points,
+                                                                               por : notiResult[1][0].por
                                                                            };
                                                                            var messageId = 0;
                                                                            var masterId = 0;
@@ -1075,10 +1075,10 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                     ae : notiResult[1][0].ae,
                                                                                     an : notiResult[1][0].an,
                                                                                     replyObject : notiResult[2],
-                                                                                    communtyEzeId : notiResult[1][0].ae,
+                                                                                    communtyEzeId : notiResult[1][0].communtyEzeId,
                                                                                     ha : notiResult[0][i].ha,
-                                                                                    totalPoints : notiResult[0][i].total_points,
-                                                                                    por : notiResult[0][i].por
+                                                                                    totalPoints : notiResult[1][0].total_points,
+                                                                                    por : notiResult[1][0].por
                                                                                 };
                                                                                 console.log(data);
                                                                                 var messageId = 0;
