@@ -116,6 +116,11 @@
         "file" : "job_post_mail.html",
         "subject" : "New Job"
       },
+      "job_apply_comapney_template" : {
+        "params" : ["ezeoneId", "JobType", "JobTitle", "JobCode", "DateTime"],
+        "file" : "job_post_mail.html",
+        "subject" : "Candidate applied to Job "
+      },
       "default": {
         "params": ["HTML"],
         "file": "default.html",

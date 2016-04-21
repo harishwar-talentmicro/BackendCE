@@ -304,19 +304,23 @@ router.post('/job_seeker',function(req,res,next){
         switch (source){
             case "1,2" :
                 jobSeekerQuery +=
-                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
-                     CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
+                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,(SELECT GROUP_CONCAT(Locname) FROM mjobloc WHERE \
+                     find_in_set(mjobloc.tid,(SELECT GROUP_CONCAT(CityID) FROM tprefferedcities WHERE CVID=tcv.TID))) as location,\
+                     tcv.OID,tcv.MasterID, \
+                     CONCAT(tcv.firstname,' ',tcv.lastName) AS Name,\
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +
+                tcv.KeySkills, tcv.mobile_no, IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +
                     "   WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
                 jobSeekerQuery+=subQuery   ;
                 jobSeekerQuery +=
                     " UNION " +
-                    " SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    " SELECT tcv.TID AS cvid,(SELECT GROUP_CONCAT(Locname) FROM mjobloc WHERE \
+                     find_in_set(mjobloc.tid,(SELECT GROUP_CONCAT(CityID) FROM tprefferedcities WHERE CVID=tcv.TID))) as location,\
+                tcv.OID,tcv.MasterID,\
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +"  \
+                    tcv.KeySkills, tcv.mobile_no,IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +"  \
                     WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0 AND OID = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
                 jobSeekerQuery+=subQuery ;
@@ -342,19 +346,25 @@ router.post('/job_seeker',function(req,res,next){
 
             case "2,1":
                 jobSeekerQuery +=
-                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
-                     CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
+                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,(SELECT GROUP_CONCAT(Locname) FROM mjobloc WHERE \
+                     find_in_set(mjobloc.tid,(SELECT GROUP_CONCAT(CityID) FROM tprefferedcities WHERE CVID=tcv.TID))) as location,\
+                     tcv.OID,tcv.MasterID, \
+                     CONCAT(tcv.firstname,' ',tcv.lastName) AS Name,\
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +
+                tcv.KeySkills, tcv.mobile_no, IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
+                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +
                     "   WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
                 jobSeekerQuery+=subQuery   ;
                 jobSeekerQuery +=
                     " UNION " +
-                    " SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    " SELECT tcv.TID AS cvid,(SELECT GROUP_CONCAT(Locname) FROM mjobloc WHERE \
+                     find_in_set(mjobloc.tid,(SELECT GROUP_CONCAT(CityID) FROM tprefferedcities WHERE CVID=tcv.TID))) as location,\
+                tcv.OID,tcv.MasterID,\
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +"  \
+                    tcv.KeySkills, tcv.mobile_no,IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
+                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +"  \
                     WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0 AND OID = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ? " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") "  : "";
                 jobSeekerQuery+=subQuery ;
@@ -367,10 +377,13 @@ router.post('/job_seeker',function(req,res,next){
 
             case "2":
                 jobSeekerQuery +=
-                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID,\
+                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,(SELECT GROUP_CONCAT(Locname) FROM mjobloc WHERE \
+                     find_in_set(mjobloc.tid,(SELECT GROUP_CONCAT(CityID) FROM tprefferedcities WHERE CVID=tcv.TID))) as location,\
+                    tcv.OID,tcv.MasterID,\
                     (SELECT CONCAT(FirstName,' ',LastName) FROM tmaster WHERE tmaster.TID = tcv.MasterID) AS Name, \
                     tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                    tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +" \
+                    tcv.KeySkills, tcv.mobile_no, IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
+                    + status + " FROM tcv AS tcv "+ edujoin + locjoin + filterQuery1 +" \
                     WHERE tcv.MasterID > 0 and tcv.Status=1 and tcv.jobid=0  AND OID = 0  " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") " : "";
                 jobSeekerQuery+=subQuery ;
@@ -391,10 +404,13 @@ router.post('/job_seeker',function(req,res,next){
             default :
 
                 jobSeekerQuery +=
-                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid,tcv.OID,tcv.MasterID, \
+                    " SELECT SQL_CALC_FOUND_ROWS * from (SELECT tcv.TID AS cvid, (SELECT GROUP_CONCAT(Locname) FROM mjobloc WHERE \
+                     find_in_set(mjobloc.tid,(SELECT GROUP_CONCAT(CityID) FROM tprefferedcities WHERE CVID=tcv.TID))) as location,\
+                    tcv.OID,tcv.MasterID, \
                      CONCAT(tcv.firstname,' ',tcv.lastName) AS Name, \
                 tcv.salary AS ctc, tcv.Exp, tcv.noticeperiod, \
-                tcv.KeySkills, tcv.mobile_no, tcv.CVDoc " + status + " FROM tcv AS tcv " + edujoin + locjoin + filterQuery1 +
+                tcv.KeySkills, tcv.mobile_no,  IF(OID=0,(SELECT image from t_docsandurls WHERE masterid=tcv.MasterID AND tag='CV' AND imageurl=0 LIMIT 0,1),tcv.CVDoc) as CVDoc "
+                    + status + " FROM tcv AS tcv " + edujoin + locjoin + filterQuery1 +
                     " WHERE  FIND_IN_SET(tcv.OID,@user_ids) and tcv.Status=1 AND tcv.jobid = 0 " + source1GenderQuery ;
                 jobSeekerQuery += (skillKeywordsQueryParts.length) ?  " AND ( "+ skillKeywordsQueryParts.join(" OR ") +") ": "";
                 jobSeekerQuery+=subQuery   ;

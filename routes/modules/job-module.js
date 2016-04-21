@@ -29,7 +29,7 @@ var mailerApi = new Mailer();
 var notification = null;
 var notificationQmManager = null;
 var fs = require('fs');
-
+var moment = require('moment');
 
 var st = null;
 function Job(db,stdLib){
@@ -911,7 +911,7 @@ Job.prototype.searchJobs = function(req,res,next){
             +',' + st.db.escape(toEzeid)+',' + st.db.escape(isAlumniSearch);
         console.log('CALL psearchjobs(' + query + ')');
         st.db.query('CALL psearchjobs(' + query + ')', function (err, getResult) {
-            //console.log(getResult);
+            console.log(getResult);
 
             if (!err) {
                 if (getResult) {
@@ -1424,6 +1424,7 @@ Job.prototype.applyJob = function(req,res,next){
                                         res.status(200).json(responseMessage);
                                         console.log('FnApplyJob: Job apply successfully');
                                         if (insertResult[0][0].Status == 0){
+                                            var dateTime = moment().format('MMMM Do YYYY, h:mm:ss a'); // April 21st 2016, 5:54:50 pm
                                            var notificationQueryParams = st.db.escape(token) + ',' + st.db.escape(jobId);
                                            var notificationQuery = 'CALL pnotify_jobcreator_afterApply(' + notificationQueryParams + ')';
                                            console.log(notificationQuery);
@@ -1435,6 +1436,7 @@ Job.prototype.applyJob = function(req,res,next){
                                                        if (notDetailsRes[0][count].userRights){
                                                            if ((!isNaN(parseInt(notDetailsRes[0][count].userRights.split('')[4]))) &&
                                                                parseInt(notDetailsRes[0][count].userRights.split('')[4]) > 0 ){
+                                                               var fn = (insertResult[0][0].FirstName) ? insertResult[0][0].FirstName : insertResult[0][0].EZEID
                                                                if (notDetailsRes[0][count].ispo){
                                                                    var receiverId = notDetailsRes[0][count].receiverId;
                                                                    var senderTitle = insertResult[0][0].EZEID;
@@ -1442,11 +1444,11 @@ Job.prototype.applyJob = function(req,res,next){
                                                                    var groupId = notDetailsRes[0][count].groupId;
                                                                    var messageText = 'Name has applied to job';
                                                                    /**
-                                                                    * messageType 19 when student will apply to job who has posted
+                                                                    * messageType 22 when student will apply to job who has posted
                                                                     * job and placement officer if verified college will get notification
                                                                     *
                                                                     */
-                                                                   var messageType = 19;
+                                                                   var messageType = 22;
                                                                    var operationType = 0;
                                                                    var iphoneId = notDetailsRes[0][count].iphoneId;
                                                                    var messageId = 0;
@@ -1467,13 +1469,13 @@ Job.prototype.applyJob = function(req,res,next){
                                                                     * which is assigned to this lead
                                                                     */
 
-                                                                   if (notDetailsRes[0][count].CVMailID){
-                                                                       mailerApi.sendMail('sales_lead_template', {
-                                                                           ezeoneId : insertResult[0][0].EZEID,
-                                                                           message : 'salesEnquiryMessage'
-
-                                                                       }, '', notDetailsRes[0][count].CVMailID);
-                                                                   }
+                                                                   //if (notDetailsRes[0][count].CVMailID){
+                                                                   //    mailerApi.sendMail('sales_lead_template', {
+                                                                   //        ezeoneId : insertResult[0][0].EZEID,
+                                                                   //        message : 'salesEnquiryMessage'
+                                                                   //
+                                                                   //    }, '', notDetailsRes[0][count].CVMailID);
+                                                                   //}
 
                                                                }
                                                                else {
@@ -1482,13 +1484,13 @@ Job.prototype.applyJob = function(req,res,next){
                                                                    var senderTitle = insertResult[0][0].EZEID;
                                                                    var groupTitle = notDetailsRes[0][count].groupTitle;
                                                                    var groupId = notDetailsRes[0][count].groupId;
-                                                                   var messageText = 'Name has applied to job';
+                                                                   var messageText = fn +' has applied to job';
                                                                    /**
                                                                     * messageType 19 when student will apply to job who has posted
                                                                     * job and placement officer if verified college will get notification
                                                                     *
                                                                     */
-                                                                   var messageType = 19;
+                                                                   var messageType = 22;
                                                                    var operationType = 0;
                                                                    var iphoneId = notDetailsRes[0][count].iphoneId;
                                                                    var messageId = 0;
@@ -1508,15 +1510,16 @@ Job.prototype.applyJob = function(req,res,next){
                                                                     * Send mail to those users who are falling under the category of the folder
                                                                     * which is assigned to this lead
                                                                     */
-                                                                   if (notDetailsRes[0][count].CVMailID){
-                                                                       mailerApi.sendMail('sales_lead_template', {
-                                                                           ezeoneId : insertResult[0][0].EZEID,
-                                                                           message : 'salesEnquiryMessage'
-
-                                                                       }, '', notDetailsRes[0][count].CVMailID);
-                                                                   }
+                                                                   //if (notDetailsRes[0][count].CVMailID){
+                                                                   //    mailerApi.sendMail('job_apply_comapney_template', {
+                                                                   //        ezeoneId : insertResult[0][0].EZEID,
+                                                                   //        JobType : (insertResult[0][0].JobType) ? insertResult[0][0].JobType : 'FullTime',
+                                                                   //        JobTitle : insertResult[0][0].JobTitle,
+                                                                   //        JobCode : insertResult[0][0].JobCode,
+                                                                   //        DateTime : dateTime
+                                                                   //    }, '', notDetailsRes[0][count].CVMailID);
+                                                                   //}
                                                                }
-
                                                            }
                                                        }
                                                    }
