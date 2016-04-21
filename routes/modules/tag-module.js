@@ -170,6 +170,8 @@ Tag.prototype.saveStandardTags = function(req,res,next){
     var randomName;
     var tagType;
     var imageBuffer;
+    var folder_content = (req.query.folder_content) ? req.query.folder_content : '';
+
 
     if (tag == 0){
         tagType = 0;
@@ -343,7 +345,8 @@ Tag.prototype.saveStandardTags = function(req,res,next){
 
                                 remoteWriteStream.on('finish', function () {
                                     var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                        + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                        + ',' + st.db.escape(tag) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName)
+                                        + ',' + st.db.escape(folder_content);
 
                                     var query = 'CALL psavedocsandurls(' + queryParams + ')';
                                     console.log(query);
@@ -405,7 +408,8 @@ Tag.prototype.saveStandardTags = function(req,res,next){
                             randomName = req.body.link;
 
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                + ',' + st.db.escape(tag.toString().toUpperCase()) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                + ',' + st.db.escape(tag.toString().toUpperCase()) + ',' + st.db.escape(pin)
+                                + ',' + st.db.escape(randomName)+ ',' + st.db.escape(folder_content);
 
 
                             var query = 'CALL psavedocsandurls(' + queryParams + ')';
@@ -723,6 +727,7 @@ Tag.prototype.saveTags = function(req,res,next){
     var link = (req.query.link) ? req.query.link : '';
     var tag = (req.query.tag) ? req.query.tag : '';
     var pin = (!isNaN(parseInt(req.query.pin))) ?  parseInt(req.query.pin) : 0;
+    var folder_content = (req.query.folder_content) ? req.query.folder_content : '';
 
     var errorList = {};
     var validationStatus = true;
@@ -798,7 +803,7 @@ Tag.prototype.saveTags = function(req,res,next){
 
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(1) + ',' +
                                 st.db.escape('')+ ',' + st.db.escape(tag) + ',' + st.db.escape(pin) +
-                                ',' + st.db.escape(link);
+                                ',' + st.db.escape(link) + ',' + st.db.escape(folder_content)  ;
 
                             var tagQuery = "CALL psavedocsandurls("+queryParams+")";
 
@@ -862,7 +867,7 @@ Tag.prototype.saveTags = function(req,res,next){
                                 if(!err){
                                     var queryParams = st.db.escape(token) + ',' + st.db.escape('0') + ',' +
                                         st.db.escape(originalFileName)+ ',' + st.db.escape(tag) + ',' + st.db.escape(pin) +
-                                        ',' + st.db.escape(uniqueFileName);
+                                        ',' + st.db.escape(uniqueFileName)+ ',' + st.db.escape(folder_content);
 
                                     var tagQuery = "CALL psavedocsandurls("+queryParams+")";
 
@@ -1070,7 +1075,7 @@ Tag.prototype.getTags = function(req,res,next){
 
     var token = req.query.token;
     var startCount = ((!isNaN(parseInt(req.query.pc))) && parseInt(req.query.pc) > 0) ?  parseInt(req.query.pc) : 0;
-    var recordsPerPage = ((!isNaN(parseInt(req.query.ps))) && parseInt(req.query.ps) > 0 ) ?  parseInt(req.query.ps) : 10;
+    var recordsPerPage = ((!isNaN(parseInt(req.query.ps))) && parseInt(req.query.ps) > 0 ) ?  parseInt(req.query.ps) : 500;
     req.query.q = (req.query.q) ? req.query.q : '';
 
     var output = [];
@@ -1106,7 +1111,7 @@ Tag.prototype.getTags = function(req,res,next){
                         console.log(query);
                         st.db.query(query, function (err, getresult) {
                             if (!err) {
-                                //console.log(getresult);
+                                console.log(getresult);
                                 if(getresult) {
                                     if (getresult[0]) {
 
@@ -1123,8 +1128,6 @@ Tag.prototype.getTags = function(req,res,next){
                                             req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].path;
                                             output.push(result);
                                         }
-
-
                                         responseMessage.status = true;
                                         responseMessage.tc = (getresult[1]) ? ((getresult[1][0]) ? getresult[1][0].tc : 0) : 0;
                                         responseMessage.error = null;
@@ -1313,6 +1316,7 @@ Tag.prototype.savePictures = function(req,res,next) {
     var imageBuffer;
     var tags;
     var spQuery;
+    var folder_content;
     params = params.split(',');
     console.log('----------params--------');
     console.log(params);
@@ -1324,6 +1328,7 @@ Tag.prototype.savePictures = function(req,res,next) {
     pin = (params[4]) ? params[4] : null;
     link = (params[5]) ? params[5] : '';
     tid = (params[6]) ? params[6] : 0;
+    folder_content = (params[7]) ? params[7] : '';
 
 
     if (tagType == 0) {
@@ -1437,12 +1442,14 @@ Tag.prototype.savePictures = function(req,res,next) {
                     remoteWriteStream.on('finish', function () {
                         if (token) {
                             var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName)
+                                + ',' + st.db.escape(folder_content);
                             spQuery = 'CALL psavedocsandurls(' + queryParams + ')';
                         }
                         else {
                             var queryParams = st.db.escape(parseInt(tid)) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                                + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName)
+                                + ',' + st.db.escape(folder_content);
 
                             spQuery = 'CALL psavedocsandurlsAP(' + queryParams + ')';
                         }
@@ -1506,7 +1513,8 @@ Tag.prototype.savePictures = function(req,res,next) {
                 randomName = (req.body.link) ? req.body.link : '';
 
                 var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                    + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+                    + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName)
+                    + ',' + st.db.escape(folder_content);
 
 
                 var query = 'CALL psavedocsandurls(' + queryParams + ')';

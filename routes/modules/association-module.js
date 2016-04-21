@@ -772,7 +772,7 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                                isvideo : notiResult[1][0].isvideo,
                                                                                ae : notiResult[1][0].ae,
                                                                                an : notiResult[1][0].an,
-                                                                               replyObject : notiResult[2],
+                                                                               replayObject : notiResult[2],
                                                                                communityEzeId : notiResult[1][0].communtyEzeId,
                                                                                ha : 1,
                                                                                totalPoints : notiResult[1][0].total_points,
@@ -793,21 +793,19 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                            /**
                                                                             * messageType 14 is for helpdesk request to admin
                                                                             */
-                                                                           var messageType = 14;
+                                                                           var messageType = 18;
                                                                            var operationType = 0;
                                                                            var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                           if(iphoneId){
-                                                                               console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                               notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                               console.log("Notification Send");
-                                                                           }
-                                                                           else {
-                                                                               console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                   operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                               notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                   operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                               console.log("Notification Send");
-                                                                           }
+                                                                           console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                               operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                           notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                               operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                           console.log("Notification Send");
+                                                                           //if(iphoneId){
+                                                                           //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                           //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                           //    console.log("Notification Send");
+                                                                           //}
 
                                                                        }
                                                                    }
@@ -1074,7 +1072,7 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                     isvideo : notiResult[1][0].isvideo,
                                                                                     ae : notiResult[1][0].ae,
                                                                                     an : notiResult[1][0].an,
-                                                                                    replyObject : notiResult[2],
+                                                                                    replayObject : notiResult[2],
                                                                                     communtyEzeId : notiResult[1][0].communtyEzeId,
                                                                                     ha : notiResult[0][i].ha,
                                                                                     totalPoints : notiResult[1][0].total_points,
@@ -1096,21 +1094,19 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                 /**
                                                                                  * messageType 15 is helpdesk admin response to user
                                                                                  */
-                                                                                var messageType = 15;
+                                                                                var messageType = 19;
                                                                                 var operationType = 0;
                                                                                 var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                                if (iphoneId){
-                                                                                    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                    console.log("Notification Send");
-                                                                                }
-                                                                                else {
-                                                                                    console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                                    console.log("Notification Send");
-                                                                                }
+                                                                                console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                console.log("Notification Send");
+                                                                                //if (iphoneId){
+                                                                                //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                //    console.log("Notification Send");
+                                                                                //}
                                                                             }
                                                                         }
                                                                     }
@@ -1835,21 +1831,19 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                                 /**
                                                                                  * messageType 16 is event/poster/poll/ posted after approval of admin
                                                                                  */
-                                                                                var messageType = 16;
+                                                                                var messageType = 20;
                                                                                 var operationType = 0;
                                                                                 var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                                if (iphoneId){
-                                                                                    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                    console.log("Notification Send");
-                                                                                }
-                                                                                else {
-                                                                                    console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                                    console.log("Notification Send");
-                                                                                }
+                                                                                console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                console.log("Notification Send");
+                                                                                //if (iphoneId){
+                                                                                //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                //    console.log("Notification Send");
+                                                                                //}
                                                                             }
                                                                         }
                                                                     }
@@ -2217,21 +2211,19 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 /**
                                                                                  * messageType 16 is event/poster/poll/ posted after approval of admin
                                                                                  */
-                                                                                var messageType = 16;
+                                                                                var messageType = 20;
                                                                                 var operationType = 0;
                                                                                 var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                                if (iphoneId){
-                                                                                    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                    console.log("Notification Send");
-                                                                                }
-                                                                                else {
-                                                                                    console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                                    console.log("Notification Send");
-                                                                                }
+                                                                                console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                                    operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                                console.log("Notification Send");
+                                                                                //if (iphoneId){
+                                                                                //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                                //    console.log("Notification Send");
+                                                                                //}
                                                                             }
                                                                         }
                                                                     }
@@ -2749,21 +2741,19 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                                     /**
                                                                      * messageType 17 is event/poster/poll/ posted after approval of admin
                                                                      */
-                                                                    var messageType = 17;
+                                                                    var messageType = 21;
                                                                     var operationType = 0;
                                                                     var iphoneId = (notiResult[0][i].iphoneId)? notiResult[0][i].iphoneId : null;
-                                                                    if (iphoneId){
-                                                                        console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                        notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                        console.log("Notification Send");
-                                                                    }
-                                                                    else {
-                                                                        console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                            operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                        notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
-                                                                            operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
-                                                                        console.log("Notification Send");
-                                                                    }
+                                                                    console.log(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
+                                                                        operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
+                                                                    console.log("Notification Send");
+                                                                    //if (iphoneId){
+                                                                    //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                    //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
+                                                                    //    console.log("Notification Send");
+                                                                    //}
                                                                 }
                                                             }
                                                         }
