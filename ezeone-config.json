@@ -1,4 +1,3 @@
-
 {
   "CONSTANT" : {
     "INDEX_PATH" : "../public/index.html",
@@ -118,7 +117,7 @@
       },
       "job_apply_comapney_template" : {
         "params" : ["ezeoneId", "JobType", "JobTitle", "JobCode", "DateTime"],
-        "file" : "job_post_mail.html",
+        "file" : "job_apply_company.html",
         "subject" : "Candidate applied to Job "
       },
       "default": {

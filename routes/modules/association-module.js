@@ -791,7 +791,7 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                            var txId = 0;
                                                                            var issos = false;
                                                                            /**
-                                                                            * messageType 14 is for helpdesk request to admin
+                                                                            * messageType 18 is for helpdesk request to admin
                                                                             */
                                                                            var messageType = 18;
                                                                            var operationType = 0;
@@ -801,11 +801,6 @@ Association.prototype.saveAssociationServices = function(req,res,next){
                                                                            notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                            console.log("Notification Send");
-                                                                           //if(iphoneId){
-                                                                           //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                           //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                           //    console.log("Notification Send");
-                                                                           //}
 
                                                                        }
                                                                    }
@@ -1092,7 +1087,7 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                 var txId = 0;
                                                                                 var issos = false;
                                                                                 /**
-                                                                                 * messageType 15 is helpdesk admin response to user
+                                                                                 * messageType 19 is helpdesk admin response to user
                                                                                  */
                                                                                 var messageType = 19;
                                                                                 var operationType = 0;
@@ -1102,11 +1097,6 @@ Association.prototype.updateAssociationServices = function(req,res,next){
                                                                                 notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                     operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                                 console.log("Notification Send");
-                                                                                //if (iphoneId){
-                                                                                //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                //    console.log("Notification Send");
-                                                                                //}
                                                                             }
                                                                         }
                                                                     }
@@ -1829,7 +1819,7 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                                 var txId = 0;
                                                                                 var issos = false;
                                                                                 /**
-                                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                                 * messageType 20 is event/poster/poll/ posted after approval of admin
                                                                                  */
                                                                                 var messageType = 20;
                                                                                 var operationType = 0;
@@ -1839,11 +1829,6 @@ Association.prototype.saveAssociationTenMaster = function(req,res,next){
                                                                                 notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                     operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                                 console.log("Notification Send");
-                                                                                //if (iphoneId){
-                                                                                //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                //    console.log("Notification Send");
-                                                                                //}
                                                                             }
                                                                         }
                                                                     }
@@ -2192,10 +2177,6 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                     communityEzeId : req.body.code,
                                                                                     pa : notiResult[0][i].pa
                                                                                 };
-
-                                                                                /**
-                                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
-                                                                                 */
                                                                                 var messageId = 0;
                                                                                 var masterId = 0;
                                                                                 var latitude = '';
@@ -2209,7 +2190,7 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 var txId = 0;
                                                                                 var issos = false;
                                                                                 /**
-                                                                                 * messageType 16 is event/poster/poll/ posted after approval of admin
+                                                                                 * messageType 20 is event/poster/poll/ posted after approval of admin
                                                                                  */
                                                                                 var messageType = 20;
                                                                                 var operationType = 0;
@@ -2219,11 +2200,6 @@ Association.prototype.saveAssociationOpinionPoll = function(req,res,next){
                                                                                 notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                                     operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                                 console.log("Notification Send");
-                                                                                //if (iphoneId){
-                                                                                //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                                //    console.log("Notification Send");
-                                                                                //}
                                                                             }
                                                                         }
                                                                     }
@@ -2739,7 +2715,7 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                                     var txId = 0;
                                                                     var issos = false;
                                                                     /**
-                                                                     * messageType 17 is event/poster/poll/ posted after approval of admin
+                                                                     * messageType 21 is event/poster/poll/ posted after approval of admin
                                                                      */
                                                                     var messageType = 21;
                                                                     var operationType = 0;
@@ -2749,11 +2725,7 @@ Association.prototype.associationUpdateTenStatus = function(req,res,next){
                                                                     notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType,
                                                                         operationType, iphoneId,messageId,masterId,latitude,longitude,priority,dateTime,a_name,msgUserid,jobId,aUrl,txId,data,issos);
                                                                     console.log("Notification Send");
-                                                                    //if (iphoneId){
-                                                                    //    console.log(senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                    //    notification.publish(receiverId,senderTitle, groupTitle, groupId, messageText, messageType, operationType, iphoneId,data);
-                                                                    //    console.log("Notification Send");
-                                                                    //}
+
                                                                 }
                                                             }
                                                         }

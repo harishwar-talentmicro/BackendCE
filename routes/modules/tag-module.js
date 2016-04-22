@@ -718,10 +718,7 @@ function FnCropImage(imageParams, callback){
  * @description api code for save tags
  */
 Tag.prototype.saveTags = function(req,res,next){
-
-
     var standardTagList = ['PIC','1','2','3','4','5','0'];
-
     var token = (req.query.token) ? req.query.token : '';
     var type = (!isNaN(parseInt(req.query.type)))  ?  parseInt(req.query.type) : 0;  // 0-image, 1- url
     var link = (req.query.link) ? req.query.link : '';
@@ -732,21 +729,18 @@ Tag.prototype.saveTags = function(req,res,next){
     var errorList = {};
     var validationStatus = true;
 
-
     var fileProperty = '';
 
     if(!token){
         errorList['token'] = 'Invalid token';
         validationStatus *= false;
     }
-
-    if(type){
+    if(type == 1){
         if(!link){
             errorList['link'] = 'Link is required';
             validationStatus *= false;
         }
     }
-
     if(!type){
         if(req.files){
             for(var pr in req.files){
@@ -755,7 +749,6 @@ Tag.prototype.saveTags = function(req,res,next){
                     console.log(req.files);
                 }
             }
-
             if(!pr){
                 errorList['image'] = 'File/document is required';
                 validationStatus *= false;
@@ -766,7 +759,6 @@ Tag.prototype.saveTags = function(req,res,next){
             validationStatus *= false;
         }
     }
-
     if(!tag){
         errorList['tag'] = 'Tag is required';
         validationStatus *= false;
@@ -778,9 +770,6 @@ Tag.prototype.saveTags = function(req,res,next){
             validationStatus *= false;
         }
     }
-
-
-
     var respMsg = {
         status : false,
         error : null,
@@ -793,20 +782,14 @@ Tag.prototype.saveTags = function(req,res,next){
             st.validateToken(token, function (err, tokenResult) {
                 if(!err){
                     if(tokenResult){
-
-
                         if(type){
                             /**
                              * Directly save into db
                              */
-
-
-                            var queryParams = st.db.escape(token) + ',' + st.db.escape(1) + ',' +
+                            var queryParams = st.db.escape(token) + ',' + st.db.escape(type) + ',' +
                                 st.db.escape('')+ ',' + st.db.escape(tag) + ',' + st.db.escape(pin) +
                                 ',' + st.db.escape(link) + ',' + st.db.escape(folder_content)  ;
-
                             var tagQuery = "CALL psavedocsandurls("+queryParams+")";
-
                             console.log(tagQuery);
                             st.db.query(tagQuery,function(err,tQResults){
                                 if(err){
@@ -815,7 +798,7 @@ Tag.prototype.saveTags = function(req,res,next){
                                     res.status(400).json(respMsg);
                                 }
                                 else{
-                                    //console.log(tQResults);
+                                    console.log(tQResults);
                                     if(tQResults){
                                         if(tQResults.affectedRows){
                                             respMsg.status = true;
@@ -838,15 +821,11 @@ Tag.prototype.saveTags = function(req,res,next){
                                     }
                                 }
                             });
-
                         }
                         else {
                             /**
                              * Upload file to cloud and then save to db
                              */
-
-
-
                             var readStream = fs.createReadStream(req.files[pr].path);
                             var uniqueFileName = uuid.v4() + ((req.files[pr].extension) ? ('.' + req.files[pr].extension) : '');
                             var originalFileName = req.files[pr].originalname;
@@ -861,16 +840,12 @@ Tag.prototype.saveTags = function(req,res,next){
                             else {
                                 originalFileName = req.files[pr].originalname;
                             }
-
-
                             uploadDocumentToCloud(uniqueFileName,readStream,function(err){
                                 if(!err){
                                     var queryParams = st.db.escape(token) + ',' + st.db.escape('0') + ',' +
                                         st.db.escape(originalFileName)+ ',' + st.db.escape(tag) + ',' + st.db.escape(pin) +
                                         ',' + st.db.escape(uniqueFileName)+ ',' + st.db.escape(folder_content);
-
                                     var tagQuery = "CALL psavedocsandurls("+queryParams+")";
-
                                     console.log(tagQuery);
                                     st.db.query(tagQuery,function(err,tQResults){
                                         if(err){
@@ -879,7 +854,7 @@ Tag.prototype.saveTags = function(req,res,next){
                                             res.status(400).json(respMsg);
                                         }
                                         else{
-                                            //console.log(tQResults);
+                                            console.log(tQResults);
                                             if(tQResults){
                                                 if(tQResults.affectedRows){
                                                     respMsg.status = true;
@@ -906,9 +881,7 @@ Tag.prototype.saveTags = function(req,res,next){
                                 else{
                                     res.status(400).json(respMsg);
                                 }
-
                             });
-
                         }
                     }
                     else{
@@ -935,7 +908,6 @@ Tag.prototype.saveTags = function(req,res,next){
 
         res.status(400).json(respMsg);
     }
-
 };
 
 /**
@@ -1126,6 +1098,7 @@ Tag.prototype.getTags = function(req,res,next){
                                             result.s_url = (getresult[0][i].type) ?
                                                 getresult[0][i].path :
                                             req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + getresult[0][i].path;
+                                            result.folder_content = (getresult[0][i].folder_content) ?  getresult[0][i].folder_content : '';
                                             output.push(result);
                                         }
                                         responseMessage.status = true;
@@ -1448,8 +1421,8 @@ Tag.prototype.savePictures = function(req,res,next) {
                         }
                         else {
                             var queryParams = st.db.escape(parseInt(tid)) + ',' + st.db.escape(type) + ',' + st.db.escape(originalFileName)
-                                + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName)
-                                + ',' + st.db.escape(folder_content);
+                                + ',' + st.db.escape(tagType) + ',' + st.db.escape(pin) + ',' + st.db.escape(randomName);
+
 
                             spQuery = 'CALL psavedocsandurlsAP(' + queryParams + ')';
                         }
@@ -1465,7 +1438,7 @@ Tag.prototype.savePictures = function(req,res,next) {
                                         type: type,
                                         tag: tagType,
                                         pin: (!isNaN(parseInt(pin))) ? parseInt(pin) : null,
-                                        s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName
+                                        s_url : req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + randomName,
                                     };
                                     res.status(200).json(responseMessage);
                                     console.log('FnSavePictures: Image Saved  successfully');

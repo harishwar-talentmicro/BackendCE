@@ -96,18 +96,22 @@ msgNotification.prototype.sendComposeMessage= function(msgContent, callBack) {
                                                                         if (groupDetails[0][0].tid != groupDetails[1][i].tid) {
                                                                             var receiverId = groupDetails[1][i].tid;
                                                                             var senderTitle = groupDetails[0][0].groupname;
-                                                                            if (id_type == 0) {
+
+                                                                                if (id_type == 0) {
                                                                                 groupId = groupInfo[0][0].groupid;
                                                                                 groupTitle = groupInfo[0][0].groupname;
+                                                                                console.log("groupId",groupId,"----",groupTitle);
+                                                                                var iphoneId = groupDetails[1][i].iphoneId;
                                                                             }
                                                                             else {
                                                                                 groupId = groupDetails[0][0].tid;
                                                                                 groupTitle = groupDetails[0][0].groupname;
+                                                                                var iphoneId = iosId;
                                                                             }
                                                                             var messageText = msgContent.message;
                                                                             var messageType = id_type;
                                                                             var operationType = 0;
-                                                                            var iphoneId = iosId;
+
                                                                             var messageId = msgContent.message_id;
                                                                             var msgUserid = msgContent.message_userid;
                                                                             var masterid = groupDetails[0][0].AdminID;
