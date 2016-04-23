@@ -153,6 +153,7 @@ router.get('/role',businessManager.getRoles);
 router.get('/m/sales_transaction',businessManager.getTransactionOfSales);
 router.post('/external_sales_request', businessManager.saveExternalsalesRequest);
 router.get('/m/sales_trans_details', businessManager.getSalesTransDetails);
+//router.get('/test_sales_mail', businessManager.testFunction);
 
 //Configuration module methods
 var Configuration = require('./modules/configuration-module.js');

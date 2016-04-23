@@ -199,8 +199,8 @@ Service.prototype.getServiceProviders = function(req,res,next){
             st.validateToken(token, function (err, result) {
                 if (!err) {
                     if (result) {
-                        var queryParams =   st.db.escape(token) + ',' + st.db.escape(dateTime)+ ',' + st.db.escape(lat)
-                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(serviceType);
+                        var queryParams =   st.db.escape(token) + ',' + st.db.escape(lat)
+                            + ',' + st.db.escape(lng)+ ',' + st.db.escape(serviceType) + ',' + st.db.escape(req.query.service_mid);
                         var query = 'CALL pgetserviceproviders(' + queryParams + ')';
                         console.log(query);
                         st.db.query(query, function (err, serviceResult) {
@@ -208,13 +208,13 @@ Service.prototype.getServiceProviders = function(req,res,next){
                                 if (serviceResult) {
                                     if(serviceResult[0]){
                                         if(serviceResult[1]){
-                                            for(var i=0; i < serviceResult[1].length; i++){
-                                                serviceResult[1][i].tilebanner = serviceResult[1][i].tilebanner ?
+                                            for(var i=0; i < serviceResult[0].length; i++){
+                                                serviceResult[0][i].tilebanner = serviceResult[0][i].tilebanner ?
                                                 req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + serviceResult[1][i].tilebanner: '';
                                             }
                                             res.status(200).json({
-                                                totalcount : (serviceResult[0][0]) ? serviceResult[0][0].totalcount : 0,
-                                                Result : (serviceResult[1]) ? serviceResult[1] : []
+                                                totalcount : (serviceResult[1][0]) ? serviceResult[1][0].totalcount : 0,
+                                                Result : (serviceResult[0]) ? serviceResult[0] : []
                                             });
                                             console.log('FnGetServiceProviders: service providers loaded successfully');
                                         }

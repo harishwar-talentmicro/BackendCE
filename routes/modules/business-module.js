@@ -54,7 +54,7 @@ function alterEzeoneId(ezeoneId){
  */
 var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folderRuleID,salesEnquiryMessage){
     /**
-     * We are getting ezeid then compairing EZEID with TOEZEID
+     * We are getting ezeid(enquiry sender) then compairing EZEID with TOEZEID(to whome enquiry has been sent)
      * We are getting ezeid then compairing EZEID with TOEZEID
      * if EZEID's are not same then only notifications will be sent.
      */
@@ -90,17 +90,23 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
                                                      * rid is folder rule id
                                                      */
                                                     var foldRIDSubuser = (notDetailsRes[0][count].rid) ?
-                                                        notDetailsRes[0][count].rid.split(',') : '';
-                                                    console.log(foldRIDSubuser);
+                                                      notDetailsRes[0][count].rid.split(',') : '';
+
+                                                    var foldRIDSubuserArray = foldRIDSubuser.indexOf(folderRuleID.toString());
+                                                    console.log(foldRIDSubuserArray);
                                                     /**
                                                      * to match string with string using toString
                                                      */
-                                                    if (foldRIDSubuser.indexOf((folderRuleID) ? folderRuleID.toString() : null ) != -1){
+                                                    console.log("Before block");
+                                                    if(foldRIDSubuserArray != -1){
+                                                    //if (foldRIDSubuser.indexOf((folderRuleID.toString()) ? folderRuleID.toString() : null ) != -1){
+                                                        console.log("Coming to this block");
                                                         var receiverId = notDetailsRes[0][count].receiverId;
                                                         var senderTitle = userDetailsRes[0][0].EZEID;
                                                         var groupTitle = notDetailsRes[0][count].groupTitle;
                                                         var groupId = notDetailsRes[0][count].groupId;
                                                         var messageText = 'You have received a lead.';
+
                                                         /**
                                                          * messageType 13 is  for sales enquiry
                                                          *
@@ -120,22 +126,23 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
                                                             messageText, messageType, operationType, iphoneId, messageId, masterid);
                                                         console.log("Notification Send");
 
+                                                        if (notDetailsRes[0][count].SalesMailID){
+                                                            mailerApi.sendMail('sales_lead_template',
+                                                                {
+                                                                    ezeoneId : userDetailsRes[0][0].EZEID,
+                                                                    message : salesEnquiryMessage
 
-                                                        mailerApi.sendMail('sales_lead_template', {
-                                                            ezeoneId : userDetailsRes[0][0].EZEID,
-                                                            message : salesEnquiryMessage
+                                                                }, '', notDetailsRes[0][count].SalesMailID);
 
-                                                        }, '', notDetailsRes[0][count].SalesMailID);
+                                                        }
 
                                                         /**
                                                          * Send mail to those users who are falling under the category of the folder
                                                          * which is assigned to this lead
                                                          */
-
                                                     }
                                                 }
                                             }
-
                                         }
                                     }
                                     else {
@@ -169,6 +176,12 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
 
     });
 };
+
+
+//BusinessManager.prototype.testFunction = function(req,res,next){
+//    sendNotificationAndMailToSubuser('dc32e06e-0879-11e6-9705-42010af00003','@sgowri2','10907','message');
+//    res.status(200);
+//};
 
 /**
  * Method : GET
@@ -997,7 +1010,8 @@ BusinessManager.prototype.sendSalesRequest = function(req,res,next){
                                                  * passing folder rule id to check folder access
                                                  */
                                                 if (!TID) {
-                                                    sendNotificationAndMailToSubuser(Token, ToEZEID, FunctionType, transResult[0][0].rid,MessageText);
+                                                    var fun = sendNotificationAndMailToSubuser(Token, ToEZEID, FunctionType, transResult[0][0].rid,MessageText);
+                                                    console.log(fun);
                                                 }
                                                 var proposal_message = '';
                                                 if (transResult[2]) {
