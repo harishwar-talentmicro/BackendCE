@@ -743,7 +743,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
                                         }
                                     }
                                     else {
-                                        console.log('FnHolidayList: sending holiday list error ' + error);
+                                        console.log('FnHolidayList: sending holiday list error ' + err);
                                         CallBack();
                                     }
                                 });

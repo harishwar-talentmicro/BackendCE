@@ -1872,7 +1872,6 @@ Job.prototype.jobs = function(req,res,next){
                                             }
                                         }
                                         else {
-
                                             responseMessage.message = 'Jobs not loaded ';
                                             console.log('FnJobs: Jobs not loaded');
                                             res.status(200).json(responseMessage);
