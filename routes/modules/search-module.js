@@ -630,8 +630,6 @@ Search.prototype.searchInformation = function(req,res,next){
                                                 output.push(result);
                                             }
                                         }
-
-
                                         res.json({result: UserInfoResult[0][0], banners: output});
                                         console.log('FnGetSearchInformationNew: tmaster: Search result sent successfully');
                                     }
@@ -793,7 +791,7 @@ Search.prototype.getWorkingHrsHolidayList = function (req, res) {
                                         }
                                     }
                                     else {
-                                        console.log('FnHolidayList: sending holiday list error ' + error);
+                                        console.log('FnHolidayList: sending holiday list error ');
                                         CallBack();
                                     }
                                 });

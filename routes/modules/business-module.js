@@ -92,8 +92,10 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
                                                     var foldRIDSubuser = (notDetailsRes[0][count].rid) ?
                                                       notDetailsRes[0][count].rid.split(',') : '';
 
-                                                    var foldRIDSubuserArray = foldRIDSubuser.indexOf(folderRuleID.toString());
-                                                    console.log(foldRIDSubuserArray);
+                                                    if (folderRuleID){
+                                                        var foldRIDSubuserArray = foldRIDSubuser.indexOf(folderRuleID.toString());
+                                                        console.log(foldRIDSubuserArray);
+                                                    }
                                                     /**
                                                      * to match string with string using toString
                                                      */
@@ -135,7 +137,6 @@ var sendNotificationAndMailToSubuser = function(token,toEZEID,functionType,folde
                                                                 }, '', notDetailsRes[0][count].SalesMailID);
 
                                                         }
-
                                                         /**
                                                          * Send mail to those users who are falling under the category of the folder
                                                          * which is assigned to this lead

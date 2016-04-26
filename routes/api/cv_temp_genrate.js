@@ -171,7 +171,6 @@ router.post('/',function(req,res,next){
 
 });
 
-
 router.post('/test_code',function(req,res,next){
     var if_not_ref = '';
     var reference = req.body.reference;
@@ -244,5 +243,61 @@ router.post('/test_code',function(req,res,next){
 
 });
 
+
+var geocoderProvider = 'google';
+var httpAdapter = 'http';
+// optional
+//var extra = {
+//    apiKey: 'YOUR_API_KEY', // for Mapquest, OpenCage, Google Premier
+//    formatter: null         // 'gpx', 'string', ...
+//};
+
+var geocoder = require('node-geocoder')(geocoderProvider, httpAdapter);
+
+router.get('/test_add', function(req,res,next){
+    var cmbQuery = '';
+    var geoQuery = 'SELECT lat ,longg as lon ,masterid FROM address_test where  address is null ';
+    req.st.db.query(geoQuery, function (err, queryResult) {
+        console.log(queryResult);
+        if (!err) {
+            if(queryResult){
+                for (var i = 0; i < queryResult.length; i++){
+                    testFunction(queryResult[i].lat,queryResult[i].lon,queryResult[i].masterid);
+                }
+                res.status(200).json(queryResult);
+            }
+        }
+        else {
+            console.log('error in psavejobnotification');
+        }
+    });
+var testFunction = function(lat,lng,id){
+
+    var geocoderProvider = 'google';
+    var httpAdapter = 'https';
+// optional
+    var extra = {
+        apiKey: 'AIzaSyBr6vVcI-3fov2urOfRukcHdkKlLHz6xh8', // for Mapquest, OpenCage, Google Premier
+        formatter: null         // 'gpx', 'string', ...
+    };
+
+
+    var geocoder = require('node-geocoder')(geocoderProvider, httpAdapter,extra);
+    geocoder.reverse({lat:lat, lon:lng}, function(err, result) {
+        //geocoder.getFromLocation(queryResult[i].lat ,queryResult[i].lon,1, function(err, reasult) {
+        console.log(result);
+        var addUpdateQuery = 'UPDATE address_test SET address='+req.db.escape(result[0].formattedAddress)+
+            ' WHERE masterid=' +req.db.escape(id)+';';
+        console.log(addUpdateQuery);
+        req.st.db.query(addUpdateQuery, function (err, queryResult){
+            if (!err){
+                if (queryResult){
+                }
+
+            }
+        });
+    });
+};
+});
 
 module.exports = router;
